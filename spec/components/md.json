@@ -72,6 +72,10 @@
     ],
     "api": [
       [
+        "createMarkdown(空容器, { source, codeMax, imgH, tableMax })",
+        "satin-ui/markdown"
+      ],
+      [
         "renderMarkdown(容器, 文本, 选项)",
         "satin-ui/markdown"
       ]

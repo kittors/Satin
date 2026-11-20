@@ -334,7 +334,7 @@
 .sn-app.sn-collapsed .sn-side .sn-lbl, .sn-app.sn-collapsed .sn-side-top b, .sn-app.sn-collapsed .sn-side-top .sn-logo, .sn-app.sn-collapsed .sn-side .sn-badge { opacity: 0; } /* 收起时淡出，不从排版里拿掉（拿掉会让旁边的东西跳一下） */
 .sn-app:not(.sn-collapsed) .sn-side .sn-lbl, .sn-app:not(.sn-collapsed) .sn-side-top b, .sn-app:not(.sn-collapsed) .sn-side-top .sn-logo { transition: opacity .16s var(--sn-ease-out) .14s; }
 .sn-side-nav { position: relative; display: grid; gap: 2px; }
-.sn-side-nav a, .sn-side-foot a { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 12px; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); cursor: pointer; white-space: nowrap; transition: color .12s, background-color .12s; } /* 左边 12px：图标中心离侧栏边 8 + 12 + 8 = 28，收起成 56 宽时正好在正中 */
+.sn-side-nav a, .sn-side-foot a { position: relative; z-index: 1; display: flex; text-decoration: none; align-items: center; gap: 10px; height: 32px; padding: 0 12px; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); cursor: pointer; white-space: nowrap; transition: color .12s, background-color .12s; } /* 左边 12px：图标中心离侧栏边 8 + 12 + 8 = 28，收起成 56 宽时正好在正中 */
 @media (hover: hover) {
 .sn-side-nav a:hover, .sn-side-foot a:hover { color: var(--sn-label); background: var(--sn-b-ghost-hover); } }
 .sn-side-nav a.sn-on { color: var(--sn-label); font-weight: 500; background: none; }
@@ -385,7 +385,7 @@
 
 /* ———— 面包屑、分页、步骤 ———— */
 .sn-crumbs { display: flex; align-items: center; gap: 2px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
-.sn-crumbs a { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: var(--sn-r-sm); color: var(--sn-label3); cursor: pointer; transition: color .12s, background-color .12s; }
+.sn-crumbs a { display: inline-flex; align-items: center; text-decoration: none; gap: 4px; padding: 2px 6px; border-radius: var(--sn-r-sm); color: var(--sn-label3); cursor: pointer; transition: color .12s, background-color .12s; }
 @media (hover: hover) {
 .sn-crumbs a:hover { color: var(--sn-label); background: var(--sn-b-ghost-hover); } }
 .sn-crumbs .sn-ic { width: 14px; height: 14px; color: var(--sn-label-off); }

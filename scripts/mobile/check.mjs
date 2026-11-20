@@ -11,10 +11,12 @@ import { pw, arg, ensureDir, ROOT, sleep } from "../parity/lib.mjs";
 
 const OUT = ensureDir(path.resolve(ROOT, arg("out", ".parity/mobile")));
 const CPU = +arg("cpu", 4), ONLY = arg("only", "");
-const BASE = "http://127.0.0.1:5192";
+const SIDE = arg("side", "cur"), BASE = SIDE === "base" ? "http://127.0.0.1:5193" : "http://127.0.0.1:5192";
+// 改造前的设计稿类名没有 sn- 前缀：同一个选择器去掉前缀再用
+const S = (sel) => (SIDE === "base" ? sel.replace(/\.sn-/g, ".") : sel);
 const report = { recipes: [], touch: [], webkit: [] }, fail = [];
 const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: "zh-CN", timezoneId: "Asia/Shanghai" };
-const watch = (page, errs) => { page.on("pageerror", (e) => errs.push("pageerror: " + e.message.slice(0, 200))); page.on("console", (m) => { if (m.type() === "error") errs.push("console: " + m.text().slice(0, 200)); }); };
+const watch = (page, errs) => { page.on("pageerror", (e) => errs.push("pageerror: " + e.message.slice(0, 200))); page.on("console", (m) => { if (m.type() === "error" && !/Failed to load resource/.test(m.text())) errs.push("console: " + m.text().slice(0, 200)); }); page.on("response", (r) => { if (r.status() >= 400 && !/\/favicon\.ico$/.test(r.url())) errs.push(`${r.status()} ${r.url()}`); }); };
 const stats = (d) => { const s = [...d].sort((a, b) => a - b), q = (p) => s[Math.min(s.length - 1, Math.floor(p * s.length))] ?? 0; return { n: d.length, p95: q(.95), max: s[s.length - 1] ?? 0, over50: d.filter((x) => x > 50).length }; };
 const okFrames = (st) => st.p95 <= 17.5 && st.max <= 34 && st.over50 === 0;
 
@@ -51,7 +53,7 @@ const ACTIONS = [
   { id: "drawer", key: "drawer-swipe", what: "开抽屉、手指往右拖关", run: async (p, t) => { await t.tap("#shotCards [data-edit]"); await sleep(500); await t.swipe(".sn-drawer.sn-open .sn-hd", 260, 0); }, ok: (p) => p.evaluate(() => !document.querySelector(".sn-drawer.sn-open")), wait: 700 },
   { id: "toast", what: "点按钮弹 Toast", run: async (p, t) => { await t.tap("[data-toast]"); }, ok: (p) => p.evaluate(() => !!document.querySelector(".sn-toast")) },
   { id: "ctxmenu", what: "长按开右键菜单", run: async (p, t) => { await t.longPress("[data-ctx]"); }, ok: (p) => p.evaluate(() => !!document.querySelector(".sn-menu.sn-open, .sn-ctx.sn-open, [role=menu].sn-open")) },
-  { id: "segmented", what: "点分段控件第二项", run: async (p, t) => { await t.tap(".demo .sn-seg button:nth-of-type(2)"); }, ok: (p) => p.evaluate(() => document.querySelector(".demo .sn-seg button:nth-of-type(2)")?.getAttribute("aria-checked") === "true" || document.querySelector(".demo .sn-seg button:nth-of-type(2)")?.classList.contains("sn-on")) },
+  { id: "segmented", what: "点分段控件第二项", run: async (p, t) => { await t.tap(".demo .sn-seg button:nth-of-type(2)"); }, ok: (p) => p.evaluate(() => document.querySelector(".demo .sn-seg button:nth-of-type(2)")?.getAttribute("aria-selected") === "true") },
   { id: "slider", what: "手指拖滑块", run: async (p, t) => { await t.drag(".demo .sn-slider", 0.2, 0.8); }, ok: (p) => p.evaluate(() => +document.querySelector(".demo .sn-slider")?.getAttribute("aria-valuenow") > 0) },
   { id: "tabs", what: "点第二个标签", run: async (p, t) => { await t.tap(".demo .sn-tab-list button:nth-of-type(2)"); }, ok: (p) => p.evaluate(() => document.querySelector(".demo .sn-tab-list button:nth-of-type(2)")?.classList.contains("sn-on")) },
   { id: "scrollarea", what: "手指往上滑滚动区域", run: async (p, t) => { await t.swipe(".demo .sn-sa-vp, .demo .sn-sa", 0, -260); }, ok: (p) => p.evaluate(() => [...document.querySelectorAll(".demo .sn-sa-vp")].some((v) => v.scrollTop > 0 || v.scrollLeft > 0)) },
@@ -59,7 +61,7 @@ const ACTIONS = [
 ];
 // 触屏操作：CDP 发真正的触摸事件（tap、长按、拖、滑），坐标取元素中心
 function touch(page, cdp) {
-  const at = async (sel, fx = .5, fy = .5) => { const b = await page.locator(sel).first().boundingBox(); if (!b) throw new Error("找不到 " + sel); return [b.x + b.width * fx, b.y + b.height * fy]; };
+  const at = async (sel, fx = .5, fy = .5) => { const b = await page.locator(S(sel)).first().boundingBox(); if (!b) throw new Error("找不到 " + sel); return [b.x + b.width * fx, b.y + b.height * fy]; };
   const ev = (type, pts) => cdp ? cdp.send("Input.dispatchTouchEvent", { type, touchPoints: pts.map(([x, y]) => ({ x, y })) }) : null;
   return {
     tap: async (sel) => { const [x, y] = await at(sel); if (cdp) { await ev("touchStart", [[x, y]]); await sleep(60); await ev("touchEnd", []); } else await page.touchscreen.tap(x, y); },
@@ -83,7 +85,8 @@ async function touchRun(engine) {
     let err = null; try { await a.run(page, t); } catch (e) { err = e.message; }
     await sleep(a.wait ?? 700);
     const frames = await page.evaluate(() => window.__parity.perfStop());
-    const st = stats(frames), ok = !err && (await a.ok(page).catch(() => false));
+    // 改造前那边只量帧间隔（结果判定里的选择器是改造后的类名）
+    const st = stats(frames), ok = SIDE === "base" ? !err : !err && (await a.ok(page).catch(() => false));
     const shot = path.join(OUT, `touch-${engine}-${a.key ?? a.id}.png`); await page.screenshot({ path: shot });
     const row = { id: a.key ?? a.id, what: a.what, engine, cpu: engine === "chrome" ? CPU : 1, ok, err, frames: st, framesOk: okFrames(st), errs };
     report[engine === "webkit" ? "webkit" : "touch"].push(row);

@@ -61,11 +61,11 @@ export const Stepper = /* @__PURE__ */ wrap(S.createStepper, { name: "SnStepper"
 export const NumberFlow = /* @__PURE__ */ wrap(S.createNumberFlow, { name: "SnNumberFlow", props: ["value", "style", "format"], events: [] });
 
 // ———— 纯样式组件 ————
-export const Icon = defineComponent({
+export const Icon = /* @__PURE__ */ defineComponent({
   name: "SnIcon", props: { name: String, size: { type: Number, default: 16 } },
   setup: (p) => () => h("svg", { class: "sn-ic", "data-icon": p.name, width: p.size, height: p.size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true", innerHTML: ICONS[p.name] || "" }),
 });
-export const Button = defineComponent({
+export const Button = /* @__PURE__ */ defineComponent({
   name: "SnButton",
   props: { variant: { type: String, default: "secondary" }, size: String, icon: String, round: Boolean, selected: Boolean, busy: Boolean, disabled: Boolean, tip: String, type: { type: String, default: "button" } },
   setup(p, { slots, attrs }) {
@@ -76,44 +76,44 @@ export const Button = defineComponent({
     };
   },
 });
-export const Input = defineComponent({
+export const Input = /* @__PURE__ */ defineComponent({
   name: "SnInput", inheritAttrs: false, props: { modelValue: null, size: String, invalid: Boolean }, emits: ["update:modelValue"],
   setup: (p, { attrs, emit }) => () => h("input", { ...attrs, class: cx("sn-input", p.size && p.size !== "md" && `sn-${p.size}`, attrs.class), value: p.modelValue, "aria-invalid": p.invalid ? "true" : undefined, onInput: (e) => emit("update:modelValue", e.target.value) }),
 });
-export const Field = defineComponent({
+export const Field = /* @__PURE__ */ defineComponent({
   name: "SnField", props: { label: String, help: String, error: { type: String, default: undefined }, for: String },
   setup: (p, { slots }) => () => h("div", { class: cx("sn-field", p.error && "sn-bad") }, [p.label ? h("label", { class: "sn-lbl", for: p.for }, p.label) : null, slots.default?.(), p.help ? h("div", { class: "sn-help" }, p.help) : null, p.error != null ? h("div", { class: "sn-err" }, [h("span", p.error)]) : null]),
 });
 const Box = () => h("span", { class: "sn-box" }, [h("svg", { viewBox: "0 0 12 12", fill: "none", stroke: "currentColor", "stroke-width": CHECK.stroke, "stroke-linecap": "round", "stroke-linejoin": "round" }, [h("path", { d: CHECK.path })]), h("span", { class: "sn-bar" })]);
-export const Checkbox = defineComponent({
+export const Checkbox = /* @__PURE__ */ defineComponent({
   name: "SnCheckbox", props: { modelValue: Boolean, label: String, indeterminate: Boolean, disabled: Boolean }, emits: ["update:modelValue"],
   setup: (p, { slots, emit }) => () => h("label", { class: "sn-check" }, [h("input", { type: "checkbox", checked: p.modelValue, indeterminate: p.indeterminate, disabled: p.disabled, onChange: (e) => emit("update:modelValue", e.target.checked) }), h(Box), p.label ?? slots.default?.()]),
 });
-export const Switch = defineComponent({
+export const Switch = /* @__PURE__ */ defineComponent({
   name: "SnSwitch", props: { modelValue: Boolean, label: String, disabled: Boolean }, emits: ["update:modelValue"],
   setup: (p, { slots, emit }) => () => h("label", { class: "sn-switch" }, [h("input", { type: "checkbox", role: "switch", checked: p.modelValue, disabled: p.disabled, onChange: (e) => emit("update:modelValue", e.target.checked) }), h("span", { class: "sn-track" }, [h("span", { class: "sn-knob" })]), p.label ?? slots.default?.()]),
 });
-export const Chip = defineComponent({
+export const Chip = /* @__PURE__ */ defineComponent({
   name: "SnChip", props: { on: Boolean, removable: Boolean }, emits: ["remove"],
   setup: (p, { slots, emit }) => () => h("span", { class: cx("sn-chip", p.removable && "sn-tag", p.on && "sn-on") }, [slots.default?.(), p.removable ? h("button", { class: "sn-x", "aria-label": tt("components.remove"), onClick: () => emit("remove") }, [h(Icon, { name: "x", size: 10 })]) : null]),
 });
-export const Progress = defineComponent({
+export const Progress = /* @__PURE__ */ defineComponent({
   name: "SnProgress", props: { value: Number, ring: Boolean, size: String },
   setup(p) { return () => { const v = p.value == null ? undefined : String(+p.value).replace(/^0\./, "."); return p.ring ? h("span", { class: cx("sn-pring", p.size === "lg" && "sn-lg"), style: { "--sn-p": v ?? "0" } }) : h("div", { class: cx("sn-pbar", p.value == null && "sn-indet"), style: v != null ? { "--sn-p": v } : undefined }, [h("i")]); }; },
 });
-export const Spinner = defineComponent({ name: "SnSpinner", props: { size: String }, setup: (p) => () => h("span", { class: cx("sn-spinner", p.size === "lg" && "sn-lg") }) });
-export const Steps = defineComponent({
+export const Spinner = /* @__PURE__ */ defineComponent({ name: "SnSpinner", props: { size: String }, setup: (p) => () => h("span", { class: cx("sn-spinner", p.size === "lg" && "sn-lg") }) });
+export const Steps = /* @__PURE__ */ defineComponent({
   name: "SnSteps", props: { steps: { type: Array, default: () => [] }, current: { type: Number, default: 0 } },
   setup: (p) => () => h("div", { class: "sn-steps" }, p.steps.flatMap((s, i) => [i ? h("span", { class: cx("sn-ln", i <= p.current && "sn-done") }, [h("i")]) : null, h("span", { class: cx("sn-st", i < p.current && "sn-done", i === p.current && "sn-cur") }, [h("span", { class: "sn-n" }, String(i + 1)), s])]).filter(Boolean)),
 });
-export const Text = defineComponent({
+export const Text = /* @__PURE__ */ defineComponent({
   name: "SnText", props: { as: { type: String, default: "span" }, level: { type: String, default: "body" }, tone: String, num: Boolean, truncate: Boolean },
   setup: (p, { slots }) => () => h(p.as, { class: cx(`sn-t-${p.level === "bodyStrong" ? "body-strong" : p.level}`, p.tone && `sn-c-${p.tone}`, p.num && "sn-num", p.truncate && "sn-truncate") }, slots.default?.()),
 });
 // Tooltip：给默认插槽里的第一个元素加 data-tip
-export const Tooltip = defineComponent({ name: "SnTooltip", props: { text: String, kbd: String }, setup: (p, { slots }) => () => { const [v] = slots.default?.() || []; return v ? cloneVNode(v, { "data-tip": p.text, "data-kbd": p.kbd }) : null; } });
+export const Tooltip = /* @__PURE__ */ defineComponent({ name: "SnTooltip", props: { text: String, kbd: String }, setup: (p, { slots }) => () => { const [v] = slots.default?.() || []; return v ? cloneVNode(v, { "data-tip": p.text, "data-kbd": p.kbd }) : null; } });
 
-export const Dialog = defineComponent({
+export const Dialog = /* @__PURE__ */ defineComponent({
   name: "SnDialog", props: { open: Boolean, title: String, description: String }, emits: ["close", "update:open"],
   setup(p, { slots, emit }) {
     const el = ref(null);
@@ -126,7 +126,7 @@ export const Dialog = defineComponent({
     ])]);
   },
 });
-export const Drawer = defineComponent({
+export const Drawer = /* @__PURE__ */ defineComponent({
   name: "SnDrawer", props: { open: Boolean, title: String }, emits: ["close", "update:open"],
   setup(p, { slots, emit }) {
     const el = ref(null); let layer = null;

@@ -1,6 +1,6 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 239,
+  "var(--sn-ease-out)": 241,
   "var(--sn-ease-out-strong)": 52,
   "linear": 37,
   "var(--sn-ease-overshoot)": 10,
@@ -1036,6 +1036,12 @@
    "selector": ".sn-input",
    "prop": "transition",
    "value": "border-color .15s var(--sn-ease-out), box-shadow .18s var(--sn-ease-out), background .15s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/form.css",
+   "selector": ".sn-input:-webkit-autofill, .sn-input:-webkit-autofill:hover, .sn-input:-webkit-autofill:focus",
+   "prop": "transition",
+   "value": "border-color .15s var(--sn-ease-out), box-shadow .18s var(--sn-ease-out), background-color 600000s 0s, color 600000s 0s"
   },
   {
    "file": "packages/satin-ui/css/form.css",

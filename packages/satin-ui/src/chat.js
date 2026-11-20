@@ -130,7 +130,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
       const y = PAD_T + off[i]; if (el._y !== y) { el.style.transform = `translateY(${y}px)`; el._y = y; }
     }
     const a = PAD_T + off[i0], b = PAD_T + off[Math.min(items.length, i1 + 1)];
-    phTop.style.height = a + "px"; phBot.style.transform = `translateY(${b}px)`; phBot.style.height = Math.max(0, PAD_T + off[items.length] - b) + "px";
+    // 上方没有没画出来的条目（滚到最早）时不留占位：原来留着 PAD_T 那 12px，骨架条的第一截露出来，最上面多一道灰条
+    phTop.style.height = (i0 > 0 ? a : 0) + "px"; phBot.style.transform = `translateY(${b}px)`; phBot.style.height = Math.max(0, PAD_T + off[items.length] - b) + "px";
   }
   // 量高度：视口上方的条目变了就补偿滚动位置；贴底时平滑跟随
   const ro = new ResizeObserver((ents) => {

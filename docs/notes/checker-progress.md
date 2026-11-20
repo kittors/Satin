@@ -1,4 +1,4 @@
-# 检查器进度（子智能体写，主线程巡检用）
+# 检查器进度（子智能体写，主线程巡检用；原在 skills/satin/scripts/PROGRESS.md，挪出技能目录，免得随技能拷走）
 
 - 开工：建目录 skills/satin/scripts/{lib,fixtures}；方案：不依赖 postcss/acorn（自带极简 CSS 解析和 JS 字符串提取），技能整个拷到别处也能跑；dom 模式用 Playwright + 本机 Chrome
 - 写完 lib/css.mjs（极简 CSS 解析）、lib/color.mjs（颜色解析、色差、对比度）、lib/tokens.mjs（令牌取值、最近令牌/刻度/字号/曲线推荐，带快照）、lib/rules.mjs（规则清单，带快照）

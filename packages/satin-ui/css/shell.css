@@ -30,6 +30,8 @@
 .sn-panel { box-sizing: border-box; min-width: 0; padding: var(--sn-sp-20); border-radius: var(--sn-r-lg); background: var(--sn-raised); border: 1px solid var(--sn-line); }
 .sn-panel.sn-flush { padding: 0; overflow: hidden; }
 .sn-panel-hd { display: flex; align-items: center; gap: var(--sn-sp-8); margin-bottom: var(--sn-sp-16); }
+/* 标题和说明包在一个 div 里（最常见的写法）也一样：第一块撑满，右边的按钮、链接靠右 */
+.sn-panel-hd > :first-child { flex: 1; min-width: 0; }
 .sn-panel-hd h2, .sn-panel-hd h3 { flex: 1; min-width: 0; font: 600 calc(15px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
 .sn-panel-hd p { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-panel-ft { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: var(--sn-sp-8); margin-top: var(--sn-sp-20); }

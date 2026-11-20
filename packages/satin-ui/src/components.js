@@ -294,4 +294,6 @@ import { bindBanners as _bindBanners } from "./feedback.js";
 export function enhance(root = typeof document !== "undefined" ? document : null) {
   if (!root) return;
   injectIcons(root); _bindForms(root); _bindInputs(root); _bindCollapses(root); bindPickers(root); _bindOverlays(root); _bindBanners(root);
+  // 侧栏布局：接上选中滑块、收起按钮、⌘\；窄于 720（手机、竖着的平板）自动收成图标栏（data-collapse-below 可改，0 不收）
+  for (const app of [...(root.matches?.(".sn-app") ? [root] : []), ...root.querySelectorAll(".sn-app")]) if (app.querySelector(".sn-side-nav")) mountSidebar(app, { collapseBelow: +(app.dataset.collapseBelow ?? 720) });
 }

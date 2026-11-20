@@ -40,7 +40,7 @@
 </div>
 ```
 
-侧栏在手机上自动收成图标栏：`createSidebar(document.querySelector(".sn-app"), { collapseBelow: 720 })`。
+侧栏：`enhance()` 已经接上（选中滑块、收起按钮、⌘\）；布局窄于 720（手机、竖着的平板）自动收成图标栏，`<div class="sn-app" data-collapse-below="0">` 不收。框架里用 `createSidebar(el, { collapseBelow: 720 })`。
 React：`<Segmented items={[...]} value={f} onChange={setF} />`、`<Pager total={7} page={page} onChange={setPage} />`；表格用 `rows.map` 生成 `<tr>`。
 没有数据时 `tbody` 里放一行：`<tr><td colspan="6"><div class="sn-empty-state"><span class="sn-art" data-i="folder-open"></span><h4>还没有项目</h4><p>从一部小说或剧本开始。</p><div class="sn-acts"><button class="sn-btn sn-primary">新建项目</button></div></div></td></tr>`。
 加载中：表格先显示几行骨架（`references/components/loading.md`），不要整页转圈。删除用弹窗确认并写清影响范围，成功后 `toast({ text: "已删除「长夜」", action: { label: "撤销", run } })`。

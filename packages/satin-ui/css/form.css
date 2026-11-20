@@ -24,6 +24,8 @@
 .sn-input { --sn-h: 32px; --sn-r: var(--sn-btn-r); --sn-px: 11px; --sn-pb: 1.5px; all: unset; box-sizing: border-box; width: 100%; height: var(--sn-h); padding: 0 var(--sn-px) var(--sn-pb); border-radius: var(--sn-r);
   font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); background: var(--sn-field); border: 1px solid var(--sn-line-control); box-shadow: var(--sn-field-inset), 0 0 0 0 var(--sn-ring);
   transition: border-color .15s var(--sn-ease-out), box-shadow .18s var(--sn-ease-out), background .15s var(--sn-ease-out); }
+/* 浏览器自动填充（登录页的账号、密码）：Chrome 会把底色换成浅蓝 / 浅黄、深色模式下字也看不清。底色的变化拖到"永远"，字色保持正文色 */
+.sn-input:-webkit-autofill, .sn-input:-webkit-autofill:hover, .sn-input:-webkit-autofill:focus { -webkit-text-fill-color: var(--sn-label); caret-color: var(--sn-label); transition: border-color .15s var(--sn-ease-out), box-shadow .18s var(--sn-ease-out), background-color 600000s 0s, color 600000s 0s; }
 .sn-input.sn-sm { --sn-h: 28px; --sn-r: max(4px, calc(var(--sn-btn-r) - 2px)); --sn-px: 9px; --sn-pb: 1.5px; font-size: calc(12px * var(--sn-font-scale, 1)); }
 .sn-input.sn-lg { --sn-h: 36px; --sn-pb: 2px; font-size: calc(14px * var(--sn-font-scale, 1)); }
 .sn-input.sn-xl { --sn-h: 40px; --sn-r: calc(var(--sn-btn-r) + 2px); --sn-px: 12px; --sn-pb: 2px; font-size: calc(14px * var(--sn-font-scale, 1)); }
@@ -90,7 +92,7 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 .sn-menu.sn-end { left: auto; right: 0; transform-origin: top right; }
 .sn-open > .sn-menu, .sn-menu.sn-open { opacity: 1; scale: 1; translate: 0; pointer-events: auto; visibility: visible;
   transition: opacity 0s, scale .14s var(--sn-ease-out-strong), translate .14s var(--sn-ease-out-strong), visibility 0s; }
-.sn-menu .sn-item { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); cursor: pointer;
+.sn-menu .sn-item { display: flex; align-items: center; text-decoration: none; gap: 8px; height: 32px; padding: 0 8px; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); cursor: pointer;
   transition: background-color .08s var(--sn-ease-out); }
 .sn-menu .sn-item.sn-hl { background: var(--sn-b-ghost-hover); }
 .sn-menu .sn-item.sn-is-off { color: var(--sn-label-off); cursor: default; } .sn-menu .sn-item.sn-is-off .sn-ic { color: var(--sn-label-off); }

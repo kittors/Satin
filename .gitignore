@@ -12,3 +12,5 @@ examples/*/.angular/
 examples/*/next-env.d.ts
 # 由 spec/recipes 生成的配方测试页（scripts/skill/recipes-render.mjs）
 tests/recipes/
+# 评测拼图（scripts/eval/montage.py，截图来自 /tmp/satin-eval）
+eval/sheets/

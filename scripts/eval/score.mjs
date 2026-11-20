@@ -108,7 +108,9 @@ for (const r of runs) {
       await ctx.close();
     }
     // 4. 检查器
-    const srcs = r.fw === "html" ? [r.dir] : [path.join(r.dir, "src"), path.join(r.dir, "index.html")];
+    // 纯 HTML：项目里自己写的文件（不含 .agents 里的技能、打分产物、依赖）——整个目录交给检查器会把技能自带的检查器源码也算进去
+    const own = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.name.startsWith(".") || e.name.startsWith("_") || e.name === "node_modules" || e.name === "dist" ? [] : e.isDirectory() ? own(path.join(d, e.name)) : /\.(html|css|js|mjs|jsx|ts|tsx|vue)$/.test(e.name) ? [path.join(d, e.name)] : []);
+    const srcs = r.fw === "html" ? own(r.dir) : [path.join(r.dir, "src"), path.join(r.dir, "index.html")];
     const st = spawnSync("node", [CHECK, "static", ...srcs, "--json"], { cwd: r.dir, encoding: "utf8", timeout: 120000, maxBuffer: 1 << 26 });
     try { const j = JSON.parse(st.stdout); s.check.static = j.counts; } catch { s.check.static = { error: -1, note: (st.stderr || "").slice(0, 200) }; }
     // 页面检查：桌面 1440、手机 390 × 深浅（平板宽度和点开浮层的检查评测时不跑，省时间）

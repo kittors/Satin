@@ -129,7 +129,7 @@ const setFx = (v) => { app.dataset.navfx = v; const on = $("a.sn-on", nav); move
 nav.addEventListener("click", (e) => {
   const a = e.target.closest("a"); if (!a || a.classList.contains("sn-on")) return;
   $$("a", nav).forEach((x) => x.classList.toggle("sn-on", x === a)); moveHl(a); moveInd(a);
-  onNavigate?.(a); const head = $(".sn-app-head b", app), nt = $(".sn-lbl", a).textContent; if (!head) return;
+  onNavigate?.(a); const head = $(".sn-app-head b", app); if (!head) return; const nt = ($(".sn-lbl", a) ?? a).textContent;
   if (reduced()) head.textContent = nt; else head.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, easing: EASE_IN }).onfinish = () => { head.textContent = nt; head.animate([{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: OUT }); };
 });
 const colBtn = $("[data-collapse]", app);

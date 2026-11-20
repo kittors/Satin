@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satin · 重组件放进空容器</title>
+<script src="../packages/satin-ui/src/theme-boot.js"></script>
+<link rel="stylesheet" href="../packages/satin-ui/css/page.css">
+<style>
+  body { padding: 24px; display: grid; gap: 32px; max-width: 1100px; margin: 0 auto; }
+  .case > h2 { font: 600 13px/20px var(--sn-sans); color: var(--sn-label3); margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<!-- 用户照着文档写的样子：一个空 div + createXxx(空 div, 选项)。和设计稿里那几块逐张对着看（scripts/test/heavy-shots.mjs 截图） -->
+<section class="case" id="c-chat"><h2>createChat</h2><div id="chat" style="height: 520px"></div></section>
+<section class="case" id="c-md"><h2>createMarkdown</h2><div id="md"></div></section>
+<section class="case" id="c-flow"><h2>createFlow</h2><div id="flow" style="height: 420px"></div></section>
+<section class="case" id="c-grid"><h2>createDataGrid</h2><div id="grid" style="height: 460px"></div></section>
+<section class="case" id="c-cgrid"><h2>createCanvasGrid</h2><div id="cgrid" style="height: 460px"></div></section>
+<section class="case" id="c-theme"><h2>createThemePanel</h2><div id="theme"></div></section>
+<script type="module">
+import { setup } from "../packages/satin-ui/src/setup.js";
+import { createChat } from "../packages/satin-ui/src/chat.js";
+import { createMarkdown } from "../packages/satin-ui/src/markdown.js";
+import { createFlow } from "../packages/satin-ui/src/flow.js";
+import { createDataGrid } from "../packages/satin-ui/src/grid.js";
+import { createCanvasGrid } from "../packages/satin-ui/src/canvas-grid.js";
+import { createThemePanel } from "../packages/satin-ui/src/theme-panel.js";
+setup();
+const $ = (s) => document.querySelector(s);
+window.inst = {
+  chat: createChat($("#chat"), {
+    title: "分镜助手", placeholder: "和分镜助手一起改这一集",
+    history: { initial: () => [{ kind: "day", text: "今天" }, { kind: "msg", me: true, type: "text", text: "帮我把第三集拆成镜头" }, { kind: "msg", me: false, type: "text", text: "好的，第三集一共 12 个镜头，先从雨夜车站开始。" }], older: () => [], hasMore: () => false },
+    async *respond(q) { yield "收到：" + q; },
+  }),
+  md: createMarkdown($("#md"), { source: "## 第三集\n\n雨夜，**林夏**站在空荡的站台上。\n\n- 镜头 1：远景\n- 镜头 2：近景\n\n```js\nconst shots = 12;\n```\n\n| 镜头 | 时长 |\n|---|---|\n| 1 | 3 秒 |\n| 2 | 5 秒 |" }),
+  flow: createFlow($("#flow"), { nodes: [{ id: "a", x: 40, y: 60, t: "原文", ic: "file-text", d: "第三集.txt" }, { id: "b", x: 320, y: 60, t: "分镜", ic: "clapperboard", k: "board", d: "12 个镜头" }, { id: "c", x: 600, y: 60, t: "成片", ic: "film", k: "out", d: "横屏 16:9" }], edges: [["a", "b"], ["b", "c"]] }),
+  grid: createDataGrid($("#grid"), { rows: 5000, seed: 11 }),
+  cgrid: createCanvasGrid($("#cgrid"), { rows: 50000, seed: 23 }),
+  theme: createThemePanel($("#theme")),
+};
+window.ready = true;
+</script>
+</body>
+</html>

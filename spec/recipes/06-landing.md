@@ -8,7 +8,7 @@
 <header class="sn-page sn-wide" style="padding-block: var(--sn-sp-16)">
   <div class="sn-row sn-between">
     <b class="sn-t-title3">分镜工作台</b>
-    <nav class="sn-row sn-gap-24 sn-t-callout"><a href="#features">功能</a><a href="#pricing">价格</a><a href="/docs">文档</a></nav>
+    <nav class="sn-row sn-gap-4"><a class="sn-btn sn-ghost sn-sm" href="#features">功能</a><a class="sn-btn sn-ghost sn-sm" href="#pricing">价格</a><a class="sn-btn sn-ghost sn-sm" href="/docs">文档</a></nav>
     <div class="sn-row sn-gap-8"><a class="sn-btn sn-ghost" href="/login">登录</a><a class="sn-btn sn-primary" href="/signup">免费试用</a></div>
   </div>
 </header>
@@ -29,7 +29,7 @@
     </div>
   </section>
 </main>
-<footer class="sn-page sn-wide sn-t-caption sn-c-tertiary" style="border-top: 1px solid var(--sn-line); padding-block: var(--sn-sp-24)">© 2026 分镜工作台 · <a href="/privacy">隐私</a> · <a href="/terms">条款</a></footer>
+<footer class="sn-page sn-wide sn-t-caption sn-c-tertiary" style="border-top: 1px solid var(--sn-line); padding-block: var(--sn-sp-24)">© 2026 分镜工作台 · <a class="sn-link" href="/privacy">隐私</a> · <a class="sn-link" href="/terms">条款</a></footer>
 ```
 
 截图要用真实的产品界面（或用 Satin 搭一个真实的界面再截），不要用插画和渐变色块代替。功能点的图标用 Satin 的线性图标，不加彩色底。

@@ -14,12 +14,20 @@
   ],
   "api": [
     {
-      "title": "mountChat(.sn-chat, 选项)（satin-ui/chat）",
+      "title": "createChat(空容器或 .sn-chat, 选项)（satin-ui/chat）",
       "head": [
         "选项",
         "说明"
       ],
       "rows": [
+        [
+          "title / status / placeholder / max / maxLines / attach",
+          "空容器时用来渲染顶栏和底部输入框；update({ status }) 改顶栏状态"
+        ],
+        [
+          "composer",
+          "{ upload, attachments }：底部输入框的选项（上传函数、预置附件）"
+        ],
         [
           "respond",
           "(问题, { stopped }) => 异步生成器 / Promise<字符串>：yield { think } 是思考，yield 字符串是正文；还能给 { step }、{ card }、{ image } 这些"
@@ -34,7 +42,7 @@
         ],
         [
           "返回",
-          "{ send(text)（程序里发一条，和输入框发送一样）, receive(条目), sendText(text, { fail }), scrollToOldest(), destroy() }"
+          "{ send(text)（程序里发一条，和输入框发送一样）, receive(条目), sendText(text, { fail }), scrollToOldest(), update, destroy(), on, off }；destroy 停掉生成中的回答、撤掉监听、清空容器。旧写法 mountChat(元素, 选项) 仍然可用"
         ]
       ]
     },
@@ -89,18 +97,14 @@
     ],
     "api": [
       [
-        "mountChat(.sn-chat, { respond, history })",
+        "createChat(空容器或 .sn-chat, { title, respond, history })",
         "satin-ui/chat"
-      ],
-      [
-        "bindInputs(root)",
-        "satin-ui/components"
       ]
     ]
   },
   "example": {
     "0": {
-      "js": "import { mountChat } from \"satin-ui/chat\";\nimport { bindInputs } from \"satin-ui/components\";\n\nconst box = document.querySelector(\".sn-chat\");\nbindInputs(box); // 底部的输入框（data-composer data-external：发送交给对话组件）\n\n// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文\n// 不给 history 就从空的对话开始；要带历史：history: { initial(), older(), hasMore() }\nmountChat(box, {\n  respond: async function* (question, state) {\n    const res = await fetch(\"/api/chat\", { method: \"POST\", body: JSON.stringify({ question }) });\n    for await (const ev of readEvents(res.body)) {\n      if (state.stopped) break;              // 用户点了停止\n      if (ev.type === \"reasoning\") yield { think: ev.text };\n      if (ev.type === \"text\") yield ev.text;   // 先进缓冲、匀速放出来\n    }\n  },\n});"
+      "js": "import { createChat } from \"satin-ui/chat\";\n\n// 空容器：顶栏、消息区、底部输入框都由 createChat 填好、接好（已有设计稿里的 .sn-chat 标记也可以直接传）\n// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文\n// 不给 history 就从空的对话开始；要带历史：history: { initial(), older(), hasMore() }\n// React：const Chat = wrapSatin(createChat, { events: [] })（satin-ui/react）；自己在 effect 里创建的，卸载时调 chat.destroy()\nconst chat = createChat(document.querySelector(\"#chat\"), {\n  title: \"分镜助手\", placeholder: \"和分镜助手一起改这一集\",\n  respond: async function* (question, state) {\n    const res = await fetch(\"/api/chat\", { method: \"POST\", body: JSON.stringify({ question }) });\n    for await (const ev of readEvents(res.body)) {\n      if (state.stopped) break;              // 用户点了停止\n      if (ev.type === \"reasoning\") yield { think: ev.text };\n      if (ev.type === \"text\") yield ev.text;   // 先进缓冲、匀速放出来\n    }\n  },\n});"
     }
   },
   "demos": [

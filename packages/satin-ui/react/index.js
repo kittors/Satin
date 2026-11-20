@@ -74,7 +74,7 @@ export const Email = /* @__PURE__ */ wrap(S.createEmail, { displayName: "Email" 
 export const Table = /* @__PURE__ */ wrap(S.createTable, { valueKey: "selected", events: ["sort", "select", "rowClick"], displayName: "Table" });
 
 // ———— 纯样式组件：直接渲染元素（子节点、事件都是 React 自己的） ————
-export const Button = forwardRef(function Button({ variant = "secondary", size, icon, round, selected, busy, disabled, tip, className, children, onClick, type = "button", ...rest }, ref) {
+export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "secondary", size, icon, round, selected, busy, disabled, tip, className, children, onClick, type = "button", ...rest }, ref) {
   const iconOnly = !children && icon;
   return h("button", {
     ref, type, ...rest, className: cx("sn-btn", `sn-${variant}`, size && size !== "md" && `sn-${size}`, iconOnly && "sn-ibtn", round && "sn-round", selected && "sn-selected", disabled && "sn-is-disabled", busy && "sn-busy", className),
@@ -86,22 +86,22 @@ export const Button = forwardRef(function Button({ variant = "secondary", size, 
 export function Icon({ name, size = 16, className }) {
   return h("svg", { className: cx("sn-ic", className), "data-icon": name, width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true", dangerouslySetInnerHTML: { __html: ICONS[name] || "" } });
 }
-export const Input = forwardRef(function Input({ size, invalid, className, ...rest }, ref) {
+export const Input = /* @__PURE__ */ forwardRef(function Input({ size, invalid, className, ...rest }, ref) {
   return h("input", { ref, ...rest, className: cx("sn-input", size && size !== "md" && `sn-${size}`, className), "aria-invalid": invalid ? "true" : undefined });
 });
-export const Textarea = forwardRef(function Textarea({ className, ...rest }, ref) { return h("textarea", { ref, ...rest, className: cx("sn-input", className) }); });
+export const Textarea = /* @__PURE__ */ forwardRef(function Textarea({ className, ...rest }, ref) { return h("textarea", { ref, ...rest, className: cx("sn-input", className) }); });
 export function Field({ label, help, error, htmlFor, className, children }) {
   // 错误区：error 传了（空字符串也算）就一直在，有字时展开、清空时收起（有动画）；不传就没有
   return h("div", { className: cx("sn-field", error && "sn-bad", className) }, label ? h("label", { className: "sn-lbl", htmlFor }, label) : null, children, help ? h("div", { className: "sn-help" }, help) : null, error != null ? h("div", { className: "sn-err" }, h("span", null, error)) : null);
 }
 // 复选框的方框（和 form.js 的 BOX 同一份路径和线宽）：input 后面紧跟着它，样式靠 input:checked + .sn-box
 const Box = () => h("span", { className: "sn-box" }, h("svg", { viewBox: "0 0 12 12", fill: "none", stroke: "currentColor", strokeWidth: CHECK.stroke, strokeLinecap: "round", strokeLinejoin: "round" }, h("path", { d: CHECK.path })), h("span", { className: "sn-bar" }));
-export const Checkbox = forwardRef(function Checkbox({ label, children, className, indeterminate, ...rest }, ref) {
+export const Checkbox = /* @__PURE__ */ forwardRef(function Checkbox({ label, children, className, indeterminate, ...rest }, ref) {
   const own = useRef(null);
   useIso(() => { if (own.current) own.current.indeterminate = !!indeterminate; });
   return h("label", { className: cx("sn-check", className) }, h("input", { ref: (n) => { own.current = n; if (typeof ref === "function") ref(n); else if (ref) ref.current = n; }, type: "checkbox", ...rest }), h(Box), label ?? children);
 });
-export const Switch = forwardRef(function Switch({ label, children, className, ...rest }, ref) {
+export const Switch = /* @__PURE__ */ forwardRef(function Switch({ label, children, className, ...rest }, ref) {
   return h("label", { className: cx("sn-switch", className) }, h("input", { ref, type: "checkbox", role: "switch", ...rest }), h("span", { className: "sn-track" }, h("span", { className: "sn-knob" })), label ?? children);
 });
 export function Chip({ on, removable, onRemove, className, children, ...rest }) {

@@ -910,10 +910,11 @@ list.reload();`,
   },
   flow: {
     0: {
-      js: `import { mountFlow } from "satin-ui/flow";
+      js: `import { createFlow } from "satin-ui/flow";
 import "satin-ui/css/content.css";
 
-mountFlow(document.querySelector(".sn-flow"), {
+// 空容器：画布、工具条、小地图都由 createFlow 填好（设计稿里的 .sn-flow 标记也可以直接传）；卸载时调 flow.destroy()
+const flow = createFlow(document.querySelector("#flow"), {
   // 节点：位置、标题、图标、说明、类型（类型决定线和端口的色相：text | board | image | audio | video | out）
   nodes: [
     { id: "src",   x: 0,   y: 0, t: "导入原文", ic: "book-open",    d: "雨夜车站.docx", k: "text" },
@@ -926,23 +927,24 @@ mountFlow(document.querySelector(".sn-flow"), {
   },
   grid: {
     0: {
-      js: `import { mountDataGrid } from "satin-ui/grid";
+      js: `import { createDataGrid } from "satin-ui/grid";
 import "satin-ui/css/grid.css";
 import "satin-ui/css/data.css";
 
 // 虚拟滚动、按需取块（筛选排序在后台线程）、固定列、拖列、改列宽行高、框选合并单元格、树形、编辑、拖行
-mountDataGrid(document.querySelector(".sn-grid"), { rows: 100000 });
+// 空容器：工具条、表头、表体都由 createDataGrid 填好；卸载时调 grid.destroy()（后台线程、放进 <head> 的样式一起撤）
+const grid = createDataGrid(document.querySelector("#grid"), { rows: 100000 });
 // 列和数据现在是内置的演示项目表；接自己的列和数据的接口还在整理，暂时没有公开`,
     },
   },
   cgrid: {
     0: {
-      js: `import { mountCanvasGrid } from "satin-ui/canvas-grid";
+      js: `import { createCanvasGrid } from "satin-ui/canvas-grid";
 import "satin-ui/css/grid.css";
 import "satin-ui/css/data.css";
 
 // 整张表画在一块画布上：百万行照样流畅；交互和 DOM 版一致
-mountCanvasGrid(document.querySelector(".sn-grid.cgrid"), { rows: 1000000 });`,
+const grid = createCanvasGrid(document.querySelector("#grid"), { rows: 1000000 }); // 卸载时 grid.destroy()`,
     },
   },
   picker: {
@@ -1051,7 +1053,7 @@ export const API = {
     ]],
   ],
   flow: [
-    ["mountFlow(.sn-flow, 选项)（satin-ui/flow）", ["选项", "说明"], [
+    ["createFlow(空容器或 .sn-flow, 选项)（satin-ui/flow）；旧写法 mountFlow 仍可用", ["选项", "说明"], [
       ["nodes", "[{ id, x, y, t（标题）, ic（图标）, d（说明）, k（类型）}]"],
       ["edges", "[[从, 到]]"],
       ["返回", "{ nodes, edges }"],
@@ -1059,11 +1061,11 @@ export const API = {
     ["标记", ["写法", "说明"], [[".sn-flow > .sn-flow-world > svg.sn-flow-edges + .flow-nodes", "画布：节点用 HTML、连线用 SVG，同一层平移缩放"], ["[data-fz]、[data-flow-run]、.sn-flow-mini", "缩放按钮、运行、小地图（可选）"]]],
   ],
   grid: [
-    ["mountDataGrid(.sn-grid, 选项)（satin-ui/grid）", ["选项", "说明"], [["rows", "行数（演示数据，默认 10 万）"], ["seed", "生成演示数据的种子"]]],
+    ["createDataGrid(空容器或 .sn-grid, 选项)（satin-ui/grid）；旧写法 mountDataGrid 仍可用", ["选项", "说明"], [["rows", "行数（演示数据，默认 10 万）"], ["seed", "生成演示数据的种子"], ["返回", "{ update, destroy, on, off }；destroy 撤掉监听、后台线程、放进 <head> 的样式，清空容器"]]],
     ["现在的限制", ["项目", "说明"], [["列和数据", "内置的演示项目表（列定义、数据生成和“服务端”都在库里）"], ["接自己的数据", "列定义、按块取数据、筛选、排序、树形的接口还在整理，暂时没有公开"]]],
   ],
   cgrid: [
-    ["mountCanvasGrid(.sn-grid.cgrid, 选项)（satin-ui/canvas-grid）", ["选项", "说明"], [["rows", "行数（演示数据，默认 100 万）"], ["seed", "生成演示数据的种子"]]],
+    ["createCanvasGrid(空容器或 .sn-grid, 选项)（satin-ui/canvas-grid）；旧写法 mountCanvasGrid 仍可用", ["选项", "说明"], [["rows", "行数（演示数据，默认 100 万）"], ["seed", "生成演示数据的种子"]]],
   ],
   picker: [
     ["bindPickers(root, 选项)", ["选项 / 事件", "说明"], [

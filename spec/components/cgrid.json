@@ -15,7 +15,7 @@
   ],
   "api": [
     {
-      "title": "mountCanvasGrid(.sn-grid.cgrid, 选项)（satin-ui/canvas-grid）",
+      "title": "createCanvasGrid(空容器或 .sn-grid, 选项)（satin-ui/canvas-grid）；旧写法 mountCanvasGrid 仍可用",
       "head": [
         "选项",
         "说明"
@@ -39,14 +39,14 @@
     ],
     "api": [
       [
-        "mountCanvasGrid(.sn-grid.cgrid, { rows, seed })",
+        "createCanvasGrid(空容器或 .sn-grid, { rows, seed })",
         "satin-ui/canvas-grid"
       ]
     ]
   },
   "example": {
     "0": {
-      "js": "import { mountCanvasGrid } from \"satin-ui/canvas-grid\";\nimport \"satin-ui/css/grid.css\";\nimport \"satin-ui/css/data.css\";\n\n// 整张表画在一块画布上：百万行照样流畅；交互和 DOM 版一致\nmountCanvasGrid(document.querySelector(\".sn-grid.cgrid\"), { rows: 1000000 });"
+      "js": "import { createCanvasGrid } from \"satin-ui/canvas-grid\";\nimport \"satin-ui/css/grid.css\";\nimport \"satin-ui/css/data.css\";\n\n// 整张表画在一块画布上：百万行照样流畅；交互和 DOM 版一致\nconst grid = createCanvasGrid(document.querySelector(\"#grid\"), { rows: 1000000 }); // 卸载时 grid.destroy()"
     }
   },
   "demos": [
