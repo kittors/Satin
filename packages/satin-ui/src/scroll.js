@@ -23,6 +23,7 @@ export function scrollArea(el, options = {}) {
   if (el._sa) { if (options && Object.keys(options).length) el._sa.set(options); return el._sa; } // 接过的：改选项（标记里带着 sa-vp 类、但还没接过的照常接）
   const o = { fade: "y", size: undefined, inner: false, bar: "auto", barSize: 5, barInset: 1, overscroll: "auto", wheel: "auto", ...options };
   let box, vp;
+  const elCls0 = el.className, elPad0 = el.style.padding, elOv0 = el.style.overflow; // 销毁时还原
   if (o.inner) {
     box = el; vp = document.createElement("div");
     const cs = getComputedStyle(el);
@@ -127,7 +128,17 @@ export function scrollArea(el, options = {}) {
     if (o.overscroll !== "bounce") ela.release();
   }
   apply(); measure();
-  const api = { box, vp, refresh: measure, set(next) { Object.assign(o, next); apply(); later(); }, get options() { return { ...o }; } };
+  // 销毁：拆掉包的那一层和两根滚动条、还原类名和内联样式，元素回到接之前的样子（同一个元素可以再接一次）。
+  // 挂载时加的监听、观察器由 createScrollArea（或外面的组件）的 destroy 一起撤
+  const destroy = () => {
+    cancelAnimationFrame(raf); raf = 0; ela.release?.();
+    by.remove(); bx.remove();
+    if (o.inner) { while (vp.firstChild) el.insertBefore(vp.firstChild, vp); vp.remove(); el.style.padding = elPad0; el.style.overflow = elOv0; }
+    else if (box.parentNode) { box.parentNode.insertBefore(el, box); box.remove(); }
+    el.className = elCls0; if (!elCls0) el.removeAttribute("class");
+    delete el._sa; delete vp._sa;
+  };
+  const api = { box, vp, refresh: measure, set(next) { Object.assign(o, next); apply(); later(); }, destroy, get options() { return { ...o }; } };
   el._sa = api; vp._sa = api;
   return api;
 }

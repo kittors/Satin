@@ -19,4 +19,8 @@ export function installTheme(): void;
 export function setMode(mode?: "auto" | "light" | "dark", options?: { animate?: boolean; persist?: boolean }): void;
 export function getMode(): "auto" | "light" | "dark";
 /** 主题定制面板（主色、状态色、字体、字号）：satin-ui/theme-panel */
-export function mountThemePanel(panel: HTMLElement, o?: { initSeg?: unknown; injectIcons?: unknown }): unknown;
+/** 主题定制面板：主色、状态色、字体、字号。第二个参数不用给（以前要传的 initSeg / injectIcons 仍然接受） */
+export function mountThemePanel(panel: HTMLElement, o?: { initSeg?: unknown; injectIcons?: unknown }): { sync(): void; destroy(): void };
+export function themePanelHTML(): string;
+/** 主题定制面板（统一写法）：destroy 退订主题变化、撤掉监听、清空容器 */
+export const createThemePanel: import("./components").SatinFactory<Record<string, never>, { sync(): void }>;

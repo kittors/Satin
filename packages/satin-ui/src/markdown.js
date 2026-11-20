@@ -13,8 +13,9 @@ import { playerHTML, audioHTML, mountPlayer, mountAudio } from "./media.js";
 import { scrollArea } from "./scroll.js";
 import { openLightbox } from "./lightbox.js";
 import { scoped } from "./i18n.js";
+import { defineComponent, useShared } from "./lifecycle.js";
 import I18N_DEFAULTS from "./locales/zh-CN/markdown.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 // 链接、图片地址只放行 http(s)、mailto、相对地址（图片另外放行 data:image/）。
 // 先按浏览器解析 URL 的规则归一：去掉首尾的控制字符和空格、去掉中间所有的 Tab 和换行——不然 "java\tscript:"、"\u0001javascript:"
@@ -100,14 +101,14 @@ const VIDEO = /\.(mp4|webm|mov|m4v)(?:[?#]|$)/i, AUDIO = /\.(mp3|m4a|aac|wav|ogg
 // 视频、音频直接用组件库的播放器和音频条（和展示页"视频与音频"同一个组件）
 function media(alt, src, title, st, ctx) {
   const u = safeUrl(src);
-  if (VIDEO.test(src)) return `<figure class="sn-md-fig sn-md-media">${playerHTML({ src: u, label: alt || title || t("markdown.30") })}${title || alt ? `<figcaption>${inline(title || alt, ctx)}</figcaption>` : ""}</figure>`;
-  return `<figure class="sn-md-fig sn-md-media">${audioHTML({ src: u, title: alt || t("markdown.31"), sub: title && title !== alt ? title : "" })}</figure>`;
+  if (VIDEO.test(src)) return `<figure class="sn-md-fig sn-md-media">${playerHTML({ src: u, label: alt || title || tt("markdown.30") })}${title || alt ? `<figcaption>${inline(title || alt, ctx)}</figcaption>` : ""}</figure>`;
+  return `<figure class="sn-md-fig sn-md-media">${audioHTML({ src: u, title: alt || tt("markdown.31"), sub: title && title !== alt ? title : "" })}</figure>`;
 }
 function image(alt, src, title, size, block, ctx) {
   let st = "";
   if (size) { if (size.includes(":")) st = `aspect-ratio:${size.replace(":", "/")};height:auto;`; else { const [w, h] = size.split("x"); if (h) st += `height:${+h}px;`; if (w) st += `width:${+w}px;`; } }
   if (block && (VIDEO.test(src) || AUDIO.test(src))) return media(alt, src, title, st, ctx);
-  const box = `<span class="sn-md-img${block ? " sn-blk" : ""}${size ? " sn-sized" : ""}" style="${st}"><img src="${esc(safeUrl(src, true))}" alt="${esc(alt)}" loading="lazy" decoding="async"${block ? ` tabindex="0" role="button" aria-label="${esc(t("markdown.36", { p0: alt || title || t("markdown.32") }))}"` : ""}><span class="sn-md-img-bad" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21M17 17l4 4m0-4-4 4"/></svg>${esc(alt || t("markdown.33"))}</span></span>`;
+  const box = `<span class="sn-md-img${block ? " sn-blk" : ""}${size ? " sn-sized" : ""}" style="${st}"><img src="${esc(safeUrl(src, true))}" alt="${esc(alt)}" loading="lazy" decoding="async"${block ? ` tabindex="0" role="button" aria-label="${esc(tt("markdown.36", { p0: alt || title || tt("markdown.32") }))}"` : ""}><span class="sn-md-img-bad" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21M17 17l4 4m0-4-4 4"/></svg>${esc(alt || tt("markdown.33"))}</span></span>`;
   return block ? `<figure class="sn-md-fig">${box}${title || alt ? `<figcaption>${inline(title || alt, ctx)}</figcaption>` : ""}</figure>` : box;
 }
 // ———————————————— 块 ————————————————
@@ -152,7 +153,7 @@ function blocks(lines, ctx) {
       const body = []; while (i < lines.length && lines[i].trim()) { body.push(lines[i]); i++; }
       out.push(rawHTML(body.join("\n"))); continue;
     }
-    if ((m = /^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/.exec(l))) { const n = m[1].length, h = inline(m[2], ctx), id = slug(h, ctx); out.push(`<h${n} id="${esc(id)}">${h}<a class="sn-md-anchor" href="#${esc(id)}" aria-label="${t("markdown.5")}">#</a></h${n}>`); i++; continue; }
+    if ((m = /^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/.exec(l))) { const n = m[1].length, h = inline(m[2], ctx), id = slug(h, ctx); out.push(`<h${n} id="${esc(id)}">${h}<a class="sn-md-anchor" href="#${esc(id)}" aria-label="${tt("markdown.5")}">#</a></h${n}>`); i++; continue; }
     if (/^\s{0,3}([-*_])(\s*\1){2,}\s*$/.test(l)) { out.push("<hr>"); i++; continue; }
     // 表格：表头 + 分隔行（:-- 左对齐、:-: 居中、--: 右对齐）
     if (l.includes("|") && i + 1 < lines.length && isTableSep(lines[i + 1])) {
@@ -165,7 +166,7 @@ function blocks(lines, ctx) {
     if (/^\s{0,3}>/.test(l)) {
       const body = []; while (i < lines.length && (/^\s{0,3}>/.test(lines[i]) || (lines[i].trim() && !startsBlock(lines[i], lines[i + 1]) && body.length && body.at(-1).trim()))) { body.push(lines[i].replace(/^\s{0,3}>\s?/, "")); i++; }
       const c = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(.*)$/i.exec(body[0] || "");
-      if (c) { const [nameKey, icon] = CALLOUT[c[1].toUpperCase()], name = t(nameKey); out.push(`<div class="sn-md-callout sn-${c[1].toLowerCase()}" role="note"><p class="sn-md-callout-t"><svg viewBox="0 0 24 24" aria-hidden="true">${CALLOUT_ICON[icon]}</svg>${c[2] ? inline(c[2], ctx) : name}</p>${blocks(body.slice(1), ctx)}</div>`); }
+      if (c) { const [nameKey, icon] = CALLOUT[c[1].toUpperCase()], name = tt(nameKey); out.push(`<div class="sn-md-callout sn-${c[1].toLowerCase()}" role="note"><p class="sn-md-callout-t"><svg viewBox="0 0 24 24" aria-hidden="true">${CALLOUT_ICON[icon]}</svg>${c[2] ? inline(c[2], ctx) : name}</p>${blocks(body.slice(1), ctx)}</div>`); }
       else out.push(`<blockquote>${blocks(body, ctx)}</blockquote>`);
       continue;
     }
@@ -199,14 +200,14 @@ function list(lines, i, ctx, out) {
   const lis = items.map((b) => {
     const t = /^\[([ xX])\]\s+/.exec(b[0]); if (t) b[0] = b[0].slice(t[0].length);
     let html = blocks(b, ctx); if (!loose) html = html.replace(/^<p>([\s\S]*?)<\/p>/, "$1");
-    return t ? `<li class="sn-md-task"><span class="sn-md-check${t[1] !== " " ? " sn-on" : ""}" role="img" aria-label="${t[1] !== " " ? t("markdown.34") : t("markdown.35")}"></span><div>${html}</div></li>` : `<li>${html}</li>`;
+    return t ? `<li class="sn-md-task"><span class="sn-md-check${t[1] !== " " ? " sn-on" : ""}" role="img" aria-label="${t[1] !== " " ? tt("markdown.34") : tt("markdown.35")}"></span><div>${html}</div></li>` : `<li>${html}</li>`;
   }).join("");
   const n = ordered ? parseInt(first[2], 10) : 1;
   out.push(ordered ? `<ol${n !== 1 ? ` start="${n}"` : ""}>${lis}</ol>` : `<ul${items.some((b) => /^\[[ xX]\]\s/.test(b[0])) ? ' class="sn-md-tasks"' : ""}>${lis}</ul>`);
   return i;
 }
 // ———————————————— 代码块：高亮 + 行号 + 复制 + 换行 + 折叠 ————————————————
-const LANG = { js: "JavaScript", javascript: "JavaScript", jsx: "JSX", ts: "TypeScript", typescript: "TypeScript", tsx: "TSX", py: "Python", python: "Python", go: "Go", golang: "Go", json: "JSON", jsonc: "JSON", css: "CSS", scss: "SCSS", html: "HTML", xml: "XML", vue: "Vue", svg: "SVG", sh: "Shell", bash: "Bash", zsh: "Zsh", shell: "Shell", get console() { return t("markdown.6"); }, sql: "SQL", get text() { return t("markdown.7"); }, get txt() { return t("markdown.7"); }, md: "Markdown", markdown: "Markdown" };
+const LANG = { js: "JavaScript", javascript: "JavaScript", jsx: "JSX", ts: "TypeScript", typescript: "TypeScript", tsx: "TSX", py: "Python", python: "Python", go: "Go", golang: "Go", json: "JSON", jsonc: "JSON", css: "CSS", scss: "SCSS", html: "HTML", xml: "XML", vue: "Vue", svg: "SVG", sh: "Shell", bash: "Bash", zsh: "Zsh", shell: "Shell", get console() { return tt("markdown.6"); }, sql: "SQL", get text() { return tt("markdown.7"); }, get txt() { return tt("markdown.7"); }, md: "Markdown", markdown: "Markdown" };
 const FAMILY = { javascript: "js", jsx: "js", ts: "js", typescript: "js", tsx: "js", python: "py", golang: "go", jsonc: "json", scss: "css", less: "css", xml: "html", vue: "html", svg: "html", bash: "sh", zsh: "sh", shell: "sh", console: "sh" };
 const words = (s) => new Set(s.split(" "));
 const KW = {
@@ -264,19 +265,19 @@ const LIVE_VARS = ["--sn-label", "--sn-label2", "--sn-label3", "--sn-raised", "-
 const themeVars = () => { const cs = getComputedStyle(document.documentElement); return Object.fromEntries(LIVE_VARS.map((k) => [k, cs.getPropertyValue(k).trim()])); };
 function liveBlock(code, ctx, closed) {
   const id = "mdlive" + ++liveSeq, vars = Object.entries(themeVars()).map(([k, v]) => `${k}:${v}`).join(";");
-  return `<div class="sn-md-live" data-live="${id}"><div class="sn-md-live-hd"><div class="sn-md-live-tabs" role="tablist" aria-label="${t("markdown.8")}"><span class="sn-md-live-thumb"></span><button type="button" role="tab" aria-selected="true" data-md="live-view">${t("markdown.9")}</button><button type="button" role="tab" aria-selected="false" data-md="live-code">${t("markdown.10")}</button></div><button type="button" class="sn-md-code-btn" data-md="live-replay">${t("markdown.11")}</button></div>`
-    + `<div class="sn-md-live-view"><iframe class="sn-md-live-frame" sandbox="allow-scripts" title="${t("markdown.8")}" srcdoc="${esc(liveDoc(code, id, vars))}"></iframe></div><div class="sn-md-live-code" hidden>${codeBlock(code, "html nonum", ctx, closed)}</div></div>`;
+  return `<div class="sn-md-live" data-live="${id}"><div class="sn-md-live-hd"><div class="sn-md-live-tabs" role="tablist" aria-label="${tt("markdown.8")}"><span class="sn-md-live-thumb"></span><button type="button" role="tab" aria-selected="true" data-md="live-view">${tt("markdown.9")}</button><button type="button" role="tab" aria-selected="false" data-md="live-code">${tt("markdown.10")}</button></div><button type="button" class="sn-md-code-btn" data-md="live-replay">${tt("markdown.11")}</button></div>`
+    + `<div class="sn-md-live-view"><iframe class="sn-md-live-frame" sandbox="allow-scripts" title="${tt("markdown.8")}" srcdoc="${esc(liveDoc(code, id, vars))}"></iframe></div><div class="sn-md-live-code" hidden>${codeBlock(code, "html nonum", ctx, closed)}</div></div>`;
 }
 function codeBlock(code, info, ctx, closed) {
   const [lang0 = "", ...rest] = info.split(/\s+/), attrs = {}; for (const r of rest) { const k = r.indexOf("="); if (k > 0) attrs[r.slice(0, k)] = r.slice(k + 1); else if (r) attrs[r] = true; }
   if (/^html$/i.test(lang0) && (attrs.preview || attrs.live)) return liveBlock(code, ctx, closed);
-  const lang = lang0.toLowerCase(), label = LANG[lang] || lang0 || t("markdown.7"), lines = highlightLines(code, lang), maxh = attrs.maxh ?? attrs.h;
+  const lang = lang0.toLowerCase(), label = LANG[lang] || lang0 || tt("markdown.7"), lines = highlightLines(code, lang), maxh = attrs.maxh ?? attrs.h;
   const k = ctx.codes.push(code) - 1, digits = String(lines.length).length;
-  const title = attrs.title ? `<span class="sn-md-code-file">${esc(attrs.title)}</span><span class="md-code-lang">${esc(label)}</span>` : `<span class="sn-md-code-file">${esc(label)}</span>`;
+  const title = attrs.title ? `<span class="sn-md-code-file">${esc(attrs.title)}</span><span class="sn-md-code-lang">${esc(label)}</span>` : `<span class="sn-md-code-file">${esc(label)}</span>`;
   return `<div class="sn-md-code${attrs.wrap ? " sn-wrap" : ""}${attrs.nonum ? " sn-nonum" : ""}${closed ? "" : " open-end"}" data-k="${k}" style="--sn-md-gw:${digits}ch${maxh ? `;--sn-md-code-max:${+maxh}px` : ""}">`
-    + `<div class="sn-md-code-hd">${title}<span class="sn-md-code-n">${lines.length}${t("markdown.12")}</span><button type="button" class="sn-md-code-btn" data-md="wrap" aria-pressed="${attrs.wrap ? "true" : "false"}">${t("markdown.13")}</button><button type="button" class="sn-md-code-btn" data-md="copy">${t("markdown.14")}</button></div>`
+    + `<div class="sn-md-code-hd">${title}<span class="sn-md-code-n">${lines.length}${tt("markdown.12")}</span><button type="button" class="sn-md-code-btn" data-md="wrap" aria-pressed="${attrs.wrap ? "true" : "false"}">${tt("markdown.13")}</button><button type="button" class="sn-md-code-btn" data-md="copy">${tt("markdown.14")}</button></div>`
     + `<div class="sn-md-code-bd"><pre tabindex="0"><code>${lines.map((l) => `<span class="sn-l">${l || " "}</span>`).join("")}</code></pre></div>`
-    + `<button type="button" class="sn-md-code-more" data-md="more" hidden><span>${t("markdown.15", { p0: lines.length })}</span></button></div>`;
+    + `<button type="button" class="sn-md-code-more" data-md="more" hidden><span>${tt("markdown.15", { p0: lines.length })}</span></button></div>`;
 }
 // ———————————————— 公式：TeX 常用写法 → MathML ————————————————
 const GREEK = { alpha: "α", beta: "β", gamma: "γ", delta: "δ", epsilon: "ϵ", varepsilon: "ε", zeta: "ζ", eta: "η", theta: "θ", vartheta: "ϑ", iota: "ι", kappa: "κ", lambda: "λ", mu: "μ", nu: "ν", xi: "ξ", pi: "π", varpi: "ϖ", rho: "ρ", varrho: "ϱ", sigma: "σ", varsigma: "ς", tau: "τ", upsilon: "υ", phi: "ϕ", varphi: "φ", chi: "χ", psi: "ψ", omega: "ω", Gamma: "Γ", Delta: "Δ", Theta: "Θ", Lambda: "Λ", Xi: "Ξ", Pi: "Π", Sigma: "Σ", Upsilon: "Υ", Phi: "Φ", Psi: "Ψ", Omega: "Ω", ell: "ℓ", hbar: "ℏ", aleph: "ℵ", infty: "∞", partial: "∂", nabla: "∇", emptyset: "∅", varnothing: "∅", Re: "ℜ", Im: "ℑ", wp: "℘" };
@@ -290,15 +291,15 @@ const BB = { C: "ℂ", H: "ℍ", N: "ℕ", P: "ℙ", Q: "ℚ", R: "ℝ", Z: "ℤ
 const alpha = (ch, base, special) => special[ch] || (/[A-Z]/.test(ch) ? String.fromCodePoint(base + ch.charCodeAt(0) - 65) : ch);
 const ENVS = { matrix: ["", ""], pmatrix: ["(", ")"], bmatrix: ["[", "]"], Bmatrix: ["{", "}"], vmatrix: ["|", "|"], Vmatrix: ["‖", "‖"], cases: ["{", ""], aligned: ["", ""], align: ["", ""], gathered: ["", ""], array: ["", ""], smallmatrix: ["", ""] };
 function tex(src, display) {
-  try { const p = { s: src, i: 0, display }; const body = seq(p, () => false); if (p.i < p.s.length) throw new Error(t("markdown.16") + p.s[p.i]); return `<math${display ? ' display="block"' : ""}><mrow>${body}</mrow></math>`; }
-  catch { return `<code class="sn-md-math-err" title="${t("markdown.17")}">${esc(display ? src : "$" + src + "$")}</code>`; }
+  try { const p = { s: src, i: 0, display }; const body = seq(p, () => false); if (p.i < p.s.length) throw new Error(tt("markdown.16") + p.s[p.i]); return `<math${display ? ' display="block"' : ""}><mrow>${body}</mrow></math>`; }
+  catch { return `<code class="sn-md-math-err" title="${tt("markdown.17")}">${esc(display ? src : "$" + src + "$")}</code>`; }
 }
 const ws = (p) => { while (p.i < p.s.length && /\s/.test(p.s[p.i])) p.i++; };
-function cmdName(p) { const m = /^\\([A-Za-z]+|.)/.exec(p.s.slice(p.i)); if (!m) throw new Error(t("markdown.18")); p.i += m[0].length; return m[1]; }
-function group(p) { ws(p); if (p.s[p.i] !== "{") throw new Error(t("markdown.19")); p.i++; const body = seq(p, (q) => q.s[q.i] === "}"); if (p.s[p.i] !== "}") throw new Error(t("markdown.20")); p.i++; return body; }
-function rawGroup(p) { ws(p); if (p.s[p.i] !== "{") throw new Error(t("markdown.19")); let d = 0, j = p.i; for (; j < p.s.length; j++) { if (p.s[j] === "{") d++; else if (p.s[j] === "}" && --d === 0) break; } if (j >= p.s.length) throw new Error(t("markdown.20")); const t = p.s.slice(p.i + 1, j); p.i = j + 1; return t; }
+function cmdName(p) { const m = /^\\([A-Za-z]+|.)/.exec(p.s.slice(p.i)); if (!m) throw new Error(tt("markdown.18")); p.i += m[0].length; return m[1]; }
+function group(p) { ws(p); if (p.s[p.i] !== "{") throw new Error(tt("markdown.19")); p.i++; const body = seq(p, (q) => q.s[q.i] === "}"); if (p.s[p.i] !== "}") throw new Error(tt("markdown.20")); p.i++; return body; }
+function rawGroup(p) { ws(p); if (p.s[p.i] !== "{") throw new Error(tt("markdown.19")); let d = 0, j = p.i; for (; j < p.s.length; j++) { if (p.s[j] === "{") d++; else if (p.s[j] === "}" && --d === 0) break; } if (j >= p.s.length) throw new Error(tt("markdown.20")); const t = p.s.slice(p.i + 1, j); p.i = j + 1; return t; }
 // 一个参数：{…}、一个命令、或者一个字符
-function arg(p) { ws(p); const c = p.s[p.i]; if (c === "{") return `<mrow>${group(p)}</mrow>`; if (c === "\\") return atom(p); if (c == null) throw new Error(t("markdown.21")); p.i++; return /\d/.test(c) ? `<mn>${c}</mn>` : /[A-Za-z]/.test(c) ? `<mi>${c}</mi>` : `<mo>${esc(c)}</mo>`; }
+function arg(p) { ws(p); const c = p.s[p.i]; if (c === "{") return `<mrow>${group(p)}</mrow>`; if (c === "\\") return atom(p); if (c == null) throw new Error(tt("markdown.21")); p.i++; return /\d/.test(c) ? `<mn>${c}</mn>` : /[A-Za-z]/.test(c) ? `<mi>${c}</mi>` : `<mo>${esc(c)}</mo>`; }
 function seq(p, end) {
   let out = "";
   for (;;) {
@@ -339,20 +340,20 @@ function atom(p) {
   if (name === "operatorname") return `<mi fn>${esc(rawGroup(p))}</mi>`;
   if (name === "mathrm" || name === "mathbf" || name === "mathit" || name === "boldsymbol" || name === "mathsf") { const t = rawGroup(p), st = name === "mathbf" || name === "boldsymbol" ? ' style="font-weight:700"' : name === "mathsf" ? ' style="font-family:var(--sn-sans)"' : ""; return t.length === 1 && name !== "mathit" ? `<mi mathvariant="normal"${st}>${esc(t)}</mi>` : `<mrow${st}>${tex2(t, p.display, name === "mathrm" || name === "mathbf" ? "normal" : "")}</mrow>`; }
   if (name === "mathbb" || name === "mathcal") { const t = [...rawGroup(p)].map((ch) => `<mi>${name === "mathbb" ? alpha(ch, 0x1d538, BB) : alpha(ch, 0x1d49c, CAL)}</mi>`).join(""); return t.split("<mi>").length > 2 ? `<mrow>${t}</mrow>` : t; }
-  if (name === "left") { const l = fence(p); const body = seq(p, () => false); if (!p.s.startsWith("\\right", p.i)) throw new Error(t("markdown.22")); p.i += 6; const r = fence(p); return `<mrow>${l ? `<mo fence="true" stretchy="true">${l}</mo>` : ""}${body}${r ? `<mo fence="true" stretchy="true">${r}</mo>` : ""}</mrow>`; }
+  if (name === "left") { const l = fence(p); const body = seq(p, () => false); if (!p.s.startsWith("\\right", p.i)) throw new Error(tt("markdown.22")); p.i += 6; const r = fence(p); return `<mrow>${l ? `<mo fence="true" stretchy="true">${l}</mo>` : ""}${body}${r ? `<mo fence="true" stretchy="true">${r}</mo>` : ""}</mrow>`; }
   if (name === "big" || name === "Big" || name === "bigg" || name === "Bigg" || name === "bigl" || name === "bigr" || name === "Bigl" || name === "Bigr") { const f = fence(p), sz = { big: "1.2em", Big: "1.8em", bigg: "2.4em", Bigg: "3em" }[name.replace(/[lr]$/, "")]; return `<mo stretchy="true" minsize="${sz}" maxsize="${sz}">${f}</mo>`; }
   if (name === "begin") {
-    const env = rawGroup(p).replace(/\*$/, ""); if (!ENVS[env]) throw new Error(t("markdown.23")); if (env === "array") rawGroup(p);
+    const env = rawGroup(p).replace(/\*$/, ""); if (!ENVS[env]) throw new Error(tt("markdown.23")); if (env === "array") rawGroup(p);
     const rows = [[]];
-    for (;;) { const cell = seq(p, () => false); rows.at(-1).push(cell); ws(p); if (p.s[p.i] === "&") { p.i++; continue; } if (p.s.startsWith("\\\\", p.i)) { p.i += 2; ws(p); if (p.s[p.i] === "[") p.i = p.s.indexOf("]", p.i) + 1; rows.push([]); continue; } if (p.s.startsWith("\\end", p.i)) { p.i += 4; rawGroup(p); break; } throw new Error(t("markdown.24")); }
+    for (;;) { const cell = seq(p, () => false); rows.at(-1).push(cell); ws(p); if (p.s[p.i] === "&") { p.i++; continue; } if (p.s.startsWith("\\\\", p.i)) { p.i += 2; ws(p); if (p.s[p.i] === "[") p.i = p.s.indexOf("]", p.i) + 1; rows.push([]); continue; } if (p.s.startsWith("\\end", p.i)) { p.i += 4; rawGroup(p); break; } throw new Error(tt("markdown.24")); }
     if (rows.length > 1 && rows.at(-1).length === 1 && !rows.at(-1)[0]) rows.pop();
     const al = env === "cases" ? ' columnalign="left left"' : env.startsWith("align") ? ' columnalign="right left" columnspacing="0"' : "";
     const [l, r] = ENVS[env], tbl = `<mtable class="${env.startsWith("align") ? "sn-aligned" : env === "cases" ? "sn-cases" : env === "gathered" ? "gathered" : "sn-matrix"}"${al}${env === "smallmatrix" ? ' style="font-size:.8em"' : ""}>${rows.map((rw) => `<mtr>${rw.map((c) => `<mtd>${c}</mtd>`).join("")}</mtr>`).join("")}</mtable>`;
     return l || r ? `<mrow>${l ? `<mo fence="true" stretchy="true">${l}</mo>` : ""}${tbl}${r ? `<mo fence="true" stretchy="true">${r}</mo>` : ""}</mrow>` : tbl;
   }
-  throw new Error(t("markdown.25") + name);
+  throw new Error(tt("markdown.25") + name);
 }
-function fence(p) { ws(p); const c = p.s[p.i]; if (c === "\\") { const n = cmdName(p); if (n === "{" || n === "}") return n; if (n === "|") return "‖"; if (MO[n]) return MO[n]; throw new Error(t("markdown.26")); } p.i++; return c === "." ? "" : esc(c); }
+function fence(p) { ws(p); const c = p.s[p.i]; if (c === "\\") { const n = cmdName(p); if (n === "{" || n === "}") return n; if (n === "|") return "‖"; if (MO[n]) return MO[n]; throw new Error(tt("markdown.26")); } p.i++; return c === "." ? "" : esc(c); }
 function tex2(src, display, variant) { const p = { s: src, i: 0, display }; let out = seq(p, () => false); if (variant === "normal") out = out.replace(/<mi>/g, '<mi mathvariant="normal">'); return out; }
 // ———————————————— 渲染 + 交互 ————————————————
 /**
@@ -364,10 +365,10 @@ function tex2(src, display, variant) { const p = { s: src, i: 0, display }; let 
  */
 export function renderMarkdown(el, md, opt = {}) {
   const o = { codeMax: 240, imgH: 220, tableMax: 0, reduced: () => matchMedia("(prefers-reduced-motion: reduce)").matches, ...opt };
-  let ctx = null;
+  let ctx = null, liveRelease = null;
   el.classList.add("sn-md");
   const vars = () => { el.style.setProperty("--sn-md-code-max", o.codeMax ? o.codeMax + "px" : "none"); el.style.setProperty("--sn-md-img-h", o.imgH === "auto" ? "auto" : o.imgH + "px"); el.style.setProperty("--sn-md-table-max", o.tableMax ? o.tableMax + "px" : "none"); el.classList.toggle("sn-img-auto", o.imgH === "auto"); };
-  function render(src) { for (const a of el.querySelectorAll(".sn-audio-row")) a._audio?.destroy(); ctx = { codes: [], ids: new Map() }; el.innerHTML = blocks(String(src || "").replace(/\r\n?/g, "\n").split("\n"), ctx); vars(); enhance(); }
+  function render(src) { for (const a of el.querySelectorAll(".sn-audio-row")) a._audio?.destroy(); for (const p of el.querySelectorAll(".sn-player")) p._player?.destroy(); ctx = { codes: [], ids: new Map() }; el.innerHTML = blocks(String(src || "").replace(/\r\n?/g, "\n").split("\n"), ctx); vars(); enhance(); }
   // 代码块：内容比上限高（多出一行以上）才折叠；图片：加载中有占位、失败给提示
   function enhance() {
     for (const b of el.querySelectorAll(".sn-md-code")) clip(b);
@@ -379,7 +380,7 @@ export function renderMarkdown(el, md, opt = {}) {
     for (const a of el.querySelectorAll(".sn-audio-row")) mountAudio(a);
     const lives = el.querySelectorAll(".sn-md-live iframe");
     // 载完以后外面再问一次高度（外面的监听已经装好，不会丢）；框的尺寸变了（从隐藏到显示、换宽度）也再问
-    if (lives.length) { wireLive(); for (const f of lives) { f.addEventListener("load", () => f.contentWindow?.postMessage({ mdTheme: themeVars(), mdAsk: 1 }, "*")); liveRO?.observe(f); } }
+    if (lives.length) { liveRelease ??= wireLive(); for (const f of lives) { f.addEventListener("load", () => f.contentWindow?.postMessage({ mdTheme: themeVars(), mdAsk: 1 }, "*")); liveRO?.observe(f); } }
     for (const img of el.querySelectorAll(".sn-md-img img")) {
       const box = img.parentElement; const ok = () => box.classList.add("sn-ok"), bad = () => box.classList.add("sn-bad");
       if (img.complete) (img.naturalWidth ? ok : bad)(); else { img.addEventListener("load", ok, { once: true }); img.addEventListener("error", bad, { once: true }); }
@@ -395,7 +396,7 @@ export function renderMarkdown(el, md, opt = {}) {
   function toggle(b) {
     const bd = b.querySelector(".sn-md-code-bd"), more = b.querySelector(".sn-md-code-more span"), n = b.querySelectorAll(".sn-l").length, full = bd.firstElementChild.scrollHeight, max = parseFloat(getComputedStyle(b).getPropertyValue("--sn-md-code-max"));
     const open = !b.classList.contains("sn-expanded"), from = bd.getBoundingClientRect().height, to = open ? full : max;
-    b.classList.toggle("sn-expanded", open); b.classList.toggle("sn-clip", !open); more.textContent = open ? t("markdown.27") : t("markdown.15", { p0: n });
+    b.classList.toggle("sn-expanded", open); b.classList.toggle("sn-clip", !open); more.textContent = open ? tt("markdown.27") : tt("markdown.15", { p0: n });
     if (o.reduced()) { bd.style.maxHeight = ""; return; }
     bd.style.maxHeight = "none"; const a = bd.animate([{ height: from + "px" }, { height: to + "px" }], { duration: Math.max(200, Math.min(420, 160 + Math.abs(to - from) * .35)), easing: "cubic-bezier(.25,.8,.25,1)" }); bd.style.overflow = "hidden";
     a.onfinish = a.oncancel = () => { bd.style.maxHeight = ""; bd.style.overflow = ""; };
@@ -415,33 +416,58 @@ export function renderMarkdown(el, md, opt = {}) {
     const btn = e.target.closest("[data-md]"); const b = btn?.closest(".sn-md-code");
     if (btn && b) {
       if (btn.dataset.md === "copy") {
-        const done = (ok) => { btn.textContent = ok ? t("markdown.28") : t("markdown.29"); btn.classList.toggle("sn-ok", ok); clearTimeout(btn._t); btn._t = setTimeout(() => { btn.textContent = t("markdown.14"); btn.classList.remove("sn-ok"); }, 1600); };
+        const done = (ok) => { btn.textContent = ok ? tt("markdown.28") : tt("markdown.29"); btn.classList.toggle("sn-ok", ok); clearTimeout(btn._t); btn._t = setTimeout(() => { btn.textContent = tt("markdown.14"); btn.classList.remove("sn-ok"); }, 1600); };
         const pr = navigator.clipboard?.writeText(ctx.codes[+b.dataset.k]); if (pr) pr.then(() => done(true), () => done(false)); else done(false);
       } else if (btn.dataset.md === "wrap") { const on = !b.classList.contains("sn-wrap"); b.classList.toggle("sn-wrap", on); btn.setAttribute("aria-pressed", String(on)); clip(b); }
       else if (btn.dataset.md === "more") toggle(b);
       return;
     }
-    const img = e.target.closest(".sn-md-img.sn-blk.ok img"); if (img) zoom(img);
+    const img = e.target.closest(".sn-md-img.sn-blk.sn-ok img"); if (img) zoom(img);
   });
-  el.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".sn-md-img.sn-blk.ok img")) { e.preventDefault(); zoom(e.target); } });
+  el.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".sn-md-img.sn-blk.sn-ok img")) { e.preventDefault(); zoom(e.target); } });
   // 点开放大：用看图组件——图从原位置长到窗口中间，整篇文档里加载好的图左右翻；能放大缩小、拖动、旋转、还原
   function zoom(img) {
-    const imgs = [...el.querySelectorAll(".sn-md-img.sn-blk.ok img")];
+    const imgs = [...el.querySelectorAll(".sn-md-img.sn-blk.sn-ok img")];
     openLightbox(imgs.map((m) => ({ src: m.currentSrc || m.src, size: [m.naturalWidth, m.naturalHeight], alt: m.alt })), Math.max(0, imgs.indexOf(img)), {
       thumbOf: (i) => imgs[i], enabled: (i) => !!imgs[i]?.closest(".sn-md-img.sn-ok"),
     });
   }
   render(md);
-  return { el, set(next) { Object.assign(o, next); vars(); for (const b of el.querySelectorAll(".sn-md-code")) clip(b); }, update: render, get options() { return { ...o }; } };
+  // 销毁：停掉文档里的播放器、放开实时预览的共享接线（挂载时加的监听由 createMarkdown 一起撤）
+  const destroy = () => {
+    for (const p of el.querySelectorAll(".sn-player")) p._player?.destroy?.();
+    for (const a of el.querySelectorAll(".sn-audio-row")) a._audio?.destroy();
+    for (const f of el.querySelectorAll(".sn-md-live iframe")) liveRO?.unobserve(f);
+    liveRelease?.(); liveRelease = null;
+  };
+  return { el, set(next) { Object.assign(o, next); vars(); for (const b of el.querySelectorAll(".sn-md-code")) clip(b); }, update: render, destroy, get options() { return { ...o }; } };
 }
 // ———————————————— 沙箱预览：高度跟着内容，主题换了把新颜色发进去（整页只挂一次） ————————————————
-let liveWired = false, liveRO = null;
-function wireLive() {
-  if (liveWired) return; liveWired = true;
+// 整页共用一份（useShared 引用计数）：哪个文档先用到就装上，最后一个用它的文档销毁时撤掉
+let liveRO = null;
+const wireLive = () => useShared("satin:md-live", () => {
   liveRO = typeof ResizeObserver === "function" ? new ResizeObserver((es) => { for (const e of es) e.target.contentWindow?.postMessage({ mdAsk: 1 }, "*"); }) : null;
   addEventListener("message", (e) => { const d = e.data; if (!d || !d.mdLive) return; for (const f of document.querySelectorAll(`.sn-md-live[data-live="${d.mdLive}"] iframe`)) if (f.contentWindow === e.source) f.style.height = Math.max(48, Math.ceil(d.h)) + "px"; });
   new MutationObserver(() => { const v = themeVars(); for (const f of document.querySelectorAll(".sn-md-live iframe")) f.contentWindow?.postMessage({ mdTheme: v }, "*"); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "style"] });
-}
-// ———————————————— 演示：样例文档 + 高度设置 + 源码编辑 ————————————————
-const enc = (s) => encodeURIComponent(s).replace(/[()']/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase());
-const svgScene = (a, b, c) => "data:image/svg+xml;utf8," + enc(`<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient><radialGradient id="g" cx=".72" cy=".3" r=".5"><stop offset="0" stop-color="${c}" stop-opacity=".55"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient></defs><rect width="1280" height="720" fill="url(#s)"/><rect width="1280" height="720" fill="url(#g)"/><path d="M0 560 L240 470 L420 520 L640 430 L860 500 L1080 450 L1280 520 L1280 720 L0 720Z" fill="#000" opacity=".28"/><rect x="180" y="380" width="220" height="140" rx="6" fill="#000" opacity=".22"/><rect x="200" y="400" width="40" height="30" fill="${c}" opacity=".7"/><rect x="260" y="400" width="40" height="30" fill="${c}" opacity=".45"/></svg>`);
+});
+
+// createMarkdown(空容器, { source, codeMax, imgH, tableMax }) → { update({ source }), destroy, ... }：统一的组件写法。
+// update 给了新的 source 就重新渲染，改了 codeMax / imgH / tableMax 就只改高度设置；destroy 时撤掉挂载时加的监听、停掉文档里的播放器
+export const createMarkdown = /* @__PURE__ */ defineComponent({
+  name: "markdown",
+  html: () => `<div class="sn-md"></div>`,
+  defaults: { source: "" },
+  mount(el, o) {
+    const { source, ...opt } = o, md = renderMarkdown(el, source, opt);
+    let cur = source;
+    return {
+      update(next, prev) {
+        const set = {}; for (const k of ["codeMax", "imgH", "tableMax"]) if (next[k] !== prev[k]) set[k] = next[k];
+        if (Object.keys(set).length) md.set(set);
+        if (next.source !== prev.source) { cur = next.source; md.update(cur); }
+      },
+      destroy: md.destroy,
+      get source() { return cur; },
+    };
+  },
+});

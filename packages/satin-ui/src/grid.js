@@ -15,8 +15,9 @@ import { toast } from "./feedback.js";
 import { BOX, EASE, EASE_CSS, contentW, liftIn, popCheck, tween } from "./form.js";
 import { icon } from "./icons.js";
 import { scoped } from "./i18n.js";
+import { defineComponent } from "./lifecycle.js";
 import I18N_DEFAULTS from "./locales/zh-CN/grid.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 export const RH = 40, HEAD = 40;
 const OPTS = { status: STATUS, owner: OWNERS, tag: TAGS };
 // ———— 列模型：左固定 + 中间（可换位置）+ 右固定 ————
@@ -34,21 +35,24 @@ export function columnModel() {
   return m;
 }
 // ———— 弹层：贴着一个矩形出现，下面放不下就放上面；点外面、Esc 关 ————
+const pops = new Set(); // 开着的弹层：表格销毁时一起关
+export const closeGridPops = () => { for (const p of [...pops]) p.close(); };
 function popover(rect, html, cls = "") {
   const el = document.createElement("div"); el.className = `sn-menu sn-float sn-open sn-g-pop ${cls}`; el.innerHTML = html; document.body.append(el);
   const w = el.offsetWidth, h = el.offsetHeight, below = rect.bottom + 4 + h <= innerHeight - 8;
   el.style.left = Math.max(8, Math.min(innerWidth - w - 8, rect.left)) + "px"; el.style.top = (below ? rect.bottom + 4 : Math.max(8, rect.top - 4 - h)) + "px";
   let onClose = null;
-  const close = () => { el.remove(); removeEventListener("pointerdown", out, true); removeEventListener("keydown", key, true); onClose?.(); };
+  const close = () => { if (!pops.delete(api)) return; el.remove(); removeEventListener("pointerdown", out, true); removeEventListener("keydown", key, true); onClose?.(); };
   const out = (e) => { if (!el.contains(e.target)) close(); };
   const key = (e) => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); } };
-  setTimeout(() => { addEventListener("pointerdown", out, true); addEventListener("keydown", key, true); });
-  return { el, close, set onClose(f) { onClose = f; } };
+  setTimeout(() => { if (pops.has(api)) { addEventListener("pointerdown", out, true); addEventListener("keydown", key, true); } });
+  const api = { el, close, set onClose(f) { onClose = f; } }; pops.add(api);
+  return api;
 }
 // 选项（编辑状态、负责人、类型）：上下键选，回车确定
 export function openEnum(rect, col, cur, onPick, onCancel) {
   const opts = OPTS[col.key]; let hl = cur;
-  const p = popover(rect, opts.map((o, k) => `<div class="sn-item${k === cur ? " sn-sel" : ""}" data-k="${k}">${o}<span class="sn-chk">${icon("check", 16)}</span></div>`).join(""), "g-enum");
+  const p = popover(rect, opts.map((o, k) => `<div class="sn-item${k === cur ? " sn-sel" : ""}" data-k="${k}">${o}<span class="sn-chk">${icon("check", 16)}</span></div>`).join(""), "sn-g-enum");
   const items = [...p.el.querySelectorAll(".sn-item")], paint = () => items.forEach((x, k) => x.classList.toggle("sn-hl", k === hl));
   let picked = false; paint();
   p.el.addEventListener("pointermove", (e) => { const it = e.target.closest(".sn-item"); if (it) { hl = +it.dataset.k; paint(); } });
@@ -65,13 +69,13 @@ export function openFilter(btn, col, src) {
   const q = src.query, r = btn.getBoundingClientRect();
   if (col.filter === "enum") {
     const opts = OPTS[col.key], on = new Set(q[col.key] || []);
-    const p = popover(r, `<div class="sn-g-fhead">${col.title}</div><div class="sn-pop-checks">${opts.map((o, k) => `<label class="sn-check"><input type="checkbox" data-k="${k}"${on.has(k) ? " checked" : ""}>${BOX}${o}</label>`).join("")}</div><div class="sn-sep"></div><div class="sn-item g-fclear">${t("grid.0")}</div>`, "g-filter"); // 选项用组件库的复选框列表（和"弹出面板"里的筛选一样）
+    const p = popover(r, `<div class="sn-g-fhead">${col.title}</div><div class="sn-pop-checks">${opts.map((o, k) => `<label class="sn-check"><input type="checkbox" data-k="${k}"${on.has(k) ? " checked" : ""}>${BOX}${o}</label>`).join("")}</div><div class="sn-sep"></div><div class="sn-item sn-g-fclear">${tt("grid.0")}</div>`, "g-filter"); // 选项用组件库的复选框列表（和"弹出面板"里的筛选一样）
     let t = 0; const apply = () => { clearTimeout(t); t = setTimeout(() => src.setQuery({ ...src.query, [col.key]: [...on].sort() }), 200); };
     p.el.addEventListener("change", (e) => { const i = e.target; if (i.dataset.k == null) return; const k = +i.dataset.k; i.checked ? on.add(k) : on.delete(k); apply(); });
-    p.el.addEventListener("click", (e) => { if (e.target.closest(".g-fclear")) { on.clear(); p.el.querySelectorAll("input[data-k]").forEach((i) => (i.checked = false)); src.setQuery({ ...src.query, [col.key]: [] }); p.close(); } });
+    p.el.addEventListener("click", (e) => { if (e.target.closest(".sn-g-fclear")) { on.clear(); p.el.querySelectorAll("input[data-k]").forEach((i) => (i.checked = false)); src.setQuery({ ...src.query, [col.key]: [] }); p.close(); } });
     return p;
   }
-  const p = popover(r, `<div class="sn-g-fhead">${col.title}${t("grid.1")}</div><div class="sn-g-frange"><input class="sn-input sn-sm" data-min placeholder="${t("grid.2")}" value="${q.durMin ?? ""}"><span>–</span><input class="sn-input sn-sm" data-max placeholder="${t("grid.3")}" value="${q.durMax ?? ""}"></div><div class="sn-g-facts"><button class="sn-btn sn-ghost sn-sm" data-clear>${t("grid.4")}</button><button class="sn-btn sn-primary sn-sm" data-apply>${t("grid.5")}</button></div>`, "g-filter");
+  const p = popover(r, `<div class="sn-g-fhead">${col.title}${tt("grid.1")}</div><div class="sn-g-frange"><input class="sn-input sn-sm" data-min placeholder="${tt("grid.2")}" value="${q.durMin ?? ""}"><span>–</span><input class="sn-input sn-sm" data-max placeholder="${tt("grid.3")}" value="${q.durMax ?? ""}"></div><div class="sn-g-facts"><button class="sn-btn sn-ghost sn-sm" data-clear>${tt("grid.4")}</button><button class="sn-btn sn-primary sn-sm" data-apply>${tt("grid.5")}</button></div>`, "g-filter");
   const val = (s) => { const t = s.trim(); if (!t) return null; const m = /^(\d+):(\d{1,2})$/.exec(t); return m ? +m[1] * 60 + +m[2] : /^\d+$/.test(t) ? +t : null; };
   const go = (clear) => { src.setQuery({ ...src.query, durMin: clear ? null : val(p.el.querySelector("[data-min]").value), durMax: clear ? null : val(p.el.querySelector("[data-max]").value) }); p.close(); };
   p.el.querySelector("[data-apply]").addEventListener("click", () => go(false)); p.el.querySelector("[data-clear]").addEventListener("click", () => go(true));
@@ -82,7 +86,7 @@ export function openFilter(btn, col, src) {
 // ———— 表头：排序、筛选、拖列换位置、拖边改宽；DOM 版和 Canvas 版共用 ————
 // opt: { root, vp, src, injectIcons, apply(): 重新套用列, motion(): 列的位移 / 透明度变了，当场画一帧并接着画到停, autosize(key): 按内容算宽度, onSelAll(), selState() }
 export function mountHead(head, model, opt) {
-  head.innerHTML = model.cols.map((c) => `<div class="sn-g-hc${c.align === "right" ? " sn-r" : ""}${c.fixed ? "" : " sn-mv"}" data-c="${c.key}" role="columnheader">${c.type === "sel" ? `<span class="sn-check" data-all role="checkbox" aria-checked="false" aria-label="${t("grid.46")}">${BOX}</span>` : c.type === "act" ? "" : `<span class="sn-g-ht">${c.title}</span>${c.sort ? '<span class="sn-g-sort" data-i="arrow-up"></span>' : ""}${c.filter ? `<button class="sn-g-fb" data-i="list-filter" aria-label="${t("grid.47")}${c.title}"></button>` : ""}<i class="sn-g-rz"></i>`}</div>`).join("");
+  head.innerHTML = model.cols.map((c) => `<div class="sn-g-hc${c.align === "right" ? " sn-r" : ""}${c.fixed ? "" : " sn-mv"}" data-c="${c.key}" role="columnheader">${c.type === "sel" ? `<span class="sn-check" data-all role="checkbox" aria-checked="false" aria-label="${tt("grid.46")}">${BOX}</span>` : c.type === "act" ? "" : `<span class="sn-g-ht">${c.title}</span>${c.sort ? '<span class="sn-g-sort" data-i="arrow-up"></span>' : ""}${c.filter ? `<button class="sn-g-fb" data-i="list-filter" aria-label="${tt("grid.47")}${c.title}"></button>` : ""}<i class="sn-g-rz"></i>`}</div>`).join("");
   opt.injectIcons(head);
   const paint = () => {
     const s = opt.src.query.sort;
@@ -127,7 +131,7 @@ export function mountHead(head, model, opt) {
   const dimNow = (k, now = performance.now()) => (dim && dim.key === k ? dim.a0 + (dim.a1 - dim.a0) * EASE.out(Math.min(1, Math.max(0, (now - dim.t0) / dim.dur))) : 1);
   const moving = (now = performance.now()) => { for (const [k, o] of offs) if (now - o.t0 >= COL_DUR) offs.delete(k); if (dim && now - dim.t0 >= dim.dur && dim.a1 >= 1) dim = null; return offs.size > 0 || (!!dim && now - dim.t0 < dim.dur); }; /* 还在动吗（动就接着画下一帧）；走完的顺手清掉 */
   const motionCss = (id, body, now = performance.now()) => { /* 表头（DOM 版连表身）这一帧的位移和透明度，写成样式；拖列时的空位也跟着这一列挪 */
-    const sel = (k) => `${id} .g-head [data-c="${k}"]` + (body ? `,${id} .g-body [data-c="${k}"]` : ""); let css = ""; paintSlot(now);
+    const sel = (k) => `${id} .sn-g-head [data-c="${k}"]` + (body ? `,${id} .sn-g-body [data-c="${k}"]` : ""); let css = ""; paintSlot(now);
     for (const k of offs.keys()) { const x = offNow(k, now); if (Math.abs(x) > .01) css += `${sel(k)}{translate:${x.toFixed(2)}px 0}`; }
     if (dim) { const a = dimNow(dim.key, now); if (a < .999) css += `${sel(dim.key)}{opacity:${a.toFixed(3)}}`; }
     return css;
@@ -151,7 +155,7 @@ export function mountHead(head, model, opt) {
     const step = () => {
       raf = 0; const edgeX = vp.getBoundingClientRect().left + (side === "L" ? vp.clientWidth : vp.clientWidth - model.rightW()) - 2; // 边线最远到可见区的边上，超出的距离只用来决定横滚多快
       const w = Math.max(64, Math.min(480, Math.round(w0 + Math.min(px, edgeX) - x0 + scrolled))); if (w !== col.w) { col.w = w; opt.apply(); }
-      const x = right(); line.style.left = x - 1 + "px"; line.style.height = vp.clientHeight + "px"; line.dataset.w = t("grid.6", { p0: col.w }); line.classList.toggle("sn-flip", x > vp.clientWidth - 96);
+      const x = right(); line.style.left = x - 1 + "px"; line.style.height = vp.clientHeight + "px"; line.dataset.w = tt("grid.6", { p0: col.w }); line.classList.toggle("sn-flip", x > vp.clientWidth - 96);
       const over = px - (vp.getBoundingClientRect().left + vp.clientWidth - model.rightW() - 16);
       if (side === "M" && over > 0 && col.w < 480) { const s = vp.scrollLeft; vp.scrollLeft = s + Math.min(24, over / 2.5); scrolled += vp.scrollLeft - s; raf = requestAnimationFrame(step); }
     };
@@ -210,13 +214,13 @@ export function mountToolbar(root, src, model, { $, initSeg, seg, treeSeg, selCo
   const info = $("[data-g-info]", root), chips = $("[data-g-filters]", root), q = $("[data-g-q]", root), xb = $("[data-g-expand]", root);
   function paint() {
     const qq = src.query, parts = [];
-    if (qq.q?.trim()) parts.push(["q", t("grid.7", { p0: qq.q.trim() })]);
+    if (qq.q?.trim()) parts.push(["q", tt("grid.7", { p0: qq.q.trim() })]);
     for (const k of ["status", "owner", "tag"]) if (qq[k]?.length) parts.push([k, `${model.byKey[k].title}：${qq[k].map((x) => OPTS[k][x]).join("、")}`]);
-    if (qq.durMin != null || qq.durMax != null) parts.push(["dur", t("grid.8", { p0: qq.durMin != null ? fmt.dur(qq.durMin) : "0:00", p1: qq.durMax != null ? fmt.dur(qq.durMax) : t("grid.48") })]);
-    chips.innerHTML = parts.map(([k, t]) => `<span class="sn-chip sn-sm sn-on sn-g-chip" data-k="${k}">${t}<span class="sn-g-x" aria-label="${t("grid.9")}">×</span></span>`).join("") + (parts.length ? t("grid.10") : "");
+    if (qq.durMin != null || qq.durMax != null) parts.push(["dur", tt("grid.8", { p0: qq.durMin != null ? fmt.dur(qq.durMin) : "0:00", p1: qq.durMax != null ? fmt.dur(qq.durMax) : tt("grid.48") })]);
+    chips.innerHTML = parts.map(([k, t]) => `<span class="sn-chip sn-sm sn-on sn-g-chip" data-k="${k}">${t}<span class="sn-g-x" aria-label="${tt("grid.9")}">×</span></span>`).join("") + (parts.length ? tt("grid.10") : "");
     const sel = selCount(), tr = src.tree;
-    info.innerHTML = src.busy ? t("grid.11") : t("grid.12", { p0: src.total.toLocaleString("zh-CN"), p1: tr ? t("grid.49", { p0: src.roots.toLocaleString("zh-CN") }) : "", p2: hasFilter(qq) || qq.sort ? t("grid.50", { p0: src.ms }) : "", p3: sel ? t("grid.51", { p0: `<b>${sel.toLocaleString("zh-CN")}</b>`, p1: tr ? t("grid.52") : t("grid.53") }) : "" });
-    if (xb) { xb.hidden = !tr; if (tr && !src.busy) xb.lastChild.textContent = src.allOpen() ? t("grid.13") : t("grid.14"); } // 树形模式：所有级一起展开 / 收起
+    info.innerHTML = src.busy ? tt("grid.11") : tt("grid.12", { p0: src.total.toLocaleString("zh-CN"), p1: tr ? tt("grid.49", { p0: src.roots.toLocaleString("zh-CN") }) : "", p2: hasFilter(qq) || qq.sort ? tt("grid.50", { p0: src.ms }) : "", p3: sel ? tt("grid.51", { p0: `<b>${sel.toLocaleString("zh-CN")}</b>`, p1: tr ? tt("grid.52") : tt("grid.53") }) : "" });
+    if (xb) { xb.hidden = !tr; if (tr && !src.busy) xb.lastChild.textContent = src.allOpen() ? tt("grid.13") : tt("grid.14"); } // 树形模式：所有级一起展开 / 收起
   }
   chips.addEventListener("click", (e) => {
     const nq = { ...src.query };
@@ -447,7 +451,7 @@ export function treeDrag(src, merges, p0) {
 // 工具条上的合并 / 拆分按钮和"有几处合并暂时不显示"的提示（两版表格共用）
 export function mountMergeBar(root, injectIcons) {
   const info = root.querySelector("[data-g-info]"), bar = document.createElement("span"); bar.className = "sn-g-mbar";
-  bar.innerHTML = t("grid.15");
+  bar.innerHTML = tt("grid.15");
   // 合并按钮、提示、行数放在单独一行（固定高度、不换行）：提示出现、行数变长时只在这一行里伸缩（提示超长打省略号），不把下面的表格往下推
   injectIcons(bar); const meta = document.createElement("div"); meta.className = "sn-g-meta"; info.before(meta); meta.append(bar, info);
   return { merge: bar.querySelector("[data-g-merge]"), split: bar.querySelector("[data-g-split]"), hint: bar.querySelector(".sn-g-mhint") };
@@ -510,11 +514,11 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
 
   // 行
   const CELL = {
-    sel: `<span class="sn-grip sn-g-grip" data-i="grip-vertical" aria-label="${t("grid.16")}"></span><span class="sn-check" role="checkbox" aria-checked="false" aria-label="${t("grid.17")}">${BOX}</span>`, // 把手、复选框都是组件库共用的
+    sel: `<span class="sn-grip sn-g-grip" data-i="grip-vertical" aria-label="${tt("grid.16")}"></span><span class="sn-check" role="checkbox" aria-checked="false" aria-label="${tt("grid.17")}">${BOX}</span>`, // 把手、复选框都是组件库共用的
     text: '<span class="sn-g-t"></span>', int: '<span class="sn-g-t"></span>', dur: '<span class="sn-g-t"></span>', money: '<span class="sn-g-t"></span>', time: '<span class="sn-g-t"></span>',
     status: '<span class="sn-g-st"><i class="sn-g-dot"></i><span class="sn-g-t"></span></span>', owner: '<span class="sn-g-ow"><i class="sn-g-av"></i><span class="sn-g-t"></span></span>', tag: '<span class="sn-g-tag sn-g-t"></span>',
     prog: '<span class="sn-g-pg"><i class="sn-g-pbar"><b></b></i><span class="sn-g-t"></span></span>',
-    act: t("grid.18"), // 组件库的图标按钮（悬停出底、按下缩一下）；"详情"只在树形模式出现（平铺时详情在名称前的箭头上）
+    act: tt("grid.18"), // 组件库的图标按钮（悬停出底、按下缩一下）；"详情"只在树形模式出现（平铺时详情在名称前的箭头上）
   };
   // ———— 选中框、框选框（像 Excel）————
   // 一个框压在格线上：2px，盖住边上那条 1px 的格线、再往选区里多 1px（四条边一样）；直角；合并块整块框住。
@@ -549,7 +553,7 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
     const el = document.createElement("div"); el.className = "sn-g-row"; el.setAttribute("role", "row");
     el.innerHTML = model.cols.map((c) => `<div class="sn-g-cell${c.align === "right" ? " sn-r" : ""}" data-c="${c.key}" role="gridcell">${CELL[c.type]}</div>`).join("")
       + '<i class="sn-g-rh" aria-hidden="true"></i><div class="sn-g-detail" aria-hidden="true"><span class="sn-g-dt-cv"></span><div class="sn-g-dt-main"><b class="sn-g-dt-t"></b><p class="sn-g-dt-d"></p><div class="sn-g-dt-shots"></div></div></div>';
-    el.querySelector('[data-c="name"]').insertAdjacentHTML("afterbegin", t("grid.19")); // 组件库的展开箭头；树形：每一级的竖向引导线、没有下级时的小圆点
+    el.querySelector('[data-c="name"]').insertAdjacentHTML("afterbegin", tt("grid.19")); // 组件库的展开箭头；树形：每一级的竖向引导线、没有下级时的小圆点
     el.querySelector('[data-c="name"]').insertAdjacentHTML("beforeend", '<span class="sn-g-cnt"></span>'); // 树形：名称后面的下级数量（"4 集"）
     injectIcons(el); el._cells = {}; for (const cell of el.querySelectorAll(".sn-g-cell")) { el._cells[cell.dataset.c] = cell; cell._t = cell.querySelector(".sn-g-t"); }
     el._detail = el.querySelector(".sn-g-detail"); el._exp = el.querySelector(".sn-g-exp"); el._cnt = el.querySelector(".sn-g-cnt"); el._dtb = el.querySelector(".sn-g-dtb"); body.append(el); return el;
@@ -579,10 +583,10 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
     el.classList.toggle("sn-sk", r < 0); el.classList.toggle("sn-exp", ex);
     if (src.tree) { // 树形：缩进、引导线；有下级的是展开箭头（按"该是什么状态"转，收起时不等下级淡出），没有的是小圆点；详情挪到操作列的按钮上
       const id = src.idAt(p), lv = src.lvAt(p), kids = src.hasKids(id), op = kids && src.isOpen(id); el.style.setProperty("--sn-lv", lv); el.classList.toggle("sn-tk", kids); el.classList.toggle("sn-to", op);
-      el.setAttribute("aria-level", lv + 1); el._cells.name.setAttribute("aria-expanded", String(op)); el._exp.setAttribute("aria-expanded", String(op)); el._exp.setAttribute("aria-label", op ? t("grid.20") : t("grid.21"));
+      el.setAttribute("aria-level", lv + 1); el._cells.name.setAttribute("aria-expanded", String(op)); el._exp.setAttribute("aria-expanded", String(op)); el._exp.setAttribute("aria-label", op ? tt("grid.20") : tt("grid.21"));
       el._cnt.textContent = kids && lv < 3 ? `${src.kidsN(id)} ${TREE_UNIT[lv]}` : ""; if (r >= 0) el._dtb.setAttribute("aria-expanded", String(expTo.get(r) ?? ex));
     } else {
-      if (el.classList.contains("sn-tk") || el.classList.contains("sn-to") || el.style.getPropertyValue("--sn-lv")) { el.classList.remove("sn-tk", "sn-to"); el.style.removeProperty("--sn-lv"); el.removeAttribute("aria-level"); el._cnt.textContent = ""; el._exp.setAttribute("aria-label", t("grid.22")); }
+      if (el.classList.contains("sn-tk") || el.classList.contains("sn-to") || el.style.getPropertyValue("--sn-lv")) { el.classList.remove("sn-tk", "sn-to"); el.style.removeProperty("--sn-lv"); el.removeAttribute("aria-level"); el._cnt.textContent = ""; el._exp.setAttribute("aria-label", tt("grid.22")); }
       el._cells.name.setAttribute("aria-expanded", String(ex)); el._exp.setAttribute("aria-expanded", String(r >= 0 && (expTo.get(r) ?? ex))); // 箭头按"要去的状态"转：收起时一点就转回来，不等高度动完
     }
     if (r >= 0) { for (const c of model.cols) fillCell(el._cells[c.key], c, r); el.classList.toggle("sn-sel", isSel(r)); if (was && !reduced()) arrived.set(r, performance.now()); if (ex) fillDetail(el, r); } // 占位变成数据：120ms 从 40% 淡到 100%（render 里按时间算，和树的过渡乘在一起）
@@ -612,7 +616,7 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
   function fillDetail(el, r) {
     const d = el._detail, st = src.val(r, "status"), ow = src.val(r, "owner"), tg = src.val(r, "tag"), sh = src.val(r, "shots"), du = src.val(r, "dur"), pg = src.val(r, "prog"), up = src.val(r, "upd"), hue = (r * 47) % 360;
     d.style.setProperty("--sn-h", hue); d.querySelector(".sn-g-dt-t").textContent = src.name(r);
-    d.querySelector(".sn-g-dt-d").textContent = t("grid.23", { p0: TAGS[tg], p1: sh, p2: fmt.dur(du), p3: STATUS[st], p4: pg, p5: OWNERS[ow], p6: fmt.time(up) });
+    d.querySelector(".sn-g-dt-d").textContent = tt("grid.23", { p0: TAGS[tg], p1: sh, p2: fmt.dur(du), p3: STATUS[st], p4: pg, p5: OWNERS[ow], p6: fmt.time(up) });
     d.querySelector(".sn-g-dt-shots").innerHTML = Array.from({ length: Math.min(10, sh) }, (_, k) => `<i style="--sn-h:${(hue + k * 23) % 360}"></i>`).join("") + (sh > 10 ? `<span>+${sh - 10}</span>` : "");
   }
   // 画看得见的行；要块；滚到底时（滚到底再加载模式）加载更多
@@ -644,7 +648,7 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
     for (let j = xi; j < xpool.length; j++) if (xpool[j]._p !== -1) { xpool[j].style.display = "none"; xpool[j]._p = -1; }
     src.ensure(first, last);
     if (src.mode === "append" && last >= n - 4) src.more();
-    foot.style.top = src.rowY(n) + "px"; foot.textContent = src.mode !== "append" ? "" : src.appending ? t("grid.24") : n >= src.total ? t("grid.25", { p0: src.total.toLocaleString("zh-CN") }) : "";
+    foot.style.top = src.rowY(n) + "px"; foot.textContent = src.mode !== "append" ? "" : src.appending ? tt("grid.24") : n >= src.total ? tt("grid.25", { p0: src.total.toLocaleString("zh-CN") }) : "";
     foot.hidden = src.mode !== "append";
     if (src.mode === "append") body.style.height = src.rowsH() + RH + "px";
     rowDrag?.paint(); shade(); paintSelBox(); if (rowDrag?.anim || mo.busy || fading) schedule(); // 指针动了由 pointermove 排下一帧；这里只管缓动、过渡没走完的
@@ -718,7 +722,7 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
     const evs = [["pointermove", mv], ["pointerup", fin], ["pointercancel", fin], ["lostpointercapture", fin]];
     for (const [t, f] of evs) body.addEventListener(t, f); addEventListener("pointerup", fin); // 没拿到捕获时在窗口上收尾
   }
-  body.addEventListener("click", (e) => { const b = e.target.closest(".sn-g-ab"); if (!b) return; const p = posOf(b); if (b.dataset.act === "detail") { toggleExpand(p); return; } if (b.dataset.act === "edit") { setActive(p, "name", false); showSel(true); vp.focus({ preventScroll: true }); startEdit(); } else toast({ text: t("grid.26", { p0: src.name(src.rowAt(p)) }) }); });
+  body.addEventListener("click", (e) => { const b = e.target.closest(".sn-g-ab"); if (!b) return; const p = posOf(b); if (b.dataset.act === "detail") { toggleExpand(p); return; } if (b.dataset.act === "edit") { setActive(p, "name", false); showSel(true); vp.focus({ preventScroll: true }); startEdit(); } else toast({ text: tt("grid.26", { p0: src.name(src.rowAt(p)) }) }); });
   body.addEventListener("dblclick", (e) => { const rh = e.target.closest(".sn-g-rh"); if (rh) { resetRowH(rh.closest(".sn-g-row")); return; } const cell = e.target.closest(".sn-g-cell"); if (!cell || e.target.closest(".sn-check, .sn-g-grip, .sn-g-ab, .sn-g-exp")) return; const k = cell.dataset.c; if (k === "sel" || k === "act") return; rg = null; setActive(posOf(cell), k, false); showSel(true); startEdit(); });
   head.addEventListener("pointerdown", () => showSel(false)); // 点表头（排序、筛选、拖列、改列宽）
   // 表格里任何地方按下、打字：先把还在等落位的拖行落好；正在编辑时点了别处，先把编辑存下来（不合法就停在编辑框里，这一下不生效）——拖得起来，不用多点一次
@@ -790,8 +794,8 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
   // 靠近上下边缘自动滚，被拖的行一直在指针下面；拖着时滚轮滚了也跟着重算；合并块里的行不能单独拖，落点不会插进合并块中间。
   function startRowDrag(row, e) {
     e.preventDefault(); flushDrop();
-    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: t("grid.27") }); return; }
-    const p0 = row._p; if (merges.active().some((x) => x.p1 > x.p0 && p0 >= x.p0 && p0 <= x.p1)) { toast({ icon: "info", tone: "info", text: t("grid.28") }); return; }
+    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: tt("grid.27") }); return; }
+    const p0 = row._p; if (merges.active().some((x) => x.p1 > x.p0 && p0 >= x.p0 && p0 <= x.p1)) { toast({ icon: "info", tone: "info", text: tt("grid.28") }); return; }
     const H0 = () => src.rowH(p0), y0 = src.rowY(p0), n = src.shown, fr = vp.parentElement, sx = e.clientX, sy = e.clientY, s0 = vp.scrollTop, tgt = e.target;
     let to = p0, py = sy, px = sx, raf2 = 0, out = false, done = false, on = false, anim = false, lastTop = s0, lift = 0, gapY = y0, liftEl = null, gapEl = null;
     const slot = (t) => (t <= p0 ? src.rowY(t) : src.rowY(t + 1) - H0()); // 放到第 t 位时它的顶部在哪
@@ -803,7 +807,7 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
     const follow = () => dragClamp(y0 + py - sy + vp.scrollTop - s0, 0, slot(n - 1), vp.scrollTop, vp.clientHeight - HEAD, H0());
     let lt = 0, was = false;
     const begin = () => {
-      on = true; vp.classList.add("rowdrag");
+      on = true; vp.classList.add("sn-rowdrag");
       gapEl = document.createElement("i"); gapEl.className = "sn-g-gap"; gapEl2 = document.createElement("i"); gapEl2.className = "sn-g-gap"; body.append(gapEl, gapEl2); gOrder = gapOrder();
       liftEl = makeRow(); fill(liftEl, p0); liftEl.classList.add("sn-g-lift"); // 被拖的行单独一块：复用的行元素滚动时会换内容，被拖的行也可能离开渲染范围
       rowDrag = {
@@ -843,7 +847,7 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
       // 等被拖的行落进空位、让开的行回位、投影淡掉（至少 160ms），再真正换顺序、清掉偏移——画面不跳
       let landed = false; const t0 = performance.now(), finish = () => {
         if (landed) return; landed = true; if (pendingDrop === finish) pendingDrop = null;
-        vp.classList.remove("rowdrag"); rowDrag = null; liftEl.remove(); gapEl.remove(); gapEl2?.remove();
+        vp.classList.remove("sn-rowdrag"); rowDrag = null; liftEl.remove(); gapEl.remove(); gapEl2?.remove();
         if (to !== p0) { src.move(p0, to); if (active.p === p0) active.p = to; else if (p0 < to && active.p > p0 && active.p <= to) active.p--; else if (p0 > to && active.p >= to && active.p < p0) active.p++; active.id = src.idAt(active.p); }
         for (const r of pool) r.style.transform = ""; dver++; render(); syncMergeBar();
       };
@@ -856,23 +860,23 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
   // 拿起时展开收起的过渡还在走：收起马上做完，每一行从现在看到的位置接着走；排序时也能拖（松手后排好的顺序就当成手动顺序，排序标记去掉）
   function startTreeDrag(row, e) {
     e.preventDefault(); flushDrop();
-    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: t("grid.29") }); return; }
+    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: tt("grid.29") }); return; }
     const id0 = src.idAt(row._p); if (id0 < 0) return;
-    if (merges.active().some((x) => x.p1 > x.p0 && row._p >= x.p0 && row._p <= x.p1)) { toast({ icon: "info", tone: "info", text: t("grid.28") }); return; }
+    if (merges.active().some((x) => x.p1 > x.p0 && row._p >= x.p0 && row._p <= x.p1)) { toast({ icon: "info", tone: "info", text: tt("grid.28") }); return; }
     const fr = vp.parentElement, sx = e.clientX, tgt = e.target, off = new Map(), lifts = [];
     let D = null, y0 = 0, s0 = 0, to = 0, sy = e.clientY, py = sy, px = sx, raf2 = 0, out = false, done = false, on = false, anim = false, lastTop = 0, lift = 0, gapY = 0, gapEl = null, boxEl = null, lt = 0, was = false, wait = false;
     // 被拖的块现在的顶部：拿起时看到的位置 + 指针移动 + 拖着时滚动（最多拖出这一组兄弟的首尾半块）
     const follow = () => dragClamp(y0 + py - sy + vp.scrollTop - s0, D.lo(), D.hi(), vp.scrollTop, vp.clientHeight - HEAD, D.H()); // 夹在这一组兄弟的首尾之内，也不盖到表头上
     const begin = () => {
       const seed = mo.release(), p0 = src.findPos(id0); if (p0 < 0) return false; // 展开收起还在动：收起马上做完，现在每一行的位移交给拖行接着走
-      D = treeDrag(src, merges, p0); on = true; vp.classList.add("rowdrag");
+      D = treeDrag(src, merges, p0); on = true; vp.classList.add("sn-rowdrag");
       for (const [p, v] of seed) if (!D.inMe(p)) off.set(p, v);
       lift = seed.get(p0) ?? 0; y0 = src.rowY(p0) + lift; s0 = vp.scrollTop; lastTop = s0; gapY = y0; to = D.idx;
       gapEl = document.createElement("i"); gapEl.className = "sn-g-gap"; gapEl2 = document.createElement("i"); gapEl2.className = "sn-g-gap"; body.append(gapEl, gapEl2); gOrder = gapOrder();
       boxEl = document.createElement("i"); boxEl.className = "sn-g-liftbox"; body.append(boxEl); liftIn(boxEl); // 整块一层投影（每一行各画一层会在行和行之间叠出暗线）
       rowDrag = {
         tree: true, hides: (p) => D.inMe(p), get out() { return out; }, get anim() { return anim; },
-        abort() { cancelAnimationFrame(raf2); for (const [t, f] of evs) tgt.removeEventListener(t, f); document.removeEventListener("keydown", onKey, true); removeEventListener("blur", onBlur); done = "cancel"; if (pendingDrop) pendingDrop = null; vp.classList.remove("rowdrag"); rowDrag = null; for (const el of lifts) el.remove(); gapEl.remove(); gapEl2?.remove(); boxEl.remove(); for (const r of pool) r.style.transform = ""; }, // 视图换了：位置都不对了，马上放回去（不换顺序）
+        abort() { cancelAnimationFrame(raf2); for (const [t, f] of evs) tgt.removeEventListener(t, f); document.removeEventListener("keydown", onKey, true); removeEventListener("blur", onBlur); done = "cancel"; if (pendingDrop) pendingDrop = null; vp.classList.remove("sn-rowdrag"); rowDrag = null; for (const el of lifts) el.remove(); gapEl.remove(); gapEl2?.remove(); boxEl.remove(); for (const r of pool) r.style.transform = ""; }, // 视图换了：位置都不对了，马上放回去（不换顺序）
         offs(a, z) {
           const now = performance.now(), dt = was ? Math.min(34, now - lt) : 16.7; lt = now; anim = false; const k = 1 - Math.exp(-dt / 40), res = [], back = out || done === "cancel";
           const ease = (c, tg) => { c += (tg - c) * k; if (Math.abs(tg - c) < .3) return tg; anim = true; return c; };
@@ -908,7 +912,7 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
       done = cancel || out ? "cancel" : "drop"; if (done === "cancel") to = D.idx;
       let landed = false; const t0 = performance.now(), finish = () => {
         if (landed) return; landed = true; if (pendingDrop === finish) pendingDrop = null;
-        vp.classList.remove("rowdrag"); rowDrag = null; for (const el of lifts) el.remove(); gapEl.remove(); gapEl2?.remove(); boxEl.remove();
+        vp.classList.remove("sn-rowdrag"); rowDrag = null; for (const el of lifts) el.remove(); gapEl.remove(); gapEl2?.remove(); boxEl.remove();
         if (done === "drop" && D.commit(to)) { afterTree(); headUI.paint(); }
         for (const r of pool) r.style.transform = ""; dver++; render(); syncMergeBar();
       };
@@ -955,7 +959,7 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
     const set = (h) => { if (h === cur) return; cur = h; const er = src.rowAt(p); if (!all && expd.has(er)) expd.set(er, Math.max(MINH, h - DETAIL)); if (all) { const a = src.rowY(p) - vp.scrollTop; src.setBaseH(h); body.style.height = src.rowsH() + "px"; vp.scrollTop = src.rowY(p) - a; } else src.setRowH(p, h); dver++; render(); };
     const step = () => {
       raf3 = 0; const yb = vp.getBoundingClientRect().top + vp.clientHeight - 2; set(Math.max(MINH, Math.min(MAXH, Math.round(h0 + Math.min(py, yb) - y0 + scrolled)))); // 边线最远到表格底边，超出的距离只用来决定往下滚多快
-      line.style.top = HEAD + src.rowY(p) + cur - vp.scrollTop - 1 + "px"; line.style.width = vp.clientWidth + "px"; line.dataset.h = all ? t("grid.30", { p0: cur }) : t("grid.31", { p0: cur });
+      line.style.top = HEAD + src.rowY(p) + cur - vp.scrollTop - 1 + "px"; line.style.width = vp.clientWidth + "px"; line.dataset.h = all ? tt("grid.30", { p0: cur }) : tt("grid.31", { p0: cur });
       const over = py - (vp.getBoundingClientRect().bottom - 16);
       if (over > 0 && cur < MAXH) { const s = vp.scrollTop; vp.scrollTop = s + Math.min(24, over / 2.5); scrolled += vp.scrollTop - s; raf3 = requestAnimationFrame(step); }
     };
@@ -969,13 +973,13 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
   function resetRowH(row) { const r = row._r; if (selState() === "all") { src.setBaseH(RH); dver++; shade(); render(); } else easeRowH(row._p, RH + (r >= 0 && expd.has(r) ? DETAIL : 0)); } // 双击下边线：平滑恢复默认（展开着的行连同详情）
   function moveByKey(d) {
     if (src.tree) return moveTreeByKey(d);
-    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: t("grid.27") }); return; }
+    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: tt("grid.27") }); return; }
     const p = active.p, to = p + d; if (to < 0 || to >= src.shown || src.rowAt(p) < 0 || src.rowAt(to) < 0) return;
     src.move(p, to); active.p = to; dver++; revealActive(); schedule();
   }
   // 树形：和上一个 / 下一个兄弟换位置（连同展开着的下级），行滑过去；排序时先把排好的顺序当成手动顺序
   function moveTreeByKey(d) {
-    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: t("grid.32") }); return; }
+    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: tt("grid.32") }); return; }
     if (mo.fading()) { mo.later(() => moveTreeByKey(d)); return; } // 收起的下级还在淡出：淡完再挪
     flushDrop(); const id = src.idAt(active.p); if (id < 0 || rowDrag) return; mo.release();
     const p = src.findPos(id), { list } = src.siblings(p), i = list.findIndex((b) => b.id === id), j = i + d; if (j < 0 || j >= list.length) return;
@@ -1004,20 +1008,20 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
   function syncMergeBar() {
     const r = rgRect(), cells = r ? (r.p1 - r.p0 + 1) * r.keys.length : 0, zones = r ? new Set(r.keys.map(merges.zoneOf)) : new Set(), sib = !r || merges.siblings(r.p0, r.p1);
     mb.merge.disabled = !merges.enabled || !(cells > 1 && zones.size === 1 && r.p1 - r.p0 < 200 && sib);
-    mb.merge.dataset.tip = !merges.enabled ? t("grid.33") : cells > 1 && zones.size > 1 ? t("grid.34") : cells > 1 && !sib ? t("grid.35") : cells > 1 ? t("grid.36", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }) : t("grid.37");
+    mb.merge.dataset.tip = !merges.enabled ? tt("grid.33") : cells > 1 && zones.size > 1 ? tt("grid.34") : cells > 1 && !sib ? tt("grid.35") : cells > 1 ? tt("grid.36", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }) : tt("grid.37");
     mb.split.hidden = !(selShown && merges.at(active.p, active.c));
-    const n = merges.suspended(); mb.hint.hidden = !n; mb.hint.textContent = merges.enabled ? t("grid.38", { p0: n, p1: src.tree ? t("grid.54") : t("grid.55") }) : t("grid.39", { p0: n });
+    const n = merges.suspended(); mb.hint.hidden = !n; mb.hint.textContent = merges.enabled ? tt("grid.38", { p0: n, p1: src.tree ? tt("grid.54") : tt("grid.55") }) : tt("grid.39", { p0: n });
   }
   mb.merge.addEventListener("click", () => {
     const r = rgRect(); if (!r || mb.merge.disabled) return;
     const inside = merges.active().filter((x) => x.p0 >= r.p0 && x.p1 <= r.p1 && x.c0 >= r.c0 && x.c1 <= r.c1).map((x) => x.m); inside.forEach((m) => merges.remove(m));
-    const m = merges.add(r.p0, r.p1, r.keys); if (!m) { inside.forEach((x) => merges.restore(x)); toast({ text: t("grid.40") }); return; }
+    const m = merges.add(r.p0, r.p1, r.keys); if (!m) { inside.forEach((x) => merges.restore(x)); toast({ text: tt("grid.40") }); return; }
     rg = null; vp.focus({ preventScroll: true }); setActive(r.p0, r.keys[0], false); showSel(true); dver++; schedule();
-    toast({ kind: "action", text: t("grid.41", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }), action: { label: t("grid.42"), run: (t) => { merges.remove(m); inside.forEach((x) => merges.restore(x)); dver++; schedule(); syncMergeBar(); t.update({ kind: "status", text: t("grid.43"), done: true, duration: 1600 }); } } });
+    toast({ kind: "action", text: tt("grid.41", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }), action: { label: tt("grid.42"), run: (t) => { merges.remove(m); inside.forEach((x) => merges.restore(x)); dver++; schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("grid.43"), done: true, duration: 1600 }); } } });
   });
   mb.split.addEventListener("click", () => {
     const x = merges.at(active.p, active.c); if (!x) return; merges.remove(x.m); vp.focus({ preventScroll: true }); dver++; schedule(); syncMergeBar();
-    toast({ kind: "action", text: t("grid.44"), action: { label: t("grid.42"), run: (t) => { merges.restore(x.m); dver++; schedule(); syncMergeBar(); t.update({ kind: "status", text: t("grid.45"), done: true, duration: 1600 }); } } });
+    toast({ kind: "action", text: tt("grid.44"), action: { label: tt("grid.42"), run: (t) => { merges.restore(x.m); dver++; schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("grid.45"), done: true, duration: 1600 }); } } });
   });
   // 演示：开头连续几行负责人相同，先合并好
   src.ready.then(() => { const o = src.val(src.rowAt(0), "owner"); let k = 1; while (k < 6 && src.rowAt(k) >= 0 && src.val(src.rowAt(k), "owner") === o) k++; if (k >= 2) merges.add(0, k - 1, ["owner"]); dver++; schedule(); syncMergeBar(); });
@@ -1028,4 +1032,32 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
   apply(); paintBar(); headUI.paint(); schedule();
   root._grid = { src, model, active: () => ({ ...active }), range: () => rgRect(), selShown: () => selShown, setActive, startEdit: (k) => startEdit(k), scrollToRow: (p) => { vp.scrollTop = src.rowY(p); }, editing: () => !!editing, selCount, poolSize: () => pool.length, rowDragging: () => !!rowDrag, merges, sel: () => ({ shown: selShown, rg: rgRect() }), toggleExpand, expanded: () => expd.size,
     toggleTree, expandAll, tsel, motion: () => mo.busy, mclock: () => mo.clock, selState };
+  // 销毁：停掉下一帧的重画、拿掉放进 <head> 的样式、关掉开着的弹层、放开实例（同一个容器可以再挂一次）。
+  // 挂载时加的监听、观察器、后台线程（筛选排序那个 Worker）由 createDataGrid 一起撤
+  const api = root._grid;
+  api.destroy = () => { cancelAnimationFrame(raf); raf = 0; styleEl.remove(); closeGridPops(); if (root._grid === api) delete root._grid; };
+  return api;
 }
+
+// 工具条（搜索、平铺 / 树形、全部展开、加载方式、滚动条、行线 / 网格、筛选条件、行数信息）：DOM 版和 Canvas 版共用，seg 是分段控件名字的前缀
+export const gridBarHTML = ({ seg = "g", placeholder = tt("grid.56") } = {}) =>
+  `<div class="sn-g-bar"><span class="sn-ib sn-has-pre" style="width:220px"><span class="sn-pre" data-i="search"></span><input class="sn-input sn-sm" data-g-q placeholder="${placeholder}" aria-label="${tt("grid.57")}"></span>`
+  + `<div class="sn-seg sn-sm" data-seg="${seg}tree"><span class="sn-thumb"></span><button data-v="flat">${tt("grid.58")}</button><button data-v="tree">${tt("grid.59")}</button></div>`
+  + `<button class="sn-btn sn-ghost sn-sm" data-g-expand hidden data-i="chevrons-up-down:before">${tt("grid.14")}</button>`
+  + `<div class="sn-seg sn-sm" data-seg="${seg}mode"><span class="sn-thumb"></span><button data-v="known">${tt("grid.60")}</button><button data-v="append">${tt("grid.61")}</button></div>`
+  + `<div class="sn-seg sn-sm" data-seg="${seg}sb"><span class="sn-thumb"></span><button data-v="gutter">${tt("grid.62")}</button><button data-v="auto">${tt("grid.63")}</button></div>`
+  + `<div class="sn-seg sn-sm" data-seg="${seg}lines"><span class="sn-thumb"></span><button data-v="row">${tt("grid.64")}</button><button data-v="grid">${tt("grid.65")}</button></div>`
+  + `<span class="sn-g-filters" data-g-filters></span><span class="sn-g-info" data-g-info></span></div>`;
+const SHADES = `<i class="sn-g-shade sn-l" aria-hidden="true"></i><i class="sn-g-shade sn-r" aria-hidden="true"></i>`;
+// DOM 版数据表格的标记（和设计稿里那块一样）：createDataGrid 遇到空容器自己用它填
+export const dataGridHTML = ({ label = tt("grid.66") } = {}) =>
+  `<div class="sn-grid">${gridBarHTML()}<div class="sn-g-frame"><div class="sn-g-vp" tabindex="0" role="grid" aria-label="${label}"><div class="sn-g-head" role="row"></div><div class="sn-g-body" role="rowgroup"><div class="sn-g-foot" hidden></div></div></div>${SHADES}</div></div>`;
+export const gridShadesHTML = () => SHADES;
+
+// createDataGrid(空容器或 .sn-grid, { rows, seed }) → { update, destroy, on, off, … }：统一的组件写法（列和数据目前是演示用的项目表）。
+// destroy 撤掉挂载时加的全部监听、观察器、后台线程，拿掉 <head> 里的样式，清空容器
+export const createDataGrid = /* @__PURE__ */ defineComponent({
+  name: "data-grid",
+  html: (o) => dataGridHTML(o),
+  mount(el, o) { injectIcons(el); return mountDataGrid(el, o); },
+});

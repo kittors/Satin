@@ -3,18 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Satin · 生命周期测试</title>
-<link rel="stylesheet" href="../packages/satin-ui/css/tokens.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/reset.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/base.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/buttons.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/form.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/input.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/overlay.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/feedback.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/data.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/scroll.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/content.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/number.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/page.css">
 </head>
 <body style="padding:24px">
 <div id="host"></div>
@@ -22,7 +11,19 @@
 <script type="module">
 import * as C from "../packages/satin-ui/src/components.js";
 import { setup } from "../packages/satin-ui/src/setup.js";
-window.C = C; window.setupSatin = setup; window.ready = true;
+import { createChat } from "../packages/satin-ui/src/chat.js";
+import { createMarkdown } from "../packages/satin-ui/src/markdown.js";
+import { createFlow } from "../packages/satin-ui/src/flow.js";
+import { createDataGrid } from "../packages/satin-ui/src/grid.js";
+import { createCanvasGrid } from "../packages/satin-ui/src/canvas-grid.js";
+import { createThemePanel } from "../packages/satin-ui/src/theme-panel.js";
+import { defineElements } from "../packages/satin-ui/elements/index.js";
+defineElements();
+// 没有 html()、要在现成标记上接的组件：标记从设计稿里取（和用户照着设计稿写的一样）
+const design = new DOMParser().parseFromString(await (await fetch("../index.html")).text(), "text/html");
+window.C = { ...C, createChat, createMarkdown, createFlow, createDataGrid, createCanvasGrid, createThemePanel };
+window.markup = (sel) => { const el = design.querySelector(sel); if (!el) throw new Error("设计稿里没有 " + sel); return el.outerHTML; };
+window.setupSatin = setup; window.ready = true;
 </script>
 </body>
 </html>

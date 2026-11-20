@@ -26,3 +26,9 @@ const rows = [{ id: 1, name: "雨夜车站", shots: 48 }];
 export const T1 = <Table columns={[{ key: "name", title: "项目", sortable: true }, { key: "shots", title: "镜头", align: "right", format: (v) => v + " 个" }]} rows={rows} selectable selected={[1]} onSelect={(k) => k.length} onSort={(s) => s.dir} />;
 // @ts-expect-error columns 必须给
 export const T2 = <Table rows={rows} />;
+
+// 自己包重组件
+import { wrapSatin } from "satin-ui/react";
+import { createChat as createChat2 } from "satin-ui/chat";
+const Chat = wrapSatin(createChat2, { events: [] });
+export const chatEl = <Chat title="助手" placeholder="说点什么" />;

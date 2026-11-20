@@ -55,5 +55,16 @@ export default {
   "grid.52": "items",
   "grid.53": "rows",
   "grid.54": "sorting, filtering or expanding",
-  "grid.55": "sorting or filtering"
+  "grid.55": "sorting or filtering",
+  "grid.56": "Search names",
+  "grid.57": "Search names",
+  "grid.58": "Flat",
+  "grid.59": "Tree",
+  "grid.60": "Load on demand",
+  "grid.61": "Load at the end",
+  "grid.62": "Always show scrollbar",
+  "grid.63": "Auto-hide scrollbar",
+  "grid.64": "Row lines",
+  "grid.65": "Grid",
+  "grid.66": "Data grid, 100,000 rows"
 };

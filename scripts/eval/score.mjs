@@ -9,12 +9,19 @@
 import fs from "node:fs";
 import path from "node:path";
 import http from "node:http";
-import { spawnSync } from "node:child_process";
+import { spawnSync, spawn } from "node:child_process";
+// 页面检查要访问本进程里起的静态服务：不能用 spawnSync（会卡住事件循环，服务回不了请求，检查器等到超时）
+const spawnAsync = (cmd, args, { timeout = 300000, ...opts } = {}) => new Promise((resolve) => {
+  const p = spawn(cmd, args, opts); let stdout = "", stderr = "";
+  p.stdout.on("data", (d) => (stdout += d)); p.stderr.on("data", (d) => (stderr += d));
+  const t = setTimeout(() => p.kill("SIGTERM"), timeout);
+  p.on("close", (status) => { clearTimeout(t); resolve({ stdout, stderr, status }); });
+});
 import { createRequire } from "node:module";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const arg = (k, d) => { const i = process.argv.indexOf("--" + k); return i > 0 && process.argv[i + 1] && !process.argv[i + 1].startsWith("--") ? process.argv[i + 1] : d; };
-const BATCH = arg("batch", "b1"), FORCE = process.argv.includes("--force"), ONLY = arg("only");
+const BATCH = arg("batch", "b1"), FORCE = process.argv.includes("--force"), ONLY = arg("only"), DOM_ONLY = process.argv.includes("--dom-only");
 const BASE = path.join("/tmp/satin-eval", BATCH);
 const require = createRequire(import.meta.url);
 const pw = (() => { for (const m of [process.env.PLAYWRIGHT, "playwright", "/Users/kittors/Developer/freelance/TaleFrame/apps/admin/node_modules/playwright"]) { if (!m) continue; try { return require(m); } catch {} } throw new Error("找不到 Playwright：pnpm install（仓库根目录的 devDependencies 里有）"); })();
@@ -50,6 +57,18 @@ const browser = await pw.chromium.launch({ channel: "chrome", headless: true });
 const all = [];
 for (const r of runs) {
   const out = path.join(r.dir, "_score.json");
+  if (DOM_ONLY && fs.existsSync(out)) {
+    // 只重跑页面检查：用已有的构建产物（React / Vue 的 dist）或源码目录（纯 HTML）
+    const s = JSON.parse(fs.readFileSync(out, "utf8")), root = r.fw === "html" ? r.dir : path.join(r.dir, "dist");
+    if (s.build?.ok !== false && fs.existsSync(path.join(root, "index.html"))) {
+      const { srv, url } = await serve(root);
+      const dm = await spawnAsync("node", [CHECK, "dom", url, "--json", "--widths", "1440,390", "--no-floats", "--out", path.join(r.dir, "_check")], { cwd: r.dir, timeout: 300000 });
+      try { s.check.dom = JSON.parse(dm.stdout).counts; } catch { s.check.dom = { error: -1, note: (dm.stderr || "").slice(0, 200) }; }
+      srv.close(); fs.writeFileSync(out, JSON.stringify(s, null, 2));
+    }
+    all.push(s); console.log(`  页面检查 ${r.cond.padEnd(7)} ${r.fw.padEnd(5)} ${r.task.padEnd(13)} ${s.check.dom?.error ?? "—"}/${s.check.dom?.warn ?? "—"}`);
+    continue;
+  }
   if (!FORCE && fs.existsSync(out)) { all.push(JSON.parse(fs.readFileSync(out, "utf8"))); continue; }
   const s = { ...r, done: JSON.parse(fs.readFileSync(path.join(r.dir, "_done.json"), "utf8")), build: null, errors: [], interact: [], shots: {}, check: {} };
   // 1. 构建
@@ -93,7 +112,7 @@ for (const r of runs) {
     const st = spawnSync("node", [CHECK, "static", ...srcs, "--json"], { cwd: r.dir, encoding: "utf8", timeout: 120000, maxBuffer: 1 << 26 });
     try { const j = JSON.parse(st.stdout); s.check.static = j.counts; } catch { s.check.static = { error: -1, note: (st.stderr || "").slice(0, 200) }; }
     // 页面检查：桌面 1440、手机 390 × 深浅（平板宽度和点开浮层的检查评测时不跑，省时间）
-    const dm = spawnSync("node", [CHECK, "dom", url, "--json", "--widths", "1440,390", "--no-floats", "--out", path.join(r.dir, "_check")], { cwd: r.dir, encoding: "utf8", timeout: 300000, maxBuffer: 1 << 26 });
+    const dm = await spawnAsync("node", [CHECK, "dom", url, "--json", "--widths", "1440,390", "--no-floats", "--out", path.join(r.dir, "_check")], { cwd: r.dir, timeout: 300000 });
     try { const j = JSON.parse(dm.stdout); s.check.dom = j.counts; } catch { s.check.dom = { error: -1, note: (dm.stderr || "").slice(0, 200) }; }
     srv.close();
   }

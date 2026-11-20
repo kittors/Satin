@@ -18,7 +18,6 @@
 .sn-nf-card .sn-nf-big, .sn-nf-card .sn-nf-mid { justify-self: start; } /* 贴合内容，位数变化时宽度跟着长、跟着收 */
 .sn-nf-card .sn-nf-big { font: 600 calc(34px * var(--sn-font-scale, 1))/1.2 var(--sn-sans); letter-spacing: -.01em; color: var(--sn-label); }
 .sn-nf-card .sn-nf-mid { font: 600 calc(22px * var(--sn-font-scale, 1))/1.3 var(--sn-sans); color: var(--sn-label); }
-.sn-nf-card .row { display: flex; flex-wrap: wrap; gap: 6px; }
 .sn-nf-card .sn-note { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-nf-bell { position: relative; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--sn-fill-subtle); color: var(--sn-label2); }
 .sn-nf-bell .sn-ic { width: 20px; height: 20px; }

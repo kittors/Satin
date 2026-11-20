@@ -16,3 +16,18 @@ buttonHTML({ variant: "primay" });
 // @ts-expect-error 选项类型不对要报错
 createSlider(host, { value: "4" });
 void off; void v; void html;
+
+// 重组件：统一写法 createX（各自的入口）
+import { createChat } from "satin-ui/chat";
+import { createMarkdown } from "satin-ui/markdown";
+import { createFlow } from "satin-ui/flow";
+import { createDataGrid } from "satin-ui/grid";
+import { createCanvasGrid } from "satin-ui/canvas-grid";
+import { createThemePanel } from "satin-ui/theme-panel";
+const chat = createChat(host, { title: "助手", async *respond(q) { yield "收到：" + q; }, composer: { attachments: [] } });
+chat.send("你好"); chat.update({ status: "在线" }); chat.destroy();
+const md = createMarkdown(host, { source: "# 标题", codeMax: 0 }); md.update({ source: "## 新" }); const src: string = md.source; void src; md.destroy();
+const flow = createFlow(host, { nodes: [{ id: "a", x: 0, y: 0, t: "原文" }], edges: [] }); void flow.nodes; flow.destroy();
+createDataGrid(host, { rows: 1000 }).destroy(); createCanvasGrid(host).destroy();
+createThemePanel(host).sync();
+const mdHtml: string = createMarkdown.html({}); void mdHtml;

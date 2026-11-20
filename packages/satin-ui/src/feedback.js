@@ -3,14 +3,14 @@
 import { icon } from "./icons.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/feedback.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 const root = typeof document !== "undefined" ? document.documentElement : undefined;
 const reduced = () => root.classList.contains("sn-reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;
 const ENTER = "cubic-bezier(.25,.1,.25,1)", EASE_IN = "cubic-bezier(.42,0,1,1)", IN_OUT = "cubic-bezier(.42,0,.58,1)", POP = "cubic-bezier(.34,1.56,.64,1)";
 const RING = 2 * Math.PI * 6.5;
-// 文案转成 HTML：文件名包进 .fname，不让中英文自动留空插到"第三集.mp4"中间
+// 文案转成 HTML：文件名包进 .sn-fname，不让中英文自动留空插到"第三集.mp4"中间
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-export const fmt = (s) => esc(s).replace(/[^\s&;·，。"]+\.[a-z][a-z0-9]{1,4}\b/gi, (m) => `<span class="fname">${m}</span>`);
+export const fmt = (s) => esc(s).replace(/[^\s&;·，。"]+\.[a-z][a-z0-9]{1,4}\b/gi, (m) => `<span class="sn-fname">${m}</span>`);
 const ringSVG =() => `<svg class="sn-ring" viewBox="0 0 16 16" aria-hidden="true"><circle class="sn-track" cx="8" cy="8" r="6.5"/><circle class="sn-left" cx="8" cy="8" r="6.5" style="stroke-dasharray:${RING};stroke-dashoffset:0"/></svg>`;
 let host = null, z = 0;
 const live = [];
@@ -137,7 +137,7 @@ const nCards = [];
 function notifHost() {
   if (nHost?.isConnected) return nHost;
   nHost = document.querySelector(".sn-notifs");
-  if (!nHost) { nHost = document.createElement("div"); nHost.className = "sn-notifs"; nHost.setAttribute("aria-live", "polite"); nHost.innerHTML = t("feedback.0"); document.body.append(nHost); }
+  if (!nHost) { nHost = document.createElement("div"); nHost.className = "sn-notifs"; nHost.setAttribute("aria-live", "polite"); nHost.innerHTML = tt("feedback.0"); document.body.append(nHost); }
   nHost.addEventListener("pointerenter", () => { if (nCards.length > 1) { nExpanded = true; nLayout(); } });
   nHost.addEventListener("pointerleave", () => { if (nExpanded) { nExpanded = false; nLayout(); } });
   nHost.querySelector("[data-clear-all]")?.addEventListener("click", () => [...nCards].forEach((c, i) => setTimeout(() => nDismiss(c), i * 40)));
@@ -162,7 +162,7 @@ function nDismiss(c) {
 export function notify(o = {}) {
   const host = notifHost(), time = o.time ?? new Date().toTimeString().slice(0, 5);
   const c = document.createElement("div"); c.className = "sn-notif"; c.setAttribute("role", o.tone === "bad" ? "alert" : "status");
-  c.innerHTML = `<button class="sn-x" aria-label="${t("feedback.1")}"></button><span class="sn-src ${o.tone ? "sn-" + o.tone : ""}">${o.icon ? icon(o.icon, 16) : ""}</span><div class="sn-top"><h5>${esc(o.title || "")}</h5><time>${esc(time)}</time></div>${o.body ? `<p>${fmt(o.body)}</p>` : ""}`
+  c.innerHTML = `<button class="sn-x" aria-label="${tt("feedback.1")}"></button><span class="sn-src ${o.tone ? "sn-" + o.tone : ""}">${o.icon ? icon(o.icon, 16) : ""}</span><div class="sn-top"><h5>${esc(o.title || "")}</h5><time>${esc(time)}</time></div>${o.body ? `<p>${fmt(o.body)}</p>` : ""}`
     + (o.actions?.length ? `<div class="sn-acts">${o.actions.map((a, i) => `<button class="sn-btn ${a.variant || "sn-secondary"} sn-sm" data-k="${i}">${esc(a.label)}</button>`).join("")}</div>` : "");
   c.querySelector(".sn-x").innerHTML = icon("x", 14);
   host.append(c); nCards.unshift(c);
@@ -219,12 +219,12 @@ export function mountProgress(pc, { onCancel, onOpen } = {}) {
   const api = {
     start(t, s2, enter = true) {
       pc.classList.remove("sn-done", "sn-canceled"); sw?.classList.remove("sn-on"); pc.style.setProperty("--sn-p", 0); bar.style.width = "0%"; num.textContent = "0%";
-      swapText(title, t, !enter); swapText(sub, s2 || t("feedback.2"), !enter); cancelBtn?.classList.remove("sn-off"); openBtn?.classList.add("sn-off");
+      swapText(title, t, !enter); swapText(sub, s2 || tt("feedback.2"), !enter); cancelBtn?.classList.remove("sn-off"); openBtn?.classList.add("sn-off");
       if (enter && !reduced()) pc.animate([{ opacity: 0, transform: "translateY(8px) scale(.98)" }, { opacity: 1, transform: "none" }], { duration: 420, easing: ENTER });
     },
     set(p, s2) { p = Math.max(0, Math.min(1, p)); bar.style.width = p * 100 + "%"; num.textContent = Math.round(p * 100) + "%"; if (s2 != null && sub?.lastElementChild) sub.lastElementChild.textContent = s2; },
     finish(t, s2) { pc.classList.add("sn-done"); sw?.classList.add("sn-on"); swapText(title, t); swapText(sub, s2); cancelBtn?.classList.add("sn-off"); openBtn?.classList.remove("sn-off"); },
-    cancel(t, s2) { pc.classList.add("sn-canceled"); swapText(title, t || t("feedback.3")); swapText(sub, s2 || ""); cancelBtn?.classList.add("sn-off"); },
+    cancel(t, s2) { pc.classList.add("sn-canceled"); swapText(title, t || tt("feedback.3")); swapText(sub, s2 || ""); cancelBtn?.classList.add("sn-off"); },
   };
   cancelBtn?.addEventListener("click", () => onCancel?.(api));
   openBtn?.addEventListener("click", () => onOpen?.(api));

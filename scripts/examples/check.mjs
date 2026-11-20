@@ -11,6 +11,8 @@ import { spawn } from "node:child_process";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
 import { launch, newContext, watchErrors, arg, ensureDir, ROOT, sleep } from "../parity/lib.mjs";
+// 宽度相关的样式（treeDiff 用；要在主流程之前声明——主流程是顶层 await，跑到下面时还没声明会报 TDZ）
+const WIDTHY = new Set(["width", "min-width", "max-width", "grid-template-columns", "transform", "translate", "left", "right", "background-position", "background-size", "flex-basis"]);
 
 const OUT = ensureDir(path.resolve(ROOT, arg("out", ".parity/examples")));
 const S = "http://127.0.0.1:5192/examples";
@@ -128,7 +130,6 @@ try {
 
 // 子树逐项比：结构、属性、文字、尺寸（位置只比相对根的）、计算样式。
 // 根的宽度不一样（滑杆、标签页、折叠面板这类撑满容器的，示例页和设计稿的容器宽度不同）：只比高度、纵向位置和与宽度无关的样式
-const WIDTHY = new Set(["width", "min-width", "max-width", "grid-template-columns", "transform", "translate", "left", "right", "background-position", "background-size", "flex-basis"]);
 function treeDiff(a, b) {
   const out = [], B = new Map(b.map((n) => [n.rel, n]));
   if (a.length !== b.length) out.push(`节点数 ${a.length} ≠ ${b.length}`);
@@ -136,7 +137,9 @@ function treeDiff(a, b) {
   for (const n of a) {
     const m = B.get(n.rel); if (!m) { out.push(`${n.rel} 设计稿里没有`); continue; }
     if (n.tag !== m.tag) out.push(`${n.rel} 标签 ${n.tag} ≠ ${m.tag}`);
-    if (JSON.stringify(n.attrs) !== JSON.stringify(m.attrs)) out.push(`${n.rel} 属性 ${JSON.stringify(n.attrs).slice(0, 120)} ≠ ${JSON.stringify(m.attrs).slice(0, 120)}`);
+    // 按钮的 type="button"：标记函数生成的按钮都带上（放进表单里不会误提交），设计稿手写的没写——这是有意的，不算不同
+    const na = { ...n.attrs }; if (n.tag === "button" && na.type === "button" && !(m.attrs || {}).type) delete na.type;
+    if (JSON.stringify(na) !== JSON.stringify(m.attrs)) out.push(`${n.rel} 属性 ${JSON.stringify(n.attrs).slice(0, 120)} ≠ ${JSON.stringify(m.attrs).slice(0, 120)}`);
     if (n.text !== m.text) out.push(`${n.rel} 文字「${n.text}」≠「${m.text}」`);
     const pick = (x) => (flex ? [x[1], x[3]] : x);
     if (JSON.stringify(pick(n.box)) !== JSON.stringify(pick(m.box))) out.push(`${n.rel} 位置尺寸 ${n.box} ≠ ${m.box}`);

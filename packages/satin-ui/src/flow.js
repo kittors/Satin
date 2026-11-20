@@ -1,22 +1,23 @@
-// 流程图（FlowCanvas）：节点用 HTML，连线用 SVG，放在同一层（.flow-world）里一起平移缩放，缩放时线和节点不会脱开。
+// 流程图（FlowCanvas）：节点用 HTML，连线用 SVG，放在同一层（.sn-flow-world）里一起平移缩放，缩放时线和节点不会脱开。
 // 连线像风筝线：屏幕上始终 1px，两端颜色按节点类型渐变，中间受"重力"微微下垂；拖动节点时线有惯性，会自然晃两下再停。
 // 悬停节点：它的整条上下游链路变实，其余淡下去；一道细流光沿链路按上下游顺序扫过一遍就停。不加光晕，线始终 1px。
 // 整理：自动分层排版（flow-layout.js），节点按弹簧曲线移到新位置，连线跟着走，最后适配视图。居中：选中的节点或整张图移到中间。
 // 性能：平移缩放只改一层的 transform；拖动只重算相连的线；晃动的物理模拟只在有线没停稳时才跑，停稳就不占 CPU。
-import { $, $$, reduced } from "./core.js";
+import { $, $$, reduced, injectIcons } from "./core.js";
 import { icon } from "./icons.js";
 import { toast } from "./feedback.js";
 import { layeredLayout } from "./flow-layout.js";
 import { scoped } from "./i18n.js";
+import { defineComponent } from "./lifecycle.js";
 import I18N_DEFAULTS from "./locales/zh-CN/flow.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 // 演示的流水线：原文 → 拆分 → 分镜；分镜一张卡连出五条线（画面、配音、配乐、音效、字幕），再汇到合成；合成之后分出横屏、竖屏两个导出
 // mountFlow(.flow, { nodes, edges })：节点 [{ id, x, y, t, ic, d, k }]、连线 [[从, 到]]。
 //   拖动画布平移、滚轮 / 触控板缩放（只改一层 transform，线宽按缩放倍数反算，屏幕上始终 1px）；拖节点只重算相连的线；
 //   悬停一个节点高亮它的上下游；右下角小地图；"运行"按依赖一层层点亮。返回 { nodes, edges }
 export function mountFlow(flow, { nodes: nodeList, edges: edgeList } = {}) {
   if (!flow || flow._flow) return flow?._flow;
-  const world = $(".sn-flow-world", flow), svg = $(".sn-flow-edges", flow), layer = $(".flow-nodes", flow), zVal = $(".sn-fz-val", flow);
+  const world = $(".sn-flow-world", flow), svg = $(".sn-flow-edges", flow), layer = $(".sn-flow-nodes", flow), zVal = $(".sn-fz-val", flow);
   const mini = $(".sn-flow-mini", flow), miniSvg = $("svg", mini), miniView = $(".sn-mini-view", mini), runBtn = $("[data-flow-run]", flow);
   const NS = "http://www.w3.org/2000/svg", W = 200, PORT_Y = 20, ZMIN = .25, ZMAX = 2.5;
   // 节点类型的色相：低饱和，只用在线、端口和图标上，卡片本身保持中性
@@ -37,8 +38,8 @@ export function mountFlow(flow, { nodes: nodeList, edges: edgeList } = {}) {
   // ———— 节点 ————
   function nodeEl(id, n) {
     const el = document.createElement("div"); el.className = "sn-fnode"; el.dataset.id = id; el.tabIndex = -1; el.style.setProperty("--sn-hue", HUE[n.k]);
-    el.innerHTML = `<div class="sn-hd"><span class="sn-nic">${icon(n.ic, 16)}</span><b>${esc(n.t)}</b><span class="sn-st"></span></div><div class="sn-bd">${n.bg != null ? `<span class="sn-th" style="--sn-g:${n.bg}"></span>` : ""}<span class="fname">${esc(n.d)}</span><span class="sn-pb"><i></i></span></div>`
-      + t("flow.0");
+    el.innerHTML = `<div class="sn-hd"><span class="sn-nic">${icon(n.ic, 16)}</span><b>${esc(n.t)}</b><span class="sn-st"></span></div><div class="sn-bd">${n.bg != null ? `<span class="sn-th" style="--sn-g:${n.bg}"></span>` : ""}<span class="sn-fname">${esc(n.d)}</span><span class="sn-pb"><i></i></span></div>`
+      + tt("flow.0");
     n.el = el; place(n); layer.append(el); return el;
   }
   const place = (n) => { n.el.style.transform = `translate(${n.x}px, ${n.y}px)`; };
@@ -279,7 +280,7 @@ export function mountFlow(flow, { nodes: nodeList, edges: edgeList } = {}) {
       if (how !== "up") { hot?.classList.remove("sn-hot"); hot = null; }
       if (hot) {
         const to = hot.closest(".sn-fnode").dataset.id; hot.classList.remove("sn-hot");
-        if (!edges.some((x) => x.a === from && x.b === to)) { const ed = mkEdge(from, to); edges.push(ed); edgeEl(ed, true); toast({ text: t("flow.1", { p0: n.t, p1: nodes.get(to).t }) }); }
+        if (!edges.some((x) => x.a === from && x.b === to)) { const ed = mkEdge(from, to); edges.push(ed); edgeEl(ed, true); toast({ text: tt("flow.1", { p0: n.t, p1: nodes.get(to).t }) }); }
         ghost.remove();
       } else if (!reduced()) { const g = ghost; g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160 }).onfinish = () => g.remove(); } else ghost.remove();
       ghost = null;
@@ -304,9 +305,9 @@ export function mountFlow(flow, { nodes: nodeList, edges: edgeList } = {}) {
     else if ((e.key === "Delete" || e.key === "Backspace") && sel) {
       e.preventDefault(); trace(null);
       if (sel.type === "edge") { const ed = sel.ref; removeEdge(ed); select(null);
-        toast({ kind: "action", text: t("flow.2"), action: { label: t("flow.3"), run: (t) => { restoreEdge(ed); t.update({ kind: "status", text: t("flow.4"), done: true, duration: 2000 }); } } }); }
+        toast({ kind: "action", text: tt("flow.2"), action: { label: tt("flow.3"), run: (t) => { restoreEdge(ed); t.update({ kind: "status", text: tt("flow.4"), done: true, duration: 2000 }); } } }); }
       else { const id = sel.ref, n = nodes.get(id), gone = edges.filter((x) => x.a === id || x.b === id); n.el.remove(); gone.forEach(removeEdge); nodes.delete(id); select(null); drawMini();
-        toast({ kind: "action", text: t("flow.5", { p0: n.t }), action: { label: t("flow.3"), run: (t) => { nodes.set(id, n); layer.append(n.el); gone.forEach(restoreEdge); drawMini(); t.update({ kind: "status", text: t("flow.6"), done: true, duration: 2000 }); } } }); }
+        toast({ kind: "action", text: tt("flow.5", { p0: n.t }), action: { label: tt("flow.3"), run: (t) => { nodes.set(id, n); layer.append(n.el); gone.forEach(restoreEdge); drawMini(); t.update({ kind: "status", text: tt("flow.6"), done: true, duration: 2000 }); } } }); }
     }
   });
   for (const b of $$("[data-fz]", flow)) b.addEventListener("click", () => {
@@ -340,24 +341,51 @@ export function mountFlow(flow, { nodes: nodeList, edges: edgeList } = {}) {
     for (const id of nodes.keys()) get(id, new Set());
     const out = []; for (const [id, v] of lv) (out[v] ||= []).push(id); return out.filter(Boolean);
   }
-  let running = false;
+  let running = false, dead = false;
   runBtn.addEventListener("click", async () => {
-    if (running) return; running = true; runBtn.setAttribute("aria-disabled", "true"); runBtn.lastChild.textContent = t("flow.7");
+    if (running) return; running = true; runBtn.setAttribute("aria-disabled", "true"); runBtn.lastChild.textContent = tt("flow.7");
     for (const n of nodes.values()) { n.el.classList.remove("sn-done", "sn-running"); $(".sn-st", n.el).innerHTML = ""; $(".sn-pb", n.el).style.setProperty("--sn-p", 0); }
     for (const group of levels()) {
       await Promise.all(group.map(async (id, k) => {
         const n = nodes.get(id), inc = edges.filter((x) => x.b === id), step = 120 + ((k * 3) % 5) * 28;
         inc.forEach((x) => x.g.classList.add("sn-run")); n.el.classList.add("sn-running"); $(".sn-st", n.el).innerHTML = SPIN;
-        for (let p = 0; p <= 1.001; p += .25) { $(".sn-pb", n.el).style.setProperty("--sn-p", Math.min(1, p)); await new Promise((r) => setTimeout(r, step)); }
+        for (let p = 0; p <= 1.001; p += .25) { $(".sn-pb", n.el).style.setProperty("--sn-p", Math.min(1, p)); await new Promise((r) => setTimeout(r, step)); if (dead) return; }
         inc.forEach((x) => x.g.classList.remove("sn-run")); n.el.classList.replace("sn-running", "sn-done"); $(".sn-st", n.el).innerHTML = OK;
       }));
     }
+    if (dead) return;
     const outs = [...nodes.values()].filter((n) => n.k === "out").length;
-    running = false; runBtn.removeAttribute("aria-disabled"); runBtn.lastChild.textContent = t("flow.8"); toast({ text: outs > 1 ? t("flow.9", { p0: outs }) : t("flow.10") });
+    running = false; runBtn.removeAttribute("aria-disabled"); runBtn.lastChild.textContent = tt("flow.8"); toast({ text: outs > 1 ? tt("flow.9", { p0: outs }) : tt("flow.10") });
   });
 
   new ResizeObserver(() => schedule()).observe(flow);
   apply();
   requestAnimationFrame(() => { fit(); });
-  return (flow._flow = { nodes, get edges() { return edges; } });
+  // 销毁：停掉"运行"的逐层点亮、放开实例（同一个容器可以再挂一次）。挂载时加的监听、观察器由 createFlow 一起撤
+  const api = { nodes, get edges() { return edges; }, destroy() { dead = true; if (flow._flow === api) delete flow._flow; } };
+  return (flow._flow = api);
 }
+
+// 流程图的标记（和设计稿里那块一样）：画布（连线一层 SVG、节点一层）、左下工具条（缩小、比例、放大、适配、居中、整理）、右上"运行"、右下小地图。
+// createFlow 遇到空容器自己用它填
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+export const flowHTML = ({ label } = {}) =>
+  `<div class="sn-flow" tabindex="0" aria-label="${esc(label ?? tt("flow.11"))}">`
+  + `<div class="sn-flow-world"><svg class="sn-flow-edges"></svg><div class="sn-flow-nodes"></div></div>`
+  + `<div class="sn-flow-tools"><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-fz="-1" data-tip="${tt("flow.12")}" data-kbd="⌘−" data-i="minus"></button>`
+  + `<button class="sn-fz-val sn-num" data-fz="reset" data-tip="${tt("flow.13")}">100%</button>`
+  + `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-fz="1" data-tip="${tt("flow.14")}" data-kbd="⌘+" data-i="plus"></button><span class="sn-vr"></span>`
+  + `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-fz="fit" data-tip="${tt("flow.15")}" data-kbd="⇧1" data-i="maximize-2"></button>`
+  + `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-fz="center" data-tip="${tt("flow.16")}" data-kbd="⇧2" data-i="locate-fixed"></button><span class="sn-vr"></span>`
+  + `<button class="sn-btn sn-ghost sn-sm" data-flow-tidy data-tip="${tt("flow.17")}" data-kbd="⇧L" data-i="workflow:before">${tt("flow.18")}</button></div>`
+  + `<div class="sn-flow-run"><button class="sn-btn sn-primary sn-sm" data-flow-run data-i="play:before">${tt("flow.8")}</button></div>`
+  + `<div class="sn-flow-mini"><svg></svg><i class="sn-mini-view"></i></div>`
+  + `</div>`;
+
+// createFlow(空容器或 .sn-flow, { nodes, edges, label }) → { nodes, edges, update, destroy, on, off }：统一的组件写法。
+// 节点、连线只在创建时给（之后用户在画布上拖、连、删）；destroy 撤掉挂载时加的全部监听、观察器，清空容器
+export const createFlow = /* @__PURE__ */ defineComponent({
+  name: "flow",
+  html: (o) => flowHTML(o),
+  mount(el, o) { injectIcons(el); return mountFlow(el, o); },
+});

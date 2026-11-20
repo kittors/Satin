@@ -14,7 +14,7 @@ import { ICONS } from "../src/icons.js";
 import { CHECK } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
-const t = /* @__PURE__ */ scoped(I18N_COMPONENTS);
+const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
 
 const useIso = typeof window === "undefined" ? useEffect : useLayoutEffect;
 const cx = (...a) => a.filter(Boolean).join(" ");
@@ -50,6 +50,11 @@ function wrap(create, { valueKey = "value", events = ["change"], displayName } =
   C.displayName = displayName || create.componentName;
   return C;
 }
+
+// 自己包：重组件（对话、Markdown、流程图、数据表格……，各自单独引入）或别的 createXxx 也能变成 React 组件，用法和下面这些一样。
+//   import { createChat } from "satin-ui/chat";  const Chat = wrapSatin(createChat, { events: [] });  <Chat title="助手" respond={respond} />
+//   valueKey：受控的那个属性；events：组件会发的事件名（onXxx 转过去）
+export const wrapSatin = (create, opts) => wrap(create, opts);
 
 // ———— 有交互的组件 ————
 export const Segmented = /* @__PURE__ */ wrap(S.createSegmented, { displayName: "Segmented" });
@@ -100,7 +105,7 @@ export const Switch = forwardRef(function Switch({ label, children, className, .
   return h("label", { className: cx("sn-switch", className) }, h("input", { ref, type: "checkbox", role: "switch", ...rest }), h("span", { className: "sn-track" }, h("span", { className: "sn-knob" })), label ?? children);
 });
 export function Chip({ on, removable, onRemove, className, children, ...rest }) {
-  return h("span", { ...rest, className: cx("sn-chip", removable && "sn-tag", on && "sn-on", className) }, children, removable ? h("button", { className: "sn-x", "aria-label": t("components.remove"), onClick: onRemove }, h(Icon, { name: "x", size: 10 })) : null);
+  return h("span", { ...rest, className: cx("sn-chip", removable && "sn-tag", on && "sn-on", className) }, children, removable ? h("button", { className: "sn-x", "aria-label": tt("components.remove"), onClick: onRemove }, h(Icon, { name: "x", size: 10 })) : null);
 }
 export function Progress({ value, ring, size, className }) {
   const v = value == null ? undefined : String(+value).replace(/^0\./, ".");
@@ -141,7 +146,7 @@ export function Drawer({ open, onClose, title, children, footer, className }) {
   const ref = useRef(null), layer = useRef(null);
   useIso(() => { if (open && !layer.current) layer.current = openDrawer(ref.current, { trigger: document.activeElement, onClose: () => { layer.current = null; onClose?.(); } }); else if (!open && layer.current) { layer.current.close(true); layer.current = null; } }, [open]);
   return h("aside", { ref, className: cx("sn-drawer", className), role: "dialog", "aria-modal": "true", tabIndex: -1 },
-    h("div", { className: "sn-hd" }, h("h3", null, title), h("button", { className: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": t("components.close"), "data-tip": t("components.close"), "data-kbd": "Esc" }, h(Icon, { name: "x", size: 16 }))),
+    h("div", { className: "sn-hd" }, h("h3", null, title), h("button", { className: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": tt("components.close"), "data-tip": tt("components.close"), "data-kbd": "Esc" }, h(Icon, { name: "x", size: 16 }))),
     h("div", { className: "sn-bd" }, children), footer ? h("div", { className: "sn-ft" }, footer) : null);
 }
 

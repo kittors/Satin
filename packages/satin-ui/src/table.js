@@ -10,7 +10,7 @@ import { icon } from "./icons.js";
 import { BOX } from "./form.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/table.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const cx = (...a) => a.filter(Boolean).join(" ");
@@ -30,13 +30,13 @@ export function sortRows(rows, columns, sort) {
   return rows.map((r, i) => [r, i]).sort((A, B) => cmp(A[0], B[0]) * d || A[1] - B[1]).map((x) => x[0]);
 }
 // 一行里面的格子（勾选框的勾不写进去：勾选状态另外同步，勾一下不用重画这一行）
-const rowInner = (o, r) => (o.selectable ? `<td class="sn-tbl-pick">${check(t("table.pick"), false)}</td>` : "") + (o.columns || []).map((c) => `<td class="${tdClass(c)}">${cellHTML(c, r)}</td>`).join("");
+const rowInner = (o, r) => (o.selectable ? `<td class="sn-tbl-pick">${check(tt("table.pick"), false)}</td>` : "") + (o.columns || []).map((c) => `<td class="${tdClass(c)}">${cellHTML(c, r)}</td>`).join("");
 
 export function tableHTML(o = {}) {
   const { columns = [], rows = [], rowKey = "id", sort = null, selectable = false, selected = [], empty, loading = false, label, striped, compact, plain, lines, maxHeight, skeleton = 5 } = o;
   const sel = new Set(selected.map(String)), view = sortRows(rows, columns, sort);
   const keys = view.map((r, i) => keyOf(r, rowKey, i)), nOn = keys.filter((k) => sel.has(k)).length;
-  const head = `<thead><tr>${selectable ? `<th class="sn-tbl-pick">${check(t("table.all"), nOn > 0 && nOn === keys.length, nOn > 0 && nOn < keys.length)}</th>` : ""}${columns.map((c) => {
+  const head = `<thead><tr>${selectable ? `<th class="sn-tbl-pick">${check(tt("table.all"), nOn > 0 && nOn === keys.length, nOn > 0 && nOn < keys.length)}</th>` : ""}${columns.map((c) => {
     const on = sort?.key === c.key, aria = on ? ` aria-sort="${sort.dir === "desc" ? "descending" : "ascending"}"` : "";
     const style = c.width ? ` style="width:${typeof c.width === "number" ? c.width + "px" : esc(c.width)}"` : "";
     const inner = c.sortable ? `<button class="${cx("sn-sort", on && "sn-on", on && sort.dir === "desc" && "sn-desc")}" data-k="${esc(c.key)}">${esc(c.title)}${icon("arrow-up", 16)}</button>` : esc(c.title);
@@ -45,7 +45,7 @@ export function tableHTML(o = {}) {
   const n = columns.length + (selectable ? 1 : 0);
   let body;
   if (loading) body = Array.from({ length: skeleton }, (_, j) => `<tr class="sn-tbl-loading">${selectable ? `<td class="sn-tbl-pick"></td>` : ""}${columns.map((c, i) => `<td class="${tdClass(c)}"><span class="sn-sk" style="display:inline-block;height:12px;width:${c.align === "right" ? 36 : 48 + ((i * 7 + j * 13) % 4) * 8}%"></span></td>`).join("")}</tr>`).join("");
-  else if (!view.length) body = `<tr class="sn-tbl-empty"><td colspan="${n}">${esc(empty ?? t("table.empty"))}</td></tr>`;
+  else if (!view.length) body = `<tr class="sn-tbl-empty"><td colspan="${n}">${esc(empty ?? tt("table.empty"))}</td></tr>`;
   else body = view.map((r, i) => { const k = keys[i], on = sel.has(k); let inner = rowInner(o, r); if (on && selectable) inner = inner.replace('<input type="checkbox">', '<input type="checkbox" checked>'); return `<tr data-key="${esc(k)}"${on ? ' class="sn-sel"' : ""}>${inner}</tr>`; }).join("");
   const wrapCls = cx("sn-tbl-wrap", striped && "sn-striped", compact && "sn-compact", plain && "sn-plain");
   const wrapAttr = (lines === "grid" ? ` data-lines="grid"` : "") + (maxHeight ? ` style="--sn-tbl-max:${typeof maxHeight === "number" ? maxHeight + "px" : esc(maxHeight)}"` : "");

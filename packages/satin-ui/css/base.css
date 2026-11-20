@@ -55,6 +55,7 @@
 /* 中英文、数字之间自动留空；代码、按键、文件名整体不插空 */
 :where([class^="sn-"], [class*=" sn-"]):lang(zh) { text-autospace: normal; }
 :where([class^="sn-"], [class*=" sn-"]) :where(code, kbd) { text-autospace: no-autospace; }
+.sn-fname { text-autospace: no-autospace; } /* 文件名这类整体（原来的 .fname）：要写在上面 :lang(zh) 那条之后才压得住（同样的优先级，后写的赢） */
 /* 只在页面的一部分用 Satin（嵌进别的设计系统里）：外面包一层 sn-root，拿到和整页一样的底色、文字色、字体字号（reset.css 写在 body 上的那一套） */
 .sn-root { background: var(--sn-canvas); color: var(--sn-label); font: calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); -webkit-font-smoothing: antialiased; }
 /* 扩大点击区（手机上的小图标按钮、关闭按钮、行内链接）：样子不变，能点到的范围至少 44×44（09 号 §11 触控尺寸） */

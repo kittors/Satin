@@ -1,6 +1,6 @@
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/theme.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 // 主题定制：主色（和成功 / 警告 / 危险三种状态色）、字体、字号比例——随时改，所有组件跟着变。
 // 组件只认 CSS 变量（--accent / --on-primary / --success / --warning / --danger / --sans / --mono / --font-scale），这里只是把选择写到根元素上；
 // 深浅两套主题各用各的值（主色在深色下自动提亮，保证在深底上看得清），选择存在 localStorage，刷新还在。
@@ -8,21 +8,21 @@ const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 const root = typeof document !== "undefined" ? document.documentElement : undefined, KEY = "satin-custom";
 // 主色：默认"墨"——跟着主题的文字色走（黑白克制，Satin 的本色）；其余几种是给品牌色用的，深色下用更亮的那一版
 export const ACCENTS = [
-  { id: "ink", get name() { return t("theme.0"); }, light: null, dark: null },
-  { id: "blue", get name() { return t("theme.1"); }, light: "#0a66d9", dark: "#3d8bfd" },
-  { id: "indigo", get name() { return t("theme.2"); }, light: "#4f46e5", dark: "#8b85ff" },
-  { id: "green", get name() { return t("theme.3"); }, light: "#18794e", dark: "#3dd68c" },
-  { id: "amber", get name() { return t("theme.4"); }, light: "#b45309", dark: "#f5a524" },
-  { id: "rose", get name() { return t("theme.5"); }, light: "#d6245b", dark: "#ff5c8a" },
+  { id: "ink", get name() { return tt("theme.0"); }, light: null, dark: null },
+  { id: "blue", get name() { return tt("theme.1"); }, light: "#0a66d9", dark: "#3d8bfd" },
+  { id: "indigo", get name() { return tt("theme.2"); }, light: "#4f46e5", dark: "#8b85ff" },
+  { id: "green", get name() { return tt("theme.3"); }, light: "#18794e", dark: "#3dd68c" },
+  { id: "amber", get name() { return tt("theme.4"); }, light: "#b45309", dark: "#f5a524" },
+  { id: "rose", get name() { return tt("theme.5"); }, light: "#d6245b", dark: "#ff5c8a" },
 ];
 // 字体：都是系统里就有的字体，不额外下载；中文跟着回退到苹方 / 宋体 / 圆体
 export const FONTS = [
-  { id: "system", get name() { return t("theme.6"); }, sans: null },
-  { id: "rounded", get name() { return t("theme.7"); }, sans: '"SF Pro Rounded", ui-rounded, "Yuanti SC", "PingFang SC", "Microsoft YaHei", sans-serif' },
-  { id: "humanist", get name() { return t("theme.8"); }, sans: '"Avenir Next", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif' },
-  { id: "serif", get name() { return t("theme.9"); }, sans: '"New York", ui-serif, "Songti SC", "Noto Serif SC", serif' },
+  { id: "system", get name() { return tt("theme.6"); }, sans: null },
+  { id: "rounded", get name() { return tt("theme.7"); }, sans: '"SF Pro Rounded", ui-rounded, "Yuanti SC", "PingFang SC", "Microsoft YaHei", sans-serif' },
+  { id: "humanist", get name() { return tt("theme.8"); }, sans: '"Avenir Next", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif' },
+  { id: "serif", get name() { return tt("theme.9"); }, sans: '"New York", ui-serif, "Songti SC", "Noto Serif SC", serif' },
 ];
-export const SCALES = [{ id: "s", get name() { return t("theme.10"); }, v: .93 }, { id: "m", get name() { return t("theme.11"); }, v: 1 }, { id: "l", get name() { return t("theme.12"); }, v: 1.07 }, { id: "xl", get name() { return t("theme.13"); }, v: 1.14 }];
+export const SCALES = [{ id: "s", get name() { return tt("theme.10"); }, v: .93 }, { id: "m", get name() { return tt("theme.11"); }, v: 1 }, { id: "l", get name() { return tt("theme.12"); }, v: 1.07 }, { id: "xl", get name() { return tt("theme.13"); }, v: 1.14 }];
 export const DEFAULTS = { accent: "ink", custom: "", font: "system", scale: "m", success: "", warning: "", danger: "" };
 // 颜色小工具：十六进制 ↔ RGB、相对亮度、和白色 / 黑色按比例混
 const rgb = (hex) => { const h = hex.replace("#", ""), n = h.length === 3 ? h.split("").map((c) => c + c).join("") : h; return [0, 2, 4].map((i) => parseInt(n.slice(i, i + 2), 16)); };

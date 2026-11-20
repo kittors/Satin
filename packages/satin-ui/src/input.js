@@ -5,9 +5,10 @@ import { fmtSize, midEllipsis, waveBars } from "./data.js";
 import { scrollArea } from "./scroll.js";
 import { EASE_CSS, setFieldError, clearFieldError } from "./form.js";
 import { $, $$, reduced, injectIcons } from "./core.js";
+import { onCleanup } from "./lifecycle.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/input.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 const setErr = setFieldError, clearErr = clearFieldError;
 void clearErr;
 const IN_OUT = "cubic-bezier(.42,0,.58,1)", POP = "cubic-bezier(.34,1.56,.64,1)", EASE_IN = "cubic-bezier(.42,0,1,1)";
@@ -55,7 +56,7 @@ export function autoGrow(box) {
   const mirror = document.createElement("div");
   Object.assign(mirror.style, { position: "absolute", visibility: "hidden", left: "-9999px", top: "0", boxSizing: "border-box", whiteSpace: "pre-wrap", overflowWrap: "anywhere",
     font: cs.font, lineHeight: cs.lineHeight, letterSpacing: cs.letterSpacing, padding: cs.padding });
-  document.body.append(mirror);
+  document.body.append(mirror); onCleanup(() => mirror.remove()); // 组件销毁时拿掉（展示页直接 mountXxx 的不受影响）
   const edges = () => { ta.classList.toggle("sn-fade-top", ta.scrollTop > 2); ta.classList.toggle("sn-fade-bottom", ta.scrollTop + ta.clientHeight < ta.scrollHeight - 2); };
   const fit = () => {
     mirror.style.width = ta.offsetWidth + "px"; mirror.textContent = ta.value + "​";
@@ -74,7 +75,7 @@ export function longCount(box, { showFrom = 0 } = {}) {
   const ta = $("textarea", box), max = Number(box.dataset.max), cnt = $(".sn-ta-count", box), fg = $(".sn-uring .sn-fg", cnt), C = 2 * Math.PI * 6;
   fg.style.strokeDasharray = C; fg.style.strokeDashoffset = C;
   let txt = $(".sn-txt", cnt), mode = "", wasOver = false;
-  if (txt) txt.innerHTML = '<span class="sn-pre"></span><span class="sn-roll"><span>0</span></span><span class="suf"></span>';
+  if (txt) txt.innerHTML = '<span class="sn-pre"></span><span class="sn-roll"><span>0</span></span><span class="sn-suf"></span>';
   const update = (animate) => {
     const n = len(ta.value), p = n / max, over = n > max;
     fg.style.strokeDashoffset = String(C * (1 - Math.min(1, p)));
@@ -84,7 +85,7 @@ export function longCount(box, { showFrom = 0 } = {}) {
     if (!txt) return;
     const m = over ? "over" : p >= .9 ? "left" : "n", num = over ? n - max : p >= .9 ? max - n : n;
     if (m !== mode) {
-      mode = m; $(".sn-pre", txt).textContent = m === "over" ? t("input.0") : m === "left" ? t("input.1") : ""; $(".suf", txt).textContent = m === "n" ? ` / ${max}` : t("input.2");
+      mode = m; $(".sn-pre", txt).textContent = m === "over" ? tt("input.0") : m === "left" ? tt("input.1") : ""; $(".sn-suf", txt).textContent = m === "n" ? ` / ${max}` : tt("input.2");
       setRoll($(".sn-roll", txt), num);
       if (animate && !reduced()) txt.animate([{ opacity: .2, transform: "translateY(2px)" }, { opacity: 1, transform: "none" }], { duration: 180, easing: "cubic-bezier(0,0,.58,1)" });
     } else if (animate) roll($(".sn-roll", txt), num, m === "n" ? undefined : m === "over" ? 1 : -1); else setRoll($(".sn-roll", txt), num);
@@ -110,7 +111,7 @@ export function mountPassword(input) {
   let last = "", lastLv = 0;
   const score = (v) => {
     if (!v) return [0, "　"];
-    if (v.length < 8) return [0, t("input.7", { p0: 8 - v.length })];
+    if (v.length < 8) return [0, tt("input.7", { p0: 8 - v.length })];
     const kinds = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z\d]/].filter((r) => r.test(v)).length;
     return [Math.min(4, 1 + (kinds >= 2) + (kinds >= 3 || v.length >= 12) + (kinds >= 3 && v.length >= 14)), ""];
   };
@@ -118,7 +119,7 @@ export function mountPassword(input) {
     const v = input.value, [lv, hint] = score(v), lit = lv || (v ? 1 : 0);
     meter.dataset.level = lv;
     bars.forEach((b, i) => { b.style.setProperty("transition-delay", `${i * 30}ms`); b.classList.toggle("sn-on", i < lit); });
-    const text = hint || (LABELS[lv] && t(LABELS[lv]));
+    const text = hint || (LABELS[lv] && tt(LABELS[lv]));
     if (text !== last) { roll(label, text, lv >= lastLv ? 1 : -1); last = text; lastLv = lv; }
   });
   if (!caps) return;
@@ -133,7 +134,7 @@ export function mountEmail(input) {
   if (!once(input, "_em")) return;
   const mark = $(".sn-ok-mark", input.closest(".sn-ib")), field = input.closest(".sn-field"); let t = 0;
   input.addEventListener("input", () => { clearTimeout(t); if (!okMail(input.value)) mark.classList.remove("sn-on"); t = setTimeout(() => mark.classList.toggle("sn-on", okMail(input.value)), 400); });
-  input.addEventListener("blur", () => { if (input.value.trim() && !okMail(input.value)) setErr(field, t("input.8")); });
+  input.addEventListener("blur", () => { if (input.value.trim() && !okMail(input.value)) setErr(field, tt("input.8")); });
 }
 // ———— 6. 搜索：等待超过 300ms 才转圈，转了至少 500ms；结果数量淡入 ————
 // mountSearch([data-search] 容器, { search })：search(q) 返回结果数量（或 Promise）；等待超过 300ms 才转圈、转了至少留 500ms；结果数量淡入
@@ -149,7 +150,7 @@ export function mountSearch(ib, { search = () => 0, debounce = 150 } = {}) {
       const show = setTimeout(() => { if (id === seq) { ib.classList.add("sn-loading"); shownAt = performance.now(); } }, 300);
       let n = 0; try { n = await search(q); } catch { n = 0; }
       clearTimeout(show); if (id !== seq) return;
-      const done = () => { if (id !== seq) return; ib.classList.remove("sn-loading"); const c = Array.isArray(n) ? n.length : Number(n) || 0; if (res) res.textContent = c ? t("input.9", { p0: c }) : t("input.10"); ib.classList.add("sn-has-res"); };
+      const done = () => { if (id !== seq) return; ib.classList.remove("sn-loading"); const c = Array.isArray(n) ? n.length : Number(n) || 0; if (res) res.textContent = c ? tt("input.9", { p0: c }) : tt("input.10"); ib.classList.add("sn-has-res"); };
       shownAt ? setTimeout(done, Math.max(0, 500 - (performance.now() - shownAt))) : done();
     }, debounce);
   });
@@ -167,7 +168,7 @@ export function mountTagInput(box, { initial = [], onChange } = {}) {
     const t = raw.trim(); if (!t) return;
     const dup = find(t); if (dup) { nudge(dup); return; }
     if (chips().length >= max) { nudge(foot.lastElementChild); return; }
-    const c = document.createElement("span"); c.className = "sn-chip sn-tag sn-on"; c.innerHTML = `${esc(t)}<button class="sn-x" aria-label="${t("input.11")}${esc(t)}" data-i="x"></button>`; injectIcons(c);
+    const c = document.createElement("span"); c.className = "sn-chip sn-tag sn-on"; c.innerHTML = `${esc(t)}<button class="sn-x" aria-label="${tt("input.11")}${esc(t)}" data-i="x"></button>`; injectIcons(c);
     box.insertBefore(c, input); sync();
     if (!reduced()) c.animate([{ opacity: 0, transform: "scale(.8)" }, { opacity: 1, transform: "none" }], { duration: 260, delay, easing: POP, fill: "backwards" });
   }
@@ -248,21 +249,21 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   (files.closest(".sn-sa") || files).after(note);
   let noteT = 0, rejected = [];
   const notify = (text) => { $(".sn-tx", note).textContent = text; note.classList.add("sn-on"); clearTimeout(noteT); noteT = setTimeout(() => { note.classList.remove("sn-on"); rejected = []; }, 5000); };
-  const reject = (name, why) => { rejected.push(name); notify(rejected.length > 1 ? t("input.12", { p0: rejected.length, p1: why }) : t("input.13", { p0: midEllipsis(name, 22), p1: why })); };
+  const reject = (name, why) => { rejected.push(name); notify(rejected.length > 1 ? tt("input.12", { p0: rejected.length, p1: why }) : tt("input.13", { p0: midEllipsis(name, 22), p1: why })); };
   // data-external：发送和停止交给外面处理（比如聊天框），输入框只管三种状态；生成中仍然可以接着写下一条
-  const external = box.hasAttribute("data-external"), idleLabel = send.getAttribute("aria-label") || t("input.14");
+  const external = box.hasAttribute("data-external"), idleLabel = send.getAttribute("aria-label") || tt("input.14");
   let busy = false, timer = 0, fileN = 0;
-  // 有文字或有附件就能发；超出字数不能发。正在收起的附件（.leaving）不算
-  const kept = () => [...files.children].filter((f) => !f.classList.contains("leaving"));
+  // 有文字或有附件就能发；超出字数不能发。正在收起的附件（.sn-leaving）不算
+  const kept = () => [...files.children].filter((f) => !f.classList.contains("sn-leaving"));
   const sync = () => {
     const fs = kept(), waiting = fs.some((f) => !f.classList.contains("sn-done")), failed = fs.some((f) => f.classList.contains("sn-fail"));
     const ready = (!!ta.value.trim() || fs.length > 0) && !waiting && !box.classList.contains("sn-over");
     send.classList.toggle("sn-ready", ready && !busy); send.setAttribute("aria-disabled", String(!ready && !busy));
-    if (!busy) send.dataset.tip = failed ? t("input.15") : waiting ? t("input.16") : idleLabel;
+    if (!busy) send.dataset.tip = failed ? tt("input.15") : waiting ? tt("input.16") : idleLabel;
   };
   const setBusy = (on) => {
     busy = on; box.classList.toggle("sn-busy", on && !external); send.classList.toggle("sn-busy", on); swap.classList.toggle("sn-on", on); ta.readOnly = on && !external;
-    send.setAttribute("aria-label", on ? t("input.17") : idleLabel); send.dataset.tip = on ? t("input.17") : idleLabel; if (!on) clearTimeout(timer); sync();
+    send.setAttribute("aria-label", on ? tt("input.17") : idleLabel); send.dataset.tip = on ? tt("input.17") : idleLabel; if (!on) clearTimeout(timer); sync();
   };
   const reset = () => { setBusy(false); ta.focus({ preventScroll: true }); };
   // 键盘提交：生成中不停止也不发送（停止是破坏性操作，只能点按钮），只轻轻晃一下停止按钮提示
@@ -284,7 +285,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     const out = kept();
     if (out.length) {
       const h = files.offsetHeight, pt = getComputedStyle(files).paddingTop;
-      for (const f of out) { f.classList.add("leaving"); f.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: "ease-out", fill: "forwards" }); }
+      for (const f of out) { f.classList.add("sn-leaving"); f.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: "ease-out", fill: "forwards" }); }
       files.style.overflow = "hidden";
       files.animate([{ height: h + "px", paddingTop: pt }, { height: "0px", paddingTop: "0px" }], { duration: dur, easing: ease }).onfinish = () => {
         for (const f of out) f.remove(); files.style.overflow = ""; sync();
@@ -297,11 +298,11 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && !e.isComposing) { e.preventDefault(); start(true); } });
   send.addEventListener("click", () => start());
   // ———— 附件：图片、视频（缩略图块），音频、文档（条）。加进来先上传，传完才能发；可以拖进来，也可以粘贴截图 ————
-  const X = t("input.18");
+  const X = tt("input.18");
   const tileHTML = (f) => `<span class="sn-clip"><span class="sn-th"></span>${f.kind === "vid" ? `<span class="sn-play" data-i="play"></span><span class="sn-dur">${f.dur}</span>` : ""}<span class="sn-up"><span class="sn-pring"></span><span class="sn-ic sn-re" data-i="refresh-cw"></span><span class="sn-ic sn-al" data-i="circle-alert"></span></span></span>${X}`;
   const barHTML = (f) => f.kind === "aud"
-    ? `<button class="sn-ap" type="button" aria-label="${t("input.19")}"><span class="sn-swap"><span class="sn-a" data-i="play"></span><span class="sn-b" data-i="pause"></span></span></button><span class="sn-meta"><b class="fname">${esc(midEllipsis(f.name))}</b><span class="sn-wfl"><span class="sn-wf">${waveBars(22, f.seed)}<span class="sn-wf-on">${waveBars(22, f.seed)}</span></span><span class="sn-st">${f.dur}</span></span></span><span class="sn-pb"><i></i></span>${X}`
-    : `<span class="sn-ext-card">${f.ext}</span><span class="sn-meta"><b class="fname">${esc(midEllipsis(f.name))}</b><span class="sn-st">${f.ext} · ${fmtSize(f.size)}</span></span><span class="sn-pb"><i></i></span>${X}`;
+    ? `<button class="sn-ap" type="button" aria-label="${tt("input.19")}"><span class="sn-swap"><span class="sn-a" data-i="play"></span><span class="sn-b" data-i="pause"></span></span></button><span class="sn-meta"><b class="sn-fname">${esc(midEllipsis(f.name))}</b><span class="sn-wfl"><span class="sn-wf">${waveBars(22, f.seed)}<span class="sn-wf-on">${waveBars(22, f.seed)}</span></span><span class="sn-st">${f.dur}</span></span></span><span class="sn-pb"><i></i></span>${X}`
+    : `<span class="sn-ext-card">${f.ext}</span><span class="sn-meta"><b class="sn-fname">${esc(midEllipsis(f.name))}</b><span class="sn-st">${f.ext} · ${fmtSize(f.size)}</span></span><span class="sn-pb"><i></i></span>${X}`;
   const metaOf = (el) => (el.dataset.kind === "aud" ? el.dataset.dur : `${el.dataset.ext} · ${fmtSize(+el.dataset.size)}`);
   const setMeta = (el, msg) => { const st = $(".sn-st", el); if (st) st.textContent = msg || metaOf(el); el.title = msg || ""; };
   function addFile(f, file) {
@@ -312,22 +313,22 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     el.innerHTML = tile ? tileHTML(f) : barHTML(f); injectIcons(el); files.append(el);
     if (!reduced()) el.animate([{ opacity: 0, transform: "scale(.88) translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: POP });
     requestAnimationFrame(() => files.scrollTo({ left: files.scrollWidth, behavior: reduced() ? "auto" : "smooth" }));
-    if (f.bad) { el.classList.add("sn-bad", "leaving"); setMeta(el, f.bad + t("input.20")); el.title = f.bad; reject(f.name, f.bad); setTimeout(() => nudge(el), 260); sync(); setTimeout(() => removeFile(el), 2600); return; }
+    if (f.bad) { el.classList.add("sn-bad", "sn-leaving"); setMeta(el, f.bad + tt("input.20")); el.title = f.bad; reject(f.name, f.bad); setTimeout(() => nudge(el), 260); sync(); setTimeout(() => removeFile(el), 2600); return; }
     upload(el, f.failAt); sync();
   }
   // 上传（演示）：进度一阵一阵地走；failAt 到了就失败，点一下重传
   function upload(el, failAt = 0) {
     clearTimeout(el._t); el.classList.remove("sn-fail", "sn-done"); el.style.setProperty("--sn-p", 0); let p = 0; sync();
     if (realUpload && el._file) { // 真上传：进度由 upload 报，结束就完成，出错就失败（点一下重试）
-      realUpload(el._file, (q) => { el.style.setProperty("--sn-p", q); if (el.dataset.kind === "doc") setMeta(el, t("input.21", { p0: Math.round(q * 100) })); })
+      realUpload(el._file, (q) => { el.style.setProperty("--sn-p", q); if (el.dataset.kind === "doc") setMeta(el, tt("input.21", { p0: Math.round(q * 100) })); })
         .then(() => { if (!el.isConnected) return; el.style.setProperty("--sn-p", 1); el.classList.add("sn-done"); setMeta(el, null); sync(); },
-              () => { if (!el.isConnected) return; el.classList.add("sn-fail"); setMeta(el, t("input.22")); notify(t("input.23", { p0: midEllipsis(el.dataset.name, 22) })); sync(); });
+              () => { if (!el.isConnected) return; el.classList.add("sn-fail"); setMeta(el, tt("input.22")); notify(tt("input.23", { p0: midEllipsis(el.dataset.name, 22) })); sync(); });
       return;
     }
     const step = () => {
       if (!el.isConnected) return; p = Math.min(1, p + .07 + Math.random() * .1);
-      if (failAt && p >= failAt) { el.classList.add("sn-fail"); setMeta(el, t("input.22")); notify(t("input.23", { p0: midEllipsis(el.dataset.name, 22) })); sync(); return; }
-      el.style.setProperty("--sn-p", p); if (el.dataset.kind === "doc") setMeta(el, t("input.21", { p0: Math.round(p * 100) }));
+      if (failAt && p >= failAt) { el.classList.add("sn-fail"); setMeta(el, tt("input.22")); notify(tt("input.23", { p0: midEllipsis(el.dataset.name, 22) })); sync(); return; }
+      el.style.setProperty("--sn-p", p); if (el.dataset.kind === "doc") setMeta(el, tt("input.21", { p0: Math.round(p * 100) }));
       if (p >= 1) { el.classList.add("sn-done"); setMeta(el, null); sync(); return; }
       el._t = setTimeout(step, 130 + Math.random() * 140);
     };
@@ -338,7 +339,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     if (!el.isConnected || el._gone) return; el._gone = true; clearTimeout(el._t); el._a?.cancel();
     const rest = [...files.children].filter((x) => x !== el && !x._gone);
     if (reduced()) { el.remove(); sync(); return; }
-    el.classList.add("leaving");
+    el.classList.add("sn-leaving");
     if (!rest.length) {
       const h = files.offsetHeight, pt = getComputedStyle(files).paddingTop; files.style.overflow = "hidden";
       el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: EASE_IN, fill: "forwards" });
@@ -373,7 +374,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   function addReal(file) {
     const kind = kindOf(file), url = URL.createObjectURL(file);
     const f = { kind, name: file.name, size: file.size, ext: (file.name.split(".").pop() || "FILE").slice(0, 4).toUpperCase(), dur: "0:00", seed: ++fileN, g: kind === "img" ? `url("${url}") center / cover` : "" };
-    if (file.size > 2 * 1024 ** 3) f.bad = t("input.24");
+    if (file.size > 2 * 1024 ** 3) f.bad = tt("input.24");
     addFile(f, file);
     if (kind === "vid" || kind === "aud") { const m = document.createElement(kind === "vid" ? "video" : "audio"); m.preload = "metadata"; m.src = url;
       m.onloadedmetadata = () => { const el = [...files.children].find((x) => x.dataset.seed === String(f.seed)); if (!el || !isFinite(m.duration)) return; el.dataset.dur = clock(m.duration); const d = $(".sn-dur", el) || $(".sn-st", el); if (d && (kind === "vid" || el.classList.contains("sn-done"))) d.textContent = el.dataset.dur; }; }
@@ -384,10 +385,10 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   box.addEventListener("dragleave", () => { if (--dragN <= 0) { dragN = 0; box.classList.remove("sn-drop"); } });
   box.addEventListener("drop", (e) => { if (!hasFiles(e)) return; e.preventDefault(); dragN = 0; box.classList.remove("sn-drop"); for (const file of e.dataTransfer.files) addReal(file); });
   ta.addEventListener("paste", (e) => { const fs = [...(e.clipboardData?.files || [])]; if (!fs.length) return; e.preventDefault(); fs.forEach(addReal); });
-  const styles = [t("input.25"), t("input.26"), t("input.27"), t("input.28")]; let si = 0; const styleBtn = $("[data-cm-style]", box);
-  styleBtn?.addEventListener("click", () => { si = (si + 1) % styles.length; styleBtn.lastChild.textContent = t("input.29", { p0: styles[si] }); if (!reduced()) styleBtn.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 200, easing: "cubic-bezier(0,0,.58,1)" }); });
-  const models = [t("input.30"), t("input.31")]; let mi = 0; const modelBtn = $("[data-cm-model]", box);
-  modelBtn?.addEventListener("click", () => { mi = (mi + 1) % models.length; modelBtn.firstChild.textContent = t("input.32", { p0: models[mi] }); if (!reduced()) modelBtn.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 200, easing: "cubic-bezier(0,0,.58,1)" }); });
+  const styles = [tt("input.25"), tt("input.26"), tt("input.27"), tt("input.28")]; let si = 0; const styleBtn = $("[data-cm-style]", box);
+  styleBtn?.addEventListener("click", () => { si = (si + 1) % styles.length; styleBtn.lastChild.textContent = tt("input.29", { p0: styles[si] }); if (!reduced()) styleBtn.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 200, easing: "cubic-bezier(0,0,.58,1)" }); });
+  const models = [tt("input.30"), tt("input.31")]; let mi = 0; const modelBtn = $("[data-cm-model]", box);
+  modelBtn?.addEventListener("click", () => { mi = (mi + 1) % models.length; modelBtn.firstChild.textContent = tt("input.32", { p0: models[mi] }); if (!reduced()) modelBtn.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 200, easing: "cubic-bezier(0,0,.58,1)" }); });
   sync(); upd(false);
   return box._cm;
 }

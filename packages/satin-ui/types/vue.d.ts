@@ -33,3 +33,6 @@ export function toast(o: ToastOptions): ToastHandle;
 export function notify(o: NotifyOptions): { close(): void };
 declare const plugin: Plugin;
 export default plugin;
+
+/** 把任意 createXxx（包括重组件）包成 Vue 组件：props 列出要传给组件的选项名 */
+export function wrapSatin(create: import("./components").SatinFactory<any, any>, opts: { name: string; props?: string[]; valueKey?: string; events?: string[]; modelEvent?: string }): import("vue").DefineComponent<Record<string, unknown>>;

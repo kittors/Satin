@@ -10,5 +10,13 @@ export default {
   "flow.7": "Running…",
   "flow.8": "Run",
   "flow.9": "Exported {p0} versions",
-  "flow.10": "Exported"
+  "flow.10": "Exported",
+  "flow.11": "Flow canvas",
+  "flow.12": "Zoom out",
+  "flow.13": "Reset to 100%",
+  "flow.14": "Zoom in",
+  "flow.15": "Fit: show all nodes",
+  "flow.16": "Center: move the selected nodes (or the whole graph) to the middle",
+  "flow.17": "Tidy up: layer by dependencies, reduce crossings, align",
+  "flow.18": "Tidy"
 };

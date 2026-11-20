@@ -85,6 +85,7 @@ export default defineNuxtPlugin((nuxtApp) => { nuxtApp.vueApp.use(Satin); });
 <link rel="stylesheet" href="node_modules/satin-ui/css/page.css">
 <script type="importmap">{ "imports": {
   "satin-ui": "./node_modules/satin-ui/src/index.js",
+  "satin-ui/components": "./node_modules/satin-ui/src/components.js",
   "satin-ui/elements": "./node_modules/satin-ui/elements/index.js",
   "satin-ui/theme": "./node_modules/satin-ui/src/theme.js",
   "satin-ui/chat": "./node_modules/satin-ui/src/chat.js",
@@ -102,6 +103,8 @@ export default defineNuxtPlugin((nuxtApp) => { nuxtApp.vueApp.use(Satin); });
 </body>
 </html>
 ```
+纯 HTML 里组件、函数一律从 `satin-ui` 引（`createTable`、`toast`、`openDialog`……都在这一个入口）；用到别的子路径（`satin-ui/chat`……）先在导入映射里加一行，没加的路径浏览器找不到，整段脚本都不会跑。
+
 Svelte、Solid、Preact、Angular：样式同上（入口里 `import "satin-ui/css/page.css"`），交互组件用自定义元素（Angular 在组件里加 `schemas: [CUSTOM_ELEMENTS_SCHEMA]`）。
 
 **嵌进已有页面**（别的设计系统里只放一块 Satin）：改引 `satin-ui/css`（不带页面级重置），外面包一层 `<div class="sn-root">`。
@@ -132,7 +135,8 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 图标按钮 | `<Button variant="ghost" icon="settings" tip="设置" />` | `<button class="sn-btn sn-ghost sn-ibtn" data-tip="设置" data-i="settings"></button>` | 只有图标时必须有 `data-tip` 或 `aria-label` |
 | 带图标的按钮 | `<Button icon="download">导出</Button>` | `data-i="download:before"` + `injectIcons()` | 图标名见 `references/icons.md`（146 个），不要用 emoji |
 | 等待 / 成功 | `<Button busy>`；`busy(btn, promise)`、`succeed(btn)` | | 300ms 内完成不转圈 |
-| 输入框 + 标签 + 说明 + 错误 | `<Field label help error><Input /></Field>` | `fieldHTML({ label, control: inputHTML(), help, error })` | 错误写在字段下面，不弹窗；`validateForm(form, 规则)` 一次校验 |
+| 输入框 + 标签 + 说明 + 错误 | `<Field label help error={错误}><Input /></Field>`（Vue `<SnField :error>`） | `fieldHTML({ label, control: inputHTML(), help, error })` | 错误写在字段下面，不弹窗；`validateForm(form, 规则)` 一次校验。手写标记时：字段加 `sn-bad`，错误写成 `<div class="sn-err"><span>错误文字</span></div>` |
+| 密码框（显示 / 隐藏、大写提示）、邮箱框 | `<Password label value onChange />`、`<Email … />`（Vue `<SnPassword v-model>`、`<SnEmail v-model>`） | `createPassword(空容器, { label, id })`、`createEmail`；注册页密码 `meter: true` 出强度条 | 不要自己做眼睛按钮 |
 | 多行输入 | `<Textarea>` | `<textarea class="sn-input">` | |
 | 搜索框 | | `<span class="sn-ib sn-has-pre"><span class="sn-pre" data-i="search"></span><input class="sn-input" placeholder="搜索项目"></span>` | |
 | 下拉选择 | `<Select items value onChange>` | `<sn-select items='["A","B"]' value="A">` | 选项 ≤ 5 个而且要一眼看全：用分段控件 |
@@ -214,6 +218,25 @@ createTable(document.getElementById("projects"), {
 | `.sn-stat` | 指标：`<span>标签</span><b>1,284</b><small class="sn-up">+12%</small>` |
 | `.sn-bottom-bar` | 手机底部操作栏，贴底，避开底部横条 |
 
+### 常用令牌速查（名字照抄，不要猜；没列的查 `references/tokens.md`）
+
+| 用途 | 令牌 |
+|---|---|
+| 页面底色 / 卡片、面板底色 / 浮层底色 / 凹下去的底 | `--sn-canvas` / `--sn-raised` / `--sn-overlay` / `--sn-sunken` |
+| 悬停、按下、很淡的底 | `--sn-fill-hover` / `--sn-fill-active` / `--sn-fill-subtle` |
+| 文字：主 / 次 / 第三级 / 禁用 | `--sn-label` / `--sn-label2` / `--sn-label3` / `--sn-label-off` |
+| 线：分隔、卡片描边 / 输入框描边 | `--sn-line` / `--sn-line-control` |
+| 强调（主按钮）/ 主色上的文字 | `--sn-accent` / `--sn-on-primary` |
+| 状态 | `--sn-success` / `--sn-warning` / `--sn-danger` |
+| 阴影（只给浮层）：菜单、弹出面板 / 弹窗 | `--sn-e1` / `--sn-e2` |
+| 圆角 | `--sn-r-xs`（4）/ `--sn-r-sm`（6）/ `--sn-r-md`（8）/ `--sn-r-lg`（12）/ `--sn-r-xl`（16）/ `--sn-r-full` |
+| 间距 | `--sn-sp-4` `--sn-sp-8` `--sn-sp-12` `--sn-sp-16` `--sn-sp-20` `--sn-sp-24` `--sn-sp-32` `--sn-sp-40` `--sn-sp-48` `--sn-sp-64` |
+| 曲线 | `--sn-ease-out`（大多数）/ `--sn-ease-in`（离开）/ `--sn-ease-in-out` / `--sn-ease-open`（展开、抽屉） |
+| 字体 | `--sn-sans` / `--sn-mono` |
+
+字号、行高、字重不用变量：用排版类 `sn-t-display / title1 / title2 / title3 / body / body-strong / callout / caption / micro / code`。
+自己写的类名**不要用 `sn-` 前缀**（`sn-` 是 Satin 的；编一个 `sn-eyebrow` 没有样式，检查器会报），比如 `page-eyebrow`。
+
 还不够时自己写 CSS，但**只用令牌**：`var(--sn-sp-16)`（间距 0/2/4/6/8/10/12/14/16/20/24/28/32/40/48/64/80）、`var(--sn-label2)`（文字）、
 `var(--sn-raised)`（底色）、`var(--sn-line)`（线）、`var(--sn-r-lg)`（圆角）。令牌全表见 `references/tokens.md`。
 
@@ -237,7 +260,9 @@ createTable(document.getElementById("projects"), {
 
 ## 6. 常见错误
 
-- 忘了引样式（`satin-ui/css/page.css`）或 theme-boot（Vite 用 `satin()` 插件）→ 页面没样式、深色刷新闪白。
+- 忘了引样式（`satin-ui/css/page.css`）→ 页面没样式。
+- Vite 项目忘了加 `satin()` 插件（`vite.config.js` 里 `plugins: [react(), satin()]`）→ 深色模式下每次刷新先闪一下浅色。这一步和引样式一样是必做的。
+- 在 Next.js / Nuxt 的服务端代码里 `import "satin-ui/theme-boot"`：那是浏览器里 `<script src>` 用的首帧脚本，服务端什么都不做。服务端渲染内联首帧脚本用 `satin-ui/theme-boot-script`（上面第 1 节的写法），Vite 项目用 `satin()` 插件。
 - 只写了 `class="btn primary"` → Satin 的类名都带 `sn-` 前缀：`sn-btn sn-primary`。
 - 纯 HTML 页面没调 `setup()` / `defineElements()` / `injectIcons()` → Tooltip 不出、`<sn-select>` 不渲染、`data-i` 不显示图标。
 - 在 React / Vue 里用 `document.querySelector` 改组件内部的 DOM → 用组件的 props；要实例就 `ref`。

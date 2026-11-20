@@ -29,5 +29,7 @@ export default {
   "canvas-grid.26": ", collapsed",
   "canvas-grid.27": "Name",
   "canvas-grid.28": "sorting, filtering or expanding",
-  "canvas-grid.29": "sorting or filtering"
+  "canvas-grid.29": "sorting or filtering",
+  "canvas-grid.30": "Data grid, 1,000,000 rows, drawn on canvas",
+  "canvas-grid.31": "Search names"
 };

@@ -10,9 +10,8 @@ const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "packages/satin-ui/packag
 const entries = new Set();
 const walk = (v) => { if (typeof v === "string") { if (/\.m?js$/.test(v) && !v.includes("*")) entries.add(path.join(ROOT, "packages/satin-ui", v)); } else if (v && typeof v === "object") for (const x of Object.values(v)) walk(x); };
 walk(pkg.exports);
-// theme-boot.js 是放在 <head> 里同步执行的小脚本（第一帧之前写主题），本来就是"有副作用"的，不在这里测
-for (const e of [...entries]) if (/theme-boot/.test(e)) entries.delete(e);
-for (const f of fs.readdirSync(path.join(ROOT, "packages/satin-ui/src"))) if (/\.js$/.test(f) && !/worker/.test(f) && f !== "theme-boot.js") entries.add(path.join(ROOT, "packages/satin-ui/src", f));
+// theme-boot.js 是放在 <head> 里同步执行的小脚本（第一帧之前写主题）：在浏览器里有副作用是本意，在 Node 里导入也要什么都不做、不报错（服务端代码误引不能崩）
+for (const f of fs.readdirSync(path.join(ROOT, "packages/satin-ui/src"))) if (/\.js$/.test(f) && !/worker/.test(f) ) entries.add(path.join(ROOT, "packages/satin-ui/src", f));
 // Node 里没有 document / window / localStorage / addEventListener……：导入时碰到就会抛 ReferenceError，正好当场报出来
 let bad = 0;
 for (const e of [...entries].sort()) {

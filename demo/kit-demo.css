@@ -34,6 +34,7 @@
 .rules b { color: var(--sn-label); font-weight: 500; }
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .row + .row { margin-top: 16px; }
+.sn-nf-card .row { display: flex; flex-wrap: wrap; gap: 6px; } /* 数字滚动卡片里的按钮行（原来写在库的 number.css 里） */
 .stack { display: grid; gap: 16px; }
 .grid-m { display: grid; align-items: center; gap: 14px 16px; }
 .grid-m .sn-cap { white-space: nowrap; }

@@ -49,7 +49,7 @@ mountFlow(document.querySelector(".sn-flow"), {
 
 ```html
 <div class="sn-flow" id="flowBox" tabindex="0" aria-label="流程图画布">
-<div class="sn-flow-world"><svg class="sn-flow-edges" /><div></div></div>
+<div class="sn-flow-world"><svg class="sn-flow-edges" /><div class="sn-flow-nodes"></div></div>
 <div class="sn-flow-tools"><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-fz="-1" data-tip="缩小" data-kbd="⌘−" data-i="minus"></button><button class="sn-fz-val sn-num" data-fz="reset" data-tip="恢复到 100%">100%</button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-fz="1" data-tip="放大" data-kbd="⌘+" data-i="plus"></button><span class="sn-vr"></span><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-fz="fit" data-tip="适配视图：全部节点放进画布" data-kbd="⇧1" data-i="maximize-2"></button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-fz="center" data-tip="居中：选中的节点或整张图移到画布中间" data-kbd="⇧2" data-i="locate-fixed"></button><span class="sn-vr"></span><button class="sn-btn sn-ghost sn-sm" data-flow-tidy="" data-tip="自动排版：按上下游分层、减少交叉、对齐" data-kbd="⇧L" data-i="workflow:before">整理</button></div>
 <div class="sn-flow-run"><button class="sn-btn sn-primary sn-sm" data-flow-run="" data-i="play:before">运行</button></div>
 <div class="sn-flow-mini"><svg /><i class="sn-mini-view"></i></div>

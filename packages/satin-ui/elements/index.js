@@ -29,8 +29,13 @@ export function defineElements(prefix = "sn") {
     customElements.define(tag, class extends HTMLElement {
       static observedAttributes = attrs;
       opts() { const o = {}; for (const a of attrs) if (this.hasAttribute(a)) o[camel(a)] = parse(this.getAttribute(a)); return o; }
-      connectedCallback() { if (this.inst) return; this.style.display ||= "contents"; this.unsetup = setup(); this.inst = create(this, this.opts()); }
-      disconnectedCallback() { this.inst?.destroy(); this.inst = null; this.unsetup?.(); this.unsetup = null; }
+      // 插进页面后等这一轮同步代码跑完再创建：Angular 这类框架先插元素、同一轮里再设 [attr.xxx]，马上创建拿到的是空选项。
+      // 微任务在下一帧画出来之前就跑完，纯 HTML 页面看不出差别
+      connectedCallback() {
+        if (this.inst || this.pending) return; this.style.display ||= "contents"; this.pending = true;
+        queueMicrotask(() => { this.pending = false; if (!this.isConnected || this.inst) return; this.unsetup = setup(); this.inst = create(this, this.opts()); });
+      }
+      disconnectedCallback() { if (this.pending) return; this.inst?.destroy(); this.inst = null; this.unsetup?.(); this.unsetup = null; }
       attributeChangedCallback() { this.inst?.update(this.opts()); }
       get instance() { return this.inst; }
     });

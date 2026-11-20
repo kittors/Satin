@@ -49,6 +49,15 @@ createApp(App).use(Satin).mount("#app"); // <SnSegmented v-model="view" :items="
 </script>
 ```
 
+**重组件**（对话、Markdown、流程图、十万行 / 一百万行数据表格、主题面板）各自单独引入，写法和轻组件一样：
+
+```js
+import { createChat } from "satin-ui/chat";
+const chat = createChat(document.querySelector("#chat"), { title: "分镜助手", async *respond(q) { yield "收到：" + q; } });
+chat.destroy(); // 卸载时：停掉生成中的回答、撤掉监听、清空容器
+// React：const Chat = wrapSatin(createChat, { events: [] })（satin-ui/react），然后 <Chat title="…" respond={…} />
+```
+
 **第一帧之前写好深浅主题**（刷新不闪）：Vite 用 `satin-ui/vite` 插件；Next.js、Nuxt 把 `satin-ui/theme-boot-script` 内联进 `<head>`；纯 HTML `<script src="…/satin-ui/src/theme-boot.js">`。
 
 ## 入口
@@ -59,7 +68,7 @@ createApp(App).use(Satin).mount("#app"); // <SnSegmented v-model="view" :items="
 | `satin-ui/react`、`satin-ui/vue` | React 18+ / Vue 3.3+ 封装（受控 / 非受控、v-model、服务端渲染） |
 | `satin-ui/elements` | 不带 Shadow DOM 的自定义元素 `<sn-segmented>`、`<sn-select>`…… |
 | `satin-ui/theme`、`satin-ui/theme-panel` | 深浅模式 `setMode()`、主色 / 状态色 / 字体 / 字号 `set()`、局部主题 `applyTheme(el, …)`、定制面板 |
-| `satin-ui/markdown`、`/chat`、`/flow`、`/grid`、`/canvas-grid`、`/lightbox`、`/media` | 重组件，各自单独引入 |
+| `satin-ui/markdown`、`/chat`、`/flow`、`/grid`、`/canvas-grid`、`/lightbox`、`/media` | 重组件，各自单独引入：`createMarkdown`、`createChat`、`createFlow`、`createDataGrid`、`createCanvasGrid`（`satin-ui/theme-panel` 里是 `createThemePanel`）；原来的 `mountXxx` 也还能用 |
 | `satin-ui/css`、`satin-ui/css/page.css`、`satin-ui/css/*.css` | 样式合集（不含 / 含页面级重置）、单个文件 |
 | `satin-ui/tokens/*` | W3C 设计令牌（DTCG JSON） |
 | `satin-ui/locales/en` | 英文 |

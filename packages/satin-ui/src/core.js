@@ -68,6 +68,7 @@ export function fitStack(el) {
 }
 export function initSeg(seg, onChange, start = 0) {
   const thumb = $(".sn-thumb", seg), btns = $$("button", seg);
+  if (!btns.length) return { go() {} }; // 还没有选项（比如框架先插元素、后设属性）：什么都不接，选项来了重建时再接
   let idx = start, edges = [idx, idx + 1], anim = null, plan = null;
   // 滑块的位置按每一格实际的左右边算（不假设每格一样宽）：边的位置 e 是"第几格"，小数部分在这一格里按比例插值
   let X = [0], W0 = 1;

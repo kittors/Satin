@@ -13,7 +13,10 @@ for (const [fw, url] of Object.entries(PAGES)) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: "zh-CN" });
   await ctx.addInitScript({ path: path.join(ROOT, "tests/count-probe.js") });
   const page = await ctx.newPage(), errs = [];
-  page.on("pageerror", (e) => errs.push(e.message)); page.on("console", (m) => { if (m.type() === "error") errs.push(m.text()); });
+  // 404 的资源记下地址（控制台那条"Failed to load resource"不带地址）；浏览器自己要的 /favicon.ico 不算
+  page.on("pageerror", (e) => errs.push(e.message));
+  page.on("console", (m) => { if (m.type() === "error" && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });
+  page.on("response", (r) => { if (r.status() >= 400 && !/\/favicon\.ico$/.test(r.url())) errs.push(`${r.status()} ${r.url()}`); });
   await page.goto(url, { waitUntil: "load" }); await page.waitForFunction(() => window.__ready);
   const cdp = await ctx.newCDPSession(page); await cdp.send("HeapProfiler.enable");
   const gc = async () => { for (let i = 0; i < 3; i++) await cdp.send("HeapProfiler.collectGarbage"); };

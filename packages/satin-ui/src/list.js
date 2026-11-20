@@ -3,7 +3,7 @@ import { scrollArea } from "./scroll.js";
 import { $, reduced } from "./core.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/list.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // ———— 无限列表 ————
 // mountInfiniteList(容器, { loadPage, renderRow, rowHeight, total, pageSize, onCount })：
@@ -35,7 +35,7 @@ export function mountInfiniteList(vl, { loadPage, renderRow, rowHeight = 56, tot
       el._kind = k; el._d = null; el.style.animationDelay = ""; // 换成骨架 / 提示行：调用方缓存在 el._d 上的子元素作废
       const j = (i - items()) % 3; el.style.setProperty("--sn-sk-i", j);
       el.innerHTML = k === "s" ? `<span class="sn-th sn-sk"></span><span class="sn-tx"><span class="sn-ln"><i class="sn-sk" style="width:${SKW[j][0]}px"></i></span><span class="sn-ln sn-sm"><i class="sn-sk" style="width:${SKW[j][1]}px"></i></span></span>`
-        : k === "e" ? t("list.0") : `<span>${t("list.1", { p0: items().toLocaleString("zh-CN") })}</span>`;
+        : k === "e" ? tt("list.0") : `<span>${tt("list.1", { p0: items().toLocaleString("zh-CN") })}</span>`;
     }
     el.style.transform = `translateY(${i * ROW}px)`;
   }

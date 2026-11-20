@@ -9,20 +9,21 @@ import { scrollArea } from "./scroll.js";
 import { $, reduced, injectIcons } from "./core.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/picker.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 // bindPickers(root = document, { today, now })：把 root 里写了 data-pk 的选择器都接上——
 //   data-pk="date"（日期）| "range"（日期范围，两个月并排、左边快捷预设）| "time"（时、分两列）| "datetime"（定时发布：日历 + 时间）| "region"（省 / 市 / 区）。
 //   选好时在宿主上发 pick 事件（冒泡，detail: { text }）；today / now 默认是真实的今天、现在。接过的不重复接
 export function bindPickers(root = document, { today, now } = {}) {
-  const $$ = (q, r = root) => [...r.querySelectorAll(q)].filter((h) => !q.startsWith("[data-pk") || (!h._pk && (h._pk = true)));
-  const WK = t("picker.0"), TODAY = today || new Date(new Date().setHours(0, 0, 0, 0)), NOW = now || new Date();
+  // root 自己就是选择器（createPicker 传进来的）也算上；document 没有 matches，照旧只找里面的
+  const $$ = (q, r = root) => [...(r === root && r.matches?.(q) ? [r] : []), ...r.querySelectorAll(q)].filter((h) => !q.startsWith("[data-pk") || (!h._pk && (h._pk = true)));
+  const WK = tt("picker.0"), TODAY = today || new Date(new Date().setHours(0, 0, 0, 0)), NOW = now || new Date();
   const pad = (n) => String(n).padStart(2, "0");
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const ymd = (d) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
   const same = (a, b) => !!a && !!b && ymd(a) === ymd(b);
   const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
-  const fmtDay = (d) => t("picker.1", { p0: d.getFullYear() !== TODAY.getFullYear() ? t("picker.142", { p0: d.getFullYear() }) : "", p1: d.getMonth() + 1, p2: d.getDate() });
-  const fmtFull = (d) => t("picker.2", { p0: fmtDay(d), p1: WK[d.getDay()] });
+  const fmtDay = (d) => tt("picker.1", { p0: d.getFullYear() !== TODAY.getFullYear() ? tt("picker.142", { p0: d.getFullYear() }) : "", p1: d.getMonth() + 1, p2: d.getDate() });
+  const fmtFull = (d) => tt("picker.2", { p0: fmtDay(d), p1: WK[d.getDay()] });
   const EASE = "cubic-bezier(.22,1,.36,1)";
 
   // ———— 面板开合 ————
@@ -74,10 +75,10 @@ export function bindPickers(root = document, { today, now } = {}) {
     const multi = months > 1;
     root.classList.add("sn-cal"); root.classList.toggle("sn-multi", multi);
     const NAV = (d, lbl) => `<button class="sn-btn sn-ghost sn-sm sn-ibtn" type="button" data-nav="${d}" aria-label="${lbl}" data-i="chevron-${d < 0 ? "left" : "right"}"></button>`;
-    const WKH = `<div class="sn-cal-wk">${[...t("picker.135")].map((c) => `<span>${c}</span>`).join("")}</div>`;
+    const WKH = `<div class="sn-cal-wk">${[...tt("picker.135")].map((c) => `<span>${c}</span>`).join("")}</div>`;
     root.innerHTML = multi
-      ? `<div class="sn-cal-body">${Array.from({ length: months }, (_, k) => `<div class="sn-cal-pane"><div class="sn-cal-ph">${k === 0 ? NAV(-1, t("picker.136")) : "<i></i>"}<b class="sn-cal-t"></b>${k === months - 1 ? NAV(1, t("picker.137")) : "<i></i>"}</div>${WKH}<div class="sn-cal-vp"><div class="sn-cal-grid" role="grid"></div></div></div>`).join("")}</div>`
-      : `<div class="sn-cal-hd"><button class="sn-cal-title" type="button" aria-label="${t("picker.3")}"><b class="sn-cal-t"></b><span data-i="chevron-down"></span></button><span class="sn-grow"></span>${NAV(-1, t("picker.138"))}${NAV(1, t("picker.139"))}</div>${WKH}<div class="sn-cal-vp"><div class="sn-cal-grid" role="grid"></div><div class="sn-cal-mv"></div></div>`;
+      ? `<div class="sn-cal-body">${Array.from({ length: months }, (_, k) => `<div class="sn-cal-pane"><div class="sn-cal-ph">${k === 0 ? NAV(-1, tt("picker.136")) : "<i></i>"}<b class="sn-cal-t"></b>${k === months - 1 ? NAV(1, tt("picker.137")) : "<i></i>"}</div>${WKH}<div class="sn-cal-vp"><div class="sn-cal-grid" role="grid"></div></div></div>`).join("")}</div>`
+      : `<div class="sn-cal-hd"><button class="sn-cal-title" type="button" aria-label="${tt("picker.3")}"><b class="sn-cal-t"></b><span data-i="chevron-down"></span></button><span class="sn-grow"></span>${NAV(-1, tt("picker.138"))}${NAV(1, tt("picker.139"))}</div>${WKH}<div class="sn-cal-vp"><div class="sn-cal-grid" role="grid"></div><div class="sn-cal-mv"></div></div>`;
     injectIcons(root);
     const titles = $$(".sn-cal-t", root), mv = $(".sn-cal-mv", root);
     let grids = $$(".sn-cal-grid", root), view = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1), focusD = TODAY, sel = null, a = null, b = null, hover = null, mvYear = view.getFullYear();
@@ -106,7 +107,7 @@ export function bindPickers(root = document, { today, now } = {}) {
           if (el.className !== c) el.className = c;
           el.tabIndex = live && same(d, focusD) ? 0 : -1; el.setAttribute("aria-selected", String(on)); el.setAttribute("aria-label", fmtFull(d));
         });
-        if (titles[k]) titles[k].textContent = inMonths() ? t("picker.4", { p0: mvYear }) : t("picker.5", { p0: monthOf(k).getFullYear(), p1: monthOf(k).getMonth() + 1 });
+        if (titles[k]) titles[k].textContent = inMonths() ? tt("picker.4", { p0: mvYear }) : tt("picker.5", { p0: monthOf(k).getFullYear(), p1: monthOf(k).getMonth() + 1 });
       });
     }
     // 换月：几个月一起换，新网格从所去方向滑进来，旧的往反方向滑走
@@ -128,7 +129,7 @@ export function bindPickers(root = document, { today, now } = {}) {
     // 确认结束日期、重置时：带子用 120ms 补成实色 / 淡掉；平时（悬停预览）直接变，不拖尾巴
     let settleT = 0;
     const settle = () => { if (reduced()) return; root.classList.add("sn-settle"); clearTimeout(settleT); settleT = setTimeout(() => root.classList.remove("sn-settle"), 160); };
-    const renderMonths = () => { mv.innerHTML = Array.from({ length: 12 }, (_, m) => `<button type="button" class="${mvYear === view.getFullYear() && m === view.getMonth() ? "sn-cur" : ""}${mvYear === TODAY.getFullYear() && m === TODAY.getMonth() ? " sn-now" : ""}" data-m="${m}">${m + 1}${t("picker.6")}</button>`).join(""); };
+    const renderMonths = () => { mv.innerHTML = Array.from({ length: 12 }, (_, m) => `<button type="button" class="${mvYear === view.getFullYear() && m === view.getMonth() ? "sn-cur" : ""}${mvYear === TODAY.getFullYear() && m === TODAY.getMonth() ? " sn-now" : ""}" data-m="${m}">${m + 1}${tt("picker.6")}</button>`).join(""); };
     const toggleMonths = (on = !inMonths()) => { if (!mv) return; mvYear = view.getFullYear(); if (on) renderMonths(); root.classList.toggle("sn-months", on); paint(); if (on) $(".sn-cal-mv button.sn-cur", root)?.focus({ preventScroll: true }); };
     function pick(d) {
       focusD = d; reveal(d);
@@ -178,7 +179,7 @@ export function bindPickers(root = document, { today, now } = {}) {
   // ———— 时间列 ————
   function timeCols(root, { step = 5, onChange } = {}) {
     const ITEM = 32;
-    const col = (k, n, st) => `<div class="sn-tcol" data-k="${k}" tabindex="0" role="listbox" aria-label="${k === "h" ? t("picker.140") : t("picker.141")}"><div class="sn-tpad"></div>${Array.from({ length: n / st }, (_, i) => `<button class="sn-t" type="button" tabindex="-1" role="option" data-v="${i * st}">${pad(i * st)}</button>`).join("")}<div class="sn-tpad"></div></div>`;
+    const col = (k, n, st) => `<div class="sn-tcol" data-k="${k}" tabindex="0" role="listbox" aria-label="${k === "h" ? tt("picker.140") : tt("picker.141")}"><div class="sn-tpad"></div>${Array.from({ length: n / st }, (_, i) => `<button class="sn-t" type="button" tabindex="-1" role="option" data-v="${i * st}">${pad(i * st)}</button>`).join("")}<div class="sn-tpad"></div></div>`;
     root.classList.add("sn-tcols"); root.innerHTML = `<i class="sn-tband"></i>${col("h", 24, 1)}<span class="sn-tsep">:</span>${col("m", 60, step)}`;
     const cols = $$(".sn-tcol", root), val = { h: 20, m: 30 };
     for (const c of cols) scrollArea(c, { fade: "none", bar: "hover", overscroll: "contain" }); // 时、分两列：滚动区域的细滚动条（悬停才出），滚到头停住
@@ -200,7 +201,7 @@ export function bindPickers(root = document, { today, now } = {}) {
   // ———— 1. 日期（单选） ————
   for (const h of $$('[data-pk="date"]')) {
     host(h); const panel = $(".sn-pk-panel", h);
-    const cal = calendar($(".cal-slot", panel), { onPick: (d) => { setVal(h, fmtFull(d)); setTimeout(() => close(h, true), 140); } });
+    const cal = calendar($(".sn-cal-slot", panel), { onPick: (d) => { setVal(h, fmtFull(d)); setTimeout(() => close(h, true), 140); } });
     h._clear = () => { cal.clear(); setVal(h, ""); };
     h._onOpen = () => cal.focus();
     $("[data-today]", panel).addEventListener("click", () => { cal.set(TODAY); setVal(h, fmtFull(TODAY)); setTimeout(() => close(h, true), 140); });
@@ -210,15 +211,15 @@ export function bindPickers(root = document, { today, now } = {}) {
   // ———— 2. 日期范围：左边快捷项，两个月并排；底部"重置"随时清空重选 ————
   for (const h of $$('[data-pk="range"]')) {
     host(h); const panel = $(".sn-pk-panel", h), note = $(".sn-pk-foot .sn-note", panel), ok = $("[data-ok]", panel), rst = $("[data-reset]", panel), pre = $(".sn-pk-presets", panel);
-    const days = (a, b) => Math.round((b - a) / 864e5) + 1, fmtR = (a, b) => t("picker.7", { p0: fmtDay(a), p1: fmtDay(b), p2: days(a, b) });
+    const days = (a, b) => Math.round((b - a) / 864e5) + 1, fmtR = (a, b) => tt("picker.7", { p0: fmtDay(a), p1: fmtDay(b), p2: days(a, b) });
     const state = (a, b, pv = null) => {
       const lo = pv && pv < a ? pv : a, hi = pv && pv < a ? a : pv;
-      note.textContent = b ? fmtR(a, b) : pv ? fmtR(lo, hi) : a ? t("picker.8") : t("picker.9");
+      note.textContent = b ? fmtR(a, b) : pv ? fmtR(lo, hi) : a ? tt("picker.8") : tt("picker.9");
       note.classList.toggle("sn-pv", !b && !!pv);
       ok.setAttribute("aria-disabled", String(!b)); rst.setAttribute("aria-disabled", String(!a));
     };
     const mark = (btn) => pre.querySelectorAll("button").forEach((o) => o.classList.toggle("sn-on", o === btn));
-    const cal = calendar($(".cal-slot", panel), { range: true, months: 2, onPick: (a, b) => { mark(null); state(a, b); }, onPreview: (a, hv) => state(a, null, hv) });
+    const cal = calendar($(".sn-cal-slot", panel), { range: true, months: 2, onPick: (a, b) => { mark(null); state(a, b); }, onPreview: (a, hv) => state(a, null, hv) });
     const PRE = { today: () => [TODAY, TODAY], d7: () => [addDays(TODAY, -6), TODAY], d30: () => [addDays(TODAY, -29), TODAY], month: () => [new Date(2026, 10, 1), TODAY], last: () => [new Date(2026, 9, 1), new Date(2026, 9, 31)] };
     pre.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; const [x, y] = PRE[b.dataset.p](); cal.setRange(x, y); mark(b); state(x, y); });
     rst.addEventListener("click", () => { cal.clear(); mark(null); state(null, null); cal.focus(); });
@@ -231,7 +232,7 @@ export function bindPickers(root = document, { today, now } = {}) {
   // ———— 3. 时间 ————
   for (const h of $$('[data-pk="time"]')) {
     host(h); const panel = $(".sn-pk-panel", h); let cur = { h: 20, m: 30 }, picked = false;
-    const tc = timeCols($(".tc-slot", panel), { step: 5, onChange: (v) => { cur = v; if (picked) setVal(h, `${pad(v.h)}:${pad(v.m)}`, true); } });
+    const tc = timeCols($(".sn-tc-slot", panel), { step: 5, onChange: (v) => { cur = v; if (picked) setVal(h, `${pad(v.h)}:${pad(v.m)}`, true); } });
     h._onOpen = () => { tc.set(cur.h, cur.m); requestAnimationFrame(() => { picked = true; tc.focus(); }); };
     h._clear = () => { picked = false; setVal(h, ""); };
     $("[data-now]", panel).addEventListener("click", () => tc.set(NOW.getHours(), NOW.getMinutes(), true));
@@ -244,11 +245,11 @@ export function bindPickers(root = document, { today, now } = {}) {
     let day = addDays(TODAY, 1), tm = { h: 20, m: 30 };
     const check = () => {
       const t = new Date(day.getFullYear(), day.getMonth(), day.getDate(), tm.h, tm.m), bad = t < NOW;
-      note.textContent = bad ? t("picker.10", { p0: NOW.getMonth() + 1, p1: NOW.getDate(), p2: pad(NOW.getHours()), p3: pad(NOW.getMinutes()) }) : t("picker.11", { p0: fmtFull(day), p1: pad(tm.h), p2: pad(tm.m) });
-      note.classList.toggle("sn-bad", bad); ok.setAttribute("aria-disabled", String(bad)); ok.dataset.tip = bad ? t("picker.12") : ""; return !bad;
+      note.textContent = bad ? tt("picker.10", { p0: NOW.getMonth() + 1, p1: NOW.getDate(), p2: pad(NOW.getHours()), p3: pad(NOW.getMinutes()) }) : tt("picker.11", { p0: fmtFull(day), p1: pad(tm.h), p2: pad(tm.m) });
+      note.classList.toggle("sn-bad", bad); ok.setAttribute("aria-disabled", String(bad)); ok.dataset.tip = bad ? tt("picker.12") : ""; return !bad;
     };
-    const cal = calendar($(".cal-slot", panel), { min: TODAY, onPick: (d) => { day = d; check(); } });
-    const tc = timeCols($(".tc-slot", panel), { step: 5, onChange: (v) => { tm = v; check(); } });
+    const cal = calendar($(".sn-cal-slot", panel), { min: TODAY, onPick: (d) => { day = d; check(); } });
+    const tc = timeCols($(".sn-tc-slot", panel), { step: 5, onChange: (v) => { tm = v; check(); } });
     cal.set(day);
     h._onOpen = () => { tc.set(tm.h, tm.m); check(); requestAnimationFrame(() => cal.focus()); };
     h._clear = () => setVal(h, "");
@@ -257,20 +258,20 @@ export function bindPickers(root = document, { today, now } = {}) {
 
   // ———— 5. 地址：省 → 市 → 区 ————
   const REG = {
-    "北京市": { "北京市": [t("picker.13"), t("picker.14"), t("picker.15"), t("picker.16"), t("picker.17"), t("picker.18"), t("picker.19"), t("picker.20"), t("picker.21"), t("picker.22")] },
-    "上海市": { "上海市": [t("picker.23"), t("picker.24"), t("picker.25"), t("picker.26"), t("picker.27"), t("picker.28"), t("picker.29"), t("picker.30"), t("picker.31"), t("picker.32")] },
-    "广东省": { "广州市": [t("picker.33"), t("picker.34"), t("picker.35"), t("picker.36"), t("picker.37"), t("picker.38"), t("picker.39"), t("picker.40"), t("picker.41")], "深圳市": [t("picker.42"), t("picker.43"), t("picker.44"), t("picker.45"), t("picker.46"), t("picker.47"), t("picker.48"), t("picker.49"), t("picker.50")], "珠海市": [t("picker.51"), t("picker.52"), t("picker.53")] },
-    "浙江省": { "杭州市": [t("picker.54"), t("picker.55"), t("picker.56"), t("picker.57"), t("picker.58"), t("picker.59"), t("picker.60"), t("picker.61"), t("picker.62"), t("picker.63")], "宁波市": [t("picker.64"), t("picker.65"), t("picker.66"), t("picker.67"), t("picker.68"), t("picker.69")], "温州市": [t("picker.70"), t("picker.71"), t("picker.72"), t("picker.73")] },
-    "江苏省": { "南京市": [t("picker.74"), t("picker.75"), t("picker.76"), t("picker.77"), t("picker.78"), t("picker.79"), t("picker.80"), t("picker.81")], "苏州市": [t("picker.82"), t("picker.83"), t("picker.84"), t("picker.85"), t("picker.86")] },
-    "四川省": { "成都市": [t("picker.87"), t("picker.88"), t("picker.89"), t("picker.90"), t("picker.91"), t("picker.92"), t("picker.93"), t("picker.94"), t("picker.95"), t("picker.96")], "绵阳市": [t("picker.97"), t("picker.98"), t("picker.99")] },
-    "湖北省": { "武汉市": [t("picker.100"), t("picker.101"), t("picker.102"), t("picker.103"), t("picker.104"), t("picker.105"), t("picker.106")] },
-    "陕西省": { "西安市": [t("picker.107"), t("picker.108"), t("picker.109"), t("picker.110"), t("picker.111"), t("picker.112"), t("picker.113")] },
-    "福建省": { "福州市": [t("picker.77"), t("picker.114"), t("picker.115"), t("picker.116"), t("picker.117")], "厦门市": [t("picker.118"), t("picker.119"), t("picker.120"), t("picker.121"), t("picker.122"), t("picker.123")] },
-    "重庆市": { "重庆市": [t("picker.124"), t("picker.65"), t("picker.125"), t("picker.126"), t("picker.127"), t("picker.128")] },
+    "北京市": { "北京市": [tt("picker.13"), tt("picker.14"), tt("picker.15"), tt("picker.16"), tt("picker.17"), tt("picker.18"), tt("picker.19"), tt("picker.20"), tt("picker.21"), tt("picker.22")] },
+    "上海市": { "上海市": [tt("picker.23"), tt("picker.24"), tt("picker.25"), tt("picker.26"), tt("picker.27"), tt("picker.28"), tt("picker.29"), tt("picker.30"), tt("picker.31"), tt("picker.32")] },
+    "广东省": { "广州市": [tt("picker.33"), tt("picker.34"), tt("picker.35"), tt("picker.36"), tt("picker.37"), tt("picker.38"), tt("picker.39"), tt("picker.40"), tt("picker.41")], "深圳市": [tt("picker.42"), tt("picker.43"), tt("picker.44"), tt("picker.45"), tt("picker.46"), tt("picker.47"), tt("picker.48"), tt("picker.49"), tt("picker.50")], "珠海市": [tt("picker.51"), tt("picker.52"), tt("picker.53")] },
+    "浙江省": { "杭州市": [tt("picker.54"), tt("picker.55"), tt("picker.56"), tt("picker.57"), tt("picker.58"), tt("picker.59"), tt("picker.60"), tt("picker.61"), tt("picker.62"), tt("picker.63")], "宁波市": [tt("picker.64"), tt("picker.65"), tt("picker.66"), tt("picker.67"), tt("picker.68"), tt("picker.69")], "温州市": [tt("picker.70"), tt("picker.71"), tt("picker.72"), tt("picker.73")] },
+    "江苏省": { "南京市": [tt("picker.74"), tt("picker.75"), tt("picker.76"), tt("picker.77"), tt("picker.78"), tt("picker.79"), tt("picker.80"), tt("picker.81")], "苏州市": [tt("picker.82"), tt("picker.83"), tt("picker.84"), tt("picker.85"), tt("picker.86")] },
+    "四川省": { "成都市": [tt("picker.87"), tt("picker.88"), tt("picker.89"), tt("picker.90"), tt("picker.91"), tt("picker.92"), tt("picker.93"), tt("picker.94"), tt("picker.95"), tt("picker.96")], "绵阳市": [tt("picker.97"), tt("picker.98"), tt("picker.99")] },
+    "湖北省": { "武汉市": [tt("picker.100"), tt("picker.101"), tt("picker.102"), tt("picker.103"), tt("picker.104"), tt("picker.105"), tt("picker.106")] },
+    "陕西省": { "西安市": [tt("picker.107"), tt("picker.108"), tt("picker.109"), tt("picker.110"), tt("picker.111"), tt("picker.112"), tt("picker.113")] },
+    "福建省": { "福州市": [tt("picker.77"), tt("picker.114"), tt("picker.115"), tt("picker.116"), tt("picker.117")], "厦门市": [tt("picker.118"), tt("picker.119"), tt("picker.120"), tt("picker.121"), tt("picker.122"), tt("picker.123")] },
+    "重庆市": { "重庆市": [tt("picker.124"), tt("picker.65"), tt("picker.125"), tt("picker.126"), tt("picker.127"), tt("picker.128")] },
   };
   const disp = (p) => p.filter((x, i) => i === 0 || x !== p[i - 1]).join(" / "); // 直辖市不重复写"北京市 / 北京市"
   for (const h of $$('[data-pk="region"]')) {
-    host(h); const panel = $(".sn-pk-panel", h), q = $(".rg-search input", panel), tabsEl = $(".sn-rg-tabs", panel), ink = $(".sn-ink", tabsEl), vp = $(".sn-rg-vp", panel), res = $(".sn-rg-res", panel);
+    host(h); const panel = $(".sn-pk-panel", h), q = $(".sn-rg-search input", panel), tabsEl = $(".sn-rg-tabs", panel), ink = $(".sn-ink", tabsEl), vp = $(".sn-rg-vp", panel), res = $(".sn-rg-res", panel);
     let path = [], level = 0, list = null, hl = -1;
     const boxOf = (el) => (el.parentElement?.classList.contains("sn-sa") ? el.parentElement : el); // 包了滚动区域的列表：显隐、滑动都作用在外面那一层
     scrollArea(res, { fade: "y", size: 20, overscroll: "contain" }); boxOf(res).hidden = res.hidden; res.hidden = false;
@@ -278,7 +279,7 @@ export function bindPickers(root = document, { today, now } = {}) {
     const moveInk = () => { const b = $(`button[data-lv="${level}"]`, tabsEl); if (b) ink.style.transform = `translateX(${b.offsetLeft + 8}px) scaleX(${Math.max(8, b.offsetWidth - 16)})`; };
     function tabs() {
       tabsEl.querySelectorAll("button").forEach((b) => b.remove());
-      for (let i = 0; i <= level; i++) { const b = document.createElement("button"); b.type = "button"; b.dataset.lv = i; b.textContent = path[i] || t("picker.129"); b.classList.toggle("sn-ph", !path[i]); tabsEl.insertBefore(b, ink); }
+      for (let i = 0; i <= level; i++) { const b = document.createElement("button"); b.type = "button"; b.dataset.lv = i; b.textContent = path[i] || tt("picker.129"); b.classList.toggle("sn-ph", !path[i]); tabsEl.insertBefore(b, ink); }
       moveInk();
     }
     function fill(lv, dir = 0) {
@@ -307,7 +308,7 @@ export function bindPickers(root = document, { today, now } = {}) {
       const out = [];
       for (const [p, cs] of Object.entries(REG)) for (const [c, ds] of Object.entries(cs)) for (const d of ds) if (d.includes(s) || c.includes(s) || p.includes(s)) out.push([p, c, d]);
       hl = out.length ? 0 : -1;
-      res.innerHTML = out.length ? out.slice(0, 40).map(([p, c, d], i) => `<button type="button" class="${i === 0 ? "sn-hl" : ""}" data-path="${p}/${c}/${d}"><b>${mark(d, s)}</b><span>${p === c ? mark(p, s) : `${mark(p, s)} / ${mark(c, s)}`}</span></button>`).join("") : `<div class="sn-none">${t("picker.130")}"${esc(s)}"${t("picker.131")}"${t("picker.132")}"${t("picker.133")}"${t("picker.134")}"</div>`;
+      res.innerHTML = out.length ? out.slice(0, 40).map(([p, c, d], i) => `<button type="button" class="${i === 0 ? "sn-hl" : ""}" data-path="${p}/${c}/${d}"><b>${mark(d, s)}</b><span>${p === c ? mark(p, s) : `${mark(p, s)} / ${mark(c, s)}`}</span></button>`).join("") : `<div class="sn-none">${tt("picker.130")}"${esc(s)}"${tt("picker.131")}"${tt("picker.132")}"${tt("picker.133")}"${tt("picker.134")}"</div>`;
     });
     panel.addEventListener("keydown", (e) => {
       const inSearch = !res.hidden, items = inSearch ? [...res.querySelectorAll("button")] : [...(list?.querySelectorAll("button") || [])];

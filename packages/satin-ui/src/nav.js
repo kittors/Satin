@@ -1,11 +1,12 @@
 // UI 库设计稿第二批：媒体与上传、导航、行为。数值照 09 号 §2（连续性、模式 b/g/h）、§8（拖拽、增删）、§7.2（乐观更新）、§10（玻璃）。
 // 用法：图片放大（openLightbox）、上传（mountUpload）、侧栏（mountSidebar）、标签页（mountTabs）、分页（mountPager）、步骤（setStep）、
 // 拖拽重排（mountReorder）、带补位动画的增删（insertWithFlip / removeWithFlip）、乐观更新（optimistic）
+import { onCleanup } from "./lifecycle.js";
 import { fitScroll, $, $$, reduced, injectIcons, edgeFrames, initSeg } from "./core.js";
 import { toast } from "./feedback.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/nav.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 const OPEN = "cubic-bezier(.32,.72,0,1)", EASE_IN = "cubic-bezier(.42,0,1,1)", OUT = "cubic-bezier(0,0,.58,1)", IN_OUT = "cubic-bezier(.42,0,.58,1)";
 const SPRING = "linear(0, .32, .78, 1.04, 1.09, 1.06, 1.02, 1, .99, .99, 1)";
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -26,8 +27,10 @@ export { openLightbox, closeLightbox } from "./lightbox.js";
 // mountUpload(拖放区, { list, accept, maxSize, tooBig, badType, upload })：点了选文件、拖进来；每个文件一行（进度、失败重试、取消 / 移除）。
 //   accept：允许的扩展名（正则）；maxSize：字节；upload(file, onProgress) 返回 Promise——真上传（不给就是演示用的假进度：名字带"断网"的传到一半失败）。
 //   返回 { add(files) }
-export function mountUpload(drop, { list, accept = /.*/, maxSize = Infinity, badType = t("nav.0"), tooBig = t("nav.1"), upload: realUpload } = {}) {
+export function mountUpload(drop, { list, accept = /.*/, maxSize = Infinity, badType = tt("nav.0"), tooBig = tt("nav.1"), upload: realUpload } = {}) {
   if (drop._upl) return drop._upl;
+  // list 不给：拖放区后面有 .sn-files 就用它，没有就放一个（组件销毁时拿掉）
+  if (!list) { list = drop.nextElementSibling?.matches(".sn-files") ? drop.nextElementSibling : null; if (!list) { list = document.createElement("div"); list.className = "sn-files"; drop.after(list); const l = list; onCleanup(() => l.remove()); } }
   const input = $("input", drop), files = list;
   const OK = accept, LIMIT = maxSize;
 const size = (b) => b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
@@ -35,31 +38,31 @@ function addFiles(list) {
   for (const f of list) {
     const bad = !OK.test(f.name) ? badType : f.size > LIMIT ? tooBig : "";
     const row = document.createElement("div"); row.className = "sn-file" + (bad ? " sn-bad" : "");
-    row.innerHTML = `<span class="sn-fi" data-i="${bad ? "circle-alert" : "file-text"}"></span><div class="sn-fm"><b class="fname">${f.name.replace(/[<>&"]/g, "")}</b><span class="sn-st"><span>${size(f.size)}</span><span class="sn-msg">${bad || t("nav.18")}</span></span><div class="sn-pbar"><i style="width:0"></i></div></div>`
-      + `<button class="sn-btn sn-ghost sn-sm" data-file-act>${bad ? t("nav.4") : t("nav.8")}</button>`;
+    row.innerHTML = `<span class="sn-fi" data-i="${bad ? "circle-alert" : "file-text"}"></span><div class="sn-fm"><b class="sn-fname">${f.name.replace(/[<>&"]/g, "")}</b><span class="sn-st"><span>${size(f.size)}</span><span class="sn-msg">${bad || tt("nav.18")}</span></span><div class="sn-pbar"><i style="width:0"></i></div></div>`
+      + `<button class="sn-btn sn-ghost sn-sm" data-file-act>${bad ? tt("nav.4") : tt("nav.8")}</button>`;
     injectIcons(row); files.append(row);
     if (!reduced()) row.animate([{ opacity: 0, transform: "translateY(8px) scale(.98)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: OUT });
-    row._file = f; if (!bad) run(row, f.name.includes(t("nav.2")));
+    row._file = f; if (!bad) run(row, f.name.includes(tt("nav.2")));
   }
 }
 function run(row, fail) {
   if (realUpload && row._file instanceof Blob) { // 真上传：进度由 upload 报
     const bar = $(".sn-pbar i", row), msg = $(".sn-msg", row);
     realUpload(row._file, (q) => { bar.style.width = q * 100 + "%"; msg.textContent = `${Math.round(q * 100)}%`; })
-      .then(() => { row.classList.add("sn-done"); msg.textContent = t("nav.3"); $("[data-file-act]", row).textContent = t("nav.4"); },
-            () => { row.classList.add("sn-bad"); msg.textContent = t("nav.5"); $("[data-file-act]", row).textContent = t("nav.6"); row.dataset.retry = "1"; });
+      .then(() => { row.classList.add("sn-done"); msg.textContent = tt("nav.3"); $("[data-file-act]", row).textContent = tt("nav.4"); },
+            () => { row.classList.add("sn-bad"); msg.textContent = tt("nav.5"); $("[data-file-act]", row).textContent = tt("nav.6"); row.dataset.retry = "1"; });
     return;
   }
   let p = 0; const bar = $(".sn-pbar i", row), msg = $(".sn-msg", row);
   row._t = setInterval(() => {
     p = Math.min(1, p + .05 + Math.random() * .08); bar.style.width = p * 100 + "%"; msg.textContent = `${Math.round(p * 100)}%`;
-    if (fail && p > .55) { clearInterval(row._t); row.classList.add("sn-bad"); msg.textContent = t("nav.7"); $("[data-file-act]", row).textContent = t("nav.6"); row.dataset.retry = "1"; }
-    else if (p >= 1) { clearInterval(row._t); row.classList.add("sn-done"); msg.textContent = t("nav.3"); $(".sn-fi", row).innerHTML = '<svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'; $("[data-file-act]", row).textContent = t("nav.4"); }
+    if (fail && p > .55) { clearInterval(row._t); row.classList.add("sn-bad"); msg.textContent = tt("nav.7"); $("[data-file-act]", row).textContent = tt("nav.6"); row.dataset.retry = "1"; }
+    else if (p >= 1) { clearInterval(row._t); row.classList.add("sn-done"); msg.textContent = tt("nav.3"); $(".sn-fi", row).innerHTML = '<svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'; $("[data-file-act]", row).textContent = tt("nav.4"); }
   }, 220);
 }
 files.addEventListener("click", (e) => {
   const b = e.target.closest("[data-file-act]"); if (!b) return; const row = b.closest(".sn-file");
-  if (row.dataset.retry) { delete row.dataset.retry; row.classList.remove("sn-bad"); b.textContent = t("nav.8"); run(row, false); return; }
+  if (row.dataset.retry) { delete row.dataset.retry; row.classList.remove("sn-bad"); b.textContent = tt("nav.8"); run(row, false); return; }
   clearInterval(row._t);
   const sibs = $$(".sn-file", files).filter((x) => x !== row), r = row.getBoundingClientRect(), fr = files.getBoundingClientRect();
   flip(sibs, () => Object.assign(row.style, { position: "absolute", left: 0, right: 0, top: r.top - fr.top + "px" }), { duration: 520, easing: SPRING });
@@ -73,7 +76,8 @@ drop.addEventListener("dragenter", (e) => { e.preventDefault(); depth++; drop.cl
 drop.addEventListener("dragover", (e) => e.preventDefault());
 drop.addEventListener("dragleave", () => { if (--depth <= 0) { depth = 0; drop.classList.remove("sn-over"); } });
 drop.addEventListener("drop", (e) => { e.preventDefault(); depth = 0; drop.classList.remove("sn-over"); addFiles(e.dataTransfer.files); });
-  return (drop._upl = { add: addFiles });
+  // 销毁：停掉还在走的演示进度（每个文件一个定时器，挂载之后才开的，不在自动记录的范围里）
+  return (drop._upl = { add: addFiles, destroy() { for (const r of files.querySelectorAll(".sn-file")) clearInterval(r._t); } });
 }
 // ———— 3. 侧栏与布局 ————
 // mountSidebar(.app, { onNavigate })：侧栏选中的底色 / 指示条在条目之间滑动（app 上 data-navfx="slide | bar | fade | text"）；
@@ -135,7 +139,7 @@ const toggleSide = () => {
   // 最终宽度 = 现在的宽度 + 侧栏现在的宽度 − 侧栏最终的宽度：收到一半又点展开时，侧栏现在的宽度是动画中途的值，照样算得准
   const sideNow = side.getBoundingClientRect().width, sideTo = parseFloat(getComputedStyle(app).getPropertyValue(on ? "--sn-side-w-min" : "--sn-side-w"));
   const n = agrid ? colsAt(agrid.clientWidth + sideNow - sideTo) : 1; if (agrid) agrid.style.gridTemplateColumns = `repeat(${n}, minmax(0, 1fr))`;
-  app.classList.toggle("sn-collapsed", on); if (colBtn) colBtn.dataset.tip = on ? t("nav.9") : t("nav.10"); for (const a of $$(".sn-side a", app)) a.dataset.tip = on ? ($(".sn-lbl", a)?.textContent ?? "") : "";
+  app.classList.toggle("sn-collapsed", on); if (colBtn) colBtn.dataset.tip = on ? tt("nav.9") : tt("nav.10"); for (const a of $$(".sn-side a", app)) a.dataset.tip = on ? ($(".sn-lbl", a)?.textContent ?? "") : "";
   flipCards(first, 300); lastCols = n;
   clearTimeout(sideAnim); sideAnim = setTimeout(() => { sideAnim = 0; if (agrid) agrid.style.gridTemplateColumns = ""; lastCols = cols(); lastRects = new Map(cardsEls.map((c) => [c, c.getBoundingClientRect()])); }, 340); /* 侧栏动画完：交回自动列数（最终宽度下列数一样，不会再动） */
 };
@@ -147,7 +151,7 @@ if (collapseBelow > 0) {
   if (app.clientWidth < collapseBelow) {
     const els = [side, ...$$(".sn-side .sn-lbl, .sn-side-top b, .sn-side-top .sn-logo, .sn-side .sn-badge, .sn-side-nav p", app)];
     for (const e of els) e.style.transition = "none";
-    app.classList.add("sn-collapsed"); if (colBtn) colBtn.dataset.tip = t("nav.9");
+    app.classList.add("sn-collapsed"); if (colBtn) colBtn.dataset.tip = tt("nav.9");
     for (const a of $$(".sn-side a", app)) a.dataset.tip = $(".sn-lbl", a)?.textContent ?? "";
     void app.offsetWidth; for (const e of els) e.style.transition = "";
   }
@@ -289,7 +293,7 @@ function end(cancel) {
     const a = r.animate([{ transform: `translate(${dx}px, ${dy}px)${tf === "none" ? "" : " " + tf}` }, { transform: "none" }], { duration: r === row ? 440 : 360, easing: SPRING });
     if (r === row) { row.classList.add("sn-landing"); a.onfinish = a.oncancel = () => row.classList.remove("sn-landing"); }
   }
-  say(back ? t("nav.11") : target !== idx ? t("nav.12", { p0: target + 1 }) : "");
+  say(back ? tt("nav.11") : target !== idx ? tt("nav.12", { p0: target + 1 }) : "");
 }
 list.addEventListener("pointerdown", (e) => {
   const g = e.target.closest(".sn-grip"); if (!g || e.button !== 0 || drag) return;
@@ -319,18 +323,18 @@ list.addEventListener("keydown", (e) => {
   const row = g.closest(rowSel), rs = rowsOf(), i = rs.indexOf(row), picked = row.classList.contains("sn-picked");
   if (e.key === " " || e.key === "Enter") {
     e.preventDefault();
-    if (!picked) { row.classList.add("sn-picked"); row._from = i; say(t("nav.13", { p0: ($("b", row) || row).textContent.trim(), p1: i + 1, p2: rs.length })); }
-    else { row.classList.remove("sn-picked"); say(t("nav.14", { p0: i + 1 })); if (row._from !== i) onReorder?.(row._from, i, row); }
+    if (!picked) { row.classList.add("sn-picked"); row._from = i; say(tt("nav.13", { p0: ($("b", row) || row).textContent.trim(), p1: i + 1, p2: rs.length })); }
+    else { row.classList.remove("sn-picked"); say(tt("nav.14", { p0: i + 1 })); if (row._from !== i) onReorder?.(row._from, i, row); }
   } else if ((e.key === "ArrowUp" || e.key === "ArrowDown") && picked) {
     e.preventDefault(); const j = i + (e.key === "ArrowUp" ? -1 : 1); if (j < 0 || j >= rs.length) return;
-    flipRows(() => list.insertBefore(row, e.key === "ArrowUp" ? rs[j] : rs[j].nextSibling)); g.focus({ preventScroll: true }); say(t("nav.15", { p0: j + 1 }));
+    flipRows(() => list.insertBefore(row, e.key === "ArrowUp" ? rs[j] : rs[j].nextSibling)); g.focus({ preventScroll: true }); say(tt("nav.15", { p0: j + 1 }));
   } else if (e.key === "Escape" && picked) {
     e.preventDefault(); e.stopPropagation(); row.classList.remove("sn-picked");
     if (row._from !== i) flipRows(() => list.insertBefore(row, rs.filter((r) => r !== row)[row._from] || null));
-    g.focus({ preventScroll: true }); say(t("nav.16", { p0: row._from + 1 }));
+    g.focus({ preventScroll: true }); say(tt("nav.16", { p0: row._from + 1 }));
   }
 });
-list.addEventListener("focusout", (e) => { if (kb) return; const row = e.target.closest(rowSel); if (row?.classList.contains("sn-picked") && !row.contains(e.relatedTarget)) { row.classList.remove("sn-picked"); say(t("nav.14", { p0: rowsOf().indexOf(row) + 1 })); } });
+list.addEventListener("focusout", (e) => { if (kb) return; const row = e.target.closest(rowSel); if (row?.classList.contains("sn-picked") && !row.contains(e.relatedTarget)) { row.classList.remove("sn-picked"); say(tt("nav.14", { p0: rowsOf().indexOf(row) + 1 })); } });
   return (list._ro = { rows: rowsOf });
 }
 // ———— 8. 新增与删除：插进来的从下面淡入，别的元素让位；删掉的先脱离布局淡出，剩下的用弹簧补位 ————
@@ -351,13 +355,13 @@ export function removeWithFlip(el) {
 // ———— 9. 乐观更新：先显示结果再保存；失败时抖两下、恢复、给重试 ————
 // optimistic({ apply, revert, save, shake, failText })：apply() 马上改界面；save() 返回 Promise；失败就 revert()、shake 元素抖两下、
 // 出一条带"重试"的提示（重试 = 再来一遍整个过程）。返回 save 的 Promise（失败时 reject）
-export function optimistic({ apply, revert, save, shake, failText = t("nav.17") }) {
+export function optimistic({ apply, revert, save, shake, failText = tt("nav.17") }) {
   apply();
   const run = Promise.resolve().then(save);
   run.catch(() => {
     revert();
     if (shake) { shake.classList.remove("sn-shake2"); void shake.offsetWidth; shake.classList.add("sn-shake2"); shake.addEventListener("animationend", () => shake.classList.remove("sn-shake2"), { once: true }); }
-    toast({ icon: "circle-x", tone: "danger", text: failText, alert: true, action: { label: t("nav.6"), run: (t) => { t.close(); optimistic({ apply, revert, save, shake, failText }); } } });
+    toast({ icon: "circle-x", tone: "danger", text: failText, alert: true, action: { label: tt("nav.6"), run: (t) => { t.close(); optimistic({ apply, revert, save, shake, failText }); } } });
   });
   return run;
 }

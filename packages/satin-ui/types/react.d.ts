@@ -37,3 +37,6 @@ export function toast(o: ToastOptions): ToastHandle;
 export function notify(o: NotifyOptions): { close(): void };
 export function useSatin(): React.MutableRefObject<SatinInstance | null>;
 export function useToast(): (o: ToastOptions) => ToastHandle;
+
+/** 把任意 createXxx（包括重组件 createChat、createMarkdown、createFlow……）包成 React 组件：props 就是组件的选项，ref 拿到实例 */
+export function wrapSatin<O>(create: import("./components").SatinFactory<O, any>, opts?: { valueKey?: string; events?: string[]; displayName?: string }): import("react").ForwardRefExoticComponent<O & { className?: string; style?: import("react").CSSProperties; id?: string; [k: string]: unknown } & import("react").RefAttributes<unknown>>;

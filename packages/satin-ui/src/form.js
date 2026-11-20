@@ -1,7 +1,7 @@
 import { TICK, showTip, hideTip, tipTarget } from "./core.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/form.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 // UI 库设计稿：按钮的等待和成功、菜单与下拉、复制、芯片、字段校验、输入框、密码、自动增高、滑块、验证码。
 // 所有数值照 09 号：等待 300/500ms、错误抖动 360ms、列表补位用弹簧、离开用 ease.in。
 // ———— 复选框：整个组件库共用一份 ————
@@ -69,7 +69,7 @@ export function initSlider(s) {
 // 复制按钮复制成功后：图标原地变成对勾 1.2 秒，Tooltip 改成"已复制"，不另弹 Toast。
 // 按钮里放 <span class="swap"><span class="a" data-i="copy"></span><span class="b" data-i="check"></span></span>
 export function copied(b) {
-  const sw = b.querySelector(".sn-swap"); sw?.classList.add("sn-on"); if (tipTarget() === b || b.matches(":hover")) showTip(b, t("form.0"));
+  const sw = b.querySelector(".sn-swap"); sw?.classList.add("sn-on"); if (tipTarget() === b || b.matches(":hover")) showTip(b, tt("form.0"));
   clearTimeout(b._t); b._t = setTimeout(() => sw?.classList.remove("sn-on"), 1200);
 }
 // 按钮的等待 → 成功：300ms 内完成就不显示转圈；转圈出现后至少留 500ms，不闪一下就没；成功后对勾留 1.5 秒。
@@ -186,24 +186,26 @@ export function removeChip(chip, { onRemoved } = {}) {
 // [data-clearable] 清除按钮、[data-eye] 显示密码、[data-autogrow] 自动长高、[data-slider] 滑块、[data-otp] 验证码、[data-indeterminate] 半选
 export function bindForms(root = document) {
   const once = (el) => (el._fw ? false : (el._fw = true));
+  // root 自己符合也算（组件只接自己这一个，不去动旁边的）；document 没有 matches，照旧只找里面的
+  const all = (q) => [...(root.matches?.(q) ? [root] : []), ...root.querySelectorAll(q)];
   bindSelects(root);
-  for (const b of root.querySelectorAll("[data-copy]")) if (once(b)) b.addEventListener("click", async () => { const v = b.dataset.copy; if (v) try { await navigator.clipboard.writeText(v); } catch {} copied(b); });
-  for (const c of root.querySelectorAll(".sn-chip[data-toggle]")) if (once(c)) { c.setAttribute("aria-pressed", String(c.classList.contains("sn-on"))); c.addEventListener("click", () => { const on = c.classList.toggle("sn-on"); c.setAttribute("aria-pressed", String(on)); }); }
-  for (const row of root.querySelectorAll('[data-chips="removable"]')) if (once(row)) row.addEventListener("click", (e) => { const x = e.target.closest(".sn-chip .sn-x"); if (x && row.contains(x)) removeChip(x.closest(".sn-chip")); });
-  for (const w of root.querySelectorAll("[data-clearable]")) if (once(w)) {
+  for (const b of all("[data-copy]")) if (once(b)) b.addEventListener("click", async () => { const v = b.dataset.copy; if (v) try { await navigator.clipboard.writeText(v); } catch {} copied(b); });
+  for (const c of all(".sn-chip[data-toggle]")) if (once(c)) { c.setAttribute("aria-pressed", String(c.classList.contains("sn-on"))); c.addEventListener("click", () => { const on = c.classList.toggle("sn-on"); c.setAttribute("aria-pressed", String(on)); }); }
+  for (const row of all('[data-chips="removable"]')) if (once(row)) row.addEventListener("click", (e) => { const x = e.target.closest(".sn-chip .sn-x"); if (x && row.contains(x)) removeChip(x.closest(".sn-chip")); });
+  for (const w of all("[data-clearable]")) if (once(w)) {
     const input = w.querySelector("input"), sync = () => w.classList.toggle("sn-filled", !!input.value);
     input.addEventListener("input", sync); sync();
     // 清空后补发一次 input 事件，搜索结果、字数这些跟着输入框走的东西一起归零
     w.querySelector(".sn-clear")?.addEventListener("click", () => { input.value = ""; input.dispatchEvent(new Event("input", { bubbles: true })); sync(); input.focus(); });
   }
-  for (const b of root.querySelectorAll("[data-eye]")) if (once(b)) b.addEventListener("click", () => {
+  for (const b of all("[data-eye]")) if (once(b)) b.addEventListener("click", () => {
     const input = b.closest(".sn-ib").querySelector("input"), on = input.type === "password";
-    input.type = on ? "text" : "password"; b.querySelector(".sn-swap")?.classList.toggle("sn-on", on); b.setAttribute("aria-label", on ? t("form.1") : t("form.2")); input.focus();
+    input.type = on ? "text" : "password"; b.querySelector(".sn-swap")?.classList.toggle("sn-on", on); b.setAttribute("aria-label", on ? tt("form.1") : tt("form.2")); input.focus();
   });
-  for (const t of root.querySelectorAll("[data-autogrow]")) if (once(t)) t.addEventListener("input", () => { t.style.height = "auto"; t.style.height = t.scrollHeight + 2 + "px"; });
-  for (const el of root.querySelectorAll("[data-slider]")) if (once(el)) initSlider(el);
-  for (const box of root.querySelectorAll("[data-otp]")) mountOtp(box);
-  for (const c of root.querySelectorAll("[data-indeterminate]")) c.indeterminate = true;
+  for (const t of all("[data-autogrow]")) if (once(t)) t.addEventListener("input", () => { t.style.height = "auto"; t.style.height = t.scrollHeight + 2 + "px"; });
+  for (const el of all("[data-slider]")) if (once(el)) initSlider(el);
+  for (const box of all("[data-otp]")) mountOtp(box);
+  for (const c of all("[data-indeterminate]")) c.indeterminate = true;
 }
 
 // 页面级：复选框勾上时弹一下、下拉在外面点一下就收起、字段改了就清错、抖动结束去掉类、带 aria-disabled 的按钮点了不触发（只出提示）。

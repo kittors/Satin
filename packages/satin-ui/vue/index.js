@@ -11,7 +11,7 @@ import { ICONS } from "../src/icons.js";
 import { CHECK } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
-const t = /* @__PURE__ */ scoped(I18N_COMPONENTS);
+const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
 
 const cx = (...a) => a.filter(Boolean).join(" ");
 // 把 createXxx 包成 Vue 组件。props：组件的选项名；valueKey：v-model 绑定的那一项
@@ -39,6 +39,10 @@ function wrap(create, { name, props = [], valueKey = "value", events = ["change"
     },
   });
 }
+
+// 自己包：重组件（对话、Markdown、流程图、数据表格……，各自单独引入）或别的 createXxx 也能变成 Vue 组件。props 列出要传给组件的选项名
+//   import { createChat } from "satin-ui/chat";  const SnChat = wrapSatin(createChat, { name: "SnChat", props: ["title", "respond", "placeholder"], events: [] });
+export const wrapSatin = (create, opts) => wrap(create, opts);
 
 export const Segmented = /* @__PURE__ */ wrap(S.createSegmented, { name: "SnSegmented", props: ["items", "value", "size", "label"] });
 export const Slider = /* @__PURE__ */ wrap(S.createSlider, { name: "SnSlider", props: ["value", "max", "label"] });
@@ -91,7 +95,7 @@ export const Switch = defineComponent({
 });
 export const Chip = defineComponent({
   name: "SnChip", props: { on: Boolean, removable: Boolean }, emits: ["remove"],
-  setup: (p, { slots, emit }) => () => h("span", { class: cx("sn-chip", p.removable && "sn-tag", p.on && "sn-on") }, [slots.default?.(), p.removable ? h("button", { class: "sn-x", "aria-label": t("components.remove"), onClick: () => emit("remove") }, [h(Icon, { name: "x", size: 10 })]) : null]),
+  setup: (p, { slots, emit }) => () => h("span", { class: cx("sn-chip", p.removable && "sn-tag", p.on && "sn-on") }, [slots.default?.(), p.removable ? h("button", { class: "sn-x", "aria-label": tt("components.remove"), onClick: () => emit("remove") }, [h(Icon, { name: "x", size: 10 })]) : null]),
 });
 export const Progress = defineComponent({
   name: "SnProgress", props: { value: Number, ring: Boolean, size: String },
@@ -128,7 +132,7 @@ export const Drawer = defineComponent({
     const el = ref(null); let layer = null;
     watch(() => p.open, (o) => { if (o && !layer) layer = openDrawer(el.value, { trigger: document.activeElement, onClose: () => { layer = null; emit("close"); emit("update:open", false); } }); else if (!o && layer) { layer.close(true); layer = null; } });
     return () => h("aside", { ref: el, class: "sn-drawer", role: "dialog", "aria-modal": "true", tabindex: "-1" }, [
-      h("div", { class: "sn-hd" }, [h("h3", p.title), h("button", { class: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": t("components.close"), "data-tip": t("components.close"), "data-kbd": "Esc" }, [h(Icon, { name: "x", size: 16 })])]),
+      h("div", { class: "sn-hd" }, [h("h3", p.title), h("button", { class: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": tt("components.close"), "data-tip": tt("components.close"), "data-kbd": "Esc" }, [h(Icon, { name: "x", size: 16 })])]),
       h("div", { class: "sn-bd" }, slots.default?.()), slots.footer ? h("div", { class: "sn-ft" }, slots.footer()) : null,
     ]);
   },

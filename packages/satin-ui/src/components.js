@@ -24,7 +24,12 @@ import { openLightbox, closeLightbox } from "./lightbox.js";
 import { tableHTML, mountTable, sortRows } from "./table.js";
 
 // 给内层实例补几个方法（destroy……）：按属性描述符合并，getter（value、tags……）不会变成快照
-const ext = (base, more) => { const o = {}; Object.defineProperties(o, Object.getOwnPropertyDescriptors(base ?? {})); Object.defineProperties(o, Object.getOwnPropertyDescriptors(more)); return o; };
+// 合并实例：more 的同名属性盖过 base 的，只有 destroy 两边都有时先后都调（原来直接盖掉，mountXxx 自己的 destroy 就丢了）
+const ext = (base, more) => {
+  const o = {}; Object.defineProperties(o, Object.getOwnPropertyDescriptors(base ?? {})); Object.defineProperties(o, Object.getOwnPropertyDescriptors(more));
+  if (typeof base?.destroy === "function" && typeof more.destroy === "function") o.destroy = () => { try { base.destroy(); } finally { more.destroy(); } };
+  return o;
+};;
 export const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const cx = (...a) => a.filter(Boolean).join(" ");
 const attrs = (o) => Object.entries(o).filter(([, v]) => v != null && v !== false).map(([k, v]) => (v === true ? ` ${k}` : ` ${k}="${esc(v)}"`)).join("");
@@ -45,7 +50,7 @@ export const inputHTML = ({ value = "", placeholder = "", size, type = "text", i
 // name 写成 data-f，validateForm 按它找规则
 export const fieldHTML = ({ label = "", control = "", help = "", error, id, name } = {}) =>
   `<div class="${cx("sn-field", error && "sn-bad")}"${attrs({ "data-f": name })}>${label ? `<label class="sn-lbl"${attrs({ for: id })}>${esc(label)}</label>` : ""}${control}${help ? `<div class="sn-help">${esc(help)}</div>` : ""}${error != null ? `<div class="sn-err"><span>${esc(error)}</span></div>` : ""}</div>`;
-export const chipHTML = ({ text = "", on, removable } = {}) => `<span class="${cx("sn-chip", removable && "sn-tag", on && "sn-on")}">${esc(text)}${removable ? `<button class="sn-x" aria-label="${t("components.14")}${esc(text)}">${svg(x, 10, "x")}</button>` : ""}</span>`;
+export const chipHTML = ({ text = "", on, removable } = {}) => `<span class="${cx("sn-chip", removable && "sn-tag", on && "sn-on")}">${esc(text)}${removable ? `<button class="sn-x" aria-label="${tt("components.14")}${esc(text)}">${svg(x, 10, "x")}</button>` : ""}</span>`;
 // 进度条（value 0–1；不给 value 是不确定进度）、进度环
 const num = (v) => String(+v).replace(/^0\./, ".");
 export const progressHTML = ({ value, ring, size } = {}) => (ring
@@ -104,13 +109,13 @@ export const createSelect = /* @__PURE__ */ defineComponent({
 import { forgetSelect as selectsRelease } from "./form.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/components.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 
 // ———— 验证码 ————
 export const createOtp = /* @__PURE__ */ defineComponent({
   name: "otp",
   defaults: { length: 6 },
-  html: (o) => `<div class="sn-otp" data-otp>${Array.from({ length: o.length }, (_, i) => `${i === o.length / 2 && o.length % 2 === 0 ? '<span class="sn-gap"></span>' : ""}<input inputmode="numeric" maxlength="1" aria-label="${t("components.15", { p0: i + 1 })}">`).join("")}</div>`,
+  html: (o) => `<div class="sn-otp" data-otp>${Array.from({ length: o.length }, (_, i) => `${i === o.length / 2 && o.length % 2 === 0 ? '<span class="sn-gap"></span>' : ""}<input inputmode="numeric" maxlength="1" aria-label="${tt("components.15", { p0: i + 1 })}">`).join("")}</div>`,
   mount(el, o, api) {
     const otp = mountOtp(el, { onComplete: (v) => api.emit("complete", v) });
     return { get value() { return otp.value; }, clear: otp.clear, destroy() { delete el._otp; } };
@@ -133,11 +138,11 @@ export const createTabs = /* @__PURE__ */ defineComponent({
 export const createPager = /* @__PURE__ */ defineComponent({
   name: "pager",
   defaults: { total: 1, page: 1, count: null },
-  html: (o) => `<div class="sn-pager">${o.count != null ? `<span class="sn-total">${t("components.16", { p0: esc(o.count) })}</span>` : ""}<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-pg="prev" aria-label="${t("components.0")}">${svg(chevronLeft, 16, "chevron-left")}</button><div class="sn-pages"></div><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-pg="next" aria-label="${t("components.1")}">${svg(chevronRight, 16, "chevron-right")}</button></div>`,
+  html: (o) => `<div class="sn-pager">${o.count != null ? `<span class="sn-total">${tt("components.16", { p0: esc(o.count) })}</span>` : ""}<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-pg="prev" aria-label="${tt("components.0")}">${svg(chevronLeft, 16, "chevron-left")}</button><div class="sn-pages"></div><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-pg="next" aria-label="${tt("components.1")}">${svg(chevronRight, 16, "chevron-right")}</button></div>`,
   mount(el, o, api) {
     const p = mountPager(el, { total: o.total, page: o.page, onChange: (n) => api.emit("change", n) });
     const total = () => el.querySelector(".sn-total");
-    return { update(n) { if (n.total != null) p.setTotal(n.total); if (n.page != null && n.page !== p.page) p.go(n.page, true); if (n.count != null && total()) total().textContent = t("components.16", { p0: n.count }); }, get page() { return p.page; }, get total() { return p.total; }, go: p.go, destroy() { delete el._pg; } };
+    return { update(n) { if (n.total != null) p.setTotal(n.total); if (n.page != null && n.page !== p.page) p.go(n.page, true); if (n.count != null && total()) total().textContent = tt("components.16", { p0: n.count }); }, get page() { return p.page; }, get total() { return p.total; }, go: p.go, destroy() { delete el._pg; } };
   },
 });
 
@@ -160,9 +165,9 @@ export const createCollapse = /* @__PURE__ */ defineComponent({
 // ———— 标签输入、数字步进、密码、邮箱、搜索、字数 ————
 export const createTagInput = /* @__PURE__ */ defineComponent({
   name: "taginput",
-  defaults: { tags: [], max: 8, get placeholder() { return t("components.2"); } },
+  defaults: { tags: [], max: 8, get placeholder() { return tt("components.2"); } },
   // 两个并排的元素：输入框和下面的计数行（计数行在输入框的下一个兄弟元素里找）
-  html: (o) => `<div class="sn-box-in sn-tagin" data-tagin data-max="${o.max}"><input placeholder="${esc(o.placeholder)}" aria-label="${t("components.3")}"></div><div class="sn-tagin-foot"><span>${esc(o.hint ?? t("components.13"))}</span><span class="sn-num"><span class="sn-roll"><span>0</span></span> / ${o.max}</span></div>`,
+  html: (o) => `<div class="sn-box-in sn-tagin" data-tagin data-max="${o.max}"><input placeholder="${esc(o.placeholder)}" aria-label="${tt("components.3")}"></div><div class="sn-tagin-foot"><span>${esc(o.hint ?? tt("components.13"))}</span><span class="sn-num"><span class="sn-roll"><span>0</span></span> / ${o.max}</span></div>`,
   mount(el, o, api) {
     const t = mountTagInput(el, { initial: o.tags, onChange: (tags) => api.emit("change", tags) });
     return { get tags() { return t.tags; }, add: t.add, clear: t.clear, destroy() { delete el._tags; } };
@@ -171,7 +176,7 @@ export const createTagInput = /* @__PURE__ */ defineComponent({
 export const createStepper = /* @__PURE__ */ defineComponent({
   name: "stepper",
   defaults: { value: 0, min: 0, max: 100 },
-  html: (o) => `<div class="sn-stepper" data-stepper data-min="${o.min}" data-max="${o.max}" data-value="${o.value}"><button class="sn-st-btn" data-d="-1" aria-label="${t("components.4")}">${svg(minus, 16, "minus")}</button><span class="sn-st-val" tabindex="0" role="spinbutton"${attrs({ "aria-label": o.label })}><span class="sn-roll"><span>${o.value}</span></span></span>${o.unit ? `<span class="sn-st-unit">${esc(o.unit)}</span>` : ""}<button class="sn-st-btn" data-d="1" aria-label="${t("components.5")}">${svg(plus, 16, "plus")}</button></div>`,
+  html: (o) => `<div class="sn-stepper" data-stepper data-min="${o.min}" data-max="${o.max}" data-value="${o.value}"><button class="sn-st-btn" data-d="-1" aria-label="${tt("components.4")}">${svg(minus, 16, "minus")}</button><span class="sn-st-val" tabindex="0" role="spinbutton"${attrs({ "aria-label": o.label })}><span class="sn-roll"><span>${o.value}</span></span></span>${o.unit ? `<span class="sn-st-unit">${esc(o.unit)}</span>` : ""}<button class="sn-st-btn" data-d="1" aria-label="${tt("components.5")}">${svg(plus, 16, "plus")}</button></div>`,
   mount(el, o, api) {
     const s = mountStepper(el, { onChange: (v) => api.emit("change", v) });
     return { update(n) { if (n.value != null && n.value !== s.value) s.set(n.value); }, get value() { return s.value; }, set: s.set, destroy() { delete el._step; } };
@@ -181,23 +186,23 @@ export const createStepper = /* @__PURE__ */ defineComponent({
 // ———— 密码、邮箱、搜索、计数输入框：给空容器就按选项渲染（和设计稿一样的标记），给已有标记就接交互 ————
 // 渲染出来的是整个字段（标签、输入框、强度条 / 大写提示、错误区）；按钮（显示密码、清除）挂载时一起接上
 const fieldWrap = (o, inner) => `<div class="sn-field"${attrs({ "data-f": o.name })}>${o.label ? `<label class="sn-lbl"${attrs({ for: o.id })}>${esc(o.label)}</label>` : ""}${inner}${o.help ? `<div class="sn-help">${esc(o.help)}</div>` : ""}<div class="sn-err"><span></span></div></div>`;
-export const passwordHTML = (o = {}) => fieldWrap(o, `<span class="sn-ib sn-has-post"><input class="${cx("sn-input", o.size && "sn-" + o.size)}" type="password"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder, autocomplete: o.autocomplete ?? (o.meter ? "new-password" : "current-password") })} data-pw><span class="sn-post"><button type="button" class="sn-eye" data-eye aria-label="${esc(t("components.17"))}"><span class="sn-swap"><span class="sn-a" data-i="eye"></span><span class="sn-b" data-i="eye-off"></span></span></button></span></span>` +
+export const passwordHTML = (o = {}) => fieldWrap(o, `<span class="sn-ib sn-has-post"><input class="${cx("sn-input", o.size && "sn-" + o.size)}" type="password"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder, autocomplete: o.autocomplete ?? (o.meter ? "new-password" : "current-password") })} data-pw><span class="sn-post"><button type="button" class="sn-eye" data-eye aria-label="${esc(tt("components.17"))}"><span class="sn-swap"><span class="sn-a" data-i="eye"></span><span class="sn-b" data-i="eye-off"></span></span></button></span></span>` +
   (o.meter ? `<div class="sn-pw-meter" data-level="0" aria-live="polite"><i></i><i></i><i></i><i></i><span class="sn-pw-label"><span class="sn-roll"><span> </span></span></span></div>` : "") +
-  `<div class="sn-caps"><span><span data-i="triangle-alert"></span>${esc(t("components.18"))}</span></div>`);
+  `<div class="sn-caps"><span><span data-i="triangle-alert"></span>${esc(tt("components.18"))}</span></div>`);
 export const emailHTML = (o = {}) => fieldWrap(o, `<span class="sn-ib sn-has-post"><input class="${cx("sn-input", o.size && "sn-" + o.size)}" type="email"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder ?? "name@example.com", autocomplete: o.autocomplete ?? "email" })} data-email><span class="sn-post"><svg class="sn-ok-mark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></span></span>`);
-export const searchHTML = (o = {}) => `<span class="sn-ib sn-has-pre sn-has-post sn-search" data-clearable data-search><span class="sn-pre"><span class="sn-swap"><span class="sn-a" data-i="search"></span><span class="sn-b"><span class="sn-spin-ic"></span></span></span></span><input class="${cx("sn-input", o.size && "sn-" + o.size)}"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder, "aria-label": o.label ?? o.placeholder })}><span class="sn-post"><span class="sn-res-count"></span>${o.kbd === false ? "" : `<span class="sn-kbd">${esc(o.kbd ?? "/")}</span>`}<button type="button" class="sn-clear" aria-label="${esc(t("components.19"))}" data-i="x"></button></span></span>`;
+export const searchHTML = (o = {}) => `<span class="sn-ib sn-has-pre sn-has-post sn-search" data-clearable data-search><span class="sn-pre"><span class="sn-swap"><span class="sn-a" data-i="search"></span><span class="sn-b"><span class="sn-spin-ic"></span></span></span></span><input class="${cx("sn-input", o.size && "sn-" + o.size)}"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder, "aria-label": o.label ?? o.placeholder })}><span class="sn-post"><span class="sn-res-count"></span>${o.kbd === false ? "" : `<span class="sn-kbd">${esc(o.kbd ?? "/")}</span>`}<button type="button" class="sn-clear" aria-label="${esc(tt("components.19"))}" data-i="x"></button></span></span>`;
 export const countHTML = (o = {}) => `<span class="sn-ib sn-has-post sn-has-count"><input class="${cx("sn-input", o.size && "sn-" + o.size)}"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder, maxlength: o.max ?? 20, value: o.value })} data-count><span class="sn-post"><span class="sn-counter"><span class="sn-roll"><span>0</span></span><span>/${+(o.max ?? 20)}</span></span></span></span>`;
 const inputOf = (el, sel) => (el.matches?.(sel) ? el : el.querySelector(sel));
 export const createPassword = /* @__PURE__ */ defineComponent({ name: "password", html: passwordHTML, mount(el, o, api) { injectIcons(el); const input = inputOf(el, "input[data-pw], input[type=password]"); if (o.value != null) input.value = o.value; mountPassword(input); _bindForms(input.closest(".sn-field") || el); input.addEventListener("input", () => api.emit("change", input.value)); return { get value() { return input.value; }, update(n) { if (n.value != null && n.value !== input.value) input.value = n.value; }, focus: () => input.focus() }; } });
 export const createEmail = /* @__PURE__ */ defineComponent({ name: "email", html: emailHTML, mount(el, o, api) { const input = inputOf(el, "input[data-email], input[type=email]"); if (o.value != null) input.value = o.value; mountEmail(input); input.addEventListener("input", () => api.emit("change", input.value)); return { get value() { return input.value; }, update(n) { if (n.value != null && n.value !== input.value) input.value = n.value; }, focus: () => input.focus() }; } });
-export const createSearch = /* @__PURE__ */ defineComponent({ name: "search", html: searchHTML, mount(el, o, api) { injectIcons(el); _bindForms(el.parentElement || el); mountSearch(el.matches(".sn-ib") ? el : el.querySelector(".sn-ib") || el, { search: (q) => (api.emit("search", q), o.search?.(q) ?? 0), debounce: o.debounce ?? 150 }); return {}; } });
+export const createSearch = /* @__PURE__ */ defineComponent({ name: "search", html: searchHTML, mount(el, o, api) { injectIcons(el); _bindForms(el); mountSearch(el.matches(".sn-ib") ? el : el.querySelector(".sn-ib") || el, { search: (q) => (api.emit("search", q), o.search?.(q) ?? 0), debounce: o.debounce ?? 150 }); return { destroy() { for (const x of [el, ...el.querySelectorAll("*")]) { delete x._fw; delete x._sr; } } }; } });
 export const createCount = /* @__PURE__ */ defineComponent({ name: "count", html: countHTML, mount(el) { const input = inputOf(el, "input[data-count], input"); mountCount(input); return { destroy() { delete input._cnt; } }; } });
 export const createLongText = /* @__PURE__ */ defineComponent({ name: "longtext", mount(el, o, api) { mountLongText(el, { onSubmit: (v) => api.emit("submit", v) }); return {}; } });
 // 提示词输入框的标记（和设计稿一样）：附件菜单（图片、视频、音频、文档）、自动长高的输入框、用量环、发送 / 停止按钮。
 // external：发送由外面接管（对话框里用），不在这里清空。图标是 data-i，挂载时换成 SVG
-export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach = true, send = t("components.12"), external } = {}) =>
+export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach = true, send = tt("components.12"), external } = {}) =>
   `<div class="sn-box-in sn-composer" data-composer${external ? " data-external" : ""} data-max="${+max}" data-max-lines="${+maxLines}"><div class="sn-cm-files"></div><textarea rows="1" placeholder="${esc(placeholder)}"></textarea><div class="sn-cm-bar">` +
-  (attach ? `<div class="sn-select sn-inline-menu sn-up"><button class="sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add" data-menubtn data-cm-attach data-tip="${esc(t("components.6"))}" aria-label="${esc(t("components.7"))}" data-i="plus"></button><div class="sn-menu" role="menu" style="min-width:208px"><div class="sn-item" data-add="img" data-i="image:before">${esc(t("components.8"))}<span class="sn-key">JPG · PNG</span></div><div class="sn-item" data-add="vid" data-i="film:before">${esc(t("components.9"))}<span class="sn-key">MP4 · MOV</span></div><div class="sn-item" data-add="aud" data-i="audio-lines:before">${esc(t("components.10"))}<span class="sn-key">MP3 · WAV</span></div><div class="sn-item" data-add="doc" data-i="file-text:before">${esc(t("components.11"))}<span class="sn-key">PDF · DOCX</span></div></div></div>` : "") +
+  (attach ? `<div class="sn-select sn-inline-menu sn-up"><button class="sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add" data-menubtn data-cm-attach data-tip="${esc(tt("components.6"))}" aria-label="${esc(tt("components.7"))}" data-i="plus"></button><div class="sn-menu" role="menu" style="min-width:208px"><div class="sn-item" data-add="img" data-i="image:before">${esc(tt("components.8"))}<span class="sn-key">JPG · PNG</span></div><div class="sn-item" data-add="vid" data-i="film:before">${esc(tt("components.9"))}<span class="sn-key">MP4 · MOV</span></div><div class="sn-item" data-add="aud" data-i="audio-lines:before">${esc(tt("components.10"))}<span class="sn-key">MP3 · WAV</span></div><div class="sn-item" data-add="doc" data-i="file-text:before">${esc(tt("components.11"))}<span class="sn-key">PDF · DOCX</span></div></div></div>` : "") +
   `<span class="sn-grow"></span><span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg></span><button class="sn-cm-send" aria-label="${esc(send)}" data-tip="${esc(send)}" data-kbd="⌘↵"><svg class="sn-orbit" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19"/></svg><span class="sn-swap"><span class="sn-a" data-i="arrow-up"></span><span class="sn-b"><span class="sn-stop"></span></span></span></button></div></div>`;
 export const createComposer = /* @__PURE__ */ defineComponent({ name: "composer", html: (o) => composerHTML(o), mount(el, o, api) { injectIcons(el); const c = mountComposer(el, { onSend: (m) => api.emit("send", m), onStop: () => api.emit("stop"), upload: o.upload }); return ext(c, { destroy() { delete el._cm; } }); } });
 
@@ -228,7 +233,8 @@ export const createProgressCard = /* @__PURE__ */ defineComponent({
 export const createPicker = /* @__PURE__ */ defineComponent({
   name: "picker",
   // 选择器选好了值会在元素上发 pick（detail.text 是显示的文字），转成 onChange / sn-change
-  mount(el, o, api) { bindPickers(el.parentElement ?? el, { today: o.today, now: o.now }); el.addEventListener("pick", (e) => api.emit("change", e.detail)); return {}; },
+  // 只接 el 这一个（原来按父元素找，会把旁边的选择器也接上）；destroy 时撤掉标记，同一个元素可以再接一次
+  mount(el, o, api) { bindPickers(el, { today: o.today, now: o.now }); el.addEventListener("pick", (e) => api.emit("change", e.detail)); return { destroy() { for (const h of [el, ...el.querySelectorAll("[data-pk]")]) delete h._pk; } }; },
 });
 
 // ———— 上传、拖动排序、侧边栏、无限列表 ————
@@ -238,8 +244,8 @@ export const createSidebar = /* @__PURE__ */ defineComponent({ name: "sidebar", 
 export const createInfiniteList = /* @__PURE__ */ defineComponent({ name: "infinitelist", mount(el, o, api) { const l = mountInfiniteList(el, { ...o, onCount: (n) => api.emit("count", n) }); return ext(l, { destroy() { delete el._vl; } }); } });
 
 // ———— 视频、音频 ————
-export const createPlayer = /* @__PURE__ */ defineComponent({ name: "player", html: (o) => playerHTML(o), mount(el, o, api) { const p = mountPlayer(el, { onError: (e) => api.emit("error", e) }); return ext(p, { destroy() { p.destroy?.(); delete el._player; } }); } });
-export const createAudio = /* @__PURE__ */ defineComponent({ name: "audio", html: (o) => audioHTML(o), mount(el, o, api) { const a = mountAudio(el, { onError: (e) => api.emit("error", e) }); return ext(a, { destroy() { a.destroy?.(); delete el._audio; } }); } });
+export const createPlayer = /* @__PURE__ */ defineComponent({ name: "player", html: (o) => playerHTML(o), mount(el, o, api) { const p = mountPlayer(el, { onError: (e) => api.emit("error", e) }); return ext(p, { destroy() { delete el._player; } }); } });
+export const createAudio = /* @__PURE__ */ defineComponent({ name: "audio", html: (o) => audioHTML(o), mount(el, o, api) { const a = mountAudio(el, { onError: (e) => api.emit("error", e) }); return ext(a, { destroy() { delete el._audio; } }); } });
 
 // ———— 浮层：Popover、对话框、抽屉、命令面板、右键菜单、看图 ————
 // Popover：el 是浮层面板（.sn-pop），trigger 是按钮

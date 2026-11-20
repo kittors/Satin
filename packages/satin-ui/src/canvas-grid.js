@@ -7,15 +7,16 @@
 import { $, injectIcons, initSeg, reduced } from "./core.js";
 import { STATUS, OWNERS, TAGS, TREE_UNIT, fmt, parseEdit, editText } from "./table-data.js";
 import { createSource } from "./table-source.js";
-import { colStops, columnModel, createMerges, createRowMotion, createTreeSel, dragClamp, gapPieces, gapStep, mountHead, mountMergeBar, mountToolbar, openEnum, shades, slotShift, treeCols, treeDrag } from "./grid.js";
+import { closeGridPops, gridBarHTML, gridShadesHTML, colStops, columnModel, createMerges, createRowMotion, createTreeSel, dragClamp, gapPieces, gapStep, mountHead, mountMergeBar, mountToolbar, openEnum, shades, slotShift, treeCols, treeDrag } from "./grid.js";
 import { gridBars } from "./grid-bars.js";
 import { elastic } from "./scroll.js";
 import { ICONS } from "./icons.js";
 import { toast } from "./feedback.js";
 import { CHECK, EASE, popScale } from "./form.js";
 import { scoped } from "./i18n.js";
+import { defineComponent } from "./lifecycle.js";
 import I18N_DEFAULTS from "./locales/zh-CN/canvas-grid.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 // mountCanvasGrid(.grid.cgrid, { rows, seed })：Canvas 版数据表格——整张表画在一块画布上（百万行照样流畅），交互和 DOM 版一致。
 //   rows：行数（演示数据，默认 100 万）；数据来源同 DOM 版（table-source.js）
 export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
@@ -263,7 +264,7 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
     // 松手：等被拖的行落进空位、让开的行回位、投影淡掉（至少 160ms），再真正换顺序——画面不跳
     if (drag?.done) { const t = now - drag.done; if (reduced() || (!drag.anim && t >= 160) || t > 800) { const d = drag; drag = null; commitDrag(d); } else more = true; }
     // 滚到底再加载：末尾一行提示
-    if (src.mode === "append") { const y = src.rowY(n) - st; if (y < Hc) text(src.appending ? t("canvas-grid.0") : n >= src.total ? t("canvas-grid.1", { p0: src.total.toLocaleString("zh-CN") }) : "", 16, y + RH / 2, F.s, C.label3); }
+    if (src.mode === "append") { const y = src.rowY(n) - st; if (y < Hc) text(src.appending ? tt("canvas-grid.0") : n >= src.total ? tt("canvas-grid.1", { p0: src.total.toLocaleString("zh-CN") }) : "", 16, y + RH / 2, F.s, C.label3); }
     if (more) schedule();
     root._grid?.onFrame?.(now); /* 逐帧检查用：每画完一帧调一次 */
   }
@@ -338,7 +339,7 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
       if (h.x >= 28 && h.x < 50) { e.preventDefault(); const prev = visibleSel(); if (e.shiftKey && anchorP >= 0) { const on = !isSel(r); for (let q = Math.min(anchorP, h.p); q <= Math.max(anchorP, h.p); q++) { const rr = src.tree ? src.idAt(q) : src.rowAt(q); if (rr >= 0) toggleSel(rr, on); } } else toggleSel(r); anchorP = h.p; checkFx(prev, r); bar.paint(); headUI.paint(); schedule(); } // 树形：勾上一级 = 勾上它下面所有的
       return;
     }
-    if (h.key === "act") { e.preventDefault(); showSel(false); if (h.dt) { toggleExpand(h.p); return; } if (h.x >= h.col.w - 76 && h.x < h.col.w - 46) { setActive(h.p, "name", false); showSel(true); vp.focus({ preventScroll: true }); startEdit(); } else if (h.x >= h.col.w - 40) toast({ text: t("canvas-grid.2", { p0: src.name(r) }) }); return; }
+    if (h.key === "act") { e.preventDefault(); showSel(false); if (h.dt) { toggleExpand(h.p); return; } if (h.x >= h.col.w - 76 && h.x < h.col.w - 46) { setActive(h.p, "name", false); showSel(true); vp.focus({ preventScroll: true }); startEdit(); } else if (h.x >= h.col.w - 40) toast({ text: tt("canvas-grid.2", { p0: src.name(r) }) }); return; }
     if (h.exp) { e.preventDefault(); showSel(false); toggleExpand(h.p); return; }
     e.preventDefault(); vp.focus({ preventScroll: true });
     if (e.shiftKey && selShown) { rg = { ap: rg?.ap ?? active.p, ac: rg?.ac ?? active.c, fp: h.p, fc: h.key }; syncMergeBar(); schedule(); return; }
@@ -374,7 +375,7 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
   }
   function setActive(p, c, reveal = true) {
     [p, c] = anchorOf(Math.max(0, Math.min(src.shown - 1, p)), c); active = { p, c, id: src.idAt(p) }; if (reveal) revealActive(); schedule(); syncMergeBar();
-    const r = src.rowAt(active.p), col = model.byKey[c], lv = src.tree ? t("canvas-grid.3", { p0: src.lvAt(active.p) + 1, p1: src.hasKids(r) ? (src.isOpen(r) ? t("canvas-grid.25") : t("canvas-grid.26")) : "" }) : ""; if (r >= 0) sr.textContent = t("canvas-grid.4", { p0: active.p + 1, p1: lv, p2: col.title || t("canvas-grid.27"), p3: c === "name" ? src.name(r) : col.type === "dur" ? fmt.dur(src.val(r, c)) : col.type === "money" ? fmt.money(src.val(r, c)) : col.type === "status" ? STATUS[src.val(r, c)] : col.type === "owner" ? OWNERS[src.val(r, c)] : col.type === "tag" ? TAGS[src.val(r, c)] : col.type === "time" ? fmt.time(src.val(r, c)) : src.val(r, c) });
+    const r = src.rowAt(active.p), col = model.byKey[c], lv = src.tree ? tt("canvas-grid.3", { p0: src.lvAt(active.p) + 1, p1: src.hasKids(r) ? (src.isOpen(r) ? tt("canvas-grid.25") : tt("canvas-grid.26")) : "" }) : ""; if (r >= 0) sr.textContent = tt("canvas-grid.4", { p0: active.p + 1, p1: lv, p2: col.title || tt("canvas-grid.27"), p3: c === "name" ? src.name(r) : col.type === "dur" ? fmt.dur(src.val(r, c)) : col.type === "money" ? fmt.money(src.val(r, c)) : col.type === "status" ? STATUS[src.val(r, c)] : col.type === "owner" ? OWNERS[src.val(r, c)] : col.type === "tag" ? TAGS[src.val(r, c)] : col.type === "time" ? fmt.time(src.val(r, c)) : src.val(r, c) });
   }
   function revealActive() {
     const top = src.rowY(active.p), rh = src.rowH(active.p); if (top < vp.scrollTop) vp.scrollTop = top; else if (top + rh > vp.scrollTop + Hc) vp.scrollTop = top + rh - Hc;
@@ -445,8 +446,8 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
   }
   function startRowDrag(p0, e) {
     e.preventDefault(); flushDrop();
-    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: t("canvas-grid.5") }); return; }
-    if (merges.active().some((x) => x.p1 > x.p0 && p0 >= x.p0 && p0 <= x.p1)) { toast({ icon: "info", tone: "info", text: t("canvas-grid.6") }); return; }
+    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: tt("canvas-grid.5") }); return; }
+    if (merges.active().some((x) => x.p1 > x.p0 && p0 >= x.p0 && p0 <= x.p1)) { toast({ icon: "info", tone: "info", text: tt("canvas-grid.6") }); return; }
     const n = src.shown, y0 = src.rowY(p0), sx = e.clientX, sy = e.clientY, s0 = vp.scrollTop; let py = sy, px = sx, raf2 = 0, done = false, on = false, lastTop = s0; // 拿起的位置固定下来；被拖的行高度按实时的算
     const slot = (t) => (t <= p0 ? src.rowY(t) : src.rowY(t + 1) - src.rowH(p0));
     const nearest = (y) => { let lo = 0, hi = n - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (slot(m) <= y) lo = m; else hi = m - 1; } return lo + 1 < n && Math.abs(slot(lo + 1) - y) < Math.abs(y - slot(lo)) ? lo + 1 : lo; };
@@ -471,8 +472,8 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
   // 拿起时展开收起的过渡还在走：收起马上做完，每一行从现在看到的位置接着走；排序时也能拖（松手后排好的顺序就当成手动顺序）
   function startTreeDrag(p, e) {
     e.preventDefault(); flushDrop();
-    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: t("canvas-grid.7") }); return; }
-    if (merges.active().some((x) => x.p1 > x.p0 && p >= x.p0 && p <= x.p1)) { toast({ icon: "info", tone: "info", text: t("canvas-grid.6") }); return; }
+    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: tt("canvas-grid.7") }); return; }
+    if (merges.active().some((x) => x.p1 > x.p0 && p >= x.p0 && p <= x.p1)) { toast({ icon: "info", tone: "info", text: tt("canvas-grid.6") }); return; }
     const id0 = src.idAt(p), sx = e.clientX; let sy = e.clientY, py = sy, px = sx, raf2 = 0, done = false, on = false, lastTop = 0, D = null, y0 = 0, s0 = 0, wait = false; if (id0 < 0) return;
     const begin = () => {
       const seed = mo.release(), p0 = src.findPos(id0); if (p0 < 0) return false;
@@ -540,7 +541,7 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
     const set = (h) => { if (h === cur) return; cur = h; const er = src.rowAt(p); if (!all && expd.has(er)) expd.set(er, Math.max(MINH, h - DETAIL)); if (all) { const a = src.rowY(p) - vp.scrollTop; src.setBaseH(h); sizeBody(); vp.scrollTop = src.rowY(p) - a; } else { src.setRowH(p, h); sizeBody(); } schedule(); };
     const step = () => {
       raf3 = 0; const yb = vp.getBoundingClientRect().top + vp.clientHeight - 2; set(Math.max(MINH, Math.min(MAXH, Math.round(h0 + Math.min(py, yb) - y0 + scrolled)))); // 边线最远到表格底边，超出的距离只决定往下滚多快
-      line.style.top = HEAD + src.rowY(p) + cur - vp.scrollTop - 1 + "px"; line.style.width = vp.clientWidth + "px"; line.dataset.h = all ? t("canvas-grid.8", { p0: cur }) : t("canvas-grid.9", { p0: cur });
+      line.style.top = HEAD + src.rowY(p) + cur - vp.scrollTop - 1 + "px"; line.style.width = vp.clientWidth + "px"; line.dataset.h = all ? tt("canvas-grid.8", { p0: cur }) : tt("canvas-grid.9", { p0: cur });
       const over = py - (vp.getBoundingClientRect().top + vp.clientHeight - 16);
       if (over > 0 && cur < MAXH) { const s = vp.scrollTop; vp.scrollTop = s + Math.min(24, over / 2.5); scrolled += vp.scrollTop - s; raf3 = requestAnimationFrame(step); }
     };
@@ -554,13 +555,13 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
   function resetRowH(p) { const r = src.rowAt(p); if (selState() === "all") { src.setBaseH(RH); sizeBody(); schedule(); } else easeRowH(p, RH + (r >= 0 && expd.has(r) ? DETAIL : 0)); } // 双击下边线：平滑恢复默认（展开着的行连同详情）
   function moveByKey(d) {
     if (src.tree) return moveTreeByKey(d);
-    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: t("canvas-grid.5") }); return; }
+    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: tt("canvas-grid.5") }); return; }
     const p = active.p, to = p + d; if (to < 0 || to >= src.shown || src.rowAt(p) < 0 || src.rowAt(to) < 0) return;
     src.move(p, to); active.p = to; revealActive(); schedule();
   }
   // 树形：和上一个 / 下一个兄弟换位置（连同展开着的下级），行滑过去；排序时先把排好的顺序当成手动顺序
   function moveTreeByKey(d) {
-    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: t("canvas-grid.10") }); return; }
+    if (!src.canMove()) { toast({ icon: "info", tone: "info", text: tt("canvas-grid.10") }); return; }
     if (mo.fading()) { mo.later(() => moveTreeByKey(d)); return; } // 收起的下级还在淡出：淡完再挪
     flushDrop(); const id = src.idAt(active.p); if (id < 0 || drag) return; mo.release();
     const p = src.findPos(id), { list } = src.siblings(p), i = list.findIndex((b) => b.id === id), j = i + d; if (j < 0 || j >= list.length) return;
@@ -576,7 +577,7 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
     g.fillStyle = gr; g.beginPath(); g.roundRect(x0, y + 12, cw, chh, 6); g.fill();
     const tx = x0 + cw + 16, st = src.val(r, "status"), sh = src.val(r, "shots");
     text(trunc(src.name(r), W - tx - 16, "600 13px -apple-system, 'PingFang SC', sans-serif"), tx, y + 22, "600 13px -apple-system, 'PingFang SC', sans-serif", C.label);
-    text(trunc(t("canvas-grid.11", { p0: TAGS[src.val(r, "tag")], p1: sh, p2: fmt.dur(src.val(r, "dur")), p3: STATUS[st], p4: src.val(r, "prog"), p5: OWNERS[src.val(r, "owner")], p6: fmt.time(src.val(r, "upd")) }), W - tx - 16, F.s), tx, y + 44, F.s, C.label2);
+    text(trunc(tt("canvas-grid.11", { p0: TAGS[src.val(r, "tag")], p1: sh, p2: fmt.dur(src.val(r, "dur")), p3: STATUS[st], p4: src.val(r, "prog"), p5: OWNERS[src.val(r, "owner")], p6: fmt.time(src.val(r, "upd")) }), W - tx - 16, F.s), tx, y + 44, F.s, C.label2);
     for (let k = 0; k < Math.min(10, sh); k++) { const g2 = g.createLinearGradient(tx + k * 32, y + 58, tx + k * 32 + 28, y + 74); g2.addColorStop(0, `hsl(${(hue + k * 23) % 360} 30% 36%)`); g2.addColorStop(1, `hsl(${(hue + k * 23 + 30) % 360} 26% 16%)`); g.fillStyle = g2; g.beginPath(); g.roundRect(tx + k * 32, y + 58, 28, 16, 3); g.fill(); }
     if (sh > 10) text(`+${sh - 10}`, tx + 10 * 32 + 4, y + 66, F.s, C.label3);
     g.fillStyle = C.line; g.fillRect(0, y + h - 1, W, 1); g.restore(); font = "";
@@ -597,22 +598,37 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
     const r = rgRect(), cells = r ? (r.p1 - r.p0 + 1) * r.keys.length : 0, zones = r ? new Set(r.keys.map(merges.zoneOf)) : new Set();
     const sib = !r || merges.siblings(r.p0, r.p1);
     mb.merge.disabled = !merges.enabled || !(cells > 1 && zones.size === 1 && r.p1 - r.p0 < 200 && sib);
-    mb.merge.dataset.tip = !merges.enabled ? t("canvas-grid.12") : cells > 1 && zones.size > 1 ? t("canvas-grid.13") : cells > 1 && !sib ? t("canvas-grid.14") : cells > 1 ? t("canvas-grid.15", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }) : t("canvas-grid.16");
+    mb.merge.dataset.tip = !merges.enabled ? tt("canvas-grid.12") : cells > 1 && zones.size > 1 ? tt("canvas-grid.13") : cells > 1 && !sib ? tt("canvas-grid.14") : cells > 1 ? tt("canvas-grid.15", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }) : tt("canvas-grid.16");
     mb.split.hidden = !(selShown && merges.at(active.p, active.c));
-    const n = merges.suspended(); mb.hint.hidden = !n; mb.hint.textContent = merges.enabled ? t("canvas-grid.17", { p0: n, p1: src.tree ? t("canvas-grid.28") : t("canvas-grid.29") }) : t("canvas-grid.18", { p0: n });
+    const n = merges.suspended(); mb.hint.hidden = !n; mb.hint.textContent = merges.enabled ? tt("canvas-grid.17", { p0: n, p1: src.tree ? tt("canvas-grid.28") : tt("canvas-grid.29") }) : tt("canvas-grid.18", { p0: n });
   }
   mb.merge.addEventListener("click", () => {
     const r = rgRect(); if (!r || mb.merge.disabled) return;
     const inside = merges.active().filter((x) => x.p0 >= r.p0 && x.p1 <= r.p1 && x.c0 >= r.c0 && x.c1 <= r.c1).map((x) => x.m); inside.forEach((m) => merges.remove(m));
-    const m = merges.add(r.p0, r.p1, r.keys); if (!m) { inside.forEach((x) => merges.restore(x)); toast({ text: t("canvas-grid.19") }); return; }
+    const m = merges.add(r.p0, r.p1, r.keys); if (!m) { inside.forEach((x) => merges.restore(x)); toast({ text: tt("canvas-grid.19") }); return; }
     rg = null; vp.focus({ preventScroll: true }); setActive(r.p0, r.keys[0], false); showSel(true); schedule();
-    toast({ kind: "action", text: t("canvas-grid.20", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }), action: { label: t("canvas-grid.21"), run: (t) => { merges.remove(m); inside.forEach((x) => merges.restore(x)); schedule(); syncMergeBar(); t.update({ kind: "status", text: t("canvas-grid.22"), done: true, duration: 1600 }); } } });
+    toast({ kind: "action", text: tt("canvas-grid.20", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }), action: { label: tt("canvas-grid.21"), run: (t) => { merges.remove(m); inside.forEach((x) => merges.restore(x)); schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("canvas-grid.22"), done: true, duration: 1600 }); } } });
   });
   mb.split.addEventListener("click", () => {
     const x = merges.at(active.p, active.c); if (!x) return; merges.remove(x.m); vp.focus({ preventScroll: true }); schedule(); syncMergeBar();
-    toast({ kind: "action", text: t("canvas-grid.23"), action: { label: t("canvas-grid.21"), run: (t) => { merges.restore(x.m); schedule(); syncMergeBar(); t.update({ kind: "status", text: t("canvas-grid.24"), done: true, duration: 1600 }); } } });
+    toast({ kind: "action", text: tt("canvas-grid.23"), action: { label: tt("canvas-grid.21"), run: (t) => { merges.restore(x.m); schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("canvas-grid.24"), done: true, duration: 1600 }); } } });
   });
   src.ready.then(() => { const o = src.val(src.rowAt(0), "owner"); let k = 1; while (k < 6 && src.rowAt(k) >= 0 && src.val(src.rowAt(k), "owner") === o) k++; if (k >= 2) merges.add(0, k - 1, ["owner"]); else { const t = src.val(src.rowAt(0), "tag"); k = 1; while (k < 6 && src.rowAt(k) >= 0 && src.val(src.rowAt(k), "tag") === t) k++; if (k >= 2) merges.add(0, k - 1, ["tag"]); } schedule(); syncMergeBar(); });
 
   root._grid = { toggleTree, expandAll, tsel, motion: () => mo.busy, selState, dbgHides: (id) => !!drag && (src.tree ? drag.hides(src.findPos(id)) : src.rowAt(drag.p0) === id), drawn: () => drawn, src, model, active: () => ({ ...active }), setActive, startEdit: (k) => startEdit(k), scrollToRow: (p) => { vp.scrollTop = src.rowY(p); }, editing: () => !!editing, selCount, cellRect, hit, rowDragging: () => !!drag, dbg: () => (drag ? { to: drag.to, out: drag.out, done: !!drag.done, lift: drag.lift, off: Object.fromEntries(drag.off), gapY: drag.gapY, top: src.rowY(drag.p0) + drag.lift } : null), merges, sel: () => ({ shown: selShown, rg: rgRect() }), toggleExpand, expanded: () => expd.size };
+  // 销毁：停掉下一帧的重画、拿掉放进 <head> 的两段样式、关掉开着的弹层、放开实例。挂载时加的监听、观察器、后台线程由 createCanvasGrid 一起撤
+  const api = root._grid;
+  api.destroy = () => { cancelAnimationFrame(raf); raf = 0; styleEl.remove(); motionEl.remove(); closeGridPops(); if (root._grid === api) delete root._grid; };
+  return api;
 }
+
+// Canvas 版数据表格的标记（和设计稿里那块一样）：createCanvasGrid 遇到空容器自己用它填
+export const canvasGridHTML = ({ label = tt("canvas-grid.30") } = {}) =>
+  `<div class="sn-grid">${gridBarHTML({ seg: "cg", placeholder: tt("canvas-grid.31") })}<div class="sn-g-frame"><div class="sn-g-vp" tabindex="0" role="grid" aria-label="${label}"><div class="sn-g-head" role="row"></div><canvas class="sn-cg-cv" aria-hidden="true"></canvas><div class="sn-cg-sizer"></div></div>${gridShadesHTML()}<div class="sn-cg-sr" aria-live="polite"></div></div></div>`;
+
+// createCanvasGrid(空容器或 .sn-grid, { rows, seed }) → { update, destroy, on, off, … }：统一的组件写法（列和数据目前是演示用的项目表）
+export const createCanvasGrid = /* @__PURE__ */ defineComponent({
+  name: "canvas-grid",
+  html: (o) => canvasGridHTML(o),
+  mount(el, o) { injectIcons(el); return mountCanvasGrid(el, o); },
+});

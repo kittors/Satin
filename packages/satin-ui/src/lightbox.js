@@ -14,7 +14,7 @@ import { reduced, injectIcons } from "./core.js";
 import { playerHTML, mountPlayer } from "./media.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/lightbox.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 const OPEN = "cubic-bezier(.32,.72,0,1)", EASE_IN = "cubic-bezier(.42,0,1,1)";
 // 飞回缩略图：起步柔一点再加速、平缓落地。用打开那条曲线（起步极快）时，按下 Esc 后第一帧就缩掉四成面积，像跳了一下（2026-11-20 看图边界测试逐帧量到）
 const BACK = "cubic-bezier(.25,.1,.25,1)", T_BACK = 280;
@@ -105,13 +105,13 @@ export function openLightbox(items, n, { thumbOf = () => null, enabled = () => t
   if (cur) cur.close(true);
   const scrim = document.createElement("div"); scrim.className = "sn-lightbox-scrim";
   const stage = document.createElement("div"); stage.className = "sn-lb-stage"; stage.tabIndex = -1;
-  stage.setAttribute("role", "dialog"); stage.setAttribute("aria-modal", "true"); stage.setAttribute("aria-label", t("lightbox.0"));
+  stage.setAttribute("role", "dialog"); stage.setAttribute("aria-modal", "true"); stage.setAttribute("aria-label", tt("lightbox.0"));
   const box = document.createElement("div"); box.className = "sn-lightbox";
-  const bar = document.createElement("div"); bar.className = "sn-lb-bar sn-glass"; bar.setAttribute("role", "toolbar"); bar.setAttribute("aria-label", t("lightbox.1"));
-  bar.innerHTML = `<span class="sn-lb-g lb-nav">${BAR("chevron-left", "prev", t("lightbox.6"), "←")}<span class="sn-t sn-num"></span>${BAR("chevron-right", "next", t("lightbox.7"), "→")}</span>`
-    + `<span class="sn-lb-g lb-zoom">${BAR("zoom-out", "zout", t("lightbox.8"), "−")}<span class="sn-z sn-num"></span>${BAR("zoom-in", "zin", t("lightbox.9"), "+")}</span>`
-    + `<span class="sn-lb-g lb-rot">${BAR("rotate-ccw", "rl", t("lightbox.10"), "⇧R")}${BAR("rotate-cw", "rr", t("lightbox.11"), "R")}${BAR("scan", "reset", t("lightbox.12"), "0")}</span>`
-    + `<span class="sn-lb-g">${BAR("x", "x", t("lightbox.13"), "Esc")}</span>`;
+  const bar = document.createElement("div"); bar.className = "sn-lb-bar sn-glass"; bar.setAttribute("role", "toolbar"); bar.setAttribute("aria-label", tt("lightbox.1"));
+  bar.innerHTML = `<span class="sn-lb-g sn-lb-nav">${BAR("chevron-left", "prev", tt("lightbox.6"), "←")}<span class="sn-t sn-num"></span>${BAR("chevron-right", "next", tt("lightbox.7"), "→")}</span>`
+    + `<span class="sn-lb-g sn-lb-zoom">${BAR("zoom-out", "zout", tt("lightbox.8"), "−")}<span class="sn-z sn-num"></span>${BAR("zoom-in", "zin", tt("lightbox.9"), "+")}</span>`
+    + `<span class="sn-lb-g sn-lb-rot">${BAR("rotate-ccw", "rl", tt("lightbox.10"), "⇧R")}${BAR("rotate-cw", "rr", tt("lightbox.11"), "R")}${BAR("scan", "reset", tt("lightbox.12"), "0")}</span>`
+    + `<span class="sn-lb-g">${BAR("x", "x", tt("lightbox.13"), "Esc")}</span>`;
   injectIcons(bar);
   stage.append(box); document.body.append(scrim, stage, bar);
   const q = (s) => bar.querySelector(s), btn = (a) => q(`[data-lb="${a}"]`);
@@ -145,9 +145,9 @@ export function openLightbox(items, n, { thumbOf = () => null, enabled = () => t
   }
   function fill() {
     player?.destroy(); player = null; img = null; box.textContent = "";
-    box.insertAdjacentHTML("beforeend", t("lightbox.2"));
+    box.insertAdjacentHTML("beforeend", tt("lightbox.2"));
     if (it.video) {
-      box.innerHTML = playerHTML({ src: it.src, poster: it.poster, label: it.alt || t("lightbox.3") });
+      box.innerHTML = playerHTML({ src: it.src, poster: it.poster, label: it.alt || tt("lightbox.3") });
       // 封面、画面出来之前垫着缩略图那张（视频还没画面时是透明的，原来露出一块黑，从彩色缩略图里飞出来一个黑框）；开始播了就撤掉，比例不一样时两边照常是黑边
       const base = thumbBg(thumbOf(n)), pl = box.firstElementChild;
       if (base) { pl.style.background = `${base}, #000`; pl.querySelector("video")?.addEventListener("playing", () => (pl.style.background = ""), { once: true }); }
@@ -168,14 +168,14 @@ export function openLightbox(items, n, { thumbOf = () => null, enabled = () => t
           pre.onerror = () => {
             clearTimeout(slow); me.classList.remove("sn-loading", "sn-slow"); me.classList.add("sn-failed");
             const err = box.querySelector(".sn-lb-err"), hasBase = !!me.style.getPropertyValue("--sn-g0"); // 垫着缩略图：说明放到顶上，不挡画面
-            err.classList.toggle("sn-top", hasBase); err.textContent = hasBase ? t("lightbox.4") : t("lightbox.5");
+            err.classList.toggle("sn-top", hasBase); err.textContent = hasBase ? tt("lightbox.4") : tt("lightbox.5");
           };
         }
       }
     }
-    stage.classList.toggle("is-video", it.video);
-    q(".lb-zoom").hidden = q(".lb-rot").hidden = it.video;
-    q(".lb-nav").hidden = items.length < 2;
+    stage.classList.toggle("sn-is-video", it.video);
+    q(".sn-lb-zoom").hidden = q(".sn-lb-rot").hidden = it.video;
+    q(".sn-lb-nav").hidden = items.length < 2;
     Object.assign(view, { x: 0, y: 0, s: 1, r: 0 }); goal = { x: 0, y: 0, z: 1, r: 0 }; tw = null; draw();
   }
 

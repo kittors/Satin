@@ -7,7 +7,7 @@
     "serve": "python3 serve.py 5192 .",
     "lint": "eslint .",
     "test": "pnpm lint && pnpm test:node && pnpm test:types",
-    "test:node": "node scripts/test/imports.mjs && node scripts/test/node-import.mjs && node scripts/test/sync.mjs && node scripts/test/ssr.mjs && node scripts/test/table.mjs && node scripts/test/select.mjs && node scripts/test/factories.mjs && node scripts/skill/recipes-render.mjs && node scripts/test/enhance.mjs && node scripts/test/size.mjs && node skills/satin/scripts/check.test.mjs --static-only",
+    "test:node": "node scripts/test/imports.mjs && node scripts/test/i18n-shadow.mjs && node scripts/test/prefix-leaks.mjs && node scripts/test/node-import.mjs && node scripts/test/sync.mjs && node scripts/test/ssr.mjs && node scripts/test/table.mjs && node scripts/test/select.mjs && node scripts/test/factories.mjs && node scripts/skill/recipes-render.mjs && node scripts/test/enhance.mjs && node scripts/test/size.mjs && node skills/satin/scripts/check.test.mjs --static-only",
     "test:types": "tsc -p tests/types",
     "test:browser": "node scripts/test/lifecycle.mjs && node scripts/test/md-xss.mjs",
     "test:tokens": "node scripts/tokens/check.mjs --prefix sn-",

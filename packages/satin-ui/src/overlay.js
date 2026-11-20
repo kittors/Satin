@@ -3,7 +3,7 @@
 import { $, $$, injectIcons, hideTip, resetTipLayer, reduced } from "./core.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/overlay.js";
-const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 // 打开中的浮层排成一摞，Esc 只关最上面那个（下拉选择自己处理 Esc）。放在模块里：命令面板单独用（官网的搜索）时也在这一摞里
 const layers = [];
 const push = (l) => layers.push(l), drop = (l) => { const i = layers.indexOf(l); if (i >= 0) layers.splice(i, 1); };
@@ -23,12 +23,12 @@ void OPEN;
 // 输入就筛选，上下键选、回车执行、Esc 关闭；高亮条在行间滑过去，筛选时留下的行移到新位置，新出现的淡入。
 // groups: [{ name, items: [{ icon, name, sub, key, keys }] }]（keys 是额外的搜索词，比如英文名）；onRun(item) 选中后执行；
 // empty(q) 没有结果时显示的 HTML，里面带 data-empty-act 的按钮点了（或直接回车）调 onEmpty(q)。页面里没有 #cmdk-panel 就自己建一个。
-export function mountCmdk(groups, { onRun, placeholder, empty = (q) => t("overlay.0", { p0: esc(q) }), onEmpty, hotkey = true, enterLabel = t("overlay.1") } = {}) {
+export function mountCmdk(groups, { onRun, placeholder, empty = (q) => tt("overlay.0", { p0: esc(q) }), onEmpty, hotkey = true, enterLabel = tt("overlay.1") } = {}) {
   if (!document.getElementById("cmdk-panel")) {
-    document.body.insertAdjacentHTML("beforeend", t("overlay.2")
+    document.body.insertAdjacentHTML("beforeend", tt("overlay.2")
       + '<div class="sn-q"><span data-i="search"></span><input id="cmdkInput" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="cmdkList"><span class="sn-kbd">Esc</span></div>'
       + '<div class="sn-list" id="cmdkList" role="listbox"><span class="sn-bar" aria-hidden="true"></span></div>'
-      + `<div class="sn-foot"><span><kbd>↑</kbd><kbd>↓</kbd>${t("overlay.3")}</span><span><kbd>↵</kbd>${esc(enterLabel)}</span><span><kbd>Esc</kbd>${t("overlay.4")}</span></div></div>`);
+      + `<div class="sn-foot"><span><kbd>↑</kbd><kbd>↓</kbd>${tt("overlay.3")}</span><span><kbd>↵</kbd>${esc(enterLabel)}</span><span><kbd>Esc</kbd>${tt("overlay.4")}</span></div></div>`);
     injectIcons(document.getElementById("cmdk-panel"));
   }
   const $ = (q, r = document) => r.querySelector(q), $$ = (q, r = document) => [...r.querySelectorAll(q)];
@@ -260,7 +260,7 @@ function onMove(e) {
 }
 function recheck() { if (sys?.holding && performance.now() - sys.last > T_SWITCH) { sys.holding = false; evaluate(sys.pts.at(-1), true); } }
 function evaluate(p, force) {
-  const el = document.elementFromPoint(p.x, p.y), m = el?.closest(".sn-menu.sn-float.open"), level = m ? sys.chain.indexOf(m) : -1;
+  const el = document.elementFromPoint(p.x, p.y), m = el?.closest(".sn-menu.sn-float.sn-open"), level = m ? sys.chain.indexOf(m) : -1;
   if (level < 0) { sys.holding = false; drawTri(null); return; }
   const it = el.closest(".sn-item"), sub = sys.chain[level + 1];
   // 指针朝着已打开的子菜单走：途经的行不高亮、不展开
