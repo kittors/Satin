@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "satin",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["serve.py", "5192", "."],
+      "port": 5192
+    }
+  ]
+}

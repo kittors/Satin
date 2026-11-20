@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文档 · Satin</title>
+<meta name="description" content="Satin 组件库文档：快速上手、主题定制、UI/UX 规范，以及每个组件的演示、标记和验收要点。">
+<link rel="icon" href="data:,">
+<script src="../theme-boot.js"></script>
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../buttons.css">
+<link rel="stylesheet" href="../form.css">
+<link rel="stylesheet" href="../overlay.css">
+<link rel="stylesheet" href="../feedback.css">
+<link rel="stylesheet" href="../data.css">
+<link rel="stylesheet" href="../scroll.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body class="s-body d-body">
+
+<header class="s-nav">
+  <div class="s-wrap s-wrap-wide">
+    <button class="btn ghost sm ibtn s-burger" data-burger aria-label="打开目录" aria-expanded="false" data-i="list"></button>
+    <a class="s-logo" href="./" aria-label="Satin 首页"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><mask id="lg"><rect width="24" height="24" rx="6.5" fill="#fff"/><rect x="-4" y="10.75" width="32" height="2.5" fill="#000" transform="rotate(-34 12 12)"/></mask></defs><rect width="24" height="24" rx="6.5" fill="currentColor" mask="url(#lg)"/></svg>Satin</a>
+    <nav class="s-links" aria-label="主导航">
+      <a href="docs.html#/start" data-nav="start">文档</a><a href="docs.html#/c/button" data-nav="c">组件</a><a href="docs.html#/guide/principles" data-nav="guide">规范</a><a href="./#theme">主题</a><a href="../" target="_blank" rel="noopener">展示页</a>
+    </nav>
+    <div class="s-nav-end">
+      <button class="s-search" data-search aria-label="搜索组件和规范"><span data-i="search"></span>搜索组件<kbd data-kbd-k>⌘K</kbd></button>
+      <button class="btn ghost sm ibtn" data-custom-btn data-tip="主题定制" aria-label="主题定制" aria-haspopup="dialog" aria-expanded="false" data-i="sliders-horizontal"></button>
+      <button class="btn ghost sm ibtn s-mode" data-mode-btn><span data-i="sun:sun"></span><span data-i="moon:moon"></span></button>
+    </div>
+  </div>
+</header>
+<div class="pop th-panel s-pop" data-theme-panel role="dialog" aria-label="主题定制"></div>
+
+<div class="d-layout">
+  <aside class="d-side" data-side aria-label="文档目录"></aside>
+  <main class="d-main" data-main tabindex="-1"><div class="d-skel" aria-hidden="true"></div></main>
+  <aside class="d-toc" data-toc aria-label="本页目录"></aside>
+</div>
+<div class="d-scrim" data-scrim></div>
+
+<script type="module" src="docs.js"></script>
+</body>
+</html>

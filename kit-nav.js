@@ -1,0 +1,455 @@
+// UI 库设计稿第二批：媒体与上传、导航、行为。数值照 09 号 §2（连续性、模式 b/g/h）、§8（拖拽、增删）、§7.2（乐观更新）、§10（玻璃）。
+// 用法：图片放大（openLightbox）、上传（mountUpload）、侧栏（mountSidebar）、标签页（mountTabs）、分页（mountPager）、步骤（setStep）、
+// 拖拽重排（mountReorder）、带补位动画的增删（insertWithFlip / removeWithFlip）、乐观更新（optimistic）
+import { fitScroll, $, $$, reduced, injectIcons, edgeFrames, initSeg } from "./kit-core.js";
+import { toast } from "./kit-feedback.js";
+import { mountPlayer, mountAudio } from "./kit-media.js";
+import { SCENES } from "./kit-data.js";
+import { numberFlow } from "./kit-number.js";
+import { openLightbox } from "./kit-lightbox.js";
+
+const OPEN = "cubic-bezier(.32,.72,0,1)", EASE_IN = "cubic-bezier(.42,0,1,1)", OUT = "cubic-bezier(0,0,.58,1)", IN_OUT = "cubic-bezier(.42,0,.58,1)";
+const SPRING = "linear(0, .32, .78, 1.04, 1.09, 1.06, 1.02, 1, .99, .99, 1)";
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+// 只用 transform 把一组元素从旧位置移到新位置
+const flip = (els, change, opt = {}) => {
+  const before = new Map(els.map((e) => [e, e.getBoundingClientRect()])); change();
+  if (reduced()) return;
+  els.forEach((e, k) => {
+    if (!e.isConnected) return; const a = before.get(e), b = e.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+    if (dx || dy) e.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }], { duration: opt.duration || 300, easing: opt.easing || IN_OUT, delay: (opt.stagger || 0) * k, fill: "backwards" });
+  });
+};
+void wait; void initSeg;
+
+// ———— 1. 图片放大：看图组件在 kit-lightbox.js（放大缩小、旋转、还原、视频）；从这里引入的照样能用 ————
+export { openLightbox, closeLightbox } from "./kit-lightbox.js";
+
+
+// ———— 2. 上传 ————
+// mountUpload(拖放区, { list, accept, maxSize, tooBig, badType, upload })：点了选文件、拖进来；每个文件一行（进度、失败重试、取消 / 移除）。
+//   accept：允许的扩展名（正则）；maxSize：字节；upload(file, onProgress) 返回 Promise——真上传（不给就是演示用的假进度：名字带"断网"的传到一半失败）。
+//   返回 { add(files) }
+export function mountUpload(drop, { list, accept = /.*/, maxSize = Infinity, badType = "格式不支持", tooBig = "文件太大", upload: realUpload } = {}) {
+  if (drop._upl) return drop._upl;
+  const input = $("input", drop), files = list;
+  const OK = accept, LIMIT = maxSize;
+const size = (b) => b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+function addFiles(list) {
+  for (const f of list) {
+    const bad = !OK.test(f.name) ? badType : f.size > LIMIT ? tooBig : "";
+    const row = document.createElement("div"); row.className = "file" + (bad ? " bad" : "");
+    row.innerHTML = `<span class="fi" data-i="${bad ? "circle-alert" : "file-text"}"></span><div class="fm"><b class="fname">${f.name.replace(/[<>&"]/g, "")}</b><span class="st"><span>${size(f.size)}</span><span class="msg">${bad || "等待上传"}</span></span><div class="pbar"><i style="width:0"></i></div></div>`
+      + `<button class="btn ghost sm" data-file-act>${bad ? "移除" : "取消"}</button>`;
+    injectIcons(row); files.append(row);
+    if (!reduced()) row.animate([{ opacity: 0, transform: "translateY(8px) scale(.98)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: OUT });
+    row._file = f; if (!bad) run(row, f.name.includes("断网"));
+  }
+}
+function run(row, fail) {
+  if (realUpload && row._file instanceof Blob) { // 真上传：进度由 upload 报
+    const bar = $(".pbar i", row), msg = $(".msg", row);
+    realUpload(row._file, (q) => { bar.style.width = q * 100 + "%"; msg.textContent = `${Math.round(q * 100)}%`; })
+      .then(() => { row.classList.add("done"); msg.textContent = "已上传"; $("[data-file-act]", row).textContent = "移除"; },
+            () => { row.classList.add("bad"); msg.textContent = "没传完，点重试"; $("[data-file-act]", row).textContent = "重试"; row.dataset.retry = "1"; });
+    return;
+  }
+  let p = 0; const bar = $(".pbar i", row), msg = $(".msg", row);
+  row._t = setInterval(() => {
+    p = Math.min(1, p + .05 + Math.random() * .08); bar.style.width = p * 100 + "%"; msg.textContent = `${Math.round(p * 100)}%`;
+    if (fail && p > .55) { clearInterval(row._t); row.classList.add("bad"); msg.textContent = "网络中断，没传完"; $("[data-file-act]", row).textContent = "重试"; row.dataset.retry = "1"; }
+    else if (p >= 1) { clearInterval(row._t); row.classList.add("done"); msg.textContent = "已上传"; $(".fi", row).innerHTML = '<svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'; $("[data-file-act]", row).textContent = "移除"; }
+  }, 220);
+}
+files.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-file-act]"); if (!b) return; const row = b.closest(".file");
+  if (row.dataset.retry) { delete row.dataset.retry; row.classList.remove("bad"); b.textContent = "取消"; run(row, false); return; }
+  clearInterval(row._t);
+  const sibs = $$(".file", files).filter((x) => x !== row), r = row.getBoundingClientRect(), fr = files.getBoundingClientRect();
+  flip(sibs, () => Object.assign(row.style, { position: "absolute", left: 0, right: 0, top: r.top - fr.top + "px" }), { duration: 520, easing: SPRING });
+  if (reduced()) row.remove(); else row.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.96)" }], { duration: 160, easing: EASE_IN, fill: "forwards" }).onfinish = () => row.remove();
+});
+drop.addEventListener("click", () => input.click());
+drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
+input.addEventListener("change", () => { addFiles(input.files); input.value = ""; });
+let depth = 0;
+drop.addEventListener("dragenter", (e) => { e.preventDefault(); depth++; drop.classList.add("over"); });
+drop.addEventListener("dragover", (e) => e.preventDefault());
+drop.addEventListener("dragleave", () => { if (--depth <= 0) { depth = 0; drop.classList.remove("over"); } });
+drop.addEventListener("drop", (e) => { e.preventDefault(); depth = 0; drop.classList.remove("over"); addFiles(e.dataTransfer.files); });
+  return (drop._upl = { add: addFiles });
+}
+
+// ———— 3. 侧栏与布局 ————
+// mountSidebar(.app, { onNavigate })：侧栏选中的底色 / 指示条在条目之间滑动（app 上 data-navfx="slide | bar | fade | text"）；
+// [data-collapse] 收起 / 展开（⌘\ 也行），主区宽度连续变，.app-grid 里的卡片按新列数从原位置滑过去。返回 { toggle(), select(a) }
+export function mountSidebar(app, { onNavigate } = {}) {
+  if (app._side) return app._side;
+  const side = $(".side", app), agrid = $(".app-grid", app), nav = $(".side-nav", app), hl = $(".hl-bar", nav);
+const cardsEls = $$(".gc", agrid), CARD_MIN = 140, CARD_GAP = 12, SIDE_EASE = "cubic-bezier(.32, .72, 0, 1)"; /* 和 .app-grid 的 minmax(140px, 1fr)、gap 12、侧栏宽度动画的 ease.open 一致 */
+const cols = () => getComputedStyle(agrid).gridTemplateColumns.split(" ").length;
+const colsAt = (w) => Math.max(1, Math.floor((w + CARD_GAP) / (CARD_MIN + CARD_GAP)));
+// 从旧位置、旧大小滑到现在的位置、大小（同比缩放，封面不变形）；动的时候布局还在变也接得上（偏移是相对现在布局的）
+const flipCards = (first, dur) => {
+  if (reduced()) return;
+  for (const c of cardsEls) c.getAnimations().forEach((x) => x.cancel()); /* 先停掉上一段（first 已经按看到的位置量好），再量新布局，量到的才是不带位移的位置 */
+  for (const c of cardsEls) {
+    const a = first.get(c), b = c.getBoundingClientRect(), s = a.width / b.width, dx = a.left - b.left, dy = a.top - b.top;
+    if (Math.abs(dx) < .5 && Math.abs(dy) < .5 && Math.abs(s - 1) < .002) continue;
+    c.animate([{ transformOrigin: "0 0", transform: `translate(${dx}px, ${dy}px) scale(${s})` }, { transformOrigin: "0 0", transform: "none" }], { duration: dur, easing: SIDE_EASE });
+  }
+};
+let lastCols = cols(), sideAnim = 0;
+// 窗口大小变了、网格自己换列：同样从原位置滑过去（侧栏开合时由 toggleSide 处理，这里不管）
+let lastRects = new Map(cardsEls.map((c) => [c, c.getBoundingClientRect()]));
+new ResizeObserver(() => {
+  const n = cols(); if (n !== lastCols && !sideAnim) flipCards(lastRects, 300);
+  lastCols = n; lastRects = new Map(cardsEls.map((c) => [c, c.getBoundingClientRect()]));
+}).observe(agrid);
+// 选中切换四种：滑块（底色滑过去）/ 指示条（左边短条从旧项伸到新项）/ 原地淡入（纯 CSS）/ 仅文字（纯 CSS）
+const moveHl = (a, instant) => { hl.style.transition = instant ? "none" : ""; hl.style.translate = `0 ${a.offsetTop}px`; };
+moveHl($("a.on", nav), true); requestAnimationFrame(() => (hl.style.transition = ""));
+// 指示条：前缘先走、后缘跟上（和分段控件、标签页下划线同一套走法），关键帧交给合成线程播；中途再点，从当前看到的位置接着走
+const ind = $(".hl-ind", nav), IND = 16; let indAnim = null;
+const indAt = (a) => { const y = a.offsetTop + (a.offsetHeight - IND) / 2; return [y, y + IND]; };
+const moveInd = (a, instant) => {
+  const to = indAt(a), tf = ([t, b]) => `translateY(${t}px) scaleY(${(b - t) / IND})`;
+  let from = to;
+  if (indAnim) { const m = new DOMMatrixReadOnly(getComputedStyle(ind).transform); from = [m.f, m.f + IND * m.d]; indAnim.cancel(); indAnim = null; }
+  else if (ind._to) from = ind._to;
+  ind.style.transform = tf(to); ind._to = to;
+  if (instant || reduced() || app.dataset.navfx !== "bar" || Math.abs(from[0] - to[0]) < 1) return;
+  const { frames, duration } = edgeFrames(from, to, (e) => tf(e));
+  indAnim = ind.animate(frames, { duration, easing: "linear" }); indAnim.onfinish = () => (indAnim = null);
+};
+moveInd($("a.on", nav), true);
+const setFx = (v) => { app.dataset.navfx = v; const on = $("a.on", nav); moveHl(on, true); moveInd(on, true); };
+nav.addEventListener("click", (e) => {
+  const a = e.target.closest("a"); if (!a || a.classList.contains("on")) return;
+  $$("a", nav).forEach((x) => x.classList.toggle("on", x === a)); moveHl(a); moveInd(a);
+  onNavigate?.(a); const head = $(".app-head b", app), nt = $(".lbl", a).textContent; if (!head) return;
+  if (reduced()) head.textContent = nt; else head.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, easing: EASE_IN }).onfinish = () => { head.textContent = nt; head.animate([{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: OUT }); };
+});
+const colBtn = $("[data-collapse]", app);
+const toggleSide = () => {
+  const on = !app.classList.contains("collapsed"), first = new Map(cardsEls.map((c) => [c, c.getBoundingClientRect()]));
+  // 侧栏宽度连续变，主区跟着连续变。一开始就按最终宽度定好列数（中途不再换列、卡片不会突然变大变小），卡片从原位置滑到新位置
+  // 最终宽度 = 现在的宽度 + 侧栏现在的宽度 − 侧栏最终的宽度：收到一半又点展开时，侧栏现在的宽度是动画中途的值，照样算得准
+  const sideNow = side.getBoundingClientRect().width, sideTo = parseFloat(getComputedStyle(app).getPropertyValue(on ? "--side-w-min" : "--side-w"));
+  const n = colsAt(agrid.clientWidth + sideNow - sideTo); agrid.style.gridTemplateColumns = `repeat(${n}, minmax(0, 1fr))`;
+  app.classList.toggle("collapsed", on); colBtn.dataset.tip = on ? "展开侧栏" : "收起侧栏"; for (const a of $$(".side a", app)) a.dataset.tip = on ? $(".lbl", a).textContent : "";
+  flipCards(first, 300); lastCols = n;
+  clearTimeout(sideAnim); sideAnim = setTimeout(() => { sideAnim = 0; agrid.style.gridTemplateColumns = ""; lastCols = cols(); lastRects = new Map(cardsEls.map((c) => [c, c.getBoundingClientRect()])); }, 340); /* 侧栏动画完：交回自动列数（最终宽度下列数一样，不会再动） */
+};
+colBtn.addEventListener("click", toggleSide);
+document.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "\\") { e.preventDefault(); toggleSide(); } });
+  return (app._side = { toggle: toggleSide, select: (a) => a.click(), setFx });
+}
+
+// ———— 4. 标签页 ————
+// mountTabs(.tabs, { onChange(i, tab) })：下划线前缘先走、后缘跟上；新内容从所选标签那一侧滑进来；← → 切换；一行放不下横着滑。返回 { select(i), index }
+export function mountTabs(root, { onChange } = {}) {
+  if (root._tabs) return root._tabs;
+  const tl = $(".tab-list", root), ink = $(".ink", tl), tabs = $$("button", tl), panels = $$(".tab-panel", root);
+fitScroll(tl, { bar: "hover" });
+let ti = 0, inkAnim = null, inkEdges = null;
+// 下划线只用 transform（平移 + 横向缩放）在合成线程上动，不动 left/right（那会每帧重排）
+ink.style.left = "0"; ink.style.width = "100px"; ink.style.transformOrigin = "0 0";
+const inkTf = ([l, r]) => `translateX(${l}px) scaleX(${(r - l) / 100})`;
+const placeInk = (b, instant) => {
+  const to = [b.offsetLeft, b.offsetLeft + b.offsetWidth];
+  const from = inkAnim && inkEdges ? (() => { const m = new DOMMatrix(getComputedStyle(ink).transform); return [m.e, m.e + m.a * 100]; })() : inkEdges;
+  inkAnim?.cancel(); inkAnim = null; inkEdges = to; ink.style.transform = inkTf(to);
+  if (instant || reduced() || !from) return;
+  const { frames, duration } = edgeFrames(from, to, (e) => inkTf(e));
+  inkAnim = ink.animate(frames, { duration, easing: "linear" }); const a = inkAnim; a.onfinish = () => { if (inkAnim === a) inkAnim = null; };
+};
+placeInk(tabs[0], true);
+new ResizeObserver(() => placeInk(tabs[ti], true)).observe(tl);
+tabs.forEach((b, i) => b.addEventListener("click", () => {
+  if (i === ti) return; const right = i > ti, old = panels[ti], nw = panels[i];
+  tabs[ti].classList.remove("on"); b.classList.add("on"); placeInk(b, false, right); ti = i;
+  if (old) old.hidden = true; if (nw) nw.hidden = false; onChange?.(i, b);
+  if (nw && !reduced()) nw.animate([{ opacity: 0, transform: `translateX(${right ? 16 : -16}px)` }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(.22,1,.36,1)" });
+}));
+tl.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); const n = Math.max(0, Math.min(tabs.length - 1, ti + (e.key === "ArrowRight" ? 1 : -1))); tabs[n].click(); tabs[n].focus(); } });
+  return (root._tabs = { select: (i) => tabs[i]?.click(), get index() { return ti; } });
+}
+
+// ———— 5. 分页 ————
+// mountPager(.pager, { total, page, onChange(page) })：当前页的底色滑到新页码；页码多时中间用省略。返回 { go(p), page }
+export function mountPager(pager, { total = 1, page = 1, onChange } = {}) {
+  if (pager._pg) return pager._pg;
+  const pages = $(".pages", pager), TOTAL = total;
+const seq = (p) => { const s = new Set([1, TOTAL, p - 1, p, p + 1].filter((x) => x >= 1 && x <= TOTAL)); const a = [...s].sort((x, y) => x - y), out = []; a.forEach((x, i) => { if (i && x - a[i - 1] > 1) out.push("…"); out.push(x); }); return out; };
+function renderPager(animate) {
+  const curEl = $(".cur", pages), oldLeft = curEl ? curEl.getBoundingClientRect().left : null;
+  pages.innerHTML = '<span class="cur"></span>' + seq(page).map((x) => x === "…" ? '<span class="pg gap">…</span>' : `<button class="pg${x === page ? " on" : ""}" data-p="${x}" aria-current="${x === page ? "page" : "false"}">${x}</button>`).join("");
+  const on = $(".pg.on", pages), c = $(".cur", pages); c.style.width = on.offsetWidth + "px"; c.style.translate = `${on.offsetLeft}px 0`;
+  if (animate && oldLeft != null && !reduced()) { const dx = oldLeft - c.getBoundingClientRect().left; c.animate([{ transform: `translateX(${dx}px)` }, { transform: "none" }], { duration: 270, easing: IN_OUT }); }
+}
+renderPager(false);
+pager.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-p],[data-pg]"); if (!b) return;
+  const np = b.dataset.p ? Number(b.dataset.p) : Math.max(1, Math.min(TOTAL, page + (b.dataset.pg === "next" ? 1 : -1)));
+  if (np !== page) { page = np; renderPager(true); onChange?.(page); }
+});
+  return (pager._pg = { go: (p) => { const np = Math.max(1, Math.min(TOTAL, p)); if (np !== page) { page = np; renderPager(true); onChange?.(page); } }, get page() { return page; } });
+}
+
+// ———— 6. 步骤：setStep(.steps, i)——第 i 步是当前，前面的都完成（连线跟着填满） ————
+export function setStep(steps, i) {
+  const st = $$(".st", steps), ln = $$(".ln", steps); i = Math.max(0, Math.min(st.length - 1, i));
+  st.forEach((s, k) => { s.classList.toggle("done", k < i); s.classList.toggle("cur", k === i); });
+  ln.forEach((l, k) => l.classList.toggle("done", k < i));
+  return i;
+}
+
+// ———— 7. 拖拽重排（09 号 §8.1） ————
+// mountReorder(列表, { onReorder(from, to, row) })：按住每一行的 .grip 拖（先动 4px 才算拿起）；被拖的行跟手，超出首尾越拉越沉；
+// 其他行让位、落点画一条线；拿出列表 40px 以外松手就取消；靠近窗口上下边缘自动滚。键盘：空格拿起、↑↓ 移动、空格放下、Esc 取消。
+// 行是列表里的 .drag-row（可以用 row 选项换）。返回 { rows() }
+export function mountReorder(list, { onReorder, row: rowSel = ".drag-row" } = {}) {
+  if (list._ro) return list._ro;
+  let line = $(".drop-line", list); if (!line) { line = document.createElement("span"); line.className = "drop-line"; list.prepend(line); }
+  const live = document.createElement("span");
+live.className = "dl-sr"; live.setAttribute("aria-live", "assertive"); list.after(live);
+const rowsOf = () => $$(rowSel, list), GAP = 6, A = 8, SLOP = 4, AWAY = 40, EDGE = 56, RUB = 36;
+const say = (t) => { live.textContent = ""; if (t) setTimeout(() => (live.textContent = t), 30); };
+const rubber = (o) => (1 - 1 / ((o * .55) / RUB + 1)) * RUB; // 超出的距离 → 实际多走的距离：越拉越沉，最多 36px
+const stopMoves = (r) => r.getAnimations().forEach((a) => { if (!(a instanceof CSSTransition) || a.transitionProperty === "transform") a.cancel(); });
+let drag = null, kb = false;
+function begin(row) {
+  const rs = rowsOf();
+  // 正在跑的位移动画停在眼睛看到的位置（写成内联 transform），后面的过渡从这里接着走
+  let busy = false; for (const r of rs) { if (!r.getAnimations().length) continue; busy = true; const cur = getComputedStyle(r).transform; stopMoves(r); r.style.transition = "none"; r.style.transform = cur === "none" ? "" : cur; }
+  if (busy) void list.offsetWidth;
+  const idx = rs.indexOf(row), m = busy ? new DOMMatrixReadOnly(getComputedStyle(row).transform) : new DOMMatrixReadOnly();
+  drag = { row, rs, idx, tops: rs.map((r) => r.offsetTop), hs: rs.map((r) => r.offsetHeight), h: row.offsetHeight + GAP, x: 0, y: 0, gy: 0, target: idx, out: false, laid: false, auto: false, t0: 0, k0: Math.max(0, Math.min(1, (1 - m.a) / .05)), dy0: m.m42, raf: 0 };
+  row.classList.remove("picked"); row.classList.add("lifted");
+}
+function frame(now) {
+  const d = drag; if (!d) return; d.raf = 0;
+  const { row, rs, idx, tops, hs, h } = d, n = rs.length, vh = innerHeight;
+  // 靠近窗口上下边缘、列表还有一部分在窗口外：自动滚过去，越靠边越快
+  let lr = list.getBoundingClientRect(); const up = d.y < EDGE && lr.top < 0, dn = d.y > vh - EDGE && lr.bottom > vh;
+  d.auto = up || dn;
+  if (d.auto) { const f = Math.min(1, up ? (EDGE - d.y) / EDGE : (d.y - vh + EDGE) / EDGE); scrollBy({ top: (up ? -1 : 1) * Math.ceil(18 * f * f), behavior: "instant" }); lr = list.getBoundingClientRect(); }
+  const out = d.x < lr.left - AWAY || d.x > lr.right + AWAY || d.y < lr.top - AWAY || d.y > lr.bottom + AWAY;
+  // 被拖的行：跟手，限制在第一行到最后一行之间，超出的部分加橡皮筋；拿起时向右拉开 16px、缩到 95%，180ms 缓出，不是一下跳过去
+  const raw = d.dy0 + (d.y - lr.top - d.gy), lo = tops[0] - tops[idx], hi = tops[n - 1] + hs[n - 1] - hs[idx] - tops[idx];
+  const dy = raw < lo ? lo - rubber(lo - raw) : raw > hi ? hi + rubber(raw - hi) : raw;
+  if (!d.t0) d.t0 = Math.max(now, performance.now() - 4); // 拉开动画从第一次真正画出来的时刻算起：那一帧要是晚到了（浏览器第一次处理按住拖动会卡一帧），下一帧也不会多走一大截
+  const t = Math.max(0, Math.min(1, (now - d.t0) / 180)), k = d.k0 + (1 - d.k0) * (1 - (1 - t) ** 3);
+  row.style.transform = `translate(${16 * k}px, ${dy}px) scale(${1 - .05 * k})`;
+  if (out !== d.out) row.classList.toggle("away", out);
+  // 落点：去掉被拖的行之后，行中心（按限制后的位置）落在哪个缝里；拿出去了就是原位
+  let target = idx;
+  if (!out) { const cy = tops[idx] + Math.max(lo, Math.min(hi, raw)) + hs[idx] / 2; target = n - 1; for (let j = 0, q = 0; j < n; j++) { if (j === idx) continue; if (cy < tops[j] - (j > idx ? h : 0) + hs[j] / 2) { target = q; break; } q++; } }
+  if (target !== d.target || out !== d.out || !d.laid) { d.target = target; d.out = out; d.laid = true; place(d); }
+  if (t < 1 || d.auto) d.raf = requestAnimationFrame(frame);
+}
+// 落点线和让位：只在落点或"拿出去"变了的时候改，过渡按自己的节奏走，不每帧重启
+function place(d) {
+  const { row, rs, idx, tops, hs, h, target, out } = d, show = !out && target !== idx;
+  if (show) {
+    const others = rs.filter((r) => r !== row), oi = target < others.length ? rs.indexOf(others[target]) : rs.indexOf(others.at(-1));
+    const y = target < others.length ? tops[oi] - (oi > idx ? h : 0) - GAP / 2 - 1 : tops[oi] - (oi > idx ? h : 0) + hs[oi] + GAP / 2 - 1;
+    if (!line.classList.contains("on")) { line.style.transition = "none"; line.style.translate = `0 ${y}px`; void line.offsetWidth; line.style.transition = ""; } else line.style.translate = `0 ${y}px`; // 线刚出现时直接在落点长出来，不从上一次的位置滑过来
+  }
+  line.classList.toggle("on", show);
+  // 让位：线两侧往外让 A × 0.7ⁿ，延迟 24ms × n；拿出去了就都回原位（原位的空缺重新打开，表示松手会回去）
+  rs.forEach((r, i) => {
+    if (r === row) return;
+    if (out) { r.style.transition = `transform .24s ${OUT}`; r.style.transform = ""; return; }
+    const q = i < idx ? i : i - 1, nn = q < target ? target - 1 - q : q - target, push = target === idx || reduced() ? 0 : (q < target ? -1 : 1) * A * Math.pow(.7, nn);
+    r.style.transition = `transform .2s cubic-bezier(.22,1,.36,1) ${nn * 24}ms`; r.style.transform = `translateY(${(i > idx ? -h : 0) + push}px)`;
+  });
+}
+function end(cancel) {
+  const d = drag; if (!d) return; drag = null; if (d.raf) cancelAnimationFrame(d.raf);
+  line.classList.remove("on");
+  const { row, rs, idx } = d, back = cancel || d.out, target = back ? idx : d.target;
+  // 记下每一行的布局位置和眼睛看到的变换；复位、换顺序之后，从看到的位置弹回新位置（起点和松手那一刻完全一致，不跳）
+  const pre = rs.map((r) => [r, r.offsetLeft, r.offsetTop, getComputedStyle(r).transform]);
+  for (const r of rs) { stopMoves(r); r.style.transition = ""; r.style.transform = ""; }
+  row.classList.remove("lifted", "away");
+  if (target !== idx) { list.insertBefore(row, rs.filter((r) => r !== row)[target] || null); onReorder?.(idx, target, row); }
+  if (!reduced()) for (const [r, l0, t0, tf] of pre) {
+    const dx = l0 - r.offsetLeft, dy = t0 - r.offsetTop; if (!dx && !dy && tf === "none") continue;
+    const a = r.animate([{ transform: `translate(${dx}px, ${dy}px)${tf === "none" ? "" : " " + tf}` }, { transform: "none" }], { duration: r === row ? 440 : 360, easing: SPRING });
+    if (r === row) { row.classList.add("landing"); a.onfinish = a.oncancel = () => row.classList.remove("landing"); }
+  }
+  say(back ? "已取消，回到原位" : target !== idx ? `已放到第 ${target + 1} 位` : "");
+}
+list.addEventListener("pointerdown", (e) => {
+  const g = e.target.closest(".grip"); if (!g || e.button !== 0 || drag) return;
+  e.preventDefault(); g.focus({ preventScroll: true }); try { g.setPointerCapture(e.pointerId); } catch {}
+  const row = g.closest(rowSel), sx = e.clientX, sy = e.clientY; let on = false, done = false;
+  const mv = (ev) => {
+    if (done) return;
+    if (!on) { if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < SLOP) return; on = true; begin(row); drag.gy = sy - list.getBoundingClientRect().top; }
+    if (!drag) return; drag.x = ev.clientX; drag.y = ev.clientY; if (!drag.raf) drag.raf = requestAnimationFrame(frame);
+  };
+  const fin = (cancel) => { if (done) return; done = true; for (const [t, f] of evs) g.removeEventListener(t, f); if (on) end(cancel); };
+  const evs = [["pointermove", mv], ["pointerup", () => fin(false)], ["pointercancel", () => fin(true)], ["lostpointercapture", () => fin(true)]];
+  for (const [t, f] of evs) g.addEventListener(t, f);
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && drag) { e.preventDefault(); e.stopPropagation(); end(true); } }, true);
+addEventListener("blur", () => end(true));
+addEventListener("scroll", () => { if (drag && !drag.raf) drag.raf = requestAnimationFrame(frame); }, { passive: true, capture: true });
+// 键盘：空格拿起，上下键移动，空格放下，Esc 取消并回到原位；焦点离开就放下
+function flipRows(change) {
+  const rs = rowsOf(), before = rs.map((r) => r.getBoundingClientRect());
+  rs.forEach(stopMoves); kb = true; change(); kb = false; // DOM 换位会让焦点短暂离开，期间不当成放下
+  if (reduced()) return;
+  rs.forEach((r, k) => { const b = r.getBoundingClientRect(), dx = before[k].left - b.left, dy = before[k].top - b.top; if (dx || dy) r.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }], { duration: 220, easing: IN_OUT }); });
+}
+list.addEventListener("keydown", (e) => {
+  const g = e.target.closest(".grip"); if (!g || drag) return;
+  const row = g.closest(rowSel), rs = rowsOf(), i = rs.indexOf(row), picked = row.classList.contains("picked");
+  if (e.key === " " || e.key === "Enter") {
+    e.preventDefault();
+    if (!picked) { row.classList.add("picked"); row._from = i; say(`已拿起「${($("b", row) || row).textContent.trim()}」，第 ${i + 1} 位，共 ${rs.length} 位。上下键移动，空格放下，Esc 取消`); }
+    else { row.classList.remove("picked"); say(`已放下，第 ${i + 1} 位`); if (row._from !== i) onReorder?.(row._from, i, row); }
+  } else if ((e.key === "ArrowUp" || e.key === "ArrowDown") && picked) {
+    e.preventDefault(); const j = i + (e.key === "ArrowUp" ? -1 : 1); if (j < 0 || j >= rs.length) return;
+    flipRows(() => list.insertBefore(row, e.key === "ArrowUp" ? rs[j] : rs[j].nextSibling)); g.focus({ preventScroll: true }); say(`第 ${j + 1} 位`);
+  } else if (e.key === "Escape" && picked) {
+    e.preventDefault(); e.stopPropagation(); row.classList.remove("picked");
+    if (row._from !== i) flipRows(() => list.insertBefore(row, rs.filter((r) => r !== row)[row._from] || null));
+    g.focus({ preventScroll: true }); say(`已取消，回到第 ${row._from + 1} 位`);
+  }
+});
+list.addEventListener("focusout", (e) => { if (kb) return; const row = e.target.closest(rowSel); if (row?.classList.contains("picked") && !row.contains(e.relatedTarget)) { row.classList.remove("picked"); say(`已放下，第 ${rowsOf().indexOf(row) + 1} 位`); } });
+  return (list._ro = { rows: rowsOf });
+}
+
+// ———— 8. 新增与删除：插进来的从下面淡入，别的元素让位；删掉的先脱离布局淡出，剩下的用弹簧补位 ————
+// insertWithFlip(容器, 元素, 放在谁前面)；removeWithFlip(元素) 返回 Promise（动画走完、元素移除后）
+export function insertWithFlip(box, el, before = null) {
+  const sibs = [...box.children].filter((x) => x !== el && getComputedStyle(x).position !== "absolute");
+  flip(sibs, () => box.insertBefore(el, before), { duration: 260 });
+  if (!reduced()) el.animate([{ opacity: 0, transform: "translateY(8px) scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 240, easing: OUT });
+  return el;
+}
+export function removeWithFlip(el) {
+  const box = el.parentElement, sibs = [...box.children].filter((s) => s !== el), r = el.getBoundingClientRect(), br = box.getBoundingClientRect();
+  if (getComputedStyle(box).position === "static") box.style.position = "relative";
+  flip(sibs, () => Object.assign(el.style, { position: "absolute", left: r.left - br.left + "px", top: r.top - br.top + "px", width: r.width + "px", pointerEvents: "none" }), { duration: 520, easing: SPRING });
+  if (reduced()) { el.remove(); return Promise.resolve(); }
+  return new Promise((ok) => { el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.96)" }], { duration: 160, easing: EASE_IN, fill: "forwards" }).onfinish = () => { el.remove(); ok(); }; });
+}
+
+// ———— 9. 乐观更新：先显示结果再保存；失败时抖两下、恢复、给重试 ————
+// optimistic({ apply, revert, save, shake, failText })：apply() 马上改界面；save() 返回 Promise；失败就 revert()、shake 元素抖两下、
+// 出一条带"重试"的提示（重试 = 再来一遍整个过程）。返回 save 的 Promise（失败时 reject）
+export function optimistic({ apply, revert, save, shake, failText = "没保存上，已恢复原样" }) {
+  apply();
+  const run = Promise.resolve().then(save);
+  run.catch(() => {
+    revert();
+    if (shake) { shake.classList.remove("shake2"); void shake.offsetWidth; shake.classList.add("shake2"); shake.addEventListener("animationend", () => shake.classList.remove("shake2"), { once: true }); }
+    toast({ icon: "circle-x", tone: "danger", text: failText, alert: true, action: { label: "重试", run: (t) => { t.close(); optimistic({ apply, revert, save, shake, failText }); } } });
+  });
+  return run;
+}
+
+// ———— 展示页：演示数据 ————
+export function initNav() {
+  // 图片：五张，第四张演示加载失败；点开放大
+  const IMGS = [["16:9", SCENES[0]], ["1:1", SCENES[1]], ["4:3", SCENES[2]], ["9:16", SCENES[3]], ["16:9", SCENES[4]]];
+  const RATIO = { "16:9": 16 / 9, "1:1": 1, "4:3": 4 / 3, "9:16": 9 / 16 }, grid = $("#imgGrid");
+  function loadImages() {
+    grid.innerHTML = IMGS.map(([r, g], i) => `<div class="im" tabindex="0" data-n="${i}" style="--g:${g}"><span class="ph sk"></span><span class="pic"></span><span class="tag-ratio">${r}</span><div class="err"><span data-i="image-off"></span>图片加载失败<button class="textbtn" data-img-retry>重试</button></div></div>`).join("");
+    injectIcons(grid);
+    $$(".im", grid).forEach((im, i) => setTimeout(() => im.classList.add(i === 3 ? "failed" : "loaded"), 400 + i * 260 + Math.random() * 300));
+  }
+  loadImages();
+  $("[data-img-reload]").addEventListener("click", loadImages);
+  const items = IMGS.map(([r, g]) => ({ bg: g, ratio: RATIO[r] })), thumbOf = (i) => $(`.im[data-n="${i}"]`, grid), enabled = (i) => thumbOf(i)?.classList.contains("loaded");
+  grid.addEventListener("click", (e) => {
+    const retry = e.target.closest("[data-img-retry]"), im = e.target.closest(".im");
+    if (retry) { im.classList.remove("failed"); setTimeout(() => im.classList.add("loaded"), 700); return; }
+    if (im?.classList.contains("loaded")) openLightbox(items, Number(im.dataset.n), { thumbOf, enabled });
+  });
+  grid.addEventListener("keydown", (e) => { const im = e.target.closest(".im"); if (im && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); im.click(); } });
+
+  // 视频与音频：真视频、真音乐（Mixkit），交互在 kit-media.js
+  mountPlayer($("#player"), { onError: () => toast({ icon: "circle-x", tone: "danger", text: "视频没能加载，检查网络后再试", alert: true }) });
+  mountAudio($("#audio"), { onError: () => toast({ icon: "circle-x", tone: "danger", text: "音频没能加载，检查网络后再试", alert: true }) });
+
+  // 上传：只收 txt、docx、epub，50 MB 以内；"模拟拖入"一次放三个（一个会断网、一个太大）
+  const drop = $("#drop"), upl = mountUpload(drop, { list: $("#files"), accept: /\.(txt|docx|epub)$/i, maxSize: 50 * 1024 * 1024, badType: "格式不支持，只能上传 txt、docx、epub", tooBig: "超过 50 MB" });
+  $("[data-sim-drop]").addEventListener("click", async () => {
+    drop.classList.add("over"); await wait(500); drop.classList.remove("over");
+    upl.add([{ name: "雨夜车站（第二稿）.docx", size: 2.4 * 1048576 }, { name: "第三集_断网.txt", size: 186 * 1024 }, { name: "海报.psd", size: 81 * 1048576 }]);
+  });
+  const ugrid = $("#uplGrid"), addBtn = $("[data-upl-add]", ugrid); let ui = 0;
+  addBtn.addEventListener("click", () => {
+    const tile = document.createElement("div"); tile.className = "upl"; tile.style.setProperty("--g", SCENES[ui++ % SCENES.length]);
+    tile.innerHTML = '<div class="ov"><span class="pring" style="--p:0"></span></div>'; ugrid.insertBefore(tile, addBtn);
+    if (!reduced()) tile.animate([{ opacity: 0, transform: "scale(.96) translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 240, easing: OUT });
+    let p = 0; const ring = $(".pring", tile); const iv = setInterval(() => { p = Math.min(1, p + .08 + Math.random() * .1); ring.style.setProperty("--p", p); if (p >= 1) { clearInterval(iv); tile.classList.add("done"); } }, 160);
+  });
+
+  // 侧栏：主区的卡片；四种选中样式的切换和说明
+  const app = $("#app");
+  $("#appGrid").innerHTML = ["雨夜车站", "海边的第七天", "城南旧事", "长夜", "山那边的学校", "最后一班地铁", "雾港", "春天的信"].map((n, i) => `<div class="gc"><span class="cv" style="--g:${SCENES[i % SCENES.length]}"></span><b>${n}</b></div>`).join("");
+  const sb = mountSidebar(app);
+  const NOTE = { slide: "一级导航、条目不多、中间没有分组标题时用：底色在条目之间滑动。", bar: "条目密、带图标的侧栏，或收起成图标栏时用：整块底色太重，只留左边一根短条。", fade: "条目多、有分组标题、侧栏会滚动、多层级时用：选中项可能离得很远，滑过去反而乱。", text: "文档目录、设置分区这类次级导航用：不抢正文，只变字色和图标。" };
+const noteEl = $("[data-navfx-note]"), fxSeg = $('[data-seg="navfx"]');
+if (fxSeg) initSeg(fxSeg, (v) => { sb.setFx(v); noteEl.textContent = NOTE[v]; }, 0);
+if (noteEl) noteEl.textContent = NOTE.slide;
+
+  // 标签页、分页、步骤
+  mountTabs($("#tabsDemo"));
+  mountPager($("#pager"), { total: 13 });
+  let si = 1; for (const b of $$("[data-step]")) b.addEventListener("click", () => { si = setStep($("#steps"), si + Number(b.dataset.step)); });
+
+  // 拖拽重排：五个镜头
+  const SHOTS = [["镜头 07 · 车站外，雨刚停", "远景 · 4 秒"], ["镜头 08 · 林夏走进候车厅", "全景 · 6 秒"], ["镜头 09 · 站台上的最后一班车", "中景 · 5 秒"], ["镜头 10 · 车窗里的倒影", "特写 · 3 秒"], ["镜头 11 · 雨夜里的公交站", "近景 · 4 秒"]];
+  const list = $("#dragList");
+  list.insertAdjacentHTML("beforeend", SHOTS.map(([n, m], i) => `<div class="drag-row"><button class="grip" aria-label="拖动排序：${n}" data-i="grip-vertical"></button><span class="cv" style="--g:${SCENES[i % SCENES.length]}"></span><b>${n}</b><span class="m">${m}</span></div>`).join(""));
+  injectIcons(list);
+  mountReorder(list, { onReorder: (from, to, row) => { if (row.dataset.kb) toast({ icon: "info", tone: "info", text: `已放下：第 ${to + 1} 位` }); } });
+
+  // 新增与删除：标签，删掉的能撤销
+  const box = $("#chipsBox"), addIn = $("#addTag");
+  const chipEl = (t) => { const tmp = document.createElement("span"); tmp.innerHTML = `<span class="chip tag on">${t}<button class="x" aria-label="移除 ${t}" data-i="x"></button></span>`; injectIcons(tmp); return tmp.firstElementChild; };
+  for (const t of ["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]) box.append(chipEl(t));
+  const addChip = (text, index) => insertWithFlip(box, chipEl(text), $$(".chip", box)[index ?? 1e9] || null);
+  const submit = () => { const v = addIn.value.trim(); if (!v) return; addChip(v); addIn.value = ""; };
+  addIn.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+  $("[data-add-tag]").addEventListener("click", submit);
+  box.addEventListener("click", (e) => {
+    const x = e.target.closest(".x"); if (!x) return; const c = x.closest(".chip"), text = c.firstChild.textContent, index = $$(".chip", box).indexOf(c);
+    removeWithFlip(c);
+    toast({ kind: "action", text: `已移除标签"${text}"`, action: { label: "撤销", run: (t) => { addChip(text, index); t.update({ kind: "status", text: `已恢复"${text}"`, done: true, duration: 2000 }); } } });
+  });
+
+  // 乐观更新：收藏、改名；勾上"模拟保存失败"时 700ms 后失败
+  const orow = $(".opt-row"), star = $("[data-star]"), nBox = $(".n", star), nameEl = $("[data-rename]"), failBox = $("#optFail");
+  let count = 24; const starNum = numberFlow(nBox, { value: count, style: "blur", reduced });
+  const fakeSave = () => wait(700).then(() => { if (failBox.checked) throw new Error("fail"); });
+  star.addEventListener("click", () => {
+    const on = !star.classList.contains("on");
+    optimistic({ shake: orow,
+      apply: () => { star.classList.toggle("on", on); star.setAttribute("aria-pressed", String(on)); count += on ? 1 : -1; starNum.set(count); },
+      revert: () => { star.classList.toggle("on", !on); star.setAttribute("aria-pressed", String(!on)); count += on ? -1 : 1; starNum.set(count); },
+      save: fakeSave });
+  });
+  function rename() {
+    const old = nameEl.textContent, inp = document.createElement("input"); inp.className = "input sm"; inp.value = old; nameEl.replaceChildren(inp); inp.focus(); inp.select();
+    let done = false;
+    const commit = (save) => {
+      if (done) return; done = true; const v = inp.value.trim() || old;
+      if (!save || v === old) { nameEl.textContent = old; return; }
+      optimistic({ shake: orow, apply: () => (nameEl.textContent = v), revert: () => (nameEl.textContent = old), save: fakeSave }).then(() => toast({ text: `已改名为"${v}"` }), () => {});
+    };
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") commit(true); if (e.key === "Escape") { e.stopPropagation(); commit(false); } });
+    inp.addEventListener("blur", () => commit(true));
+  }
+  nameEl.addEventListener("dblclick", rename);
+  nameEl.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target === nameEl) rename(); });
+}

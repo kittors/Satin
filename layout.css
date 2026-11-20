@@ -1,0 +1,119 @@
+/* Satin：布局与响应式。预览框按真实宽度排版（容器查询 @container lo），太宽时整体缩小显示。
+   线框：块是浅底细边，字是灰条，标题是深灰条，主按钮是深色胶囊。断点、栅格、边距见 04 号 §9、§3。 */
+.lo-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 12px; }
+.lo-tools .slider .bubble { display: none; }
+.lo-presets { display: flex; flex-wrap: wrap; gap: 4px; }
+.lo-presets .on { background: var(--fill-active); color: var(--label); }
+.lo-info { margin: 4px 0 12px; font: 400 calc(12px * var(--font-scale, 1))/calc(18px * var(--font-scale, 1)) var(--sans); color: var(--label2); font-variant-numeric: tabular-nums; }
+.lo-info b { font-weight: 600; color: var(--label); }
+.lo-frame { position: relative; overflow: hidden; border-radius: var(--r-lg); background: var(--sunken); }
+.lo-vp { position: absolute; top: 0; left: 0; height: 560px; overflow: hidden; transform-origin: 0 0; container: lo / inline-size; background: var(--canvas); box-shadow: 0 0 0 1px var(--line); }
+.lo-in { position: absolute; inset: 0; --cols: 4; --gutter: 16px; --margin: 16px; }
+@container lo (min-width: 720px) { .lo-in { --cols: 8; --gutter: 24px; --margin: 24px; } }
+@container lo (min-width: 1100px) { .lo-in { --margin: 32px; } }
+@container lo (min-width: 1200px) { .lo-in { --cols: 12; } }
+@container lo (min-width: 1440px) { .lo-in { --margin: 40px; } }
+.lo-l { display: none; height: 100%; }
+.lo-in[data-mode="shell"] .lo-shell, .lo-in[data-mode="split"] .lo-split, .lo-in[data-mode="cards"] .lo-cards, .lo-in[data-mode="dash"] .lo-dash, .lo-in[data-mode="read"] .lo-read, .lo-in[data-mode="form"] .lo-form { display: grid; }
+
+/* ———— 线框元素 ———— */
+.lo-in i, .lo-in b { display: block; border-radius: 4px; }
+.lo-line { height: 8px; background: var(--fill-active); }
+.lo-line.s { width: 64%; } .lo-line.xs { width: 36%; }
+.lo-h1 { width: 42%; max-width: 280px; height: 16px; border-radius: 5px !important; background: color-mix(in srgb, var(--label) 72%, transparent); }
+.lo-h1.big { width: 70%; max-width: 520px; height: 22px; }
+.lo-h2 { width: 46%; max-width: 160px; height: 10px; background: color-mix(in srgb, var(--label) 42%, transparent); }
+.lo-kicker { width: 64px; height: 8px; background: color-mix(in srgb, var(--label) 30%, transparent); }
+.lo-cta { flex: none; width: 88px; height: 28px; border-radius: 14px !important; background: var(--accent); }
+.lo-btn2 { flex: none; width: 72px; height: 28px; border-radius: 14px !important; box-shadow: inset 0 0 0 1px var(--line-control); }
+.lo-thumb, .lo-media { width: 100%; aspect-ratio: 16 / 9; border-radius: 8px !important; background: radial-gradient(60% 80% at 72% 30%, rgba(255, 210, 160, .35), transparent 60%), linear-gradient(180deg, #2a3242, #141a24); }
+.lo-block { border-radius: 10px !important; background: var(--raised); box-shadow: 0 0 0 1px var(--line); }
+.lo-gap { display: block; height: 8px; }
+
+/* ———— 主区：内容按边距排，栅格叠加以它为参照 ———— */
+.lo-main { position: relative; min-width: 0; min-height: 0; overflow: hidden; padding: 24px var(--margin); background: var(--raised); }
+.lo-main.lo-canvas { background: var(--canvas); }
+.lo-page { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; max-width: 960px; margin: 0 auto; }
+.lo-page.wide { max-width: none; }
+.lo-ph { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+.lo-two { display: grid; grid-template-columns: 1fr; gap: var(--gutter); }
+.lo-two .lo-block { height: 120px; }
+@container lo (min-width: 720px) { .lo-two { grid-template-columns: 1fr 1fr; } }
+.lo-grid { position: absolute; z-index: 2; inset: 0 var(--margin); display: none; grid-template-columns: repeat(var(--cols), 1fr); gap: var(--gutter); pointer-events: none; }
+.lo-in.show-grid .lo-grid { display: grid; }
+.lo-grid i { border-radius: 0 !important; background: rgba(255, 59, 48, .07); box-shadow: inset 1px 0 rgba(255, 59, 48, .22), inset -1px 0 rgba(255, 59, 48, .22); }
+@container lo (max-width: 719px) { .lo-grid i:nth-child(n + 5) { display: none; } }
+@container lo (max-width: 1199px) { .lo-grid i:nth-child(n + 9) { display: none; } }
+
+/* ———— 侧栏、顶栏 ———— */
+.lo-side { display: none; flex-direction: column; gap: 4px; padding: 14px 12px; background: var(--canvas); box-shadow: 1px 0 0 var(--line); }
+.lo-side .lo-logo { width: 24px; height: 24px; margin: 0 4px 14px; border-radius: 7px !important; background: var(--accent); }
+.lo-in .lo-ni { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 8px; border-radius: 8px; }
+.lo-ni::before { content: ""; flex: none; width: 16px; height: 16px; border-radius: 4px; background: var(--fill-active); }
+.lo-ni::after { content: ""; flex: 1; height: 8px; border-radius: 4px; background: var(--fill-subtle); }
+.lo-ni.on { background: var(--fill-subtle); } .lo-ni.on::before { background: color-mix(in srgb, var(--label) 55%, transparent); }
+@container lo (max-width: 1099px) { .lo-ni::after { display: none; } .lo-in .lo-ni { justify-content: center; padding: 0; } .lo-side .lo-logo { margin: 0 auto 14px; } }
+.lo-top { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 var(--margin); background: var(--raised); box-shadow: 0 1px 0 var(--line); }
+.lo-top .lo-burger { flex: none; width: 18px; height: 14px; border-radius: 1px !important; background: linear-gradient(var(--label2) 0 2px, transparent 2px 6px, var(--label2) 6px 8px, transparent 8px 12px, var(--label2) 12px 14px); }
+.lo-top .lo-title { width: 120px; height: 12px; background: color-mix(in srgb, var(--label) 60%, transparent); }
+.lo-top .lo-cta { margin-left: auto; }
+@container lo (min-width: 720px) { .lo-top .lo-burger { display: none; } }
+
+/* ———— 1. 应用外壳：侧栏（抽屉 → 图标栏 64 → 232）+ 顶栏 + 主区（阅读型最大 960 居中）+ 检查器（1280 起，320） ———— */
+.lo-shell { grid-template: "top" 52px "main" 1fr / 1fr; }
+.lo-shell > .lo-side { grid-area: side; } .lo-shell > .lo-top { grid-area: top; } .lo-shell > .lo-main { grid-area: main; }
+.lo-shell > .lo-insp { grid-area: insp; display: none; flex-direction: column; gap: 12px; padding: 20px; background: var(--raised); box-shadow: -1px 0 0 var(--line); }
+.lo-insp .lo-ib { height: 96px; }
+@container lo (min-width: 720px) { .lo-shell { grid-template: "side top" 52px "side main" 1fr / 64px 1fr; } .lo-shell > .lo-side { display: flex; } }
+@container lo (min-width: 1100px) { .lo-shell { grid-template-columns: 232px 1fr; } }
+@container lo (min-width: 1280px) { .lo-shell { grid-template: "side top insp" 52px "side main insp" 1fr / 232px 1fr 320px; } .lo-shell > .lo-insp { display: flex; } }
+
+/* ———— 2. 三栏：侧栏 + 二级栏（列表）+ 详情。窄的时候只剩列表，点开详情盖上来 ———— */
+.lo-split { grid-template-columns: 1fr; }
+.lo-list { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 12px; overflow: hidden; background: var(--raised); }
+.lo-list .lo-search { height: 28px; margin-bottom: 8px; border-radius: 14px !important; background: var(--fill-subtle); }
+.lo-row { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 8px; border-radius: 8px; }
+.lo-row.on { background: var(--fill-subtle); }
+.lo-row .lo-av { flex: none; width: 28px; height: 28px; border-radius: 50% !important; background: var(--fill-active); }
+.lo-row span { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.lo-hint { margin: auto 0 0; padding: 8px; font: 400 calc(11px * var(--font-scale, 1))/calc(16px * var(--font-scale, 1)) var(--sans); color: var(--label3); text-align: center; }
+.lo-split > .lo-detail { display: none; }
+@container lo (min-width: 720px) {
+  .lo-split { grid-template-columns: 64px 240px 1fr; } .lo-split > .lo-side { display: flex; } .lo-split > .lo-detail { display: block; }
+  .lo-list { background: var(--canvas); box-shadow: 1px 0 0 var(--line); } .lo-hint { display: none; }
+}
+@container lo (min-width: 1100px) { .lo-split { grid-template-columns: 232px 240px 1fr; } }
+@container lo (min-width: 1280px) { .lo-split { grid-template-columns: 232px 280px 1fr; } }
+
+/* ———— 3. 卡片网格：不写死列数，最小卡宽 260 + auto-fill；列间距 16、行间距 24 ———— */
+.lo-cards { grid-template-columns: 1fr; }
+.lo-cardgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px 16px; }
+.lo-card { display: flex; flex-direction: column; gap: 8px; padding: 10px 10px 14px; border-radius: 12px; background: var(--raised); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, .04); }
+
+/* ———— 4. 仪表盘：块按栅格列数跨（统计卡 compact 4 列 = 整行、regular 4 列 = 半行、wide 3 列 = 四分之一） ———— */
+.lo-dash { grid-template-columns: 1fr; }
+.lo-dgrid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--gutter); }
+.lo-dgrid > * { grid-column: span 4; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+.lo-stat { height: 84px; } .lo-stat .lo-num { width: 56%; height: 20px; border-radius: 5px !important; background: color-mix(in srgb, var(--label) 72%, transparent); }
+.lo-chart { height: 220px; } .lo-dlist { height: 220px; }
+.lo-bars { flex: 1; display: flex; align-items: flex-end; gap: 8%; padding: 0 2%; }
+.lo-in .lo-bars i { flex: 1; border-radius: 3px 3px 0 0; background: color-mix(in srgb, var(--label) 22%, transparent); }
+.lo-dtable { gap: 0 !important; padding: 6px 14px !important; }
+.lo-tr { display: grid; grid-template-columns: 2fr 1fr 1fr; align-items: center; gap: 16px; height: 34px; box-shadow: 0 1px 0 var(--line); }
+.lo-tr:last-child { box-shadow: none; }
+@container lo (min-width: 720px) { .lo-chart, .lo-dlist, .lo-dtable { grid-column: span 8; } }
+@container lo (min-width: 1200px) { .lo-stat { grid-column: span 3; } .lo-chart { grid-column: span 8; } .lo-dlist { grid-column: span 4; } .lo-dtable { grid-column: span 12; } }
+
+/* ———— 5. 阅读页：最大宽 960 居中，两边随断点留边距 ———— */
+.lo-read { grid-template-columns: 1fr; }
+.lo-article { gap: 12px; padding-top: 16px; }
+
+/* ———— 6. 表单：最大宽 640；720 起标签在左（120），窄的时候标签在上 ———— */
+.lo-form { grid-template-columns: 1fr; }
+.lo-formwrap { max-width: 640px; gap: 16px; padding-top: 8px; }
+.lo-field { display: grid; gap: 8px; }
+.lo-label { width: 72px; height: 10px; background: color-mix(in srgb, var(--label) 40%, transparent); }
+.lo-input { height: 32px; border-radius: 8px !important; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line-control); }
+.lo-input.tall { height: 72px; }
+.lo-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+@container lo (min-width: 720px) { .lo-field { grid-template-columns: 120px 1fr; align-items: center; gap: 16px; } .lo-field:has(.tall) { align-items: start; } .lo-field:has(.tall) .lo-label { margin-top: 11px; } } /* sp-ok: 11 = (32 - 10) / 2，和单行输入框的中线对齐 */

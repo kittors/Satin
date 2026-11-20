@@ -1,0 +1,325 @@
+// UI 库设计稿：日期、时间、地址选择器。
+// 1. 日期：单选和范围。换月时网格往所去的方向滑；点标题切到月份视图（年份用左右箭头换）。
+//    键盘：方向键按天 / 周移动，PageUp / PageDown 换月，Home / End 到周一 / 周日，回车选中，Esc 收起并把焦点还给触发框。
+// 2. 时间：时、分两列，原生滚动 + 吸附到中间那条选中带；点数字滚到中间；方向键一格、翻页键五格；"此刻"一键回到现在。
+// 3. 定时发布：日历和时间放在一个面板里；早于现在的不能确定，原因写在面板底部。
+// 4. 地址：省 → 市 → 区三级标签，选完一级自动滑到下一级；可以跨级搜索（命中的字加下划线）；常用城市一键到区县。
+// 面板开合和菜单一样：第一帧就不透明，只放大 140ms；收起 100ms 淡出。只动 transform 和 opacity。
+import { scrollArea } from "./kit-scroll.js";
+import { $, reduced, injectIcons } from "./kit-core.js";
+
+// bindPickers(root = document, { today, now })：把 root 里写了 data-pk 的选择器都接上——
+//   data-pk="date"（日期）| "range"（日期范围，两个月并排、左边快捷预设）| "time"（时、分两列）| "datetime"（定时发布：日历 + 时间）| "region"（省 / 市 / 区）。
+//   选好时在宿主上发 pick 事件（冒泡，detail: { text }）；today / now 默认是真实的今天、现在。接过的不重复接
+export function bindPickers(root = document, { today, now } = {}) {
+  const $$ = (q, r = root) => [...r.querySelectorAll(q)].filter((h) => !q.startsWith("[data-pk") || (!h._pk && (h._pk = true)));
+  const WK = "日一二三四五六", TODAY = today || new Date(new Date().setHours(0, 0, 0, 0)), NOW = now || new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const ymd = (d) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  const same = (a, b) => !!a && !!b && ymd(a) === ymd(b);
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const fmtDay = (d) => `${d.getFullYear() !== TODAY.getFullYear() ? d.getFullYear() + " 年 " : ""}${d.getMonth() + 1} 月 ${d.getDate()} 日`;
+  const fmtFull = (d) => `${fmtDay(d)} 星期${WK[d.getDay()]}`;
+  const EASE = "cubic-bezier(.22,1,.36,1)";
+
+  // ———— 面板开合 ————
+  const hosts = [];
+  const close = (h, refocus) => { if (!h.classList.contains("open")) return; h.classList.remove("open"); if (refocus) $(".pk-trigger", h).focus({ preventScroll: true }); };
+  const open = (h) => {
+    for (const o of hosts) if (o !== h) close(o);
+    const p = $(".pk-panel", h); p.style.left = ""; p.style.right = ""; p.style.transformOrigin = "";
+    h.classList.add("open"); h._onOpen?.();
+    // 横向放进窗口：默认和触发框左边对齐；右边出界就往左挪，最多挪到离窗口左边 12px。
+    // 原来只会"左对齐 / 右对齐"二选一，范围面板（约 680px）两边都放不下时会从另一边伸出去被截掉。比窗口还宽的，面板自己换成竖排（picker.css 末尾）
+    const hr = h.getBoundingClientRect(), w = p.offsetWidth, room = innerWidth - 12;
+    if (hr.left + w > room) { const x = Math.max(12 - hr.left, room - w - hr.left); p.style.left = x + "px"; p.style.transformOrigin = `${Math.round(Math.max(0, Math.min(w, hr.width / 2 - x)))}px 0`; }
+  };
+  function host(h) {
+    hosts.push(h); const trig = $(".pk-trigger", h);
+    trig.addEventListener("click", (e) => {
+      if (e.target.closest(".end > .b") && h.classList.contains("has")) { h._clear?.(); return; }
+      if (h.classList.contains("open")) close(h); else open(h);
+    });
+    h.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && h.classList.contains("open")) { e.preventDefault(); e.stopPropagation(); close(h, true); }
+      if ((e.key === "ArrowDown" || e.key === "Enter") && e.target === trig && !h.classList.contains("open")) { e.preventDefault(); open(h); }
+    });
+  }
+  document.addEventListener("pointerdown", (e) => { for (const h of hosts) if (!h.contains(e.target)) close(h); });
+  // 触发框里的值：换值时旧字淡出、新字从下面 2px 淡入；滚动时间列这类连续变化用 instant
+  const setVal = (h, text, instant = false) => {
+    if ((text || "") !== (h._pkv ?? "")) { h._pkv = text || ""; h.dispatchEvent(new CustomEvent("pick", { bubbles: true, detail: { text } })); } // 值变了：发 pick
+    const v = $(".pk-trigger .val", h), has = !!text, next = text || v.dataset.ph; h.classList.toggle("has", has);
+    const put = () => { v.textContent = next; v.classList.toggle("ph", !has); };
+    if (instant || reduced() || v.textContent === next) { put(); return; }
+    v.getAnimations().forEach((a) => a.cancel());
+    v.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 80, easing: "ease-in" }).onfinish = () => { put(); v.animate([{ opacity: 0, transform: "translateY(2px)" }, { opacity: 1, transform: "none" }], { duration: 160, easing: EASE }); };
+  };
+  // 内容区换一屏：新的从所去方向滑进来，旧的往反方向滑走
+  const swapIn = (oldEl, newEl, dir) => {
+    if (reduced() || !dir) { oldEl.remove(); return; }
+    const D = 22 * dir;
+    oldEl.style.pointerEvents = "none";
+    oldEl.animate([{ transform: "none", opacity: 1 }, { transform: `translateX(${-D}px)`, opacity: 0 }], { duration: 150, easing: "ease-in", fill: "forwards" }).onfinish = () => oldEl.remove();
+    newEl.animate([{ transform: `translateX(${D}px)`, opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 220, easing: EASE });
+  };
+
+  // ———— 日历（一次显示一个月或两个月） ————
+  // 范围选择：选了开始、还没选结束时，悬停处半透明预览这一段（跟着鼠标走，不加过渡）；点下结束日期时预览 120ms 补成实色。
+  // 带子 32px 高（和选中的圆一样高），行与行之间留 4px 缝；行首行尾不收圆角，平平地接到下一行；只有起止两天是实心圆。
+  function calendar(root, { range = false, min = null, months = 1, onPick, onPreview } = {}) {
+    const multi = months > 1;
+    root.classList.add("cal"); root.classList.toggle("multi", multi);
+    const NAV = (d, lbl) => `<button class="btn ghost sm ibtn" type="button" data-nav="${d}" aria-label="${lbl}" data-i="chevron-${d < 0 ? "left" : "right"}"></button>`;
+    const WKH = `<div class="cal-wk">${[..."一二三四五六日"].map((c) => `<span>${c}</span>`).join("")}</div>`;
+    root.innerHTML = multi
+      ? `<div class="cal-body">${Array.from({ length: months }, (_, k) => `<div class="cal-pane"><div class="cal-ph">${k === 0 ? NAV(-1, "上个月") : "<i></i>"}<b class="cal-t"></b>${k === months - 1 ? NAV(1, "下个月") : "<i></i>"}</div>${WKH}<div class="cal-vp"><div class="cal-grid" role="grid"></div></div></div>`).join("")}</div>`
+      : `<div class="cal-hd"><button class="cal-title" type="button" aria-label="切换到月份"><b class="cal-t"></b><span data-i="chevron-down"></span></button><span class="grow"></span>${NAV(-1, "上一页")}${NAV(1, "下一页")}</div>${WKH}<div class="cal-vp"><div class="cal-grid" role="grid"></div><div class="cal-mv"></div></div>`;
+    injectIcons(root);
+    const titles = $$(".cal-t", root), mv = $(".cal-mv", root);
+    let grids = $$(".cal-grid", root), view = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1), focusD = TODAY, sel = null, a = null, b = null, hover = null, mvYear = view.getFullYear();
+    const monthOf = (k) => new Date(view.getFullYear(), view.getMonth() + k, 1);
+    const mIdx = (d) => (d.getFullYear() - view.getFullYear()) * 12 + d.getMonth() - view.getMonth();
+    const shown = (d) => { const m = mIdx(d); return m >= 0 && m < months; };
+    const isDis = (d) => !!min && d < min;
+    const inMonths = () => root.classList.contains("months");
+    const dayAt = (g, i) => addDays(g._start, i);
+    function build(g, k) {
+      const first = monthOf(k), start = addDays(first, -((first.getDay() + 6) % 7));
+      g._start = start; g._month = first.getMonth();
+      g.innerHTML = Array.from({ length: 42 }, (_, i) => `<button class="d" type="button" tabindex="-1"><span>${addDays(start, i).getDate()}</span></button>`).join("");
+    }
+    function paint() {
+      const end = b || hover, lo = a && end ? (end < a ? end : a) : null, hi = a && end ? (end < a ? a : end) : null, band = lo && hi && !same(lo, hi);
+      root.classList.toggle("pv", range && !!a && !b);
+      grids.forEach((g, k) => {
+        [...g.children].forEach((el, i) => {
+          const d = dayAt(g, i), out = d.getMonth() !== g._month, live = !(multi && out);
+          const on = live && (range ? same(d, a) || same(d, b) : same(d, sel));
+          // 选了开始、还没点结束：鼠标或键盘焦点所在那天只描一圈边（hv），点下去才变实心——实心留给真正选定的日子
+          const hv = live && range && !!a && !b && same(d, hover) && !same(d, a);
+          let c = "d"; if (out) c += " out"; if (same(d, TODAY)) c += " today"; if (isDis(d)) c += " dis"; if (on) c += " sel"; if (hv) c += " hv";
+          if (range && band && live) { if (d > lo && d < hi) c += " in"; if (same(d, lo)) c += " a"; if (same(d, hi)) c += " b"; }
+          if (el.className !== c) el.className = c;
+          el.tabIndex = live && same(d, focusD) ? 0 : -1; el.setAttribute("aria-selected", String(on)); el.setAttribute("aria-label", fmtFull(d));
+        });
+        if (titles[k]) titles[k].textContent = inMonths() ? `${mvYear} 年` : `${monthOf(k).getFullYear()} 年 ${monthOf(k).getMonth() + 1} 月`;
+      });
+    }
+    // 换月：几个月一起换，新网格从所去方向滑进来，旧的往反方向滑走
+    function setView(v, dir) {
+      view = new Date(v.getFullYear(), v.getMonth(), 1);
+      grids = grids.map((old, k) => { const g = document.createElement("div"); g.className = "cal-grid"; g.setAttribute("role", "grid"); old.after(g); build(g, k); swapIn(old, g, dir); return g; });
+      paint();
+    }
+    // 让某一天（或某一段）出现在视图里；已经看得见就不动
+    function reveal(x, y = x) {
+      if (shown(x) && shown(y)) return false;
+      const mx = new Date(x.getFullYear(), x.getMonth(), 1), my = new Date(y.getFullYear(), y.getMonth(), 1);
+      const span = (my.getFullYear() - mx.getFullYear()) * 12 + my.getMonth() - mx.getMonth();
+      const nv = span < months ? mx : new Date(my.getFullYear(), my.getMonth() - (months - 1), 1);
+      setView(nv, nv < view ? -1 : 1); return true;
+    }
+    const cellOf = (d) => { for (const g of grids) { const i = Math.round((d - g._start) / 864e5); if (i >= 0 && i < 42 && !(multi && g.children[i].classList.contains("out"))) return g.children[i]; } return null; };
+    const pop = (d) => { if (reduced()) return; const el = cellOf(d); if (!el) return; el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); };
+    // 确认结束日期、重置时：带子用 120ms 补成实色 / 淡掉；平时（悬停预览）直接变，不拖尾巴
+    let settleT = 0;
+    const settle = () => { if (reduced()) return; root.classList.add("settle"); clearTimeout(settleT); settleT = setTimeout(() => root.classList.remove("settle"), 160); };
+    const renderMonths = () => { mv.innerHTML = Array.from({ length: 12 }, (_, m) => `<button type="button" class="${mvYear === view.getFullYear() && m === view.getMonth() ? "cur" : ""}${mvYear === TODAY.getFullYear() && m === TODAY.getMonth() ? " now" : ""}" data-m="${m}">${m + 1} 月</button>`).join(""); };
+    const toggleMonths = (on = !inMonths()) => { if (!mv) return; mvYear = view.getFullYear(); if (on) renderMonths(); root.classList.toggle("months", on); paint(); if (on) $(".cal-mv button.cur", root)?.focus({ preventScroll: true }); };
+    function pick(d) {
+      focusD = d; reveal(d);
+      if (!range) { sel = d; paint(); pop(d); onPick?.(d); return; }
+      if (!a || b) { a = d; b = null; hover = null; } else if (d < a) { b = a; a = d; } else b = d;
+      if (b) settle(); paint(); pop(d); onPick?.(a, b);
+    }
+    root.addEventListener("click", (e) => {
+      const nav = e.target.closest("[data-nav]");
+      if (nav) { const n = +nav.dataset.nav; if (inMonths()) { mvYear += n; renderMonths(); paint(); } else setView(monthOf(n), n); return; }
+      if (e.target.closest(".cal-title")) { toggleMonths(); return; }
+      const m = e.target.closest(".cal-mv button");
+      if (m) { const to = new Date(mvYear, +m.dataset.m, 1), dir = Math.sign(to - view); root.classList.remove("months"); if (dir) setView(to, dir); else paint(); return; }
+      const cell = e.target.closest(".cal-grid .d"); if (!cell || cell.classList.contains("dis") || (multi && cell.classList.contains("out"))) return;
+      pick(dayAt(cell.parentElement, [...cell.parentElement.children].indexOf(cell)));
+    });
+    // 范围：选了开始、还没选结束时，悬停预览这一段（底部同时写出天数）
+    root.addEventListener("pointerover", (e) => {
+      if (!range || !a || b) return; const cell = e.target.closest(".cal-grid .d"); if (!cell || (multi && cell.classList.contains("out"))) return;
+      const nd = dayAt(cell.parentElement, [...cell.parentElement.children].indexOf(cell));
+      if (!same(nd, hover)) { hover = nd; paint(); onPreview?.(a, hover); }
+    });
+    root.addEventListener("pointerleave", () => { if (range && a && !b && hover) { hover = null; paint(); onPreview?.(a, null); } });
+    root.addEventListener("keydown", (e) => {
+      if (!e.target.closest(".cal-grid")) return;
+      const k = e.key, step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[k], wd = (focusD.getDay() + 6) % 7;
+      let nd = null;
+      if (step) nd = addDays(focusD, step);
+      else if (k === "PageUp" || k === "PageDown") nd = new Date(focusD.getFullYear(), focusD.getMonth() + (k === "PageUp" ? -1 : 1), Math.min(focusD.getDate(), 28));
+      else if (k === "Home") nd = addDays(focusD, -wd);
+      else if (k === "End") nd = addDays(focusD, 6 - wd);
+      else if (k === "Enter" || k === " ") { e.preventDefault(); if (!isDis(focusD)) pick(focusD); return; }
+      if (!nd) return; e.preventDefault(); focusD = nd; if (range && a && !b) { hover = nd; onPreview?.(a, nd); }
+      if (!reveal(nd)) paint();
+      cellOf(focusD)?.focus({ preventScroll: true });
+    });
+    grids.forEach((g, k) => build(g, k)); paint();
+    return {
+      set(d) { sel = d; focusD = d; if (!shown(d)) { view = new Date(d.getFullYear(), d.getMonth(), 1); grids.forEach((g, k) => build(g, k)); } paint(); },
+      setRange(x, y) { a = x; b = y; hover = null; focusD = y; settle(); if (!reveal(x, y)) paint(); },
+      clear() { settle(); sel = a = b = hover = null; paint(); },
+      get: () => (range ? { a, b } : sel),
+      focus() { root.classList.remove("months"); paint(); cellOf(focusD)?.focus({ preventScroll: true }); },
+    };
+  }
+
+  // ———— 时间列 ————
+  function timeCols(root, { step = 5, onChange } = {}) {
+    const ITEM = 32;
+    const col = (k, n, st) => `<div class="tcol" data-k="${k}" tabindex="0" role="listbox" aria-label="${k === "h" ? "时" : "分"}"><div class="tpad"></div>${Array.from({ length: n / st }, (_, i) => `<button class="t" type="button" tabindex="-1" role="option" data-v="${i * st}">${pad(i * st)}</button>`).join("")}<div class="tpad"></div></div>`;
+    root.classList.add("tcols"); root.innerHTML = `<i class="tband"></i>${col("h", 24, 1)}<span class="tsep">:</span>${col("m", 60, step)}`;
+    const cols = $$(".tcol", root), val = { h: 20, m: 30 };
+    for (const c of cols) scrollArea(c, { fade: "none", bar: "hover", overscroll: "contain" }); // 时、分两列：滚动区域的细滚动条（悬停才出），滚到头停住
+    const idxOf = (c) => Math.max(0, Math.min(c.querySelectorAll(".t").length - 1, Math.round(c.scrollTop / ITEM)));
+    const mark = (c) => { const i = idxOf(c), items = c.querySelectorAll(".t"); items.forEach((t, j) => { t.classList.toggle("on", j === i); t.setAttribute("aria-selected", String(j === i)); }); return +items[i].dataset.v; };
+    const to = (c, i, smooth) => c.scrollTo({ top: i * ITEM, behavior: smooth && !reduced() ? "smooth" : "auto" });
+    for (const c of cols) {
+      let raf = 0;
+      c.addEventListener("scroll", () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; const v = mark(c); if (val[c.dataset.k] !== v) { val[c.dataset.k] = v; onChange?.({ ...val }); } }); }, { passive: true });
+      c.addEventListener("click", (e) => { const t = e.target.closest(".t"); if (!t) return; to(c, [...c.querySelectorAll(".t")].indexOf(t), true); c.focus({ preventScroll: true }); });
+      c.addEventListener("keydown", (e) => { const n = { ArrowUp: -1, ArrowDown: 1, PageUp: -5, PageDown: 5 }[e.key]; if (!n) return; e.preventDefault(); to(c, idxOf(c) + n, true); });
+    }
+    return {
+      set(h, m, smooth = false) { val.h = h; val.m = Math.round(m / step) * step % 60; to(cols[0], h, smooth); to(cols[1], val.m / step, smooth); if (!smooth) cols.forEach(mark); },
+      get: () => ({ ...val }), focus: () => cols[0].focus({ preventScroll: true }),
+    };
+  }
+
+  // ———— 1. 日期（单选） ————
+  for (const h of $$('[data-pk="date"]')) {
+    host(h); const panel = $(".pk-panel", h);
+    const cal = calendar($(".cal-slot", panel), { onPick: (d) => { setVal(h, fmtFull(d)); setTimeout(() => close(h, true), 140); } });
+    h._clear = () => { cal.clear(); setVal(h, ""); };
+    h._onOpen = () => cal.focus();
+    $("[data-today]", panel).addEventListener("click", () => { cal.set(TODAY); setVal(h, fmtFull(TODAY)); setTimeout(() => close(h, true), 140); });
+    $("[data-clear]", panel).addEventListener("click", () => h._clear());
+  }
+
+  // ———— 2. 日期范围：左边快捷项，两个月并排；底部"重置"随时清空重选 ————
+  for (const h of $$('[data-pk="range"]')) {
+    host(h); const panel = $(".pk-panel", h), note = $(".pk-foot .note", panel), ok = $("[data-ok]", panel), rst = $("[data-reset]", panel), pre = $(".pk-presets", panel);
+    const days = (a, b) => Math.round((b - a) / 864e5) + 1, fmtR = (a, b) => `${fmtDay(a)} – ${fmtDay(b)} · ${days(a, b)} 天`;
+    const state = (a, b, pv = null) => {
+      const lo = pv && pv < a ? pv : a, hi = pv && pv < a ? a : pv;
+      note.textContent = b ? fmtR(a, b) : pv ? fmtR(lo, hi) : a ? "再选结束日期" : "先选开始日期，再选结束日期";
+      note.classList.toggle("pv", !b && !!pv);
+      ok.setAttribute("aria-disabled", String(!b)); rst.setAttribute("aria-disabled", String(!a));
+    };
+    const mark = (btn) => pre.querySelectorAll("button").forEach((o) => o.classList.toggle("on", o === btn));
+    const cal = calendar($(".cal-slot", panel), { range: true, months: 2, onPick: (a, b) => { mark(null); state(a, b); }, onPreview: (a, hv) => state(a, null, hv) });
+    const PRE = { today: () => [TODAY, TODAY], d7: () => [addDays(TODAY, -6), TODAY], d30: () => [addDays(TODAY, -29), TODAY], month: () => [new Date(2026, 10, 1), TODAY], last: () => [new Date(2026, 9, 1), new Date(2026, 9, 31)] };
+    pre.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; const [x, y] = PRE[b.dataset.p](); cal.setRange(x, y); mark(b); state(x, y); });
+    rst.addEventListener("click", () => { cal.clear(); mark(null); state(null, null); cal.focus(); });
+    ok.addEventListener("click", () => { const r = cal.get(); if (!r.b) return; setVal(h, fmtR(r.a, r.b)); close(h, true); });
+    h._clear = () => { cal.clear(); setVal(h, ""); mark(null); state(null, null); };
+    h._onOpen = () => cal.focus();
+    state(null, null);
+  }
+
+  // ———— 3. 时间 ————
+  for (const h of $$('[data-pk="time"]')) {
+    host(h); const panel = $(".pk-panel", h); let cur = { h: 20, m: 30 }, picked = false;
+    const tc = timeCols($(".tc-slot", panel), { step: 5, onChange: (v) => { cur = v; if (picked) setVal(h, `${pad(v.h)}:${pad(v.m)}`, true); } });
+    h._onOpen = () => { tc.set(cur.h, cur.m); requestAnimationFrame(() => { picked = true; tc.focus(); }); };
+    h._clear = () => { picked = false; setVal(h, ""); };
+    $("[data-now]", panel).addEventListener("click", () => tc.set(NOW.getHours(), NOW.getMinutes(), true));
+    $("[data-ok]", panel).addEventListener("click", () => { picked = true; setVal(h, `${pad(cur.h)}:${pad(cur.m)}`); close(h, true); });
+  }
+
+  // ———— 4. 定时发布：日历 + 时间 ————
+  for (const h of $$('[data-pk="datetime"]')) {
+    host(h); const panel = $(".pk-panel", h), note = $(".pk-foot .note", panel), ok = $("[data-ok]", panel);
+    let day = addDays(TODAY, 1), tm = { h: 20, m: 30 };
+    const check = () => {
+      const t = new Date(day.getFullYear(), day.getMonth(), day.getDate(), tm.h, tm.m), bad = t < NOW;
+      note.textContent = bad ? `不能早于现在（${NOW.getMonth() + 1} 月 ${NOW.getDate()} 日 ${pad(NOW.getHours())}:${pad(NOW.getMinutes())}）` : `${fmtFull(day)} ${pad(tm.h)}:${pad(tm.m)} 发布`;
+      note.classList.toggle("bad", bad); ok.setAttribute("aria-disabled", String(bad)); ok.dataset.tip = bad ? "不能早于现在" : ""; return !bad;
+    };
+    const cal = calendar($(".cal-slot", panel), { min: TODAY, onPick: (d) => { day = d; check(); } });
+    const tc = timeCols($(".tc-slot", panel), { step: 5, onChange: (v) => { tm = v; check(); } });
+    cal.set(day);
+    h._onOpen = () => { tc.set(tm.h, tm.m); check(); requestAnimationFrame(() => cal.focus()); };
+    h._clear = () => setVal(h, "");
+    ok.addEventListener("click", () => { if (!check()) return; setVal(h, `${fmtFull(day)} ${pad(tm.h)}:${pad(tm.m)}`); close(h, true); });
+  }
+
+  // ———— 5. 地址：省 → 市 → 区 ————
+  const REG = {
+    "北京市": { "北京市": ["东城区", "西城区", "朝阳区", "海淀区", "丰台区", "石景山区", "通州区", "顺义区", "昌平区", "大兴区"] },
+    "上海市": { "上海市": ["黄浦区", "徐汇区", "长宁区", "静安区", "普陀区", "虹口区", "杨浦区", "闵行区", "宝山区", "浦东新区"] },
+    "广东省": { "广州市": ["荔湾区", "越秀区", "海珠区", "天河区", "白云区", "黄埔区", "番禺区", "花都区", "南沙区"], "深圳市": ["罗湖区", "福田区", "南山区", "宝安区", "龙岗区", "盐田区", "龙华区", "坪山区", "光明区"], "珠海市": ["香洲区", "斗门区", "金湾区"] },
+    "浙江省": { "杭州市": ["上城区", "拱墅区", "西湖区", "滨江区", "萧山区", "余杭区", "临平区", "钱塘区", "富阳区", "临安区"], "宁波市": ["海曙区", "江北区", "北仑区", "镇海区", "鄞州区", "奉化区"], "温州市": ["鹿城区", "龙湾区", "瓯海区", "洞头区"] },
+    "江苏省": { "南京市": ["玄武区", "秦淮区", "建邺区", "鼓楼区", "浦口区", "栖霞区", "雨花台区", "江宁区"], "苏州市": ["姑苏区", "虎丘区", "吴中区", "相城区", "吴江区"] },
+    "四川省": { "成都市": ["锦江区", "青羊区", "金牛区", "武侯区", "成华区", "龙泉驿区", "新都区", "温江区", "双流区", "郫都区"], "绵阳市": ["涪城区", "游仙区", "安州区"] },
+    "湖北省": { "武汉市": ["江岸区", "江汉区", "硚口区", "汉阳区", "武昌区", "青山区", "洪山区"] },
+    "陕西省": { "西安市": ["新城区", "碑林区", "莲湖区", "灞桥区", "未央区", "雁塔区", "长安区"] },
+    "福建省": { "福州市": ["鼓楼区", "台江区", "仓山区", "马尾区", "晋安区"], "厦门市": ["思明区", "海沧区", "湖里区", "集美区", "同安区", "翔安区"] },
+    "重庆市": { "重庆市": ["渝中区", "江北区", "南岸区", "九龙坡区", "沙坪坝区", "渝北区"] },
+  };
+  const disp = (p) => p.filter((x, i) => i === 0 || x !== p[i - 1]).join(" / "); // 直辖市不重复写"北京市 / 北京市"
+  for (const h of $$('[data-pk="region"]')) {
+    host(h); const panel = $(".pk-panel", h), q = $(".rg-search input", panel), tabsEl = $(".rg-tabs", panel), ink = $(".ink", tabsEl), vp = $(".rg-vp", panel), res = $(".rg-res", panel);
+    let path = [], level = 0, list = null, hl = -1;
+    const boxOf = (el) => (el.parentElement?.classList.contains("sa") ? el.parentElement : el); // 包了滚动区域的列表：显隐、滑动都作用在外面那一层
+    scrollArea(res, { fade: "y", size: 20, overscroll: "contain" }); boxOf(res).hidden = res.hidden; res.hidden = false;
+    const optsAt = (lv) => (lv === 0 ? Object.keys(REG) : lv === 1 ? Object.keys(REG[path[0]]) : REG[path[0]][path[1]]);
+    const moveInk = () => { const b = $(`button[data-lv="${level}"]`, tabsEl); if (b) ink.style.transform = `translateX(${b.offsetLeft + 8}px) scaleX(${Math.max(8, b.offsetWidth - 16)})`; };
+    function tabs() {
+      tabsEl.querySelectorAll("button").forEach((b) => b.remove());
+      for (let i = 0; i <= level; i++) { const b = document.createElement("button"); b.type = "button"; b.dataset.lv = i; b.textContent = path[i] || "请选择"; b.classList.toggle("ph", !path[i]); tabsEl.insertBefore(b, ink); }
+      moveInk();
+    }
+    function fill(lv, dir = 0) {
+      const nl = document.createElement("div"); nl.className = "rg-list"; nl.setAttribute("role", "listbox");
+      nl.innerHTML = optsAt(lv).map((n) => `<button type="button" role="option"${path[lv] === n ? ' class="on" aria-selected="true"' : ""}>${esc(n)}</button>`).join("");
+      vp.insertBefore(nl, boxOf(res)); hl = -1;
+      scrollArea(nl, { fade: "y", size: 20, overscroll: "contain" }); // 每一级的列表都是一个滚动区域；换级时整块（连滚动条）滑走
+      if (list) swapIn(boxOf(list), boxOf(nl), dir); list = nl;
+      const on = $(".on", nl); if (on) nl.scrollTop = Math.max(0, on.offsetTop - nl.clientHeight / 2 + on.offsetHeight / 2); // 只滚列表自己，不能用 scrollIntoView（会把整个页面也拽过去）
+    }
+    const goLevel = (lv, dir) => { level = lv; tabs(); fill(lv, dir); };
+    const finish = () => { setVal(h, disp(path)); setTimeout(() => close(h, true), 120); };
+    function choose(name) { path = path.slice(0, level); path[level] = name; if (level < 2) goLevel(level + 1, 1); else { tabs(); list.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.textContent === name)); finish(); } }
+    vp.addEventListener("click", (e) => {
+      const b = e.target.closest(".rg-list button"); if (b) { choose(b.textContent); return; }
+      const r = e.target.closest(".rg-res button"); if (r) { path = r.dataset.path.split("/"); q.value = ""; showRes(false); goLevel(2, 0); finish(); }
+    });
+    tabsEl.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; const lv = +b.dataset.lv; if (lv !== level) goLevel(lv, lv < level ? -1 : 1); });
+    $(".rg-hot", panel).addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; path = b.dataset.path.split("/"); q.value = ""; showRes(false); goLevel(2, 1); });
+    // 搜索：省、市、区都能搜，命中的字加下划线；回车选第一条，上下键挑
+    const mark = (s, w) => esc(s).split(esc(w)).join(`<mark>${esc(w)}</mark>`);
+    const keep = (el) => { const box = el.parentElement, t = el.offsetTop, b = t + el.offsetHeight; if (t < box.scrollTop) box.scrollTop = t; else if (b > box.scrollTop + box.clientHeight) box.scrollTop = b - box.clientHeight; };
+    const showRes = (on) => { boxOf(res).hidden = !on; if (list) boxOf(list).hidden = on; };
+    q.addEventListener("input", () => {
+      const s = q.value.trim(); showRes(!!s); if (!s) return;
+      const out = [];
+      for (const [p, cs] of Object.entries(REG)) for (const [c, ds] of Object.entries(cs)) for (const d of ds) if (d.includes(s) || c.includes(s) || p.includes(s)) out.push([p, c, d]);
+      hl = out.length ? 0 : -1;
+      res.innerHTML = out.length ? out.slice(0, 40).map(([p, c, d], i) => `<button type="button" class="${i === 0 ? "hl" : ""}" data-path="${p}/${c}/${d}"><b>${mark(d, s)}</b><span>${p === c ? mark(p, s) : `${mark(p, s)} / ${mark(c, s)}`}</span></button>`).join("") : `<div class="none">没有找到"${esc(s)}"，换个说法试试，比如"西湖"或"南山"</div>`;
+    });
+    panel.addEventListener("keydown", (e) => {
+      const inSearch = !res.hidden, items = inSearch ? [...res.querySelectorAll("button")] : [...(list?.querySelectorAll("button") || [])];
+      if (!items.length) return;
+      const cols = inSearch ? 1 : 3, n = { ArrowDown: cols, ArrowUp: -cols, ArrowRight: inSearch ? 0 : 1, ArrowLeft: inSearch ? 0 : -1 }[e.key];
+      if (n != null && n !== 0 && (inSearch || e.target !== q)) { e.preventDefault(); hl = Math.max(0, Math.min(items.length - 1, (hl < 0 ? 0 : hl + n))); items.forEach((b, i) => b.classList.toggle("hl", i === hl)); keep(items[hl]); }
+      else if (e.key === "ArrowDown" && e.target === q) { e.preventDefault(); hl = 0; items.forEach((b, i) => b.classList.toggle("hl", i === 0)); }
+      else if (e.key === "Enter" && hl >= 0) { e.preventDefault(); items[hl].click(); }
+    });
+    h._onOpen = () => { q.value = ""; showRes(false); goLevel(path.length === 3 ? 2 : Math.min(path.length, 2), 0); requestAnimationFrame(() => { moveInk(); q.focus({ preventScroll: true }); }); };
+    h._clear = () => { path = []; setVal(h, ""); };
+  }
+  void injectIcons;
+}
+
+// 展示页：设计稿里的"今天""现在"固定在 2026-11-19 15:42（截图、文案都按这一天写的）
+export function initPickers() { bindPickers(document, { today: new Date(2026, 10, 19), now: new Date(2026, 10, 19, 15, 42) }); }

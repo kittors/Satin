@@ -1,0 +1,99 @@
+/* Satin：滚动区域（ScrollArea）。所有溢出滚动的地方都用它，不露系统滚动条。
+   - 滚动还是浏览器原生的（惯性、键盘、读屏都在），只把系统滚动条藏起来，换成一根细的悬浮滚动条；
+   - 滚动条的位置和边缘渐隐都由滚动时间线驱动（scroll-driven animations），在合成线程上跟手，不跑一行 JS；
+   - 边缘渐隐只在那个方向还有内容时出现，可以按边开关、调宽度：data-fade="y|x|both|top bottom left right|none"，--sa-fade: 24px。 */
+
+@property --sa-t { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --sa-b { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --sa-l { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --sa-r { syntax: "<length>"; inherits: false; initial-value: 0px; }
+:root { --sa-thumb: rgba(0, 0, 0, .26); --sa-thumb-hover: rgba(0, 0, 0, .44); }
+[data-theme="dark"] { --sa-thumb: rgba(255, 255, 255, .28); --sa-thumb-hover: rgba(255, 255, 255, .48); }
+
+.sa { min-height: 0; min-width: 0; timeline-scope: --sa-y, --sa-x; --sa-fade: 24px; }
+/* 包在外面的滚动区域要做定位容器；套在元素里面的（inner：菜单、侧栏目录）不改元素自己的定位——菜单是 absolute / fixed，目录是 sticky */
+.sa:not(.sa-in) { position: relative; }
+.sa-vp { overflow: auto; overscroll-behavior: contain; scrollbar-width: none; scroll-timeline: --sa-y y, --sa-x x; }
+.sa-vp::-webkit-scrollbar { display: none; }
+
+/* 边缘渐隐：滚动多少，渐隐带就长多宽（最多 --sa-fade），滚到头就消失 */
+@keyframes sa-t { from { --sa-t: 0px; } to { --sa-t: var(--sa-fade, 24px); } }
+@keyframes sa-b { from { --sa-b: var(--sa-fade, 24px); } to { --sa-b: 0px; } }
+@keyframes sa-l { from { --sa-l: 0px; } to { --sa-l: var(--sa-fade, 24px); } }
+@keyframes sa-r { from { --sa-r: var(--sa-fade, 24px); } to { --sa-r: 0px; } }
+.sa-vp.fy { animation: sa-t linear both, sa-b linear both; animation-timeline: --sa-y, --sa-y; animation-range: 0 var(--sa-fade, 24px), calc(100% - var(--sa-fade, 24px)) 100%;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sa-t), #000 calc(100% - var(--sa-b)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sa-t), #000 calc(100% - var(--sa-b)), transparent 100%); }
+.sa-vp.fx { animation: sa-l linear both, sa-r linear both; animation-timeline: --sa-x, --sa-x; animation-range: 0 var(--sa-fade, 24px), calc(100% - var(--sa-fade, 24px)) 100%;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--sa-l), #000 calc(100% - var(--sa-r)), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--sa-l), #000 calc(100% - var(--sa-r)), transparent 100%); }
+.sa-vp.fy.fx { animation: sa-t linear both, sa-b linear both, sa-l linear both, sa-r linear both; animation-timeline: --sa-y, --sa-y, --sa-x, --sa-x;
+  animation-range: 0 var(--sa-fade, 24px), calc(100% - var(--sa-fade, 24px)) 100%, 0 var(--sa-fade, 24px), calc(100% - var(--sa-fade, 24px)) 100%;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sa-t), #000 calc(100% - var(--sa-b)), transparent 100%), linear-gradient(to right, transparent 0, #000 var(--sa-l), #000 calc(100% - var(--sa-r)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sa-t), #000 calc(100% - var(--sa-b)), transparent 100%), linear-gradient(to right, transparent 0, #000 var(--sa-l), #000 calc(100% - var(--sa-r)), transparent 100%);
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+/* 只开一边：把另一边的渐隐宽度钉死为 0（动画只给开着的那边） */
+.sa-vp.no-t { --sa-t: 0px !important; } .sa-vp.no-b { --sa-b: 0px !important; } .sa-vp.no-l { --sa-l: 0px !important; } .sa-vp.no-r { --sa-r: 0px !important; }
+
+/* 悬浮滚动条：平时 5px、半透明；悬停或拖动时变 8px、加深；不滚动 0.7 秒后淡出 */
+.sa-bar { position: absolute; z-index: 6; opacity: 0; transition: opacity .25s var(--ease-out) .5s; touch-action: none; }
+.sa:hover > .sa-bar, .sa.active > .sa-bar, .sa-bar.drag { opacity: 1; transition-delay: 0s; transition-duration: .12s; }
+.sa-bar[hidden] { display: none; }
+.sa-bar { cursor: pointer; } /* 轨道能点（翻页）、滑块能拖：手型 */
+.sa-bar.y { top: 3px; bottom: 3px; right: var(--sa-inset, 1px); width: calc(var(--sa-bar, 5px) + 7px); }
+.sa-bar.x { left: 3px; right: 3px; bottom: var(--sa-inset, 1px); height: calc(var(--sa-bar, 5px) + 7px); }
+.sa-thumb { position: absolute; border-radius: 99px; background: var(--sa-thumb); transition: width .15s var(--ease-out), height .15s var(--ease-out), background-color .15s var(--ease-out); }
+.sa-bar.y .sa-thumb { right: 2px; top: 0; width: var(--sa-bar, 5px); height: var(--thumb, 24px); animation: sa-thumb-y linear both; animation-timeline: --sa-y; }
+.sa-bar.x .sa-thumb { bottom: 2px; left: 0; height: var(--sa-bar, 5px); width: var(--thumb, 24px); animation: sa-thumb-x linear both; animation-timeline: --sa-x; }
+.sa-bar.y:hover .sa-thumb, .sa-bar.y.drag .sa-thumb { width: calc(var(--sa-bar, 5px) + 3px); background: var(--sa-thumb-hover); }
+.sa-bar.x:hover .sa-thumb, .sa-bar.x.drag .sa-thumb { height: calc(var(--sa-bar, 5px) + 3px); background: var(--sa-thumb-hover); }
+/* 显示方式（data-bar）：auto 滚动或悬停时出现；hover 只在悬停时出现；always 常显；none 不显示（横向长条、附件条这类只靠渐隐和滚轮） */
+.sa[data-bar="always"] > .sa-bar { opacity: 1; transition: none; }
+.sa[data-bar="hover"].active:not(:hover) > .sa-bar:not(.drag) { opacity: 0; transition-delay: 0s; }
+.sa[data-bar="none"] > .sa-bar { display: none; }
+/* 常驻（gutter）：滚动条有自己的一条（12px），不压内容；只有溢出的方向才留。条上一道分隔线、底色略深，滑块居中 */
+.sa[data-bar="gutter"] { --sa-g: 12px; }
+.sa[data-bar="gutter"].ov-y { padding-right: var(--sa-g); }
+.sa[data-bar="gutter"].ov-x { padding-bottom: var(--sa-g); }
+.sa[data-bar="gutter"] > .sa-bar { opacity: 1; transition: none; background: color-mix(in srgb, var(--label) 3%, transparent); }
+.sa[data-bar="gutter"] > .sa-bar.y { top: 0; bottom: 0; right: 0; width: var(--sa-g); box-shadow: inset 1px 0 0 var(--line); }
+.sa[data-bar="gutter"].ov-x > .sa-bar.y { bottom: var(--sa-g); }
+.sa[data-bar="gutter"] > .sa-bar.x { left: 0; right: 0; bottom: 0; height: var(--sa-g); box-shadow: inset 0 1px 0 var(--line); }
+.sa[data-bar="gutter"].ov-y > .sa-bar.x { right: var(--sa-g); }
+.sa[data-bar="gutter"] > .sa-bar.y .sa-thumb { top: 3px; right: calc((var(--sa-g) - var(--sa-bar, 5px)) / 2); }
+.sa[data-bar="gutter"] > .sa-bar.x .sa-thumb { left: 3px; bottom: calc((var(--sa-g) - var(--sa-bar, 5px)) / 2); }
+.sa[data-bar="gutter"] > .sa-bar.y:hover .sa-thumb, .sa[data-bar="gutter"] > .sa-bar.y.drag .sa-thumb { right: calc((var(--sa-g) - var(--sa-bar, 5px) - 3px) / 2); }
+.sa[data-bar="gutter"] > .sa-bar.x:hover .sa-thumb, .sa[data-bar="gutter"] > .sa-bar.x.drag .sa-thumb { bottom: calc((var(--sa-g) - var(--sa-bar, 5px) - 3px) / 2); }
+/* 回弹（data-over="bounce"）：滚到头再拉，整个视口被拉开一段；外层裁切，露出的是所在卡片的底色 */
+.sa[data-over="bounce"] { overflow: clip; }
+@keyframes sa-thumb-y { from { translate: 0 0; } to { translate: 0 calc(var(--track, 0px) - var(--thumb, 24px)); } }
+@keyframes sa-thumb-x { from { translate: 0 0; } to { translate: calc(var(--track, 0px) - var(--thumb, 24px)) 0; } }
+/* 不支持滚动时间线的浏览器：JS 每帧写位置（见 kit-scroll.js） */
+.sa.js-driven .sa-thumb { animation: none; }
+.sa.js-driven .sa-vp { animation: none; }
+
+/* ———— 演示 ———— */
+.sa-demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px; align-items: start; }
+.sa-card { border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--raised); overflow: hidden; }
+.sa-card .sa-vp { max-height: 240px; }
+.sa-card .row-i { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px; font: 400 calc(13px * var(--font-scale, 1))/calc(20px * var(--font-scale, 1)) var(--sans); }
+.sa-card .row-i + .row-i { }
+.sa-card .row-i b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400; }
+.sa-card .row-i span { flex: none; margin-left: auto; white-space: nowrap; color: var(--label3); font-size: calc(12px * var(--font-scale, 1)); font-variant-numeric: tabular-nums; }
+.strip { display: flex; gap: 10px; padding: 14px; width: max-content; }
+.strip .fr { width: 120px; flex: none; display: grid; gap: 6px; font: 400 calc(12px * var(--font-scale, 1))/calc(16px * var(--font-scale, 1)) var(--sans); color: var(--label2); }
+.strip .fr i { aspect-ratio: 16 / 9; border-radius: var(--r-sm); background: var(--g); }
+.grid2d { display: grid; grid-template-columns: repeat(12, 88px); gap: 8px; padding: 12px; width: max-content; }
+.grid2d i { height: 56px; border-radius: var(--r-sm); background: var(--g); }
+
+/* 输入框当滚动视口（多行输入、Markdown 源码）：包上滚动区域以后照样是块级，不在下面留出行内元素的那一截空隙 */
+.sa > textarea.sa-vp { display: block; }
+
+/* 一排对比的小框：每个框上面写选项和一句话说明 */
+.sa-panes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 20px 16px; align-items: start; }
+.sa-pane-f { display: grid; gap: 4px; min-width: 0; }
+.sa-pane-f > b { font: 600 calc(13px * var(--font-scale, 1))/calc(18px * var(--font-scale, 1)) var(--mono); color: var(--label); }
+.sa-pane-f > span { min-height: calc(36px * var(--font-scale, 1)); margin-bottom: 6px; word-break: keep-all; overflow-wrap: anywhere; /* 中文按词断行，"（默认）"不拆开 */ font: 400 calc(12px * var(--font-scale, 1))/calc(18px * var(--font-scale, 1)) var(--sans); color: var(--label3); }
+.sa-card .sa-pane, .sa-card .sa-pane.sa-vp { max-height: 176px; }
+.sa-ta { max-width: 560px; }
+.sa-ta textarea.input { height: 128px; }

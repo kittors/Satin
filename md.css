@@ -1,0 +1,189 @@
+/* Satin：Markdown 渲染（kit-md.js）。字号行高跟正文一致（14 / 24），块之间的距离都在间距刻度上；
+   代码块、图片、表格的高度由 --md-code-max / --md-img-h / --md-table-max 决定，单个块可以在 Markdown 里覆盖。 */
+.md {
+  --md-code-bg: color-mix(in srgb, var(--label) 3%, var(--raised)); --md-code-max: 240px; --md-img-h: 220px; --md-table-max: none;
+  --t-kw: #ad3da4; --t-str: #c41a16; --t-num: #1c00cf; --t-com: #8e8e93; --t-fn: #326d74; --t-typ: #3900a0; --t-prop: #0f68a0; --t-attr: #836c28; --t-tag: #ad3da4;
+  font: 400 calc(14px * var(--font-scale, 1))/calc(24px * var(--font-scale, 1)) var(--sans); color: var(--label); overflow-wrap: anywhere;
+}
+[data-theme="dark"] .md { --t-kw: #fc5fa3; --t-str: #fc6a5d; --t-num: #d0bf69; --t-com: #7f8c98; --t-fn: #67b7a4; --t-typ: #5dd8ff; --t-prop: #41a1c0; --t-attr: #bf8555; --t-tag: #fc5fa3; }
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+
+/* 标题：悬停出 # 锚点 */
+.md :is(h1, h2, h3, h4, h5, h6) { position: relative; margin: 28px 0 12px; font-weight: 600; color: var(--label); scroll-margin-top: 64px; }
+.md h1 { font-size: calc(24px * var(--font-scale, 1)); line-height: 32px; letter-spacing: -.01em; }
+.md h2 { padding-bottom: 8px; font-size: calc(19px * var(--font-scale, 1)); line-height: 28px; }
+.md h3 { font-size: calc(16px * var(--font-scale, 1)); line-height: 24px; }
+.md h4 { font-size: calc(14px * var(--font-scale, 1)); line-height: 22px; }
+.md :is(h5, h6) { font-size: calc(13px * var(--font-scale, 1)); line-height: 20px; color: var(--label2); }
+.md-anchor { margin-left: 6px; font-weight: 400; color: var(--label-off); text-decoration: none; opacity: 0; transition: opacity .12s; }
+.md :is(h1, h2, h3, h4, h5, h6):hover .md-anchor, .md-anchor:focus-visible { opacity: 1; }
+
+/* 正文 */
+.md p { margin: 12px 0; }
+.md a { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent); text-underline-offset: 3px; transition: text-decoration-color .12s; }
+.md a:hover { text-decoration-color: currentColor; }
+.md strong { font-weight: 600; }
+.md del { color: var(--label3); }
+.md hr { height: 1px; margin: 24px 0; border: 0; background: var(--line); }
+.md-ic { padding: 2px 6px; border-radius: 4px; background: var(--fill-subtle); font: 400 .9em/1 var(--mono); }
+
+/* 列表、任务 */
+.md :is(ul, ol) { margin: 12px 0; padding-left: 24px; }
+.md li { margin: 4px 0; }
+.md li > :is(ul, ol) { margin: 4px 0; }
+.md li > p, .md-task > div > p { margin: 4px 0; }
+.md-task > div > :is(ul, ol) { margin: 4px 0; } /* 任务项里的子列表和普通列表项一样贴近 */
+.md li::marker { color: var(--label3); font-variant-numeric: tabular-nums; }
+.md ul.md-tasks { padding-left: 0; list-style: none; }
+.md-task { display: flex; align-items: flex-start; gap: 8px; }
+.md-task > div { min-width: 0; }
+.md-check { position: relative; flex: none; width: 16px; height: 16px; margin-top: 4px; border-radius: 4px; box-shadow: inset 0 0 0 1.5px var(--line-control); }
+.md-check.on { background: var(--accent); box-shadow: none; }
+.md-check.on::after { content: ""; position: absolute; inset: 0; background: var(--raised); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.4 2.4 4.6-5' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.4 2.4 4.6-5' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat; }
+.md-task:has(.md-check.on) > div { color: var(--label3); }
+
+/* 引用、提示块（NOTE 中性，TIP 绿，IMPORTANT 强调色，WARNING 橙，CAUTION 红） */
+.md blockquote { margin: 16px 0; padding: 2px 0 2px 16px; box-shadow: inset 3px 0 0 var(--line-control); color: var(--label2); }
+.md blockquote > :first-child { margin-top: 0; } .md blockquote > :last-child { margin-bottom: 0; }
+.md-callout { --tone: var(--label3); margin: 16px 0; padding: 12px 16px; border-radius: var(--r-md); background: color-mix(in srgb, var(--tone) 7%, var(--raised)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 22%, transparent); }
+.md-callout.tip { --tone: var(--success); } .md-callout.important { --tone: var(--accent); } .md-callout.warning { --tone: var(--warning); } .md-callout.caution { --tone: var(--danger); }
+.md .md-callout-t { display: flex; align-items: center; gap: 6px; margin: 0 0 4px; font-weight: 600; color: color-mix(in srgb, var(--tone) 85%, var(--label)); }
+.md-callout-t svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.md-callout > :not(.md-callout-t) { margin: 4px 0 0; }
+
+/* 表格：表头吸顶；超过 --md-table-max 在框里滚 */
+.md-table { margin: 16px 0; max-height: var(--md-table-max); overflow: auto; border: 1px solid var(--line); border-radius: var(--r-md); overscroll-behavior-x: none; overscroll-behavior-y: auto; } /* 表格里不回弹：横向滚到头就停；竖向滚到头交给页面接着滚 */
+.md-table table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: calc(13px * var(--font-scale, 1)); line-height: 20px; font-variant-numeric: tabular-nums; }
+.md-table th { position: sticky; top: 0; z-index: 1; padding: 8px 12px; background: color-mix(in srgb, var(--label) 3%, var(--raised)); box-shadow: inset 0 -1px 0 var(--line); font-weight: 600; text-align: left; white-space: nowrap; }
+.md-table td { padding: 8px 12px; box-shadow: inset 0 -1px 0 var(--line); }
+.md-table td, .md-table th { word-break: keep-all; overflow-wrap: break-word; } /* 中文按词不拆（"已完成"不会断成两行）；放不下时表格在自己的框里横着滑 */
+.md-table tr:last-child td { box-shadow: none; }
+
+/* 代码块：头部（文件名 / 语言、行数、自动换行、复制）+ 带行号的代码；超过 --md-code-max 折叠，底部渐隐 */
+.md-code { position: relative; margin: 16px 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--md-code-bg); } /* 用真边框：行号的底色贴着左边，内阴影画的框会被它盖掉 */
+.md-code-hd { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 6px 0 14px; font: 400 calc(12px * var(--font-scale, 1))/calc(16px * var(--font-scale, 1)) var(--sans); color: var(--label3); }
+.md-code-file { font: 500 calc(12px * var(--font-scale, 1))/calc(16px * var(--font-scale, 1)) var(--mono); color: var(--label); }
+.md-code-n { margin-left: auto; font-variant-numeric: tabular-nums; }
+.md-code-btn { all: unset; height: 24px; padding: 0 8px; border-radius: 6px; color: var(--label2); cursor: pointer; transition: background-color .12s, color .12s, transform .1s var(--ease-out); }
+.md-code-btn:hover { background: var(--fill-hover); color: var(--label); }
+.md-code-btn[aria-pressed="true"] { background: var(--fill-active); color: var(--label); }
+.md-code-btn.ok { color: var(--success); }
+.md-code-btn:focus-visible, .md-code-more:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+.md-code-bd { position: relative; }
+.md-code pre { margin: 0; padding: 12px 0; overflow: auto; outline: none; counter-reset: ln; font: 400 calc(12.5px * var(--font-scale, 1))/calc(20px * var(--font-scale, 1)) var(--mono); tab-size: 4; color: var(--label); }
+.md-code pre:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+.md-code .l { display: block; padding-right: 16px; white-space: pre; }
+/* 行号：横着滚时贴在左边不动；自动换行时折下来的行缩进到行号后面 */
+.md-code .l::before { counter-increment: ln; content: counter(ln); position: sticky; left: 0; display: inline-block; box-sizing: content-box; width: var(--md-gw, 2ch); margin-right: 4px; padding: 0 12px 0 14px; background: var(--md-code-bg); color: var(--label-off); text-align: right; user-select: none; }
+.md-code.nonum .l { padding-left: 14px; }
+.md-code.nonum .l::before { display: none; }
+.md-code:not(.wrap) .l { width: max-content; min-width: 100%; }
+.md-code.wrap .l { white-space: pre-wrap; padding-left: calc(var(--md-gw, 2ch) + 30px); text-indent: calc(-1 * (var(--md-gw, 2ch) + 30px)); } /* sp-ok: 30 = 行号左右留白 14 + 12 再加间隔 4，换行后折下来的行和不换行时的代码起点对齐 */
+.md-code.wrap.nonum .l { padding-left: 14px; text-indent: 0; }
+.md-code.clip .md-code-bd { max-height: var(--md-code-max); overflow: hidden; }
+.md-code.clip .md-code-bd::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 56px; background: linear-gradient(to bottom, color-mix(in srgb, var(--md-code-bg) 0%, transparent), var(--md-code-bg)); pointer-events: none; }
+.md-code-more { all: unset; display: flex; align-items: center; justify-content: center; width: 100%; height: 36px; font: 500 calc(12px * var(--font-scale, 1))/calc(16px * var(--font-scale, 1)) var(--sans); color: var(--label2); cursor: pointer; transition: background-color .12s, color .12s, transform .1s var(--ease-out); }
+.md-code-more:hover { background: var(--fill-hover); color: var(--label); }
+.md-code-more[hidden] { display: none; }
+.t-kw, .t-lit { color: var(--t-kw); } .t-str { color: var(--t-str); } .t-num { color: var(--t-num); } .t-com { color: var(--t-com); font-style: italic; }
+.t-fn { color: var(--t-fn); } .t-typ { color: var(--t-typ); } .t-prop, .t-var { color: var(--t-prop); } .t-attr, .t-dec, .t-sel { color: var(--t-attr); } .t-tag { color: var(--t-tag); }
+.t-op { color: var(--label2); } .t-pun { color: var(--label3); }
+
+/* 图片：块级图片在一个 --md-img-h 高的框里完整显示（不裁）；加载中是占位微光，失败给图标和说明；点开放大 */
+.md-fig { margin: 16px 0; }
+.md-fig figcaption { margin-top: 8px; font-size: calc(12px * var(--font-scale, 1)); line-height: 18px; color: var(--label3); text-align: center; }
+.md-img { position: relative; display: inline-block; max-width: 100%; overflow: hidden; vertical-align: middle; border-radius: 6px; }
+.md-img img { display: block; max-width: 100%; height: auto; opacity: 0; transition: opacity .3s var(--ease-out); }
+.md-img.ok img { opacity: 1; }
+.md-img:not(.ok):not(.bad) { min-width: 48px; min-height: 24px; background: var(--fill-subtle); }
+.md-img:not(.ok):not(.bad)::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--label) 6%, transparent), transparent); animation: md-shimmer 1.2s ease-in-out infinite; }
+@keyframes md-shimmer { from { translate: -100% 0; } to { translate: 100% 0; } }
+.md-img.blk { display: flex; justify-content: center; width: 100%; height: var(--md-img-h); border: 1px solid var(--line); border-radius: var(--r-md); background: color-mix(in srgb, var(--label) 3%, var(--raised)); }
+.md-img.blk img { width: auto; height: 100%; max-width: 100%; object-fit: contain; cursor: zoom-in; outline: none; }
+.md-img.blk img:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+.md.img-auto .md-img.blk:not(.sized) { height: auto; }
+.md.img-auto .md-img.blk:not(.sized) img { width: 100%; height: auto; }
+.md-img-bad { display: none; }
+.md-img.bad img { display: none; }
+.md-img.bad .md-img-bad { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; font-size: calc(12px * var(--font-scale, 1)); line-height: 18px; color: var(--label3); }
+.md-img.blk.bad .md-img-bad { flex-direction: column; justify-content: center; gap: 8px; }
+.md-img-bad svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.md-img.blk.bad .md-img-bad svg { width: 24px; height: 24px; }
+
+/* 公式：MathML 原生排版；块级居中，太宽横着滚；写法不认识就原样标红显示 */
+.md math { font-family: "STIX Two Math", "Latin Modern Math", math; font-size: 1.08em; }
+.md-math { margin: 16px 0; padding: 4px 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
+.md-math math { font-size: 1.18em; }
+/* 矩阵、分段函数、对齐：单元格留白；分段函数左对齐，aligned 右左交替（MathML Core 不认 columnalign，用样式定） */
+.md math mtd { padding: .25em .5em; }
+.md math mtable.matrix mtd { padding: .2em .45em; }
+.md math mtable.cases mtd { padding: .3em 1em .3em 0; text-align: left; }
+.md math mtable.aligned mtd { padding: .25em 0; }
+.md math mtable.aligned mtd:nth-child(odd) { text-align: right; }
+.md math mtable.aligned mtd:nth-child(even) { text-align: left; }
+.md-math-err { padding: 2px 6px; border-radius: 4px; background: color-mix(in srgb, var(--danger) 8%, transparent); font: 400 .9em/1.6 var(--mono); color: var(--danger); }
+
+@media (prefers-reduced-motion: reduce) { .md-img::before { animation: none !important; } }
+html.reduce-motion .md-img::before { animation: none !important; }
+
+/* ———— 演示 ———— */
+.md-cfg { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 20px; }
+.md-demo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; } /* 只有一列也写成 minmax(0, 1fr)：长代码、宽表格在自己的框里横着滚，不把整块撑出容器 */
+.md-demo[data-view="doc"] .md-src, .md-demo[data-view="src"] .md-doc, .md-demo[data-view="doc"] .sa:has(> .md-src) { display: none; } /* 源码框包了滚动区域：藏外面那一层 */
+.md-demo[data-view="split"] { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.md-doc { max-width: 760px; }
+.md-demo .md-doc { max-height: 720px; } /* 预览限高，在里面的滚动视口里滚（kit-md.js 用 scrollArea 套的） */
+.md-src { display: block; width: 100%; height: 720px; padding: 16px; resize: vertical; border: 1px solid var(--line); border-radius: var(--r-md); outline: none; background: var(--md-code-bg, var(--raised)); font: 400 calc(12.5px * var(--font-scale, 1))/calc(20px * var(--font-scale, 1)) var(--mono); color: var(--label); }
+.md-src:focus { border-color: var(--focus); box-shadow: 0 0 0 3px var(--ring); }
+
+/* 视频、音频：组件库的播放器和音频条（kit-media.js）；视频撑满正文宽度，音频条居中 */
+.md .md-media .player { max-width: 100%; }
+.md .md-media .audio-row { max-width: 560px; margin: 0 auto; }
+/* 写在 Markdown 里的 HTML */
+.md kbd { display: inline-block; min-width: 1.6em; padding: 0 6px; border-radius: 6px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line-control), 0 1px 0 var(--line-control); font: 500 .86em/1.7 var(--sans); text-align: center; color: var(--label); }
+.md mark { padding: 0 2px; border-radius: 3px; background: color-mix(in srgb, var(--warning) 24%, transparent); color: inherit; }
+.md sup, .md sub { font-size: .75em; line-height: 0; }
+.md details { margin: 16px 0; border-radius: 12px; background: var(--md-code-bg); box-shadow: inset 0 0 0 1px var(--line); interpolate-size: allow-keywords; }
+.md summary { display: flex; align-items: center; gap: 8px; padding: 10px 14px; list-style: none; font-weight: 500; cursor: pointer; user-select: none; border-radius: 12px; }
+.md summary::-webkit-details-marker { display: none; }
+.md summary::before { content: ""; flex: none; width: 14px; height: 14px; background: var(--label3); transition: transform .28s var(--ease-out-strong);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center / contain no-repeat; }
+.md details[open] > summary::before { transform: rotate(90deg); }
+.md summary:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+.md details > :not(summary) { margin-left: 36px; margin-right: 14px; }
+.md details > :last-child { margin-bottom: 12px; }
+/* 展开收起：内容高度从 0 缓到自然高度（和代码块展开同一个做法），收起时先淡出 */
+.md details::details-content { block-size: 0; overflow: clip; opacity: 0; transition: block-size .32s var(--ease-open), opacity .2s var(--ease-out), content-visibility .32s allow-discrete; }
+.md details[open]::details-content { block-size: auto; opacity: 1; }
+.md figure:not(.md-fig) { margin: 16px 0; text-align: center; }
+.md figure:not(.md-fig) img { max-width: 100%; height: auto; border-radius: 12px; }
+.md figure:not(.md-fig) figcaption { margin-top: 8px; font-size: calc(12px * var(--font-scale, 1)); line-height: 18px; color: var(--label3); }
+.md img:not(.md-img img) { max-width: 100%; height: auto; }
+.md video:not(.md-video video) { max-width: 100%; border-radius: 12px; }
+/* 能动的 HTML：沙箱 iframe，"预览 / 代码"两格切换（滑块按非线性曲线走） */
+.md-live { margin: 16px 0; overflow: hidden; border-radius: var(--r-md); background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); }
+.md-live-hd { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 8px 0 8px; background: var(--md-code-bg); }
+.md-live-tabs { position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 2px; border-radius: 9px; background: var(--fill-active); }
+.md-live-tabs button { all: unset; position: relative; z-index: 1; height: 26px; padding: 0 14px; font: 500 calc(12px * var(--font-scale, 1))/26px var(--sans); text-align: center; color: var(--label3); cursor: pointer; transition: color .16s var(--ease-out); }
+.md-live-tabs button[aria-selected="true"] { color: var(--label); }
+.md-live-tabs button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: 7px; }
+.md-live-thumb { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); border-radius: 7px; background: var(--raised); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); transition: transform .34s var(--ease-out-strong); }
+[data-theme="dark"] .md-live-thumb { background: var(--overlay); }
+.md-live.code .md-live-thumb { transform: translateX(100%); }
+.md-live-frame { display: block; width: 100%; height: 120px; border: 0; background: transparent; color-scheme: normal; }
+.md-live-view[hidden], .md-live-code[hidden] { display: none; }
+.md-live-code .md-code { margin: 0; border: 0; border-radius: 0; }
+
+/* 窄处：代码头每一项都不换行；放不下时先收行数（缩到没有），再省略文件名，按钮始终完整 */
+.md-code-hd > * { flex: none; white-space: nowrap; }
+.md-code-hd > .md-code-file { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.md-code-hd > .md-code-n { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: clip; text-align: right; }
+.md-live-hd button { white-space: nowrap; }
+/* 并排视图：演示框窄于 640 时预览和源码上下叠（源码在下） */
+@container demo (max-width: 640px) {
+  .md-demo[data-view="split"] { grid-template-columns: minmax(0, 1fr); }
+  .md-demo[data-view="split"] .md-doc { max-height: 560px; }
+  .md-demo[data-view="split"] .md-src { height: 360px; }
+}

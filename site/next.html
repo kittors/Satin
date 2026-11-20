@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-CN" data-docs="next-docs.html">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satin · 每一帧都打磨过的界面组件库</title>
+<meta name="description" content="Satin 是一套克制、细腻的界面组件：动效逐帧验收，深浅两套主题，主色、字体、字号随时可调。纯 HTML、CSS 和 ES 模块，引入就能用。">
+<link rel="icon" href="data:,">
+<script src="../theme-boot.js"></script>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link rel="preconnect" href="https://assets.mixkit.co" crossorigin>
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../buttons.css">
+<link rel="stylesheet" href="../form.css">
+<link rel="stylesheet" href="../overlay.css">
+<link rel="stylesheet" href="../feedback.css">
+<link rel="stylesheet" href="../data.css">
+<link rel="stylesheet" href="../scroll.css">
+<link rel="stylesheet" href="../number.css">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="next.css">
+</head>
+<body class="s-body n-home">
+
+<!-- 顶栏：在页顶是一整条；往下滚，收成居中的一颗浮岛 -->
+<header class="n-nav" data-nav>
+  <i class="n-island" aria-hidden="true"></i>
+  <div class="n-nav-in">
+    <a class="s-logo n-logo" href="next.html" aria-label="Satin 首页"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><mask id="lg"><rect width="24" height="24" rx="6.5" fill="#fff"/><rect x="-4" y="10.75" width="32" height="2.5" fill="#000" transform="rotate(-34 12 12)"/></mask></defs><rect width="24" height="24" rx="6.5" fill="currentColor" mask="url(#lg)"/></svg>Satin</a>
+    <nav class="n-links" aria-label="主导航"><a href="next-docs.html#/start">文档</a><a href="next-docs.html#/c/button">组件</a><a href="next-docs.html#/guide/principles">规范</a><a href="#theme">主题</a><a href="../" target="_blank" rel="noopener">展示页</a></nav>
+    <div class="n-end">
+      <button class="btn ghost sm ibtn" data-search data-tip="搜索" data-kbd="⌘K" aria-label="搜索组件和规范" data-i="search"></button>
+      <button class="btn ghost sm ibtn s-mode" data-mode-btn><span data-i="sun:sun"></span><span data-i="moon:moon"></span></button>
+      <a class="btn primary sm n-go" href="next-docs.html#/start">开始使用</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 第一屏：两种灰度的大标题，标题里嵌着两个会自己动的小组件 -->
+  <section class="n-hero">
+    <div class="n-wrap">
+      <h1 class="n-h1 rv"><span class="n-l1">每一帧都<span class="n-chip" data-chip="0" aria-hidden="true"></span>打磨过的</span><span class="n-l2">界面<span class="n-chip" data-chip="1" aria-hidden="true"></span>组件库。</span></h1>
+      <p class="n-lead rv" style="--d:.08s">克制、细腻、经得起慢放的界面组件。纯 HTML、CSS 和 ES 模块，引入就能用；主色、字体、字号随时可调。</p>
+      <div class="n-cta rv" style="--d:.14s"><a class="btn primary lg" href="next-docs.html#/c/button">浏览组件</a><a class="btn tertiary lg" href="next-docs.html#/guide/principles">阅读规范<span data-i="arrow-right:after"></span></a></div>
+    </div>
+
+    <!-- 一个用 Satin 搭起来的应用：分镜工作台。素材全部来自网上的真实照片、视频和音乐 -->
+    <div class="n-wrap n-wide">
+      <div class="n-show rv" style="--d:.2s">
+        <img class="n-wall" data-photo="dusk" data-w="2400" data-q="75" alt="">
+        <div class="mac n-app" role="region" aria-label="用 Satin 搭的分镜工作台（可以直接操作）">
+          <aside class="na-side">
+            <div class="na-top"><span class="mac-lights" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <button class="na-ws"><img data-photo="clapboard" data-w="96" alt=""><span><b>雨夜车站</b><small>苏婉的团队</small></span><span data-i="chevrons-up-down"></span></button>
+            <nav class="na-nav" data-na-nav aria-label="工作台导航">
+              <a class="on" data-i="clapperboard:before">分镜</a>
+              <a data-i="image:before">素材<span class="na-n">128</span></a>
+              <a data-i="music:before">配乐</a>
+              <a data-i="message-square:before">讨论<span class="na-n unread" aria-label="2 条未读">2</span></a>
+              <a data-i="square-check-big:before">任务<span class="na-n">3</span></a>
+            </nav>
+            <p class="na-cap">集数</p>
+            <nav class="na-nav na-eps" aria-label="集数">
+              <a><i></i>第一集 · 雨夜</a><a><i></i>第二集 · 站台</a><a class="on"><i></i>第三集 · 末班车</a><a><i></i>第四集 · 回声</a>
+            </nav>
+            <div class="na-me"><img data-photo="suwan" data-w="96" alt=""><span><b>苏婉</b><small>导演</small></span><button class="btn ghost sm ibtn" aria-label="设置" data-tip="设置" data-i="settings"></button></div>
+          </aside>
+          <div class="na-main">
+            <div class="na-bar">
+              <div class="na-title"><b>第三集 · 末班车</b><small class="num" data-na-count>9 个镜头 · 已采用 6</small></div>
+              <div class="seg sm" data-na-view role="tablist" aria-label="视图"><span class="thumb"></span><button data-v="grid">网格</button><button data-v="line">时间线</button></div>
+              <button class="na-search" data-search><span data-i="search"></span>搜索<kbd data-kbd-k>⌘K</kbd></button>
+              <button class="btn primary sm" data-na-gen>生成镜头</button>
+            </div>
+            <div class="na-body">
+              <div class="na-shots" data-shots></div>
+              <aside class="na-insp">
+                <div class="na-ih"><b data-insp-t>镜头 12</b><span class="tag" data-insp-tag>已采用</span><button class="btn ghost sm ibtn" aria-label="更多" data-tip="更多" data-i="ellipsis"></button></div>
+                <div class="na-vid" data-insp-vid>
+                  <img class="na-still" data-photo="tram" data-w="640" alt="">
+                  <video data-video="4451" muted loop playsinline preload="none" aria-label="夜里安静的东京街道"></video>
+                  <span class="na-dur num" data-insp-dur>0:08</span>
+                </div>
+                <div class="na-f"><span class="na-lbl">画面描述</span><p class="na-prompt" data-insp-prompt>雨夜，末班电车停在站台边；镜头缓慢推近，积水里映着车灯。</p></div>
+                <div class="na-f"><span class="na-lbl">画面比例</span><div class="seg sm" data-na-ratio role="tablist" aria-label="画面比例"><span class="thumb"></span><button data-v="16:9">16:9</button><button data-v="9:16">9:16</button><button data-v="1:1">1:1</button><button data-v="2.39">2.39</button></div></div>
+                <div class="na-row"><span>自动配乐</span><label class="switch"><input type="checkbox" checked aria-label="自动配乐"><span class="track"><span class="knob"></span></span></label></div>
+                <div class="na-row"><span>生成字幕</span><label class="switch"><input type="checkbox" aria-label="生成字幕"><span class="track"><span class="knob"></span></span></label></div>
+                <div class="na-row"><span>运动强度</span><span class="num na-v" data-motion-v>64</span></div>
+                <div class="slider" data-slider data-max="100" tabindex="0" role="slider" aria-label="运动强度" aria-valuenow="64"><span class="rail"></span><span class="fillbar"></span><span class="knob"></span><span class="bubble"></span></div>
+                <div class="na-np np" aria-label="配乐">
+                  <button class="btn primary sm ibtn np-play" data-np-play aria-label="播放" data-tip="播放"><span data-i="play:pl"></span><span data-i="pause:pa"></span><span class="spinner"></span></button>
+                  <div class="np-meta"><b data-np-title></b><span data-np-by></span></div>
+                  <div class="np-wave" data-np-wave role="slider" tabindex="0" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                  <div class="np-bar"><span class="num" data-np-cur>0:00</span><span class="num" data-np-dur></span></div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 组件：一个窗口里轮流放大组件，标签下面的细线是倒计时 -->
+  <section class="n-sec" id="components">
+    <div class="n-wrap">
+      <div class="n-head rv">
+        <div><p class="n-eyebrow"><span data-i="component"></span>组件</p><h2 class="n-h2">从一个按钮，<span>到一百万行数据。</span></h2></div>
+        <p class="n-p">按钮、表单、浮层、反馈、数据、媒体、导航、拖拽，六十多个组件。大组件一样细：十万行的表格、上万个节点的流程图，滚起来都不掉帧。</p>
+      </div>
+      <div class="n-tabs rv" role="tablist" aria-label="组件" data-tabs>
+        <button role="tab" data-k="grid" data-h="605" data-t="数据表格 — 100,000 行" aria-selected="true">数据表格<i></i></button>
+        <button role="tab" data-k="cgrid" data-h="605" data-t="Canvas 表格 — 1,000,000 行">Canvas 表格<i></i></button>
+        <button role="tab" data-k="flow" data-h="561" data-t="流程图">流程图<i></i></button>
+        <button role="tab" data-k="media" data-h="526" data-t="第三集 · 粗剪">播放器<i></i></button>
+        <button role="tab" data-k="vlist" data-h="511" data-t="素材库">无限列表<i></i></button>
+      </div>
+      <div class="n-panel n-tabpanel rv" data-tabpanel>
+        <img class="n-wall" data-photo="range" data-w="2400" data-q="72" alt="">
+        <div class="n-wins" data-wins></div>
+      </div>
+      <div class="n-more rv"><a class="btn primary" href="next-docs.html#/c/button">看全部组件</a><a class="btn tertiary" href="../" target="_blank" rel="noopener">打开展示页<span data-i="arrow-up-right:after"></span></a></div>
+    </div>
+  </section>
+
+  <!-- 细节：六个真组件，悬停、按下、拖拽、打断、等待都做到位 -->
+  <section class="n-sec" id="details">
+    <div class="n-wrap">
+      <div class="n-head rv">
+        <div><p class="n-eyebrow"><span data-i="zoom-in"></span>细节</p><h2 class="n-h2">好用，<span>差在看不见的地方。</span></h2></div>
+        <p class="n-p">悬停、按下、拖拽、打断、等待。每一种都按同一套曲线和时长做，下面六个都是真组件，试一下。</p>
+      </div>
+      <div class="n-cards">
+        <article class="n-card rv">
+          <div class="n-stage fr">
+            <div class="seg" data-fr-seg role="tablist" aria-label="筛选"><span class="thumb"></span><button data-v="all">全部</button><button data-v="run">进行中</button><button data-v="need">待审核</button><button data-v="done">已交付</button></div>
+            <div class="fr-strip" data-fr-strip aria-hidden="true"><i class="fr-line"></i></div>
+            <div class="fr-read num" data-fr-read>点一下上面任意一格</div>
+          </div>
+          <div class="n-card-ft"><div><b>分段控件</b><span>滑块前缘先到、后缘跟上。下面是这次切换每一帧的间隔，在你的浏览器里实测。</span></div><a class="btn ghost sm ibtn" href="next-docs.html#/c/segmented" aria-label="分段控件文档" data-tip="分段控件" data-i="arrow-up-right"></a></div>
+        </article>
+        <article class="n-card rv" style="--d:.06s">
+          <div class="n-stage ar">
+            <ul class="ar-list" data-ar>
+              <li data-name="雨夜车站"><img data-photo="slate" data-w="120" alt=""><span><b>雨夜车站</b><small>3 分钟前改过</small></span><button class="btn ghost sm ibtn" data-tip="归档" aria-label="归档" data-i="archive"></button></li>
+              <li data-name="旧城往事"><img data-photo="crew" data-w="120" alt=""><span><b>旧城往事</b><small>昨天 14:20</small></span><button class="btn ghost sm ibtn" data-tip="归档" aria-label="归档" data-i="archive"></button></li>
+              <li data-name="第七号片场"><img data-photo="soundstage" data-w="120" alt=""><span><b>第七号片场</b><small>11 月 12 日</small></span><button class="btn ghost sm ibtn" data-tip="归档" aria-label="归档" data-i="archive"></button></li>
+            </ul>
+          </div>
+          <div class="n-card-ft"><div><b>能撤销，就别确认</b><span>归档直接做，再给 5 秒撤销。离开的一行脱离布局淡出，下面的用弹簧补位。</span></div><a class="btn ghost sm ibtn" href="next-docs.html#/c/addremove" aria-label="新增与删除文档" data-tip="新增与删除" data-i="arrow-up-right"></a></div>
+        </article>
+        <article class="n-card rv" style="--d:.12s">
+          <div class="n-stage bz">
+            <div class="n-row"><button class="btn primary" data-bz="1100">保存修改</button><button class="btn secondary" data-bz="180">刷新</button></div>
+            <span class="bz-note">"刷新"180ms 就回来了，所以不转圈</span>
+          </div>
+          <div class="n-card-ft"><div><b>等一下，就给个结果</b><span>300ms 内完成什么都不显示；超过才转圈，转圈至少留 500ms，成功后对勾在原地出现。</span></div><a class="btn ghost sm ibtn" href="next-docs.html#/c/button" aria-label="按钮文档" data-tip="按钮" data-i="arrow-up-right"></a></div>
+        </article>
+        <article class="n-card rv">
+          <div class="n-stage ck" data-ck>
+            <div class="ck-box">
+              <div class="ck-in"><span data-i="search"></span><span class="ck-q">分镜</span><kbd>esc</kbd></div>
+              <div class="ck-list"><i class="ck-hl"></i><a data-i="clapperboard:before">分镜台<small>第三集</small></a><a data-i="image:before">素材库<small>128 个文件</small></a><a data-i="music:before">配乐候选<small>4 首</small></a><a data-i="message-square:before">分镜讨论<small>2 条未读</small></a></div>
+            </div>
+          </div>
+          <div class="n-card-ft"><div><b>命令面板</b><span>高亮条在行间滑过去，不是一行一行地亮。⌘K 打开真的那个，搜整个文档。</span></div><a class="btn ghost sm ibtn" href="next-docs.html#/c/cmdk" aria-label="命令面板文档" data-tip="命令面板" data-i="arrow-up-right"></a></div>
+        </article>
+        <article class="n-card rv" style="--d:.06s">
+          <div class="n-stage nf">
+            <div class="nf-big num" data-nf>12,840</div>
+            <div class="n-row"><button class="btn secondary sm ibtn" data-nf-d="-1" aria-label="减一" data-tip="减一" data-i="minus"></button><button class="btn secondary sm ibtn" data-nf-d="1" aria-label="加一" data-tip="加一" data-i="plus"></button><button class="btn tertiary sm" data-nf-d="r">随机</button></div>
+          </div>
+          <div class="n-card-ft"><div><b>数字变化</b><span>只滚动变了的那几位，进位时相邻一位一起走；数字等宽，宽度不跳。</span></div><a class="btn ghost sm ibtn" href="next-docs.html#/c/numflow" aria-label="数字变化文档" data-tip="数字变化" data-i="arrow-up-right"></a></div>
+        </article>
+        <article class="n-card rv" style="--d:.12s">
+          <div class="n-stage sw">
+            <div class="sw-row"><label class="switch"><input type="checkbox" checked aria-label="自动配乐"><span class="track"><span class="knob"></span></span>自动配乐</label><label class="check" data-box><input type="checkbox" checked>生成字幕</label></div>
+            <div class="sw-row" data-chips><button class="chip on"><span data-i="check"></span>电影感</button><button class="chip"><span data-i="check"></span>胶片颗粒</button><button class="chip on"><span data-i="check"></span>冷色调</button></div>
+          </div>
+          <div class="n-card-ft"><div><b>开关与勾选</b><span>按下就有回应：滑块先拉长再落定，勾选框轻轻弹一下，标签的对勾从左边让出位置。</span></div><a class="btn ghost sm ibtn" href="next-docs.html#/c/choice" aria-label="单选与复选文档" data-tip="单选与复选" data-i="arrow-up-right"></a></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主题：窗口里的界面跟着下面这条工具栏一起变 -->
+  <section class="n-sec" id="theme">
+    <div class="n-wrap">
+      <div class="n-head rv">
+        <div><p class="n-eyebrow"><span data-i="palette"></span>主题</p><h2 class="n-h2">改一个变量，<span>所有组件跟着变。</span></h2></div>
+        <p class="n-p">主色、状态色、字体、字号随时可调。组件只认 CSS 变量：深色下主色自动提亮，主色上的字自动选黑或白，改完立刻生效。</p>
+      </div>
+      <div class="n-panel n-themepanel rv">
+        <img class="n-wall" data-photo="lake" data-w="2400" data-q="72" alt="">
+        <div class="mac n-twin">
+          <div class="mac-bar"><span class="mac-lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="mac-title">新建项目</span></div>
+          <div class="mac-body n-form">
+            <div class="n-form-head"><div><b>新建项目</b><span>从小说、剧本到成片，都在这里完成</span></div><span class="tag">草稿</span></div>
+            <div class="n-grid2">
+              <label class="field"><span class="lbl">项目名称</span><input class="input" value="雨夜车站"></label>
+              <div class="field"><span class="lbl">画面比例</span><div class="seg" data-pv-seg role="tablist" aria-label="画面比例"><span class="thumb"></span><button data-v="16:9">横屏 16:9</button><button data-v="9:16">竖屏 9:16</button></div></div>
+            </div>
+            <div class="field"><span class="lbl">风格</span><div class="n-row" data-chips><button class="chip on"><span data-i="check"></span>电影感</button><button class="chip"><span data-i="check"></span>胶片颗粒</button><button class="chip on"><span data-i="check"></span>冷色调</button><button class="chip"><span data-i="check"></span>手持</button></div></div>
+            <div class="n-grid2">
+              <label class="switch"><input type="checkbox" checked><span class="track"><span class="knob"></span></span>自动配乐</label>
+              <label class="check" data-box><input type="checkbox" checked>生成字幕</label>
+            </div>
+            <div class="field"><span class="lbl">本月额度<span class="aside num">64 / 100 分钟</span></span><div class="pbar" style="--p:.64"><i></i></div></div>
+            <div class="n-row n-tags"><span class="tag run"><i></i>生成中</span><span class="tag need"><i></i>待审核 2</span><span class="tag bad"><i></i>失败 1</span><span class="tag">已交付 9</span></div>
+            <div class="n-row n-form-act"><button class="btn ghost">取消</button><button class="btn primary" data-pv-ok>创建项目</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="n-tbar rv" data-tbar>
+        <div class="seg sm n-tb-mode" data-mode-seg role="tablist" aria-label="外观"><span class="thumb"></span><button data-v="auto" aria-label="跟随系统" data-tip="跟随系统" data-i="monitor"></button><button data-v="light" aria-label="浅色" data-tip="浅色" data-i="sun"></button><button data-v="dark" aria-label="深色" data-tip="深色" data-i="moon"></button></div>
+        <div class="n-tb-rest" data-inline-theme></div>
+        <button class="btn primary sm" data-copy-vars aria-label="复制 CSS 变量" data-i="copy:before"><span class="n-tb-txt">复制 CSS 变量</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 规范 -->
+  <section class="n-sec" id="guides">
+    <div class="n-wrap">
+      <div class="n-head rv">
+        <div><p class="n-eyebrow"><span data-i="compass"></span>规范</p><h2 class="n-h2">不只给组件，<span>也给规矩。</span></h2></div>
+        <p class="n-p">颜色、排版、间距、动效、交互质感、去 AI 感。每一条都写清楚数值，组件页里的要点就是它的验收标准。</p>
+      </div>
+      <div class="n-feats" data-guides></div>
+      <div class="n-more rv"><a class="btn primary" href="next-docs.html#/guide/principles">阅读规范</a><a class="btn tertiary" href="next-docs.html#/guide/motion">动效规范<span data-i="arrow-right:after"></span></a></div>
+    </div>
+  </section>
+
+  <!-- 性能：三个数字 + 你的浏览器此刻每一帧的间隔 -->
+  <section class="n-sec" id="perf">
+    <div class="n-wrap">
+      <div class="n-head rv">
+        <div><p class="n-eyebrow"><span data-i="gauge"></span>性能</p><h2 class="n-h2">数据再多，<span>也不掉帧。</span></h2></div>
+      </div>
+      <div class="n-stats rv">
+        <a href="next-docs.html#/c/grid"><b class="num">10 万行</b><em>DOM 数据表格</em><span class="n-sub">虚拟滚动、拖列、冻结、排序，滚起来每帧都在 16.7ms 以内。</span></a>
+        <a href="next-docs.html#/c/cgrid"><b class="num">100 万行</b><em>Canvas 表格</em><span class="n-sub">一百万行照样框选、拖动、改行高，字体跟着主题走。</span></a>
+        <a href="next-docs.html#/c/flowstress"><b class="num">1 万个</b><em>流程图节点</em><span class="n-sub">视口裁剪加细节分级，缩放平移时只画看得见的部分。</span></a>
+      </div>
+      <div class="n-fps rv" data-fps>
+        <div class="n-fps-t"><b>你的浏览器，此刻的每一帧</b><span>这一页在你屏幕上画出的最近 240 帧的间隔，实时更新。</span><strong class="num" data-fps-p95>—</strong><small>p95 帧间隔</small></div>
+        <svg class="n-fps-svg" data-fps-svg viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true"><path class="n-fps-ref" d="M0 0"/><path class="n-fps-area" d="M0 220"/><path class="n-fps-line" d="M0 220"/></svg>
+        <div class="n-fps-tip" data-fps-tip hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 收尾 -->
+  <section class="n-sec n-end-sec">
+    <div class="n-wrap">
+      <h2 class="n-h2 n-center rv">从一个 CSS 文件开始，<span>到一整套产品界面。</span></h2>
+      <div class="n-more rv"><a class="btn primary lg" href="next-docs.html#/start">开始使用</a><a class="btn tertiary lg" href="next-docs.html#/c/button">浏览组件</a><a class="btn tertiary lg" href="../" target="_blank" rel="noopener">打开展示页</a></div>
+    </div>
+  </section>
+</main>
+
+<footer class="n-foot">
+  <div class="n-wrap">
+    <div class="n-foot-grid">
+      <div><a class="s-logo" href="next.html"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><mask id="lg2"><rect width="24" height="24" rx="6.5" fill="#fff"/><rect x="-4" y="10.75" width="32" height="2.5" fill="#000" transform="rotate(-34 12 12)"/></mask></defs><rect width="24" height="24" rx="6.5" fill="currentColor" mask="url(#lg2)"/></svg>Satin</a><p>每一帧都打磨过的界面组件库。纯 HTML、CSS 和 ES 模块。</p>
+        <div class="seg sm n-foot-mode" data-mode-seg role="tablist" aria-label="外观"><span class="thumb"></span><button data-v="auto" aria-label="跟随系统" data-tip="跟随系统" data-i="monitor"></button><button data-v="light" aria-label="浅色" data-tip="浅色" data-i="sun"></button><button data-v="dark" aria-label="深色" data-tip="深色" data-i="moon"></button></div></div>
+      <div><h4>开始</h4><ul><li><a href="next-docs.html#/intro">介绍</a></li><li><a href="next-docs.html#/start">快速上手</a></li><li><a href="next-docs.html#/theming">主题定制</a></li></ul></div>
+      <div><h4>组件</h4><ul><li><a href="next-docs.html#/c/button">按钮</a></li><li><a href="next-docs.html#/c/grid">数据表格</a></li><li><a href="next-docs.html#/c/flow">流程图</a></li><li><a href="next-docs.html#/c/chat">聊天与 AI 对话</a></li></ul></div>
+      <div><h4>规范</h4><ul><li><a href="next-docs.html#/guide/principles">设计原则</a></li><li><a href="next-docs.html#/guide/motion">动效</a></li><li><a href="next-docs.html#/guide/feel">交互质感</a></li><li><a href="next-docs.html#/guide/no-ai">去 AI 感</a></li></ul></div>
+      <div><h4>资源</h4><ul><li><a href="../" target="_blank" rel="noopener">组件展示页</a></li><li><a href="next-docs.html#/c/flowstress">万级节点流程图</a></li><li><a href="next-docs.html#/c/cgrid">百万行 Canvas 表格</a></li></ul></div>
+    </div>
+    <div class="s-credits n-credits" data-credits></div>
+  </div>
+</footer>
+
+<script type="module" src="next-home.js"></script>
+</body>
+</html>

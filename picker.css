@@ -1,0 +1,159 @@
+/* Satin：日期、时间、地址选择器。
+   触发框和下拉选择同一个样子；面板和菜单同一种开合（第一帧就不透明，只放大 140ms，收起 100ms 淡出）。只动 transform 和 opacity。 */
+
+/* ———— 触发框 ———— */
+.pk { position: relative; display: inline-block; min-width: 220px; }
+.pk-trigger { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 9px 1.5px 11px; border-radius: var(--btn-r); /* sp-ok: 左 11 右 9 加 1px 边框和图标留白，底 1.5 让字视觉居中 */
+  font: 400 calc(13px * var(--font-scale, 1))/1 var(--sans); color: var(--label); cursor: pointer; background: var(--field); border: 1px solid var(--line-control); box-shadow: var(--field-inset);
+  transition: border-color .15s var(--ease-out), box-shadow .15s var(--ease-out); }
+.pk-trigger:hover { border-color: var(--line-control-hover); }
+.pk-trigger:focus-visible, .pk.open > .pk-trigger { border-color: var(--focus); box-shadow: var(--field-inset), 0 0 0 3px var(--ring); }
+.pk-trigger .val { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.pk-trigger .val.ph { color: var(--label3); }
+.pk-trigger .end { width: 18px; height: 18px; flex: none; color: var(--label3); }
+.pk-trigger .end .ic { width: 15px; height: 15px; }
+/* 有值时悬停：右边的图标换成清除（×），点一下清空 */
+.pk-trigger .end > .b { border-radius: 50%; cursor: pointer; }
+.pk-trigger .end > .b:hover { color: var(--label); background: var(--b-ghost-hover); }
+.pk.has:hover > .pk-trigger .end > .a { opacity: 0; transform: scale(.6) rotate(-12deg); }
+.pk.has:hover > .pk-trigger .end > .b { opacity: 1; transform: none; }
+
+/* ———— 面板 ———— */
+.pk-panel { position: absolute; z-index: 30; left: 0; top: calc(100% + 6px); padding: 12px; border-radius: var(--r-xl); background: var(--menu-bg); box-shadow: var(--menu-shadow);
+  transform-origin: top left; opacity: 0; scale: .97; translate: 0 -4px; pointer-events: none; visibility: hidden;
+  transition: opacity .1s var(--ease-in), scale 0s linear .1s, translate 0s linear .1s, visibility 0s linear .1s; }
+.pk.open > .pk-panel { opacity: 1; scale: 1; translate: 0; pointer-events: auto; visibility: visible;
+  transition: opacity 0s, scale .14s var(--ease-out-strong), translate .14s var(--ease-out-strong), visibility 0s; }
+.pk-foot { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; }
+.pk-foot .grow { flex: 1; }
+.pk-foot .note { font: 400 calc(12px * var(--font-scale, 1))/calc(16px * var(--font-scale, 1)) var(--sans); color: var(--label3); font-variant-numeric: tabular-nums; }
+.pk-foot .note.bad { color: var(--danger); }
+.pk-foot .note { transition: color .12s; } .pk-foot .note.pv { color: var(--label3); opacity: .8; }
+.pk-foot .note:not(.pv):not(.bad) { color: var(--label2); }
+
+/* ———— 日历 ———— */
+.cal { width: 252px; user-select: none; }
+.cal-hd { display: flex; align-items: center; gap: 2px; height: 32px; margin-bottom: 6px; }
+.cal-hd .grow { flex: 1; }
+.cal-title { all: unset; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 6px 0 8px; border-radius: var(--r-md); font: 600 calc(14px * var(--font-scale, 1))/1 var(--sans); color: var(--label); cursor: pointer; font-variant-numeric: tabular-nums; transition: background-color .12s; }
+.cal-title:hover { background: var(--b-ghost-hover); }
+.cal-title:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+.cal-title .ic { width: 14px; height: 14px; color: var(--label3); transition: rotate .2s var(--ease-out-strong); }
+.cal.months .cal-title .ic { rotate: 180deg; }
+.cal-wk { display: grid; grid-template-columns: repeat(7, 36px); height: 28px; align-items: center; text-align: center; font: 400 calc(12px * var(--font-scale, 1))/1 var(--sans); color: var(--label3); transition: opacity .12s var(--ease-out); }
+.cal.months .cal-wk { opacity: 0; }
+.cal-vp { position: relative; height: 216px; overflow: hidden; }
+.cal-grid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, 36px); grid-auto-rows: 36px; }
+/* 一格 36px，里面一个 32px 的圆。范围内是一条连续的浅色带，起止两天是实心圆、带子只铺半边 */
+.cal-grid .d { all: unset; position: relative; display: grid; place-items: center; font: 400 calc(13px * var(--font-scale, 1))/1 var(--sans); color: var(--label); cursor: pointer; font-variant-numeric: tabular-nums; }
+.cal-grid .d::before { content: ""; position: absolute; inset: 2px; border-radius: 50%; transition: background-color .12s var(--ease-out), scale .18s var(--ease-out-strong); }
+.cal-grid .d > span { position: relative; }
+.cal-grid .d:hover::before { background: var(--b-ghost-hover); }
+.cal-grid .d.out { color: var(--label3); }
+.cal-grid .d.today > span::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 3px; height: 3px; margin-left: -1.5px; border-radius: 50%; background: currentColor; } /* sp-ok: 3px 圆点用负外边距居中 */
+.cal-grid .d.dis { color: var(--label-off); cursor: not-allowed; }
+.cal-grid .d.dis:hover::before { background: none; }
+/* 范围带：32px 高（和圆一样高），行与行之间留 4px 缝；行首行尾不收圆角，平平地接到下一行。起止两天只铺半边，和实心圆接上 */
+.cal-grid .d { isolation: isolate; }
+.cal-grid .d::after { content: ""; position: absolute; z-index: -1; left: 0; right: 0; top: 2px; bottom: 2px; background: var(--fill-subtle); opacity: 0; }
+.cal-grid .d.in::after { opacity: 1; }
+.cal-grid .d.a::after { left: 50%; opacity: 1; }
+.cal-grid .d.b::after { right: 50%; opacity: 1; }
+.cal-grid .d.a.b::after { opacity: 0; }
+.cal-grid .d.in:hover::before { background: color-mix(in srgb, var(--label) 9%, transparent); }
+/* 还没选结束：半透明预览，跟着鼠标走，不加过渡（加了会拖一串淡入淡出的尾巴）。
+   点下结束日期：预览补成实色，120ms；重置：120ms 淡掉。只有这两个时刻有过渡，别的时候都是直接变 */
+.cal.pv .cal-grid .d.in::after, .cal.pv .cal-grid .d.a::after, .cal.pv .cal-grid .d.b::after { opacity: .5; }
+.cal.settle .cal-grid .d::after { transition: opacity .12s var(--ease-out); }
+/* 两个月并排：每个月自己一行标题，左边那个带"上个月"，右边那个带"下个月"；不显示别的月份的日子，免得两边重复 */
+.cal.multi { width: auto; }
+.cal-body { display: flex; gap: 24px; }
+.cal-pane { width: 252px; }
+.cal-ph { display: grid; grid-template-columns: 28px 1fr 28px; align-items: center; height: 32px; margin-bottom: 6px; }
+.cal-ph .cal-t { text-align: center; font: 600 calc(14px * var(--font-scale, 1))/1 var(--sans); font-variant-numeric: tabular-nums; }
+.cal.multi .cal-grid .d.out { visibility: hidden; pointer-events: none; }
+.cal-grid .d.sel { color: var(--raised); }
+/* 实心圆、描边圆都用内阴影画，不用背景：背景有 120ms 过渡（留给悬停的浅灰圆），文字颜色却是一下就变——
+   用背景画的话，选中那几帧是白底白字、取消时是黑底黑字，数字会闪没；预览日挪走时还会留一个白圆慢慢淡掉。内阴影不过渡，和文字同一帧到位 */
+.cal-grid .d.sel::before { box-shadow: inset 0 0 0 20px var(--label); }
+/* 选中：圆从 92% 轻轻放大到原大，150ms，只是一个"按下去了"的回应，不弹 */
+.cal-grid .d.sel.pop::before { animation: d-pop .15s var(--ease-out); }
+/* 预览中的结束日：一圈 1.5px 描边，圆里填面板底色盖住半边带子；点下去一帧填成实心，再轻轻放大 */
+.cal-grid .d.hv::before { box-shadow: inset 0 0 0 1.5px var(--label), inset 0 0 0 20px var(--menu-bg); }
+@keyframes d-pop { from { scale: .92; } }
+.cal-grid .d:focus-visible::before { box-shadow: 0 0 0 2px var(--focus); }
+.cal-grid .d.sel:focus-visible::before { box-shadow: inset 0 0 0 20px var(--label), 0 0 0 2px var(--focus); }
+.cal-grid .d.hv:focus-visible::before { box-shadow: inset 0 0 0 1.5px var(--label), inset 0 0 0 20px var(--menu-bg), 0 0 0 2px var(--focus); }
+/* 月份视图：点标题切过去，3 列 4 行 */
+.cal-mv { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 6px; padding: 4px 0; background: var(--menu-bg); opacity: 0; scale: .96; pointer-events: none; transition: opacity .12s var(--ease-in), scale 0s linear .12s; }
+.cal.months .cal-mv { opacity: 1; scale: 1; pointer-events: auto; transition: opacity .16s var(--ease-out), scale .22s var(--ease-out-strong); }
+.cal-mv button { all: unset; display: grid; place-items: center; border-radius: var(--r-md); font: 400 calc(13px * var(--font-scale, 1))/1 var(--sans); color: var(--label); cursor: pointer; transition: background-color .12s, transform .1s var(--ease-out); }
+.cal-mv button:hover { background: var(--b-ghost-hover); }
+.cal-mv button.cur { background: var(--accent); color: var(--on-primary); }
+.cal-mv button.now { box-shadow: inset 0 0 0 1px var(--line-control); }
+.cal-mv button:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+
+/* 范围选择：左边一列快捷项 */
+.pk-range { display: flex; gap: 12px; }
+.pk-presets { display: grid; align-content: start; gap: 2px; width: 104px; padding-right: 12px; }
+.pk-presets button { all: unset; height: 30px; padding: 0 10px; border-radius: var(--r-md); font: 400 calc(13px * var(--font-scale, 1))/calc(30px * var(--font-scale, 1)) var(--sans); color: var(--label2); cursor: pointer; transition: background-color .12s, color .12s, transform .1s var(--ease-out); }
+.pk-presets button:hover { background: var(--b-ghost-hover); color: var(--label); }
+.pk-presets button.on { background: var(--fill-active); color: var(--label); font-weight: 500; }
+
+/* ———— 时间：时、分两列，滚动吸附，中间一条选中带 ———— */
+.tcols { position: relative; display: flex; align-items: stretch; gap: 4px; height: 224px; }
+.tcols .tband { position: absolute; left: 0; right: 0; top: 96px; height: 32px; border-radius: var(--r-md); background: var(--fill-active); pointer-events: none; }
+.tcol { position: relative; width: 56px; height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; scrollbar-width: none; overscroll-behavior: contain; outline: none; border-radius: var(--r-md);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent); }
+.tcol::-webkit-scrollbar { display: none; }
+.tcol:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+.tcol .tpad { height: 96px; }
+.tcol .t { all: unset; display: grid; place-items: center; width: 100%; height: 32px; scroll-snap-align: center; font: 400 calc(14px * var(--font-scale, 1))/1 var(--sans); color: var(--label3); cursor: pointer; font-variant-numeric: tabular-nums; transition: color .12s, font-weight .12s; }
+.tcol .t:hover { color: var(--label2); }
+.tcol .t.on { color: var(--label); font-weight: 600; }
+.tcol .t.dis { color: var(--label-off); }
+.tsep { display: grid; place-items: center; width: 8px; font: 600 calc(14px * var(--font-scale, 1))/1 var(--sans); color: var(--label3); position: relative; }
+.pk-dt { display: flex; gap: 16px; }
+.pk-dt .tside { display: grid; align-content: start; gap: 6px; padding-left: 16px; }
+.pk-dt .tside .cap { height: 32px; display: flex; align-items: center; margin-bottom: 6px; font: 600 calc(14px * var(--font-scale, 1))/1 var(--sans); }
+
+/* ———— 地址：搜索 + 常用 + 省市区三级标签 ———— */
+.rg { width: 352px; }
+.rg-hot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 8px; font: 400 calc(12px * var(--font-scale, 1))/1 var(--sans); color: var(--label3); }
+.rg-hot button { all: unset; height: 24px; padding: 0 10px; border-radius: var(--r-full); font: 400 calc(12px * var(--font-scale, 1))/calc(24px * var(--font-scale, 1)) var(--sans); color: var(--label2); background: var(--fill-subtle); cursor: pointer; transition: background-color .12s, color .12s, transform .1s var(--ease-out); }
+.rg-hot button:hover { background: var(--fill-active); color: var(--label); }
+.rg-tabs { position: relative; display: flex; gap: 4px; height: 34px; }
+.rg-tabs button { all: unset; position: relative; max-width: 110px; padding: 0 8px; font: 500 calc(13px * var(--font-scale, 1))/calc(34px * var(--font-scale, 1)) var(--sans); color: var(--label); cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; transition: color .12s; }
+.rg-tabs button.ph { color: var(--label3); font-weight: 400; }
+.rg-tabs button:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); border-radius: var(--r-sm); }
+.rg-tabs .ink { position: absolute; left: 0; bottom: 0; width: 1px; height: 2px; border-radius: 1px; background: var(--accent); transform-origin: 0 0; transition: transform .26s var(--ease-out-strong); }
+.rg-vp { position: relative; height: 232px; margin-top: 6px; overflow: hidden; }
+.rg-list { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; display: grid; grid-template-columns: repeat(3, 1fr); align-content: start; gap: 2px; }
+.rg-list::-webkit-scrollbar { display: none; }
+.rg-list button { all: unset; display: flex; align-items: center; gap: 4px; height: 32px; padding: 0 8px; border-radius: var(--r-md); font: 400 calc(13px * var(--font-scale, 1))/1 var(--sans); color: var(--label2); cursor: pointer; white-space: nowrap; transition: background-color .12s, color .12s; }
+.rg-list button:hover, .rg-list button.hl { background: var(--b-ghost-hover); color: var(--label); }
+.rg-list button.on { color: var(--label); font-weight: 600; }
+.rg-list button.on::after { content: ""; width: 5px; height: 5px; margin-left: auto; border-radius: 50%; background: var(--accent); }
+.rg-res { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; display: grid; align-content: start; gap: 2px; }
+.rg-res button { all: unset; display: flex; align-items: baseline; gap: 8px; height: 34px; padding: 0 10px; border-radius: var(--r-md); font: 400 calc(13px * var(--font-scale, 1))/calc(34px * var(--font-scale, 1)) var(--sans); color: var(--label); cursor: pointer; }
+.rg-res button b { font-weight: 400; }
+.rg-res button span { font-size: calc(12px * var(--font-scale, 1)); color: var(--label3); }
+.rg-res button mark { background: none; color: var(--label); font-weight: 600; text-decoration: underline; text-decoration-color: var(--line-control-hover); text-underline-offset: 3px; }
+.rg-res button:hover, .rg-res button.hl { background: var(--b-ghost-hover); }
+.rg-res .none { padding: 24px 10px; text-align: center; font: 400 calc(13px * var(--font-scale, 1))/calc(20px * var(--font-scale, 1)) var(--sans); color: var(--label3); }
+
+/* 选择器里的滚动列表包了滚动区域：外面那一层占原来列表的位置（时间列撑满高度；地址的列表、搜索结果铺满可视区） */
+.tcols > .sa { flex: none; }
+.rg-vp > .sa { position: absolute; inset: 0; }
+
+/* 窄的时候（窗口比面板窄：手机、窄的嵌入框）：面板不能比窗口宽——
+   范围选择两个月上下排、快捷项排成一行；日期加时间的时间列放到日历下面 */
+@media (max-width: 720px) {
+  .pk-range { flex-direction: column; gap: 8px; }
+  .pk-presets { width: auto; padding-right: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+  .cal-body { flex-direction: column; gap: 12px; }
+}
+@media (max-width: 480px) {
+  .pk-dt { flex-direction: column; gap: 8px; }
+  .pk-dt .tside { padding-left: 0; }
+}
