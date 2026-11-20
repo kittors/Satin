@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>坏页面（检查器自测用）</title>
+<style>
+body { margin: 0; font: 14px/22px -apple-system, "PingFang SC", sans-serif; background: #fff; color: #1d1d1f; }
+header { display: flex; gap: 24px; align-items: center; padding: 12px 24px; border-bottom: 1px solid #ddd; backdrop-filter: blur(12px); background: rgba(255, 255, 255, .7); }
+nav a { display: block; padding: 4px 12px; color: #444; text-decoration: none; }
+nav a.active { border-left: 3px solid #6366f1; font-weight: 700; color: #6366f1; }
+main { padding: 24px; display: grid; gap: 24px; }
+.hero { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 40px; border-radius: 16px; }
+.glow { box-shadow: 0 0 24px rgba(99, 102, 241, .6); }
+.card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, .12); padding: 16px; min-height: 80px; }
+.kpis { display: flex; gap: 16px; }
+.kpi { flex: 1; min-width: 160px; }
+.kpi .n { font-size: 32px; line-height: 40px; font-weight: 700; }
+.badges span { display: inline-block; padding: 2px 8px; margin-right: 4px; border-radius: 99px; color: #fff; font-size: 12px; line-height: 18px; }
+.overlap { position: relative; width: 240px; }
+.overlap .cover { position: absolute; inset: 0; background: rgba(255, 255, 255, .01); }
+.narrow { width: 64px; }
+.wide { width: 1700px; height: 8px; background: #eee; }
+.low { color: #c8c8c8; }
+.tiny a { display: inline-block; width: 20px; height: 20px; margin-right: 2px; background: #eee; color: #333; text-align: center; font-size: 12px; line-height: 20px; }
+.clip { position: relative; overflow: hidden; height: 48px; width: 280px; }
+.clip .menu { position: absolute; left: 0; top: 36px; width: 200px; padding: 8px; background: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, .12); display: none; }
+.clip.open .menu { display: block; }
+</style>
+</head>
+<body>
+<header class="glass">
+  <b>Studio</b>
+  <nav><a href="#" class="active">项目</a><a href="#">素材</a><a href="#">团队</a></nav>
+</header>
+<main>
+  <div class="hero glow"><h1>AI 创作平台</h1><p>一句话生成整部短片</p></div>
+  <div class="card"><b>外层卡片</b><div class="card">内层卡片，里面又是一张卡片</div></div>
+  <div class="kpis">
+    <div class="card kpi"><div class="n">10K+</div>用户</div>
+    <div class="card kpi"><div class="n">98%</div>好评</div>
+    <div class="card kpi"><div class="n">1,284</div>项目</div>
+  </div>
+  <div class="badges"><span style="background:#e11d48">紧急</span><span style="background:#2563eb">进行中</span><span style="background:#16a34a">新</span><span style="background:#9333ea">热门</span></div>
+  <div class="overlap"><button>被挡住的按钮</button><div class="cover"></div></div>
+  <button class="narrow">很长的按钮文字会换行</button>
+  <div class="wide"></div>
+  <p class="low">浅灰色的正文，几乎看不清</p>
+  <div class="tiny"><a href="#">1</a><a href="#">2</a><a href="#">3</a><a href="#">4</a></div>
+  <div class="clip" id="clip"><button aria-haspopup="menu" onclick="this.parentElement.classList.toggle('open')">打开菜单</button><div class="menu">重命名<br>复制一份<br>移到别的项目<br>删除</div></div>
+</main>
+  <!-- 编出来的 sn- 类名（class-exists） -->
+  <span class="sn-eyebrow">工作区设置</span>
+</body>
+</html>

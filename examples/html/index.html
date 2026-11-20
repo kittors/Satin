@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Satin · 纯 HTML 示例</title>
+<!-- 第一帧之前写好深浅主题（刷新不闪） -->
+<script src="../../packages/satin-ui/src/theme-boot.js"></script>
+<!-- 样式：整页都用 Satin 时引 page.css（令牌 + 页面级重置 + 全部组件样式）；嵌进已有页面时改引 css/satin.css -->
+<link rel="stylesheet" href="../../packages/satin-ui/css/page.css">
+<link rel="stylesheet" href="../shared/sink.css">
+</head>
+<body>
+<main class="sink" id="app"></main>
+<script type="module">
+// 纯 HTML：纯样式的组件直接写标记（这里用 satin-ui 的标记函数生成，和手写一模一样）；有交互的组件用自定义元素 <sn-xxx>，放进页面就自动挂载
+import { setup, buttonHTML, fieldHTML, inputHTML, checkHTML, switchHTML, progressHTML, stepsHTML, chipHTML } from "../../packages/satin-ui/src/index.js";
+import * as C from "../../packages/satin-ui/src/components.js";
+import { defineElements } from "../../packages/satin-ui/elements/index.js";
+import { SINK as S } from "../shared/sink.js";
+setup(); defineElements();
+const j = (v) => JSON.stringify(v).replace(/'/g, "&#39;");
+document.getElementById("app").innerHTML = `
+  <h1>${S.title}</h1>
+  <div class="line">${S.buttons.map(([v, t]) => C.buttonHTML({ text: t, variant: v })).join("")}${C.buttonHTML({ variant: "ghost", icon: S.iconButton.icon, tip: S.iconButton.tip })}</div>
+  ${C.fieldHTML({ label: S.field.label, id: "f-title", control: C.inputHTML({ id: "f-title", placeholder: S.field.placeholder }), help: S.field.help })}
+  <div class="line">${C.checkHTML(S.check)}${C.switchHTML(S.switch)}</div>
+  <div class="line"><sn-segmented items='${j(S.segmented.items)}' value="${S.segmented.value}"></sn-segmented></div>
+  <div class="sn-field"><span class="sn-lbl">${S.slider.label}</span><sn-slider value="${S.slider.value}" max="${S.slider.max}" label="${S.slider.label}"></sn-slider></div>
+  <div class="sn-field"><span class="sn-lbl">${S.select.label}</span><sn-select items='${j(S.select.items)}' value="${S.select.value}"></sn-select></div>
+  <sn-tabs tabs='${j(S.tabs.tabs)}' value="${S.tabs.value}"></sn-tabs>
+  <div class="line">${C.progressHTML({ value: S.progress })}${C.progressHTML({ value: S.progress, ring: true })}</div>
+  ${C.stepsHTML(S.steps)}
+  <sn-collapse items='${j(S.collapse.items)}' open='${j(S.collapse.open)}'></sn-collapse>
+  <div class="sn-field"><span class="sn-lbl">${S.stepper.label}</span><sn-stepper value="${S.stepper.value}" min="${S.stepper.min}" max="${S.stepper.max}" unit="${S.stepper.unit}" label="${S.stepper.label}"></sn-stepper></div>
+  <div class="line">${S.chips.map((t) => C.chipHTML({ text: t })).join("")}</div>`;
+void buttonHTML; void fieldHTML; void inputHTML; void checkHTML; void switchHTML; void progressHTML; void stepsHTML; void chipHTML;
+document.documentElement.dataset.ready = "1";
+</script>
+</body>
+</html>

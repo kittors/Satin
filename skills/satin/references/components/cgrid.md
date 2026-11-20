@@ -1,0 +1,60 @@
+# 数据表格 · Canvas · Canvas grid · 一百万行
+
+> 组件 id：`cgrid`　分组：数据展示
+
+一百万行，表体画在一块画布上，功能和上面的 DOM 版一样：懒加载（200 行一块）、搜索和列头筛选、排序、拖列、改宽、左右固定列、拖行、编辑、勾选、键盘。表头还是 DOM（只有十来格，读屏也读得到列名）。行高 32，更紧凑。合并单元格、行展开、选中和编辑、勾选的动效都和 DOM 版一样，按同样的时长画在画布上。树形模式也一样（一百万个节点、两万多个项目）：展开收起、勾选联动、兄弟内拖行和 DOM 版共用一份实现。
+
+## 验收要点
+
+- 滚动用原生滚动条：滚动容器里放一块和全部行一样高的垫片，画布 sticky 贴在视口里不动，滚到哪画哪；一百万行 × 32 = 3200 万 px，在浏览器元素高度的上限（约 3355 万）以内。
+- 一帧只画看得见的十几行：中间列裁在两边固定列之间，固定列最后画、盖在上面；横着滚开时固定列边上画一道渐变阴影。字体切换尽量少，量过的字宽缓存起来，放不下就截断加省略号。
+- 悬停、勾选、拖行让位、编辑后闪一下、数据到了淡入、换列位置时列从旧位置滑过去，都在画布上画；动画只在进行中的那几帧重画。
+- 编辑：在格子的位置盖一个输入框（选项列弹出选项），滚动时能提交就提交、不合法就取消；当前格子的内容写进一个看不见的 aria-live 区域，读屏能读到。
+- 什么时候用哪个：几千行以内、格子里要放复杂的交互组件用 DOM 版；几十万行以上、只读或简单编辑、要求快速滚动不掉帧用 Canvas 版。
+
+## 写法
+
+### mountCanvasGrid(.sn-grid.cgrid, 选项)（satin-ui/canvas-grid）
+
+| 选项 | 说明 |
+|---|---|
+| rows | 行数（演示数据，默认 100 万） |
+| seed | 生成演示数据的种子 |
+
+## 用法
+
+```js
+import { mountCanvasGrid } from "satin-ui/canvas-grid";
+import "satin-ui/css/grid.css";
+import "satin-ui/css/data.css";
+
+// 整张表画在一块画布上：百万行照样流畅；交互和 DOM 版一致
+mountCanvasGrid(document.querySelector(".sn-grid.cgrid"), { rows: 1000000 });
+```
+
+## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）
+
+```html
+<div class="sn-grid" id="gridCanvas">
+<div class="sn-g-bar">
+<span class="sn-ib sn-has-pre" style="width:220px"><span class="sn-pre" data-i="search"></span><input class="sn-input sn-sm" data-g-q="" placeholder="搜索名称，比如 书店 9" aria-label="搜索名称"></span>
+<div class="sn-seg sn-sm" data-seg="cgtree"><span class="sn-thumb"></span><button data-v="flat">平铺</button><button data-v="tree">树形</button></div>
+<button class="sn-btn sn-ghost sn-sm" data-g-expand="" hidden data-i="chevrons-up-down:before">全部展开</button>
+<div class="sn-seg sn-sm" data-seg="cgmode"><span class="sn-thumb"></span><button data-v="known">按需加载</button><button data-v="append">滚到底再加载</button></div>
+<div class="sn-seg sn-sm" data-seg="cgsb"><span class="sn-thumb"></span><button data-v="gutter">常驻滚动条</button><button data-v="auto">自动隐藏</button></div>
+<div class="sn-seg sn-sm" data-seg="cglines"><span class="sn-thumb"></span><button data-v="row">行线</button><button data-v="grid">网格</button></div>
+<span class="sn-g-filters" data-g-filters=""></span>
+<span class="sn-g-info" data-g-info=""></span>
+</div>
+<div class="sn-g-frame"><div class="sn-g-vp" tabindex="0" role="grid" aria-label="数据表格，一百万行，画布绘制"><div class="sn-g-head" role="row"></div><canvas class="sn-cg-cv" aria-hidden="true"></canvas><div class="sn-cg-sizer"></div></div><i class="sn-g-shade sn-l" aria-hidden="true"></i><i class="sn-g-shade sn-r" aria-hidden="true"></i><div class="sn-cg-sr" aria-live="polite"></div></div>
+</div>
+```
+
+## 规则
+
+- 滚动用原生滚动条：滚动容器里放一块和全部行一样高的垫片，画布 sticky 贴在视口里不动，滚到哪画哪；一百万行 × 32 = 3200 万 px，在浏览器元素高度的上限（约 3355 万）以内。
+- 一帧只画看得见的十几行：中间列裁在两边固定列之间，固定列最后画、盖在上面；横着滚开时固定列边上画一道渐变阴影。字体切换尽量少，量过的字宽缓存起来，放不下就截断加省略号。
+- 悬停、勾选、拖行让位、编辑后闪一下、数据到了淡入、换列位置时列从旧位置滑过去，都在画布上画；动画只在进行中的那几帧重画。
+- 编辑：在格子的位置盖一个输入框（选项列弹出选项），滚动时能提交就提交、不合法就取消；当前格子的内容写进一个看不见的 aria-live 区域，读屏能读到。
+- 什么时候用哪个：几千行以内、格子里要放复杂的交互组件用 DOM 版；几十万行以上、只读或简单编辑、要求快速滚动不掉帧用 Canvas 版。
+

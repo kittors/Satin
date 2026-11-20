@@ -1,0 +1,16 @@
+/* 坏样式：每条静态规则至少踩一次（检查器的自测用，不要照抄） */
+.title { color: #666; padding: 13px 18px; font-weight: 800; font-size: 15.5px; }
+.hero { background: linear-gradient(135deg, #667eea, #764ba2); }
+.brand-text { background-clip: text; -webkit-text-fill-color: transparent; }
+.glow { box-shadow: 0 0 20px rgba(99, 102, 241, .5); }
+.halo { box-shadow: 0 0 64px rgba(0, 0, 0, .2); }
+.panel { transition: all .3s; border: 1px solid rgb(229, 231, 235); }
+.drawer { transition: width .3s ease, left .4s; }
+@keyframes grow { from { height: 0; } to { height: 200px; } }
+.fade { transition: opacity 1s cubic-bezier(.68, -.55, .27, 1.55); }
+.label { text-transform: uppercase; letter-spacing: .2em; }
+button:focus { outline: none; }
+.btn-ok:focus:not(:focus-visible) { outline: none; }
+
+/* 写错的令牌名（token-exists） */
+.meta { color: var(--sn-text-secondary); font-size: var(--sn-t-callout-size); }

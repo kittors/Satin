@@ -1,0 +1,9 @@
+{
+  // 类型测试：按发布包的导出表（exports 里的 types）解析 satin-ui，和用户项目里一样，不用 paths 映射。
+  // 跑法：npx tsc -p tests/types
+  "compilerOptions": {
+    "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler", "strict": true, "noEmit": true, "skipLibCheck": false,
+    "jsx": "react-jsx", "lib": ["ES2022", "DOM", "DOM.Iterable"], "types": []
+  },
+  "include": ["./**/*"]
+}

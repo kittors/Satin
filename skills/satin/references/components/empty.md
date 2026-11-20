@@ -1,0 +1,26 @@
+# 空状态 · Empty
+
+> 组件 id：`empty`　分组：反馈
+
+空的时候告诉用户这里会有什么、下一步做什么。三种：第一次用、筛选没结果、出错。不用插画，只用一个图标。
+
+## 验收要点
+
+- 图标放在 48 的浅灰圆角方块里；标题 15/600，说明 13，最宽 280，标题均衡断行。
+- 按钮最多两个，第一次用的主按钮用实心；其他两种只用次按钮。
+
+## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）
+
+```html
+<div class="sn-empty-grid">
+<div class="sn-empty-state"><span class="sn-art" data-i="folder-open"></span><h4>还没有项目</h4><p>从一部小说或剧本开始，几分钟就能看到第一版分镜。</p><div class="sn-acts"><button class="sn-btn sn-primary" data-i="plus:before">新建项目</button><button class="sn-btn sn-secondary">导入原文</button></div></div>
+<div class="sn-empty-state"><span class="sn-art" data-i="search"></span><h4>没有找到"雨夜"相关的镜头</h4><p>换个关键词，或者清除筛选再看看。</p><div class="sn-acts"><button class="sn-btn sn-secondary">清除筛选</button></div></div>
+<div class="sn-empty-state"><span class="sn-art" data-i="wifi-off"></span><h4>加载失败</h4><p>网络好像断了，恢复后会自动重试。</p><div class="sn-acts"><button class="sn-btn sn-secondary" data-act="" data-retry="">重试</button></div></div>
+</div>
+```
+
+## 规则
+
+- 图标放在 48 的浅灰圆角方块里；标题 15/600，说明 13，最宽 280，标题均衡断行。
+- 按钮最多两个，第一次用的主按钮用实心；其他两种只用次按钮。
+

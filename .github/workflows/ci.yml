@@ -1,0 +1,31 @@
+# 持续集成：代码检查、Node 里的测试（导入、生成物、服务端渲染、体积预算、检查器）、类型测试、浏览器测试（生命周期泄漏、Markdown XSS）、各框架示例构建。
+# 和改造前逐像素比的效果对比（scripts/parity）要改造前的备份目录，只在本机跑，不在这里。
+name: CI
+on:
+  push:
+    branches: [main, web-v1]
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test:node
+      - run: pnpm test:types
+      # 浏览器测试用系统里的 Chrome（GitHub 的 ubuntu 镜像自带），Playwright 只装依赖库
+      - run: npx playwright install-deps chromium
+      - name: 浏览器测试
+        run: |
+          python3 serve.py 5192 . > /tmp/serve.log 2>&1 &
+          sleep 2
+          pnpm test:browser
+          node skills/satin/scripts/check.test.mjs
+      - run: pnpm build:examples

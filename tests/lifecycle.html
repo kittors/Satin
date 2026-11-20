@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Satin · 生命周期测试</title>
+<link rel="stylesheet" href="../packages/satin-ui/css/tokens.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/reset.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/base.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/buttons.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/form.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/input.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/overlay.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/feedback.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/data.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/scroll.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/content.css">
+<link rel="stylesheet" href="../packages/satin-ui/css/number.css">
+</head>
+<body style="padding:24px">
+<div id="host"></div>
+<script src="count-probe.js"></script>
+<script type="module">
+import * as C from "../packages/satin-ui/src/components.js";
+import { setup } from "../packages/satin-ui/src/setup.js";
+window.C = C; window.setupSatin = setup; window.ready = true;
+</script>
+</body>
+</html>

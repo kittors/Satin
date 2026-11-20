@@ -1,0 +1,4 @@
+/* 示例页的排版（各框架共用）：一栏，组和组之间 24px */
+.sink { max-width: 640px; margin: 0 auto; padding: 32px 24px 64px; display: grid; gap: 24px; }
+.sink h1 { font: 600 22px/30px var(--sn-sans); }
+.sink .line { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
