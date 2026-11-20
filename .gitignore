@@ -1,2 +1,14 @@
 node_modules/
 .DS_Store
+.parity/
+eval/runs/
+*.log
+# 示例的构建产物
+examples/*/dist/
+examples/*/.next/
+examples/*/.nuxt/
+examples/*/.output/
+examples/*/.angular/
+examples/*/next-env.d.ts
+# 由 spec/recipes 生成的配方测试页（scripts/skill/recipes-render.mjs）
+tests/recipes/
