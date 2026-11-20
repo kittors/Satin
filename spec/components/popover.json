@@ -1,0 +1,115 @@
+{
+  "id": "popover",
+  "name": "弹出面板",
+  "nav": "弹出面板",
+  "en": "Popover",
+  "group": "浮层",
+  "specRef": "",
+  "summary": "点一下才出现，里面可以放少量操作，改动立即生效，不需要\"保存\"。从按钮那一侧长出来，下方放不下就翻到上方；点外面或按 Esc 关闭，焦点回到按钮。",
+  "acceptance": [
+    "面板宽 248–320，圆角 12，内边距 14–16；标题 13/600，说明 12。",
+    "打开后焦点移到面板里第一个控件；Tab 走出面板时自动关闭。",
+    "和 Tooltip 的分工：Tooltip 悬停出现、只有文字；Popover 点击出现、可以操作。"
+  ],
+  "api": [
+    {
+      "title": "openPopover(面板, 触发按钮, 选项)",
+      "head": [
+        "选项",
+        "取值",
+        "默认",
+        "说明"
+      ],
+      "rows": [
+        [
+          "align",
+          "\"start\" | \"end\"",
+          "\"start\"",
+          "和按钮左边对齐还是右边对齐"
+        ],
+        [
+          "onClose",
+          "() => {}",
+          "无",
+          "关上以后调"
+        ]
+      ]
+    },
+    {
+      "title": "返回值",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "close(refocus)",
+          "关上；refocus 为 true 时焦点回到按钮"
+        ]
+      ]
+    },
+    {
+      "title": "其他",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "popoverOf(面板)",
+          "正开着的那个（没开返回 undefined），用来做“再点一下关上”"
+        ],
+        [
+          "[data-pop=\"面板 id\"]",
+          "写在按钮上，bindOverlays 接上：点了开、再点关"
+        ],
+        [
+          "关闭时机",
+          "Esc、点面板外面（要整页调过 setup()）、Tab 走出面板、窗口变化时重新对位"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "overlay.css"
+    ],
+    "api": [
+      [
+        "bindOverlays(root)：接上 [data-pop]",
+        "satin-ui/components"
+      ],
+      [
+        "openPopover(面板, 按钮, { align, onClose })",
+        "satin-ui/components"
+      ],
+      [
+        "popoverOf(面板)",
+        "satin-ui/components"
+      ],
+      [
+        "setup()：整页调一次，Esc、点外面关上",
+        "satin-ui"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "html": "<button class=\"sn-btn sn-secondary\" data-pop=\"pop-share\">分享</button>\n\n<!-- 面板放在页面任意地方（一般放在 body 末尾），打开时贴着按钮弹出 -->\n<div class=\"sn-pop sn-popover\" id=\"pop-share\" role=\"dialog\" aria-label=\"分享\">\n  <h4>分享给协作者</h4>\n  <p>拿到链接的人可以查看，不能修改。</p>\n  <div class=\"sn-acts\"><button class=\"sn-btn sn-primary sn-sm\">复制链接</button></div>\n</div>",
+      "js": "import { setup } from \"satin-ui\";\nimport { bindOverlays, openPopover, popoverOf } from \"satin-ui/components\";\nimport \"satin-ui/css/overlay.css\";\n\nsetup(); // 页面级行为（Esc、点外面关上），整页调一次\n\n// 写在标记上：[data-pop=\"面板 id\"] 点了开、再点关；Esc、点外面、焦点离开面板都会关\nbindOverlays(document);\n\n// 或者自己控制：贴着按钮打开（align: \"end\" 右对齐），返回的 close() 关上\nconst btn = document.querySelector(\"#share\"), pop = document.querySelector(\"#pop-share\");\nbtn.addEventListener(\"click\", () => {\n  const open = popoverOf(pop);\n  if (open) open.close();\n  else openPopover(pop, btn, { align: \"end\", onClose: () => console.log(\"关了\") });\n});"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"row\">\n      <button class=\"sn-btn sn-secondary\" data-pop=\"pop-share\" data-i=\"share:before\">分享</button>\n      <button class=\"sn-btn sn-secondary\" data-pop=\"pop-filter\" data-i=\"list-filter:before\"><span class=\"sn-txt\">筛选</span><span class=\"sn-count-badge sn-num\" hidden></span></button>\n      <button class=\"sn-btn sn-ghost sn-ibtn\" data-pop=\"pop-info\" data-tip=\"画面比例说明\" data-i=\"info\"></button>\n    </div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

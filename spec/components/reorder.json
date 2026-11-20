@@ -1,0 +1,64 @@
+{
+  "id": "reorder",
+  "name": "拖拽重排",
+  "nav": "拖拽重排",
+  "en": "Reorder",
+  "group": "行为",
+  "specRef": "",
+  "summary": "按住左边的把手拖（移动 4px 才算拿起，只点一下什么都不动）。被拖的行浮起来、向一侧拉开并缩到 95%，原位的空缺立刻收拢；落点出现一条从中间往两边长出的细线，线两边的行往外让开，离线越远让得越少、启动越晚。松手用弹簧从当前位置归位。拖到列表外 40px 以外：落点线收起、其他行回到原位、被拖的行变淡，这时松手就取消；按 Esc 也取消。键盘：聚焦把手按空格拿起，上下键移动，再按空格放下，Esc 取消并回到原位。",
+  "acceptance": [
+    "让位：紧邻线的那行位移 A，往外第 n 行是 A × 0.7ⁿ，延迟 24ms × n；A 取 8px。",
+    "只用 transform，不改布局；减少动态效果时只保留落点线。",
+    "被拖的行只在第一行到最后一行之间跟手，超出的部分越拉越沉（最多再走 36px），不会拖出外框；靠近窗口上下边缘、列表还有一部分在窗口外时自动滚动；拖着时滚动页面，行仍贴着指针。",
+    "归位动画没走完就再拿起，从眼睛看到的位置接着动；切走窗口、指针被系统收走都按取消处理。"
+  ],
+  "api": [
+    {
+      "title": "createReorder(列表, 选项)",
+      "head": [
+        "选项",
+        "说明"
+      ],
+      "rows": [
+        [
+          "onReorder",
+          "({ from, to, row }) => {}：顺序变了（拖拽、键盘都算）；同时冒泡 sn-reorder"
+        ],
+        [
+          "row",
+          "行的选择器（默认 \".sn-drag-row\"）；拖的把手是行里的 .sn-grip"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "data.css"
+    ],
+    "api": [
+      [
+        "createReorder(列表, { row, onReorder })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "html": "<div class=\"sn-drag-list\">\n  <div class=\"sn-drag-row\"><button class=\"sn-grip\" aria-label=\"拖动排序：镜头 07\" data-i=\"grip-vertical\"></button><b>镜头 07 · 车站外</b></div>\n  <div class=\"sn-drag-row\"><button class=\"sn-grip\" aria-label=\"拖动排序：镜头 08\" data-i=\"grip-vertical\"></button><b>镜头 08 · 候车厅</b></div>\n</div>",
+      "js": "import { createReorder } from \"satin-ui/components\";\n\n// 按住 .sn-grip 拖（先动 4px 才算拿起）；其他行让位、落点画线；拿出列表 40px 外松手就取消；\n// 键盘：空格拿起、↑↓ 移动、空格放下、Esc 取消（读屏会播报位置）\ncreateReorder(document.querySelector(\".sn-drag-list\"), {\n  onReorder: ({ from, to, row }) => save(order()),\n});"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"sn-drag-list\" id=\"dragList\"><span class=\"sn-drop-line\"></span></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

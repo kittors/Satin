@@ -1,0 +1,44 @@
+{
+  "id": "choice",
+  "name": "复选、单选、开关",
+  "nav": "复选、单选、开关",
+  "en": "Checkbox · Radio · Switch",
+  "group": "表单",
+  "specRef": "",
+  "summary": "勾选时对勾一笔画出来并轻轻弹一下；单选的内点弹出；开关的圆钮弹到另一边，按住时圆钮横向拉长。都能用 Tab 聚焦、空格切换。",
+  "acceptance": [],
+  "api": [],
+  "usage": {
+    "css": [
+      "form.css"
+    ],
+    "api": [
+      [
+        "checkHTML({ label, checked, indeterminate, disabled })",
+        "satin-ui/components"
+      ],
+      [
+        "switchHTML({ label, checked, disabled })",
+        "satin-ui/components"
+      ],
+      [
+        "setup()：整页调一次，复选框勾上时轻轻弹一下",
+        "satin-ui"
+      ]
+    ]
+  },
+  "example": null,
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"grid-m auto\" style=\"--min:200px;align-items:start;gap:24px\">\n      <div class=\"stack\" style=\"gap:10px\">\n        <label class=\"sn-check\"><input type=\"checkbox\" checked><span class=\"sn-box\"><svg viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.5 6.2l2.4 2.4 4.6-5\" /></svg><span class=\"sn-bar\"></span></span>自动保存草稿</label>\n        <label class=\"sn-check\"><input type=\"checkbox\"><span class=\"sn-box\"><svg viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.5 6.2l2.4 2.4 4.6-5\" /></svg><span class=\"sn-bar\"></span></span>生成完成后提醒我</label>\n        <label class=\"sn-check\"><input type=\"checkbox\" data-indeterminate><span class=\"sn-box\"><svg viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.5 6.2l2.4 2.4 4.6-5\" /></svg><span class=\"sn-bar\"></span></span>全选（部分选中）</label>\n        <label class=\"sn-check\"><input type=\"checkbox\" disabled><span class=\"sn-box\"><svg viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.5 6.2l2.4 2.4 4.6-5\" /></svg><span class=\"sn-bar\"></span></span>不可用</label>\n      </div>\n      <div class=\"stack\" style=\"gap:10px\" role=\"radiogroup\">\n        <label class=\"sn-radio\"><input type=\"radio\" name=\"q\" checked><span class=\"sn-box\"></span>标准画质</label>\n        <label class=\"sn-radio\"><input type=\"radio\" name=\"q\"><span class=\"sn-box\"></span>高画质</label>\n        <label class=\"sn-radio\"><input type=\"radio\" name=\"q\"><span class=\"sn-box\"></span>最高画质（更慢）</label>\n        <label class=\"sn-radio\"><input type=\"radio\" name=\"q\" disabled><span class=\"sn-box\"></span>不可用</label>\n      </div>\n      <div class=\"stack\" style=\"gap:12px\">\n        <label class=\"sn-switch\"><input type=\"checkbox\" checked><span class=\"sn-track\"><span class=\"sn-knob\"></span></span>跟随系统外观</label>\n        <label class=\"sn-switch\"><input type=\"checkbox\"><span class=\"sn-track\"><span class=\"sn-knob\"></span></span>启动时打开上次的项目</label>\n        <label class=\"sn-switch\"><input type=\"checkbox\" disabled><span class=\"sn-track\"><span class=\"sn-knob\"></span></span>不可用</label>\n      </div>\n    </div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

@@ -1,0 +1,26 @@
+{
+  "id": "elevation",
+  "name": "阴影与层级",
+  "nav": "阴影与层级",
+  "en": "04 号 §6",
+  "group": "基础",
+  "specRef": "",
+  "summary": "三层：卡片（只靠描边和明度差）、浮层（菜单、Popover、通知）、对话框。卡片悬停时不上浮、不加阴影，只叠一层悬停填充。Tooltip 和 Toast 不在这三层里，用反色底，一眼能和页面内容分开。",
+  "acceptance": [],
+  "api": [],
+  "usage": null,
+  "example": null,
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"elev e0\"><b>卡片</b><span class=\"sn-t-caption sn-c-tertiary\">raised + 1px 描边</span></div>\n<div class=\"elev e1\"><b>浮层</b><span class=\"sn-t-caption sn-c-tertiary\">菜单、Popover、通知</span></div>\n<div class=\"elev e2\"><b>对话框</b><span class=\"sn-t-caption sn-c-tertiary\">对话框、抽屉</span></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

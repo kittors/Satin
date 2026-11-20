@@ -1,0 +1,26 @@
+{
+  "id": "spacing",
+  "title": "间距",
+  "en": "Spacing",
+  "embed": "spacing",
+  "rulesOf": "spacing",
+  "lead": "16 以下每 2px 一档，只在控件内部用；再往上逐级放大，用在组件之间、区块之间。越相关越近：组和组之间至少是组内的两倍。",
+  "body": [
+    [
+      "h2",
+      "语义令牌"
+    ],
+    [
+      "p",
+      "页面和组件只写语义令牌，不写数字：<code>--sn-gap-tight</code>（图标和字）、<code>--sn-gap-inline</code>（同一行的控件）、<code>--sn-gap-stack</code>（上下堆叠）、<code>--sn-gap-group</code>（组之间）、<code>--sn-gap-section</code>（区块之间），以及 <code>--sn-pad-card</code>、<code>--sn-pad-panel</code>、<code>--sn-pad-page</code>。"
+    ],
+    [
+      "h2",
+      "密度"
+    ],
+    [
+      "p",
+      "根元素上写 <code>data-density=\"compact\"</code> 或 <code>\"comfortable\"</code>，语义令牌整体换一档，组件不用改。"
+    ]
+  ]
+}

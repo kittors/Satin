@@ -1,0 +1,119 @@
+{
+  "id": "chat",
+  "name": "聊天与 AI 对话",
+  "nav": "聊天与 AI 对话",
+  "en": "Chat",
+  "group": "数据展示",
+  "specRef": "",
+  "summary": "超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条；已经载入的消息滚得再快、拖滚动条拖得再猛，都直接显示真内容，不换骨架，也不露白。发送时，输入框里的字原地变成气泡，果断地飞进它在列表里的位置（一起步就是高速，再柔和停住），图片、视频的缩略图边飞边放大，音频、文档整条飞过去，原来的消息同时往上让位。AI 回复先思考（灰字流出，想完自动收起，可以点开看），再列出步骤，再逐词流出正文、镜头卡片和生成的画面；生成中发送按钮变成\"停止\"。",
+  "acceptance": [
+    "虚拟列表：只渲染视口上下各 1.25 屏；行高先估、渲染后按实际量出来的缓存；视口上方的条目高度变了，补偿滚动位置，看着的内容不动。",
+    "已经载入的消息永远直接画真内容：拖滚动条时在同一个任务里画好新位置，并重算是否贴底；往上翻到离顶部还有两屏时就提前加载下一页。",
+    "流式输出：网络来的字先进缓冲，再按匀速放出来（每秒 45～160 个，积压越多越快），新字淡入；贴底时视口平滑跟着往下走，不一行一行跳；用户往上翻了就不再跟，右下角显示新消息数。",
+    "发送：临界阻尼弹簧曲线，竖直 300ms、水平 360ms，120ms 走完 60%；影子每帧追真实落点，落地和真气泡完全重合；字从发出那一帧起就是气泡的配色。AI 等消息落地再回复。减少动态效果时直接出现。"
+  ],
+  "api": [
+    {
+      "title": "mountChat(.sn-chat, 选项)（satin-ui/chat）",
+      "head": [
+        "选项",
+        "说明"
+      ],
+      "rows": [
+        [
+          "respond",
+          "(问题, { stopped }) => 异步生成器 / Promise<字符串>：yield { think } 是思考，yield 字符串是正文；还能给 { step }、{ card }、{ image } 这些"
+        ],
+        [
+          "history",
+          "{ initial() → 条目数组, older() → 更早的一页（可以是 Promise）, hasMore() }：带历史，往上滚加载更早的；不给就从空的对话开始"
+        ],
+        [
+          "hiRes",
+          "(背景) => 背景：点开看大图时用的高清背景（默认原样）"
+        ],
+        [
+          "返回",
+          "{ send(text)（程序里发一条，和输入框发送一样）, receive(条目), sendText(text, { fail }), scrollToOldest(), destroy() }"
+        ]
+      ]
+    },
+    {
+      "title": "消息里的图片、视频",
+      "head": [
+        "写法",
+        "说明"
+      ],
+      "rows": [
+        [
+          "{ type: \"image\", g: CSS 背景 }",
+          "图片气泡；点开用看图组件（satin-ui/lightbox），能放大缩小、旋转，列表里渲染着的图片、视频按顺序左右翻"
+        ],
+        [
+          "{ type: \"video\", g: 封面, src, poster }",
+          "视频气泡；点开在看图层里直接播放"
+        ],
+        [
+          "生成的画面",
+          "AI 回复里生成好的画面点开同样用看图组件"
+        ]
+      ]
+    },
+    {
+      "title": "表现",
+      "head": [
+        "行为",
+        "说明"
+      ],
+      "rows": [
+        [
+          "超多消息",
+          "只渲染视口上下各一屏多；行高先估、渲染后量出来缓存；上方条目高度变了补偿滚动，看着的内容不跳"
+        ],
+        [
+          "发送",
+          "输入框里的字原地变成气泡，飞进它在列表里的位置；原来的消息同时让位上移"
+        ],
+        [
+          "回复",
+          "等用户的消息落地再开始；思考结束自动收起成“已思考 N 秒”；正文匀速流出；随时可以停止"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "content.css",
+      "input.css",
+      "data.css"
+    ],
+    "api": [
+      [
+        "mountChat(.sn-chat, { respond, history })",
+        "satin-ui/chat"
+      ],
+      [
+        "bindInputs(root)",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { mountChat } from \"satin-ui/chat\";\nimport { bindInputs } from \"satin-ui/components\";\n\nconst box = document.querySelector(\".sn-chat\");\nbindInputs(box); // 底部的输入框（data-composer data-external：发送交给对话组件）\n\n// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文\n// 不给 history 就从空的对话开始；要带历史：history: { initial(), older(), hasMore() }\nmountChat(box, {\n  respond: async function* (question, state) {\n    const res = await fetch(\"/api/chat\", { method: \"POST\", body: JSON.stringify({ question }) });\n    for await (const ev of readEvents(res.body)) {\n      if (state.stopped) break;              // 用户点了停止\n      if (ev.type === \"reasoning\") yield { think: ev.text };\n      if (ev.type === \"text\") yield ev.text;   // 先进缓冲、匀速放出来\n    }\n  },\n});"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"sn-chat\" id=\"chatBox\">\n  <div class=\"sn-chat-hd\"><div class=\"sn-tx\"><b>分镜助手</b><span class=\"sn-sub\"><span data-chat-status>在线</span>·<span data-chat-count class=\"sn-num\"></span></span></div></div>\n  <div class=\"sn-chat-body\"><div class=\"sn-chat-vp\" id=\"chatVp\"><div class=\"sn-chat-canvas\"><div class=\"sn-chat-ph sn-top\"></div><div class=\"sn-chat-ph sn-bot\"></div></div></div><button class=\"sn-chat-jump\" data-chat-jump aria-label=\"跳到最新\"><span data-i=\"arrow-down\"></span><span class=\"sn-badge\" hidden>0</span></button></div>\n  <div class=\"sn-chat-foot\">\n    <div class=\"sn-box-in sn-composer\" data-composer data-external data-max=\"500\" data-max-lines=\"5\">\n      <div class=\"sn-cm-files\"></div>\n      <textarea rows=\"1\" placeholder=\"和分镜助手一起改这一集\"></textarea>\n      <div class=\"sn-cm-bar\"><div class=\"sn-select sn-inline-menu sn-up\"><button class=\"sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add\" data-menubtn data-cm-attach data-tip=\"添加图片、视频、音频或文档\" aria-label=\"添加附件\" data-i=\"plus\"></button><div class=\"sn-menu\" role=\"menu\" style=\"min-width:208px\"><div class=\"sn-item\" data-add=\"img\" data-i=\"image:before\">图片<span class=\"sn-key\">JPG · PNG</span></div><div class=\"sn-item\" data-add=\"vid\" data-i=\"film:before\">视频<span class=\"sn-key\">MP4 · MOV</span></div><div class=\"sn-item\" data-add=\"aud\" data-i=\"audio-lines:before\">音频<span class=\"sn-key\">MP3 · WAV</span></div><div class=\"sn-item\" data-add=\"doc\" data-i=\"file-text:before\">文档<span class=\"sn-key\">PDF · DOCX</span></div><div class=\"sn-sep\"></div><div class=\"sn-item\" data-add=\"fail\" data-i=\"refresh-cw:before\">演示：上传失败</div><div class=\"sn-item\" data-add=\"big\" data-i=\"circle-alert:before\">演示：文件太大</div></div></div><button class=\"sn-btn sn-ghost sn-sm sn-cm-chip\" data-cm-style>风格：电影感</button><span class=\"sn-grow\"></span>\n        <button class=\"sn-btn sn-ghost sn-sm sn-cm-model\" data-cm-model data-tip=\"换模型\" data-i=\"chevron-down:after\">分镜模型 · 精细</button><span class=\"sn-ta-count\"><svg class=\"sn-uring\" viewBox=\"0 0 16 16\"><circle class=\"sn-bg\" cx=\"8\" cy=\"8\" r=\"6\" /><circle class=\"sn-fg\" cx=\"8\" cy=\"8\" r=\"6\" /></svg></span>\n        <button class=\"sn-cm-send\" aria-label=\"发送\" data-tip=\"发送\" data-kbd=\"⌘↵\"><svg class=\"sn-orbit\" viewBox=\"0 0 40 40\"><circle cx=\"20\" cy=\"20\" r=\"19\" /></svg><span class=\"sn-swap\"><span class=\"sn-a\" data-i=\"arrow-up\"></span><span class=\"sn-b\"><span class=\"sn-stop\"></span></span></span></button></div>\n    </div>\n  </div>\n</div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

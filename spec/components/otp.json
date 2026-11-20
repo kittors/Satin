@@ -1,0 +1,62 @@
+{
+  "id": "otp",
+  "name": "验证码",
+  "nav": "验证码",
+  "en": "OTP",
+  "group": "表单",
+  "specRef": "",
+  "summary": "6 格，输入后自动跳到下一格；退格回到上一格；粘贴一串数字会自动分到各格。填进去的数字从下面淡入上来。",
+  "acceptance": [],
+  "api": [
+    {
+      "title": "createOtp(容器, 选项)",
+      "head": [
+        "选项 / 返回",
+        "说明"
+      ],
+      "rows": [
+        [
+          "length",
+          "空容器按它渲染几格（默认 6）"
+        ],
+        [
+          "onComplete",
+          "(code) => {}：填满时调（同时在容器上发 complete、sn-complete 事件）"
+        ],
+        [
+          "返回 value / clear()",
+          "现在填了的 / 清空"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "form.css"
+    ],
+    "api": [
+      [
+        "createOtp(容器, { length, onComplete })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { createOtp } from \"satin-ui/components\";\n\n// 自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入\nconst otp = createOtp(document.querySelector(\"[data-otp]\"), {\n  onComplete: (code) => verify(code), // 6 位都填满时调\n});\notp.value;   // 现在填了的\notp.clear(); // 清空、焦点回第一格"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"sn-otp\" data-otp><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 1 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 2 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 3 位\"><span class=\"sn-gap\"></span><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 4 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 5 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 6 位\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

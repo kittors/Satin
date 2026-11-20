@@ -1,0 +1,85 @@
+{
+  "id": "chip",
+  "name": "切换芯片",
+  "nav": "切换芯片",
+  "en": "ToggleChip · Tag",
+  "group": "按钮",
+  "specRef": "",
+  "summary": "筛选条件、多选标签。选中时前面长出一个对勾；可以移除的标签，移除时先收起宽度再消失，旁边的芯片平滑补位。",
+  "acceptance": [],
+  "api": [
+    {
+      "title": "标记",
+      "head": [
+        "写法",
+        "说明"
+      ],
+      "rows": [
+        [
+          ".sn-chip[data-toggle]",
+          "筛选芯片：点了切换 .sn-on（切换照“代码”里几行接上）"
+        ],
+        [
+          "[data-chips=\"removable\"] .sn-chip .sn-x",
+          "可移除标签：点 × 移除"
+        ]
+      ]
+    },
+    {
+      "title": "函数",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "chipHTML({ text, on, removable })",
+          "生成芯片 / 标签的标记"
+        ],
+        [
+          "removeChip(芯片, { onRemoved })",
+          "先脱离布局淡出，剩下的用弹簧补位"
+        ],
+        [
+          "chipremove 事件",
+          "移除后在容器上冒泡，detail: { chip }"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "buttons.css"
+    ],
+    "api": [
+      [
+        "removeChip(芯片, { onRemoved })",
+        "satin-ui/components"
+      ],
+      [
+        "chipHTML({ text, on, removable })",
+        "satin-ui/components"
+      ]
+    ],
+    "js": "筛选芯片点了切换 <code>.sn-on</code>：几行代码接上，见\"代码\""
+  },
+  "example": {
+    "0": {
+      "html": "<!-- 筛选芯片：可多选，点了切换（aria-pressed 跟着变） -->\n<div class=\"row\">\n  <button class=\"sn-chip sn-on\" data-toggle><span data-i=\"check\"></span>进行中</button>\n  <button class=\"sn-chip\" data-toggle><span data-i=\"check\"></span>已完成</button>\n</div>\n\n<!-- 可移除的标签：容器写 data-chips=\"removable\" -->\n<div class=\"row\" data-chips=\"removable\">\n  <span class=\"sn-chip sn-tag sn-on\">雨夜<button class=\"sn-x\" aria-label=\"移除 雨夜\" data-i=\"x\"></button></span>\n  <span class=\"sn-chip sn-tag sn-on\">车站<button class=\"sn-x\" aria-label=\"移除 车站\" data-i=\"x\"></button></span>\n</div>",
+      "js": "import { injectIcons } from \"satin-ui\";\nimport { removeChip } from \"satin-ui/components\";\nimport \"satin-ui/css/buttons.css\";\n\ninjectIcons(document);\n\n// 筛选芯片：点了切换 .sn-on，aria-pressed 跟着变\nfor (const c of document.querySelectorAll(\".sn-chip[data-toggle]\")) {\n  c.setAttribute(\"aria-pressed\", String(c.classList.contains(\"sn-on\")));\n  c.addEventListener(\"click\", () => c.setAttribute(\"aria-pressed\", String(c.classList.toggle(\"sn-on\"))));\n}\n\n// 可移除标签：点 × 先脱离布局淡出，剩下的用弹簧补位；移除后容器上冒泡 chipremove\nconst row = document.querySelector('[data-chips=\"removable\"]');\nrow.addEventListener(\"click\", (e) => {\n  const x = e.target.closest(\".sn-chip .sn-x\");\n  if (x) removeChip(x.closest(\".sn-chip\"));\n});\nrow.addEventListener(\"chipremove\", (e) => console.log(\"移除了\", e.detail.chip.textContent));"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"row\" style=\"gap:8px\" id=\"filterChips\"><button class=\"sn-chip sn-on\" data-toggle><span data-i=\"check\"></span>进行中</button><button class=\"sn-chip\" data-toggle><span data-i=\"check\"></span>已完成</button><button class=\"sn-chip\" data-toggle><span data-i=\"check\"></span>失败</button><button class=\"sn-chip\" data-toggle><span data-i=\"check\"></span>已归档</button></div>\n<div class=\"row\" style=\"gap:8px\" id=\"tagChips\" data-chips=\"removable\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

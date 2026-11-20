@@ -1,0 +1,39 @@
+{
+  "id": "iconbutton",
+  "name": "纯图标按钮",
+  "nav": "纯图标按钮",
+  "en": "IconButton",
+  "group": "按钮",
+  "specRef": "",
+  "summary": "没有文字的按钮必须有名称：悬停 500ms 后用 Tooltip 显示，读屏也读这个名称。默认没有面，悬停时出现底色、图标变深，按下时缩一下；需要更明显时用带底色或带边框的；圆形用在浮动操作和播放器上。",
+  "acceptance": [
+    "徽标只用中性色（黑或白），数字等宽；新出现时轻轻弹一下。",
+    "28 的小号按钮点击区域仍扩到 32×32。"
+  ],
+  "api": [],
+  "usage": {
+    "css": [
+      "buttons.css"
+    ],
+    "api": [
+      [
+        "setup()：整页调一次，带 data-tip 的按钮自动有文字提示",
+        "satin-ui"
+      ]
+    ]
+  },
+  "example": null,
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div id=\"ibtns\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

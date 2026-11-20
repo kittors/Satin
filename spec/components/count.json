@@ -1,0 +1,75 @@
+{
+  "id": "count",
+  "name": "字数统计",
+  "nav": "字数统计",
+  "en": "Counter · LongText",
+  "group": "表单",
+  "specRef": "",
+  "summary": "单行：聚焦或有内容时，右边淡入\"已写/上限\"，数字滚动变化；写到 90% 变成提醒色，写满再敲时计数抖一下。长文本：输入框随内容平滑长高，到上限高度后在里面滚动，上下边缘渐隐；右下角一圈用量环，快满时显示\"还剩几字\"，超出时整个框变红、显示\"超出几字\"。",
+  "acceptance": [
+    "按\"字\"计数（字形簇），不按字节；上限写在计数里，不藏在帮助文字中。",
+    "单行用 maxlength 硬上限；长文本允许先写超，超出的部分不能保存，计数变红提示删减。",
+    "高度变化 140ms ease.out；超过 7 行在框内滚动，不把页面撑长。"
+  ],
+  "api": [
+    {
+      "title": "函数",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "createCount(input[data-count])",
+          "单行计数，maxlength 是上限"
+        ],
+        [
+          "createLongText([data-ta], { onSubmit })",
+          "自动长高 + 量环计数（data-max）；⌘↵ 提交"
+        ],
+        [
+          "bindInputs(root)",
+          "按标记一次接上（data-count / data-ta / data-pw / data-email / data-tagin / data-stepper / data-composer）"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "form.css",
+      "input.css"
+    ],
+    "api": [
+      [
+        "createCount(input[data-count])",
+        "satin-ui/components"
+      ],
+      [
+        "createLongText([data-ta], { onSubmit })",
+        "satin-ui/components"
+      ],
+      [
+        "bindInputs(root)",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { createCount, createLongText, bindInputs } from \"satin-ui/components\";\n\n// 单行：<input maxlength=\"20\" data-count>，右边的计数跟着滚动，快满变色，写满还在敲时抖一下\ncreateCount(document.querySelector(\"input[data-count]\"));\n\n// 长文本：<div data-ta data-max=\"200\">…<textarea>…</div>\n// 自动长高 + 量环计数；快满\"还剩 N 字\"，超出\"超出 N 字\"并整框变红；⌘↵ 提交\ncreateLongText(document.querySelector(\"[data-ta]\"), { onSubmit: (text) => save(text) });\n\n// 或者按标记一次接上页面上所有的\nbindInputs(document);"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"grid-m auto\" style=\"--min:260px;gap:24px;align-items:start\">\n      <div class=\"stack\" style=\"gap:18px\">\n        <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"c-title\">镜头标题</label>\n          <span class=\"sn-ib sn-has-post sn-has-count\"><input class=\"sn-input sn-lg\" id=\"c-title\" maxlength=\"20\" placeholder=\"一句话说清这个镜头\" data-count><span class=\"sn-post\"><span class=\"sn-counter\"><span class=\"sn-roll\"><span>0</span></span><span>/20</span></span></span></span></div>\n        <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"c-name\">角色名</label>\n          <span class=\"sn-ib sn-has-post sn-has-count\"><input class=\"sn-input\" id=\"c-name\" maxlength=\"8\" value=\"林夏\" data-count><span class=\"sn-post\"><span class=\"sn-counter\"><span class=\"sn-roll\"><span>0</span></span><span>/8</span></span></span></span></div>\n      </div>\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"c-desc\">画面描述</label>\n        <div class=\"sn-box-in\" data-ta data-max=\"120\" data-max-lines=\"7\">\n          <textarea id=\"c-desc\" rows=\"3\" placeholder=\"写清楚人物、动作和光线，生成会更准。可以一直往下写，框会跟着长高。\"></textarea>\n          <div class=\"sn-ta-foot\"><span class=\"sn-hint\">⇧↵ 换行 · ⌘↵ 保存</span><span class=\"sn-ta-count\"><svg class=\"sn-uring\" viewBox=\"0 0 16 16\"><circle class=\"sn-bg\" cx=\"8\" cy=\"8\" r=\"6\" /><circle class=\"sn-fg\" cx=\"8\" cy=\"8\" r=\"6\" /></svg><span class=\"sn-txt\"><span class=\"sn-roll\"><span>0</span></span> / 120</span></span></div>\n        </div>\n        <div class=\"sn-help\">中文、英文、标点都按一个字算；表情按一个字算。</div></div>\n    </div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

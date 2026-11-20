@@ -1,0 +1,50 @@
+[
+  {
+    "name": "ease.out",
+    "token": "motion.easing.out",
+    "css": "cubic-bezier(0, 0, 0.58, 1)",
+    "use": "进入；悬停、按下"
+  },
+  {
+    "name": "ease.outStrong",
+    "token": "motion.easing.outStrong",
+    "css": "cubic-bezier(0.22, 1, 0.36, 1)",
+    "use": "小件落定；容器出现后错峰的子元素"
+  },
+  {
+    "name": "ease.in",
+    "token": "motion.easing.in",
+    "css": "cubic-bezier(0.42, 0, 1, 1)",
+    "use": "只用于离开"
+  },
+  {
+    "name": "ease.inOut",
+    "token": "motion.easing.inOut",
+    "css": "cubic-bezier(0.42, 0, 0.58, 1)",
+    "use": "留在屏上换位、换尺寸"
+  },
+  {
+    "name": "ease.overshoot",
+    "token": "motion.easing.overshoot",
+    "css": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+    "use": "小型确认：勾选、开关圆钮、徽标"
+  },
+  {
+    "name": "ease.open",
+    "token": "motion.easing.open",
+    "css": "cubic-bezier(0.32, 0.72, 0, 1)",
+    "use": "展开和收回：卡片变详情、面板"
+  },
+  {
+    "name": "ease.spring",
+    "token": "motion.easing.spring",
+    "css": "linear(0, 0.32, 0.78, 1.04, 1.09, 1.06, 1.02, 1, 0.99, 0.99, 1)",
+    "use": "拖拽、滑动松手后的回弹"
+  },
+  {
+    "name": "linear",
+    "token": "motion.easing.linear",
+    "css": "linear",
+    "use": "只用于转圈、进度条"
+  }
+]

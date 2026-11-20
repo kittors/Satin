@@ -1,0 +1,77 @@
+{
+  "id": "progress",
+  "name": "进度",
+  "nav": "进度",
+  "en": "Progress",
+  "group": "反馈",
+  "specRef": "",
+  "summary": "能数清楚、超过 3 秒的工作（导入、导出、上传、批量生成）显示进度：数量、进度条、剩余时间，可以取消。完成时旧文字模糊淡出，新文字淡入，不整块重画。AI 生成先列出步骤，再一段段淡入结果，提前留好高度，内容出来时页面不跳。",
+  "acceptance": [
+    "进度卡入场 420ms；完成时旧文字 160ms 模糊淡出，新文字 420ms 淡入，图标原地换成对勾。",
+    "每次等待只用一个指示器：有进度卡就不再转圈、不再弹 Toast。"
+  ],
+  "api": [
+    {
+      "title": "createProgressCard(.sn-pcard, 选项)",
+      "head": [
+        "选项 / 方法",
+        "说明"
+      ],
+      "rows": [
+        [
+          "onCancel / onOpen",
+          "点“取消” / “打开”时调；同时在卡片上冒泡 sn-cancel / sn-open"
+        ],
+        [
+          "start(标题, 副标题)",
+          "开始：进度归零"
+        ],
+        [
+          "set(p, 副标题)",
+          "进度 0 ~ 1"
+        ],
+        [
+          "finish(标题, 副标题)",
+          "完成：文字模糊换掉，图标原地变对勾"
+        ],
+        [
+          "cancel(标题, 副标题)",
+          "取消"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "feedback.css"
+    ],
+    "api": [
+      [
+        "createProgressCard(.sn-pcard, { onCancel, onOpen })",
+        "satin-ui/components"
+      ],
+      [
+        "progressHTML({ value, ring, size })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { createProgressCard } from \"satin-ui/components\";\n\nconst card = createProgressCard(document.querySelector(\".sn-pcard\"), {\n  onCancel: () => { job.cancel(); card.cancel(\"已取消导出\", \"已导出的部分不会保留。\"); },\n  onOpen: () => showInFolder(),\n});\n\ncard.start(\"正在导出 第三集.mp4\");\njob.on(\"progress\", (p, done, total) => card.set(p, `已完成 ${done} / ${total} 个镜头`));\njob.on(\"end\", () => card.finish(\"导出完成\", '第三集.mp4 · 1.2 GB · 已保存到\"下载\"'));"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"grid-m lc\">\n  <span class=\"sn-cap\">进度条</span><div class=\"stack\" style=\"gap:12px;max-width:420px\"><div class=\"sn-pbar\" style=\"--sn-p:.62\"><i></i></div><div class=\"sn-pbar sn-indet\"><i></i></div></div>\n  <span class=\"sn-cap\">进度环</span><div class=\"row\"><span class=\"sn-pring\" style=\"--sn-p:.25\"></span><span class=\"sn-pring\" style=\"--sn-p:.62\"></span><span class=\"sn-pring sn-lg\" style=\"--sn-p:.9\"></span><span class=\"sn-spinner\"></span><span class=\"sn-spinner sn-lg\"></span></div>\n</div>\n<div class=\"sn-pcard\" id=\"pcard\"><span class=\"sn-pc-ic\"><span class=\"sn-swap\"><span class=\"sn-a\" data-i=\"film\"></span><span class=\"sn-b\" data-i=\"check\"></span></span></span>\n  <div class=\"sn-pc-main\"><div class=\"sn-pc-top\"><b class=\"sn-pc-title\"><span>正在导出 第三集.mp4</span></b><span class=\"sn-pc-num sn-num\">0%</span></div><div class=\"sn-pbar\"><i></i></div><div class=\"sn-pc-sub sn-num\"><span>准备中…</span></div></div>\n  <div class=\"sn-pc-acts\"><button class=\"sn-btn sn-ghost sn-sm\" data-pc-cancel>取消</button></div></div>\n<div class=\"row\"><button class=\"sn-btn sn-secondary\" data-pc-start data-i=\"refresh-cw:before\">重新导出</button><span class=\"sn-note\">中途点\"取消\"看取消后的状态</span></div>\n<div class=\"sn-aigen\" id=\"aigen\">\n  <div class=\"sn-ai-head\"><b>生成分镜描述</b><button class=\"sn-btn sn-secondary sn-sm\" data-ai-run data-i=\"play:before\">开始生成</button></div>\n  <ol class=\"sn-ai-steps\"><li data-s=\"0\">理解原文</li><li data-s=\"1\">拆分成镜头</li><li data-s=\"2\">写画面描述</li></ol>\n  <div class=\"sn-ai-out\"></div>\n</div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

@@ -1,0 +1,88 @@
+{
+  "id": "notify",
+  "name": "通知",
+  "nav": "通知",
+  "en": "Notification",
+  "group": "反馈",
+  "specRef": "",
+  "summary": "不是用户刚才的操作引起的：后台任务完成或失败、额度、更新、审核。显示在右上角，直到用户处理或关闭；铃铛和窗口标题都显示数量，铃铛里能找回全部。新的一条从上方落到旧的上面，旧的后退、每层露出 12px，最多 3 层；指针移上去就展开成列表。",
+  "acceptance": [
+    "宽 360，圆角 12；标题 13/600，正文 13，时间 12。操作按钮在右下角，主按钮放最后，最多两个。",
+    "落下 560ms ease.open；关掉一条时，下面的补上来。",
+    "客户端来源：生成完成或失败、导出完成、额度不足、版本更新、公告；后台：待审核、举报、系统告警、导出完成。"
+  ],
+  "api": [
+    {
+      "title": "notify(选项)",
+      "head": [
+        "选项",
+        "说明"
+      ],
+      "rows": [
+        [
+          "icon / tone",
+          "lucide 图标名 / \"ok\" | \"bad\" | \"warn\" | \"\""
+        ],
+        [
+          "title / body / time",
+          "标题、正文（文件名不拆开）、时间（默认现在）"
+        ],
+        [
+          "actions",
+          "[{ label, variant, run(card) }]：按钮；没写 run 就是关闭"
+        ]
+      ]
+    },
+    {
+      "title": "返回值和其他",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "close()",
+          "关掉这一条"
+        ],
+        [
+          "notify 事件",
+          "每来一条在 document 上发，detail 是传进来的选项"
+        ],
+        [
+          ".sn-notifs",
+          "容器（没有就自己建），里面的 [data-clear-all] 全部清除"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "feedback.css",
+      "number.css"
+    ],
+    "api": [
+      [
+        "notify({ icon, tone, title, body, actions })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { notify } from \"satin-ui/components\";\n\n// 卡片在右上角叠起来：后面的底边露出 12px、最多 3 层；指针移上去展开成列表；可以一键全部清除\nconst n = notify({\n  icon: \"circle-check\", tone: \"ok\",          // tone：\"ok\" | \"bad\" | \"warn\" | \"\"\n  title: \"第三集生成完成\",\n  body: \"12 个镜头都生成好了，可以开始剪辑。\",\n  actions: [{ label: \"查看\", variant: \"secondary\", run: (card) => { open(); card.close(); } }],\n});\nn.close();\n\n// 每来一条都会在 document 上发 notify 事件，铃铛这类地方可以跟着记未读\ndocument.addEventListener(\"notify\", (e) => bell.add(e.detail));"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"row\">\n      <button class=\"sn-btn sn-secondary\" data-notify data-i=\"bell-ring:before\">来一条通知</button>\n      <span class=\"sn-note\">连点几次看堆叠；把指针移到右上角的通知上看展开，悬停时左上角出现关闭</span>\n      <span style=\"flex:1\"></span>\n      <button class=\"sn-btn sn-ghost sn-ibtn\" id=\"bellBtn\" data-pop=\"pop-bell\" data-tip=\"通知\" data-i=\"bell\"></button>\n    </div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

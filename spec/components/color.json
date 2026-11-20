@@ -1,0 +1,29 @@
+{
+  "id": "color",
+  "name": "颜色",
+  "nav": "颜色",
+  "en": "04 号 §1",
+  "group": "基础",
+  "specRef": "",
+  "summary": "只用中性色。层级靠背景明度差和文字四级灰度表达，不靠彩色；彩色只用在危险、成功、警告这类语义上。色块显示当前主题的值，切换主题可以对照另一套。",
+  "acceptance": [
+    "**强调色等于主文字色**：开关、复选框、进度、焦点都用黑（浅色）或白（深色），不用品牌色。",
+    "**禁止**：琥珀色等彩色品牌色、彩色图标、彩色状态徽章、左侧竖条、渐变文字。"
+  ],
+  "api": [],
+  "usage": null,
+  "example": null,
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"swatches\" id=\"swatches\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

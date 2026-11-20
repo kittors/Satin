@@ -1,0 +1,66 @@
+{
+  "id": "optimistic",
+  "name": "乐观更新",
+  "nav": "乐观更新",
+  "en": "Optimistic",
+  "group": "行为",
+  "specRef": "",
+  "summary": "几乎一定成功、能撤回的操作（收藏、重命名、排序）先显示结果再保存；保存失败时这一行左右抖两下、恢复原样，并给出重试。付款、永久删除、发给别人的操作不用乐观更新。",
+  "acceptance": [],
+  "api": [
+    {
+      "title": "optimistic(选项)",
+      "head": [
+        "选项",
+        "说明"
+      ],
+      "rows": [
+        [
+          "apply / revert",
+          "马上改界面 / 失败时改回去"
+        ],
+        [
+          "save",
+          "() => Promise：保存"
+        ],
+        [
+          "shake",
+          "失败时抖两下的元素"
+        ],
+        [
+          "failText",
+          "失败提示（默认“没保存上，已恢复原样”），带“重试”"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "data.css"
+    ],
+    "api": [
+      [
+        "optimistic({ apply, revert, save, shake, failText })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { optimistic } from \"satin-ui/components\";\n\n// 先显示结果再保存；失败时恢复、整行抖两下、出一条带\"重试\"的提示\nstar.addEventListener(\"click\", () => {\n  const on = !star.classList.contains(\"sn-on\");\n  optimistic({\n    apply: () => star.classList.toggle(\"sn-on\", on),\n    revert: () => star.classList.toggle(\"sn-on\", !on),\n    save: () => fetch(\"/api/star\", { method: on ? \"POST\" : \"DELETE\" }).then((r) => { if (!r.ok) throw r; }),\n    shake: row,\n  });\n});"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"sn-opt-row\"><span class=\"sn-cv\" style=\"width:48px;height:28px;border-radius:4px;--sn-g:linear-gradient(160deg,#2c3b50,#0e131b);background:var(--sn-g)\"></span><span class=\"sn-nm\" data-rename tabindex=\"0\" data-tip=\"双击或按回车改名\">雨夜车站</span><button class=\"sn-star\" data-star aria-pressed=\"false\"><span data-i=\"star\"></span><span class=\"sn-n\"><span>24</span></span></button></div>\n<label class=\"sn-check\" data-c style=\"margin-top:4px\"><input type=\"checkbox\" id=\"optFail\">模拟保存失败</label>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

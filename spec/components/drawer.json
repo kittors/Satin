@@ -1,0 +1,112 @@
+{
+  "id": "drawer",
+  "name": "抽屉",
+  "nav": "抽屉",
+  "en": "Drawer",
+  "group": "浮层",
+  "specRef": "",
+  "summary": "长表单、要对照页面编辑时用。从右边滑进来，背后的页面保持可见；改动即时反映到背后的页面，自动保存。抽屉不用来做确认。",
+  "acceptance": [
+    "悬浮在窗口里，四周留 8px，圆角 16；开 320ms ease.open，关 220ms ease.in。",
+    "背后的页面只压暗 12%（深色 40%），保证能对照着改。",
+    "Esc 或点外面关闭，焦点回到\"编辑\"按钮。"
+  ],
+  "api": [
+    {
+      "title": "openDrawer(抽屉, 选项)",
+      "head": [
+        "选项",
+        "说明"
+      ],
+      "rows": [
+        [
+          "trigger",
+          "触发的按钮：关上后焦点回到这里"
+        ],
+        [
+          "focus",
+          "打开后焦点先落在这里（默认抽屉里第一个能聚焦的）"
+        ],
+        [
+          "scrim",
+          "遮罩元素（默认页面上的 .sn-drawer-scrim，没有就建一个）"
+        ],
+        [
+          "onClose",
+          "关上以后调"
+        ]
+      ]
+    },
+    {
+      "title": "其他",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "返回值",
+          "{ close(refocus) }"
+        ],
+        [
+          "closeDrawer(refocus)",
+          "关上正开着的那个抽屉"
+        ],
+        [
+          "[data-drawer=\"抽屉 id\"]",
+          "打开抽屉的按钮（bindOverlays 接上）"
+        ],
+        [
+          "抽屉里的 [data-x]",
+          "关闭"
+        ],
+        [
+          "关闭时机",
+          "Esc、点外面（提示、轻提示、菜单除外；要整页调过 setup()）"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "overlay.css"
+    ],
+    "api": [
+      [
+        "bindOverlays(root)：接上 [data-drawer]",
+        "satin-ui/components"
+      ],
+      [
+        "openDrawer(抽屉, 选项)",
+        "satin-ui/components"
+      ],
+      [
+        "closeDrawer(refocus)",
+        "satin-ui/components"
+      ],
+      [
+        "setup()：整页调一次，Esc、点外面关上",
+        "satin-ui"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "html": "<button class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-drawer=\"dr-edit\" data-i=\"pencil\"></button>\n\n<!-- 遮罩可以不写：没有 .sn-drawer-scrim 会自动建一个 -->\n<aside class=\"sn-drawer\" id=\"dr-edit\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"dr-t\" tabindex=\"-1\">\n  <div class=\"sn-hd\">\n    <h3 id=\"dr-t\">编辑镜头</h3>\n    <button class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-i=\"x\"></button>\n  </div>\n  <div class=\"sn-bd\">\n    <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dr-title\">镜头标题</label><input class=\"sn-input\" id=\"dr-title\"></div>\n  </div>\n  <div class=\"sn-ft\"><button class=\"sn-btn sn-ghost\" data-x>完成</button></div>\n</aside>",
+      "js": "import { setup } from \"satin-ui\";\nimport { bindOverlays, openDrawer } from \"satin-ui/components\";\n\nsetup(); // 页面级行为（Esc、点外面关上），整页调一次\n\n// [data-drawer=\"抽屉 id\"] 打开；抽屉里的 [data-x]、Esc、点外面关闭；焦点圈在抽屉里\nbindOverlays(document);\n\n// 自己控制：先把要编辑的内容填进去再打开，关上时收尾\neditBtn.addEventListener(\"click\", () => {\n  title.value = shot.title;\n  openDrawer(document.querySelector(\"#dr-edit\"), {\n    trigger: editBtn,       // 关上后焦点回到这里\n    focus: title,           // 打开后焦点先落在这里\n    onClose: () => save(shot),\n  });\n});"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"sn-shot-cards\" id=\"shotCards\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

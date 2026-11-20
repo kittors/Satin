@@ -1,0 +1,38 @@
+{
+  "id": "input",
+  "name": "输入框",
+  "nav": "输入框",
+  "en": "TextField",
+  "group": "表单",
+  "specRef": "04 号 §8",
+  "summary": "四种高度：28 用在表格和工具条，32 默认，36 用在主要表单，40 只用在登录和欢迎页。聚焦时边框加深，外加 3px 的柔环。",
+  "acceptance": [],
+  "api": [],
+  "usage": {
+    "css": [
+      "form.css"
+    ]
+  },
+  "example": null,
+  "demos": [
+    {
+      "caption": "状态",
+      "html": "<div class=\"grid-m auto\" style=\"--min:200px;gap:20px 20px;align-items:start\" id=\"inputStates\"></div>"
+    },
+    {
+      "caption": "尺寸",
+      "html": "<div class=\"grid-m auto\" style=\"--min:150px;gap:16px\">\n      <div class=\"sn-field\"><span class=\"sn-cap\">sm 28</span><input class=\"sn-input sn-sm\" placeholder=\"表格、工具条\"></div>\n      <div class=\"sn-field\"><span class=\"sn-cap\">md 32（默认）</span><input class=\"sn-input\" placeholder=\"大多数地方\"></div>\n      <div class=\"sn-field\"><span class=\"sn-cap\">lg 36</span><input class=\"sn-input sn-lg\" placeholder=\"主要表单\"></div>\n      <div class=\"sn-field\"><span class=\"sn-cap\">xl 40</span><input class=\"sn-input sn-xl\" placeholder=\"登录、欢迎页\"></div>\n    </div>"
+    },
+    {
+      "caption": "前缀、后缀、清除",
+      "html": "<div class=\"grid-m auto\" style=\"--min:200px;gap:16px\">\n      <span class=\"sn-ib sn-has-pre\"><span class=\"sn-pre\" data-i=\"mail\"></span><input class=\"sn-input\" placeholder=\"带前缀图标\"></span>\n      <span class=\"sn-ib sn-has-post\"><input class=\"sn-input sn-num\" value=\"1080\" aria-label=\"高度\"><span class=\"sn-post\"><span class=\"sn-unit\">px</span></span></span>\n      <span class=\"sn-ib sn-has-post sn-filled\" data-clearable><input class=\"sn-input\" value=\"输入后右侧出现清除\"><span class=\"sn-post\"><button class=\"sn-clear\" aria-label=\"清除\" data-i=\"x\"></button></span></span>\n    </div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

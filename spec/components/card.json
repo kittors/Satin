@@ -1,0 +1,43 @@
+{
+  "id": "card",
+  "name": "卡片",
+  "nav": "卡片",
+  "en": "Card",
+  "group": "数据展示",
+  "specRef": "",
+  "summary": "项目、素材用卡片。悬停时卡片不上浮、不加阴影：封面在框里慢慢放大一点，右上角出现\"更多\"，左上角出现勾选框。选中后外圈一道 2px 的线。",
+  "acceptance": [
+    "封面 16:9，圆角 12（卡片）、内部元素按嵌套公式缩小；标题 13/500 一行截断，副信息 12。",
+    "封面放大 1.04、600ms ease.out；客户端的项目卡片悬停时改为播放预览视频。"
+  ],
+  "api": [],
+  "usage": {
+    "css": [
+      "data.css"
+    ],
+    "api": [
+      [
+        "openMenu(菜单, { trigger, anchor, align })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { setup } from \"satin-ui\";\nimport { openMenu } from \"satin-ui/components\";\n\nsetup(); // 页面级行为（菜单的键盘操作、点外面关上），整页调一次\n\n// 卡片本身是标记：封面、标题、元信息；左上角的勾选框多选，右上角\"更多\"弹菜单\ncards.addEventListener(\"change\", (e) => e.target.closest(\".sn-pc\")?.classList.toggle(\"sn-sel\", e.target.checked));\ncards.addEventListener(\"click\", (e) => {\n  const more = e.target.closest(\"[data-card-more]\");\n  if (more) openMenu(document.querySelector(\"#m-card\"), { trigger: more, anchor: more, align: \"end\" });\n});"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"sn-pcards\" id=\"pcards\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

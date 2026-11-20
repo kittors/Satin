@@ -1,0 +1,62 @@
+{
+  "id": "addremove",
+  "name": "新增与删除",
+  "nav": "新增与删除",
+  "en": "Add · Remove",
+  "group": "行为",
+  "specRef": "",
+  "summary": "新的一项从它该在的位置出现（位移 8px、从 96% 放大），其他项平滑让位；删除时数据立刻删掉，离场的元素马上脱离布局淡出，剩下的用弹簧补位；撤销后元素按\"新增\"的方式回来。",
+  "acceptance": [],
+  "api": [
+    {
+      "title": "函数",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "insertWithFlip(容器, 元素, 放在谁前面)",
+          "从下面淡入，别的元素让位"
+        ],
+        [
+          "removeWithFlip(元素)",
+          "先脱离布局淡出，剩下的用弹簧补位；返回 Promise"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "data.css"
+    ],
+    "api": [
+      [
+        "insertWithFlip(容器, 元素, 放在谁前面)",
+        "satin-ui/components"
+      ],
+      [
+        "removeWithFlip(元素)",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { insertWithFlip, removeWithFlip, toast } from \"satin-ui/components\";\n\n// 新增：从下面淡入，别的元素让位\ninsertWithFlip(box, chipEl(\"回忆\"));\n\n// 删除：先脱离布局淡出，剩下的用弹簧补位；给撤销\nawait removeWithFlip(chip);\ntoast({ kind: \"action\", text: '已移除\"雨夜\"', action: { label: \"撤销\", run: () => insertWithFlip(box, chip, box.children[index]) } });"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"sn-add-row\"><input class=\"sn-input\" id=\"addTag\" placeholder=\"添加一个标签，回车确认\"><button class=\"sn-btn sn-secondary\" data-add-tag>添加</button></div><div class=\"sn-chips-box\" id=\"chipsBox\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

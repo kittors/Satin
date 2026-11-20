@@ -1,0 +1,142 @@
+{
+  "id": "select",
+  "name": "下拉选择与菜单",
+  "nav": "下拉选择与菜单",
+  "en": "Select · Menu",
+  "group": "表单",
+  "specRef": "09 号 §5.3",
+  "summary": "面板从触发器那里长出来，带一点回弹，全程不透明，不会透出背后的字。上下键移动、回车选中、Esc 关闭；收起比展开快。",
+  "acceptance": [
+    "菜单项高 32、圆角 8，面板圆角 12、内边距 4（嵌套公式）。",
+    "危险项放在最后，用分隔隔开，文字和图标都是红色；不可撤销的再弹确认。",
+    "子菜单、安全三角区、右键菜单见 右键菜单与子菜单。"
+  ],
+  "api": [
+    {
+      "title": "createSelect(元素, 选项)",
+      "head": [
+        "选项",
+        "取值",
+        "说明"
+      ],
+      "rows": [
+        [
+          "items / value / placeholder / label",
+          "[\"16:9\", { value, label, disabled }] / 字符串",
+          "空容器按它渲染；已有标记时不用给"
+        ],
+        [
+          "onChange",
+          "(value) => {}",
+          "选中一项时调；value 取条目的 data-v，没写就用文字；同时冒泡 sn-change"
+        ]
+      ]
+    },
+    {
+      "title": "返回值",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "open() / close(refocus)",
+          "打开、关上"
+        ],
+        [
+          "value",
+          "当前选中项的值（只读）"
+        ],
+        [
+          "update({ value })",
+          "选中某一项（不触发回调）"
+        ]
+      ]
+    },
+    {
+      "title": "标记",
+      "head": [
+        "写法",
+        "说明"
+      ],
+      "rows": [
+        [
+          ".sn-select[data-select]",
+          "下拉选择：选中后把文字写进 .sn-val、打勾"
+        ],
+        [
+          ".sn-select（不带 data-select）",
+          "菜单按钮：选了就关"
+        ],
+        [
+          ".sn-trigger / [data-menubtn]",
+          "触发器"
+        ],
+        [
+          "[data-prefix]",
+          "写在菜单按钮的触发器上：选中后按钮文字 = 前缀 + 条目文字"
+        ],
+        [
+          ".sn-menu > .sn-item",
+          "条目；.sn-sel 选中、.sn-chk 打勾位置、.sn-is-off 不可用、data-v 值"
+        ]
+      ]
+    },
+    {
+      "title": "其他",
+      "head": [
+        "名称",
+        "说明"
+      ],
+      "rows": [
+        [
+          "bindSelects(root)",
+          "把 root 里所有 .sn-select 一次接上（接过的不重复接）"
+        ],
+        [
+          "select 事件",
+          "选中时在 .sn-select 上冒泡，detail: { value, item }"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "form.css",
+      "overlay.css"
+    ],
+    "api": [
+      [
+        "createSelect(元素, { items, value, placeholder, label, onChange })",
+        "satin-ui/components"
+      ],
+      [
+        "bindSelects(root)",
+        "satin-ui/components"
+      ],
+      [
+        "setup()：整页调一次，点外面收起",
+        "satin-ui"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "html": "<!-- 下拉选择：选中后把文字写进 .sn-val，打勾 -->\n<div class=\"sn-select\" data-select>\n  <button class=\"sn-trigger\"><span class=\"sn-val\">16:9 · 横屏</span><span data-i=\"chevron-down\"></span></button>\n  <div class=\"sn-menu\" role=\"listbox\">\n    <div class=\"sn-item sn-sel\" data-v=\"16:9\">16:9 · 横屏<span class=\"sn-chk\" data-i=\"check\"></span></div>\n    <div class=\"sn-item\" data-v=\"9:16\">9:16 · 竖屏<span class=\"sn-chk\" data-i=\"check\"></span></div>\n    <div class=\"sn-item\" data-v=\"1:1\">1:1 · 方形<span class=\"sn-chk\" data-i=\"check\"></span></div>\n  </div>\n</div>\n\n<!-- 菜单按钮：选了就关；触发器写了 data-prefix，选中后按钮文字变成\"排序：……\" -->\n<div class=\"sn-select sn-inline-menu\">\n  <button class=\"sn-btn sn-secondary\" data-menubtn data-prefix=\"排序：\">排序：最近更新</button>\n  <div class=\"sn-menu\" role=\"menu\">\n    <div class=\"sn-item sn-sel\">最近更新<span class=\"sn-chk\" data-i=\"check\"></span></div>\n    <div class=\"sn-item\">名称<span class=\"sn-chk\" data-i=\"check\"></span></div>\n  </div>\n</div>",
+      "js": "import { setup, injectIcons } from \"satin-ui\";\nimport { createSelect, bindSelects } from \"satin-ui/components\";\nimport \"satin-ui/css/form.css\";\nimport \"satin-ui/css/overlay.css\";\n\nsetup();               // 页面级行为（点外面收起、Esc），整页调一次\ninjectIcons(document); // data-i 换成图标\n\n// 一个一个接：选中时回调\nconst ratio = createSelect(document.querySelector(\"[data-select]\"), {\n  onChange: (value) => console.log(\"画面比例\", value),\n});\nratio.update({ value: \"9:16\" }); // 改选中项（不触发回调）\nratio.value;                     // \"9:16\"\n\n// 或者把页面上所有 .sn-select 一次接上，用事件拿结果\nbindSelects(document);\ndocument.addEventListener(\"select\", (e) => console.log(e.detail.value));\n\n// 不写标记也行：给一个空容器，按选项渲染\ncreateSelect(document.querySelector(\"#ratio\"), { items: [\"16:9 · 横屏\", \"9:16 · 竖屏\"], value: \"16:9 · 横屏\", label: \"画面比例\" });"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"row\" style=\"align-items:flex-start;gap:20px\">\n      <div class=\"sn-select\" data-select><button class=\"sn-trigger\"><span class=\"sn-val\">16:9 · 横屏</span><span data-i=\"chevron-down\"></span></button>\n        <div class=\"sn-menu\" role=\"listbox\"><div class=\"sn-item sn-sel\">16:9 · 横屏<span class=\"sn-chk\" data-i=\"check\"></span></div><div class=\"sn-item\">9:16 · 竖屏<span class=\"sn-chk\" data-i=\"check\"></span></div><div class=\"sn-item\">1:1 · 方形<span class=\"sn-chk\" data-i=\"check\"></span></div><div class=\"sn-item\">2.39:1 · 宽银幕<span class=\"sn-chk\" data-i=\"check\"></span></div></div></div>\n      <div class=\"sn-select sn-inline-menu\"><button class=\"sn-btn sn-ghost sn-ibtn\" data-menubtn data-tip=\"更多\" data-i=\"ellipsis\"></button>\n        <div class=\"sn-menu\" role=\"menu\" style=\"min-width:200px\"><div class=\"sn-item\" data-i=\"pencil:before\">重命名<span class=\"sn-key\">F2</span></div><div class=\"sn-item\" data-i=\"copy:before\">复制一份<span class=\"sn-key\">⌘D</span></div><div class=\"sn-item\" data-i=\"archive:before\">归档</div><div class=\"sn-sep\"></div><div class=\"sn-item sn-danger-item\" data-i=\"trash-2:before\">删除项目</div></div></div>\n    </div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

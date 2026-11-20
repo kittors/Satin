@@ -1,0 +1,58 @@
+{
+  "id": "slider",
+  "name": "滑块",
+  "nav": "滑块",
+  "en": "Slider",
+  "group": "表单",
+  "specRef": "",
+  "summary": "悬停时圆钮放大，拖动时再放大一点，并在上方显示数值。方向键每次走一格，按住 Shift 走十格。",
+  "acceptance": [],
+  "api": [
+    {
+      "title": "createSlider(元素, 选项)",
+      "head": [
+        "写法 / 事件",
+        "说明"
+      ],
+      "rows": [
+        [
+          "value / max / label",
+          "空容器按它渲染；已有标记时写成 aria-valuenow / data-max"
+        ],
+        [
+          "onChange",
+          "(value) => {}：拖动、点轨道、方向键改值时调（元素上同时发 slide、sn-change 事件）"
+        ],
+        [
+          "返回 value / update({ value })",
+          "当前值 / 从外面改值"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "form.css"
+    ],
+    "api": [
+      [
+        "createSlider(元素, { value, max, label, onChange })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": null,
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"row\" style=\"gap:40px\">\n      <div class=\"sn-field\"><span class=\"sn-lbl\">画面强度</span><div class=\"sn-slider\" data-slider tabindex=\"0\" role=\"slider\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"52\"><span class=\"sn-rail\"></span><span class=\"sn-fillbar\"></span><span class=\"sn-knob\"></span><span class=\"sn-bubble\"></span></div></div>\n      <div class=\"sn-field\"><span class=\"sn-lbl\">镜头时长（秒）</span><div class=\"sn-slider\" data-slider data-max=\"12\" tabindex=\"0\" role=\"slider\" aria-valuemin=\"0\" aria-valuemax=\"12\" aria-valuenow=\"4\"><span class=\"sn-rail\"></span><span class=\"sn-fillbar\"></span><span class=\"sn-knob\"></span><span class=\"sn-bubble\"></span></div></div>\n    </div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

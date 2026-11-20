@@ -1,0 +1,76 @@
+{
+  "id": "numflow",
+  "name": "数字变化",
+  "nav": "数字变化",
+  "en": "NumberFlow",
+  "group": "反馈",
+  "specRef": "",
+  "summary": "数字变了只动变了的那几位：变大往上走、变小往下走，从个位开始依次动；位数变化时新的一位从 0 宽长出来，逗号、小数点、货币符号不跟着滚。四种样式按场合选。",
+  "acceptance": [
+    "**滚动**：每一位是一条 0～9 的竖条，像里程表一样滚过中间的数字，上下边缘渐隐；计数、统计这类连续变化的数字用。",
+    "**模糊滚动**：同样滚动，滚动时带竖直方向的运动模糊（滚过的格数越多越糊），停下变清晰；大号数字、跳变幅度大时用，更有速度感。",
+    "**推入**：变了的那一位，旧数字往上（或往下）滑走，新数字从另一头滑进来；价格、档位这类\"换了一个值\"的场合用。",
+    "**淡入**：原地淡出淡入，带一点缩放和模糊；徽标、按钮里的小数字用。",
+    "共同：每位晚 30ms 依次动；中途又来新值，从当前看到的位置接着滚；读屏只读最终的值；减少动态效果时直接换。"
+  ],
+  "api": [
+    {
+      "title": "createNumberFlow(元素, 选项)",
+      "head": [
+        "选项 / 方法",
+        "说明"
+      ],
+      "rows": [
+        [
+          "value",
+          "初始值"
+        ],
+        [
+          "format",
+          "(v) => 文字：千分位、单位……（默认中文千分位）"
+        ],
+        [
+          "style",
+          "\"roll\" | \"blur\" | \"push\" | \"fade\""
+        ],
+        [
+          "set(v, { instant })",
+          "改值：只动变了的那几位"
+        ],
+        [
+          "value / update({ style })",
+          "当前值 / 换样式"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "number.css"
+    ],
+    "api": [
+      [
+        "createNumberFlow(元素, { value, format, style })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { createNumberFlow } from \"satin-ui/components\";\n\n// 只滚动变了的那几位；style：\"roll\"（滚动）| \"blur\"（滚动带模糊）| \"push\"（推入）| \"fade\"（淡入）\nconst views = createNumberFlow(document.querySelector(\"#views\"), {\n  value: 12840,\n  style: \"roll\",\n  format: (v) => Number(v).toLocaleString(\"zh-CN\"),\n});\nviews.set(12841);\nviews.value;                     // 12841\nviews.update({ style: \"fade\" }); // 换样式"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"sn-nf-card\"><span class=\"sn-cap\">已生成镜头</span><span class=\"sn-nf-big\" data-nf=\"shots\"></span><div class=\"row\"><button class=\"sn-btn sn-secondary sn-sm\" data-nf-add=\"1\">+1</button><button class=\"sn-btn sn-secondary sn-sm\" data-nf-add=\"18\">+18</button><button class=\"sn-btn sn-secondary sn-sm\" data-nf-add=\"-7\">−7</button><button class=\"sn-btn sn-ghost sn-sm\" data-nf-add=\"rand\">随机</button></div></div>\n<div class=\"sn-nf-card\"><span class=\"sn-cap\">套餐价格（每月）</span><span class=\"sn-nf-big\" data-nf=\"price\"></span><div class=\"row\"><button class=\"sn-btn sn-secondary sn-sm\" data-nf-plan>换个套餐</button></div></div>\n<div class=\"sn-nf-card\"><span class=\"sn-cap\">本月生成时长</span><span class=\"sn-nf-mid\" data-nf=\"live\"></span><span class=\"sn-note\">每 1.2 秒自动更新一次</span></div>\n<div class=\"sn-nf-card\"><span class=\"sn-cap\">未读消息</span><span class=\"sn-nf-bell\"><span data-i=\"bell\"></span><span class=\"sn-badge-n\"><span data-nf=\"badge\"></span></span></span><div class=\"row\"><button class=\"sn-btn sn-secondary sn-sm\" data-nf-badge>来新消息</button></div></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

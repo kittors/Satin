@@ -1,0 +1,26 @@
+{
+  "id": "motion",
+  "name": "动效曲线",
+  "nav": "动效曲线",
+  "en": "09 号 §1",
+  "group": "基础",
+  "specRef": "",
+  "summary": "全系统只有这几条曲线。先看动效类型再选：进入先快后慢，离开先慢后快，换位两端慢中间快。点一下每张卡片看它怎么动。",
+  "acceptance": [],
+  "api": [],
+  "usage": null,
+  "example": null,
+  "demos": [
+    {
+      "caption": "时长",
+      "html": "<div class=\"grid-m\" style=\"grid-template-columns:minmax(0,160px) minmax(0,160px) 1fr\" id=\"durations\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

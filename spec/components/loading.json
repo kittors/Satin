@@ -1,0 +1,74 @@
+{
+  "id": "loading",
+  "name": "骨架与加载",
+  "nav": "骨架与加载",
+  "en": "Skeleton · Spinner",
+  "group": "反馈",
+  "specRef": "",
+  "summary": "300ms 以内的等待什么都不显示；超过 300ms 才出现，一旦出现至少留 500ms。布局已知时用骨架，不用孤零零的转圈；数据到了逐行替换，每行间隔 40ms 淡入。",
+  "acceptance": [
+    "骨架的光带 1.2 秒扫过一次，整列共用一道光，不是每块各扫各的。",
+    "转圈 0.9 秒一圈；按钮里的转圈至少转满一圈再停。只在按钮里和很小的区域用转圈。",
+    "自动保存这类用户不用察觉的等待，不显示加载，只在固定位置放一个安静的状态字。"
+  ],
+  "api": [
+    {
+      "title": "loadWithSkeleton(容器, 选项)",
+      "head": [
+        "选项",
+        "说明"
+      ],
+      "rows": [
+        [
+          "load",
+          "() => Promise：取数据"
+        ],
+        [
+          "skeleton",
+          "骨架的 HTML（.sn-sk 是一条骨架）"
+        ],
+        [
+          "render",
+          "(数据) => HTML"
+        ],
+        [
+          "stagger",
+          "逐行替换的间隔（默认 40ms）"
+        ],
+        [
+          "返回",
+          "Promise：{ shown（骨架出现过没有）, waited（等了多久）}"
+        ]
+      ]
+    }
+  ],
+  "usage": {
+    "css": [
+      "feedback.css"
+    ],
+    "api": [
+      [
+        "loadWithSkeleton(容器, { load, skeleton, render, stagger })",
+        "satin-ui/components"
+      ]
+    ]
+  },
+  "example": {
+    "0": {
+      "js": "import { loadWithSkeleton } from \"satin-ui/components\";\n\n// 300ms 内回来就不显示骨架（不闪）；显示了就至少留 500ms；数据到了逐行替换，每行淡入\nconst { shown, waited } = await loadWithSkeleton(document.querySelector(\".sn-sk-list\"), {\n  load: () => fetch(\"/api/shots\").then((r) => r.json()),\n  skeleton: '<div class=\"sn-sk-row\"><span class=\"sn-sk\" style=\"width:64px;height:40px\"></span>…</div>'.repeat(4),\n  render: (shots) => shots.map((s) => `<div class=\"sn-sk-row\"><b>${s.title}</b></div>`).join(\"\"),\n});"
+    }
+  },
+  "demos": [
+    {
+      "caption": "",
+      "html": "<div class=\"row\" style=\"margin-bottom:16px\">\n      <button class=\"sn-btn sn-secondary\" data-load=\"200\">加载（快，200ms）</button><button class=\"sn-btn sn-secondary\" data-load=\"1600\">加载（慢，1.6 秒）</button>\n      <span class=\"sn-note\" id=\"loadNote\">快的那次不会闪出骨架</span>\n    </div><div class=\"sn-sk-list\" id=\"skList\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}
