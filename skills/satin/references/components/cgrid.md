@@ -14,7 +14,7 @@
 
 ## 写法
 
-### mountCanvasGrid(.sn-grid.cgrid, 选项)（satin-ui/canvas-grid）
+### createCanvasGrid(空容器或 .sn-grid, 选项)（satin-ui/canvas-grid）；旧写法 mountCanvasGrid 仍可用
 
 | 选项 | 说明 |
 |---|---|
@@ -24,12 +24,12 @@
 ## 用法
 
 ```js
-import { mountCanvasGrid } from "satin-ui/canvas-grid";
+import { createCanvasGrid } from "satin-ui/canvas-grid";
 import "satin-ui/css/grid.css";
 import "satin-ui/css/data.css";
 
 // 整张表画在一块画布上：百万行照样流畅；交互和 DOM 版一致
-mountCanvasGrid(document.querySelector(".sn-grid.cgrid"), { rows: 1000000 });
+const grid = createCanvasGrid(document.querySelector("#grid"), { rows: 1000000 }); // 卸载时 grid.destroy()
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

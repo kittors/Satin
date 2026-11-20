@@ -14,7 +14,7 @@ let DEFINED = new Set(); // 这次扫到的文件里自己定义的 --sn-* 变�
 const KNOWN_CLS = (() => { try { return new Set(JSON.parse(fs.readFileSync(new URL("./classes.snapshot.json", import.meta.url), "utf8"))); } catch { return null; } })();
 
 const EXT = /\.(css|scss|sass|less|html?|vue|svelte|jsx|tsx|js|mjs|cjs|ts|astro)$/i;
-const SKIP_DIR = /(^|\/)(node_modules|dist|build|\.next|\.nuxt|\.output|\.svelte-kit|\.angular|\.turbo|\.vercel|coverage|\.git|\.parity|out)(\/|$)/;
+const SKIP_DIR = /(^|\/)(\.[^./][^/]*|_check|_shots|node_modules|dist|build|\.next|\.nuxt|\.output|\.svelte-kit|\.angular|\.turbo|\.vercel|coverage|\.git|\.parity|out)(\/|$)/;
 // Satin 自己的样式（令牌定义、组件样式）不查
 const SKIP_FILE = /(^|\/)(packages\/satin-ui\/css|node_modules\/satin-ui)\/|\.min\.(js|css)$|\.d\.ts$/;
 
@@ -81,6 +81,7 @@ function extractTags(src, units, baseLine = 1) {
   while ((m = TAG.exec(src))) {
     const tag = m[1], attrs = m[2] || "", line = baseLine + lineOf(src, m.index) - 1;
     units.tags.push({ tag, line });
+    if (tag === "a" && /(^|\s)(:?href|to)\s*=/.test(attrs) && !/(^|\s)(class|className|:class)\s*=/.test(attrs)) (units.bareLinks ||= []).push({ line });
     let a; ATTR_RE.lastIndex = 0;
     while ((a = ATTR_RE.exec(attrs))) {
       const name = a[1].replace(/^[:@]|^v-bind:/, ""), val = a[2] ?? a[3] ?? a[4] ?? a[5] ?? a[6] ?? "";
@@ -157,6 +158,8 @@ function checkDecl(d, where, out, srcLine = "") {
   if (!v || /^(inherit|initial|unset|revert|none)$/i.test(v)) return;
   const isMask = /^(-webkit-)?mask/.test(prop);
   const gradient = /\b(repeating-)?(linear|radial|conic)-gradient\(/i.test(v);
+  // no-eyebrow：全大写英文小标签（眉题）
+  if (prop === "text-transform" && /\buppercase\b/.test(v)) out.push(finding("no-eyebrow", where, `text-transform: ${v}`, "中文界面不放全大写、加字距的英文小标签（眉题）；标题上面不放小字，层级靠字号和说明文字"));
   // no-gradient
   if (/^background(-image)?$/.test(prop) && gradient && !SPIN_SEL.test(sel)) out.push(finding("no-gradient", where, `${prop} 用了渐变：${v.slice(0, 80)}`));
   if (/^(-webkit-)?background-clip$/.test(prop) && /\btext\b/.test(v)) out.push(finding("no-gradient", where, "background-clip: text（渐变文字）"));
@@ -221,7 +224,7 @@ function checkDecl(d, where, out, srcLine = "") {
 function checkRule(r, where, out) {
   const get = (p) => r.decls.filter((d) => d.prop === p).pop()?.value;
   const tt = get("text-transform"), ls = get("letter-spacing");
-  if (tt === "uppercase" && ls) { const em = /^([\d.]+)em$/.exec(ls), px = /^([\d.]+)px$/.exec(ls); if ((em && +em[1] > .05) || (px && +px[1] / 14 > .05)) out.push(finding("font-weight", where, `全大写 + 宽字距（letter-spacing: ${ls}）的小标签`, "去掉 text-transform 和 letter-spacing；分组标题用 sn-t-micro（11/16/500）或 sn-cap")); }
+  void tt; void ls; // 全大写 + 宽字距的小标签改由 checkDecl 里的 no-eyebrow 报（原来记在 font-weight 名下）
 }
 
 // ———— Tailwind 工具类 ————
@@ -299,6 +302,7 @@ export function runStatic(inputs, { root = process.cwd() } = {}) {
     for (const u of units.inline) for (const d of parseInline(u.text, u.line)) checkDecl(d, at(u.line), out, lines[u.line - 1] || "");
     for (const c of units.attrColors) checkDecl({ prop: c.prop === "color" ? "color" : "fill", value: c.value, selector: c.tag }, at(c.line), out);
     for (const c of units.classes) checkClasses(c.text, at(c.line), out);
+    for (const l of units.bareLinks || []) out.push(finding("link-style", at(l.line), "<a href> 没有 class：浏览器默认的蓝色、下划线", "文字链接用 class=\"sn-link\"；导航里的用侧栏 / 面包屑的标记；像按钮的用 class=\"sn-btn sn-ghost\""));
     for (const t of units.text) checkText(t, at(t.line), out);
     for (const i of units.icons) if (AI_ICON_NAME.test(i.name) || AI_ICON_COMPONENT.test(i.name)) out.push(finding("no-ai-icons", at(i.line), `AI 套路图标：${i.how}`, "换成字面意思的图标（生成用 play 或 plus，或者直接写\"生成\"两个字）；AI 功能不需要专门的图标"));
     for (const a of units.animate) for (const m of a.text.matchAll(/\b(width|height|top|left|right|bottom|margin\w*|padding\w*|inset\w*|fontSize|lineHeight)\s*:/g)) { out.push(finding("motion-props", at(a.line), `element.animate() 的关键帧动了布局属性 ${m[1]}`, "关键帧只写 transform、opacity、filter")); break; }

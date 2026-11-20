@@ -182,6 +182,42 @@ transition: opacity .5s linear; transition: transform 1s ease; cubic-bezier(.68,
 
 **怎么改**：写具体的名词和数字：做了什么、结果在哪、下一步能做什么。
 
+## 不加英文眉题（`no-eyebrow`，warn）
+
+**为什么**：标题上面一行全大写、加字距的英文小字（PROJECTS · 2026、DASHBOARD）是模板和 AI 生成页面的标志；中文产品界面的层级靠标题字号、字重和一句说明。
+
+**这样写**：
+```
+<h1>全部项目</h1><p>共 128 个项目，本周新增 6 个</p>
+```
+
+**不要这样**：
+```
+<span style="text-transform: uppercase; letter-spacing: .2em">Projects · 2026</span><h1>全部项目</h1>
+```
+
+**检查器怎么判**（static）：样式里出现 text-transform: uppercase。
+
+**怎么改**：删掉眉题；要补充信息就放进标题下面那句说明（--sn-label2 的正文小一号）。
+
+## 链接用 Satin 的样式（`link-style`，warn）
+
+**为什么**：没写 class 的 <a href> 是浏览器默认的亮蓝色加下划线，和界面其他部分不是一套；低档模型做的登录页、页脚最常见。
+
+**这样写**：
+```
+<a class="sn-link" href="/terms">服务条款</a>
+```
+
+**不要这样**：
+```
+<a href="/terms">服务条款</a>
+```
+
+**检查器怎么判**（static）：标记里有 href（或 to）却没有 class 的 <a>。
+
+**怎么改**：文字链接加 class="sn-link"；侧栏、面包屑按组件的标记写；看起来像按钮的用 sn-btn。
+
 ## 字重只用 400、500、600；字号只用排版档（`font-weight`，warn）
 
 **为什么**：800 的粗标题、随手的 15.5px 字号让层级乱掉。

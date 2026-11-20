@@ -17,12 +17,13 @@
 
 ## 写法
 
-### mountDataGrid(.sn-grid, 选项)（satin-ui/grid）
+### createDataGrid(空容器或 .sn-grid, 选项)（satin-ui/grid）；旧写法 mountDataGrid 仍可用
 
 | 选项 | 说明 |
 |---|---|
 | rows | 行数（演示数据，默认 10 万） |
 | seed | 生成演示数据的种子 |
+| 返回 | { update, destroy, on, off }；destroy 撤掉监听、后台线程、放进  的样式，清空容器 |
 
 ### 现在的限制
 
@@ -34,12 +35,13 @@
 ## 用法
 
 ```js
-import { mountDataGrid } from "satin-ui/grid";
+import { createDataGrid } from "satin-ui/grid";
 import "satin-ui/css/grid.css";
 import "satin-ui/css/data.css";
 
 // 虚拟滚动、按需取块（筛选排序在后台线程）、固定列、拖列、改列宽行高、框选合并单元格、树形、编辑、拖行
-mountDataGrid(document.querySelector(".sn-grid"), { rows: 100000 });
+// 空容器：工具条、表头、表体都由 createDataGrid 填好；卸载时调 grid.destroy()（后台线程、放进 <head> 的样式一起撤）
+const grid = createDataGrid(document.querySelector("#grid"), { rows: 100000 });
 // 列和数据现在是内置的演示项目表；接自己的列和数据的接口还在整理，暂时没有公开
 ```
 

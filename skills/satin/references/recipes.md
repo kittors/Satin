@@ -5,7 +5,7 @@
 ## 后台列表（侧栏 + 搜索筛选 + 表格 + 分页）
 
 结构：左侧栏导航 → 页头（标题、数量、主按钮）→ 工具条（搜索、筛选、次要操作）→ 表格 → 分页。
-一页只有一个主按钮（"新建"）；筛选用分段控件或芯片，不用一排下拉；表格数字列右对齐、用等宽数字；状态用 `sn-tag`。
+账户（头像）放页头右上角或顶栏，侧栏底部只放"设置"，不要自己在侧栏底部拼头像 + 名字 + 角色。一页只有一个主按钮（"新建"）；筛选用分段控件或芯片，不用一排下拉；表格数字列右对齐、用等宽数字；状态用 `sn-tag`。
 
 ```html
 <div class="sn-app">
@@ -44,7 +44,7 @@
 </div>
 ```
 
-侧栏在手机上自动收成图标栏：`createSidebar(document.querySelector(".sn-app"), { collapseBelow: 720 })`。
+侧栏：`enhance()` 已经接上（选中滑块、收起按钮、⌘\）；布局窄于 720（手机、竖着的平板）自动收成图标栏，`<div class="sn-app" data-collapse-below="0">` 不收。框架里用 `createSidebar(el, { collapseBelow: 720 })`。
 React：`<Segmented items={[...]} value={f} onChange={setF} />`、`<Pager total={7} page={page} onChange={setPage} />`；表格用 `rows.map` 生成 `<tr>`。
 没有数据时 `tbody` 里放一行：`<tr><td colspan="6"><div class="sn-empty-state"><span class="sn-art" data-i="folder-open"></span><h4>还没有项目</h4><p>从一部小说或剧本开始。</p><div class="sn-acts"><button class="sn-btn sn-primary">新建项目</button></div></div></td></tr>`。
 加载中：表格先显示几行骨架（`references/components/loading.md`），不要整页转圈。删除用弹窗确认并写清影响范围，成功后 `toast({ text: "已删除「长夜」", action: { label: "撤销", run } })`。
@@ -102,14 +102,14 @@ React：`<Segmented items={[...]} value={f} onChange={setF} />`、`<Pager total=
     <form class="sn-form" style="margin-top: var(--sn-sp-24)" novalidate>
       <div class="sn-field" data-f="mail"><label class="sn-lbl" for="l-mail">邮箱</label><input class="sn-input sn-lg" id="l-mail" type="email" autocomplete="email" placeholder="name@company.com"><div class="sn-err"><span></span></div></div>
       <div class="sn-field" data-f="pwd">
-        <label class="sn-lbl" for="l-pwd">密码 <a class="sn-aside" href="/forgot">忘记密码？</a></label>
+        <label class="sn-lbl" for="l-pwd">密码 <a class="sn-aside sn-link" href="/forgot">忘记密码？</a></label>
         <span class="sn-ib sn-has-post"><input class="sn-input sn-lg" id="l-pwd" type="password" autocomplete="current-password"><span class="sn-post"><button type="button" class="sn-eye" data-eye aria-label="显示密码"><span class="sn-swap"><span class="sn-a" data-i="eye"></span><span class="sn-b" data-i="eye-off"></span></span></button></span></span>
         <div class="sn-err"><span></span></div>
       </div>
       <label class="sn-check"><input type="checkbox" checked><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>30 天内保持登录</label>
       <button class="sn-btn sn-primary sn-lg" type="submit" style="width: 100%">登录</button>
     </form>
-    <p class="sn-t-callout sn-c-tertiary" style="margin-top: var(--sn-sp-20); text-align: center">还没有账号？<a href="/signup">注册</a></p>
+    <p class="sn-t-callout sn-c-tertiary" style="margin-top: var(--sn-sp-20); text-align: center">还没有账号？<a class="sn-link" href="/signup">注册</a></p>
   </div>
 </main>
 ```
@@ -162,20 +162,20 @@ React：`<Segmented items={[...]} value={f} onChange={setF} />`、`<Pager total=
 
 ## AI 对话
 
-结构：对话框占满主区高度：顶栏（助手名字、状态）→ 消息区（虚拟列表、流式输出、跳到最新）→ 底部提示词输入框（附件、用量环、发送 / 停止）。
-用 `satin-ui/chat` 的 `mountChat`，不要自己写消息气泡和滚动：它已经处理了流式输出匀速放字、贴底跟随、往上翻加载历史、发送动画、减少动态效果。
+结构：对话框占满主区高度：顶栏（助手名字、状态）→ 消息区（虚拟列表、流式输出、跳到最新）→ 底部提示词输入框（附件、用量环、发送 / 停止）。对话框的顶栏就是页面标题，外面不再放同名的页头。
+用 `satin-ui/chat` 的 `createChat`，不要自己写消息气泡和滚动：它已经处理了流式输出匀速放字、贴底跟随、往上翻加载历史、发送动画、减少动态效果。
 
 ```html
-<div class="sn-page sn-wide" style="height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr)">
-  <header class="sn-page-hd"><div><h1>分镜助手</h1><p>改剧本、拆镜头、写画面描述</p></div></header>
-  <div id="chat" style="min-height: 0"></div>
+<!-- 对话框自己带顶栏（名字、状态、条数）：外面不要再放一个写着同样名字的页头 -->
+<div class="sn-page sn-wide" style="height: 100dvh; padding-block: var(--sn-sp-16)">
+  <div id="chat" style="height: 100%"></div>
 </div>
 <script type="module">
   import { setup } from "satin-ui";
-  import { mountChat } from "satin-ui/chat";
+  import { createChat } from "satin-ui/chat";
   setup();
-  // 空容器：mountChat 按选项填好标记。respond 返回异步迭代的文字片段（流式），或者直接返回一整段
-  mountChat(document.getElementById("chat"), {
+  // 空容器：createChat 按选项填好标记（顶栏、消息区、底部输入框都接好了）。respond 返回异步迭代的文字片段（流式），或者直接返回一整段
+  createChat(document.getElementById("chat"), {
     title: "分镜助手", placeholder: "和分镜助手一起改这一集",
     async *respond(text) {
       const res = await fetch("/api/chat", { method: "POST", body: JSON.stringify({ text }) });
@@ -186,7 +186,9 @@ React：`<Segmented items={[...]} value={f} onChange={setF} />`、`<Pager total=
 </script>
 ```
 
-React / Vue：在 `useEffect` / `onMounted` 里对一个空 `<div>` 调 `mountChat`，返回的实例在卸载时不用管（容器移除后监听会跟着失效）；或者整块用纯 HTML 写在一个组件里。
+React：`const Chat = wrapSatin(createChat, { events: [] })`（`satin-ui/react`），然后 `<Chat title="分镜助手" respond={respond} />`，挂载、卸载都处理好了。
+Vue：`const SnChat = wrapSatin(createChat, { name: "SnChat", props: ["title", "placeholder", "respond"], events: [] })`（`satin-ui/vue`）。
+自己在 `useEffect` / `onMounted` 里调 `createChat(空 div, 选项)` 也行，卸载时一定调返回值的 `destroy()`。
 只要一个输入框（不要对话列表）：`createComposer(空容器, { placeholder, onSend({ text, files }) })`（React 里同样在 effect 里调）。
 消息里有 Markdown：助手回复按 Markdown 渲染（代码块、表格、公式），不用自己处理。
 
@@ -200,7 +202,7 @@ React / Vue：在 `useEffect` / `onMounted` 里对一个空 `<div>` 调 `mountCh
 <header class="sn-page sn-wide" style="padding-block: var(--sn-sp-16)">
   <div class="sn-row sn-between">
     <b class="sn-t-title3">分镜工作台</b>
-    <nav class="sn-row sn-gap-24 sn-t-callout"><a href="#features">功能</a><a href="#pricing">价格</a><a href="/docs">文档</a></nav>
+    <nav class="sn-row sn-gap-4"><a class="sn-btn sn-ghost sn-sm" href="#features">功能</a><a class="sn-btn sn-ghost sn-sm" href="#pricing">价格</a><a class="sn-btn sn-ghost sn-sm" href="/docs">文档</a></nav>
     <div class="sn-row sn-gap-8"><a class="sn-btn sn-ghost" href="/login">登录</a><a class="sn-btn sn-primary" href="/signup">免费试用</a></div>
   </div>
 </header>
@@ -221,7 +223,7 @@ React / Vue：在 `useEffect` / `onMounted` 里对一个空 `<div>` 调 `mountCh
     </div>
   </section>
 </main>
-<footer class="sn-page sn-wide sn-t-caption sn-c-tertiary" style="border-top: 1px solid var(--sn-line); padding-block: var(--sn-sp-24)">© 2026 分镜工作台 · <a href="/privacy">隐私</a> · <a href="/terms">条款</a></footer>
+<footer class="sn-page sn-wide sn-t-caption sn-c-tertiary" style="border-top: 1px solid var(--sn-line); padding-block: var(--sn-sp-24)">© 2026 分镜工作台 · <a class="sn-link" href="/privacy">隐私</a> · <a class="sn-link" href="/terms">条款</a></footer>
 ```
 
 截图要用真实的产品界面（或用 Satin 搭一个真实的界面再截），不要用插画和渐变色块代替。功能点的图标用 Satin 的线性图标，不加彩色底。

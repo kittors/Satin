@@ -13,7 +13,7 @@
 
 ## 写法
 
-### mountFlow(.sn-flow, 选项)（satin-ui/flow）
+### createFlow(空容器或 .sn-flow, 选项)（satin-ui/flow）；旧写法 mountFlow 仍可用
 
 | 选项 | 说明 |
 |---|---|
@@ -31,10 +31,11 @@
 ## 用法
 
 ```js
-import { mountFlow } from "satin-ui/flow";
+import { createFlow } from "satin-ui/flow";
 import "satin-ui/css/content.css";
 
-mountFlow(document.querySelector(".sn-flow"), {
+// 空容器：画布、工具条、小地图都由 createFlow 填好（设计稿里的 .sn-flow 标记也可以直接传）；卸载时调 flow.destroy()
+const flow = createFlow(document.querySelector("#flow"), {
   // 节点：位置、标题、图标、说明、类型（类型决定线和端口的色相：text | board | image | audio | video | out）
   nodes: [
     { id: "src",   x: 0,   y: 0, t: "导入原文", ic: "book-open",    d: "雨夜车站.docx", k: "text" },

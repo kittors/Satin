@@ -257,9 +257,12 @@ createTable(document.getElementById("projects"), {
 13. **键盘能用**：可点的东西都能 Tab 到，有焦点框（`:focus-visible`）。
 14. **深浅两套主题都要好看**：不写死颜色就自动适配。切深浅：`import { setMode } from "satin-ui/theme"; setMode("dark")`（`"auto"` 跟系统，`"light"` 浅色）；换主色、字体、字号：`set({ accent: "blue" })`。
 15. **手机上点得到**：可点区域至少 44×44（按钮 `sn-lg`，图标按钮加 `sn-tap`），字段一栏，底部操作用 `.sn-bottom-bar` 贴底；侧栏布局 `createSidebar(el, { collapseBelow: 720 })`。详见 `references/mobile.md`。
+16. **不加英文眉题**：标题上面不放全大写、加字距的英文小字（"PROJECTS · 2026""DASHBOARD"）——这是模板味；层级靠标题字号和说明文字。
 
 ## 6. 常见错误
 
+- 文字链接（忘记密码、服务条款、查看全部）直接写 `<a href>`：浏览器默认蓝色下划线。加 `class="sn-link"`；像按钮的用 `sn-btn sn-ghost`。
+- 标题上面放英文全大写小字（PROJECTS · 2026、CHECKOUT · 01、YOUR WORKSPACE）：删掉，补充信息写进标题下面那句说明。
 - 忘了引样式（`satin-ui/css/page.css`）→ 页面没样式。
 - Vite 项目忘了加 `satin()` 插件（`vite.config.js` 里 `plugins: [react(), satin()]`）→ 深色模式下每次刷新先闪一下浅色。这一步和引样式一样是必做的。
 - 在 Next.js / Nuxt 的服务端代码里 `import "satin-ui/theme-boot"`：那是浏览器里 `<script src>` 用的首帧脚本，服务端什么都不做。服务端渲染内联首帧脚本用 `satin-ui/theme-boot-script`（上面第 1 节的写法），Vite 项目用 `satin()` 插件。

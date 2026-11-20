@@ -13,14 +13,16 @@
 
 ## 写法
 
-### mountChat(.sn-chat, 选项)（satin-ui/chat）
+### createChat(空容器或 .sn-chat, 选项)（satin-ui/chat）
 
 | 选项 | 说明 |
 |---|---|
+| title / status / placeholder / max / maxLines / attach | 空容器时用来渲染顶栏和底部输入框；update({ status }) 改顶栏状态 |
+| composer | { upload, attachments }：底部输入框的选项（上传函数、预置附件） |
 | respond | (问题, { stopped }) => 异步生成器 / Promise：yield { think } 是思考，yield 字符串是正文；还能给 { step }、{ card }、{ image } 这些 |
 | history | { initial() → 条目数组, older() → 更早的一页（可以是 Promise）, hasMore() }：带历史，往上滚加载更早的；不给就从空的对话开始 |
 | hiRes | (背景) => 背景：点开看大图时用的高清背景（默认原样） |
-| 返回 | { send(text)（程序里发一条，和输入框发送一样）, receive(条目), sendText(text, { fail }), scrollToOldest(), destroy() } |
+| 返回 | { send(text)（程序里发一条，和输入框发送一样）, receive(条目), sendText(text, { fail }), scrollToOldest(), update, destroy(), on, off }；destroy 停掉生成中的回答、撤掉监听、清空容器。旧写法 mountChat(元素, 选项) 仍然可用 |
 
 ### 消息里的图片、视频
 
@@ -41,15 +43,14 @@
 ## 用法
 
 ```js
-import { mountChat } from "satin-ui/chat";
-import { bindInputs } from "satin-ui/components";
+import { createChat } from "satin-ui/chat";
 
-const box = document.querySelector(".sn-chat");
-bindInputs(box); // 底部的输入框（data-composer data-external：发送交给对话组件）
-
+// 空容器：顶栏、消息区、底部输入框都由 createChat 填好、接好（已有设计稿里的 .sn-chat 标记也可以直接传）
 // 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文
 // 不给 history 就从空的对话开始；要带历史：history: { initial(), older(), hasMore() }
-mountChat(box, {
+// React：const Chat = wrapSatin(createChat, { events: [] })（satin-ui/react）；自己在 effect 里创建的，卸载时调 chat.destroy()
+const chat = createChat(document.querySelector("#chat"), {
+  title: "分镜助手", placeholder: "和分镜助手一起改这一集",
   respond: async function* (question, state) {
     const res = await fetch("/api/chat", { method: "POST", body: JSON.stringify({ question }) });
     for await (const ev of readEvents(res.body)) {
