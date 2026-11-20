@@ -67,7 +67,9 @@ function touch(page, cdp) {
     tap: async (sel) => { const [x, y] = await at(sel); if (cdp) { await ev("touchStart", [[x, y]]); await sleep(60); await ev("touchEnd", []); } else await page.touchscreen.tap(x, y); },
     longPress: async (sel) => { const [x, y] = await at(sel); if (!cdp) throw new Error("长按要用 CDP"); await ev("touchStart", [[x, y]]); await sleep(700); await ev("touchEnd", []); },
     drag: async (sel, f0, f1) => { const [x0, y] = await at(sel, f0), [x1] = await at(sel, f1); if (!cdp) throw new Error("拖动要用 CDP"); await ev("touchStart", [[x0, y]]); for (let i = 1; i <= 12; i++) { await sleep(16); await ev("touchMove", [[x0 + ((x1 - x0) * i) / 12, y]]); } await ev("touchEnd", []); },
-    swipe: async (sel, dx, dy) => { const [x, y] = await at(sel); if (!cdp) throw new Error("滑动要用 CDP"); await ev("touchStart", [[x, y]]); for (let i = 1; i <= 14; i++) { await sleep(16); await ev("touchMove", [[x + (dx * i) / 14, y + (dy * i) / 14]]); } await ev("touchEnd", []); },
+    // 手指滑动用浏览器自己的合成手势（按屏幕刷新的节奏发触摸事件，和真手指一样）：原来从测试脚本逐点发，每点来回 30ms 左右，
+    // 页面只能跟着 30Hz 的输入出帧，不降速、改造前也都是 33ms 一帧——量到的是测试方式，不是页面
+    swipe: async (sel, dx, dy) => { const [x, y] = await at(sel); if (!cdp) throw new Error("滑动要用 CDP"); await cdp.send("Input.synthesizeScrollGesture", { x, y, xDistance: dx, yDistance: dy, gestureSourceType: "touch", speed: 900 }); },
   };
 }
 async function touchRun(engine) {

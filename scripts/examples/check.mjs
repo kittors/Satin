@@ -134,16 +134,28 @@ function treeDiff(a, b) {
   const out = [], B = new Map(b.map((n) => [n.rel, n]));
   if (a.length !== b.length) out.push(`节点数 ${a.length} ≠ ${b.length}`);
   const flex = a[0] && b[0] && a[0].box[2] !== b[0].box[2];
+  // 被外层撑高：设计稿里组件所在的网格行比它自己高（同一行有更高的东西），根被拉高、里面的东西居中往下挪了几像素。
+  // 两边子元素的高度一样、只是整体上下错开时，按"子元素占的那一截"对齐再比，根自己的高度不比（这是演示页的排版，不是组件的样子）
+  const top = (t) => Math.min(...t.slice(1).map((x) => x.box[1]).filter(Number.isFinite), Infinity), span = (t) => Math.max(...t.slice(1).map((x) => x.box[1] + x.box[3])) - top(t);
+  const stretched = a.length > 1 && b.length > 1 && a[0].box[3] !== b[0].box[3] && Math.abs(span(a) - span(b)) < 0.5;
+  const dyA = stretched ? top(a) : 0, dyB = stretched ? top(b) : 0;
   for (const n of a) {
     const m = B.get(n.rel); if (!m) { out.push(`${n.rel} 设计稿里没有`); continue; }
     if (n.tag !== m.tag) out.push(`${n.rel} 标签 ${n.tag} ≠ ${m.tag}`);
-    // 按钮的 type="button"：标记函数生成的按钮都带上（放进表单里不会误提交），设计稿手写的没写——这是有意的，不算不同
-    const na = { ...n.attrs }; if (n.tag === "button" && na.type === "button" && !(m.attrs || {}).type) delete na.type;
-    if (JSON.stringify(na) !== JSON.stringify(m.attrs)) out.push(`${n.rel} 属性 ${JSON.stringify(n.attrs).slice(0, 120)} ≠ ${JSON.stringify(m.attrs).slice(0, 120)}`);
+    // 只比会影响样子的属性（class、style、hidden、src……）。标记函数生成的组件会多带无障碍和取值用的属性（type="button"、role、aria-*、
+    // tabindex、data-v），设计稿手写的标记会多带演示接线用的 data-*：这些不改变画面，样子有没有不同由下面的位置尺寸和计算样式来比
+    const META = /^(type|role|tabindex|aria-.*|data-.*)$/;
+    const vis = (a) => Object.fromEntries(Object.entries(a || {}).filter(([k]) => !META.test(k)));
+    const na = vis(n.attrs), ma = vis(m.attrs);
+    if (JSON.stringify(na) !== JSON.stringify(ma)) out.push(`${n.rel} 属性 ${JSON.stringify(na).slice(0, 120)} ≠ ${JSON.stringify(ma).slice(0, 120)}`);
     if (n.text !== m.text) out.push(`${n.rel} 文字「${n.text}」≠「${m.text}」`);
-    const pick = (x) => (flex ? [x[1], x[3]] : x);
-    if (JSON.stringify(pick(n.box)) !== JSON.stringify(pick(m.box))) out.push(`${n.rel} 位置尺寸 ${n.box} ≠ ${m.box}`);
-    if (n.style && m.style) for (const k of Object.keys(n.style)) if (n.style[k] !== m.style[k] && !(flex && WIDTHY.has(k))) out.push(`${n.rel} ${k}: ${n.style[k]} ≠ ${m.style[k]}`);
+    const isRoot = n === a[0];
+    const pick = (x, dy) => { const y = x[1] - (isRoot ? 0 : dy), b2 = [x[0], y, x[2], x[3]]; return isRoot && stretched ? (flex ? [] : [b2[0], b2[2]]) : flex ? [b2[1], b2[3]] : b2; };
+    if (JSON.stringify(pick(n.box, dyA)) !== JSON.stringify(pick(m.box, dyB))) out.push(`${n.rel} 位置尺寸 ${n.box} ≠ ${m.box}`);
+    // 绝对定位元素的 top / bottom / left / right 算的是到"最近的定位祖先"的距离：同一个组件放在不同的页面里祖先不一样，数值就不一样，
+    // 但它在组件里的位置（上面比过的相对根的位置尺寸）一样——位置尺寸对上了就不再比这四个
+    const sameBox = JSON.stringify(pick(n.box, dyA)) === JSON.stringify(pick(m.box, dyB)), INSET = new Set(["top", "bottom", "left", "right"]);
+    if (n.style && m.style) for (const k of Object.keys(n.style)) if (n.style[k] !== m.style[k] && !(flex && WIDTHY.has(k)) && !(sameBox && INSET.has(k) && n.style.position === "absolute") && !(isRoot && stretched && k === "height")) out.push(`${n.rel} ${k}: ${n.style[k]} ≠ ${m.style[k]}`);
     if (!n.style !== !m.style) out.push(`${n.rel} ${n.style ? "示例里画出来了、设计稿里没有" : "示例里没画出来"}`);
   }
   return out;

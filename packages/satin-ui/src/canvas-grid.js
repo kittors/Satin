@@ -618,7 +618,7 @@ export function mountCanvasGrid(root, { rows = 1000000, seed = 23 } = {}) {
   root._grid = { toggleTree, expandAll, tsel, motion: () => mo.busy, selState, dbgHides: (id) => !!drag && (src.tree ? drag.hides(src.findPos(id)) : src.rowAt(drag.p0) === id), drawn: () => drawn, src, model, active: () => ({ ...active }), setActive, startEdit: (k) => startEdit(k), scrollToRow: (p) => { vp.scrollTop = src.rowY(p); }, editing: () => !!editing, selCount, cellRect, hit, rowDragging: () => !!drag, dbg: () => (drag ? { to: drag.to, out: drag.out, done: !!drag.done, lift: drag.lift, off: Object.fromEntries(drag.off), gapY: drag.gapY, top: src.rowY(drag.p0) + drag.lift } : null), merges, sel: () => ({ shown: selShown, rg: rgRect() }), toggleExpand, expanded: () => expd.size };
   // 销毁：停掉下一帧的重画、拿掉放进 <head> 的两段样式、关掉开着的弹层、放开实例。挂载时加的监听、观察器、后台线程由 createCanvasGrid 一起撤
   const api = root._grid;
-  api.destroy = () => { cancelAnimationFrame(raf); raf = 0; styleEl.remove(); motionEl.remove(); closeGridPops(); if (root._grid === api) delete root._grid; };
+  api.destroy = () => { cancelAnimationFrame(raf); raf = 0; styleEl.remove(); motionEl.remove(); closeGridPops(); hideErr(); if (root._grid === api) delete root._grid; };
   return api;
 }
 

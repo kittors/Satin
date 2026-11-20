@@ -63,7 +63,7 @@ for (const r of runs) {
     if (s.build?.ok !== false && fs.existsSync(path.join(root, "index.html"))) {
       const { srv, url } = await serve(root);
       const dm = await spawnAsync("node", [CHECK, "dom", url, "--json", "--widths", "1440,390", "--no-floats", "--out", path.join(r.dir, "_check")], { cwd: r.dir, timeout: 300000 });
-      try { s.check.dom = JSON.parse(dm.stdout).counts; } catch { s.check.dom = { error: -1, note: (dm.stderr || "").slice(0, 200) }; }
+      try { const j = JSON.parse(dm.stdout); s.check.dom = j.counts; s.check.domFindings = (j.findings || []).slice(0, 40).map((f) => ({ rule: f.rule, severity: f.severity, problem: String(f.problem || "").slice(0, 160), where: String(f.where || "").slice(-80) })); } catch { s.check.dom = { error: -1, note: (dm.stderr || "").slice(0, 200) }; }
       srv.close(); fs.writeFileSync(out, JSON.stringify(s, null, 2));
     }
     all.push(s); console.log(`  页面检查 ${r.cond.padEnd(7)} ${r.fw.padEnd(5)} ${r.task.padEnd(13)} ${s.check.dom?.error ?? "—"}/${s.check.dom?.warn ?? "—"}`);
@@ -115,7 +115,7 @@ for (const r of runs) {
     try { const j = JSON.parse(st.stdout); s.check.static = j.counts; } catch { s.check.static = { error: -1, note: (st.stderr || "").slice(0, 200) }; }
     // 页面检查：桌面 1440、手机 390 × 深浅（平板宽度和点开浮层的检查评测时不跑，省时间）
     const dm = await spawnAsync("node", [CHECK, "dom", url, "--json", "--widths", "1440,390", "--no-floats", "--out", path.join(r.dir, "_check")], { cwd: r.dir, timeout: 300000 });
-    try { const j = JSON.parse(dm.stdout); s.check.dom = j.counts; } catch { s.check.dom = { error: -1, note: (dm.stderr || "").slice(0, 200) }; }
+    try { const j = JSON.parse(dm.stdout); s.check.dom = j.counts; s.check.domFindings = (j.findings || []).slice(0, 40).map((f) => ({ rule: f.rule, severity: f.severity, problem: String(f.problem || "").slice(0, 160), where: String(f.where || "").slice(-80) })); } catch { s.check.dom = { error: -1, note: (dm.stderr || "").slice(0, 200) }; }
     srv.close();
   }
   fs.writeFileSync(out, JSON.stringify(s, null, 2));

@@ -29,13 +29,21 @@
     const realNow = performance.now.bind(performance), realRAF = window.requestAnimationFrame.bind(window), realCAF = window.cancelAnimationFrame.bind(window);
     const FR = 1000 / 60, base = Math.ceil(realNow() / FR) * FR;
     let lastReal = -1, frameT = base, seq = 1e7, calls = 0;
-    // 每帧前进"真实帧间隔四舍五入成几帧"× 16.667ms：去掉亚帧抖动，又和真实时间同步（掉帧时一次走两步），
-    // CSS 过渡 / WAAPI（浏览器按真实时间播）和 JS 定时器不会越走越错开
-    P.clock = () => {};
+    // 每个真实帧固定前进一帧（16.667ms），掉帧也只算一帧：两遍跑出来的帧数只取决于页面做了什么，不取决于机器当时忙不忙。
+    // CSS 过渡 / CSS 动画 / WAAPI 由 syncAnims 每帧按这个时间设进度，不会和 JS 定时器错开
+    // 停表（发输入事件期间）：时间不走、页面的 rAF 推迟、定时器不跑、动画定住；P.rafs(n) 在停表时正好放行 n 帧。
+    // 原来这里是空函数——Playwright 发一个事件来回几十毫秒，这段真实时间里走了几帧每次不一样，事件落在第几帧也就不一样
+    let held = false, budget = 0;
+    P.clock = (run) => { held = !run; budget = 0; };
+    P.allowFrames = (n) => { budget += n; };
     P.pendingTimers = () => { let k = 0; for (const t of timers.values()) if (!t.every) k++; return k; };
-    const tick = (ts) => { if (ts !== lastReal) { frameT += lastReal < 0 ? FR : Math.max(1, Math.round((ts - lastReal) / FR)) * FR; lastReal = ts; calls = 0; } return frameT; };
+    // 冻结：Worker 的模块还在加载（真实时间，每次快慢不同）时时间不走、页面的 rAF 回调推迟，等代码到了再接着走——第几帧收到 Worker 的回复只取决于帧号
+    let loading = 0;
+    P.clockLoading = () => loading;
+    const frozen = () => loading > 0 || (held && budget <= 0);
+    const tick = (ts) => { if (frozen()) return frameT; if (ts !== lastReal) { frameT += FR; lastReal = ts; calls = 0; if (held) budget--; } return frameT; };
     performance.now = () => (++calls > 200000 ? frameT + (calls - 200000) * 1e-3 : frameT); // 防止"同一帧里等时间走"的循环卡死
-    window.requestAnimationFrame = (cb) => realRAF((ts) => cb(tick(ts)));
+    window.requestAnimationFrame = (cb) => realRAF(function f(ts) { if (frozen() && ts !== lastReal) return realRAF(f); cb(tick(ts)); });
     window.cancelAnimationFrame = (id) => realCAF(id);
     const timers = new Map();
     const add = (fn, ms, args, every) => { const id = ++seq; timers.set(id, { fn, args, due: frameT + Math.max(0, +ms || 0), every: every ? Math.max(1, +ms || 0) : 0, seq: id }); return id; };
@@ -45,26 +53,36 @@
     // CSS 过渡 / CSS 动画 / WAAPI 也按帧时钟播：浏览器按真实时间推进，动画开始的那一刻落在帧里的哪个位置每次不一样，
     // 同一帧取到的进度就差一点（Toast 退场到一半被定时器移除时，记下的最后状态两次不同）。
     // 每帧开头给文档时间线上在播的动画设 currentTime = 上一帧的值 + 播放速率 × 帧间隔（第一次见到时从它当时的进度起），
-    // 这一帧画出来、记录器读到的就只取决于帧号。页面自己暂停、跳转、反向播放的照常：只接管 running 状态的，
-    // 页面在两帧之间改过 currentTime（和我们上次设的差出 1 帧以上的真实推进），就从页面给的值接着走
-    const vt = new WeakMap(); let lastFT = null;
+    // 这一帧画出来、记录器读到的就只取决于帧号，浏览器在两帧之间按真实时间走了多少都不算。
+    // 页面自己动过的（设 currentTime / startTime / playbackRate，调 play / pause / reverse / finish / updatePlaybackRate）
+    // 从页面给的值接着走：拦下这些调用做记号（我们自己设的不算）。页面暂停的、CSS 里 animation-play-state 停住的只记下进度，不推
+    const vt = new WeakMap(), touched = new WeakSet(); let lastFT = null, ours = false;
+    const AP = Animation.prototype;
+    for (const k of ["currentTime", "startTime", "playbackRate"]) {
+      const d = Object.getOwnPropertyDescriptor(AP, k); if (!d?.set) continue;
+      Object.defineProperty(AP, k, { ...d, set(v) { if (!ours) touched.add(this); d.set.call(this, v); } });
+    }
+    for (const m of ["play", "pause", "reverse", "finish", "updatePlaybackRate"]) { const o = AP[m]; if (o) AP[m] = function (...x) { if (!ours) touched.add(this); return o.apply(this, x); }; }
+    const setCT = (a, v) => { ours = true; try { a.currentTime = v; } finally { ours = false; } };
     const syncAnims = () => {
       const dt = lastFT == null ? 0 : frameT - lastFT; lastFT = frameT;
       for (const a of document.getAnimations()) {
         if (a.timeline !== document.timeline) continue; // 滚动驱动的不管
-        const cur = a.currentTime, st = vt.get(a);
+        const cur = a.currentTime, st = vt.get(a), byPage = touched.has(a);
+        if (byPage) touched.delete(a);
         if (a.playState !== "running" || cur == null) { if (cur != null) vt.set(a, { ct: cur, rate: a.playbackRate }); else vt.delete(a); continue; }
-        // 第一次见到：刚开始播的进度是 0 到零点几毫秒（开始时刻落在帧里的位置），取整到整帧
-        if (!st) { const ct = Math.round(cur / FR) * FR; vt.set(a, { ct, rate: a.playbackRate }); a.currentTime = ct; continue; }
-        // 页面在两帧之间自己跳过：浏览器只会按真实时间推进 ±1~2 帧，差得比这多就是页面设的
-        const drift = Math.abs(cur - st.ct) - Math.abs(a.playbackRate) * (dt + 2 * FR);
-        const next = (drift > 0 || st.rate !== a.playbackRate ? cur : st.ct) + a.playbackRate * dt;
+        // 第一次见到：浏览器已经按真实时间播了零点几到十几毫秒（开始时刻落在真实帧里的位置，每次不同），一律从 0 起；
+        // 页面自己设过进度的（animate() 后马上设 currentTime 这类）照页面的
+        if (!st) { const ct = byPage ? cur : 0; vt.set(a, { ct, rate: a.playbackRate }); setCT(a, ct); continue; }
+        // 页面动过：从页面给的值接着走；没动过：只按帧号推进，浏览器按真实时间多走的那一截不算
+        const next = (byPage ? cur : st.ct) + a.playbackRate * dt;
         st.ct = next; st.rate = a.playbackRate;
-        a.currentTime = next;
+        setCT(a, next);
       }
     };
     P.syncAnims = syncAnims;
     const drive = (ts) => {
+      if (frozen()) { if (!window.__parityRealAnims) syncAnims(); realRAF(drive); return; } // 冻结中：不推进、不跑定时器；动画按 dt = 0 定住（新出现的也定在开头）
       tick(ts);
       if (!window.__parityRealAnims) syncAnims();
       for (let guard = 0; guard < 2000; guard++) {
@@ -94,7 +112,8 @@
         this.postMessage = (m) => { if (ready) deliver(m); else inbox.push(m); };
         this.terminate = () => { delete scopes[id]; };
         const u = new URL(String(url), location.href); u.searchParams.set("parity-worker", id);
-        import(u.href).then(() => { ready = true; for (const m of inbox.splice(0)) deliver(m); }, (e) => { const ev = new ErrorEvent("error", { message: String(e) }); me.onerror?.(ev); me.dispatchEvent(ev); });
+        loading++;
+        import(u.href).then(() => { loading--; ready = true; for (const m of inbox.splice(0)) deliver(m); }, (e) => { loading--; const ev = new ErrorEvent("error", { message: String(e) }); me.onerror?.(ev); me.dispatchEvent(ev); });
       }
     };
   }
@@ -195,7 +214,10 @@
       const r = n.getBoundingClientRect(), attrs = {};
       for (const [k, v] of Object.entries(attrsOf(n))) if (!IDREF.test(k)) attrs[k] = v;
       out.push({ rel, tag: n.tagName.toLowerCase(), attrs, text: P.normText(ownText(n)), box: [r2(r.x - R.x), r2(r.y - R.y), r2(r.width), r2(r.height)], style: n.getClientRects().length ? styleOf(n) : null });
-      const cnt = {}; for (const c of n.children) { const t = c.tagName.toLowerCase(), i = (cnt[t] = (cnt[t] ?? -1) + 1); rec(c, rel + ">" + t + (i ? ":" + i : "")); }
+      // 自定义元素、框架的宿主（display: contents，比如 <sn-slider>、React 封装的 .sn-host）不占盒子：当它透明，直接接着往下走，
+      // 路径和设计稿里直接写标记的那份对得上
+      const kids = (x) => [...x.children].flatMap((c) => (c.tagName.includes("-") || c.classList.contains("sn-host")) && getComputedStyle(c).display === "contents" ? kids(c) : [c]);
+      const cnt = {}; for (const c of kids(n)) { const t = c.tagName.toLowerCase(), i = (cnt[t] = (cnt[t] ?? -1) + 1); rec(c, rel + ">" + t + (i ? ":" + i : "")); }
     };
     rec(el, el.tagName.toLowerCase());
     return out;
@@ -346,7 +368,7 @@
     const f = () => { k++; const busy = mutN !== seen || P.busyAnims() > 0 || pendingRendered() || (P.pendingTimers?.() || 0) > 0; seen = mutN; quiet = busy ? 0 : quiet + 1; if ((k >= n && quiet >= 10) || k >= n + max) ok(k); else requestAnimationFrame(f); };
     requestAnimationFrame(f);
   });
-  P.rafs = (n = 1) => new Promise((ok) => { let k = 0; const f = () => (++k >= n ? ok(k) : requestAnimationFrame(f)); requestAnimationFrame(f); });
+  P.rafs = (n = 1) => new Promise((ok) => { P.allowFrames?.(n); let k = 0; const f = () => (++k >= n ? ok(k) : requestAnimationFrame(f)); requestAnimationFrame(f); });
   // 只量帧间隔（不读布局）：性能那一遍用
   let perf = null;
   P.perfStart = () => { const R = (perf = { ts: [], on: true }); const f = (t) => { if (!R.on) return; R.ts.push(t); requestAnimationFrame(f); }; requestAnimationFrame(f); };

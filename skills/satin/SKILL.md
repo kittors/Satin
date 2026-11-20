@@ -119,7 +119,7 @@ Svelte、Solid、Preact、Angular：样式同上（入口里 `import "satin-ui/c
 | 设置页 | `.sn-page.sn-narrow`：页头 → 若干 `.sn-setting`（左：标题 + 说明，右：字段）→ 底部保存按钮；或设置列表 `.sn-set-list` |
 | 登录 / 注册 | `.sn-auth > .sn-panel`：标题 + 一句说明 → 字段 → 主按钮（撑满）→ 次要链接；不要插画、不要渐变背景 |
 | 仪表盘 | 页头 → 一排 3～4 个 `.sn-stat`（放在一个 `.sn-panel` 里，不是每个一张卡）→ 两栏 `.sn-with-aside`：主图表/表格 + 右侧最近动态列表 |
-| AI 对话 | `satin-ui/chat` 的 `mountChat`，或：消息列表 + 底部 `createComposer` 提示词输入框 |
+| AI 对话 | `satin-ui/chat` 的 `createChat`（顶栏、消息区、输入框都带好；React 用 `wrapSatin(createChat)` 包成组件），对话框占满主区，外面不再放同名页头 |
 | 落地页 | 顶栏（文字 logo + 3～4 个链接 + 一个主按钮）→ 首屏：一句话标题（说清做什么）+ 一句副标题 + 一主一次两个按钮 + 一张真实产品截图 → 3 个功能点（图标 + 标题 + 两行字，不用卡片墙）→ 页脚 |
 | 移动端 H5（下单、表单） | 单栏，字段间距 20；底部 `.sn-bottom-bar` 贴底放总价 + 主按钮（避开 iPhone 底部横条）；点得到的东西至少 44×44 |
 | 表单向导（多步） | 顶部 `stepsHTML` / `<Steps>` 步骤条 → 当前步的字段（`.sn-form`）→ 底部"上一步"（ghost，左）+"下一步"（primary，右） |
@@ -152,7 +152,7 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 步骤条 | `<Steps steps current>` | `stepsHTML({ steps, current })` | |
 | 折叠面板 | `<Collapse items open>` | `<sn-collapse>` | |
 | 表格 | `<Table columns rows selectable onSelect onSort>`（Vue `<SnTable v-model="选中的键">`） | `createTable(el, { columns, rows })`，或照抄下面的 `.sn-tbl` 标记 | 排序时行平滑移到新位置；数字列 `align: "right"`；斑马纹 `striped`、紧凑 `compact`、限高 `maxHeight` |
-| 十万行数据表格 | | `satin-ui/grid` 的 `mountDataGrid` | 只在数据真的很多时用 |
+| 十万行数据表格 | | `satin-ui/grid` 的 `createDataGrid` | 只在数据真的很多时用（列和数据目前是演示用的；一般的表格用上面的 `createTable`） |
 | 状态标签 | | `<span class="sn-tag sn-ok"><i></i>已完成</span>` | `sn-run` 进行中、`sn-ok` 完成、`sn-warn` 待处理、`sn-bad` 失败、不加是草稿 |
 | 数量徽标 / 头像 | | `<span class="sn-badge">3</span>`、`<span class="sn-av sn-sm" style="--sn-h:210">林</span>` | 头像底色用 `--sn-h` 色相，不写颜色 |
 | 设置列表 | | `.sn-set-list > .sn-set-row` | 见 `list.md` |
@@ -168,10 +168,10 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 抽屉 | `<Drawer open onClose title footer>` | `openDrawer()` | 编辑一条记录 |
 | 菜单 / 右键菜单 | | `openMenu()`，标记见 `select.md`、`ctxmenu.md` | |
 | 命令面板 | | `createCommandPalette()` | |
-| 侧栏导航 | | `.sn-app > aside.sn-side + main.sn-app-main`，`createSidebar()` | 选中项 `a.sn-on` |
+| 侧栏导航 | | `.sn-app > aside.sn-side + main.sn-app-main`：纯 HTML 的 `enhance()` 已经接好（窄于 720 自动收成图标栏）；框架里 `createSidebar(el, { collapseBelow: 720 })` | 选中项 `a.sn-on` |
 | 提示词输入框 / 附件 | | `createComposer()` | |
-| 对话 | | `satin-ui/chat` 的 `mountChat` | |
-| Markdown | | `satin-ui/markdown` 的 `renderMarkdown` | 自带 XSS 过滤 |
+| 对话 | `wrapSatin(createChat, { events: [] })` | `satin-ui/chat` 的 `createChat(空容器, { title, respond })` | 卸载时 `destroy()` |
+| Markdown | `wrapSatin(createMarkdown, { events: [] })` | `satin-ui/markdown` 的 `createMarkdown(空容器, { source })` | 自带 XSS 过滤；换内容 `update({ source })` |
 | 上传 | | `createUpload()` | |
 | 视频 / 音频 | | `satin-ui/media` | |
 | 看大图 | | `satin-ui/lightbox` 的 `openLightbox` | |
@@ -256,13 +256,14 @@ createTable(document.getElementById("projects"), {
 12. **浮层不被裁、不被挡**，按钮文字不换行，元素不重叠，没有横向滚动条。
 13. **键盘能用**：可点的东西都能 Tab 到，有焦点框（`:focus-visible`）。
 14. **深浅两套主题都要好看**：不写死颜色就自动适配。切深浅：`import { setMode } from "satin-ui/theme"; setMode("dark")`（`"auto"` 跟系统，`"light"` 浅色）；换主色、字体、字号：`set({ accent: "blue" })`。
-15. **手机上点得到**：可点区域至少 44×44（按钮 `sn-lg`，图标按钮加 `sn-tap`），字段一栏，底部操作用 `.sn-bottom-bar` 贴底；侧栏布局 `createSidebar(el, { collapseBelow: 720 })`。详见 `references/mobile.md`。
+15. **手机上点得到**：可点区域至少 44×44（按钮 `sn-lg`，图标按钮加 `sn-tap`），字段一栏，底部操作用 `.sn-bottom-bar` 贴底；侧栏布局在手机上收成图标栏（纯 HTML `enhance()` 自动接，框架里 `createSidebar(el, { collapseBelow: 720 })`）。详见 `references/mobile.md`。
 16. **不加英文眉题**：标题上面不放全大写、加字距的英文小字（"PROJECTS · 2026""DASHBOARD"）——这是模板味；层级靠标题字号和说明文字。
 
 ## 6. 常见错误
 
 - 文字链接（忘记密码、服务条款、查看全部）直接写 `<a href>`：浏览器默认蓝色下划线。加 `class="sn-link"`；像按钮的用 `sn-btn sn-ghost`。
 - 标题上面放英文全大写小字（PROJECTS · 2026、CHECKOUT · 01、YOUR WORKSPACE）：删掉，补充信息写进标题下面那句说明。
+- 标题、数字加粗写 `font-weight: 700` / `bold`：Satin 只有 400 / 500 / 600 三档，加粗用 600（或排版类 `sn-t-title2`、`sn-t-body-strong`）。
 - 忘了引样式（`satin-ui/css/page.css`）→ 页面没样式。
 - Vite 项目忘了加 `satin()` 插件（`vite.config.js` 里 `plugins: [react(), satin()]`）→ 深色模式下每次刷新先闪一下浅色。这一步和引样式一样是必做的。
 - 在 Next.js / Nuxt 的服务端代码里 `import "satin-ui/theme-boot"`：那是浏览器里 `<script src>` 用的首帧脚本，服务端什么都不做。服务端渲染内联首帧脚本用 `satin-ui/theme-boot-script`（上面第 1 节的写法），Vite 项目用 `satin()` 插件。

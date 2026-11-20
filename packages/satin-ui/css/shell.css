@@ -12,8 +12,11 @@
 .sn-app-main > .sn-page { padding: var(--sn-sp-12) var(--sn-sp-20) var(--sn-sp-48); }
 
 /* 页头：标题 + 一句说明在左，操作按钮在右；放不下时按钮换到下一行 */
-.sn-page-hd { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sn-sp-12) var(--sn-sp-16); margin-bottom: var(--sn-sp-24); }
-.sn-page-hd > :first-child { flex: 1 1 320px; min-width: 0; }
+/* 用网格不用 flex：原来第一块写的是 flex: 1 1 320px，页面在手机上把页头改成 flex-direction: column 时，320px 变成了高度，标题下面空出一大块 */
+.sn-page-hd { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--sn-sp-12) var(--sn-sp-16); margin-bottom: var(--sn-sp-24); }
+.sn-page-hd > :first-child { min-width: 0; }
+.sn-page-hd > :only-child { grid-column: 1 / -1; }
+@media (max-width: 559px) { .sn-page-hd { grid-template-columns: minmax(0, 1fr); align-items: start; } }
 .sn-page-hd h1 { font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.012em; color: var(--sn-label); }
 .sn-page-hd p { margin-top: var(--sn-sp-4); font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-page-hd .sn-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sn-sp-8); }

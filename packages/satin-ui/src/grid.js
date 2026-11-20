@@ -1032,10 +1032,10 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
   apply(); paintBar(); headUI.paint(); schedule();
   root._grid = { src, model, active: () => ({ ...active }), range: () => rgRect(), selShown: () => selShown, setActive, startEdit: (k) => startEdit(k), scrollToRow: (p) => { vp.scrollTop = src.rowY(p); }, editing: () => !!editing, selCount, poolSize: () => pool.length, rowDragging: () => !!rowDrag, merges, sel: () => ({ shown: selShown, rg: rgRect() }), toggleExpand, expanded: () => expd.size,
     toggleTree, expandAll, tsel, motion: () => mo.busy, mclock: () => mo.clock, selState };
-  // 销毁：停掉下一帧的重画、拿掉放进 <head> 的样式、关掉开着的弹层、放开实例（同一个容器可以再挂一次）。
+  // 销毁：停掉下一帧的重画、拿掉放进 <head> 的两段样式（列宽、列位移动画）、关掉开着的弹层和编辑报错、放开实例（同一个容器可以再挂一次）。
   // 挂载时加的监听、观察器、后台线程（筛选排序那个 Worker）由 createDataGrid 一起撤
   const api = root._grid;
-  api.destroy = () => { cancelAnimationFrame(raf); raf = 0; styleEl.remove(); closeGridPops(); if (root._grid === api) delete root._grid; };
+  api.destroy = () => { cancelAnimationFrame(raf); raf = 0; cancelAnimationFrame(motionRaf); styleEl.remove(); motionEl.remove(); closeGridPops(); hideErr?.(); if (root._grid === api) delete root._grid; };
   return api;
 }
 

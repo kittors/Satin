@@ -36,6 +36,9 @@ function pageChecks({ theme, width, want }) {
     else if (r instanceof CSSMediaRule) { if (matchMedia(r.conditionText || r.media.mediaText).matches) collect(r.cssRules, satin); }
     else if ((typeof CSSSupportsRule !== "undefined" && r instanceof CSSSupportsRule) || (typeof CSSContainerRule !== "undefined" && r instanceof CSSContainerRule)) collect(r.cssRules, satin);
     else if (r instanceof CSSStyleRule) (satin ? satinRules : userRules).push(r);
+    // @import 进来的表（纯 HTML 页面直接 <link> 了 satin-ui/css/page.css，它再 @import tokens.css、base.css……）：原来没往里走，
+    // Satin 自带的样式全被当成页面自己写的，组件自带的渐变（骨架条）、分隔线都报成了页面的问题
+    else if (typeof CSSImportRule !== "undefined" && r instanceof CSSImportRule && r.styleSheet) { let rs; try { rs = r.styleSheet.cssRules; } catch { continue; } collect(rs, satin || /satin-ui|packages\/satin-ui\/css/.test(r.styleSheet.href || r.href || "")); }
   } };
   for (const sh of document.styleSheets) { let rs; try { rs = sh.cssRules; } catch { continue; } collect(rs, /satin-ui|packages\/satin-ui\/css/.test(sh.href || "")); }
   const ruleHits = (list, el, props, pseudo) => list.some((r) => props.some((p) => r.style.getPropertyValue(p) !== "") && r.selectorText.split(",").some((s) => { s = s.trim(); if (pseudo ? !s.includes(pseudo) : /::(before|after)/.test(s)) return false; try { return el.matches(pseudo ? s.replace(pseudo, "") || "*" : s); } catch { return false; } }));
