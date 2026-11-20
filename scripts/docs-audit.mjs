@@ -33,18 +33,18 @@ const add = (kind, at, detail) => { issues.push({ kind, at, detail }); console.l
 // ———— 放进文档页里的探针 ————
 const PROBE = () => {
   const A = (window.__audit = {});
-  const MODAL = "dialog[open], .drawer, .cmdk, .lb-stage";
+  const MODAL = "dialog[open], .sn-drawer, .sn-cmdk, .sn-lb-stage";
   // 换页逐帧：第一屏的演示框空着 / 转圈 / 框高
-  A.logStart = () => { A.log = []; A.on = true; const tick = () => { const fs = [...document.querySelectorAll(".dx .d-frame")].filter((f) => { const r = f.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0 && r.height > 0; }); A.log.push({ t: performance.now(), h1: document.querySelector(".d-h1")?.textContent.trim() || "", n: fs.length, empty: fs.filter((f) => !f.classList.contains("ready")).length, spin: fs.filter((f) => +getComputedStyle(f.querySelector(".d-load")).opacity > .05).length, hs: fs.map((f) => f.offsetHeight).join(","), code: [...document.querySelectorAll(".dx .dx-code")].filter((c) => c.getBoundingClientRect().top < innerHeight).map((c) => c.dataset.sig + ":" + c.offsetHeight).join(",") }); if (A.on) requestAnimationFrame(tick); }; requestAnimationFrame(tick); };
+  A.logStart = () => { A.log = []; A.on = true; const tick = () => { const fs = [...document.querySelectorAll(".dx .d-frame")].filter((f) => { const r = f.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0 && r.height > 0; }); A.log.push({ t: performance.now(), h1: document.querySelector(".d-h1")?.textContent.trim() || "", n: fs.length, empty: fs.filter((f) => !f.classList.contains("sn-ready")).length, spin: fs.filter((f) => +getComputedStyle(f.querySelector(".d-load")).opacity > .05).length, hs: fs.map((f) => f.offsetHeight).join(","), code: [...document.querySelectorAll(".dx .dx-code")].filter((c) => c.getBoundingClientRect().top < innerHeight).map((c) => c.dataset.sig + ":" + c.offsetHeight).join(",") }); if (A.on) requestAnimationFrame(tick); }; requestAnimationFrame(tick); };
   A.logStop = () => { A.on = false; return A.log; };
   // 一个个滚到演示框，等它载好；记每个用了多久
   A.loadAll = async () => {
     const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms)), out = [];
     for (const b of document.querySelectorAll(".dx .d-frame")) {
       b.scrollIntoView({ block: "center", behavior: "instant" }); const t0 = performance.now();
-      while (!b.classList.contains("ready") && performance.now() - t0 < 4000) await sleep(40);
-      if (b.classList.contains("ready")) await sleep(250); // 载好以后等它稳定（字体到位、“放不下就竖排”这类布局判断跑完）再做静态检查
-      const dx = b.closest(".dx"); out.push({ at: `${dx.dataset.demo}#${dx.dataset.n ?? "-"}`, ms: b.classList.contains("ready") ? Math.round(performance.now() - t0) : null });
+      while (!b.classList.contains("sn-ready") && performance.now() - t0 < 4000) await sleep(40);
+      if (b.classList.contains("sn-ready")) await sleep(250); // 载好以后等它稳定（字体到位、“放不下就竖排”这类布局判断跑完）再做静态检查
+      const dx = b.closest(".dx"); out.push({ at: `${dx.dataset.demo}#${dx.dataset.n ?? "-"}`, ms: b.classList.contains("sn-ready") ? Math.round(performance.now() - t0) : null });
     }
     scrollTo({ top: 0, behavior: "instant" }); return out;
   };
@@ -52,7 +52,7 @@ const PROBE = () => {
   // 只算落在元素框里、看得见的那几段：数字滚动那一列上下排着的备用数字被裁在框外，不是折行
   const wrapped = (doc, el) => { const b = el.getBoundingClientRect(), tw = doc.createTreeWalker(el, NodeFilter.SHOW_TEXT); for (let n = tw.nextNode(); n; n = tw.nextNode()) { if (!n.textContent.trim()) continue; const rg = doc.createRange(); rg.selectNodeContents(n); const rs = [...rg.getClientRects()].filter((q) => q.width > 1 && q.top + q.height / 2 > b.top && q.top + q.height / 2 < b.bottom); if (rs.length > 1 && Math.max(...rs.map((q) => q.top)) - Math.min(...rs.map((q) => q.top)) > 4) return true; } return false; };
   const label = (el) => `${el.tagName.toLowerCase()}${el.id ? "#" + el.id : ""}${typeof el.className === "string" && el.className.trim() ? "." + el.className.trim().split(/\s+/).slice(0, 2).join(".") : ""} “${(el.getAttribute("aria-label") || el.dataset?.tip || el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 14)}”`;
-  const btnWraps = (doc, win, root) => [...root.querySelectorAll(".btn, button")].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 4 && r.height > 4 && win.getComputedStyle(b).visibility !== "hidden" && wrapped(doc, b); }).map(label);
+  const btnWraps = (doc, win, root) => [...root.querySelectorAll(".sn-btn, button")].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 4 && r.height > 4 && win.getComputedStyle(b).visibility !== "hidden" && wrapped(doc, b); }).map(label);
   // 静态检查：文档页和每个演示
   A.statics = () => {
     const out = [], de = document.documentElement;
@@ -128,8 +128,8 @@ const PROBE = () => {
         res.shift = Math.max(res.shift, Math.abs(f.closest(".dx").getBoundingClientRect().left - stage0));
         // 按打开状态查（不看画没画出来）：弹窗自带的遮罩（::backdrop）是伪元素，撒点量不到，第一帧被关在演示框里也要抓到
         const d = f.contentDocument, isG = f.classList.contains("global");
-        if (!isG && [...d.querySelectorAll("dialog, .drawer, .cmdk, .lb-stage")].some((el) => el.matches("[open], .open, .lb-stage"))) res.modalLocal++;
-        if (!isG && d.querySelector(".toasts .toast")) res.looseLocal++;
+        if (!isG && [...d.querySelectorAll("dialog, .sn-drawer, .sn-cmdk, .sn-lb-stage")].some((el) => el.matches("[open], .sn-open, .sn-lb-stage"))) res.modalLocal++;
+        if (!isG && d.querySelector(".sn-toasts .sn-toast")) res.looseLocal++;
         if (A.floats(f).some((x) => x.op > .3 && !base.has(x.el) && x.r.bottom - x.r.top >= 16)) { res.opened++; res.firstNew ||= res.frames; res.lastNew = res.frames; }
         if (frameBad) { if (frameOp >= .25) res.bad++; else res.minor++; if (frameOp > res.maxOp) { res.maxOp = frameOp; res.worst = frameWorst; } }
       } catch (e) { res.err = String(e).slice(0, 120); }
@@ -139,7 +139,7 @@ const PROBE = () => {
   }); };
   // 演示里可能弹出浮层的触发器：先放明确会弹东西的（菜单、弹出面板、对话框、提示、右键区……），再放其他可点的，最多 max 个
   const SEL = 'button, [role=button], [role=combobox], [role=tab], summary, a[href], input:not([type=hidden]):not([type=file]), textarea, select, [data-tip], [data-ctx], [data-ctx-box], [tabindex="0"]';
-  const OPENER = '[data-pop], [data-menubtn], [aria-haspopup], [data-dlg], [data-toast], [data-nf], [data-nf-add], [data-tip], [data-pk], [data-ctx], [data-ctx-box], [aria-expanded], .select > button';
+  const OPENER = '[data-pop], [data-menubtn], [aria-haspopup], [data-dlg], [data-toast], [data-nf], [data-nf-add], [data-tip], [data-pk], [data-ctx], [data-ctx-box], [aria-expanded], .sn-select > button';
   A.list = (f, max) => {
     const doc = f.contentDocument, win = f.contentWindow, sec = doc?.getElementById(new URL(f.src).searchParams.get("embed")); if (!sec) return [];
     const seen = (el) => { let o = 1; for (let a = el; a && a !== doc.body; a = a.parentElement) { const cs = win.getComputedStyle(a); o *= +cs.opacity; if (cs.pointerEvents === "none" && a !== el) return false; } return o > .1; }; // 祖先透明（没弹出来的批量操作条）、点不到的不算
@@ -147,7 +147,7 @@ const PROBE = () => {
     return [...all.filter((el) => el.matches(OPENER)), ...all.filter((el) => !el.matches(OPENER))].slice(0, max);
   };
   A.pick = (k) => { const f = [...document.querySelectorAll(".dx .d-frame iframe")][k]; A.cur = f; f.closest(".dx").scrollIntoView({ block: "center", behavior: "instant" }); return f.closest(".dx").dataset.demo + "#" + (f.closest(".dx").dataset.n ?? "-"); };
-  const OPENS = '[data-pop], [data-menubtn], [aria-haspopup], [data-dlg], [data-pk], [data-ctx], [data-ctx-box], .select > .trigger, .pk-trigger'; // 组合按钮里的主按钮（导出成片）不弹东西，只有 .trigger / [data-menubtn] 弹
+  const OPENS = '[data-pop], [data-menubtn], [aria-haspopup], [data-dlg], [data-pk], [data-ctx], [data-ctx-box], .sn-select > .sn-trigger, .sn-pk-trigger'; // 组合按钮里的主按钮（导出成片）不弹东西，只有 .trigger / [data-menubtn] 弹
   A.triggers = (max) => A.list(A.cur, max).map((el) => ({ d: label(el), tip: el.hasAttribute("data-tip"), ctx: el.matches("[data-ctx], [data-ctx-box]"), opens: el.matches(OPENS) }));
   // 重载当前演示，等它重新接好浮层处理（文档页的 whenReady 打的标记 + 三帧）
   A.reload = async () => {
@@ -165,7 +165,7 @@ const PROBE = () => {
     return { x: fr.left + (r.left + r.right) / 2, y: fr.top + (r.top + r.bottom) / 2, sy: scrollY };
   };
   // 关上以后的样子：浮层还有没有露在预览框（.d-frame，没伸出去时的大小）外面
-  A.state = () => { const f = A.cur, fl = A.floats(f), fr = f.getBoundingClientRect(), w = f.parentElement.getBoundingClientRect(); return { global: f.classList.contains("global"), lock: document.documentElement.classList.contains("dx-lock"), ext: f.parentElement.classList.contains("ext"), modal: fl.some((x) => x.modal && x.op > .3), loose: fl.some((x) => x.el.closest(".toasts, .notifs") && x.op > .05), out: fl.some((x) => x.op > .1 && (fr.top + x.r.top < w.top - 1 || fr.top + x.r.bottom > w.bottom + 1)), sy: scrollY, h: Math.round(w.height) }; };
+  A.state = () => { const f = A.cur, fl = A.floats(f), fr = f.getBoundingClientRect(), w = f.parentElement.getBoundingClientRect(); return { global: f.classList.contains("global"), lock: document.documentElement.classList.contains("dx-lock"), ext: f.parentElement.classList.contains("ext"), modal: fl.some((x) => x.modal && x.op > .3), loose: fl.some((x) => x.el.closest(".sn-toasts, .sn-notifs") && x.op > .05), out: fl.some((x) => x.op > .1 && (fr.top + x.r.top < w.top - 1 || fr.top + x.r.bottom > w.bottom + 1)), sy: scrollY, h: Math.round(w.height) }; };
 };
 
 // 滚动条常显（占宽度）：和用户的 Chrome 一样。测试浏览器默认把滚动条藏了，锁滚动时整页左右跳这类问题一直测不出来（2026-11-20）
@@ -192,7 +192,7 @@ try {
     await page.evaluate(() => __audit.pick(0)); await page.evaluate(() => __audit.reload());
     const tr = await page.evaluate((m) => __audit.triggers(m), MAXT), i = tr.findIndex((t) => /筛选/.test(t.d));
     const run = async (pin) => {
-      await page.evaluate((pin) => { document.getElementById("audit-pin")?.remove(); if (pin) document.head.insertAdjacentHTML("beforeend", '<style id="audit-pin">.dx .d-frame iframe { height: var(--h) !important; top: 0 !important; }</style>'); }, pin);
+      await page.evaluate((pin) => { document.getElementById("audit-pin")?.remove(); if (pin) document.head.insertAdjacentHTML("beforeend", '<style id="audit-pin">.dx .d-frame iframe { height: var(--sn-h) !important; top: 0 !important; }</style>'); }, pin);
       await page.evaluate(() => __audit.reload()); const aim = await page.evaluate(([m, i]) => __audit.aim(m, i), [MAXT, i]);
       await page.evaluate(() => { window.__monP = __audit.mon(__audit.cur, 800); }); await page.mouse.click(aim.x, aim.y);
       const r = await page.evaluate(() => window.__monP); await page.keyboard.press("Escape"); await page.waitForTimeout(400); return r;

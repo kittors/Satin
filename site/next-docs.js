@@ -2,8 +2,8 @@
 // 组件页的标题、说明、要点、演示源码都读组件展示页（catalog.js），演示本身用 iframe 嵌展示页的那一块（?embed=区块）。
 // 演示框：外层浅灰框 → 里面是预览台（像应用的组件放进 macOS 窗口，背后是桌面壁纸）→ 下面是代码（默认露 8 行，展开看全部）。
 import { onMode } from "./shell.js";
-import { $, $$, root, reduced, injectIcons, initSeg } from "../kit-core.js";
-import { scrollArea } from "../kit-scroll.js";
+import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
+import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { loadCatalog } from "./catalog.js";
 import { codePanel, mountCode, fmtHTML } from "./code.js";
 import { START, GUIDES } from "./pages.js";
@@ -95,8 +95,8 @@ const MAC = (title, inner) => `<div class="mac"><div class="mac-bar"><span class
 const winAt = (c, w) => (w?.demo ?? Math.max(0, (c?.demos.length || 1) - 1));
 function demoBox(id, { code = true, n } = {}) {
   const c = cat.byId[id], w0 = WIN[id], w = w0 && (n == null || n === winAt(c, w0)) ? w0 : null, min = TALL[id] || 0; // 不给保底高度：内容比预览框矮时由预览框上下居中，不把空白都堆在下面
-  const frame = `<div class="d-frame" style="--h:${Math.max(min, w ? 320 : 120)}px" data-min="${min}"><div class="d-load"><span class="spinner"></span>正在载入演示</div><iframe title="${esc(c?.name || "")}演示" data-src="../index.html?embed=${id}${n != null ? "&demo=" + n : ""}${w ? "&win=1" : ""}${w?.flush ? "&flush=1" : ""}${TALL[id] ? "&center=1" : ""}"></iframe></div>`;
-  const open = `<a class="btn ghost sm ibtn dx-open" href="../index.html#${id}" target="_blank" rel="noopener" data-tip="在展示页里打开" aria-label="在展示页里打开" data-i="arrow-up-right"></a>`;
+  const frame = `<div class="d-frame" style="--sn-h:${Math.max(min, w ? 320 : 120)}px" data-min="${min}"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="${esc(c?.name || "")}演示" data-src="../index.html?embed=${id}${n != null ? "&demo=" + n : ""}${w ? "&win=1" : ""}${w?.flush ? "&flush=1" : ""}${TALL[id] ? "&center=1" : ""}"></iframe></div>`;
+  const open = `<a class="sn-btn sn-ghost sn-sm sn-ibtn dx-open" href="../index.html#${id}" target="_blank" rel="noopener" data-tip="在展示页里打开" aria-label="在展示页里打开" data-i="arrow-up-right"></a>`;
   return `<div class="dx${w ? " is-win" : ""}" data-demo="${id}"${n != null ? ` data-n="${n}"` : ""}>
     <div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span>${open}</div>
     <div class="dx-stage">${w ? `<img class="dx-wall" src="${img("mist", 1800, 70)}" alt="" decoding="async">` : ""}${w ? MAC(w.title, frame) : frame}</div>
@@ -109,21 +109,21 @@ addEventListener("message", (e) => {
   if (e.origin !== location.origin || !e.data?.satinEmbed) return;
   for (const f of frames) if (f.contentWindow === e.source) {
     const box = f.parentElement, h = Math.max(Number(box.dataset.min), Math.ceil(e.data.h)); keepH(f, h);
-    if (box.classList.contains("ready")) { box.style.setProperty("--h", h + "px"); reAnchor(); continue; }
+    if (box.classList.contains("sn-ready")) { box.style.setProperty("--sn-h", h + "px"); reAnchor(); continue; }
     try { f.__code?.(f.contentDocument); } catch {} // 代码面板在演示露出来之前就换成生成出来的结构
     loaded(f);
     if (waiting || gap(box) > 0 || Number(box.dataset.known) === h) {
-      if (waiting) box.classList.add("instant");
-      box.style.setProperty("--h", h + "px"); box.classList.add("ready"); reAnchor();
+      if (waiting) box.classList.add("sn-instant");
+      box.style.setProperty("--sn-h", h + "px"); box.classList.add("sn-ready"); reAnchor();
       if (waiting?.pend.delete(f) && !waiting.pend.size) waiting.fin();
-    } else { box.classList.add("sized"); requestAnimationFrame(() => { box.style.setProperty("--h", h + "px"); box.classList.add("ready"); setTimeout(() => { box.classList.remove("sized"); reAnchor(); }, 360); }); }
+    } else { box.classList.add("sn-sized"); requestAnimationFrame(() => { box.style.setProperty("--sn-h", h + "px"); box.classList.add("sn-ready"); setTimeout(() => { box.classList.remove("sn-sized"); reAnchor(); }, 360); }); }
   }
 });
 let anchorTo = null;
 const reAnchor = () => { if (!anchorTo) return; const el = document.getElementById(anchorTo); if (el) el.scrollIntoView({ behavior: "instant", block: "start" }); };
 for (const ev of ["wheel", "touchstart", "keydown", "pointerdown"]) addEventListener(ev, () => { anchorTo = null; }, { passive: true });
 onMode((t) => { for (const f of frames) try { f.contentDocument.documentElement.dataset.theme = t; } catch {} });
-addEventListener("resize", () => { for (const f of frames) try { f.contentDocument.documentElement.style.setProperty("--vh", innerHeight + "px"); } catch {} });
+addEventListener("resize", () => { for (const f of frames) try { f.contentDocument.documentElement.style.setProperty("--sn-vh", innerHeight + "px"); } catch {} });
 
 // ———— 演示的代码 ————
 // 手写的演示直接给源码；内容是脚本生成的（源码里只有一个空容器），从 iframe 里取生成好的结构，整理成能抄的样子
@@ -132,8 +132,8 @@ function tidy(el) {
   const c = el.cloneNode(true);
   for (const n of [c, ...c.querySelectorAll("*")]) {
     if (n.tagName.toLowerCase() === "svg" && n.dataset.icon) { const s = document.createElement("span"); s.setAttribute("data-i", n.dataset.icon); n.replaceWith(s); continue; }
-    for (const a of [...n.attributes]) if (RUNTIME_ATTR.test(a.name) || (n.closest?.(".seg") && a.name === "role")) n.removeAttribute(a.name);
-    n.classList?.remove("hl", "ld", "cv", "in");
+    for (const a of [...n.attributes]) if (RUNTIME_ATTR.test(a.name) || (n.closest?.(".sn-seg") && a.name === "role")) n.removeAttribute(a.name);
+    n.classList?.remove("sn-hl", "ld", "sn-cv", "sn-in");
     if (n.classList?.length === 0) n.removeAttribute("class");
   }
   return c;
@@ -147,7 +147,7 @@ function codeOf(demo, doc) {
     if (all.length > 8) {
       const seen = new Set(), keep = [];
       for (const x of all) {
-        if (x.classList.contains("cap") || (!x.children.length && !x.textContent.trim())) continue;
+        if (x.classList.contains("sn-cap") || (!x.children.length && !x.textContent.trim())) continue;
         const k = x.tagName + "." + x.className; if (seen.has(k)) continue;
         seen.add(k); keep.push(x); if (keep.length >= 8) break;
       }
@@ -188,7 +188,7 @@ function whenReady(f, cb) {
 }
 function wireDemo(box, c) {
   const f = box.querySelector("iframe"), fr = f.parentElement; frames.add(f);
-  const known = hcache[hkey(f)]; if (known) { fr.style.setProperty("--h", known + "px"); fr.dataset.known = known; }
+  const known = hcache[hkey(f)]; if (known) { fr.style.setProperty("--sn-h", known + "px"); fr.dataset.known = known; }
   loadQ.push(f); nearIO.observe(fr); // 排队，换页最后统一 pump()
   // 代码面板：演示宣布“好了”的那一刻（第一条高度消息，见上面的 message 处理）同步按生成出来的结构更新——赶在页面 / 演示露出来之前，
   // 不能露出来以后再换（原来等两帧，刷新时整页出来了代码区再重排一次、“展开代码”跳一下，2026-11-20 刷新录像抓到）。
@@ -197,14 +197,14 @@ function wireDemo(box, c) {
     const slot = box.querySelector(".dx-code"); if (!slot || !c || !doc) return;
     const files = filesOf(c, doc, box.dataset.n != null ? +box.dataset.n : undefined), sig = sigOf(files);
     if (slot.dataset.sig === sig) return;
-    const open = slot.querySelector(".cx")?.classList.contains("open");
+    const open = slot.querySelector(".cx")?.classList.contains("sn-open");
     slot.dataset.sig = sig; slot.innerHTML = codePanel(files, { fold: 8 }); mountCode(slot);
     if (open) slot.querySelector(".cx-more")?.click();
   };
   f.__code = code;
   // 浮层处理：演示文档一解析完就接上（模块脚本在这之前已经跑完；等两帧，初始化里排的第一帧也走完）
   whenReady(f, (doc) => {
-    try { doc.documentElement.dataset.theme = root.dataset.theme; doc.documentElement.style.setProperty("--vh", innerHeight + "px"); } catch {} // --vh：演示里浮层的高度上限按文档页的真实窗口高算（见 form.css 的 .menu）
+    try { doc.documentElement.dataset.theme = root.dataset.theme; doc.documentElement.style.setProperty("--sn-vh", innerHeight + "px"); } catch {} // --vh：演示里浮层的高度上限按文档页的真实窗口高算（见 form.css 的 .menu）
     requestAnimationFrame(() => requestAnimationFrame(() => {
       // 窗口样式的演示：挡住整页的浮层（弹窗、抽屉、命令面板、看图）和全局提示照样铺满整个窗口；跟着元素弹出的浮层留在窗口里（窗口有边框，不往外伸）
       if (box.classList.contains("is-win")) { mirrorCtl(box, doc, box.dataset.demo); watchFloats(f, doc, { anchored: false }); } else watchFloats(f, doc);
@@ -225,12 +225,12 @@ function watchFloats(f, doc, { anchored = true } = {}) {
   // 新的这份以为没伸出去，就一直伸着收不回来（2026-11-20 巡检：视频、提示词输入框“关上后演示框没缩回”）
   f.style.top = ""; f.style.height = ""; f.style.clipPath = ""; f.classList.remove("global"); wrap.classList.remove("ext");
   if (!document.querySelector("iframe.global")) document.documentElement.classList.remove("dx-lock");
-  const MODAL = "dialog, .drawer, .drawer-scrim, .cmdk, .cmdk-scrim, .lb-stage", LOOSE = ".toasts .toast, .notifs .notif";
+  const MODAL = "dialog, .sn-drawer, .sn-drawer-scrim, .sn-cmdk, .sn-cmdk-scrim, .sn-lb-stage", LOOSE = ".sn-toasts .sn-toast, .sn-notifs .sn-notif";
   const shown = (el) => { const cs = win.getComputedStyle(el); if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity <= .02) return false; const r = el.getBoundingClientRect(); return r.width > 4 && r.height > 4 && r.right > 0 && r.left < win.innerWidth; }; // 只看水平方向：收起的抽屉滑到右边外面去了；竖直方向小画布本来就装不下弹窗
   // 伸出去（跟着元素弹出的浮层）
   const extend = (u, d) => {
     if (u === up && d === down) return; up = u; down = d;
-    f.style.top = u ? -u + "px" : ""; f.style.height = u || d ? `calc(var(--h) + ${u + d}px)` : "";
+    f.style.top = u ? -u + "px" : ""; f.style.height = u || d ? `calc(var(--sn-h) + ${u + d}px)` : "";
     doc.documentElement.style.paddingTop = u ? u + "px" : ""; wrap.classList.toggle("ext", !!(u || d));
   };
   // 铺满窗口（全局浮层）：演示留在原地 = html 的外边距对准预览框在窗口里的位置，body 宽度和预览框一样。
@@ -383,9 +383,9 @@ function watchFloats(f, doc, { anchored = true } = {}) {
   const check = () => {
     if (dead) return;
     // 挡整页的：一打上打开状态（[open]、.open）就铺满窗口，不等它画出来——抽屉从右边滑进来，等“看得见”再铺满，头两帧会被关在演示框里（巡检抓到过）；关上时等它真的退出画面再缩回
-    if ([...doc.querySelectorAll(MODAL)].some((el) => el.matches("[open], .open") || shown(el))) return toGlobal(true);
+    if ([...doc.querySelectorAll(MODAL)].some((el) => el.matches("[open], .sn-open") || shown(el))) return toGlobal(true);
     // 轻提示：正在进场（有动画在播、还没淡入）就算出现，不等它画出来；收起后留在 DOM 里、看不见的不算（只看“在不在 DOM 里”会一直铺满着出不来）
-    if ([...doc.querySelectorAll(LOOSE)].some((el) => shown(el) || (el.matches(".toasts .toast") && el.getAnimations().some((a) => a.playState === "running")))) return toGlobal(false);
+    if ([...doc.querySelectorAll(LOOSE)].some((el) => shown(el) || (el.matches(".sn-toasts .sn-toast") && el.getAnimations().some((a) => a.playState === "running")))) return toGlobal(false);
     toLocal(); if (!anchored) return;
     // 每次都从头算：位置换算回"没伸出去时"的坐标（伸出去以后内容整体下移了 up），超出预览框上沿 / 下沿多少就伸多少，没有浮层露出来就缩回去
     const H = wrap.offsetHeight; let nu = 0, nd = 0;
@@ -431,26 +431,26 @@ function watchFloats(f, doc, { anchored = true } = {}) {
   new MutationObserver((ms) => {
     if (ms.some((m) => m.type === "attributes" || [...m.addedNodes, ...m.removedNodes].some((n) => n.nodeType === 1))) { candAt = -1e9; check(); follow(300); }
   }).observe(doc.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "open"] });
-  new MutationObserver((ms) => { candAt = -1e9; if (ms.some((m) => m.target.closest?.(".toasts, .notifs, dialog, .drawer, .cmdk") || [...m.addedNodes, ...m.removedNodes].some((n) => n.nodeType === 1 && n.matches?.(".toast, .notif, .toasts, .notifs, .lb-stage, .lightbox-scrim")))) soon(); })
+  new MutationObserver((ms) => { candAt = -1e9; if (ms.some((m) => m.target.closest?.(".sn-toasts, .sn-notifs, dialog, .sn-drawer, .sn-cmdk") || [...m.addedNodes, ...m.removedNodes].some((n) => n.nodeType === 1 && n.matches?.(".sn-toast, .sn-notif, .sn-toasts, .sn-notifs, .sn-lb-stage, .sn-lightbox-scrim")))) soon(); })
     .observe(doc.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "open"] });
 }
 
 // 窗口里的演示：展示页那一块的设置行（分段控件）挪到框顶上，点了转给 iframe 里原来那个按钮
 function mirrorCtl(box, doc, id) {
   const sec = doc.getElementById(id); if (!sec) return;
-  const rows = [...sec.children].filter((r) => r.matches('[class$="-cfg"]') && r.querySelector(".seg[data-seg], button"));
+  const rows = [...sec.children].filter((r) => r.matches('[class$="-cfg"]') && r.querySelector(".sn-seg[data-seg], button"));
   if (!rows.length) return;
   const bar = $(".dx-bar", box), slot = $(".dx-ctl", bar), note = $(".dx-note", bar);
   slot.innerHTML = rows.map((r, k) => {
-    const s = r.querySelector(".seg[data-seg]"), cap = r.querySelector(".cap")?.textContent.trim() || "";
-    if (!s) return `<div class="dx-opt">${cap ? `<span>${esc(cap)}</span>` : ""}${[...r.querySelectorAll("button")].map((b, j) => `<button class="btn ghost sm" data-row="${k}" data-j="${j}">${esc(b.textContent.trim())}</button>`).join("")}</div>`;
-    return `<div class="dx-opt">${cap ? `<span>${esc(cap)}</span>` : ""}<div class="seg sm" data-k="${k}"><span class="thumb"></span>${[...s.querySelectorAll("button")].map((b) => `<button data-v="${esc(b.dataset.v)}">${esc(b.textContent.trim())}</button>`).join("")}</div></div>`;
+    const s = r.querySelector(".sn-seg[data-seg]"), cap = r.querySelector(".sn-cap")?.textContent.trim() || "";
+    if (!s) return `<div class="dx-opt">${cap ? `<span>${esc(cap)}</span>` : ""}${[...r.querySelectorAll("button")].map((b, j) => `<button class="sn-btn sn-ghost sn-sm" data-row="${k}" data-j="${j}">${esc(b.textContent.trim())}</button>`).join("")}</div>`;
+    return `<div class="dx-opt">${cap ? `<span>${esc(cap)}</span>` : ""}<div class="sn-seg sn-sm" data-k="${k}"><span class="sn-thumb"></span>${[...s.querySelectorAll("button")].map((b) => `<button data-v="${esc(b.dataset.v)}">${esc(b.textContent.trim())}</button>`).join("")}</div></div>`;
   }).join("");
   slot.addEventListener("click", (e) => { const b = e.target.closest("[data-row]"); if (b) rows[+b.dataset.row].querySelectorAll("button")[+b.dataset.j]?.click(); });
-  const readNote = () => { note.textContent = rows.map((r) => r.querySelector(".note")?.textContent.trim()).filter(Boolean).join(" · "); };
-  $$(".seg", slot).forEach((s) => {
-    const src = rows[+s.dataset.k].querySelector(".seg[data-seg]"), btns = [...src.querySelectorAll("button")];
-    const start = Math.max(0, btns.findIndex((b) => b.classList.contains("on") || b.getAttribute("aria-selected") === "true"));
+  const readNote = () => { note.textContent = rows.map((r) => r.querySelector(".sn-note")?.textContent.trim()).filter(Boolean).join(" · "); };
+  $$(".sn-seg", slot).forEach((s) => {
+    const src = rows[+s.dataset.k].querySelector(".sn-seg[data-seg]"), btns = [...src.querySelectorAll("button")];
+    const start = Math.max(0, btns.findIndex((b) => b.classList.contains("sn-on") || b.getAttribute("aria-selected") === "true"));
     initSeg(s, (v) => { btns.find((b) => b.dataset.v === v)?.click(); requestAnimationFrame(readNote); }, start);
   });
   readNote();
@@ -458,9 +458,9 @@ function mirrorCtl(box, doc, id) {
 
 // ———— 组件页 ————
 function usage(id) {
-  const u = USAGE[id] || { css: [] }, css = ["kit.css", ...(u.css || [])];
-  let h = anchor("usage", "引入") + `<p>样式表（<code>kit.css</code> 总是要引，它带着颜色、字体、间距这些令牌）：</p>`
-    + snippet("html", css.map((f) => `<link rel="stylesheet" href="/satin/${f}">`).join("\n"));
+  const u = USAGE[id] || { css: [] }, css = ["tokens.css", "base.css", ...(u.css || [])];
+  let h = anchor("usage", "引入") + `<p>样式（<code>tokens.css</code>、<code>base.css</code> 总是要引，它们带着颜色、字体、间距这些令牌和基础样式；整页都用 Satin 时直接引 <code>satin-ui/css/page.css</code>，全部组件和页面级重置一次带上）：</p>`
+    + snippet("js", css.map((f) => `import "satin-ui/css/${f}";`).join("\n"));
   if (u.api?.length) {
     const mods = new Map();
     for (const [fn, m] of u.api) for (const part of fn.split(" / ")) {
@@ -468,16 +468,16 @@ function usage(id) {
       if (name) (mods.get(m) || mods.set(m, []).get(m)).push(name);
     }
     h += `<p>能直接调用的：</p><div class="d-tablewrap"><table class="d-table"><thead><tr><th>用法</th><th>模块</th></tr></thead><tbody>${u.api.map(([fn, m]) => `<tr><td><code>${esc(fn)}</code></td><td><code>${m}</code></td></tr>`).join("")}</tbody></table></div>`;
-    if (mods.size && !EX[id]) h += snippet("js", [...mods].map(([m, ns]) => `import { ${[...new Set(ns)].join(", ")} } from "/satin/${m}";`).join("\n"));
+    if (mods.size && !EX[id]) h += snippet("js", [...mods].map(([m, ns]) => `import { ${[...new Set(ns)].join(", ")} } from "${m}";`).join("\n"));
   }
-  if (u.js) h += `<p>交互写在 <code>${u.js}</code> 里，按展示页的标记组织：照着上面"HTML"里的结构写标记，再调用这个模块的初始化函数。</p>`;
+  if (u.js) h += `<p>交互：${u.js}。</p>`;
   if (!u.api?.length && !u.js) h += `<p>纯样式组件：写好标记就能用，不需要脚本。</p>`;
   return h;
 }
 const rulesHTML = (rules) => (rules.length ? anchor("rules", "要点") + `<ul class="d-rules">${rules.map((r) => `<li>${r}</li>`).join("")}</ul>` : "");
 function head(pg, title, crumb, lead) {
   const i = pages.indexOf(pg), a = pages[i - 1], b = pages[i + 1];
-  const nav = (x, dir) => (x ? `<a class="btn tertiary ibtn" href="${x.hash}" data-tip="${dir === "l" ? "上一页" : "下一页"}：${esc(x.title)}" aria-label="${dir === "l" ? "上一页" : "下一页"}：${esc(x.title)}" data-i="arrow-${dir === "l" ? "left" : "right"}"></a>` : "");
+  const nav = (x, dir) => (x ? `<a class="sn-btn sn-tertiary sn-ibtn" href="${x.hash}" data-tip="${dir === "l" ? "上一页" : "下一页"}：${esc(x.title)}" aria-label="${dir === "l" ? "上一页" : "下一页"}：${esc(x.title)}" data-i="arrow-${dir === "l" ? "left" : "right"}"></a>` : "");
   return `<header class="d-head"><div class="d-crumb">${crumb}</div><div class="d-title"><h1 class="d-h1">${title}</h1><div class="d-head-act">${nav(a, "l")}${nav(b, "r")}</div></div><p class="d-lead">${lead}</p></header>`;
 }
 // 参数：选项、返回值、CSS 变量……每张表一个小标题
@@ -517,7 +517,7 @@ function spyToc() {
   let cur = tocHs[0];
   for (const h of tocHs) if (h.getBoundingClientRect().top <= 64 + 96) cur = h;
   if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = tocHs.filter((h) => h.getBoundingClientRect().top < innerHeight - 40).at(-1) || cur;
-  tocLinks.forEach((a, k) => a.classList.toggle("on", k === cur.id));
+  tocLinks.forEach((a, k) => a.classList.toggle("sn-on", k === cur.id));
 }
 addEventListener("scroll", () => { if (!tocRaf) tocRaf = requestAnimationFrame(spyToc); }, { passive: true });
 function buildToc(base) {
@@ -548,7 +548,7 @@ function route() {
 function swapPage(pg, part) {
   curPage = pg; frames.clear(); resetQueue(); h2n = 0;
   if (!pg) {
-    main.innerHTML = `<div class="d-404"><h1 class="d-h1">没有这一页</h1><p class="d-lead">地址可能写错了，或者这一页改了名字。</p><a class="btn secondary" href="#/intro">回到介绍</a></div>`;
+    main.innerHTML = `<div class="d-404"><h1 class="d-h1">没有这一页</h1><p class="d-lead">地址可能写错了，或者这一页改了名字。</p><a class="sn-btn sn-secondary" href="#/intro">回到介绍</a></div>`;
     tocVp.innerHTML = ""; document.title = "没有这一页 · Satin";
   } else {
     main.innerHTML = `<article class="d-page">${pg.kind === "comp" ? compPage(pg) : textPage(pg)}${pager(pg)}</article>`;
@@ -561,7 +561,7 @@ function swapPage(pg, part) {
     if (!first && !document.startViewTransition && !reduced()) main.firstElementChild.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: OUT_STRONG });
   }
   sideLinks.forEach((a, h) => a.toggleAttribute("aria-current", h === pg?.hash));
-  if (pg) { const a = sideLinks.get(pg.hash), vp = a.closest(".sa-vp") || side, r = a.getBoundingClientRect(), vr = vp.getBoundingClientRect(); if (r.top < vr.top + 40 || r.bottom > vr.bottom - 40) vp.scrollTop += r.top - vr.top - vr.height / 3; }
+  if (pg) { const a = sideLinks.get(pg.hash), vp = a.closest(".sn-sa-vp") || side, r = a.getBoundingClientRect(), vr = vp.getBoundingClientRect(); if (r.top < vr.top + 40 || r.bottom > vr.bottom - 40) vp.scrollTop += r.top - vr.top - vr.height / 3; }
   for (const n of $$("[data-nav]")) n.toggleAttribute("aria-current", !!pg && (n.dataset.nav === "c" ? pg.kind === "comp" : n.dataset.nav === "guide" ? pg.kind === "guide" : pg.kind === "start"));
   scrollTo({ top: 0, behavior: "instant" });
   closeSide();
@@ -575,10 +575,10 @@ toc.addEventListener("click", (e) => { const a = e.target.closest("a[data-to]");
 
 // ———— 窄屏：目录收进左边的抽屉 ————
 const burger = $("[data-burger]"), scrim = $("[data-scrim]");
-function closeSide() { side.classList.remove("open"); scrim.classList.remove("open"); burger?.setAttribute("aria-expanded", "false"); }
-burger?.addEventListener("click", () => { const on = !side.classList.contains("open"); side.classList.toggle("open", on); scrim.classList.toggle("open", on); burger.setAttribute("aria-expanded", String(on)); });
+function closeSide() { side.classList.remove("sn-open"); scrim.classList.remove("sn-open"); burger?.setAttribute("aria-expanded", "false"); }
+burger?.addEventListener("click", () => { const on = !side.classList.contains("sn-open"); side.classList.toggle("sn-open", on); scrim.classList.toggle("sn-open", on); burger.setAttribute("aria-expanded", String(on)); });
 scrim.addEventListener("click", closeSide);
-addEventListener("keydown", (e) => { if (e.key === "Escape" && side.classList.contains("open")) closeSide(); });
+addEventListener("keydown", (e) => { if (e.key === "Escape" && side.classList.contains("sn-open")) closeSide(); });
 
 route();
 anchorTo = decodeURIComponent(location.hash).split(":")[1] || null; setTimeout(() => (anchorTo = null), 4000);

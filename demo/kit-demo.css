@@ -1,0 +1,113 @@
+/* 展示页（index.html）自己的排版：文档框架、间距一节的演示、矩阵和两栏。不属于组件库。 */
+/* 离开视口的示例块不渲染（高度在载入时量好，滚动和目录跳转不跳），见 kit.js 末尾 */
+@layer satin {
+.demo.sn-cv { content-visibility: auto; contain-intrinsic-size: auto var(--sn-ch, 400px); }
+.doc-top { position: sticky; top: 0; z-index: 20; height: 56px; display: flex; align-items: center; gap: 16px; padding: 0 24px 0 32px;
+  background: color-mix(in srgb, var(--sn-canvas) 82%, transparent); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); }
+.doc-top .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: -.012em; }
+.doc-top .brand svg { width: 18px; height: 18px; }
+.doc-top .brand small { font-weight: 400; color: var(--sn-label3); margin-left: 6px; }
+.doc-top .tools { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.doc { display: grid; grid-template-columns: 216px minmax(0, 1fr); gap: 8px; max-width: 1320px; margin: 0 auto; padding: 0 24px 120px; }
+/* sp-ok: 页尾留白，让最后一节能滚到顶 */
+.doc-nav { position: sticky; top: 56px; align-self: start; max-height: calc(100vh - 56px); overflow: auto; padding: 16px 8px 40px 8px; }
+.doc-nav p { margin: 16px 8px 4px; font: 500 calc(11px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); letter-spacing: .02em; }
+.doc-nav a { display: block; height: 30px; line-height: 30px; padding: 0 10px; border-radius: var(--sn-r-sm); font-size: calc(13px * var(--sn-font-scale, 1)); color: var(--sn-label2); text-decoration: none;
+  transition: background .12s var(--sn-ease-out), color .12s var(--sn-ease-out); }
+.doc-nav a:hover { background: var(--sn-fill-hover); color: var(--sn-label); }
+.doc-nav a.sn-on { background: var(--sn-fill-active); color: var(--sn-label); }
+.doc-main { min-width: 0; padding: 24px 16px 0; }
+.intro { padding: 24px 0 8px; max-width: 760px; }
+.intro h1 { font: 600 calc(28px * var(--sn-font-scale, 1))/calc(36px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.02em; }
+.intro p { margin-top: 10px; color: var(--sn-label2); }
+.spec { padding-top: 56px; }
+/* sp-ok: 等于页头高度，锚点跳过去不被挡 */
+.spec > h2 { font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.012em; display: flex; align-items: baseline; gap: 10px; }
+.spec > h2 small { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label3); }
+.spec > p { margin-top: 6px; color: var(--sn-label2); max-width: 760px; }
+.spec h3 { margin: 28px 0 10px; font: 600 calc(15px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); }
+.demo { margin-top: 12px; padding: 24px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+.demo + .demo { margin-top: 12px; }
+.demo.flush { padding: 0; overflow: hidden; }
+.rules { margin-top: 12px; padding-left: 16px; color: var(--sn-label2); font-size: calc(13px * var(--sn-font-scale, 1)); line-height: 20px; }
+.rules li + li { margin-top: 4px; }
+.rules b { color: var(--sn-label); font-weight: 500; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.row + .row { margin-top: 16px; }
+.stack { display: grid; gap: 16px; }
+.grid-m { display: grid; align-items: center; gap: 14px 16px; }
+.grid-m .sn-cap { white-space: nowrap; }
+code.k { font: calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label2); background: var(--sn-fill-subtle); padding: 1px 4px; border-radius: var(--sn-r-xs); }
+/* ———— 密度：紧凑（表格、后台、工具）、标准、宽松（阅读、欢迎页）。只换语义间距的档，刻度不变 ———— */
+/* ———— 间距一节的演示 ———— */
+.sp-scale { display: grid; grid-template-columns: max-content 28px 96px 1fr; align-items: center; column-gap: 16px; row-gap: 6px; }
+.sp-row { display: contents; }
+.sp-row .sn-num { text-align: right; font: 500 calc(12px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); }
+.sp-bar { display: flex; align-items: center; height: 20px; }
+.sp-bar i { display: block; height: 8px; border-radius: 1px; background: color-mix(in srgb, var(--sn-label) 22%, transparent); }
+.sp-compare { display: flex; flex-wrap: wrap; gap: 32px; }
+.sp-cmp { margin: 0; display: grid; gap: 12px; }
+.sp-cmp figcaption { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); }
+.sp-set { width: 260px; display: flex; flex-direction: column; padding: 16px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: var(--sn-e1); }
+.sp-set b { font: 600 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sp-set span { display: flex; align-items: center; justify-content: space-between; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sp-set span::after { content: ""; width: 26px; height: 16px; border-radius: 8px; background: var(--sn-fill-active); }
+.sp-cmp.sn-bad .sp-set { gap: 16px; }
+.sp-cmp.good .sp-set { gap: 24px; }
+.sp-cmp.good .sp-set > div { display: flex; flex-direction: column; gap: 8px; }
+.sp-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-bottom: 20px; }
+.sp-stage { position: relative; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 32px; }
+.sp-card, .sp-panel, .sp-head, .sp-tags, .sp-acts, .sp-grp { transition: padding .2s var(--sn-ease-out), gap .2s var(--sn-ease-out); }
+.sp-card { width: 280px; display: flex; flex-direction: column; gap: var(--sn-gap-group); padding: var(--sn-pad-card); border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: var(--sn-e1); }
+.sp-thumb { aspect-ratio: 16 / 9; border-radius: var(--sn-r-md); background: radial-gradient(60% 80% at 72% 30%, rgba(255, 210, 160, .45), transparent 60%), linear-gradient(180deg, #2a3242, #121722); }
+.sp-head { display: flex; flex-direction: column; gap: var(--sn-gap-tight); }
+.sp-head b { font: 600 calc(14px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sp-head span { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sp-tags, .sp-acts { display: flex; flex-wrap: wrap; gap: var(--sn-gap-inline); }
+.sp-panel { width: 280px; display: flex; flex-direction: column; gap: var(--sn-gap-group); padding: var(--sn-pad-panel); border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: var(--sn-e1); }
+.sp-grp { display: flex; flex-direction: column; gap: var(--sn-gap-inline); }
+.sp-grp b { font: 600 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sp-line { display: flex; justify-content: space-between; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sp-line span:last-child { color: var(--sn-label2); }
+/* 标注：内边距绿、间隙紫（和浏览器开发者工具的盒模型配色一致），数值写在中间 */
+.sp-overlay { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.sp-overlay i { position: absolute; display: grid; place-items: center; }
+.sp-overlay i[hidden] { display: none; }
+.sp-overlay i.out-r b { position: absolute; left: calc(100% + 2px); top: 50%; translate: 0 -50%; }
+.sp-overlay i.out-t b { position: absolute; bottom: calc(100% + 2px); left: 50%; translate: -50% 0; }
+.sp-overlay i.pad { background: rgba(52, 199, 89, .2); }
+.sp-overlay i.sn-gap { background: rgba(175, 82, 222, .2); }
+.sp-overlay b { padding: 0 4px; border-radius: 4px; font: 600 calc(10px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-sans); font-variant-numeric: tabular-nums; color: #fff; white-space: nowrap; }
+.sp-overlay i.pad b { background: #248a3d; }
+.sp-overlay i.sn-gap b { background: #8944ab; }
+.sp-ctl { border-collapse: collapse; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sp-ctl th { padding: 0 24px 8px 0; text-align: left; font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sp-ctl td { padding: 8px 24px 8px 0; }
+.sp-ctl td.sn-num { font-variant-numeric: tabular-nums; }
+/* ———— 放不下时怎么办（统一规则） ————
+   演示框是尺寸容器：里面的排版按演示框自己的宽度变（窗口宽不代表演示框宽）。容器查询不会改变弹层的定位（已验证 fixed / absolute 仍按视口和定位祖先）。 */
+.demo { container: demo / inline-size; }
+/* 矩阵（变体 × 尺寸 / 状态）：宽的时候按列对齐；放不下（fitStack 加 .stack）时每行换成"名字一行、格子一排可换行"，每个格子下面小字标出列名 */
+.mx { display: grid; grid-template-columns: 110px repeat(var(--sn-cols), max-content); gap: 14px 16px; align-items: center; }
+.mx-h, .mx-r { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; align-items: center; }
+.mx .sn-cap { white-space: nowrap; }
+.mx-c { display: grid; justify-items: start; }
+.mx-c > small { display: none; }
+.mx.stack { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.mx.stack .mx-h { display: none; }
+.mx.stack .mx-r { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; grid-column: auto; }
+.mx.stack .mx-r > .sn-cap { flex-basis: 100%; margin-bottom: -2px; }
+.mx.stack .mx-c { justify-items: center; gap: 6px; }
+.mx.stack .mx-c > small:not(:empty) { display: block; font: 400 calc(11px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
+/* 标签 + 内容两栏：演示框窄于 520 时叠起来（标签在上） */
+.grid-m.lc { grid-template-columns: var(--lc, 112px) minmax(0, 1fr); }
+@container demo (max-width: 520px) {
+  .grid-m.lc { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
+  .grid-m.lc > .sn-cap:not(:first-child) { margin-top: 12px; }
+}
+/* 一组同类的格子（输入框各种状态、空状态……）：按宽度自动分列，每列不窄于 --min */
+.grid-m.auto { grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min, 220px)), 1fr)); }
+/* 侧栏与布局的演示框高 420（库里的 .sn-app 默认占满视口高度） */
+.demo > .sn-app { height: 420px; }
+.demo > .sn-app .sn-app-main { overflow: hidden; } /* 演示框里主区不出滚动条（库里默认主区自己滚动） */
+}

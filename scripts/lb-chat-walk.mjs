@@ -11,7 +11,7 @@ const pw = require(process.env.PLAYWRIGHT || "/Users/kittors/Developer/freelance
 const arg = (k, d) => { const i = process.argv.indexOf("--" + k); if (i < 0) return d; const v = process.argv[i + 1]; return v && !v.startsWith("--") ? v : true; };
 const W = +arg("width", 1440), H = +arg("height", 900), THEME = arg("theme", "light"), OUT = arg("out", "/tmp/satin-walk");
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(`${OUT}/frames`, { recursive: true });
-const IMG = ".bubble.img:not(.vid) .ph", VID = ".bubble.img.vid .ph";
+const IMG = ".sn-bubble.sn-img:not(.sn-vid) .sn-ph", VID = ".sn-bubble.sn-img.sn-vid .sn-ph";
 
 const browser = await pw.chromium.launch({ channel: "chrome", ignoreDefaultArgs: ["--hide-scrollbars"], args: [`--window-size=${W},${H}`, "--autoplay-policy=no-user-gesture-required", "--disable-features=OverlayScrollbar"] });
 const report = [], fails = [], all = [];
@@ -41,7 +41,7 @@ try {
 
   // ———— 量 ————
   const geo = (sel) => page.evaluate(([sel]) => {
-    const f = document.querySelector(".dx .d-frame iframe"), d = f.contentDocument, fr = f.getBoundingClientRect(), vp = d.querySelector(".chat-vp"), el = [...d.querySelectorAll(sel)].sort((a, b) => Math.abs(a.getBoundingClientRect().top - 300) - Math.abs(b.getBoundingClientRect().top - 300))[0];
+    const f = document.querySelector(".dx .d-frame iframe"), d = f.contentDocument, fr = f.getBoundingClientRect(), vp = d.querySelector(".sn-chat-vp"), el = [...d.querySelectorAll(sel)].sort((a, b) => Math.abs(a.getBoundingClientRect().top - 300) - Math.abs(b.getBoundingClientRect().top - 300))[0];
     const r = el?.getBoundingClientRect(), v = vp.getBoundingClientRect(), nav = document.querySelector(".s-nav").getBoundingClientRect().bottom;
     // 对话列表真正露出来的上下沿（输入框浮在列表底部上面）：沿缩略图那一列点
     let top = v.top, bot = v.bottom; if (r) { const x = (r.left + r.right) / 2; const inV = (y) => { const e = d.elementFromPoint(x, y); return !!e && vp.contains(e); }; let a = Math.ceil(v.top) + .5; while (a < v.bottom && !inV(a)) a++; let best = null, s0 = null; for (let y = a; y < v.bottom; y++) { const h = inV(y); if (h && s0 == null) s0 = y; if ((!h || y + 1 >= v.bottom) && s0 != null) { const e = h ? y : y - 1; if (!best || e - s0 > best[1] - best[0]) best = [s0, e]; s0 = null; } } if (best) { top = best[0]; bot = best[1]; } }
@@ -66,7 +66,7 @@ try {
   const startSample = () => page.evaluate(() => {
     const f = document.querySelector(".dx .d-frame iframe"), d = f.contentDocument, w = f.contentWindow, th = d.querySelector("[data-wt]"), sec = d.getElementById("chat"), fr0 = f.getBoundingClientRect();
     const nb = document.querySelector(".s-nav").getBoundingClientRect().bottom;
-    const txt = [...sec.querySelectorAll("*")].filter((e) => !e.contains(th) && !th.contains(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && !e.closest(".tip, .menu, [role=tooltip]")).map((e) => ({ e, r: e.getBoundingClientRect() }))
+    const txt = [...sec.querySelectorAll("*")].filter((e) => !e.contains(th) && !th.contains(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && !e.closest(".sn-tip, .sn-menu, [role=tooltip]")).map((e) => ({ e, r: e.getBoundingClientRect() }))
       .filter(({ r }) => r.width > 8 && r.height > 6 && fr0.top + r.top >= nb && fr0.top + r.bottom <= innerHeight && fr0.left + r.left >= 0).sort((a, b) => a.r.top - b.r.top);
     w.__refs = txt.length ? [txt[0], txt[txt.length >> 1], txt.at(-1)].map((x) => x.e) : [];
     const side = document.querySelector("[data-side] a");
@@ -75,14 +75,14 @@ try {
       const fr = f.getBoundingClientRect(), s = { t: performance.timeOrigin + performance.now(), g: f.classList.contains("global") ? 1 : 0 };
       s.refs = w.__refs.map((e) => { const r = e.getBoundingClientRect(); return [fr.left + r.left, fr.top + r.top]; });
       const sr = side.getBoundingClientRect(); s.side = [sr.left, sr.top]; s.thv = w.getComputedStyle(th).visibility;
-      const box = d.querySelector(".lb-stage .lightbox");
+      const box = d.querySelector(".sn-lb-stage .sn-lightbox");
       if (box) {
         const cs = w.getComputedStyle(box), m = new DOMMatrix(cs.transform === "none" ? undefined : cs.transform), bw = box.offsetWidth, bh = box.offsetHeight;
         let ins = [0, 0, 0, 0]; const mm = /inset\(([^)]*?)(?: round [^)]*)?\)/.exec(cs.clipPath); if (mm) { const v = mm[1].trim().split(/\s+/).map(parseFloat); ins = [v[0], v[1] ?? v[0], v[2] ?? v[0], v[3] ?? v[1] ?? v[0]]; }
         const l = Math.max(0, ins[3]), t = Math.max(0, ins[0]), r = bw - Math.max(0, ins[1]), b = bh - Math.max(0, ins[2]);
         const pts = [[l, t], [r, t], [r, b], [l, b]].map(([x, y]) => m.transformPoint(new DOMPoint(x, y))), ox = fr.left + box.offsetLeft, oy = fr.top + box.offsetTop;
         s.box = { l: ox + Math.min(...pts.map((p) => p.x)), t: oy + Math.min(...pts.map((p) => p.y)), r: ox + Math.max(...pts.map((p) => p.x)), b: oy + Math.max(...pts.map((p) => p.y)), o: cs.visibility === "visible" ? +cs.opacity : 0 };
-        s.box.anim = box.getAnimations().map((a) => `${a.effect.getKeyframes().map((k) => Object.keys(k).filter((x) => !["offset", "easing", "composite", "computedOffset"].includes(x)).join("+")).join(">")}@${Math.round(a.currentTime)}`).join(",") + ` vis=${cs.visibility} img=${box.querySelector(".lb-img")?.className}`;
+        s.box.anim = box.getAnimations().map((a) => `${a.effect.getKeyframes().map((k) => Object.keys(k).filter((x) => !["offset", "easing", "composite", "computedOffset"].includes(x)).join("+")).join(">")}@${Math.round(a.currentTime)}`).join(",") + ` vis=${cs.visibility} img=${box.querySelector(".sn-lb-img")?.className}`;
       }
       if (s.g) { const pg = d.querySelector(".doc"), pr = d.body.getBoundingClientRect(); s.over = 0; for (let x = Math.max(4, pr.left + 4); x < Math.min(innerWidth - 4, pr.right - 4); x += 24) for (const y of [nb - 6, nb / 2]) if (d.elementsFromPoint(x, y).some((e) => pg.contains(e) && e !== pg)) s.over++; }
       window.__S.push(s); if (window.__on) requestAnimationFrame(tick);
@@ -113,7 +113,7 @@ try {
       if (how === "zoom") { await click(W / 2, H / 2 - 40); await page.waitForTimeout(900); }
     }
     let tClose = Date.now();
-    if (how === "x") { const p = await page.evaluate(() => { const f = document.querySelector(".dx .d-frame iframe"), fr = f.getBoundingClientRect(), q = f.contentDocument.querySelector('.lb-bar [data-lb="x"]')?.getBoundingClientRect(); return q ? [fr.left + q.left + q.width / 2, fr.top + q.top + q.height / 2] : null; }); if (p) { await move(p[0], p[1], 500); await page.waitForTimeout(250); tClose = Date.now(); await click(p[0], p[1]); } else { tClose = Date.now(); await page.keyboard.press("Escape"); } }
+    if (how === "x") { const p = await page.evaluate(() => { const f = document.querySelector(".dx .d-frame iframe"), fr = f.getBoundingClientRect(), q = f.contentDocument.querySelector('.sn-lb-bar [data-lb="x"]')?.getBoundingClientRect(); return q ? [fr.left + q.left + q.width / 2, fr.top + q.top + q.height / 2] : null; }); if (p) { await move(p[0], p[1], 500); await page.waitForTimeout(250); tClose = Date.now(); await click(p[0], p[1]); } else { tClose = Date.now(); await page.keyboard.press("Escape"); } }
     else if (how === "backdrop") { await move(60, H / 2, 400); await page.waitForTimeout(150); tClose = Date.now(); await click(60, H / 2); }
     else { tClose = Date.now(); await page.keyboard.press("Escape"); }
     await page.waitForTimeout(1100);

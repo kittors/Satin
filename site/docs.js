@@ -1,12 +1,15 @@
+// 旧版官网，已由 next-*.html 取代，保留待删（见 docs/report.md 建议删除清单）
 // 文档：一页里切换（地址 #/…，冒号后面是页内小节：#/c/button:usage）。左边目录、中间内容、右边本页目录。
 // 组件页的标题、说明、要点、演示源码都读组件展示页（catalog.js），演示本身用 iframe 嵌展示页的那一块（?embed=区块）。
 import { onMode } from "./shell.js";
-import { $, $$, root, reduced, injectIcons, initSeg } from "../kit-core.js";
-import { copied } from "../kit-form.js";
-import { scrollArea } from "../kit-scroll.js";
+import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
+import { copied } from "../packages/satin-ui/src/form.js";
+import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { loadCatalog, highlight, highlightJS } from "./catalog.js";
 import { START, GUIDES } from "./pages.js";
 import { USAGE, TALL } from "./usage.js";
+import { setup } from "../packages/satin-ui/src/setup.js";
+setup(); // 页面级的全局行为（Tooltip、浮层栈、主题……），原来导入时就装上
 
 const side = $("[data-side]"), main = $("[data-main]"), toc = $("[data-toc]"), cat = await loadCatalog();
 const OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
@@ -30,7 +33,7 @@ const byHash = new Map(pages.map((x) => [x.hash, x]));
 const sideLinks = new Map($$("a", side).map((a) => [a.getAttribute("href"), a]));
 
 // ———— 代码块：着色 + 复制 ————
-const COPY = '<button class="btn ghost sm ibtn d-copy" data-tip="复制" aria-label="复制"><span class="swap"><span class="a" data-i="copy"></span><span class="b" data-i="check"></span></span></button>';
+const COPY = '<button class="sn-btn sn-ghost sn-sm sn-ibtn d-copy" data-tip="复制" aria-label="复制"><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>';
 const paint = (lang, src) => (lang === "html" ? highlight(src) : lang === "js" ? highlightJS(src) : esc(src));
 const snippet = (lang, src, cap) => `<div class="d-snippet">${cap ? `<div class="d-cap">${cap}</div>` : ""}${COPY}<pre data-src="${esc(src)}"><code>${paint(lang, src)}</code></pre></div>`;
 main.addEventListener("click", (e) => {
@@ -57,9 +60,9 @@ const frames = new Set();
 function demoBox(id, { code = true, title = "" } = {}) {
   const min = TALL[id] || 140;
   return `<div class="d-demo" data-demo="${id}">
-    <div class="d-demo-bar">${code ? '<div class="seg sm" data-view role="tablist" aria-label="演示视图"><span class="thumb"></span><button data-v="view">预览</button><button data-v="code">代码</button></div>' : `<span class="d-demo-t">${title || "演示"}</span>`}
-      <a class="btn ghost sm ibtn" href="../index.html#${id}" target="_blank" rel="noopener" data-tip="在展示页里打开" aria-label="在展示页里打开" data-i="external-link"></a></div>
-    <div class="d-frame" style="--h:${Math.max(min, 200)}px" data-min="${min}"><div class="d-load"><span class="spinner"></span>正在载入演示</div><iframe title="演示" src="../index.html?embed=${id}"></iframe></div>
+    <div class="d-demo-bar">${code ? '<div class="sn-seg sn-sm" data-view role="tablist" aria-label="演示视图"><span class="sn-thumb"></span><button data-v="view">预览</button><button data-v="code">代码</button></div>' : `<span class="d-demo-t">${title || "演示"}</span>`}
+      <a class="sn-btn sn-ghost sn-sm sn-ibtn" href="../index.html#${id}" target="_blank" rel="noopener" data-tip="在展示页里打开" aria-label="在展示页里打开" data-i="external-link"></a></div>
+    <div class="d-frame" style="--sn-h:${Math.max(min, 200)}px" data-min="${min}"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="演示" src="../index.html?embed=${id}"></iframe></div>
     ${code ? '<div class="d-codes" hidden></div>' : ""}
   </div>`;
 }
@@ -68,8 +71,8 @@ addEventListener("message", (e) => {
   if (e.origin !== location.origin || !e.data?.satinEmbed) return;
   for (const f of frames) if (f.contentWindow === e.source) {
     const box = f.parentElement, h = Math.max(Number(box.dataset.min), Math.ceil(e.data.h) + 2);
-    if (!box.classList.contains("ready")) { box.classList.add("sized"); requestAnimationFrame(() => { box.style.setProperty("--h", h + "px"); box.classList.add("ready"); setTimeout(() => { box.classList.remove("sized"); reAnchor(); }, 360); }); }
-    else { box.style.setProperty("--h", h + "px"); reAnchor(); }
+    if (!box.classList.contains("sn-ready")) { box.classList.add("sn-sized"); requestAnimationFrame(() => { box.style.setProperty("--sn-h", h + "px"); box.classList.add("sn-ready"); setTimeout(() => { box.classList.remove("sn-sized"); reAnchor(); }, 360); }); }
+    else { box.style.setProperty("--sn-h", h + "px"); reAnchor(); }
   }
 });
 // 打开的地址带着小节（#/c/button:rules）：演示框载好、变高以后下面的内容往下挪了，再对准一次；用户自己滚过就不管了
@@ -86,8 +89,8 @@ function tidy(el) {
   for (const n of [c, ...c.querySelectorAll("*")]) {
     if (!n.isConnected && n !== c && !c.contains(n)) continue;
     if (n.tagName.toLowerCase() === "svg" && n.dataset.icon) { const s = document.createElement("span"); s.setAttribute("data-i", n.dataset.icon); n.replaceWith(s); continue; }
-    for (const a of [...n.attributes]) if (RUNTIME_ATTR.test(a.name) || (n.closest?.(".seg") && /^(role|tabindex)$/.test(a.name))) n.removeAttribute(a.name);
-    n.classList?.remove("hl", "ld", "cv", "in");
+    for (const a of [...n.attributes]) if (RUNTIME_ATTR.test(a.name) || (n.closest?.(".sn-seg") && /^(role|tabindex)$/.test(a.name))) n.removeAttribute(a.name);
+    n.classList?.remove("sn-hl", "ld", "sn-cv", "sn-in");
     if (n.classList?.length === 0) n.removeAttribute("class");
   }
   return c;
@@ -116,7 +119,7 @@ function codeOf(demo, doc) {
     if (all.length > 8) {
       const seen = new Set(), keep = [];
       for (const x of all) {
-        if (x.classList.contains("cap") || (!x.children.length && !x.textContent.trim())) continue;
+        if (x.classList.contains("sn-cap") || (!x.children.length && !x.textContent.trim())) continue;
         const k = x.tagName + "." + x.className; if (seen.has(k)) continue;
         seen.add(k); keep.push(x); if (keep.length >= 8) break;
       }
@@ -187,7 +190,7 @@ function spyToc() {
   let cur = tocHs[0];
   for (const h of tocHs) if (h.getBoundingClientRect().top <= 64 + 96) cur = h;
   if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = tocHs.filter((h) => h.getBoundingClientRect().top < innerHeight - 40).at(-1) || cur;
-  tocLinks.forEach((a, k) => a.classList.toggle("on", k === cur.id));
+  tocLinks.forEach((a, k) => a.classList.toggle("sn-on", k === cur.id));
 }
 addEventListener("scroll", () => { if (!tocRaf) tocRaf = requestAnimationFrame(spyToc); }, { passive: true });
 function buildToc(base) {
@@ -218,7 +221,7 @@ function swapPage(pg, part) {
   {
     curPage = pg; frames.clear(); h2n = 0;
     if (!pg) {
-      main.innerHTML = `<div class="d-404"><h1 class="d-h1">没有这一页</h1><p class="d-lead">地址可能写错了，或者这一页改了名字。</p><a class="btn secondary" href="#/intro">回到介绍</a></div>`;
+      main.innerHTML = `<div class="d-404"><h1 class="d-h1">没有这一页</h1><p class="d-lead">地址可能写错了，或者这一页改了名字。</p><a class="sn-btn sn-secondary" href="#/intro">回到介绍</a></div>`;
       toc.innerHTML = ""; document.title = "没有这一页 · Satin";
     } else {
       main.innerHTML = `<article class="d-page">${pg.kind === "comp" ? compPage(pg) : textPage(pg)}${pager(pg)}</article>`;
@@ -230,7 +233,7 @@ function swapPage(pg, part) {
     }
     // 目录里标出当前页，并滚到看得见的地方
     sideLinks.forEach((a, h) => a.toggleAttribute("aria-current", h === pg?.hash));
-    if (pg) { const a = sideLinks.get(pg.hash), vp = a.closest(".sa-vp") || side, r = a.getBoundingClientRect(), vr = vp.getBoundingClientRect(); if (r.top < vr.top + 40 || r.bottom > vr.bottom - 40) vp.scrollTop += r.top - vr.top - vr.height / 3; }
+    if (pg) { const a = sideLinks.get(pg.hash), vp = a.closest(".sn-sa-vp") || side, r = a.getBoundingClientRect(), vr = vp.getBoundingClientRect(); if (r.top < vr.top + 40 || r.bottom > vr.bottom - 40) vp.scrollTop += r.top - vr.top - vr.height / 3; }
     for (const n of $$("[data-nav]")) n.toggleAttribute("aria-current", !!pg && (n.dataset.nav === "c" ? pg.kind === "comp" : n.dataset.nav === "guide" ? pg.kind === "guide" : pg.kind === "start"));
     scrollTo({ top: 0, behavior: "instant" });
     closeSide();
@@ -245,10 +248,10 @@ toc.addEventListener("click", (e) => { const a = e.target.closest("a[data-to]");
 
 // ———— 窄屏：目录收进左边的抽屉 ————
 const burger = $("[data-burger]"), scrim = $("[data-scrim]");
-function closeSide() { side.classList.remove("open"); scrim.classList.remove("open"); burger?.setAttribute("aria-expanded", "false"); }
-burger?.addEventListener("click", () => { const on = !side.classList.contains("open"); side.classList.toggle("open", on); scrim.classList.toggle("open", on); burger.setAttribute("aria-expanded", String(on)); });
+function closeSide() { side.classList.remove("sn-open"); scrim.classList.remove("sn-open"); burger?.setAttribute("aria-expanded", "false"); }
+burger?.addEventListener("click", () => { const on = !side.classList.contains("sn-open"); side.classList.toggle("sn-open", on); scrim.classList.toggle("sn-open", on); burger.setAttribute("aria-expanded", String(on)); });
 scrim.addEventListener("click", closeSide);
-addEventListener("keydown", (e) => { if (e.key === "Escape" && side.classList.contains("open")) closeSide(); });
+addEventListener("keydown", (e) => { if (e.key === "Escape" && side.classList.contains("sn-open")) closeSide(); });
 
 route();
 // 只对"带着小节打开"的那一次有效（演示载好变高后对准一次）；之后在页内点目录、在演示里操作让它变高，都不再把页面拉回去

@@ -1,0 +1,116 @@
+{
+  "name": "satin-ui",
+  "version": "0.1.0",
+  "description": "Satin：给 AI 用的 Web UI/UX 规范库——令牌、组件样式、不依赖框架的组件、React / Vue 封装、去 AI 味规则",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": [
+    "**/*.css",
+    "./src/theme-boot.js"
+  ],
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./components": {
+      "types": "./types/components.d.ts",
+      "default": "./src/components.js"
+    },
+    "./setup": {
+      "types": "./types/index.d.ts",
+      "default": "./src/setup.js"
+    },
+    "./react": {
+      "types": "./types/react.d.ts",
+      "default": "./react/index.js"
+    },
+    "./vue": {
+      "types": "./types/vue.d.ts",
+      "default": "./vue/index.js"
+    },
+    "./elements": {
+      "types": "./types/elements.d.ts",
+      "default": "./elements/index.js"
+    },
+    "./theme": {
+      "types": "./types/theme.d.ts",
+      "default": "./src/theme.js"
+    },
+    "./theme-panel": {
+      "types": "./types/theme.d.ts",
+      "default": "./src/theme-panel.js"
+    },
+    "./theme-boot": "./src/theme-boot.js",
+    "./theme-boot-script": {
+      "types": "./types/theme-boot-script.d.ts",
+      "default": "./src/theme-boot-script.js"
+    },
+    "./vite": {
+      "types": "./types/vite.d.ts",
+      "default": "./vite/index.js"
+    },
+    "./locales/*": "./src/locales/*.js",
+    "./icons": {
+      "types": "./types/icons.d.ts",
+      "default": "./src/icons.js"
+    },
+    "./markdown": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/markdown.js"
+    },
+    "./chat": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/chat.js"
+    },
+    "./flow": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/flow.js"
+    },
+    "./grid": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/grid.js"
+    },
+    "./canvas-grid": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/canvas-grid.js"
+    },
+    "./lightbox": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/lightbox.js"
+    },
+    "./media": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/media.js"
+    },
+    "./css": "./css/satin.css",
+    "./css/*": "./css/*",
+    "./tokens/*": "./tokens/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "css",
+    "types",
+    "react",
+    "vue",
+    "elements",
+    "tokens",
+    "vite"
+  ],
+  "peerDependencies": {
+    "react": ">=18",
+    "vue": ">=3.3"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
+  }
+}

@@ -1,9 +1,9 @@
 // 官网的代码块：排版（标签太长就一行一个属性）、着色（用组件库 Markdown 的词法）、行号、折叠展开、复制、多个文件切换。
 // 文档的演示框、正文里的片段都用这一个。
-import { highlightLines } from "../kit-md.js";
-import { copied } from "../kit-form.js";
-import { reduced, injectIcons } from "../kit-core.js";
-import { scrollArea } from "../kit-scroll.js";
+import { highlightLines } from "../packages/satin-ui/src/markdown.js";
+import { copied } from "../packages/satin-ui/src/form.js";
+import { reduced, injectIcons } from "../packages/satin-ui/src/core.js";
+import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 
 // ———— HTML 排版 ————
 // 一个元素能一行写完就一行（中文按两列算，80 列为限）；写不下时开始标签单独一行，开始标签本身也写不下就一行一个属性；
@@ -49,7 +49,7 @@ export function fmtHTML(root, W = 80) {
 // ———— 代码块 ————
 // files：[{ name: "HTML", lang: "html", code }]；fold：超过多少行折叠（0 不折叠）；solo：单独一块（自带底色和圆角），否则铺在演示框里
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-const COPY = '<button class="btn ghost sm ibtn cx-copy" data-tip="复制" aria-label="复制"><span class="swap"><span class="a" data-i="copy"></span><span class="b" data-i="check"></span></span></button>';
+const COPY = '<button class="sn-btn sn-ghost sn-sm sn-ibtn cx-copy" data-tip="复制" aria-label="复制"><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>';
 export function codePanel(files, { fold = 0, solo = false, nums = true } = {}) {
   files = files.filter((f) => f.code?.trim());
   if (!files.length) return "";
@@ -59,7 +59,7 @@ export function codePanel(files, { fold = 0, solo = false, nums = true } = {}) {
     : (files[0].name && solo ? `<div class="cx-hd"><span class="cx-name">${esc(files[0].name)}</span>${COPY}</div>` : COPY);
   const body = files.map((f, i) => {
     const lines = highlightLines(f.code, f.lang), n = lines.length;
-    return `<div class="cx-file${nums && n > 1 ? "" : " nonum"}" data-k="${i}" data-n="${n}" data-src="${esc(f.code)}"${i ? " hidden" : ""} style="--gw:${String(n).length}ch"><pre tabindex="0"><code>${lines.map((l) => `<span class="l">${l || " "}</span>`).join("")}</code></pre></div>`;
+    return `<div class="cx-file${nums && n > 1 ? "" : " sn-nonum"}" data-k="${i}" data-n="${n}" data-src="${esc(f.code)}"${i ? " hidden" : ""} style="--sn-gw:${String(n).length}ch"><pre tabindex="0"><code>${lines.map((l) => `<span class="sn-l">${l || " "}</span>`).join("")}</code></pre></div>`;
   }).join("");
   return `<div class="cx${solo ? " solo" : ""}${many || (files[0].name && solo) ? " has-hd" : ""}" data-fold="${fold}">${head}<div class="cx-bd">${body}<i class="cx-fade"></i></div>`
     + `<button class="cx-more" hidden><span class="cx-more-t">展开代码</span><span class="cx-more-i" data-i="chevron-down"></span></button></div>`;
@@ -77,19 +77,19 @@ function cur(cx) { return cx.querySelector(".cx-file:not([hidden])"); }
 function fold(cx, keepOpen) {
   const f = cur(cx), n = +f.dataset.n, max = +cx.dataset.fold, need = max > 0 && n > max + 2, more = cx.querySelector(".cx-more");
   more.hidden = !need; cx.classList.toggle("can-fold", need);
-  if (!need) { cx.classList.remove("folded", "open"); cx.style.removeProperty("--fold-h"); return; }
+  if (!need) { cx.classList.remove("folded", "sn-open"); cx.style.removeProperty("--fold-h"); return; }
   const pre = f.querySelector("pre"), pad = parseFloat(getComputedStyle(pre).paddingTop) || 0;
   cx.style.setProperty("--fold-h", Math.round(pad + lh(cx) * max) + "px");
-  if (!keepOpen || !cx.classList.contains("open")) { cx.classList.add("folded"); cx.classList.remove("open"); label(cx, false); }
+  if (!keepOpen || !cx.classList.contains("sn-open")) { cx.classList.add("folded"); cx.classList.remove("sn-open"); label(cx, false); }
 }
 function label(cx, open) {
   const b = cx.querySelector(".cx-more"); b.querySelector(".cx-more-t").textContent = open ? "收起代码" : "展开代码";
-  b.classList.toggle("up", open); b.setAttribute("aria-expanded", String(open));
+  b.classList.toggle("sn-up", open); b.setAttribute("aria-expanded", String(open));
 }
 // 展开 / 收起：代码区的高度从当前值缓到目标值（和组件库 Markdown 代码块同一个做法），渐隐层跟着淡出 / 淡入
 function toggle(cx) {
-  const bd = cx.querySelector(".cx-bd"), open = !cx.classList.contains("open"), from = bd.getBoundingClientRect().height;
-  cx.classList.toggle("open", open); cx.classList.toggle("folded", !open); label(cx, open);
+  const bd = cx.querySelector(".cx-bd"), open = !cx.classList.contains("sn-open"), from = bd.getBoundingClientRect().height;
+  cx.classList.toggle("sn-open", open); cx.classList.toggle("folded", !open); label(cx, open);
   const to = bd.getBoundingClientRect().height;
   if (!reduced() && Math.abs(to - from) > 1) {
     bd.animate([{ height: from + "px" }, { height: to + "px" }], { duration: Math.max(220, Math.min(440, 180 + Math.abs(to - from) * .3)), easing: "cubic-bezier(.32,.72,0,1)" });

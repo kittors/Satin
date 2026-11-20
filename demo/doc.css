@@ -1,0 +1,53 @@
+/* 文档页的展示样式（色块、字号列表、曲线卡片、图标网格等），只属于设计稿，不进产品 */
+@layer satin {
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px 20px; }
+.sw-group { grid-column: 1 / -1; margin-top: 10px; }
+.sw-group:first-child { margin-top: 0; }
+.sw { display: grid; grid-template-columns: 40px 1fr; column-gap: 12px; align-items: center; }
+.sw .c { grid-row: span 3; width: 40px; height: 40px; border-radius: var(--sn-r-md); box-shadow: inset 0 0 0 1px var(--sn-line-control); }
+.sw b { font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-mono); }
+.sw span { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sw .sn-v { font: 400 calc(11px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label2); }
+
+.type-list > div { display: grid; grid-template-columns: minmax(0, 1fr) 120px 130px; align-items: baseline; gap: 16px; padding: 14px 24px; }
+.type-list > div:nth-child(odd) { background: var(--sn-fill-subtle); }
+.type-list .sn-meta { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label3); }
+
+.radius-box { display: grid; justify-items: center; gap: 8px; }
+.radius-box i { display: block; width: 64px; height: 64px; background: var(--sn-fill-active); box-shadow: inset 0 0 0 1px var(--sn-line-control); }
+
+.nest { display: grid; gap: 10px; justify-items: start; }
+.nest > div { width: 132px; height: 92px; border-radius: var(--R); padding: var(--sn-p); background: var(--sn-fill-active); }
+.nest > div::after { content: ""; display: block; width: 100%; height: 100%; border-radius: calc(var(--R) - var(--sn-p)); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-line-control); }
+.bad-nest > div::after { border-radius: var(--R); }
+
+.elev-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 28px; padding: 40px; background: var(--sn-canvas); }
+.elev { height: 128px; border-radius: var(--sn-r-lg); padding: 16px; display: grid; align-content: end; gap: 2px; }
+.elev b { font-weight: 600; }
+.elev.e0 { background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+.elev.e1 { background: var(--sn-overlay); box-shadow: var(--sn-e1); }
+.elev.e2 { background: var(--sn-overlay); box-shadow: var(--sn-e2); border-radius: var(--sn-r-xl); }
+
+.curves { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; margin-top: 12px; }
+.curve { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 10px; padding: 16px; border-radius: var(--sn-r-lg); background: var(--sn-raised);
+  box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); transition: background .14s var(--sn-ease-out); }
+.curve:hover { background: color-mix(in srgb, var(--sn-raised) 92%, var(--sn-label) 8%); }
+.curve:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
+.curve svg { width: 100%; height: 92px; overflow: visible; }
+.curve svg .axis { stroke: var(--sn-line-control); stroke-width: 1; fill: none; }
+.curve svg .line { stroke: var(--sn-label); stroke-width: 1.75; fill: none; }
+.curve .lane { position: relative; height: 12px; border-radius: 6px; background: var(--sn-fill-subtle); }
+.curve .ball { position: absolute; top: 1px; left: 1px; width: 10px; height: 10px; border-radius: 50%; background: var(--sn-label); }
+.curve .sn-name { font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-mono); }
+.curve .use { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 4px; }
+.icon-cell { display: grid; justify-items: center; align-content: center; gap: 8px; height: 88px; border-radius: var(--sn-r-md); color: var(--sn-label2);
+  transition: background .12s var(--sn-ease-out), color .12s var(--sn-ease-out); }
+.icon-cell:hover { background: var(--sn-fill-hover); color: var(--sn-label); }
+.icon-cell span { font: 400 calc(10px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label3); max-width: 86px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.form-demo { display: grid; gap: 16px; max-width: 440px; }
+.sn-inline-menu { min-width: 0; }
+.state-cell { display: grid; gap: 8px; }
+}

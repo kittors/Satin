@@ -22,7 +22,7 @@ const W = +arg("width", 1440), H = +arg("height", W < 600 ? 844 : 900), THEME = 
 const BASE = "http://127.0.0.1:5192/site/next-docs.html";
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(`${OUT}/frames`, { recursive: true });
 
-const CHAT_IMG = ".bubble.img:not(.vid) .ph", CHAT_VID = ".bubble.img.vid .ph";
+const CHAT_IMG = ".sn-bubble.sn-img:not(.sn-vid) .sn-ph", CHAT_VID = ".sn-bubble.sn-img.sn-vid .sn-ph";
 const CASES = [
   { name: "对话图片·演示正中·Esc", page: "chat", trig: CHAT_IMG, inner: "full", outer: "center", close: "esc" },
   { name: "对话图片·演示上沿在窗口上面·Esc", page: "chat", trig: CHAT_IMG, inner: "full", outer: "above", close: "esc" },
@@ -36,9 +36,9 @@ const CASES = [
   { name: "对话图片·演示上沿在窗口上面·放大后 Esc", page: "chat", trig: CHAT_IMG, inner: "full", outer: "above", close: "zoom" },
   { name: "对话图片·演示上沿在窗口上面·刚打开就关", page: "chat", trig: CHAT_IMG, inner: "full", outer: "above", close: "early" },
   { name: "对话图片·翻到下一张再关", page: "chat", trig: CHAT_IMG, inner: "full", outer: "center", close: "next" },
-  { name: "图片组件·正中·Esc", page: "image", trig: ".im.loaded", outer: "center", close: "esc" },
-  { name: "图片组件·一半在顶栏底下·Esc", page: "image", trig: ".im.loaded", outer: "navedge", close: "esc" },
-  { name: "图片组件·一半在窗口下沿外·点空白处", page: "image", trig: ".im.loaded", outer: "bottom", close: "backdrop" },
+  { name: "图片组件·正中·Esc", page: "image", trig: ".sn-im.sn-loaded", outer: "center", close: "esc" },
+  { name: "图片组件·一半在顶栏底下·Esc", page: "image", trig: ".sn-im.sn-loaded", outer: "navedge", close: "esc" },
+  { name: "图片组件·一半在窗口下沿外·点空白处", page: "image", trig: ".sn-im.sn-loaded", outer: "bottom", close: "backdrop" },
   { name: "Markdown 图片·正中·Esc", page: "md", trig: ".md-img.blk.ok img", inner: "full", outer: "center", close: "esc" },
   { name: "Markdown 图片·一半被窗口上沿裁掉·Esc", page: "md", trig: ".md-img.blk.ok img", inner: "cutTop", outer: "center", close: "esc" },
   { name: "Markdown 图片·一半在顶栏底下·Esc", page: "md", trig: ".md-img.blk.ok img", inner: "full", outer: "navedge", close: "esc" },
@@ -61,7 +61,7 @@ try {
     // 找到放着这个缩略图的演示，等它载好、不再变（对话里的打字动画、图片加载）
     const ok = await page.evaluate(async (trig) => {
       // 先找有这种缩略图的演示（不看加载没加载好），滚到它那里等它载好、图片加载好；对话里图片在上面的历史消息里，往上翻到它出现
-      const base = trig.replace(".ok", "");
+      const base = trig.replace(".sn-ok", "");
       for (let i = 0; i < 150; i++) {
         const fs = [...document.querySelectorAll(".dx .d-frame iframe")], f = fs.find((g) => g.contentDocument?.querySelector(base));
         if (f) {
@@ -72,10 +72,10 @@ try {
             let sc = el0.parentElement; while (sc && sc !== d.body && !(/(auto|scroll)/.test(getComputedStyle(sc).overflowY) && sc.scrollHeight > sc.clientHeight + 1)) sc = sc.parentElement;
             if (sc && sc !== d.body) { const r = el0.getBoundingClientRect(), q = sc.getBoundingClientRect(); if (r.top < q.top || r.bottom > q.bottom) { sc.dispatchEvent(new WheelEvent("wheel", { bubbles: true })); sc.scrollTop += (r.top + r.bottom) / 2 - (q.top + q.bottom) / 2; } }
           }
-          if (f.parentElement.classList.contains("ready") && f.contentDocument.querySelector(trig)) { f.dataset.lbt = "1"; f.contentDocument.querySelector(trig).dataset.lbtEl = "1"; return true; }
+          if (f.parentElement.classList.contains("sn-ready") && f.contentDocument.querySelector(trig)) { f.dataset.lbt = "1"; f.contentDocument.querySelector(trig).dataset.lbtEl = "1"; return true; }
         } else {
-          (fs.find((g) => !g.parentElement.classList.contains("ready")) || fs[i % fs.length])?.closest(".dx").scrollIntoView({ block: "center", behavior: "instant" });
-          if (i > 15) for (const g of document.querySelectorAll(".dx .d-frame.ready iframe")) { const vp = g.contentDocument?.querySelector(".chat-vp"); if (vp) { vp.dispatchEvent(new WheelEvent("wheel", { bubbles: true })); vp.scrollTop -= 400; } }
+          (fs.find((g) => !g.parentElement.classList.contains("sn-ready")) || fs[i % fs.length])?.closest(".dx").scrollIntoView({ block: "center", behavior: "instant" });
+          if (i > 15) for (const g of document.querySelectorAll(".dx .d-frame.ready iframe")) { const vp = g.contentDocument?.querySelector(".sn-chat-vp"); if (vp) { vp.dispatchEvent(new WheelEvent("wheel", { bubbles: true })); vp.scrollTop -= 400; } }
         }
         await new Promise((r) => setTimeout(r, 100));
       }
@@ -136,8 +136,8 @@ try {
       const vis = { l: Math.max(0, fr.left), t: Math.max(navB, fr.top), r: Math.min(innerWidth, fr.right), b: Math.min(innerHeight, fr.bottom) };
       // 只在演示那一块里挑，跳过提示、菜单这类浮层（提示层是共用的，看图的按钮会把它挪走）和看不见的
       const sec = d.getElementById(new URL(f.src).searchParams.get("embed"));
-      const shown = (e) => { for (let a = e; a && a !== sec; a = a.parentElement) { const cs = w.getComputedStyle(a); if (cs.visibility === "hidden" || +cs.opacity < .99 || ((cs.position === "fixed" || cs.position === "absolute") && a.matches(".tip, .menu, .pop, .popover, [role=tooltip], [role=menu]"))) return false; } return true; };
-      const txt = [...sec.querySelectorAll("*")].filter((e) => !e.contains(el) && !el.contains(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && !e.closest(".tip, .menu, .pop, .popover, [role=tooltip], [role=menu], .cx") && shown(e)).map((e) => ({ e, r: e.getBoundingClientRect() }))
+      const shown = (e) => { for (let a = e; a && a !== sec; a = a.parentElement) { const cs = w.getComputedStyle(a); if (cs.visibility === "hidden" || +cs.opacity < .99 || ((cs.position === "fixed" || cs.position === "absolute") && a.matches(".sn-tip, .sn-menu, .sn-pop, .sn-popover, [role=tooltip], [role=menu]"))) return false; } return true; };
+      const txt = [...sec.querySelectorAll("*")].filter((e) => !e.contains(el) && !el.contains(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && !e.closest(".sn-tip, .sn-menu, .sn-pop, .sn-popover, [role=tooltip], [role=menu], .cx") && shown(e)).map((e) => ({ e, r: e.getBoundingClientRect() }))
         .filter(({ r }) => r.width > 8 && r.height > 6 && fr.left + r.left >= vis.l && fr.top + r.top >= vis.t && fr.left + r.right <= vis.r && fr.top + r.bottom <= vis.b);
       txt.sort((a, b) => a.r.top - b.r.top);
       const refs = txt.length ? [txt[0], txt[txt.length >> 1], txt[txt.length - 1]].map((x) => x.e) : [];
@@ -156,7 +156,7 @@ try {
         s.refs = (w.__lbRefs || []).map((e) => { const r = e.getBoundingClientRect(); return [fr.left + r.left, fr.top + r.top]; });
         s.fix = window.__lbFix.map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top]; });
         s.thv = th.isConnected ? w.getComputedStyle(th).visibility : "gone";
-        const box = d.querySelector(".lb-stage .lightbox");
+        const box = d.querySelector(".sn-lb-stage .sn-lightbox");
         if (box) {
           const cs = w.getComputedStyle(box), m = new DOMMatrix(cs.transform === "none" ? undefined : cs.transform), bw = box.offsetWidth, bh = box.offsetHeight;
           let ins = [0, 0, 0, 0]; const mm = /inset\(([^)]*?)(?: round [^)]*)?\)/.exec(cs.clipPath); if (mm) { const v = mm[1].trim().split(/\s+/).map(parseFloat); ins = [v[0], v[1] ?? v[0], v[2] ?? v[0], v[3] ?? v[1] ?? v[0]]; }
@@ -164,7 +164,7 @@ try {
           const pts = [[l, t], [r, t], [r, b], [l, b]].map(([x, y]) => m.transformPoint(new DOMPoint(x, y)));
           const ox = fr.left + box.offsetLeft, oy = fr.top + box.offsetTop;
           s.box = { l: ox + Math.min(...pts.map((p) => p.x)), t: oy + Math.min(...pts.map((p) => p.y)), r: ox + Math.max(...pts.map((p) => p.x)), b: oy + Math.max(...pts.map((p) => p.y)), o: +cs.opacity, v: cs.visibility };
-          const bar = d.querySelector(".lb-bar"); if (bar) { const q = bar.getBoundingClientRect(); s.bar = { l: fr.left + q.left, t: fr.top + q.top, r: fr.left + q.right, b: fr.top + q.bottom }; }
+          const bar = d.querySelector(".sn-lb-bar"); if (bar) { const q = bar.getBoundingClientRect(); s.bar = { l: fr.left + q.left, t: fr.top + q.top, r: fr.left + q.right, b: fr.top + q.bottom }; }
         }
         // 演示的内容有没有画到顶栏上：铺满时在顶栏那一条里点，点到演示页面（.doc 里面）的东西就是冒出来了
         if (s.g) { const pg = d.querySelector(".doc"), nb = document.querySelector(".s-nav").getBoundingClientRect().bottom, pr = d.body.getBoundingClientRect(); s.overNav = 0; for (let x = Math.max(4, fr.left + pr.left + 4); x < Math.min(innerWidth - 4, fr.left + pr.right - 4); x += 24) for (const y of [nb - 6, nb / 2]) if (d.elementsFromPoint(x, y).some((e) => pg?.contains(e) && e !== pg)) s.overNav++; }
@@ -185,7 +185,7 @@ try {
       if (c.close === "next") { await page.keyboard.press("ArrowRight"); await page.waitForTimeout(700); }
     }
     const tClose = Date.now();
-    const xb = c.close === "x" && await page.evaluate(() => { const f = document.querySelector("iframe[data-lbt]"), fr = f.getBoundingClientRect(), q = f.contentDocument.querySelector('.lb-bar [data-lb="x"]')?.getBoundingClientRect(); return q ? [fr.left + q.left + q.width / 2, fr.top + q.top + q.height / 2] : null; });
+    const xb = c.close === "x" && await page.evaluate(() => { const f = document.querySelector("iframe[data-lbt]"), fr = f.getBoundingClientRect(), q = f.contentDocument.querySelector('.sn-lb-bar [data-lb="x"]')?.getBoundingClientRect(); return q ? [fr.left + q.left + q.width / 2, fr.top + q.top + q.height / 2] : null; });
     if (xb) { await page.mouse.move(xb[0], xb[1], { steps: 4 }); await page.mouse.click(xb[0], xb[1]); }
     else if (c.close === "backdrop") await page.mouse.click(30, H / 2);
     else await page.keyboard.press("Escape");

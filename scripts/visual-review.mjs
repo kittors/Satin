@@ -69,7 +69,7 @@ try {
     for (let k = 0; k < nf; k++) {
       const info = await page.evaluate(async ([k, OPEN, max]) => {
         const f = [...document.querySelectorAll(".dx .d-frame iframe")][k], dx = f.closest(".dx"); dx.scrollIntoView({ block: "center", behavior: "instant" });
-        for (let i = 0; i < 80 && !f.parentElement.classList.contains("ready"); i++) await new Promise((r) => setTimeout(r, 50));
+        for (let i = 0; i < 80 && !f.parentElement.classList.contains("sn-ready"); i++) await new Promise((r) => setTimeout(r, 50));
         const d = f.contentDocument, sec = d?.getElementById(new URL(f.src).searchParams.get("embed")); if (!sec) return null;
         const ok = (el) => { const r = el.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return false; const hit = d.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2); return !!hit && (hit === el || el.contains(hit)); };
         const list = [...new Set(sec.querySelectorAll(OPEN))].filter(ok).slice(0, max);

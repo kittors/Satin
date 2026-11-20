@@ -1,6 +1,6 @@
 # Satin
 
-UI 组件库，设计稿阶段：`index.html` 一页展示全部组件，纯 HTML / CSS / ES 模块，没有构建步骤。
+UI 规范库：库在 `packages/satin-ui/`（JS 源码 + CSS，没有构建步骤），`index.html` 是设计稿（一页展示全部组件，接线在 `demo/`），规范在 `spec/`，给 AI 的技能在 `skills/satin/`。改造前的样子在只读备份 `../Satin-baseline-20261120`，效果对比用 `scripts/parity/`。
 
 - 运行：`python3 serve.py 5192 .`，打开 http://127.0.0.1:5192/ 。
 - 改完 JS，先在浏览器里逐个 `import()` 模块、看页面有没有报错：`node --check` 拦不住 ES 模块里的语法错误，帧率测试也发现不了页面已经整个没跑起来。

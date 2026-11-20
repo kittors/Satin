@@ -1,11 +1,13 @@
 // 官网首页和文档共用的外壳：顶栏（滚动后出一条细线）、深浅切换、主题定制面板、⌘K 搜索、进入视口时浮现。
 // 组件全用组件库自己的：分段控件、主题面板、命令面板、文字提示，不另写一套。
-import { $, $$, root, reduced, injectIcons, initSeg } from "../kit-core.js";
-import { mountThemePanel } from "../kit-theme-panel.js";
-import { mountCmdk } from "../kit-overlay.js";
-import { scrollArea } from "../kit-scroll.js";
+import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
+import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
+import { mountCmdk } from "../packages/satin-ui/src/overlay.js";
+import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { loadCatalog } from "./catalog.js";
 import { START, GUIDES } from "./pages.js";
+import { setup } from "../packages/satin-ui/src/setup.js";
+setup(); // 页面级的全局行为（Tooltip、浮层栈、主题……），原来导入时就装上
 
 // 文档页地址：页面可以在 <html data-docs="…"> 里指定（新版设计稿用 next-docs.html），默认 docs.html
 export const DOCS = new URL(document.documentElement.dataset.docs || "./docs.html", document.documentElement.dataset.docs ? location.href : import.meta.url).pathname;
@@ -49,7 +51,7 @@ modeBtn?.addEventListener("click", () => setMode(root.dataset.theme === "dark" ?
 {
   const btn = $("[data-custom-btn]"), panel = $("[data-theme-panel]"); let mounted = false;
   const mount = () => {
-    panel.innerHTML = '<div class="th-sec"><span class="th-h">外观</span><div class="seg sm" data-th="mode"><span class="thumb"></span><button data-v="auto">跟随系统</button><button data-v="light">浅色</button><button data-v="dark">深色</button></div></div><div class="th-rest"></div>';
+    panel.innerHTML = '<div class="sn-th-sec"><span class="sn-th-h">外观</span><div class="sn-seg sn-sm" data-th="mode"><span class="sn-thumb"></span><button data-v="auto">跟随系统</button><button data-v="light">浅色</button><button data-v="dark">深色</button></div></div><div class="th-rest"></div>';
     mountThemePanel($(".th-rest", panel), { initSeg, injectIcons });
     bindModeSeg($('[data-th="mode"]', panel));
   };
@@ -58,12 +60,12 @@ modeBtn?.addEventListener("click", () => setMode(root.dataset.theme === "dark" ?
     // 第一次打开时才生成面板（面板平时是隐藏但占位的，里面的分段控件量得到宽度）
     if (on && !mounted) { mounted = true; mount(); }
     if (on) place();
-    panel.classList.toggle("open", on); btn.setAttribute("aria-expanded", String(on)); btn.classList.toggle("is-open", on);
+    panel.classList.toggle("sn-open", on); btn.setAttribute("aria-expanded", String(on)); btn.classList.toggle("sn-is-open", on);
   };
-  btn?.addEventListener("click", () => open(!panel.classList.contains("open")));
-  document.addEventListener("pointerdown", (e) => { if (panel?.classList.contains("open") && !panel.contains(e.target) && !btn.contains(e.target)) open(false); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel?.classList.contains("open")) { open(false); btn.focus(); } });
-  addEventListener("resize", () => panel?.classList.contains("open") && place());
+  btn?.addEventListener("click", () => open(!panel.classList.contains("sn-open")));
+  document.addEventListener("pointerdown", (e) => { if (panel?.classList.contains("sn-open") && !panel.contains(e.target) && !btn.contains(e.target)) open(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel?.classList.contains("sn-open")) { open(false); btn.focus(); } });
+  addEventListener("resize", () => panel?.classList.contains("sn-open") && place());
 }
 
 // ———— 搜索：组件库的命令面板，内容是全部文档页 ————
@@ -101,8 +103,8 @@ addEventListener("scroll", onScroll, { passive: true }); onScroll();
 
 // ———— 进入视口时轻轻浮上来（只做一次） ————
 export function reveal(scope = document) {
-  const io = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }, { rootMargin: "0px 0px -8% 0px", threshold: .12 });
-  for (const el of $$(".rv:not(.in)", scope)) io.observe(el);
+  const io = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { e.target.classList.add("sn-in"); io.unobserve(e.target); } }, { rootMargin: "0px 0px -8% 0px", threshold: .12 });
+  for (const el of $$(".rv:not(.sn-in)", scope)) io.observe(el);
 }
 
 injectIcons(); paintModeBtn();

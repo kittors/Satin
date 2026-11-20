@@ -1,14 +1,17 @@
+// 旧版官网，已由 next-*.html 取代，保留待删（见 docs/report.md 建议删除清单）
 // 官网首页：真实素材、真组件。所有交互都直接用组件库导出的函数（分段控件、滑块、Toast、数字变化、等待按钮、主题面板）。
 import { reveal, bindModeSeg } from "./shell.js";
-import { $, $$, reduced, injectIcons, initSeg } from "../kit-core.js";
-import { initSlider, busy, succeed, prepBusy, BOX } from "../kit-form.js";
-import { toast } from "../kit-feedback.js";
-import { numberFlow } from "../kit-number.js";
-import { scrollArea } from "../kit-scroll.js";
-import { mountThemePanel } from "../kit-theme-panel.js";
+import { $, $$, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
+import { initSlider, busy, succeed, prepBusy, BOX } from "../packages/satin-ui/src/form.js";
+import { toast } from "../packages/satin-ui/src/feedback.js";
+import { numberFlow } from "../packages/satin-ui/src/number.js";
+import { scrollArea } from "../packages/satin-ui/src/scroll.js";
+import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
 import { PHOTO, img, MUSIC, musicSrc, waveSrc, VIDEO, videoSrc, creditsHTML } from "./media.js";
 import { loadCatalog } from "./catalog.js";
 import { GUIDES } from "./pages.js";
+import { setup } from "../packages/satin-ui/src/setup.js";
+setup(); // 页面级的全局行为（Tooltip、浮层栈、主题……），原来导入时就装上
 
 const SPRING = "linear(0, .32, .78, 1.04, 1.09, 1.06, 1.02, 1, .99, .99, 1)", EASE_IN = "cubic-bezier(.42,0,1,1)", OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
 
@@ -38,26 +41,26 @@ for (const im of $$("img[data-photo]")) {
     const d = w.data, pairs = d.length / 2, per = pairs / N, peaks = [];
     for (let i = 0; i < N; i++) { let pk = 0; for (let j = Math.floor(i * per); j < Math.floor((i + 1) * per); j++) pk = Math.max(pk, Math.abs(d[2 * j]), Math.abs(d[2 * j + 1])); peaks.push(pk); }
     const hi = Math.max(...peaks) || 1;
-    wave.innerHTML = peaks.map((pk) => `<i style="--h:${(18 + 82 * pk / hi).toFixed(1)}%"></i>`).join("");
+    wave.innerHTML = peaks.map((pk) => `<i style="--sn-h:${(18 + 82 * pk / hi).toFixed(1)}%"></i>`).join("");
     bars = [...wave.children]; paint(true);
   }).catch(() => { wave.classList.add("flat"); });
   // 进度每帧连续往前走：亮到第几根就点亮第几根（只在变了的时候改类名）
   const paint = (force) => {
     const now = pendingSeek ?? audio.currentTime, p = Math.min(1, now / dur), k = Math.round(p * N) - 1;
-    if (k !== lit || force) { bars.forEach((b, i) => b.classList.toggle("on", i <= k)); lit = k; }
+    if (k !== lit || force) { bars.forEach((b, i) => b.classList.toggle("sn-on", i <= k)); lit = k; }
     const s = Math.floor(now); if (s !== shownSec) { cur.textContent = fmt(now); shownSec = s; wave.setAttribute("aria-valuenow", String(Math.round(p * 100))); }
   };
   const loop = () => { paint(); raf = audio.paused ? 0 : requestAnimationFrame(loop); };
   audio.addEventListener("loadedmetadata", () => { if (isFinite(audio.duration)) dur = audio.duration; if (pendingSeek != null) { audio.currentTime = pendingSeek; pendingSeek = null; } });
   audio.addEventListener("play", () => {
-    card.classList.add("playing"); btn.dataset.tip = "暂停"; btn.setAttribute("aria-label", "暂停"); if (!raf) loop();
-    if (audio.readyState < 3) { clearTimeout(bufT); bufT = setTimeout(() => card.classList.add("buffering"), 300); }
+    card.classList.add("sn-playing"); btn.dataset.tip = "暂停"; btn.setAttribute("aria-label", "暂停"); if (!raf) loop();
+    if (audio.readyState < 3) { clearTimeout(bufT); bufT = setTimeout(() => card.classList.add("sn-buffering"), 300); }
   });
-  audio.addEventListener("pause", () => { card.classList.remove("playing"); btn.dataset.tip = "播放"; btn.setAttribute("aria-label", "播放"); paint(); });
+  audio.addEventListener("pause", () => { card.classList.remove("sn-playing"); btn.dataset.tip = "播放"; btn.setAttribute("aria-label", "播放"); paint(); });
   audio.addEventListener("ended", () => { audio.currentTime = 0; paint(true); });
   // 缓冲：300ms 内接上就什么都不显示；超过才在按钮上转圈（图标先隐掉）
-  audio.addEventListener("waiting", () => { clearTimeout(bufT); bufT = setTimeout(() => card.classList.add("buffering"), 300); });
-  for (const ev of ["playing", "pause", "canplaythrough", "error"]) audio.addEventListener(ev, () => { clearTimeout(bufT); card.classList.remove("buffering"); });
+  audio.addEventListener("waiting", () => { clearTimeout(bufT); bufT = setTimeout(() => card.classList.add("sn-buffering"), 300); });
+  for (const ev of ["playing", "pause", "canplaythrough", "error"]) audio.addEventListener(ev, () => { clearTimeout(bufT); card.classList.remove("sn-buffering"); });
   btn.addEventListener("click", () => (audio.paused ? audio.play().catch(() => toast({ icon: "circle-x", tone: "danger", text: "音乐没能加载，检查网络后再试", alert: true })) : audio.pause()));
   const seekTo = (p) => {
     const s = Math.max(0, Math.min(1, p)) * dur;
@@ -92,7 +95,7 @@ for (const im of $$("img[data-photo]")) {
 // ———— 画面设置 ————
 initSeg($("[data-show-seg]"), null, 0);
 {
-  const s = $(".st [data-slider]"), out = $("[data-motion-v]");
+  const s = $(".sn-st [data-slider]"), out = $("[data-motion-v]");
   initSlider(s); s.addEventListener("slide", (e) => (out.textContent = e.detail));
 }
 
@@ -101,7 +104,7 @@ initSeg($("[data-show-seg]"), null, 0);
   const list = $("[data-chat]"), form = $("[data-chat-form]"), input = $("input", form), send = $("button", form);
   scrollArea(list, { fade: "y" });
   const toBottom = () => list.scrollTo({ top: list.scrollHeight, behavior: reduced() ? "auto" : "smooth" });
-  const add = (html, me) => { const m = document.createElement("div"); m.className = "ch-msg new" + (me ? " me" : ""); m.innerHTML = html; list.append(m); toBottom(); return m; };
+  const add = (html, me) => { const m = document.createElement("div"); m.className = "ch-msg sn-new" + (me ? " sn-me" : ""); m.innerHTML = html; list.append(m); toBottom(); return m; };
   const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const REPLIES = ["收到，我看看效果。", "这样好多了，雨的质感对了。", "可以，就按这个出第三集。"];
   let ri = 0, typing = null;
@@ -116,7 +119,7 @@ initSeg($("[data-show-seg]"), null, 0);
     e.preventDefault(); const txt = input.value.trim(); if (!txt) return;
     const mine = `<div class="ch-b">${esc(txt)}</div>`; input.value = ""; send.disabled = true;
     if (typing?.el) { // 对方正在输入：新消息插在输入提示上面，提示留在最下面
-      const m = document.createElement("div"); m.className = "ch-msg new me"; m.innerHTML = mine; list.insertBefore(m, typing.el); toBottom();
+      const m = document.createElement("div"); m.className = "ch-msg sn-new sn-me"; m.innerHTML = mine; list.insertBefore(m, typing.el); toBottom();
       clearTimeout(typing.t); typing.t = setTimeout(reply, 1400); return;
     }
     add(mine, true); clearTimeout(typing?.t);
@@ -128,8 +131,8 @@ initSeg($("[data-show-seg]"), null, 0);
 {
   const f = $("[data-follow]");
   f.addEventListener("click", () => {
-    const on = !f.classList.contains("secondary");
-    f.classList.toggle("primary", !on); f.classList.toggle("secondary", on);
+    const on = !f.classList.contains("sn-secondary");
+    f.classList.toggle("sn-primary", !on); f.classList.toggle("sn-secondary", on);
     f.textContent = on ? "已关注" : "关注";
   });
   $("[data-dm]").addEventListener("click", () => toast({ icon: "message-square", text: "已打开和苏婉的对话" }));
@@ -138,11 +141,11 @@ initSeg($("[data-show-seg]"), null, 0);
 // ———— 最近的项目：生成进度一点点往上走（数字只滚变了的那一位），到 100% 变成"待审核" ————
 {
   const tag = $("[data-gen]"), label = $("[data-gen-t]", tag), pct = document.createElement("span");
-  pct.className = "num"; tag.append(pct);
+  pct.className = "sn-num"; tag.append(pct);
   let v = 64; const nf = numberFlow(pct, { value: v, format: (x) => x + "%", reduced });
   const iv = setInterval(() => {
     v = Math.min(100, v + 1 + Math.round(Math.random())); nf.set(v);
-    if (v >= 100) { clearInterval(iv); setTimeout(() => { tag.classList.replace("run", "need"); label.textContent = "待审核"; pct.remove(); }, 700); }
+    if (v >= 100) { clearInterval(iv); setTimeout(() => { tag.classList.replace("sn-run", "sn-need"); label.textContent = "待审核"; pct.remove(); }, 700); }
   }, 1800);
   $("[data-export]").addEventListener("click", () => {
     const t = toast({ kind: "progress", text: "正在导出 雨夜车站 第三集.mp4" }); let p = 0;
@@ -173,7 +176,7 @@ initSeg($("[data-show-seg]"), null, 0);
       if (!iv.length) return;
       const sorted = [...iv].sort((a, b) => a - b), p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * .95))], max = sorted.at(-1);
       strip.querySelectorAll("b").forEach((b) => b.remove());
-      strip.insertAdjacentHTML("beforeend", iv.map((x, i) => `<b class="${x > 17.5 ? "slow" : ""}" style="--h:${Math.min(44, x / 33.4 * 44).toFixed(1)}px;animation-delay:${i * 8}ms"></b>`).join(""));
+      strip.insertAdjacentHTML("beforeend", iv.map((x, i) => `<b class="${x > 17.5 ? "sn-slow" : ""}" style="--sn-h:${Math.min(44, x / 33.4 * 44).toFixed(1)}px;animation-delay:${i * 8}ms"></b>`).join(""));
       read.textContent = `${iv.length} 帧 · p95 ${p95.toFixed(1)}ms · 最长 ${max.toFixed(1)}ms`;
     }, () => { r.on = false; });
   }, 0);
@@ -191,7 +194,7 @@ initSeg($("[data-show-seg]"), null, 0);
   const emptyNote = () => {
     let n = $(".ar-empty", list.parentElement);
     const none = !list.querySelector("li:not(.leaving)");
-    if (none && !n) { list.insertAdjacentHTML("afterend", '<div class="ar-empty">都归档了<div style="margin-top:6px"><button class="textbtn" data-ar-all>全部放回来</button></div></div>'); n = $(".ar-empty", list.parentElement); n.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 120, fill: "backwards" }); }
+    if (none && !n) { list.insertAdjacentHTML("afterend", '<div class="ar-empty">都归档了<div style="margin-top:6px"><button class="sn-textbtn" data-ar-all>全部放回来</button></div></div>'); n = $(".ar-empty", list.parentElement); n.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 120, fill: "backwards" }); }
     if (!none && n) n.remove();
   };
   const put = (li) => {
@@ -219,15 +222,15 @@ initSeg($("[data-show-seg]"), null, 0);
 // ———— 细节三：等待 → 成功 ————
 for (const b of $$("[data-bz]")) {
   prepBusy(b);
-  b.addEventListener("click", async () => { if (b.classList.contains("busy") || b._run) return; b._run = true; await busy(b, Number(b.dataset.bz)); succeed(b); setTimeout(() => (b._run = false), 1500); });
+  b.addEventListener("click", async () => { if (b.classList.contains("sn-busy") || b._run) return; b._run = true; await busy(b, Number(b.dataset.bz)); succeed(b); setTimeout(() => (b._run = false), 1500); });
 }
 
 // ———— 主题定制：外观 + 组件库的主题面板，右边是一张会跟着变的"新建项目" ————
 bindModeSeg($("[data-mode-seg]"));
 mountThemePanel($("[data-inline-theme]"), { initSeg, injectIcons });
 initSeg($("[data-pv-seg]"), null, 0);
-for (const c of $$("[data-chips] .chip")) c.addEventListener("click", () => c.classList.toggle("on"));
-for (const l of $$("label.check[data-box]")) $("input", l).insertAdjacentHTML("afterend", BOX);
+for (const c of $$("[data-chips] .sn-chip")) c.addEventListener("click", () => c.classList.toggle("sn-on"));
+for (const l of $$("label.sn-check[data-box]")) $("input", l).insertAdjacentHTML("afterend", BOX);
 {
   const ok = $("[data-pv-ok]"); prepBusy(ok);
   ok.addEventListener("click", async () => { if (ok._run) return; ok._run = true; await busy(ok, 900); succeed(ok); toast({ text: '已创建"雨夜车站"' }); setTimeout(() => (ok._run = false), 1500); });
@@ -236,12 +239,12 @@ for (const l of $$("label.check[data-box]")) $("input", l).insertAdjacentHTML("a
 // ———— 组件和规范：组件分组直接读展示页的目录 ————
 loadCatalog().then((cat) => {
   $("[data-comps]").innerHTML = cat.groups.filter((g) => g.name !== "基础").map((g) =>
-    `<div class="s-ix-row"><a class="s-ix-name" href="docs.html#/c/${g.items[0].id}">${g.name}<span class="num">${g.items.length}</span></a>`
+    `<div class="s-ix-row"><a class="s-ix-name" href="docs.html#/c/${g.items[0].id}">${g.name}<span class="sn-num">${g.items.length}</span></a>`
     + `<ul>${g.items.map((c) => `<li><a href="docs.html#/c/${c.id}">${c.name}</a></li>`).join("")}</ul></div>`).join("");
 });
 const PICK = ["principles", "motion", "feel", "no-ai", "color", "a11y"];
 $("[data-guides]").innerHTML = PICK.map((id) => GUIDES.find((g) => g.id === id)).map((g, i) =>
-  `<a class="s-card s-guide rv" style="--d:${(i % 3) * .06}s" href="docs.html#/guide/${g.id}"><span class="num">${String(i + 1).padStart(2, "0")}</span><h3>${g.title}</h3><p>${g.brief || g.lead}</p><span class="go">阅读<span data-i="arrow-right"></span></span></a>`).join("");
+  `<a class="s-card s-guide rv" style="--sn-d:${(i % 3) * .06}s" href="docs.html#/guide/${g.id}"><span class="sn-num">${String(i + 1).padStart(2, "0")}</span><h3>${g.title}</h3><p>${g.brief || g.lead}</p><span class="go">阅读<span data-i="arrow-right"></span></span></a>`).join("");
 injectIcons($("[data-guides]"));
 $("[data-credits]").innerHTML = creditsHTML();
 reveal();

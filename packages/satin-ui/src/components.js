@@ -1,0 +1,291 @@
+// Satin 组件的统一 API：每个组件 createXxx(el, options) → { update(options), destroy(), on(type, fn), off, ...方法 }。
+// · el 是空的：先按 options 渲染标记（框架封装、纯 JS 新建都用这种）；el 已经有标记：直接在上面接交互（展示页、服务端渲染出来的标记）
+// · 事件三种接法拿到同一份数据：选项里的 onChange 这类回调、实例上的 on("change", fn)、根元素上冒泡的 DOM 事件 sn-change
+// · destroy() 撤掉挂载时加的监听、观察器、定时器；el 是空的时候渲染的标记也一并清掉
+// · createXxx.html(options) 是纯字符串函数：Node / SSR 里也能调，生成和展示页一模一样的标记
+// 导入本身没有副作用。
+import { defineComponent } from "./lifecycle.js";
+import { initSeg, injectIcons } from "./core.js";
+import { icon } from "./icons.js";
+import { svg } from "./svg.js";
+import { check, chevronDown, chevronLeft, chevronRight, minus, plus, x } from "./icons/index.js";
+import { initSlider, mountSelect, mountOtp, BOX, busy, succeed, copied, removeChip } from "./form.js";
+import { mountTabs, mountPager, setStep, mountUpload, mountReorder, mountSidebar } from "./nav.js";
+import { mountCollapse } from "./data.js";
+import { mountTagInput, mountStepper, mountPassword, mountEmail, mountSearch, mountCount, mountLongText, mountComposer } from "./input.js";
+import { numberFlow } from "./number.js";
+import { scrollArea } from "./scroll.js";
+import { mountProgress, toast, notify } from "./feedback.js";
+import { bindPickers } from "./picker.js";
+import { mountInfiniteList } from "./list.js";
+import { mountPlayer, mountAudio, playerHTML, audioHTML } from "./media.js";
+import { openPopover, popoverOf, openDialog, closeDialog, openDrawer, closeDrawer, mountCmdk, openMenu, closeMenu } from "./overlay.js";
+import { openLightbox, closeLightbox } from "./lightbox.js";
+import { tableHTML, mountTable, sortRows } from "./table.js";
+
+// 给内层实例补几个方法（destroy……）：按属性描述符合并，getter（value、tags……）不会变成快照
+const ext = (base, more) => { const o = {}; Object.defineProperties(o, Object.getOwnPropertyDescriptors(base ?? {})); Object.defineProperties(o, Object.getOwnPropertyDescriptors(more)); return o; };
+export const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const cx = (...a) => a.filter(Boolean).join(" ");
+const attrs = (o) => Object.entries(o).filter(([, v]) => v != null && v !== false).map(([k, v]) => (v === true ? ` ${k}` : ` ${k}="${esc(v)}"`)).join("");
+// 选项条目统一成 { value, label }（也接受纯字符串）
+const items = (list = []) => list.map((x) => (typeof x === "object" ? { value: String(x.value ?? x.label), label: String(x.label ?? x.value), disabled: !!x.disabled } : { value: String(x), label: String(x) }));
+
+// ———— 纯样式组件：只有标记（React / Vue 封装直接渲染同样的标记） ————
+export const buttonHTML = ({ text = "", variant = "secondary", size, icon: ic, iconAfter, round, selected, disabled, busy: bz, type = "button", tip, attrs: extra = {} } = {}) =>
+  `<button${attrs({ type, class: cx("sn-btn", `sn-${variant}`, size && size !== "md" && `sn-${size}`, !text && ic && "sn-ibtn", round && "sn-round", selected && "sn-selected", disabled && "sn-is-disabled", bz && "sn-busy"), "aria-disabled": disabled ? "true" : null, "data-tip": tip, "aria-label": !text && tip ? tip : null, ...extra })}>`
+  + (ic ? icon(ic, !text ? (size === "sm" ? 16 : 20) : 16) : "") + esc(text) + (iconAfter ? icon(iconAfter, 16).replace('class="sn-ic"', 'class="sn-ic sn-after"') : "") + `</button>`;
+export const checkHTML = ({ label = "", checked, indeterminate, disabled, name, value } = {}) =>
+  `<label class="sn-check"><input type="checkbox"${attrs({ checked, disabled, name, value, "data-indeterminate": indeterminate })}>${BOX}${esc(label)}</label>`;
+export const switchHTML = ({ label = "", checked, disabled, name } = {}) =>
+  `<label class="sn-switch"><input type="checkbox" role="switch"${attrs({ checked, disabled, name })}><span class="sn-track"><span class="sn-knob"></span></span>${esc(label)}</label>`;
+export const inputHTML = ({ value = "", placeholder = "", size, type = "text", id, name, disabled, invalid } = {}) =>
+  `<input${attrs({ class: cx("sn-input", size && size !== "md" && `sn-${size}`), type, id, name, value: value || null, placeholder: placeholder || null, disabled, "aria-invalid": invalid ? "true" : null })}>`;
+// 字段：标签 + 控件 + 说明 + 错误。error 不传就没有错误区；传字符串就有（空字符串 = 先占好位置，之后 setFieldError 展开）。
+// name 写成 data-f，validateForm 按它找规则
+export const fieldHTML = ({ label = "", control = "", help = "", error, id, name } = {}) =>
+  `<div class="${cx("sn-field", error && "sn-bad")}"${attrs({ "data-f": name })}>${label ? `<label class="sn-lbl"${attrs({ for: id })}>${esc(label)}</label>` : ""}${control}${help ? `<div class="sn-help">${esc(help)}</div>` : ""}${error != null ? `<div class="sn-err"><span>${esc(error)}</span></div>` : ""}</div>`;
+export const chipHTML = ({ text = "", on, removable } = {}) => `<span class="${cx("sn-chip", removable && "sn-tag", on && "sn-on")}">${esc(text)}${removable ? `<button class="sn-x" aria-label="${t("components.14")}${esc(text)}">${svg(x, 10, "x")}</button>` : ""}</span>`;
+// 进度条（value 0–1；不给 value 是不确定进度）、进度环
+const num = (v) => String(+v).replace(/^0\./, ".");
+export const progressHTML = ({ value, ring, size } = {}) => (ring
+  ? `<span class="${cx("sn-pring", size === "lg" && "sn-lg")}" style="--sn-p:${num(value ?? 0)}"></span>`
+  : `<div class="${cx("sn-pbar", value == null && "sn-indet")}"${value == null ? "" : ` style="--sn-p:${num(value)}"`}><i></i></div>`);
+export const spinnerHTML = ({ size } = {}) => `<span class="${cx("sn-spinner", size === "lg" && "sn-lg")}"></span>`;
+
+// 按钮的等待、成功、复制：在已有按钮上用
+export { busy, succeed, copied, removeChip, toast, notify };
+
+// ———— 分段控件 ————
+export const createSegmented = /* @__PURE__ */ defineComponent({
+  name: "segmented",
+  defaults: { items: [], size: "md" },
+  // 服务端渲染的第一帧（脚本还没接上）：data-ssr + 选中项的 aria-selected，样式里让选中那格自己画成滑块的样子；接上以后换成真正的滑块，位置、样子一样
+  html: (o) => { const its = items(o.items), on = Math.max(0, its.findIndex((it) => String(it.value) === String(o.value ?? its[0]?.value))); return `<div class="${cx("sn-seg", o.size === "sm" && "sn-sm")}" role="tablist" data-ssr${attrs({ "aria-label": o.label })}><span class="sn-thumb"></span>${its.map((it, i) => `<button type="button" data-v="${esc(it.value)}" role="tab" aria-selected="${i === on}" tabindex="${i === on ? 0 : -1}">${esc(it.label)}</button>`).join("")}</div>`; },
+  mount(el, o, api) {
+    const btns = () => [...el.querySelectorAll("button")], idxOf = (v) => Math.max(0, btns().findIndex((b) => (b.dataset.v ?? b.textContent.trim()) === String(v)));
+    let value = o.value ?? (btns()[0]?.dataset.v ?? btns()[0]?.textContent.trim());
+    const seg = initSeg(el, (v) => { value = String(v); api.emit("change", value); }, idxOf(value));
+    return { update(n, p) { if (n.value != null && String(n.value) !== String(value)) { value = String(n.value); seg.go(idxOf(value), false, true); } }, get value() { return value; }, select: (v) => { value = String(v); seg.go(idxOf(v), false, true); } };
+  },
+});
+
+// ———— 滑块 ————
+export const createSlider = /* @__PURE__ */ defineComponent({
+  name: "slider",
+  defaults: { value: 0, max: 100 },
+  html: (o) => { const p = (Number(o.value) / Number(o.max || 100)) * 100; return `<div class="sn-slider" data-slider${o.max !== 100 ? ` data-max="${o.max}"` : ""} tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="${o.max}" aria-valuenow="${o.value}"${attrs({ "aria-label": o.label })}><span class="sn-rail"></span><span class="sn-fillbar" style="width: ${p}%;"></span><span class="sn-knob" style="left: ${p}%;"></span><span class="sn-bubble" style="left: ${p}%;">${esc(o.value)}</span></div>`; },
+  mount(el, o, api) {
+    initSlider(el);
+    el.addEventListener("slide", (e) => api.emit("change", e.detail));
+    return { update(n) { if (n.value != null && Number(n.value) !== Number(el.getAttribute("aria-valuenow"))) el.setValue(Number(n.value)); }, get value() { return Number(el.getAttribute("aria-valuenow")); }, destroy() { delete el.setValue; } };
+  },
+});
+
+// ———— 下拉选择 ————
+export const createSelect = /* @__PURE__ */ defineComponent({
+  name: "select",
+  defaults: { items: [], placeholder: "" },
+  html: (o) => {
+    const list = items(o.items), cur = list.find((x) => x.value === String(o.value));
+    return `<div class="sn-select" data-select><button class="sn-trigger"${attrs({ "aria-label": o.label })}><span class="sn-val">${esc(cur ? cur.label : o.placeholder)}</span>${svg(chevronDown, 16, "chevron-down")}</button>`
+      + `<div class="sn-menu" role="listbox">${list.map((it) => `<div class="${cx("sn-item", cur === it && "sn-sel", it.disabled && "sn-is-off")}" data-v="${esc(it.value)}">${esc(it.label)}<span class="sn-chk">${svg(check, 16, "check")}</span></div>`).join("")}</div></div>`;
+  },
+  mount(el, o, api) {
+    let s = mountSelect(el, { onChange: (v) => api.emit("change", v) }), sig = JSON.stringify(items(o.items));
+    // 选项变了（异步载入、筛选）：按新选项重画菜单、重新接上；选中值留着（新选项里还有的话）
+    const rebuild = (opts) => { s.close(); s.dispose(); const tmp = document.createElement("div"); tmp.innerHTML = createSelect.html(opts); el.replaceChildren(...tmp.firstElementChild.childNodes); s = mountSelect(el, { onChange: (v) => api.emit("change", v) }); };
+    return {
+      update(n) { const ns = JSON.stringify(items(n.items)); if (ns !== sig) { sig = ns; rebuild(n); return; } if (n.value != null && n.value !== s.value) s.set(n.value); },
+      get value() { return s.value; }, open: () => s.open(), close: (r) => s.close(r), destroy() { s.close(); s.dispose(); selectsRelease(s); },
+    };
+  },
+});
+import { forgetSelect as selectsRelease } from "./form.js";
+import { scoped } from "./i18n.js";
+import I18N_DEFAULTS from "./locales/zh-CN/components.js";
+const t = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+
+// ———— 验证码 ————
+export const createOtp = /* @__PURE__ */ defineComponent({
+  name: "otp",
+  defaults: { length: 6 },
+  html: (o) => `<div class="sn-otp" data-otp>${Array.from({ length: o.length }, (_, i) => `${i === o.length / 2 && o.length % 2 === 0 ? '<span class="sn-gap"></span>' : ""}<input inputmode="numeric" maxlength="1" aria-label="${t("components.15", { p0: i + 1 })}">`).join("")}</div>`,
+  mount(el, o, api) {
+    const otp = mountOtp(el, { onComplete: (v) => api.emit("complete", v) });
+    return { get value() { return otp.value; }, clear: otp.clear, destroy() { delete el._otp; } };
+  },
+});
+
+// ———— 标签页（标签条 + 面板） ————
+export const createTabs = /* @__PURE__ */ defineComponent({
+  name: "tabs",
+  defaults: { tabs: [], value: 0 },
+  html: (o) => `<div class="sn-tabs" data-ssr><div class="sn-tab-list" role="tablist">${o.tabs.map((t, i) => `<button${i === o.value ? ' class="sn-on"' : ""} role="tab">${esc(t.label)}${t.badge != null ? ` <span class="sn-badge sn-soft">${esc(t.badge)}</span>` : ""}</button>`).join("")}<span class="sn-ink"></span></div>`
+    + `<div class="sn-tab-panels">${o.tabs.map((t, i) => `<div class="sn-tab-panel"${i === o.value ? "" : " hidden"}>${t.html ?? esc(t.content ?? "")}</div>`).join("")}</div></div>`,
+  mount(el, o, api) {
+    const t = mountTabs(el, { onChange: (i) => api.emit("change", i) });
+    return { update(n) { if (n.value != null && n.value !== t.index) t.select(n.value); }, get value() { return t.index; }, select: t.select, destroy() { delete el._tabs; } };
+  },
+});
+
+// ———— 分页 ————
+export const createPager = /* @__PURE__ */ defineComponent({
+  name: "pager",
+  defaults: { total: 1, page: 1, count: null },
+  html: (o) => `<div class="sn-pager">${o.count != null ? `<span class="sn-total">${t("components.16", { p0: esc(o.count) })}</span>` : ""}<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-pg="prev" aria-label="${t("components.0")}">${svg(chevronLeft, 16, "chevron-left")}</button><div class="sn-pages"></div><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-pg="next" aria-label="${t("components.1")}">${svg(chevronRight, 16, "chevron-right")}</button></div>`,
+  mount(el, o, api) {
+    const p = mountPager(el, { total: o.total, page: o.page, onChange: (n) => api.emit("change", n) });
+    const total = () => el.querySelector(".sn-total");
+    return { update(n) { if (n.total != null) p.setTotal(n.total); if (n.page != null && n.page !== p.page) p.go(n.page, true); if (n.count != null && total()) total().textContent = t("components.16", { p0: n.count }); }, get page() { return p.page; }, get total() { return p.total; }, go: p.go, destroy() { delete el._pg; } };
+  },
+});
+
+// ———— 步骤条 ————
+export const stepsHTML = ({ steps = [], current = 0 } = {}) => `<div class="sn-steps">${steps.map((s, i) => (i ? `<span class="${cx("sn-ln", i <= current && "sn-done")}"><i></i></span>` : "") + `<span class="${cx("sn-st", i < current && "sn-done", i === current && "sn-cur")}"><span class="sn-n">${i + 1}</span>${esc(s)}</span>`).join("")}</div>`;
+export { setStep };
+
+// ———— 折叠面板 ————
+export const createCollapse = /* @__PURE__ */ defineComponent({
+  name: "collapse",
+  defaults: { items: [], single: false, open: [] },
+  html: (o) => `<div class="sn-acc">${o.items.map((it, i) => `<div class="${cx("sn-acc-item", o.open.includes(i) && "sn-open")}"><button class="sn-acc-hd" aria-expanded="${o.open.includes(i)}">${svg(chevronRight, 16, "chevron-right")}${esc(it.title)}</button><div class="sn-acc-bd"><div>${it.html ?? `<p>${esc(it.content ?? "")}</p>`}</div></div></div>`).join("")}</div>`,
+  mount(el, o, api) {
+    // onToggle 给的是第几项（数字）和展开没有；mountCollapse 内部回调给的是条目元素
+    const a = mountCollapse(el, { single: o.single, onToggle: (it, open) => api.emit("toggle", { index: [...el.querySelectorAll(":scope > .sn-acc-item")].indexOf(it), open }) });
+    return { open: a.open, close: a.close, toggle: a.toggle, destroy() { delete el._acc; } };
+  },
+});
+
+// ———— 标签输入、数字步进、密码、邮箱、搜索、字数 ————
+export const createTagInput = /* @__PURE__ */ defineComponent({
+  name: "taginput",
+  defaults: { tags: [], max: 8, get placeholder() { return t("components.2"); } },
+  // 两个并排的元素：输入框和下面的计数行（计数行在输入框的下一个兄弟元素里找）
+  html: (o) => `<div class="sn-box-in sn-tagin" data-tagin data-max="${o.max}"><input placeholder="${esc(o.placeholder)}" aria-label="${t("components.3")}"></div><div class="sn-tagin-foot"><span>${esc(o.hint ?? t("components.13"))}</span><span class="sn-num"><span class="sn-roll"><span>0</span></span> / ${o.max}</span></div>`,
+  mount(el, o, api) {
+    const t = mountTagInput(el, { initial: o.tags, onChange: (tags) => api.emit("change", tags) });
+    return { get tags() { return t.tags; }, add: t.add, clear: t.clear, destroy() { delete el._tags; } };
+  },
+});
+export const createStepper = /* @__PURE__ */ defineComponent({
+  name: "stepper",
+  defaults: { value: 0, min: 0, max: 100 },
+  html: (o) => `<div class="sn-stepper" data-stepper data-min="${o.min}" data-max="${o.max}" data-value="${o.value}"><button class="sn-st-btn" data-d="-1" aria-label="${t("components.4")}">${svg(minus, 16, "minus")}</button><span class="sn-st-val" tabindex="0" role="spinbutton"${attrs({ "aria-label": o.label })}><span class="sn-roll"><span>${o.value}</span></span></span>${o.unit ? `<span class="sn-st-unit">${esc(o.unit)}</span>` : ""}<button class="sn-st-btn" data-d="1" aria-label="${t("components.5")}">${svg(plus, 16, "plus")}</button></div>`,
+  mount(el, o, api) {
+    const s = mountStepper(el, { onChange: (v) => api.emit("change", v) });
+    return { update(n) { if (n.value != null && n.value !== s.value) s.set(n.value); }, get value() { return s.value; }, set: s.set, destroy() { delete el._step; } };
+  },
+});
+// 下面这几个是在已有的输入框标记上加强（标记见展示页"特殊输入框""字数统计"）
+// ———— 密码、邮箱、搜索、计数输入框：给空容器就按选项渲染（和设计稿一样的标记），给已有标记就接交互 ————
+// 渲染出来的是整个字段（标签、输入框、强度条 / 大写提示、错误区）；按钮（显示密码、清除）挂载时一起接上
+const fieldWrap = (o, inner) => `<div class="sn-field"${attrs({ "data-f": o.name })}>${o.label ? `<label class="sn-lbl"${attrs({ for: o.id })}>${esc(o.label)}</label>` : ""}${inner}${o.help ? `<div class="sn-help">${esc(o.help)}</div>` : ""}<div class="sn-err"><span></span></div></div>`;
+export const passwordHTML = (o = {}) => fieldWrap(o, `<span class="sn-ib sn-has-post"><input class="${cx("sn-input", o.size && "sn-" + o.size)}" type="password"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder, autocomplete: o.autocomplete ?? (o.meter ? "new-password" : "current-password") })} data-pw><span class="sn-post"><button type="button" class="sn-eye" data-eye aria-label="${esc(t("components.17"))}"><span class="sn-swap"><span class="sn-a" data-i="eye"></span><span class="sn-b" data-i="eye-off"></span></span></button></span></span>` +
+  (o.meter ? `<div class="sn-pw-meter" data-level="0" aria-live="polite"><i></i><i></i><i></i><i></i><span class="sn-pw-label"><span class="sn-roll"><span> </span></span></span></div>` : "") +
+  `<div class="sn-caps"><span><span data-i="triangle-alert"></span>${esc(t("components.18"))}</span></div>`);
+export const emailHTML = (o = {}) => fieldWrap(o, `<span class="sn-ib sn-has-post"><input class="${cx("sn-input", o.size && "sn-" + o.size)}" type="email"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder ?? "name@example.com", autocomplete: o.autocomplete ?? "email" })} data-email><span class="sn-post"><svg class="sn-ok-mark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></span></span>`);
+export const searchHTML = (o = {}) => `<span class="sn-ib sn-has-pre sn-has-post sn-search" data-clearable data-search><span class="sn-pre"><span class="sn-swap"><span class="sn-a" data-i="search"></span><span class="sn-b"><span class="sn-spin-ic"></span></span></span></span><input class="${cx("sn-input", o.size && "sn-" + o.size)}"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder, "aria-label": o.label ?? o.placeholder })}><span class="sn-post"><span class="sn-res-count"></span>${o.kbd === false ? "" : `<span class="sn-kbd">${esc(o.kbd ?? "/")}</span>`}<button type="button" class="sn-clear" aria-label="${esc(t("components.19"))}" data-i="x"></button></span></span>`;
+export const countHTML = (o = {}) => `<span class="sn-ib sn-has-post sn-has-count"><input class="${cx("sn-input", o.size && "sn-" + o.size)}"${attrs({ id: o.id, name: o.name, placeholder: o.placeholder, maxlength: o.max ?? 20, value: o.value })} data-count><span class="sn-post"><span class="sn-counter"><span class="sn-roll"><span>0</span></span><span>/${+(o.max ?? 20)}</span></span></span></span>`;
+const inputOf = (el, sel) => (el.matches?.(sel) ? el : el.querySelector(sel));
+export const createPassword = /* @__PURE__ */ defineComponent({ name: "password", html: passwordHTML, mount(el, o, api) { injectIcons(el); const input = inputOf(el, "input[data-pw], input[type=password]"); if (o.value != null) input.value = o.value; mountPassword(input); _bindForms(input.closest(".sn-field") || el); input.addEventListener("input", () => api.emit("change", input.value)); return { get value() { return input.value; }, update(n) { if (n.value != null && n.value !== input.value) input.value = n.value; }, focus: () => input.focus() }; } });
+export const createEmail = /* @__PURE__ */ defineComponent({ name: "email", html: emailHTML, mount(el, o, api) { const input = inputOf(el, "input[data-email], input[type=email]"); if (o.value != null) input.value = o.value; mountEmail(input); input.addEventListener("input", () => api.emit("change", input.value)); return { get value() { return input.value; }, update(n) { if (n.value != null && n.value !== input.value) input.value = n.value; }, focus: () => input.focus() }; } });
+export const createSearch = /* @__PURE__ */ defineComponent({ name: "search", html: searchHTML, mount(el, o, api) { injectIcons(el); _bindForms(el.parentElement || el); mountSearch(el.matches(".sn-ib") ? el : el.querySelector(".sn-ib") || el, { search: (q) => (api.emit("search", q), o.search?.(q) ?? 0), debounce: o.debounce ?? 150 }); return {}; } });
+export const createCount = /* @__PURE__ */ defineComponent({ name: "count", html: countHTML, mount(el) { const input = inputOf(el, "input[data-count], input"); mountCount(input); return { destroy() { delete input._cnt; } }; } });
+export const createLongText = /* @__PURE__ */ defineComponent({ name: "longtext", mount(el, o, api) { mountLongText(el, { onSubmit: (v) => api.emit("submit", v) }); return {}; } });
+// 提示词输入框的标记（和设计稿一样）：附件菜单（图片、视频、音频、文档）、自动长高的输入框、用量环、发送 / 停止按钮。
+// external：发送由外面接管（对话框里用），不在这里清空。图标是 data-i，挂载时换成 SVG
+export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach = true, send = t("components.12"), external } = {}) =>
+  `<div class="sn-box-in sn-composer" data-composer${external ? " data-external" : ""} data-max="${+max}" data-max-lines="${+maxLines}"><div class="sn-cm-files"></div><textarea rows="1" placeholder="${esc(placeholder)}"></textarea><div class="sn-cm-bar">` +
+  (attach ? `<div class="sn-select sn-inline-menu sn-up"><button class="sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add" data-menubtn data-cm-attach data-tip="${esc(t("components.6"))}" aria-label="${esc(t("components.7"))}" data-i="plus"></button><div class="sn-menu" role="menu" style="min-width:208px"><div class="sn-item" data-add="img" data-i="image:before">${esc(t("components.8"))}<span class="sn-key">JPG · PNG</span></div><div class="sn-item" data-add="vid" data-i="film:before">${esc(t("components.9"))}<span class="sn-key">MP4 · MOV</span></div><div class="sn-item" data-add="aud" data-i="audio-lines:before">${esc(t("components.10"))}<span class="sn-key">MP3 · WAV</span></div><div class="sn-item" data-add="doc" data-i="file-text:before">${esc(t("components.11"))}<span class="sn-key">PDF · DOCX</span></div></div></div>` : "") +
+  `<span class="sn-grow"></span><span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg></span><button class="sn-cm-send" aria-label="${esc(send)}" data-tip="${esc(send)}" data-kbd="⌘↵"><svg class="sn-orbit" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19"/></svg><span class="sn-swap"><span class="sn-a" data-i="arrow-up"></span><span class="sn-b"><span class="sn-stop"></span></span></span></button></div></div>`;
+export const createComposer = /* @__PURE__ */ defineComponent({ name: "composer", html: (o) => composerHTML(o), mount(el, o, api) { injectIcons(el); const c = mountComposer(el, { onSend: (m) => api.emit("send", m), onStop: () => api.emit("stop"), upload: o.upload }); return ext(c, { destroy() { delete el._cm; } }); } });
+
+// ———— 数字滚动 ————
+export const createNumberFlow = /* @__PURE__ */ defineComponent({
+  name: "numberflow",
+  defaults: { value: 0, style: "roll" },
+  html: () => `<span class="sn-nf"></span>`,
+  mount(el, o) {
+    const f = numberFlow(el, { value: o.value, format: o.format, style: o.style, reduced: o.reduced });
+    return { update(n) { if (n.value != null && n.value !== f.get()) f.set(n.value); if (n.style && n.style !== o.style) f.setStyle(n.style); }, get value() { return f.get(); }, set: f.set, get: f.get, setStyle: f.setStyle };
+  },
+});
+
+// ———— 滚动区域 ————
+export const createScrollArea = /* @__PURE__ */ defineComponent({
+  name: "scrollarea",
+  mount(el, o) { const s = scrollArea(el, o); return ext(s, { el: s.el ?? el }); },
+});
+
+// ———— 进度（带取消、打开的进度卡片） ————
+export const createProgressCard = /* @__PURE__ */ defineComponent({
+  name: "progresscard",
+  mount(el, o, api) { const p = mountProgress(el, { onCancel: () => api.emit("cancel"), onOpen: () => api.emit("open") }); return ext(p, { destroy() { delete el._pc; } }); },
+});
+
+// ———— 日期、时间、定时、地址选择器（标记见展示页"选择器"） ————
+export const createPicker = /* @__PURE__ */ defineComponent({
+  name: "picker",
+  // 选择器选好了值会在元素上发 pick（detail.text 是显示的文字），转成 onChange / sn-change
+  mount(el, o, api) { bindPickers(el.parentElement ?? el, { today: o.today, now: o.now }); el.addEventListener("pick", (e) => api.emit("change", e.detail)); return {}; },
+});
+
+// ———— 上传、拖动排序、侧边栏、无限列表 ————
+export const createUpload = /* @__PURE__ */ defineComponent({ name: "upload", mount(el, o, api) { const u = mountUpload(el, { ...o, upload: o.upload }); return ext(u, { destroy() { delete el._upl; } }); } });
+export const createReorder = /* @__PURE__ */ defineComponent({ name: "reorder", mount(el, o, api) { const r = mountReorder(el, { onReorder: (from, to, row) => api.emit("reorder", { from, to, row }), row: o.row }); return ext(r, { destroy() { delete el._ro; } }); } });
+export const createSidebar = /* @__PURE__ */ defineComponent({ name: "sidebar", mount(el, o, api) { const s = mountSidebar(el, { onNavigate: (a) => api.emit("navigate", a), collapseBelow: o.collapseBelow }); return ext(s, { destroy() { delete el._side; } }); } });
+export const createInfiniteList = /* @__PURE__ */ defineComponent({ name: "infinitelist", mount(el, o, api) { const l = mountInfiniteList(el, { ...o, onCount: (n) => api.emit("count", n) }); return ext(l, { destroy() { delete el._vl; } }); } });
+
+// ———— 视频、音频 ————
+export const createPlayer = /* @__PURE__ */ defineComponent({ name: "player", html: (o) => playerHTML(o), mount(el, o, api) { const p = mountPlayer(el, { onError: (e) => api.emit("error", e) }); return ext(p, { destroy() { p.destroy?.(); delete el._player; } }); } });
+export const createAudio = /* @__PURE__ */ defineComponent({ name: "audio", html: (o) => audioHTML(o), mount(el, o, api) { const a = mountAudio(el, { onError: (e) => api.emit("error", e) }); return ext(a, { destroy() { a.destroy?.(); delete el._audio; } }); } });
+
+// ———— 浮层：Popover、对话框、抽屉、命令面板、右键菜单、看图 ————
+// Popover：el 是浮层面板（.sn-pop），trigger 是按钮
+export function openPopoverAt(pop, trigger, options) { return openPopover(pop, trigger, options); }
+export { popoverOf, openDialog, closeDialog, openDrawer, closeDrawer, openMenu, closeMenu, mountCmdk as createCommandPalette, openLightbox, closeLightbox };
+export { wireDialog } from "./overlay.js";
+export { icon } from "./icons.js";
+
+// ———— 其余公开函数（设计稿和文档里用到的，原来只在各模块里导出）————
+// 表单校验：validateForm(form) 逐个查 required / pattern / 自定义校验，把错误写到字段下面；setFieldError / clearFieldError 单独设、清
+export { validateForm, setFieldError, clearFieldError, prepBusy, initSlider, mountSelect, bindSelects } from "./form.js";
+// 列表增删的动画（FLIP）、乐观更新（先改界面、失败再退回）
+export { insertWithFlip, removeWithFlip, optimistic } from "./nav.js";
+// 骨架屏占位到真内容的过渡；Toast 的位置（右下、顶部居中……）
+export { loadWithSkeleton, setToastPos, mountProgress } from "./feedback.js";
+// 在任意位置开浮层（右键菜单、表格单元格里的编辑器）；在一段已有标记里把浮层的触发器接上
+export { openPopover, bindOverlays } from "./overlay.js";
+// 在一段已有标记里接上折叠面板、输入框（密码、邮箱、搜索、计数、长文本）、日期选择器
+export { bindCollapses } from "./data.js";
+export { bindInputs } from "./input.js";
+export { bindPickers } from "./picker.js";
+
+// ———— 表格（真数据）：列定义 + 行数据 → 设计稿里的 .sn-tbl；排序（行移到位）、勾选、空状态、加载中 ————
+export const createTable = /* @__PURE__ */ defineComponent({
+  name: "table",
+  defaults: { columns: [], rows: [], rowKey: "id" },
+  html: (o) => tableHTML(o),
+  mount(el, o, api) {
+    const tb = mountTable(el, { ...o, onSort: (s) => api.emit("sort", s), onSelect: (k) => api.emit("select", k), onRowClick: (r) => api.emit("rowClick", r) });
+    return { update: (next) => tb.update(next), get selected() { return tb.selected; }, get sort() { return tb.sort; }, destroy: tb.destroy };
+  },
+});
+export { tableHTML, sortRows };
+export { bindForms } from "./form.js";
+export { bindBanners, closeBanner } from "./feedback.js";
+export { autoGrow, longCount } from "./input.js";
+
+// 一行接上整段标记：照设计稿写好的标记（下拉、复制按钮、筛选芯片、清除按钮、显示密码、自动长高、滑块、验证码、
+// 搜索 / 密码 / 邮箱 / 计数输入框、折叠面板、日期选择器、浮层触发器、横幅的关闭），在 root 里一次全部接上交互，并把 data-i 换成图标。
+// 纯 HTML 页面：setup(); enhance();   之后再插进来的标记：enhance(那一段)
+import { bindForms as _bindForms } from "./form.js";
+import { bindInputs as _bindInputs } from "./input.js";
+import { bindCollapses as _bindCollapses } from "./data.js";
+import { bindOverlays as _bindOverlays } from "./overlay.js";
+import { bindBanners as _bindBanners } from "./feedback.js";
+export function enhance(root = typeof document !== "undefined" ? document : null) {
+  if (!root) return;
+  injectIcons(root); _bindForms(root); _bindInputs(root); _bindCollapses(root); bindPickers(root); _bindOverlays(root); _bindBanners(root);
+}

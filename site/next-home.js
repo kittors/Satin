@@ -1,12 +1,12 @@
 // 官网首页（新版设计稿）：真实素材、真组件。交互都用组件库导出的函数（分段控件、滑块、Toast、数字变化、等待按钮、主题面板、命令面板）。
 import { reveal, bindModeSeg, onMode, openSearch } from "./shell.js";
-import { $, $$, root, reduced, injectIcons, initSeg, fitScroll } from "../kit-core.js";
-import { scrollArea } from "../kit-scroll.js";
-import { initSlider, busy, succeed, prepBusy, BOX } from "../kit-form.js";
-import { toast } from "../kit-feedback.js";
-import { numberFlow } from "../kit-number.js";
-import { mountThemePanel } from "../kit-theme-panel.js";
-import * as T from "../kit-theme.js";
+import { $, $$, root, reduced, injectIcons, initSeg, fitScroll } from "../packages/satin-ui/src/core.js";
+import { scrollArea } from "../packages/satin-ui/src/scroll.js";
+import { initSlider, busy, succeed, prepBusy, BOX } from "../packages/satin-ui/src/form.js";
+import { toast } from "../packages/satin-ui/src/feedback.js";
+import { numberFlow } from "../packages/satin-ui/src/number.js";
+import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
+import * as T from "../packages/satin-ui/src/theme.js";
 import { PHOTO, img, MUSIC, musicSrc, waveSrc, VIDEO, videoSrc, creditsHTML } from "./media.js";
 import { GUIDES } from "./pages.js";
 
@@ -47,11 +47,11 @@ function photos(scope = document) {
 {
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
   const MC = {
-    sw: '<div class="mc mc-sw"><i class="tr"><i class="fi"></i></i><i class="kn"></i></div>',
-    ck: `<div class="mc mc-ck"><i class="bx"></i><i class="fi"></i>${CHECK}</div>`,
-    sp: `<div class="mc mc-sp"><i class="ring"></i>${CHECK}</div>`,
-    pl: '<div class="mc mc-pl"><i class="bg"></i><svg class="pl" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6L19 12z"/></svg><svg class="pa" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg></div>',
-    seg: '<div class="mc mc-seg"><i class="tr"></i><i class="th"></i></div>',
+    sw: '<div class="mc mc-sw"><i class="tr"><i class="sn-fi"></i></i><i class="kn"></i></div>',
+    ck: `<div class="mc mc-ck"><i class="bx"></i><i class="sn-fi"></i>${CHECK}</div>`,
+    sp: `<div class="mc mc-sp"><i class="sn-ring"></i>${CHECK}</div>`,
+    pl: '<div class="mc mc-pl"><i class="sn-bg"></i><svg class="pl" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6L19 12z"/></svg><svg class="pa" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg></div>',
+    seg: '<div class="mc mc-seg"><i class="tr"></i><i class="sn-th"></i></div>',
     sl: '<div class="mc mc-sl"><i class="rl"></i><i class="fl"></i><i class="kn"></i></div>',
   };
   const chips = [[$('[data-chip="0"]'), ["sw", "ck", "sp"]], [$('[data-chip="1"]'), ["pl", "seg", "sl"]]];
@@ -60,13 +60,13 @@ function photos(scope = document) {
     const items = [...el.children]; let i = -1, steps = [];
     const show = () => {
       const prev = items[i]; i = (i + 1) % items.length; const cur = items[i];
-      if (prev) { prev.classList.remove("cur"); prev.classList.add("out"); setTimeout(() => prev.classList.remove("out", "on", "on2"), 420); }
-      cur.classList.remove("out", "on", "on2"); cur.classList.add("cur");
+      if (prev) { prev.classList.remove("sn-cur"); prev.classList.add("sn-out"); setTimeout(() => prev.classList.remove("sn-out", "sn-on", "on2"), 420); }
+      cur.classList.remove("sn-out", "sn-on", "on2"); cur.classList.add("sn-cur");
       steps.forEach(clearTimeout);
-      steps = [setTimeout(() => cur.classList.add("on"), 700)];
+      steps = [setTimeout(() => cur.classList.add("sn-on"), 700)];
       if (cur.classList.contains("mc-seg")) steps.push(setTimeout(() => cur.classList.add("on2"), 1600));
     };
-    return { show, still: () => { items[0].classList.add("cur", "on"); }, offset: ci * 1500 };
+    return { show, still: () => { items[0].classList.add("sn-cur", "sn-on"); }, offset: ci * 1500 };
   });
   if (reduced()) runs.forEach((r) => r.still());
   else {
@@ -95,15 +95,15 @@ const SHOTS = [
   { n: 20, d: "0:04", p: "tree", s: "ok", t: "阴天的山坡上一棵孤树，固定机位。" },
 ];
 const NEW_PICS = ["clapper", "projector", "slate", "soundstage", "clapboard"];
-const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag need"><i></i>待审核</span>', run: '<span class="tag run"><i></i><span class="t">生成中</span></span>' };
+const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="sn-tag sn-need"><i></i>待审核</span>', run: '<span class="sn-tag sn-run"><i></i><span class="sn-t">生成中</span></span>' };
 {
   const grid = $("[data-shots]"), prompt = $("[data-insp-prompt]"), title = $("[data-insp-t]"), tagEl = $("[data-insp-tag]"), vid = $("[data-insp-vid]"), dur = $("[data-insp-dur]"), count = $("[data-na-count]");
-  const card = (s) => `<button class="na-shot" data-n="${s.n}" aria-label="镜头 ${s.n}"><span class="na-th"><img data-photo="${s.p}" data-w="400" alt=""></span><span class="na-sm"><b>镜头 ${String(s.n).padStart(2, "0")}</b><span class="num">${s.d}</span>${TAG[s.s]}</span></button>`;
+  const card = (s) => `<button class="na-shot" data-n="${s.n}" aria-label="镜头 ${s.n}"><span class="na-th"><img data-photo="${s.p}" data-w="400" alt=""></span><span class="na-sm"><b>镜头 ${String(s.n).padStart(2, "0")}</b><span class="sn-num">${s.d}</span>${TAG[s.s]}</span></button>`;
   grid.innerHTML = SHOTS.map(card).join(""); photos(grid);
   const recount = () => { count.textContent = `${SHOTS.length} 个镜头 · 已采用 ${SHOTS.filter((s) => s.s === "ok").length}`; };
   // 生成中的镜头：百分比一点点往上走（数字只滚变了的那一位），到 100% 变成"待审核"
   const progress = (s) => {
-    const el = grid.querySelector(`[data-n="${s.n}"] .tag.run`), pct = document.createElement("span"); pct.className = "num"; el.append(pct);
+    const el = grid.querySelector(`[data-n="${s.n}"] .sn-tag.sn-run`), pct = document.createElement("span"); pct.className = "sn-num"; el.append(pct);
     let v = s.pct ?? 0; const nf = numberFlow(pct, { value: v, format: (x) => x + "%", reduced });
     const iv = setInterval(() => {
       v = Math.min(100, v + 3 + Math.round(Math.random() * 4)); nf.set(v);
@@ -115,8 +115,8 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
   let sel = SHOTS[3];
   const paintInsp = (s, swap = true) => {
     title.textContent = `镜头 ${String(s.n).padStart(2, "0")}`; dur.textContent = s.d; prompt.textContent = s.t;
-    tagEl.className = "tag" + (s.s === "ok" ? "" : " " + s.s); tagEl.innerHTML = s.s === "ok" ? "已采用" : s.s === "need" ? "<i></i>待审核" : "<i></i>生成中";
-    vid.classList.toggle("vid", !!s.v);
+    tagEl.className = "sn-tag" + (s.s === "ok" ? "" : " sn-" + s.s); tagEl.innerHTML = s.s === "ok" ? "已采用" : s.s === "need" ? "<i></i>待审核" : "<i></i>生成中";
+    vid.classList.toggle("sn-vid", !!s.v);
     if (!swap) return;
     const old = $$(".na-still", vid), im = document.createElement("img"); im.className = "na-still"; im.alt = PHOTO[s.p].alt; im.decoding = "async";
     im.addEventListener("load", () => { im.classList.add("ld"); setTimeout(() => old.forEach((o) => o.remove()), 320); }, { once: true });
@@ -125,9 +125,9 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
   grid.addEventListener("click", (e) => {
     const b = e.target.closest(".na-shot"); if (!b) return;
     const s = SHOTS.find((x) => x.n === Number(b.dataset.n)); if (!s || s === sel) return;
-    grid.querySelector(".na-shot.on")?.classList.remove("on"); b.classList.add("on"); sel = s; paintInsp(s);
+    grid.querySelector(".na-shot.on")?.classList.remove("sn-on"); b.classList.add("sn-on"); sel = s; paintInsp(s);
   });
-  grid.querySelector('[data-n="12"]').classList.add("on");
+  grid.querySelector('[data-n="12"]').classList.add("sn-on");
   // 生成镜头：等待按钮 → 新镜头排到最后，百分比从 0 走起；网格滚到它那里
   const gen = $("[data-na-gen]"); prepBusy(gen);
   gen.addEventListener("click", async () => {
@@ -147,8 +147,8 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
   for (const nav of $$(".na-nav")) {
     const hl = document.createElement("i"); hl.className = "na-hl"; nav.prepend(hl);
     const place = (a, anim) => { if (!anim || reduced()) { hl.style.transition = "none"; requestAnimationFrame(() => (hl.style.transition = "")); } hl.style.transform = `translateY(${a.offsetTop}px)`; };
-    place(nav.querySelector("a.on"), false);
-    for (const a of nav.querySelectorAll("a")) a.addEventListener("click", () => { nav.querySelector("a.on")?.classList.remove("on"); a.classList.add("on"); place(a, true); });
+    place(nav.querySelector("a.sn-on"), false);
+    for (const a of nav.querySelectorAll("a")) a.addEventListener("click", () => { nav.querySelector("a.sn-on")?.classList.remove("sn-on"); a.classList.add("sn-on"); place(a, true); });
   }
   const s = $(".na-insp [data-slider]"), out = $("[data-motion-v]"); initSlider(s); s.addEventListener("slide", (e) => (out.textContent = e.detail));
   // 镜头 12 的画面是一段真视频（Mixkit）：进入视口才播，离开就停；减少动态效果时不自动播
@@ -172,24 +172,24 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
     const d = w.data, pairs = d.length / 2, per = pairs / N, peaks = [];
     for (let i = 0; i < N; i++) { let pk = 0; for (let j = Math.floor(i * per); j < Math.floor((i + 1) * per); j++) pk = Math.max(pk, Math.abs(d[2 * j]), Math.abs(d[2 * j + 1])); peaks.push(pk); }
     const hi = Math.max(...peaks) || 1;
-    wave.innerHTML = peaks.map((pk) => `<i style="--h:${(18 + 82 * pk / hi).toFixed(1)}%"></i>`).join("");
+    wave.innerHTML = peaks.map((pk) => `<i style="--sn-h:${(18 + 82 * pk / hi).toFixed(1)}%"></i>`).join("");
     bars = [...wave.children]; paint(true);
   }).catch(() => wave.classList.add("flat"));
   const paint = (force) => {
     const now = pendingSeek ?? audio.currentTime, p = Math.min(1, now / dur), k = Math.round(p * N) - 1;
-    if (k !== lit || force) { bars.forEach((b, i) => b.classList.toggle("on", i <= k)); lit = k; }
+    if (k !== lit || force) { bars.forEach((b, i) => b.classList.toggle("sn-on", i <= k)); lit = k; }
     const s = Math.floor(now); if (s !== shownSec) { cur.textContent = fmt(now); shownSec = s; wave.setAttribute("aria-valuenow", String(Math.round(p * 100))); }
   };
   const loop = () => { paint(); raf = audio.paused ? 0 : requestAnimationFrame(loop); };
   audio.addEventListener("loadedmetadata", () => { if (isFinite(audio.duration)) dur = audio.duration; if (pendingSeek != null) { audio.currentTime = pendingSeek; pendingSeek = null; } });
   audio.addEventListener("play", () => {
-    card.classList.add("playing"); btn.dataset.tip = "暂停"; btn.setAttribute("aria-label", "暂停"); if (!raf) loop();
-    if (audio.readyState < 3) { clearTimeout(bufT); bufT = setTimeout(() => card.classList.add("buffering"), 300); }
+    card.classList.add("sn-playing"); btn.dataset.tip = "暂停"; btn.setAttribute("aria-label", "暂停"); if (!raf) loop();
+    if (audio.readyState < 3) { clearTimeout(bufT); bufT = setTimeout(() => card.classList.add("sn-buffering"), 300); }
   });
-  audio.addEventListener("pause", () => { card.classList.remove("playing"); btn.dataset.tip = "播放"; btn.setAttribute("aria-label", "播放"); paint(); });
+  audio.addEventListener("pause", () => { card.classList.remove("sn-playing"); btn.dataset.tip = "播放"; btn.setAttribute("aria-label", "播放"); paint(); });
   audio.addEventListener("ended", () => { audio.currentTime = 0; paint(true); });
-  audio.addEventListener("waiting", () => { clearTimeout(bufT); bufT = setTimeout(() => card.classList.add("buffering"), 300); });
-  for (const ev of ["playing", "pause", "canplaythrough", "error"]) audio.addEventListener(ev, () => { clearTimeout(bufT); card.classList.remove("buffering"); });
+  audio.addEventListener("waiting", () => { clearTimeout(bufT); bufT = setTimeout(() => card.classList.add("sn-buffering"), 300); });
+  for (const ev of ["playing", "pause", "canplaythrough", "error"]) audio.addEventListener(ev, () => { clearTimeout(bufT); card.classList.remove("sn-buffering"); });
   btn.addEventListener("click", () => (audio.paused ? audio.play().catch(() => toast({ icon: "circle-x", tone: "danger", text: "音乐没能加载，检查网络后再试", alert: true })) : audio.pause()));
   const seekTo = (p) => { const s = Math.max(0, Math.min(1, p)) * dur; if (audio.readyState >= 1) audio.currentTime = s; else { pendingSeek = s; audio.preload = "metadata"; audio.load(); } paint(); };
   wave.addEventListener("pointerdown", (e) => {
@@ -204,7 +204,7 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
 {
   const tabs = $$("[data-tabs] [role=tab]"), wins = $("[data-wins]"), panel = $("[data-tabpanel]"), DUR = 7000;
   // 窗口按里面内容的高度长（iframe 自己不滚）；载好之前先用量好的高度占位，整块的高度取几扇窗口里最高的那扇，切换时不跳
-  wins.innerHTML = tabs.map((t) => `<div class="n-win" data-k="${t.dataset.k}"><div class="mac"><div class="mac-bar"><span class="mac-lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="mac-title">${esc(t.dataset.t)}</span></div><div class="mac-body" style="height:${t.dataset.h}px"><div class="d-load"><span class="spinner"></span>正在载入</div></div></div></div>`).join("");
+  wins.innerHTML = tabs.map((t) => `<div class="n-win" data-k="${t.dataset.k}"><div class="mac"><div class="mac-bar"><span class="mac-lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="mac-title">${esc(t.dataset.t)}</span></div><div class="mac-body" style="height:${t.dataset.h}px"><div class="d-load"><span class="sn-spinner"></span>正在载入</div></div></div></div>`).join("");
   const ws = $$(".n-win", wins), frames = [];
   const fit = () => { const top = parseFloat(getComputedStyle(wins).top) || 0, hi = Math.max(...ws.map((w) => w.offsetHeight)); panel.style.height = Math.ceil(top * 2 + hi) + "px"; };
   addEventListener("message", (e) => {
@@ -225,8 +225,8 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
     if (user) { auto = false; bar?.cancel(); bar = null; }
     if (i === cur) return;
     const prev = ws[cur]; cur = i; load(i);
-    if (prev) { prev.classList.remove("cur"); prev.classList.add("out"); setTimeout(() => prev.classList.remove("out"), 260); }
-    ws[i].classList.remove("warm"); ws[i].classList.add("cur");
+    if (prev) { prev.classList.remove("sn-cur"); prev.classList.add("sn-out"); setTimeout(() => prev.classList.remove("sn-out"), 260); }
+    ws[i].classList.remove("warm"); ws[i].classList.add("sn-cur");
     tabs.forEach((t, k) => t.setAttribute("aria-selected", String(k === i)));
     bar?.cancel(); bar = null;
     if (auto) {
@@ -264,7 +264,7 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
       r.on = false; const iv = r.ts.slice(1).map((t, i) => t - r.ts[i]); if (!iv.length) return;
       const sorted = [...iv].sort((a, b) => a - b), p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * .95))], max = sorted.at(-1);
       strip.querySelectorAll("b").forEach((b) => b.remove());
-      strip.insertAdjacentHTML("beforeend", iv.map((x, i) => `<b class="${x > 17.5 ? "slow" : ""}" style="--h:${Math.min(44, x / 33.4 * 44).toFixed(1)}px;animation-delay:${i * 8}ms"></b>`).join(""));
+      strip.insertAdjacentHTML("beforeend", iv.map((x, i) => `<b class="${x > 17.5 ? "sn-slow" : ""}" style="--sn-h:${Math.min(44, x / 33.4 * 44).toFixed(1)}px;animation-delay:${i * 8}ms"></b>`).join(""));
       read.textContent = `${iv.length} 帧 · p95 ${p95.toFixed(1)}ms · 最长 ${max.toFixed(1)}ms`;
     }, () => { r.on = false; });
   }, 0);
@@ -280,7 +280,7 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
   };
   const emptyNote = () => {
     let n = $(".ar-empty", list.parentElement); const none = !list.querySelector("li:not(.leaving)");
-    if (none && !n) { list.insertAdjacentHTML("afterend", '<div class="ar-empty">都归档了<div style="margin-top:6px"><button class="textbtn" data-ar-all>全部放回来</button></div></div>'); n = $(".ar-empty", list.parentElement); n.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 120, fill: "backwards" }); }
+    if (none && !n) { list.insertAdjacentHTML("afterend", '<div class="ar-empty">都归档了<div style="margin-top:6px"><button class="sn-textbtn" data-ar-all>全部放回来</button></div></div>'); n = $(".ar-empty", list.parentElement); n.animate?.([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 120, fill: "backwards" }); }
     if (!none && n) n.remove();
   };
   const put = (li) => {
@@ -307,7 +307,7 @@ const TAG = { ok: '<span class="tag">已采用</span>', need: '<span class="tag 
 // ———— 细节三：等待 → 成功 ————
 for (const b of $$("[data-bz]")) {
   prepBusy(b);
-  b.addEventListener("click", async () => { if (b.classList.contains("busy") || b._run) return; b._run = true; await busy(b, Number(b.dataset.bz)); succeed(b); setTimeout(() => (b._run = false), 1500); });
+  b.addEventListener("click", async () => { if (b.classList.contains("sn-busy") || b._run) return; b._run = true; await busy(b, Number(b.dataset.bz)); succeed(b); setTimeout(() => (b._run = false), 1500); });
 }
 
 // ———— 细节四：命令面板小样（高亮条在行间滑；没碰它时自己往下走，像在按方向键）；点一下打开真的那个 ————
@@ -326,13 +326,13 @@ for (const b of $$("[data-bz]")) {
 }
 
 // ———— 细节六：开关、勾选、标签 ————
-for (const c of $$("[data-chips] .chip")) c.addEventListener("click", () => c.classList.toggle("on"));
-for (const l of $$("label.check[data-box]")) $("input", l).insertAdjacentHTML("afterend", BOX);
+for (const c of $$("[data-chips] .sn-chip")) c.addEventListener("click", () => c.classList.toggle("sn-on"));
+for (const l of $$("label.sn-check[data-box]")) $("input", l).insertAdjacentHTML("afterend", BOX);
 
 // ———— 主题：外观 + 组件库的主题面板（横着排成一条）+ 复制当前这套 CSS 变量 ————
 for (const s of $$("[data-mode-seg]")) bindModeSeg(s);
 mountThemePanel($("[data-inline-theme]"), { initSeg, injectIcons });
-for (const p of document.querySelectorAll("[data-tbar] .th-pick")) { p.dataset.tip = p.textContent.trim() + "色"; p.setAttribute("aria-label", p.dataset.tip); }
+for (const p of document.querySelectorAll("[data-tbar] .sn-th-pick")) { p.dataset.tip = p.textContent.trim() + "色"; p.setAttribute("aria-label", p.dataset.tip); }
 initSeg($("[data-pv-seg]"), null, 0);
 {
   const ok = $("[data-pv-ok]"); prepBusy(ok);
@@ -351,7 +351,7 @@ initSeg($("[data-pv-seg]"), null, 0);
   const IC = { principles: "compass", color: "swatch-book", type: "type", spacing: "ruler", motion: "activity", feel: "mouse-pointer-2", "no-ai": "scan-eye", a11y: "accessibility" };
   const box = $("[data-guides]");
   box.innerHTML = Object.keys(IC).map((id) => GUIDES.find((g) => g.id === id)).filter(Boolean).map((g, i) =>
-    `<a class="n-feat rv" style="--d:${(i % 4) * .05}s" href="next-docs.html#/guide/${g.id}"><span class="n-ico" data-i="${IC[g.id]}"></span><b>${g.title}</b><span>${g.brief || g.lead}</span></a>`).join("");
+    `<a class="n-feat rv" style="--sn-d:${(i % 4) * .05}s" href="next-docs.html#/guide/${g.id}"><span class="n-ico" data-i="${IC[g.id]}"></span><b>${g.title}</b><span>${g.brief || g.lead}</span></a>`).join("");
   injectIcons(box);
 }
 

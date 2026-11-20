@@ -1,0 +1,80 @@
+/* Satin：页面骨架——页面容器、页头、面板（卡片）、纵向堆叠、横排、自适应网格、两栏、表单、登录页。
+   做整页时用这些类搭结构，组件往里放；不用自己写外边距、断点和颜色。全部是新类名，不影响其他组件。
+   断点按容器宽度（04 号 §9）：compact < 720、regular 720～1199、wide ≥ 1200。间距只取令牌（04 号 §3）。
+   卡片只靠描边和明度差分层，不加阴影（阴影只给浮层，04 号 §6）。 */
+@layer satin {
+/* 页面容器：居中、限宽、四周留白；窄屏留白收小。.sn-narrow 给设置页、表单页这类单栏内容 */
+.sn-page { box-sizing: border-box; width: 100%; max-width: var(--sn-page-max, 1200px); margin-inline: auto; padding: var(--sn-pad-page) var(--sn-sp-40) var(--sn-sp-64); container: sn-page / inline-size; }
+.sn-page.sn-narrow { --sn-page-max: 760px; }
+.sn-page.sn-wide { --sn-page-max: 1440px; }
+@media (max-width: 719px) { .sn-page { padding: var(--sn-sp-20) var(--sn-sp-16) var(--sn-sp-40); } }
+/* 放在侧栏布局的主区里（.sn-app-main 自带 20 内边距）：只补到页面内边距 */
+.sn-app-main > .sn-page { padding: var(--sn-sp-12) var(--sn-sp-20) var(--sn-sp-48); }
+
+/* 页头：标题 + 一句说明在左，操作按钮在右；放不下时按钮换到下一行 */
+.sn-page-hd { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sn-sp-12) var(--sn-sp-16); margin-bottom: var(--sn-sp-24); }
+.sn-page-hd > :first-child { flex: 1 1 320px; min-width: 0; }
+.sn-page-hd h1 { font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.012em; color: var(--sn-label); }
+.sn-page-hd p { margin-top: var(--sn-sp-4); font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sn-page-hd .sn-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sn-sp-8); }
+
+/* 分区：页面里的大块，之间留 section 间距；分区标题 17/600 */
+.sn-section + .sn-section { margin-top: var(--sn-sp-40); }
+.sn-section > h2, .sn-section-hd h2 { font: 600 calc(17px * var(--sn-font-scale, 1))/calc(24px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.008em; color: var(--sn-label); }
+.sn-section > h2 { margin-bottom: var(--sn-sp-12); }
+.sn-section-hd { display: flex; align-items: center; gap: var(--sn-sp-12); margin-bottom: var(--sn-sp-12); }
+.sn-section-hd h2 { flex: 1; min-width: 0; }
+.sn-section > p, .sn-section-hd + p { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+
+/* 面板（卡片）：白底（深色是抬高一档的灰）、一圈细线、大圆角；不加阴影，悬停不上浮 */
+.sn-panel { box-sizing: border-box; min-width: 0; padding: var(--sn-sp-20); border-radius: var(--sn-r-lg); background: var(--sn-raised); border: 1px solid var(--sn-line); }
+.sn-panel.sn-flush { padding: 0; overflow: hidden; }
+.sn-panel-hd { display: flex; align-items: center; gap: var(--sn-sp-8); margin-bottom: var(--sn-sp-16); }
+.sn-panel-hd h2, .sn-panel-hd h3 { flex: 1; min-width: 0; font: 600 calc(15px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sn-panel-hd p { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sn-panel-ft { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: var(--sn-sp-8); margin-top: var(--sn-sp-20); }
+
+/* 排布：纵向堆叠、横排（自动换行）、自适应网格（每格至少 --sn-min 宽）。间距用 .sn-gap-N 换一档 */
+.sn-stack { display: flex; flex-direction: column; gap: var(--sn-gap, var(--sn-sp-16)); min-width: 0; }
+.sn-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sn-gap, var(--sn-sp-12)); min-width: 0; }
+.sn-row.sn-between { justify-content: space-between; }
+.sn-row > .sn-grow { flex: 1 1 auto; min-width: 0; }
+.sn-cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--sn-min, 260px)), 1fr)); gap: var(--sn-gap, var(--sn-sp-16)); align-items: start; }
+.sn-gap-4 { --sn-gap: var(--sn-sp-4); } .sn-gap-8 { --sn-gap: var(--sn-sp-8); } .sn-gap-12 { --sn-gap: var(--sn-sp-12); } .sn-gap-16 { --sn-gap: var(--sn-sp-16); }
+.sn-gap-20 { --sn-gap: var(--sn-sp-20); } .sn-gap-24 { --sn-gap: var(--sn-sp-24); } .sn-gap-32 { --sn-gap: var(--sn-sp-32); } .sn-gap-48 { --sn-gap: var(--sn-sp-48); }
+
+/* 两栏：主内容 + 右侧栏（默认 320 宽）；页面变窄时右栏落到下面 */
+.sn-with-aside { display: grid; grid-template-columns: minmax(0, 1fr) var(--sn-aside, 320px); gap: var(--sn-sp-24); align-items: start; }
+@container sn-page (max-width: 899px) { .sn-with-aside { grid-template-columns: minmax(0, 1fr); } }
+
+/* 表单：一栏字段，字段之间 20；.sn-form-row 两个字段并排（窄时变一栏）；.sn-form-ft 底部按钮（主按钮在最右） */
+.sn-form { display: grid; gap: var(--sn-sp-20); max-width: var(--sn-form-max, 560px); }
+.sn-form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: var(--sn-sp-16); }
+.sn-form-ft { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: var(--sn-sp-8); padding-top: var(--sn-sp-4); }
+.sn-form-ft > .sn-start { margin-right: auto; }
+
+/* 设置页的一组：左边标题和说明，右边字段（窄时上下排） */
+.sn-setting { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); gap: var(--sn-sp-12) var(--sn-sp-32); padding: var(--sn-sp-24) 0; border-top: 1px solid var(--sn-line); }
+.sn-setting:first-child { border-top: 0; padding-top: 0; }
+.sn-setting > :first-child h3 { font: 600 calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sn-setting > :first-child p { margin-top: var(--sn-sp-4); font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+@container sn-page (max-width: 719px) { .sn-setting { grid-template-columns: minmax(0, 1fr); } }
+
+/* 登录、注册这类单独一张卡片的页面：整屏居中，卡片 400 宽 */
+.sn-auth { box-sizing: border-box; min-height: 100dvh; display: grid; place-items: center; padding: var(--sn-sp-40) var(--sn-sp-16); }
+.sn-auth > .sn-panel { width: min(100%, 400px); padding: var(--sn-sp-32); }
+.sn-auth h1 { font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.012em; color: var(--sn-label); }
+.sn-auth h1 + p { margin-top: var(--sn-sp-4); font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+@media (max-width: 479px) { .sn-auth { place-items: start center; padding-top: var(--sn-sp-48); } .sn-auth > .sn-panel { padding: var(--sn-sp-24) var(--sn-sp-20); } }
+
+/* 数字指标：标签、数值（等宽数字）、变化；一屏最多一排 3～4 个，不做"指标墙" */
+.sn-stat { display: grid; gap: var(--sn-sp-4); min-width: 0; }
+.sn-stat > span:first-child { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sn-stat > b { font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.012em; color: var(--sn-label); font-variant-numeric: tabular-nums; }
+.sn-stat > small { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); font-variant-numeric: tabular-nums; }
+.sn-stat > small.sn-up { color: var(--sn-success); } .sn-stat > small.sn-down { color: var(--sn-danger); }
+
+/* 移动端底部操作栏（下单、提交）：贴底，避开 iPhone 底部横条；键盘弹出时停在键盘上面（--sn-kb 由 setup() 算） */
+.sn-bottom-bar { position: sticky; bottom: var(--sn-kb, 0px); z-index: 5; display: flex; align-items: center; gap: var(--sn-sp-12); padding: var(--sn-sp-12) var(--sn-sp-16) calc(var(--sn-sp-12) + env(safe-area-inset-bottom)); background: var(--sn-raised); border-top: 1px solid var(--sn-line); }
+.sn-bottom-bar > .sn-grow { flex: 1 1 auto; min-width: 0; }
+}

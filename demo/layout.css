@@ -1,0 +1,121 @@
+/* 演示页专用（不属于组件库）：布局与响应式一节的线框。从 packages/satin-ui/css/layout.css 原样搬来。预览框按真实宽度排版（容器查询 @container lo），太宽时整体缩小显示。
+   线框：块是浅底细边，字是灰条，标题是深灰条，主按钮是深色胶囊。断点、栅格、边距见 04 号 §9、§3。 */
+@layer satin {
+.sn-lo-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 12px; }
+.sn-lo-tools .sn-slider .sn-bubble { display: none; }
+.sn-lo-presets { display: flex; flex-wrap: wrap; gap: 4px; }
+.sn-lo-presets .sn-on { background: var(--sn-fill-active); color: var(--sn-label); }
+.sn-lo-info { margin: 4px 0 12px; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); font-variant-numeric: tabular-nums; }
+.sn-lo-info b { font-weight: 600; color: var(--sn-label); }
+.sn-lo-frame { position: relative; overflow: hidden; border-radius: var(--sn-r-lg); background: var(--sn-sunken); }
+.sn-lo-vp { position: absolute; top: 0; left: 0; height: 560px; overflow: hidden; transform-origin: 0 0; container: lo / inline-size; background: var(--sn-canvas); box-shadow: 0 0 0 1px var(--sn-line); }
+.sn-lo-in { position: absolute; inset: 0; --sn-cols: 4; --sn-gutter: 16px; --sn-margin: 16px; }
+@container lo (min-width: 720px) { .sn-lo-in { --sn-cols: 8; --sn-gutter: 24px; --sn-margin: 24px; } }
+@container lo (min-width: 1100px) { .sn-lo-in { --sn-margin: 32px; } }
+@container lo (min-width: 1200px) { .sn-lo-in { --sn-cols: 12; } }
+@container lo (min-width: 1440px) { .sn-lo-in { --sn-margin: 40px; } }
+.sn-lo-l { display: none; height: 100%; }
+.sn-lo-in[data-mode="shell"] .sn-lo-shell, .sn-lo-in[data-mode="split"] .sn-lo-split, .sn-lo-in[data-mode="cards"] .sn-lo-cards, .sn-lo-in[data-mode="dash"] .sn-lo-dash, .sn-lo-in[data-mode="read"] .sn-lo-read, .sn-lo-in[data-mode="form"] .sn-lo-form { display: grid; }
+
+/* ———— 线框元素 ———— */
+.sn-lo-in i, .sn-lo-in b { display: block; border-radius: 4px; }
+.sn-lo-line { height: 8px; background: var(--sn-fill-active); }
+.sn-lo-line.sn-s { width: 64%; } .sn-lo-line.sn-xs { width: 36%; }
+.sn-lo-h1 { width: 42%; max-width: 280px; height: 16px; border-radius: 5px !important; background: color-mix(in srgb, var(--sn-label) 72%, transparent); }
+.sn-lo-h1.sn-big { width: 70%; max-width: 520px; height: 22px; }
+.sn-lo-h2 { width: 46%; max-width: 160px; height: 10px; background: color-mix(in srgb, var(--sn-label) 42%, transparent); }
+.sn-lo-kicker { width: 64px; height: 8px; background: color-mix(in srgb, var(--sn-label) 30%, transparent); }
+.sn-lo-cta { flex: none; width: 88px; height: 28px; border-radius: 14px !important; background: var(--sn-accent); }
+.sn-lo-btn2 { flex: none; width: 72px; height: 28px; border-radius: 14px !important; box-shadow: inset 0 0 0 1px var(--sn-line-control); }
+.sn-lo-thumb, .sn-lo-media { width: 100%; aspect-ratio: 16 / 9; border-radius: 8px !important; background: radial-gradient(60% 80% at 72% 30%, rgba(255, 210, 160, .35), transparent 60%), linear-gradient(180deg, #2a3242, #141a24); }
+.sn-lo-block { border-radius: 10px !important; background: var(--sn-raised); box-shadow: 0 0 0 1px var(--sn-line); }
+.sn-lo-gap { display: block; height: 8px; }
+
+/* ———— 主区：内容按边距排，栅格叠加以它为参照 ———— */
+.sn-lo-main { position: relative; min-width: 0; min-height: 0; overflow: hidden; padding: 24px var(--sn-margin); background: var(--sn-raised); }
+.sn-lo-main.sn-lo-canvas { background: var(--sn-canvas); }
+.sn-lo-page { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; max-width: 960px; margin: 0 auto; }
+.sn-lo-page.sn-wide { max-width: none; }
+.sn-lo-ph { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+.sn-lo-two { display: grid; grid-template-columns: 1fr; gap: var(--sn-gutter); }
+.sn-lo-two .sn-lo-block { height: 120px; }
+@container lo (min-width: 720px) { .sn-lo-two { grid-template-columns: 1fr 1fr; } }
+.sn-lo-grid { position: absolute; z-index: 2; inset: 0 var(--sn-margin); display: none; grid-template-columns: repeat(var(--sn-cols), 1fr); gap: var(--sn-gutter); pointer-events: none; }
+.sn-lo-in.sn-show-grid .sn-lo-grid { display: grid; }
+.sn-lo-grid i { border-radius: 0 !important; background: rgba(255, 59, 48, .07); box-shadow: inset 1px 0 rgba(255, 59, 48, .22), inset -1px 0 rgba(255, 59, 48, .22); }
+@container lo (max-width: 719px) { .sn-lo-grid i:nth-child(n + 5) { display: none; } }
+@container lo (max-width: 1199px) { .sn-lo-grid i:nth-child(n + 9) { display: none; } }
+
+/* ———— 侧栏、顶栏 ———— */
+.sn-lo-side { display: none; flex-direction: column; gap: 4px; padding: 14px 12px; background: var(--sn-canvas); box-shadow: 1px 0 0 var(--sn-line); }
+.sn-lo-side .sn-lo-logo { width: 24px; height: 24px; margin: 0 4px 14px; border-radius: 7px !important; background: var(--sn-accent); }
+.sn-lo-in .sn-lo-ni { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 8px; border-radius: 8px; }
+.sn-lo-ni::before { content: ""; flex: none; width: 16px; height: 16px; border-radius: 4px; background: var(--sn-fill-active); }
+.sn-lo-ni::after { content: ""; flex: 1; height: 8px; border-radius: 4px; background: var(--sn-fill-subtle); }
+.sn-lo-ni.sn-on { background: var(--sn-fill-subtle); } .sn-lo-ni.sn-on::before { background: color-mix(in srgb, var(--sn-label) 55%, transparent); }
+@container lo (max-width: 1099px) { .sn-lo-ni::after { display: none; } .sn-lo-in .sn-lo-ni { justify-content: center; padding: 0; } .sn-lo-side .sn-lo-logo { margin: 0 auto 14px; } }
+.sn-lo-top { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 var(--sn-margin); background: var(--sn-raised); box-shadow: 0 1px 0 var(--sn-line); }
+.sn-lo-top .sn-lo-burger { flex: none; width: 18px; height: 14px; border-radius: 1px !important; background: linear-gradient(var(--sn-label2) 0 2px, transparent 2px 6px, var(--sn-label2) 6px 8px, transparent 8px 12px, var(--sn-label2) 12px 14px); }
+.sn-lo-top .sn-lo-title { width: 120px; height: 12px; background: color-mix(in srgb, var(--sn-label) 60%, transparent); }
+.sn-lo-top .sn-lo-cta { margin-left: auto; }
+@container lo (min-width: 720px) { .sn-lo-top .sn-lo-burger { display: none; } }
+
+/* ———— 1. 应用外壳：侧栏（抽屉 → 图标栏 64 → 232）+ 顶栏 + 主区（阅读型最大 960 居中）+ 检查器（1280 起，320） ———— */
+.sn-lo-shell { grid-template: "top" 52px "main" 1fr / 1fr; }
+.sn-lo-shell > .sn-lo-side { grid-area: side; } .sn-lo-shell > .sn-lo-top { grid-area: top; } .sn-lo-shell > .sn-lo-main { grid-area: main; }
+.sn-lo-shell > .sn-lo-insp { grid-area: insp; display: none; flex-direction: column; gap: 12px; padding: 20px; background: var(--sn-raised); box-shadow: -1px 0 0 var(--sn-line); }
+.sn-lo-insp .sn-lo-ib { height: 96px; }
+@container lo (min-width: 720px) { .sn-lo-shell { grid-template: "side top" 52px "side main" 1fr / 64px 1fr; } .sn-lo-shell > .sn-lo-side { display: flex; } }
+@container lo (min-width: 1100px) { .sn-lo-shell { grid-template-columns: 232px 1fr; } }
+@container lo (min-width: 1280px) { .sn-lo-shell { grid-template: "side top insp" 52px "side main insp" 1fr / 232px 1fr 320px; } .sn-lo-shell > .sn-lo-insp { display: flex; } }
+
+/* ———— 2. 三栏：侧栏 + 二级栏（列表）+ 详情。窄的时候只剩列表，点开详情盖上来 ———— */
+.sn-lo-split { grid-template-columns: 1fr; }
+.sn-lo-list { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 12px; overflow: hidden; background: var(--sn-raised); }
+.sn-lo-list .sn-lo-search { height: 28px; margin-bottom: 8px; border-radius: 14px !important; background: var(--sn-fill-subtle); }
+.sn-lo-row { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 8px; border-radius: 8px; }
+.sn-lo-row.sn-on { background: var(--sn-fill-subtle); }
+.sn-lo-row .sn-lo-av { flex: none; width: 28px; height: 28px; border-radius: 50% !important; background: var(--sn-fill-active); }
+.sn-lo-row span { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.sn-lo-hint { margin: auto 0 0; padding: 8px; font: 400 calc(11px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); text-align: center; }
+.sn-lo-split > .sn-lo-detail { display: none; }
+@container lo (min-width: 720px) {
+  .sn-lo-split { grid-template-columns: 64px 240px 1fr; } .sn-lo-split > .sn-lo-side { display: flex; } .sn-lo-split > .sn-lo-detail { display: block; }
+  .sn-lo-list { background: var(--sn-canvas); box-shadow: 1px 0 0 var(--sn-line); } .sn-lo-hint { display: none; }
+}
+@container lo (min-width: 1100px) { .sn-lo-split { grid-template-columns: 232px 240px 1fr; } }
+@container lo (min-width: 1280px) { .sn-lo-split { grid-template-columns: 232px 280px 1fr; } }
+
+/* ———— 3. 卡片网格：不写死列数，最小卡宽 260 + auto-fill；列间距 16、行间距 24 ———— */
+.sn-lo-cards { grid-template-columns: 1fr; }
+.sn-lo-cardgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px 16px; }
+.sn-lo-card { display: flex; flex-direction: column; gap: 8px; padding: 10px 10px 14px; border-radius: 12px; background: var(--sn-raised); box-shadow: 0 0 0 1px var(--sn-line), 0 1px 2px rgba(0, 0, 0, .04); }
+
+/* ———— 4. 仪表盘：块按栅格列数跨（统计卡 compact 4 列 = 整行、regular 4 列 = 半行、wide 3 列 = 四分之一） ———— */
+.sn-lo-dash { grid-template-columns: 1fr; }
+.sn-lo-dgrid { display: grid; grid-template-columns: repeat(var(--sn-cols), minmax(0, 1fr)); gap: var(--sn-gutter); }
+.sn-lo-dgrid > * { grid-column: span 4; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+.sn-lo-stat { height: 84px; } .sn-lo-stat .sn-lo-num { width: 56%; height: 20px; border-radius: 5px !important; background: color-mix(in srgb, var(--sn-label) 72%, transparent); }
+.sn-lo-chart { height: 220px; } .sn-lo-dlist { height: 220px; }
+.sn-lo-bars { flex: 1; display: flex; align-items: flex-end; gap: 8%; padding: 0 2%; }
+.sn-lo-in .sn-lo-bars i { flex: 1; border-radius: 3px 3px 0 0; background: color-mix(in srgb, var(--sn-label) 22%, transparent); }
+.sn-lo-dtable { gap: 0 !important; padding: 6px 14px !important; }
+.sn-lo-tr { display: grid; grid-template-columns: 2fr 1fr 1fr; align-items: center; gap: 16px; height: 34px; box-shadow: 0 1px 0 var(--sn-line); }
+.sn-lo-tr:last-child { box-shadow: none; }
+@container lo (min-width: 720px) { .sn-lo-chart, .sn-lo-dlist, .sn-lo-dtable { grid-column: span 8; } }
+@container lo (min-width: 1200px) { .sn-lo-stat { grid-column: span 3; } .sn-lo-chart { grid-column: span 8; } .sn-lo-dlist { grid-column: span 4; } .sn-lo-dtable { grid-column: span 12; } }
+
+/* ———— 5. 阅读页：最大宽 960 居中，两边随断点留边距 ———— */
+.sn-lo-read { grid-template-columns: 1fr; }
+.sn-lo-article { gap: 12px; padding-top: 16px; }
+
+/* ———— 6. 表单：最大宽 640；720 起标签在左（120），窄的时候标签在上 ———— */
+.sn-lo-form { grid-template-columns: 1fr; }
+.sn-lo-formwrap { max-width: 640px; gap: 16px; padding-top: 8px; }
+.sn-lo-field { display: grid; gap: 8px; }
+.sn-lo-label { width: 72px; height: 10px; background: color-mix(in srgb, var(--sn-label) 40%, transparent); }
+.sn-lo-input { height: 32px; border-radius: 8px !important; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-line-control); }
+.sn-lo-input.sn-tall { height: 72px; }
+.sn-lo-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+@container lo (min-width: 720px) { .sn-lo-field { grid-template-columns: 120px 1fr; align-items: center; gap: 16px; } .sn-lo-field:has(.sn-tall) { align-items: start; } .sn-lo-field:has(.sn-tall) .sn-lo-label { margin-top: 11px; } } /* sp-ok: 11 = (32 - 10) / 2，和单行输入框的中线对齐 */
+}

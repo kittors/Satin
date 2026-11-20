@@ -1,0 +1,22 @@
+// satin-ui/theme：主色、状态色、字体、字号；随时改，所有组件跟着变
+export interface ThemeChoice { accent: "ink" | "blue" | "indigo" | "green" | "amber" | "rose" | string; custom: string; font: "system" | "rounded" | "humanist" | "serif" | string; scale: "s" | "m" | "l" | "xl" | string; success: string; warning: string; danger: string }
+export const ACCENTS: { id: string; name: string; light: string | null; dark: string | null }[];
+export const FONTS: { id: string; name: string; sans: string | null }[];
+export const SCALES: { id: string; name: string; v: number }[];
+export const DEFAULTS: ThemeChoice;
+export function get(): ThemeChoice;
+export function set(patch: Partial<ThemeChoice>): void;
+export function reset(): void;
+export function onChange(fn: (t: ThemeChoice) => void): () => void;
+export function vars(t: ThemeChoice, dark: boolean): Record<string, string>;
+/** 把一套选择写到某个元素上（默认根元素；给局部元素就是局部主题） */
+export function paint(el?: HTMLElement, t?: ThemeChoice): void;
+export function luminance(hex: string): number;
+export function onColor(hex: string): "#000000" | "#ffffff";
+export function load(): ThemeChoice;
+export function installTheme(): void;
+/** 深浅模式："auto" 跟着系统；存在 localStorage（和 theme-boot 同一个键），换的时候整页交叉淡化 */
+export function setMode(mode?: "auto" | "light" | "dark", options?: { animate?: boolean; persist?: boolean }): void;
+export function getMode(): "auto" | "light" | "dark";
+/** 主题定制面板（主色、状态色、字体、字号）：satin-ui/theme-panel */
+export function mountThemePanel(panel: HTMLElement, o?: { initSeg?: unknown; injectIcons?: unknown }): unknown;

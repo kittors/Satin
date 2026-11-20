@@ -1,0 +1,43 @@
+{
+  "name": "satin-workspace",
+  "private": true,
+  "type": "module",
+  "description": "Satin：给 AI 用的 Web UI/UX 规范库（工作区根，不发布）",
+  "scripts": {
+    "serve": "python3 serve.py 5192 .",
+    "lint": "eslint .",
+    "test": "pnpm lint && pnpm test:node && pnpm test:types",
+    "test:node": "node scripts/test/imports.mjs && node scripts/test/node-import.mjs && node scripts/test/sync.mjs && node scripts/test/ssr.mjs && node scripts/test/table.mjs && node scripts/test/select.mjs && node scripts/test/factories.mjs && node scripts/skill/recipes-render.mjs && node scripts/test/enhance.mjs && node scripts/test/size.mjs && node skills/satin/scripts/check.test.mjs --static-only",
+    "test:types": "tsc -p tests/types",
+    "test:browser": "node scripts/test/lifecycle.mjs && node scripts/test/md-xss.mjs",
+    "test:tokens": "node scripts/tokens/check.mjs --prefix sn-",
+    "build:examples": "node scripts/examples/build.mjs",
+    "check:examples": "node scripts/examples/check.mjs",
+    "audit:docs": "node scripts/docs-audit.mjs",
+    "spec:build": "node scripts/spec/build.mjs",
+    "skill:build": "node scripts/skill/build.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "acorn": "^8.19.0",
+    "acorn-walk": "^8.3.5",
+    "esbuild": "~0.25.12",
+    "eslint": "^9.39.5",
+    "globals": "^17.14.0",
+    "linkedom": "~0.18.15",
+    "magic-string": "~0.30.21",
+    "pixelmatch": "^7.2.0",
+    "playwright": "1.65.1",
+    "pngjs": "^7.0.0",
+    "postcss": "^8.5.33",
+    "postcss-selector-parser": "^7.2.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "satin-ui": "workspace:*",
+    "typescript": "~5.9.3",
+    "vue": "~3.5.45"
+  },
+  "packageManager": "pnpm@12.21.0"
+}
