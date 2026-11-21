@@ -1,5 +1,5 @@
 // 重组件：satin-ui/markdown、/chat、/flow、/grid、/canvas-grid、/lightbox、/media（各自单独引入，不拉进主入口）
-import type { SatinFactory, LightboxItem, LightboxOptions, LightboxHandle } from "./components";
+import type { SatinFactory, LightboxItem, LightboxOptions, LightboxHandle, ComposerParts, ComposerPartEvents, ComposerAttachment } from "./components";
 export type { LightboxItem, LightboxOptions, LightboxHandle } from "./components";
 
 export interface MarkdownOptions { source?: string; codeMax?: number; imgH?: number | "auto"; tableMax?: number; reduced?(): boolean }
@@ -12,15 +12,26 @@ export function highlightLines(code: string, lang: string): string[];
 export interface ChatItem { kind: "day" | "msg"; text?: string; me?: boolean; type?: "text" | "image" | "video" | "audio" | "file"; g?: string; cap?: string; dur?: string; src?: string; poster?: string; name?: string; ext?: string; size?: number; status?: "sending" | "sent" | "fail"; [k: string]: unknown }
 /** 历史消息：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有更早的 */
 export interface ChatHistory { initial(): ChatItem[]; older?(): ChatItem[] | Promise<ChatItem[]>; hasMore?(): boolean }
-export interface ChatOptions {
+/** 对话的选项（不含事件回调；Vue 组件的属性就是这些） */
+export interface ChatProps extends ComposerParts {
   /** 接模型的口子：异步生成器一段段 yield 字符串（或 { text } / { think } / { step } …），或直接返回一整段 */
   respond?(text: string, ctx: { /** 用户点了"停止"以后变成 true（每次读都是现在的值） */ readonly stopped: boolean }): AsyncIterable<unknown> | Promise<string> | string;
   history?: ChatHistory; title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean;
-  /** 底部输入框的选项（输入框还没接上时用） */
-  composer?: { upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: unknown[] };
+  /** 新对话：还没有消息时消息区正中的样子。不写有一个默认的（对话图标 + "有什么可以帮你？"）；true 只留空容器（自己画进 emptyEl）；false 不要 */
+  empty?: ChatEmpty | boolean;
+  /** 底部输入框的选项（输入框还没接上时用）：upload 上传函数；attachments 附件菜单每一项（img / vid / aud / doc）点了以后给出的附件 */
+  composer?: { upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: Partial<Record<"img" | "vid" | "aud" | "doc", (counter: { n: number }) => ComposerAttachment>> };
   hiRes?(bg: string): string;
 }
-export interface ChatApi { send(text: string): void; receive(item: Partial<ChatItem>): unknown; sendText(text: string, o?: { fail?: boolean }): unknown; scrollToOldest(): void }
+/** createChat 的选项：上面那些 + 输入框部件的事件回调 */
+export interface ChatOptions extends ChatProps, ComposerPartEvents {}
+/** 新对话的样子：图标（单色，图标名）、标题、说明、2～4 个建议（点了填进输入框） */
+export interface ChatEmpty { icon?: string; title?: string; subtitle?: string; suggestions?: string[] }
+export interface ChatApi { send(text: string): void; receive(item: Partial<ChatItem>): unknown; sendText(text: string, o?: { fail?: boolean }): unknown; scrollToOldest(): void;
+  /** 填一段字进底部输入框（字淡入、光标在最后），不发 */
+  fill(text: string): void;
+  /** 新对话那一块（empty 给 true 时自己往里画）；没有空状态时是 null */
+  readonly emptyEl: HTMLElement | null }
 export function mountChat(box: HTMLElement, o?: ChatOptions): ChatApi & { destroy(): void };
 /** 对话（统一写法）：空容器按选项渲染；update({ status }) 改顶栏状态；destroy 停掉生成中的回答、撤掉监听、清空容器 */
 export const createChat: SatinFactory<ChatOptions, ChatApi>;

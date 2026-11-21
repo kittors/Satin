@@ -10,7 +10,10 @@
     "虚拟列表：只渲染视口上下各 1.25 屏；行高先估、渲染后按实际量出来的缓存；视口上方的条目高度变了，补偿滚动位置，看着的内容不动。",
     "已经载入的消息永远直接画真内容：拖滚动条时在同一个任务里画好新位置，并重算是否贴底；往上翻到离顶部还有两屏时就提前加载下一页。",
     "流式输出：网络来的字先进缓冲，再按匀速放出来（每秒 45～160 个，积压越多越快），新字淡入；贴底时视口平滑跟着往下走，不一行一行跳；用户往上翻了就不再跟，右下角显示新消息数。",
-    "发送：临界阻尼弹簧曲线，竖直 300ms、水平 360ms，120ms 走完 60%；影子每帧追真实落点，落地和真气泡完全重合；字从发出那一帧起就是气泡的配色。AI 等消息落地再回复。减少动态效果时直接出现。"
+    "发送：临界阻尼弹簧曲线，竖直 300ms、水平 360ms，120ms 走完 60%；影子每帧追真实落点，落地和真气泡完全重合；字从发出那一帧起就是气泡的配色。AI 等消息落地再回复。减少动态效果时直接出现。",
+    "空状态：图标 44px、只用三档灰；标题一句话说清楚能做什么；建议 2～4 个，写成用户会说的话。",
+    "第一条消息（发出或收到）进来时空状态淡出：220ms，只动透明度和位移；输入框不跳，消息照常飞进列表。",
+    "权限、模式用标签的小圆点表示状态（绿 只读、橙 完全访问、红 有风险）；模型按钮写\"名称 · 档位\"，点开往上长菜单；没写内容时发送按钮是灰的。"
   ],
   "api": [
     {
@@ -111,6 +114,10 @@
     {
       "caption": "",
       "html": "<div class=\"sn-chat\" id=\"chatBox\">\n  <div class=\"sn-chat-hd\"><div class=\"sn-tx\"><b>分镜助手</b><span class=\"sn-sub\"><span data-chat-status>在线</span>·<span data-chat-count class=\"sn-num\"></span></span></div></div>\n  <div class=\"sn-chat-body\"><div class=\"sn-chat-vp\" id=\"chatVp\"><div class=\"sn-chat-canvas\"><div class=\"sn-chat-ph sn-top\"></div><div class=\"sn-chat-ph sn-bot\"></div></div></div><button class=\"sn-chat-jump\" data-chat-jump aria-label=\"跳到最新\"><span data-i=\"arrow-down\"></span><span class=\"sn-badge\" hidden>0</span></button></div>\n  <div class=\"sn-chat-foot\">\n    <div class=\"sn-box-in sn-composer\" data-composer data-external data-max=\"500\" data-max-lines=\"5\">\n      <div class=\"sn-cm-files\"></div>\n      <textarea rows=\"1\" placeholder=\"和分镜助手一起改这一集\"></textarea>\n      <div class=\"sn-cm-bar\"><div class=\"sn-select sn-inline-menu sn-up\"><button class=\"sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add\" data-menubtn data-cm-attach data-tip=\"添加图片、视频、音频或文档\" aria-label=\"添加附件\" data-i=\"plus\"></button><div class=\"sn-menu\" role=\"menu\" style=\"min-width:208px\"><div class=\"sn-item\" data-add=\"img\" data-i=\"image:before\">图片<span class=\"sn-key\">JPG · PNG</span></div><div class=\"sn-item\" data-add=\"vid\" data-i=\"film:before\">视频<span class=\"sn-key\">MP4 · MOV</span></div><div class=\"sn-item\" data-add=\"aud\" data-i=\"audio-lines:before\">音频<span class=\"sn-key\">MP3 · WAV</span></div><div class=\"sn-item\" data-add=\"doc\" data-i=\"file-text:before\">文档<span class=\"sn-key\">PDF · DOCX</span></div><div class=\"sn-sep\"></div><div class=\"sn-item\" data-add=\"fail\" data-i=\"refresh-cw:before\">演示：上传失败</div><div class=\"sn-item\" data-add=\"big\" data-i=\"circle-alert:before\">演示：文件太大</div></div></div><button class=\"sn-btn sn-ghost sn-sm sn-cm-chip\" data-cm-style>风格：电影感</button><span class=\"sn-grow\"></span>\n        <button class=\"sn-btn sn-ghost sn-sm sn-cm-model\" data-cm-model data-tip=\"换模型\" data-i=\"chevron-down:after\">分镜模型 · 精细</button><span class=\"sn-ta-count\"><svg class=\"sn-uring\" viewBox=\"0 0 16 16\"><circle class=\"sn-bg\" cx=\"8\" cy=\"8\" r=\"6\" /><circle class=\"sn-fg\" cx=\"8\" cy=\"8\" r=\"6\" /></svg></span>\n        <button class=\"sn-cm-send\" aria-label=\"发送\" data-tip=\"发送\" data-kbd=\"⌘↵\"><svg class=\"sn-orbit\" viewBox=\"0 0 40 40\"><circle cx=\"20\" cy=\"20\" r=\"19\" /></svg><span class=\"sn-swap\"><span class=\"sn-a\" data-i=\"arrow-up\"></span><span class=\"sn-b\"><span class=\"sn-stop\"></span></span></span></button></div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "caption": "新对话",
+      "html": "<div class=\"sn-chat sn-chat-new\" id=\"chatNew\"></div>"
     }
   ],
   "states": [],
@@ -292,10 +299,10 @@
     },
     {
       "name": "composer",
-      "type": "{ upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: unknown[] }",
+      "type": "{ upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: Partial<Record<\"img\" | \"vid\" | \"aud\" | \"doc\", (counter: { n: number }) => ComposerAttachment>> }",
       "default": "—",
       "required": false,
-      "desc": "底部输入框的选项：upload 真上传（不给是演示用的假进度）、attachments 预置附件。",
+      "desc": "底部输入框的选项：upload 真上传（不给是演示用的假进度）、attachments 附件菜单每一项（img / vid / aud / doc）点了以后给出的附件（演示、自己接选择器时用）。",
       "names": {
         "js": "composer",
         "react": "composer",
@@ -317,6 +324,76 @@
       }
     },
     {
+      "name": "empty",
+      "type": "ChatEmpty | boolean",
+      "default": "对话图标 + \"有什么可以帮你？\"",
+      "required": false,
+      "desc": "新对话：还没有消息时消息区正中的样子——`{ icon, title, subtitle, suggestions }`（单色图标、标题、说明、2～4 个建议，点建议填进输入框、不直接发）。第一次露出来时依次淡入；第一条消息进来（发出或收到）就淡出，输入框不动。不写也有默认的；`false` 不要；要自己画见插槽 empty。只在创建时用。",
+      "names": {
+        "js": "empty",
+        "react": "empty",
+        "preact": "empty",
+        "vue": "empty"
+      }
+    },
+    {
+      "name": "context",
+      "type": "ComposerContextItem[]",
+      "default": "—",
+      "required": false,
+      "desc": "输入框顶上的上下文栏（项目文件夹、本地 / 云端、分支……）：每项 `{ icon?, text }`；给了 `options`（`[{ value, label }]`）和 `value` 的那项点开是菜单，选了发 `contextChange`，没有的点了发 `contextClick`。只是选中项换了不重画。",
+      "names": {
+        "js": "context",
+        "react": "context",
+        "preact": "context",
+        "vue": "context"
+      }
+    },
+    {
+      "name": "mode",
+      "type": "ComposerMode | string",
+      "default": "—",
+      "required": false,
+      "desc": "底部一行加号旁边的模式 / 权限标签：`{ label, tone }`，tone 用状态色的小圆点（ok 绿、warn 橙、bad 红、need 主色）；给了 `options`（`[{ value, label, tone }]`）和 `value` 点开是菜单，选了发 `modeChange`。",
+      "names": {
+        "js": "mode",
+        "react": "mode",
+        "preact": "mode",
+        "vue": "mode"
+      }
+    },
+    {
+      "name": "models",
+      "type": "ComposerOption[]",
+      "default": "—",
+      "required": false,
+      "desc": "模型选择（发送按钮左边）：每项 `{ value, label }`，label 写成\"名称 · 档位\"；点开往上长菜单、选中项打勾，键盘上下选、回车定；换了以后按钮上的字平滑换掉；底部一行放不下全名时按钮上只显示档位（每项的 `short`，不写就取 label 里最后一个\"·\"后面那段），全名在菜单里、也是读屏名。",
+      "names": {
+        "js": "models",
+        "react": "models",
+        "preact": "models",
+        "vue": "models"
+      }
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "default": "models 的第一项",
+      "required": false,
+      "desc": "现在用的模型（models 里的 value）。",
+      "descBy": {
+        "react": "现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。",
+        "preact": "现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。",
+        "vue": "现在用的模型：`v-model:model` 绑定。"
+      },
+      "names": {
+        "js": "model",
+        "react": "model",
+        "preact": "model",
+        "vue": "model（v-model:model）"
+      }
+    },
+    {
       "name": "className / style / id",
       "type": "string / CSSProperties / string",
       "default": "—",
@@ -328,8 +405,79 @@
       }
     }
   ],
-  "events": [],
-  "slots": [],
+  "events": [
+    {
+      "name": "modelChange",
+      "payload": "string",
+      "when": "在模型菜单里选了别的模型（程序里改 model 不发）。",
+      "names": {
+        "js": "onModelChange",
+        "react": "onModelChange",
+        "preact": "onModelChange",
+        "vue": "@model-change / @update:model",
+        "angular": "onModelChange（选项）",
+        "solid": "onModelChange（选项）",
+        "svelte": "onModelChange（选项）",
+        "html": "onModelChange（选项），或 实例.on(\"modelChange\", fn)"
+      }
+    },
+    {
+      "name": "modeChange",
+      "payload": "string",
+      "when": "在模式 / 权限菜单里选了别的一项（mode 带 options 时）。",
+      "names": {
+        "js": "onModeChange",
+        "react": "onModeChange",
+        "preact": "onModeChange",
+        "vue": "@mode-change",
+        "angular": "onModeChange（选项）",
+        "solid": "onModeChange（选项）",
+        "svelte": "onModeChange（选项）",
+        "html": "onModeChange（选项），或 实例.on(\"modeChange\", fn)"
+      }
+    },
+    {
+      "name": "contextChange",
+      "payload": "{ index: number; value: string; item: ComposerContextItem }",
+      "when": "在上下文栏某一项的菜单里选了别的（那一项带 options 时）。",
+      "names": {
+        "js": "onContextChange",
+        "react": "onContextChange",
+        "preact": "onContextChange",
+        "vue": "@context-change",
+        "angular": "onContextChange（选项）",
+        "solid": "onContextChange（选项）",
+        "svelte": "onContextChange（选项）",
+        "html": "onContextChange（选项），或 实例.on(\"contextChange\", fn)"
+      }
+    },
+    {
+      "name": "contextClick",
+      "payload": "{ index: number; item: ComposerContextItem }",
+      "when": "点了上下文栏里没有菜单的那项（比如项目文件夹：自己打开选择器）。",
+      "names": {
+        "js": "onContextClick",
+        "react": "onContextClick",
+        "preact": "onContextClick",
+        "vue": "@context-click",
+        "angular": "onContextClick（选项）",
+        "solid": "onContextClick（选项）",
+        "svelte": "onContextClick（选项）",
+        "html": "onContextClick（选项），或 实例.on(\"contextClick\", fn)"
+      }
+    }
+  ],
+  "slots": [
+    {
+      "name": "empty",
+      "desc": "自己画新对话那一块（库只留一个空容器，第一条消息进来时连同里面的内容一起淡出）；给了它就不用写 empty。Svelte、Angular、Solid、纯 HTML：empty 给 true，再往实例的 emptyEl 里画。",
+      "names": {
+        "react": "renderEmpty",
+        "preact": "renderEmpty",
+        "vue": "#empty"
+      }
+    }
+  ],
   "methods": [
     {
       "name": "send",
@@ -358,6 +506,20 @@
       "signature": "scrollToOldest(): void",
       "returns": "void",
       "desc": "平滑滚到最早一条。"
+    },
+    {
+      "name": "fill",
+      "kind": "method",
+      "signature": "fill(text: string): void",
+      "returns": "void",
+      "desc": "把一段字填进底部输入框（字淡入、拿到焦点、光标在最后），不发。新对话的建议点了就是这样。"
+    },
+    {
+      "name": "emptyEl",
+      "kind": "property",
+      "signature": "readonly emptyEl: HTMLElement | null",
+      "returns": "HTMLElement | null",
+      "desc": "新对话那一块的元素（empty 给 true 时自己往里画）；没有空状态时是 null。"
     }
   ],
   "functions": [],
@@ -387,9 +549,18 @@
   ],
   "types": [
     "ChatOptions",
+    "ChatProps",
     "ChatHistory",
     "ChatItem",
-    "ChatApi"
+    "ChatApi",
+    "ChatEmpty",
+    "ComposerAttachment",
+    "ComposerParts",
+    "ComposerPartEvents",
+    "ComposerContextItem",
+    "ComposerOption",
+    "ComposerMode",
+    "ComposerTone"
   ],
   "keyboard": [
     {
@@ -446,6 +617,21 @@
         "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createChat } from \"satin-ui/chat\";\n\n// 接模型：异步生成器一段段 yield 文字；用户点\"停止\"时 ctx.stopped 变成 true（每次读都是现在的值）\nasync function* respond(question: string, ctx: { readonly stopped: boolean }) {\n  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n  for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n    await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回\n    yield answer.slice(i, i + 2);\n  }\n}\n\n@Component({\n  selector: \"demo-chat-basic\",\n  template: `<div #host></div>`,\n})\nexport class ChatBasicComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 输入框里的字原地变成气泡飞进列表；回答先进缓冲、匀速流出，随时能点\"停止\"；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createChat(this.host().nativeElement, { title: \"分镜助手\", placeholder: \"问点什么…\", respond });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
         "solid": "import { onSettled } from \"solid-js\";\nimport { createChat } from \"satin-ui/chat\";\n\n// 接模型：异步生成器一段段 yield 文字；用户点\"停止\"时 ctx.stopped 变成 true（每次读都是现在的值）\nasync function* respond(question, ctx) {\n  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n  for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n    await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回\n    yield answer.slice(i, i + 2);\n  }\n}\n\nexport default function Assistant() {\n  let host;\n  // 输入框里的字原地变成气泡飞进列表；回答先进缓冲、匀速流出，随时能点\"停止\"；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createChat(host, { title: \"分镜助手\", placeholder: \"问点什么…\", respond });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
         "preact": "import { Chat } from \"satin-ui/react/chat\";\n\n// 接模型：异步生成器一段段 yield 文字；用户点\"停止\"时 ctx.stopped 变成 true（每次读都是现在的值）\nasync function* respond(question, ctx) {\n  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n  for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n    await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回\n    yield answer.slice(i, i + 2);\n  }\n}\n\nexport default function Assistant() {\n  // 输入框里的字原地变成气泡飞进列表；回答先进缓冲、匀速流出，随时能点\"停止\"\n  return <Chat title=\"分镜助手\" placeholder=\"问点什么…\" respond={respond} />;\n}\n"
+      }
+    },
+    {
+      "slug": "chat-new",
+      "title": "新对话：空状态、上下文、权限，模型受控",
+      "why": "empty 给图标、标题、说明和建议（点了填进输入框）；输入框顶上是上下文栏，底部一行是权限和模型。发出第一条以后空状态淡出，输入框不动。",
+      "html": "<div id=\"chat-new\"></div>",
+      "code": {
+        "html": "<div id=\"chat-new\"></div>\n\n<script type=\"module\">\n  import { createChat } from \"satin-ui/chat\";\n  // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）\n  async function* respond(question, ctx) {\n    const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n    for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n      await new Promise((r) => setTimeout(r, 40));\n      yield answer.slice(i, i + 2);\n    }\n  }\n  // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）\n  const EMPTY = { icon: \"clapperboard\", title: \"今天拍哪一段？\", subtitle: \"说说这一集的想法，或者从下面挑一个开始。\", suggestions: [\"把第三集拆成镜头\", \"开头的雨夜再冷一点\", \"给结尾配一段钢琴\"] };\n  // 输入框顶上的上下文栏：带 options 的那项点开是菜单\n  const CONTEXT = [\n    { icon: \"folder\", text: \"雨夜车站\" },\n    { icon: \"monitor\", text: \"本地\", options: [{ value: \"local\", label: \"本地\" }, { value: \"cloud\", label: \"云端\" }], value: \"local\" },\n    { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n  ];\n  // 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）\n  const MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"auto\", label: \"自动\", tone: \"need\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"auto\" };\n  const MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n  // 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件\n  createChat(document.getElementById(\"chat-new\"), { title: \"新对话\", placeholder: \"随心输入\", respond, empty: EMPTY, context: CONTEXT, mode: MODE, models: MODELS, model: \"fine\",\n    onModelChange: (v) => console.log(\"换了模型\", v), onModeChange: (v) => console.log(\"换了权限\", v) });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Chat } from \"satin-ui/react/chat\";\n\n// 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）\nasync function* respond(question, ctx) {\n  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n  for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n    await new Promise((r) => setTimeout(r, 40));\n    yield answer.slice(i, i + 2);\n  }\n}\n\n// 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）\nconst EMPTY = { icon: \"clapperboard\", title: \"今天拍哪一段？\", subtitle: \"说说这一集的想法，或者从下面挑一个开始。\", suggestions: [\"把第三集拆成镜头\", \"开头的雨夜再冷一点\", \"给结尾配一段钢琴\"] };\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"monitor\", text: \"本地\", options: [{ value: \"local\", label: \"本地\" }, { value: \"cloud\", label: \"云端\" }], value: \"local\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）\nconst MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"auto\", label: \"自动\", tone: \"need\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"auto\" };\nconst MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n\nexport default function NewChat() {\n  const [model, setModel] = useState(\"fine\");\n  // 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件\n  return (\n    <Chat title=\"新对话\" placeholder=\"随心输入\" respond={respond} empty={EMPTY}\n      context={CONTEXT} mode={MODE} models={MODELS} model={model} onModelChange={setModel} onModeChange={(v) => console.log(\"换了权限\", v)} />\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Chat } from \"satin-ui/vue/chat\";\n\n// 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）\nasync function* respond(question, ctx) {\n  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n  for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n    await new Promise((r) => setTimeout(r, 40));\n    yield answer.slice(i, i + 2);\n  }\n}\n\n// 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）\nconst EMPTY = { icon: \"clapperboard\", title: \"今天拍哪一段？\", subtitle: \"说说这一集的想法，或者从下面挑一个开始。\", suggestions: [\"把第三集拆成镜头\", \"开头的雨夜再冷一点\", \"给结尾配一段钢琴\"] };\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"monitor\", text: \"本地\", options: [{ value: \"local\", label: \"本地\" }, { value: \"cloud\", label: \"云端\" }], value: \"local\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）\nconst MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"auto\", label: \"自动\", tone: \"need\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"auto\" };\nconst MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\nconst model = ref(\"fine\");\n</script>\n\n<template>\n  <!-- 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件 -->\n  <Chat title=\"新对话\" placeholder=\"随心输入\" :respond=\"respond\" :empty=\"EMPTY\"\n    :context=\"CONTEXT\" :mode=\"MODE\" :models=\"MODELS\" v-model:model=\"model\" @mode-change=\"(v) => console.log('换了权限', v)\" />\n</template>\n",
+        "svelte": "<script>\n  import { createChat } from \"satin-ui/chat\";\n  // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）\n  async function* respond(question, ctx) {\n    const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n    for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n      await new Promise((r) => setTimeout(r, 40));\n      yield answer.slice(i, i + 2);\n    }\n  }\n  // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）\n  const EMPTY = { icon: \"clapperboard\", title: \"今天拍哪一段？\", subtitle: \"说说这一集的想法，或者从下面挑一个开始。\", suggestions: [\"把第三集拆成镜头\", \"开头的雨夜再冷一点\", \"给结尾配一段钢琴\"] };\n  // 输入框顶上的上下文栏：带 options 的那项点开是菜单\n  const CONTEXT = [\n    { icon: \"folder\", text: \"雨夜车站\" },\n    { icon: \"monitor\", text: \"本地\", options: [{ value: \"local\", label: \"本地\" }, { value: \"cloud\", label: \"云端\" }], value: \"local\" },\n    { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n  ];\n  // 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）\n  const MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"auto\", label: \"自动\", tone: \"need\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"auto\" };\n  const MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n\n  // 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件；挂上以后建，卸载时 destroy()\n  let host;\n  $effect(() => {\n    const it = createChat(host, { title: \"新对话\", placeholder: \"随心输入\", respond, empty: EMPTY, context: CONTEXT, mode: MODE, models: MODELS, model: \"fine\",\n      onModelChange: (v) => console.log(\"换了模型\", v), onModeChange: (v) => console.log(\"换了权限\", v) });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createChat, type ChatEmpty } from \"satin-ui/chat\";\nimport type { ComposerContextItem, ComposerMode, ComposerOption } from \"satin-ui/components\";\n\n// 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）\nasync function* respond(question: string, ctx: { readonly stopped: boolean }) {\n  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n  for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n    await new Promise((r) => setTimeout(r, 40));\n    yield answer.slice(i, i + 2);\n  }\n}\n// 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）\nconst EMPTY: ChatEmpty = { icon: \"clapperboard\", title: \"今天拍哪一段？\", subtitle: \"说说这一集的想法，或者从下面挑一个开始。\", suggestions: [\"把第三集拆成镜头\", \"开头的雨夜再冷一点\", \"给结尾配一段钢琴\"] };\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT: ComposerContextItem[] = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"monitor\", text: \"本地\", options: [{ value: \"local\", label: \"本地\" }, { value: \"cloud\", label: \"云端\" }], value: \"local\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）\nconst MODE: ComposerMode = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"auto\", label: \"自动\", tone: \"need\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"auto\" };\nconst MODELS: ComposerOption[] = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n\n@Component({\n  selector: \"demo-chat-new\",\n  template: `<div #host></div>`,\n})\nexport class ChatNewComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createChat(this.host().nativeElement, { title: \"新对话\", placeholder: \"随心输入\", respond, empty: EMPTY, context: CONTEXT, mode: MODE, models: MODELS, model: \"fine\",\n        onModelChange: (v: string) => console.log(\"换了模型\", v), onModeChange: (v: string) => console.log(\"换了权限\", v) });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createChat } from \"satin-ui/chat\";\n\n// 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）\nasync function* respond(question, ctx) {\n  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n  for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n    await new Promise((r) => setTimeout(r, 40));\n    yield answer.slice(i, i + 2);\n  }\n}\n// 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）\nconst EMPTY = { icon: \"clapperboard\", title: \"今天拍哪一段？\", subtitle: \"说说这一集的想法，或者从下面挑一个开始。\", suggestions: [\"把第三集拆成镜头\", \"开头的雨夜再冷一点\", \"给结尾配一段钢琴\"] };\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"monitor\", text: \"本地\", options: [{ value: \"local\", label: \"本地\" }, { value: \"cloud\", label: \"云端\" }], value: \"local\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）\nconst MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"auto\", label: \"自动\", tone: \"need\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"auto\" };\nconst MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n\nexport default function NewChat() {\n  let host;\n  // 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createChat(host, { title: \"新对话\", placeholder: \"随心输入\", respond, empty: EMPTY, context: CONTEXT, mode: MODE, models: MODELS, model: \"fine\",\n      onModelChange: (v) => console.log(\"换了模型\", v), onModeChange: (v) => console.log(\"换了权限\", v) });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Chat } from \"satin-ui/react/chat\";\n\n// 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）\nasync function* respond(question, ctx) {\n  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;\n  for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {\n    await new Promise((r) => setTimeout(r, 40));\n    yield answer.slice(i, i + 2);\n  }\n}\n\n// 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）\nconst EMPTY = { icon: \"clapperboard\", title: \"今天拍哪一段？\", subtitle: \"说说这一集的想法，或者从下面挑一个开始。\", suggestions: [\"把第三集拆成镜头\", \"开头的雨夜再冷一点\", \"给结尾配一段钢琴\"] };\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"monitor\", text: \"本地\", options: [{ value: \"local\", label: \"本地\" }, { value: \"cloud\", label: \"云端\" }], value: \"local\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）\nconst MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"auto\", label: \"自动\", tone: \"need\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"auto\" };\nconst MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n\nexport default function NewChat() {\n  const [model, setModel] = useState(\"fine\");\n  // 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件\n  return (\n    <Chat title=\"新对话\" placeholder=\"随心输入\" respond={respond} empty={EMPTY}\n      context={CONTEXT} mode={MODE} models={MODELS} model={model} onModelChange={setModel} onModeChange={(v) => console.log(\"换了权限\", v)} />\n  );\n}\n"
       }
     },
     {

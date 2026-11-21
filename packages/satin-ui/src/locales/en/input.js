@@ -32,5 +32,8 @@ export default {
   "input.29": "Style: {p0}",
   "input.30": "Detailed",
   "input.31": "Fast",
-  "input.32": "Storyboard model · {p0}"
+  "input.32": "Storyboard model · {p0}",
+  "input.ctx": "Context",
+  "input.model": "Switch model",
+  "input.empty": "Type something to send"
 };

@@ -42,19 +42,28 @@ export default {
     { name: "upload", type: "(file: File, progress: (p: number) => void) => Promise<unknown>", default: "演示用的假进度", required: false,
       desc: "真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。", names: { js: "upload", react: "upload", preact: "upload", vue: "upload" } },
     { name: "external", type: "boolean", default: "false", required: false, desc: "发送由外面接管（对话组件里用），发送后不在这里清空。", names: { js: "external" } },
+    { name: "context", type: "ComposerContextItem[]", default: "—", required: false, desc: "输入框顶上的上下文栏（项目文件夹、本地 / 云端、分支……）：每项 `{ icon?, text }`；给了 `options`（`[{ value, label }]`）和 `value` 的那项点开是菜单，选了发 `contextChange`，没有的点了发 `contextClick`。只是选中项换了不重画。", names: { js: "context", react: "context", preact: "context", vue: "context" } },
+    { name: "mode", type: "ComposerMode | string", default: "—", required: false, desc: "底部一行加号旁边的模式 / 权限标签：`{ label, tone }`，tone 用状态色的小圆点（ok 绿、warn 橙、bad 红、need 主色）；给了 `options`（`[{ value, label, tone }]`）和 `value` 点开是菜单，选了发 `modeChange`。", names: { js: "mode", react: "mode", preact: "mode", vue: "mode" } },
+    { name: "models", type: "ComposerOption[]", default: "—", required: false, desc: "模型选择（发送按钮左边）：每项 `{ value, label }`，label 写成\"名称 · 档位\"；点开往上长菜单、选中项打勾，键盘上下选、回车定；换了以后按钮上的字平滑换掉；底部一行放不下全名时按钮上只显示档位（每项的 `short`，不写就取 label 里最后一个\"·\"后面那段），全名在菜单里、也是读屏名。", names: { js: "models", react: "models", preact: "models", vue: "models" } },
+    { name: "model", type: "string", default: "models 的第一项", required: false, desc: "现在用的模型（models 里的 value）。", descBy: { react: "现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。", preact: "现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。", vue: "现在用的模型：`v-model:model` 绑定。" }, names: { js: "model", react: "model", preact: "model", vue: "model（v-model:model）" } },
   ],
   events: [
     { name: "send", payload: "{ text: string; files: HTMLElement[] }", when: "点发送或按 ⌘↵（有内容时）。返回 Promise 时进入\"生成中\"，结束回到可发送。", names: { js: "onSend", react: "onSend", preact: "onSend", vue: "@send", html: "onSend" } },
     { name: "stop", payload: "—", when: "生成中点了停止。", names: { js: "onStop", react: "onStop", preact: "onStop", vue: "@stop", html: "onStop" } },
+    { name: "modelChange", payload: "string", when: "在模型菜单里选了别的模型（程序里改 model 不发）。", names: { js: "onModelChange", react: "onModelChange", preact: "onModelChange", vue: "@model-change / @update:model", angular: "onModelChange（选项）", solid: "onModelChange（选项）", svelte: "onModelChange（选项）", html: "onModelChange（选项），或 实例.on(\"modelChange\", fn)" } },
+    { name: "modeChange", payload: "string", when: "在模式 / 权限菜单里选了别的一项（mode 带 options 时）。", names: { js: "onModeChange", react: "onModeChange", preact: "onModeChange", vue: "@mode-change", angular: "onModeChange（选项）", solid: "onModeChange（选项）", svelte: "onModeChange（选项）", html: "onModeChange（选项），或 实例.on(\"modeChange\", fn)" } },
+    { name: "contextChange", payload: "{ index: number; value: string; item: ComposerContextItem }", when: "在上下文栏某一项的菜单里选了别的（那一项带 options 时）。", names: { js: "onContextChange", react: "onContextChange", preact: "onContextChange", vue: "@context-change", angular: "onContextChange（选项）", solid: "onContextChange（选项）", svelte: "onContextChange（选项）", html: "onContextChange（选项），或 实例.on(\"contextChange\", fn)" } },
+    { name: "contextClick", payload: "{ index: number; item: ComposerContextItem }", when: "点了上下文栏里没有菜单的那项（比如项目文件夹：自己打开选择器）。", names: { js: "onContextClick", react: "onContextClick", preact: "onContextClick", vue: "@context-click", angular: "onContextClick（选项）", solid: "onContextClick（选项）", svelte: "onContextClick（选项）", html: "onContextClick（选项），或 实例.on(\"contextClick\", fn)" } },
   ],
   slots: [],
   methods: [
     { name: "setBusy", kind: "method", signature: "setBusy(on: boolean): void", returns: "void", desc: "手动进入 / 退出\"生成中\"（不用 Promise 时）。" },
     { name: "clear", kind: "method", signature: "clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void", returns: "void", desc: "清空（`smooth` 时文字淡出、框缩回去）。" },
     { name: "files", kind: "method", signature: "files(): HTMLElement[]", returns: "HTMLElement[]", desc: "现在的附件（缩略图元素）。" },
+    { name: "fill", kind: "method", signature: "fill(text: string): void", returns: "void", desc: "把一段字填进输入框（字淡入、拿到焦点、光标在最后），不发。" },
   ],
   functions: [
-    { name: "composerHTML", signature: "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean }): string", returns: "string", from: "satin-ui", desc: "拼出提示词输入框的标记（服务端渲染、模板里用）。" },
+    { name: "composerHTML", signature: "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string", returns: "string", from: "satin-ui", desc: "拼出提示词输入框的标记（服务端渲染、模板里用）。" },
   ],
   cssVars: [
     { name: "--sn-field", desc: "输入框底色", default: "白（深色主题深灰）", token: true },
@@ -64,7 +73,7 @@ export default {
     { name: ".sn-box-in.sn-composer[data-composer]", desc: "提示词输入框（data-max、data-max-lines）" },
     { name: ".sn-cm-files / .sn-cm-bar / .sn-cm-send", desc: "附件 / 底栏 / 发送按钮（生成中 .sn-busy）" },
   ],
-  types: ["ComposerProps"],
+  types: ["ComposerProps", "ComposerParts", "ComposerPartEvents", "ComposerContextItem", "ComposerOption", "ComposerMode", "ComposerTone"],
   keyboard: [{ keys: "⌘↵ / Ctrl+↵", does: "发送。" }, { keys: "⇧↵", does: "换行。" }],
   a11y: {
     roles: ["发送按钮写 `aria-label`（\"生成\"），生成中换成\"停止\"；附件按钮写\"添加附件\"。"],
@@ -84,5 +93,6 @@ export default {
     { slug: "prompt-basic", title: "最简单的用法", why: "onSend 返回 Promise：发送后按钮变成停止、外圈转动，结束回到可发送。", html: `<div id="prompt-basic"></div>`, code: code("prompt-basic") },
     { slug: "prompt-stop", title: "停止生成", why: "生成中点停止：onStop 里取消请求，onSend 的 Promise 结束就回到可发送。", html: `<div id="prompt-stop"></div>`, code: code("prompt-stop") },
     { slug: "prompt-upload", title: "附件真上传", why: "upload(file, progress)：在这里上传，progress 更新附件上的进度环。", html: `<div id="prompt-upload"></div>`, code: code("prompt-upload") },
+    { slug: "prompt-parts", title: "上下文、权限、模型（模型受控）", why: "context 是顶上的上下文栏，mode 是权限标签，models / model 是模型选择；带 options 的点开是菜单，选了发事件。", html: `<div id="prompt-parts"></div>`, code: code("prompt-parts") },
   ],
 };

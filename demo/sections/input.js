@@ -9,7 +9,7 @@ import { $, $$ } from "../dom.js";
 // ———— 展示页：演示数据和反馈 ————
 // 附件菜单里的演示文件（参考图、空镜素材、旁白试音、文档、会失败的、超大的）：c.n 是输入框自己的文件计数
 const ATT_DOCS = [["第三集分镜脚本（终版）.docx", "DOCX"], ["雨夜车站 · 人物小传.pdf", "PDF"], ["镜头时长统计表.xlsx", "XLSX"], ["配乐参考.zip", "ZIP"]];
-const DEMO_ATTACHMENTS = {
+export const DEMO_ATTACHMENTS = {
   img: (c) => ({ kind: "img", name: `参考图 ${++c.n}.jpg`, size: 1.2e6 + Math.random() * 2e6, g: SCENES[c.n % SCENES.length] }),
   vid: (c) => ({ kind: "vid", name: `空镜素材 ${++c.n}.mp4`, size: 1.8e7 + Math.random() * 3e7, g: SCENES[(c.n + 3) % SCENES.length], dur: `0:${String(6 + ((c.n * 7) % 40)).padStart(2, "0")}` }),
   aud: (c) => ({ kind: "aud", name: `旁白试音 ${++c.n}.mp3`, size: 8e5 + Math.random() * 2e6, dur: `0:${String(20 + ((c.n * 11) % 39)).padStart(2, "0")}`, seed: c.n }),

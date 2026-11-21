@@ -898,6 +898,18 @@
       <li>流式输出：网络来的字先进缓冲，再按匀速放出来（每秒 45～160 个，积压越多越快），新字淡入；贴底时视口平滑跟着往下走，不一行一行跳；用户往上翻了就不再跟，右下角显示新消息数。</li>
       <li>发送：临界阻尼弹簧曲线，竖直 300ms、水平 360ms，120ms 走完 60%；影子每帧追真实落点，落地和真气泡完全重合；字从发出那一帧起就是气泡的配色。AI 等消息落地再回复。减少动态效果时直接出现。</li>
     </ul>
+    <!-- 新加的演示（2026-11-21，differences 26）：data-parity-appended 让对比工具先把它拿掉，页面其余部分和改造前逐像素比 -->
+    <h3 data-parity-appended>新对话</h3>
+    <p data-parity-appended>还没有消息时，消息区正中是一个单色图标、一句标题、一句说明和几个建议，点建议把它填进输入框（不直接发）。输入框顶上贴着一条浅灰的上下文栏（项目、环境、分支），底部一行左边是附件和权限标签，右边是模型选择和发送。发出第一条以后空状态淡出，输入框原地不动。</p>
+    <div class="sn-chat-cfg" data-parity-appended><span class="sn-cap">演示</span><button class="sn-btn sn-ghost sn-sm" data-chat-new-reset data-i="rotate-ccw:before">重新开始</button></div>
+    <div class="demo" data-parity-appended>
+      <div class="sn-chat sn-chat-new" id="chatNew"></div>
+    </div>
+    <ul class="rules" data-parity-appended>
+      <li>空状态：图标 44px、只用三档灰；标题一句话说清楚能做什么；建议 2～4 个，写成用户会说的话。</li>
+      <li>第一条消息（发出或收到）进来时空状态淡出：220ms，只动透明度和位移；输入框不跳，消息照常飞进列表。</li>
+      <li>权限、模式用标签的小圆点表示状态（绿 只读、橙 完全访问、红 有风险）；模型按钮写"名称 · 档位"，点开往上长菜单；没写内容时发送按钮是灰的。</li>
+    </ul>
   </section>
 
   <section class="spec" id="md">

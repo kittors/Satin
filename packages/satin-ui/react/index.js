@@ -44,7 +44,7 @@ export const Search = /* @__PURE__ */ wrap(S.createSearch, { events: ["search"],
 export const CountInput = /* @__PURE__ */ wrap(S.createCount, { passId: true, displayName: "CountInput" });
 export const LongText = /* @__PURE__ */ wrap(S.createLongText, { events: ["change", "submit"], passId: true, displayName: "LongText" });
 // 提示词输入框：onSend({ text, files }) 返回 Promise——发送后进入"生成中"（发送键变停止），Promise 结束回到可发送；onStop
-export const Composer = /* @__PURE__ */ wrap(S.createComposer, { events: ["send", "stop"], displayName: "Composer" });
+export const Composer = /* @__PURE__ */ wrap(S.createComposer, { events: ["send", "stop", "modelChange", "modeChange", "contextChange", "contextClick"], displayName: "Composer" });
 // 表格：columns + data（树形用 children）。勾选 selected + onSelect 受控（defaultSelected 非受控）；展开 expandedKeys + onExpandChange 受控（defaultExpandedKeys 非受控）；
 // sort + onSort（defaultSort）；拖行、拖列、改宽、改行高、改格子、重试：onRowReorder、onColumnReorder、onColumnResize、onRowResize、onCellEdit、onRetry。
 // 受控的值"传进来的值换了（按值比）"才跟过去；ref 拿到实例（expand、expandAll、select、refresh、edit……）。

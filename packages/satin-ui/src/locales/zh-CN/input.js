@@ -32,5 +32,8 @@ export default {
   "input.29": "风格：{p0}",
   "input.30": "精细",
   "input.31": "快速",
-  "input.32": "分镜模型 · {p0}"
+  "input.32": "分镜模型 · {p0}",
+  "input.ctx": "上下文",
+  "input.model": "换模型",
+  "input.empty": "先写点什么再发送"
 };

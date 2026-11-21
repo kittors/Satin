@@ -2,7 +2,8 @@
 // · 演示用的历史（33 天、往上滚还能再加载 30 页，每页 8 天，每天 36 条，内容是剧本里的台词、真实照片、视频、音频、文件）
 // · 剧本式的回答（思考 → 步骤 → 正文 → 镜头卡片 → 生成画面），走组件公开的 respond 接口
 // · 演示按钮：快速滚到最早、模拟收到消息、模拟发送失败
-import { mountChat } from "../../packages/satin-ui/src/chat.js";
+import { mountChat, createChat } from "../../packages/satin-ui/src/chat.js";
+import { DEMO_ATTACHMENTS } from "./input.js";
 
 // 对话里的画面都是网上的真实照片（Unsplash，可免费商用，直接用原站地址）：夜里的车站、雨、街道
 const PHOTO = (id) => `url("https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=720&h=450&q=70") center / cover`;
@@ -84,5 +85,32 @@ export function initChat() {
     if (sim === "incoming") chat.receive({ text: AI_LINES[(Math.random() * AI_LINES.length) | 0] });
     if (sim === "fail") chat.sendText("这条会发送失败，点感叹号重发", { fail: true });
     if (sim === "top") chat.scrollToOldest();
+  });
+  initNewChat();
+}
+
+// 新对话：空状态（图标、标题、说明、建议）+ 输入框的上下文栏、权限标签、模型选择；"重新开始"回到空的样子
+function initNewChat() {
+  const box = document.getElementById("chatNew"); if (!box) return;
+  const opts = {
+    title: "新对话", status: "在线", placeholder: "随心输入",
+    empty: { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] },
+    // 上下文栏：项目（点了只发事件）、在哪跑、哪一集（点开是菜单）；权限：点开选只读 / 自动 / 完全访问（小圆点的颜色表示风险）
+    context: [
+      { icon: "folder", text: "雨夜车站" },
+      { icon: "monitor", text: "本地", options: [{ value: "local", label: "本地" }, { value: "cloud", label: "云端" }], value: "local" },
+      { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }, { value: "final", label: "定稿" }], value: "ep3" },
+    ],
+    mode: { tone: "warn", options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "full" },
+    models: [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }], model: "fine",
+    composer: { attachments: DEMO_ATTACHMENTS },
+    respond: script, hiRes,
+  };
+  let chat = createChat(box, opts);
+  // 对比工具（scripts/parity）比改造前时先拿掉新加的演示：先销毁（撤掉挂在 body 上的量字节点、观察器），再拿掉元素
+  box.closest(".spec")?.addEventListener("parity:drop", () => chat.destroy());
+  box.closest(".spec")?.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-chat-new-reset]")) return;
+    chat.destroy(); box.replaceChildren(); chat = createChat(box, opts);
   });
 }

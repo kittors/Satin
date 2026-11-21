@@ -3,7 +3,7 @@
 // 用法：每种输入框一个 mountXxx(元素, 选项)；bindInputs(root) 按标记一次接上（data-count / data-ta / data-pw / data-email / data-tagin / data-stepper / data-composer）。
 import { fmtSize, midEllipsis, waveBars } from "./data.js";
 import { scrollArea } from "./scroll.js";
-import { EASE_CSS, setFieldError, clearFieldError } from "./form.js";
+import { EASE_CSS, setFieldError, clearFieldError, mountSelect } from "./form.js";
 import { $, $$, reduced, injectIcons } from "./core.js";
 import { onCleanup } from "./lifecycle.js";
 import { scoped } from "./i18n.js";
@@ -16,6 +16,64 @@ const segmenter = typeof Intl.Segmenter === "function" ? /* @__PURE__ */ new Int
 const len = (s) => (segmenter ? [...segmenter.segment(s)].length : [...s].length);
 // 按"字"数，表情也算一个
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+// ———— 提示词输入框的可选部件（新对话那一套；都不给时输入框的标记和原来一模一样） ————
+// context：输入框顶上一条浅灰的上下文栏（项目文件夹、本地 / 云端、分支……），每项 { icon?, text, options?, value? }：
+//   有 options（[{ value, label }]）的那项点开是菜单，选了发 contextChange（{ index, value }）；没有的点了发 contextClick（{ index }）
+// mode：底部一行的模式 / 权限标签 { label, tone?, options?, value? }（或直接一段文字），tone 用状态色的小圆点：ok 绿、warn 橙、bad 红、need 主色；
+//   有 options（[{ value, label, tone? }]）时点开是菜单，选了发 modeChange（value）
+// models / model：模型选择，每项 { value, label }（label 写成"名称 · 档位"），点开往上长一个菜单，选了发 modelChange（value）
+const attr = (v) => esc(String(v ?? ""));
+const TONES = { ok: " sn-ok", warn: " sn-warn", bad: " sn-bad", need: " sn-need" };
+const optOf = (opts, v) => opts.find((o) => String(o.value) === String(v)) || opts[0];
+const caret = '<span class="sn-cm-caret" data-i="chevron-down" aria-hidden="true"></span>';
+const menuHTML = (opts, cur, dots) => `<div class="sn-menu" role="menu">${opts.map((o) => `<div class="sn-item${o === cur ? " sn-sel" : ""}" role="menuitemradio" aria-checked="${o === cur}" data-v="${attr(o.value)}">${dots ? `<i class="sn-cm-dot${TONES[o.tone] || ""}"></i>` : ""}<span class="sn-tx">${attr(o.label)}</span><span class="sn-chk" data-i="check"></span></div>`).join("")}</div>`;
+export const cmContextHTML = (context) => (context?.length
+  ? `<div class="sn-cm-ctx" role="group" aria-label="${attr(tt("input.ctx"))}">${context.map((c, i) => {
+      const ic = c.icon ? ` data-i="${attr(c.icon)}:before"` : "";
+      if (!c.options?.length) return `<button type="button" class="sn-cm-ctx-i" data-ctx="${i}"${ic}><span class="sn-cm-lbl">${attr(c.text)}</span></button>`;
+      const cur = optOf(c.options, c.value ?? c.options[0].value);
+      return `<div class="sn-select sn-inline-menu sn-up sn-cm-pick" data-pick="ctx" data-ctx="${i}"><button type="button" class="sn-cm-ctx-i" data-menubtn aria-haspopup="menu"${ic}><span class="sn-cm-lbl">${attr(cur.label)}</span>${caret}</button>${menuHTML(c.options, cur)}</div>`;
+    }).join("")}</div>`
+  : "");
+export const cmModeHTML = (mode) => {
+  if (mode == null || mode === false || mode === "") return "";
+  const m = typeof mode === "object" ? mode : { label: mode };
+  if (!m.options?.length) return `<span class="sn-tag sn-cm-mode${TONES[m.tone] || ""}"><i></i><span class="sn-cm-lbl">${attr(m.label)}</span></span>`;
+  const cur = optOf(m.options, m.value ?? m.options[0].value), tone = cur.tone ?? m.tone;
+  return `<div class="sn-select sn-inline-menu sn-up sn-cm-pick" data-pick="mode"><button type="button" class="sn-tag sn-cm-mode${TONES[tone] || ""}" data-menubtn aria-haspopup="menu"><i></i><span class="sn-cm-lbl">${attr(cur.label)}</span>${caret}</button>${menuHTML(m.options, cur, true)}</div>`;
+};
+// 模型按钮在窄的时候（底部一行放不下全名）只显示档位：每项可以给 short，不给就取 label 里最后一个"·"后面那段；全名在菜单里、也是按钮的读屏名
+const shortOf = (m) => String(m.short ?? String(m.label).split(/\s*·\s*/).pop());
+export const cmModelsHTML = (models, model) => {
+  if (!models?.length) return "";
+  const cur = optOf(models, model);
+  return `<div class="sn-select sn-inline-menu sn-up sn-cm-pick sn-cm-models" data-pick="model"><button type="button" class="sn-btn sn-ghost sn-sm sn-cm-model" data-menubtn data-cm-models aria-haspopup="menu" aria-label="${attr(cur.label)}" data-tip="${attr(tt("input.model"))}"><span class="sn-cm-lbl">${attr(cur.label)}</span><span class="sn-cm-lbl sn-cm-lbl-s" aria-hidden="true">${attr(shortOf(cur))}</span>${caret}</button>` +
+    menuHTML(models, cur).replace(/data-v="([^"]*)">/g, (m0, v) => { const o = models.find((x) => attr(x.value) === v); return `data-v="${v}" data-short="${attr(o ? shortOf(o) : "")}">`; }) + `</div>`;
+};
+const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+// 框架里属性换了：结构一样、只是选中项换了 → 只改选中（不重画、不发事件，用户刚选完的动画不被打断）；结构变了才换那一块
+const withoutValue = (m) => (m && typeof m === "object" ? { ...m, value: undefined, label: m.options ? undefined : m.label, tone: m.options ? undefined : m.tone } : m);
+export function syncComposerParts(k, n, p) {
+  if (!k) return;
+  if (!same(n.context, p.context)) {
+    const a = (n.context || []).map(withoutValue), b = (p.context || []).map(withoutValue);
+    if (same(a, b)) (n.context || []).forEach((c, i) => { if (c.options && c.value !== p.context[i]?.value) k.setContextValue(i, c.value); });
+    else k.setContext(n.context);
+  }
+  if (!same(n.mode, p.mode)) { if (n.mode?.options && same(withoutValue(n.mode), withoutValue(p.mode))) k.setModeValue(n.mode.value); else k.setMode(n.mode); }
+  if (!same(n.models, p.models)) k.setModels(n.models, n.model); else if (n.model !== p.model && n.model != null) k.setModel(n.model);
+}
+// 按钮上的字换了：旧字往上淡出、新字从下面淡入（只动透明度和位移）；减少动态效果时直接换
+const OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
+function swapLabel(lbl, text, animate = true) {
+  if (!lbl || lbl.textContent === text) return;
+  if (!animate || reduced() || !lbl.isConnected) { lbl.textContent = text; return; }
+  const old = lbl.cloneNode(true); old.setAttribute("aria-hidden", "true");
+  Object.assign(old.style, { position: "absolute", left: lbl.offsetLeft + "px", top: lbl.offsetTop + "px", pointerEvents: "none" });
+  lbl.parentElement.append(old); lbl.textContent = text;
+  old.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-6px)" }], { duration: 140, easing: EASE_IN, fill: "forwards" }).onfinish = () => old.remove();
+  lbl.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 220, delay: 40, easing: OUT_STRONG, fill: "backwards" });
+}
 // 数字或短词滚动：dir > 0 时新值从下面上来（变大），dir < 0 时从上面下来
 function roll(box, value, dir) {
   const old = box.lastElementChild, text = String(value);
@@ -241,8 +299,10 @@ export function mountStepper(st, { onChange } = {}) {
 //   onStop()：生成中点停止；upload(file, onProgress) 返回 Promise：真上传（不给就是演示用的假进度）。
 //   不给 onSend、写了 data-external：发送 / 停止改成在容器上发 compose / compose-stop 事件（对话组件就这样接）。
 //   返回 { setBusy(on), clear({ smooth }), files() }
-export function mountComposer(box, { onSend, onStop, upload: realUpload, attachments } = {}) {
+export function mountComposer(box, { onSend, onStop, upload: realUpload, attachments, onModelChange, onModeChange, onContextChange, onContextClick } = {}) {
   if (box._cm) return box._cm;
+  // 输入框里的菜单（附件、模型）自己接上：用 createComposer / createChat 渲染出来的输入框，页面不一定调过 bindForms；已经接过的不重复接
+  for (const h of box.querySelectorAll(".sn-select")) mountSelect(h);
   const ta = $("textarea", box), send = $(".sn-cm-send", box), files = $(".sn-cm-files", box), swap = $(".sn-swap", send);
   autoGrow(box); const upd = longCount(box, { showFrom: .5 });
   // 附件多了横向滚动：不显示滚动条（会压在附件上），只靠左右渐隐；竖滚轮也能横着滚；滚到头回弹
@@ -263,7 +323,8 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     const fs = kept(), waiting = fs.some((f) => !f.classList.contains("sn-done")), failed = fs.some((f) => f.classList.contains("sn-fail"));
     const ready = (!!ta.value.trim() || fs.length > 0) && !waiting && !box.classList.contains("sn-over");
     send.classList.toggle("sn-ready", ready && !busy); send.setAttribute("aria-disabled", String(!ready && !busy));
-    if (!busy) send.dataset.tip = failed ? tt("input.15") : waiting ? tt("input.16") : idleLabel;
+    // 新对话那一套（.sn-cm-new）：什么都没写时，提示写明为什么发不了
+    if (!busy) send.dataset.tip = failed ? tt("input.15") : waiting ? tt("input.16") : !ready && !fs.length && !ta.value.trim() && box.classList.contains("sn-cm-new") ? tt("input.empty") : idleLabel;
   };
   const setBusy = (on) => {
     busy = on; box.classList.toggle("sn-busy", on && !external); send.classList.toggle("sn-busy", on); swap.classList.toggle("sn-on", on); ta.readOnly = on && !external;
@@ -298,6 +359,54 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     ta.dispatchEvent(new Event("input"));
   };
   box._cm = { setBusy, clear, files: kept };
+  // 填一段字进输入框（新对话的建议、程序里预填）：长高、计数、发送按钮跟着变，光标放到最后；字淡入
+  box._cm.fill = (text) => {
+    ta.value = String(text ?? ""); ta.dispatchEvent(new Event("input", { bubbles: true })); ta.focus({ preventScroll: true }); const n = ta.value.length; ta.setSelectionRange(n, n);
+    if (!reduced()) ta.animate([{ opacity: .2 }, { opacity: 1 }], { duration: 240, easing: "cubic-bezier(0,0,.58,1)" });
+  };
+  // 选择类的部件（模型、模式、上下文栏里能点开的那项）：用户在菜单里选了 → 打勾、按钮上的字平滑换掉、发事件；程序里设（受控的值换了）不发事件
+  const picks = (kind) => [...box.querySelectorAll(`.sn-cm-pick[data-pick="${kind}"]`)];
+  // 模型按钮：底部一行放不下全名（全名被省略了）就只显示档位（"精细"），不从中间截断
+  // 再放不下（320 宽这种，档位也被省略了）：底部一行收紧一点（左右留白、用量环和权限标签的间距），一般就够了
+  const cut = (el) => el && el.scrollWidth > el.clientWidth + 0.5;
+  const fitModel = () => {
+    const lbl = $(".sn-cm-model .sn-cm-lbl:not(.sn-cm-lbl-s)", box); if (!lbl) return;
+    box.classList.remove("sn-cm-compact", "sn-cm-tight");
+    if (!cut(lbl)) return;
+    box.classList.add("sn-cm-compact");
+    if (cut($(".sn-cm-model .sn-cm-lbl-s", box))) box.classList.add("sn-cm-tight");
+  };
+  if ($(".sn-cm-models", box)) { new ResizeObserver(fitModel).observe(box); fitModel(); }
+  const choose = (pick, v, quiet) => {
+    const items = [...pick.querySelectorAll(".sn-menu .sn-item")], it = items.find((x) => x.dataset.v === String(v)); if (!it) return false;
+    for (const x of items) { x.classList.toggle("sn-sel", x === it); x.setAttribute("aria-checked", String(x === it)); }
+    const btn = pick.querySelector("[data-menubtn]"), full = it.querySelector(".sn-tx").textContent;
+    if (pick.dataset.pick === "model") {
+      // 全名、档位两个都换（看得见的那个带动画），读屏名跟着全名；换完量一下全名放不放得下
+      const compact = box.classList.contains("sn-cm-compact");
+      swapLabel(btn.querySelector(".sn-cm-lbl:not(.sn-cm-lbl-s)"), full, !quiet && !compact);
+      swapLabel(btn.querySelector(".sn-cm-lbl-s"), it.dataset.short || full, !quiet && compact);
+      btn.setAttribute("aria-label", full); fitModel();
+    } else swapLabel(btn.querySelector(".sn-cm-lbl"), full, !quiet);
+    if (pick.dataset.pick === "mode") { const dot = it.querySelector(".sn-cm-dot"); for (const t of Object.values(TONES)) btn.classList.remove(t.trim()); for (const t of Object.values(TONES)) if (dot?.classList.contains(t.trim())) btn.classList.add(t.trim()); }
+    return true;
+  };
+  box.addEventListener("select", (e) => {
+    const pick = e.target.closest?.(".sn-cm-pick"); if (!pick || !box.contains(pick)) return;
+    const v = e.detail.value; if (!choose(pick, v)) return;
+    if (pick.dataset.pick === "model") onModelChange?.(v);
+    else if (pick.dataset.pick === "mode") onModeChange?.(v);
+    else onContextChange?.({ index: +pick.dataset.ctx, value: v });
+  });
+  box._cm.setModel = (v) => { for (const p of picks("model")) choose(p, v, true); };
+  box._cm.setModeValue = (v) => { for (const p of picks("mode")) choose(p, v, true); };
+  box._cm.setContextValue = (index, v) => { const p = box.querySelector(`.sn-cm-pick[data-pick="ctx"][data-ctx="${index}"]`); if (p) choose(p, v, true); };
+  box.addEventListener("click", (e) => { const c = e.target.closest(".sn-cm-ctx-i"); if (c && box.contains(c) && !c.hasAttribute("data-menubtn")) onContextClick?.(+c.dataset.ctx); });
+  // 上下文栏、模式标签、模型列表的结构换了（框架里的属性变了，不只是选中项）：只换那一块
+  const swapPart = (old, html, place) => { const t = document.createElement("template"); t.innerHTML = html; const el = t.content.firstElementChild; if (el) injectIcons(el); if (old) { if (el) old.replaceWith(el); else old.remove(); } else if (el) place(el); if (el) for (const h of [el, ...el.querySelectorAll(".sn-select")]) if (h.matches(".sn-select")) mountSelect(h); return el; };
+  box._cm.setContext = (context) => { swapPart($(".sn-cm-ctx", box), cmContextHTML(context), (el) => box.prepend(el)); box.classList.toggle("sn-has-ctx", !!context?.length); };
+  box._cm.setMode = (mode) => swapPart($(".sn-cm-bar > .sn-cm-mode, .sn-cm-bar > .sn-cm-pick[data-pick=\"mode\"]", box), cmModeHTML(mode), (el) => $(".sn-cm-bar > .sn-grow", box).before(el));
+  box._cm.setModels = (models, model) => { swapPart($(".sn-cm-models", box), cmModelsHTML(models, model), (el) => $(".sn-cm-bar > .sn-grow", box).after(el)); fitModel(); };
   ta.addEventListener("input", sync);
   ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && !e.isComposing) { e.preventDefault(); start(true); } });
   send.addEventListener("click", () => start());

@@ -3,20 +3,29 @@
 //   <Chat title="写作助手" status="在线" placeholder="说点什么…" :respond="respond" />
 // respond 接模型：异步生成器一段段 yield（或返回一整段文字）；每次都用最新的 respond。
 // status 变了更新顶栏；history、title、placeholder、max、max-lines、attach 只在创建时用（要换一段对话就换 :key）。模板 ref 的 instance：send(text)、receive(item)……
-import { defineComponent, h, ref, computed } from "vue";
+// 新对话：:empty="{ icon, title, subtitle, suggestions }"；要自己画就写 #empty 插槽（画进空状态那一块，第一条消息进来时一起淡出）。
+// 底部输入框：context（@context-change、@context-click）、mode（@mode-change）、models、v-model:model
+import { defineComponent, h, ref, computed, shallowRef, onMounted, Teleport } from "vue";
 import { createChat } from "../src/chat.js";
 import { wrap } from "./wrap.js";
 
-const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "history", "composer", "respond", "hiRes"];
-const Base = /* @__PURE__ */ wrap(createChat, { name: "SnChatInstance", props: KEYS, events: [], modelEvent: null });
+const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model"];
+const Base = /* @__PURE__ */ wrap(createChat, { name: "SnChatInstance", props: KEYS, events: ["modelChange", "modeChange", "contextChange", "contextClick"], modelEvent: null });
 export const Chat = /* @__PURE__ */ defineComponent({
   name: "SnChat", inheritAttrs: false,
   props: Object.fromEntries(KEYS.map((k) => [k, { type: null, default: undefined }])),
-  setup(p, { attrs, expose }) {
-    const inner = ref(null);
+  emits: ["modelChange", "modeChange", "contextChange", "contextClick", "update:model"],
+  setup(p, { attrs, expose, slots, emit }) {
+    const inner = ref(null), emptyEl = shallowRef(null);
     // 交给库的是固定的转发函数：父组件换了 respond 也用最新的
     const respond = (text, ctx) => p.respond?.(text, ctx), hiRes = (bg) => p.hiRes?.(bg) ?? bg;
     expose({ instance: computed(() => inner.value?.instance ?? null) });
-    return () => h(Base, { ...attrs, ...p, respond, hiRes: p.hiRes ? hiRes : undefined, ref: inner });
+    // #empty 插槽：库只留一个空容器（empty: true），子组件挂好以后（它的 onMounted 先跑）把插槽传送进去
+    onMounted(() => { if (slots.empty) emptyEl.value = inner.value?.instance?.emptyEl ?? null; });
+    const on = { onModelChange: (v) => { emit("modelChange", v); emit("update:model", v); }, onModeChange: (v) => emit("modeChange", v), onContextChange: (e) => emit("contextChange", e), onContextClick: (e) => emit("contextClick", e) };
+    return () => [
+      h(Base, { ...attrs, ...p, ...on, empty: slots.empty ? true : p.empty, respond, hiRes: p.hiRes ? hiRes : undefined, ref: inner }),
+      emptyEl.value && slots.empty ? h(Teleport, { to: emptyEl.value }, slots.empty()) : null,
+    ];
   },
 });

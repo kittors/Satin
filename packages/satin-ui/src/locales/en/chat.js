@@ -28,5 +28,6 @@ export default {
   "chat.25": "image",
   "chat.jump": "Jump to latest",
   "chat.26": "Thinking",
-  "chat.27": "Failed to send, tap to retry"
+  "chat.27": "Failed to send, tap to retry",
+  "chat.empty": "What can I help with?"
 };

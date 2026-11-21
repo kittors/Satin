@@ -9,12 +9,13 @@ import { setup } from "../src/setup.js";
 export const cx = (...a) => a.filter(Boolean).join(" ");
 // 把 createXxx 包成 Vue 组件。props：组件的选项名；valueKey：v-model 绑定的那一项
 // returns：这些事件要拿到监听的返回值（提示词输入框 @send 返回 Promise）：不写进 emits，直接调组件上的 onXxx
-export function wrap(create, { name, props = [], valueKey = "value", events = ["change"], modelEvent = "change", returns = [] }) {
+// also：某个事件同时再发成别的名字（{ modelChange: "update:model" }：v-model:model 用）
+export function wrap(create, { name, props = [], valueKey = "value", events = ["change"], modelEvent = "change", returns = [], also = {} }) {
   return defineComponent({
     name,
     inheritAttrs: false,
     props: Object.fromEntries([...props, "modelValue"].map((p) => [p, { type: null, default: undefined }])),
-    emits: [...events.filter((e) => !returns.includes(e)), "update:modelValue"],
+    emits: [...events.filter((e) => !returns.includes(e)), ...Object.values(also), "update:modelValue"],
     setup(p, { emit, expose, attrs }) {
       const host = ref(null), inst = shallowRef(null);
       const opts = () => { const o = {}; for (const k of props) if (p[k] !== undefined) o[k] = p[k]; if (p.modelValue !== undefined) o[valueKey] = p.modelValue; return o; };
@@ -24,7 +25,7 @@ export function wrap(create, { name, props = [], valueKey = "value", events = ["
         unsetup = setup();
         const handlers = {};
         for (const ev of events) { const on = "on" + ev[0].toUpperCase() + ev.slice(1);
-          handlers[on] = returns.includes(ev) ? (v) => { const fn = attrs[on]; return Array.isArray(fn) ? fn.map((f) => f(v))[0] : fn?.(v); } : (v) => { emit(ev, v); if (ev === modelEvent) emit("update:modelValue", v); }; }
+          handlers[on] = returns.includes(ev) ? (v) => { const fn = attrs[on]; return Array.isArray(fn) ? fn.map((f) => f(v))[0] : fn?.(v); } : (v) => { emit(ev, v); if (also[ev]) emit(also[ev], v); if (ev === modelEvent) emit("update:modelValue", v); }; }
         inst.value = create(host.value.firstElementChild, { ...opts(), ...handlers });
       });
       watch(opts, (o) => inst.value?.update(o), { deep: true });

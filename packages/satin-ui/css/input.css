@@ -180,6 +180,61 @@
 .sn-cm-bar > .sn-inline-menu { flex: none; }
 .sn-cm-bar .sn-grow { flex: 1; }
 .sn-cm-bar .sn-ta-count { margin-right: 6px; font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
+/* ———— 提示词输入框的可选部件（新对话那一套）：上下文栏、模式 / 权限标签、模型选择 ———— */
+/* 上下文栏：贴在输入框顶上的一条浅灰（项目文件夹、本地、分支……），和输入框是一整块；项多了折行（不做横向滚动：滚动容器会把往上长的菜单裁掉） */
+.sn-cm-ctx { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-width: 0; padding: 6px 8px; border-radius: inherit; border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: var(--sn-fill-subtle); }
+.sn-cm-ctx > .sn-select { flex: none; min-width: 0; }
+.sn-cm-ctx-i { all: unset; box-sizing: border-box; position: relative; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border-radius: var(--sn-r-sm); font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); white-space: nowrap; cursor: pointer;
+  transition: background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out), transform .12s var(--sn-ease-out); }
+.sn-cm-ctx-i .sn-ic { width: 14px; height: 14px; color: var(--sn-label3); }
+@media (hover: hover) {
+.sn-cm-ctx-i:hover { background: var(--sn-b-ghost-hover); color: var(--sn-label); } }
+.sn-cm-ctx-i:active { transform: scale(var(--sn-press)); }
+.sn-cm-pick.sn-open > .sn-cm-ctx-i { background: var(--sn-b-ghost-active); color: var(--sn-label); }
+.sn-cm-ctx-i:focus-visible { box-shadow: 0 0 0 2px var(--sn-ring); }
+/* 模式 / 权限：和标签（.sn-tag）一样，状态只用小圆点的颜色表示（附件菜单那一格本来按下拉的最小宽度 180 占位，有标签时收窄，标签紧跟着加号） */
+.sn-cm-bar:has(> .sn-cm-mode, > .sn-cm-pick[data-pick="mode"]) > .sn-inline-menu { min-width: 0; }
+.sn-cm-mode { flex: none; margin-left: 2px; }
+.sn-cm-pick[data-pick="mode"] { flex: none; min-width: 0; margin-left: 2px; }
+.sn-cm-pick > .sn-cm-mode { position: relative; margin: 0; border: 0; cursor: pointer; transition: background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out), transform .12s var(--sn-ease-out); }
+@media (hover: hover) {
+.sn-cm-pick > .sn-cm-mode:hover { background: var(--sn-fill-active); color: var(--sn-label); } }
+.sn-cm-pick > .sn-cm-mode:active { transform: scale(var(--sn-press)); }
+.sn-cm-pick.sn-open > .sn-cm-mode { background: var(--sn-fill-active); color: var(--sn-label); }
+.sn-cm-pick > .sn-cm-mode:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--sn-ring); }
+.sn-cm-dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--sn-label3); }
+.sn-cm-dot.sn-ok { background: var(--sn-success); } .sn-cm-dot.sn-warn { background: var(--sn-warning); } .sn-cm-dot.sn-bad { background: var(--sn-danger); } .sn-cm-dot.sn-need { background: var(--sn-accent); }
+/* 模型选择：按钮在右边（名称 · 档位 ▾），菜单贴着按钮右边往上长 */
+.sn-cm-models { flex: none; min-width: 0; }
+/* 新对话那一套的底部一行不折行（窄屏上发送按钮掉到第二行很难看）：放不下时模型名字先省略 */
+.sn-cm-new .sn-cm-bar { flex-wrap: nowrap; }
+.sn-cm-new .sn-cm-models { flex: 0 1 auto; }
+.sn-cm-new .sn-cm-model { max-width: 100%; }
+.sn-cm-new .sn-cm-model .sn-cm-lbl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 放不下全名（JS 量出来全名被省略了，输入框加 sn-cm-compact）：按钮上只显示档位，全名在菜单里、也是读屏名 */
+.sn-cm-lbl-s { display: none; }
+.sn-cm-compact .sn-cm-model .sn-cm-lbl:not(.sn-cm-lbl-s) { display: none; }
+.sn-cm-compact .sn-cm-model .sn-cm-lbl-s { display: inline-block; }
+/* 档位也放不下（sn-cm-tight，320 宽这种）：底部一行收紧——左右留白、用量环的右边距、权限标签的内边距和圆点间距都小一点 */
+.sn-cm-tight.sn-composer .sn-cm-bar { padding-left: 6px; padding-right: 6px; } /* 比对话底部那条 .sn-chat-foot .sn-cm-bar 的权重高 */
+.sn-cm-tight .sn-cm-bar .sn-ta-count { margin-right: 2px; }
+.sn-cm-tight .sn-cm-mode { padding: 0 6px; gap: 4px; }
+.sn-cm-tight .sn-cm-bar .sn-cm-model { padding-left: 6px; padding-right: 6px; }
+.sn-cm-models.sn-inline-menu.sn-up > .sn-menu { left: auto; right: 0; min-width: 200px; transform-origin: bottom right; }
+.sn-cm-model { position: relative; }
+/* 能点开的部件：按钮上的字换的时候旧字、新字各自动（要是块级才动得了），箭头点开时转过来；菜单从按钮那里缩放 + 淡入展开，收起反过来 */
+.sn-cm-lbl { display: inline-block; }
+.sn-cm-caret { display: inline-grid; place-items: center; margin-right: -2px; }
+.sn-cm-caret .sn-ic { width: 12px; height: 12px; opacity: .6; transition: rotate .22s var(--sn-ease-out-strong); }
+.sn-cm-model .sn-cm-caret .sn-ic { width: 14px; height: 14px; }
+.sn-cm-pick.sn-open .sn-cm-caret .sn-ic { rotate: 180deg; }
+.sn-cm-pick > .sn-menu { transition: opacity .12s var(--sn-ease-in), scale .12s var(--sn-ease-in), translate .12s var(--sn-ease-in), visibility 0s linear .12s; }
+.sn-cm-pick.sn-open > .sn-menu { transition: opacity .14s var(--sn-ease-out), scale .2s var(--sn-ease-out-strong), translate .2s var(--sn-ease-out-strong), visibility 0s; }
+.sn-cm-pick .sn-menu .sn-item .sn-tx { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 新对话那一套的发送按钮：能发的时候图标从 .86 放大到 1（灰 → 主色的底色过渡照原来的） */
+.sn-cm-new .sn-cm-send .sn-swap { scale: .86; transition: scale .24s var(--sn-ease-out-strong); }
+.sn-cm-new .sn-cm-send:is(.sn-ready, .sn-busy) .sn-swap { scale: 1; }
+@media (prefers-reduced-motion: reduce) { .sn-cm-ctx-i:active, .sn-cm-pick > .sn-cm-mode:active { transform: none; } .sn-cm-caret .sn-ic, .sn-cm-new .sn-cm-send .sn-swap { transition: none; } }
 .sn-cm-send { all: unset; box-sizing: border-box; position: relative; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
   background: var(--sn-fill-active); color: var(--sn-label-off); transition: background-color .18s var(--sn-ease-out), color .18s var(--sn-ease-out), transform .1s var(--sn-ease-out); }
 .sn-cm-send.sn-ready { background: var(--sn-accent); color: var(--sn-on-primary); }

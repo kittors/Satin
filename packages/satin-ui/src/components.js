@@ -12,7 +12,7 @@ import { check, chevronDown, chevronLeft, chevronRight, minus, plus, x } from ".
 import { initSlider, mountSelect, mountOtp, BOX, busy, succeed, copied, removeChip } from "./form.js";
 import { mountTabs, mountPager, setStep, mountUpload, mountReorder, mountSidebar } from "./nav.js";
 import { mountCollapse } from "./data.js";
-import { mountTagInput, mountStepper, mountPassword, mountEmail, mountSearch, mountCount, mountLongText, mountComposer } from "./input.js";
+import { mountTagInput, mountStepper, mountPassword, mountEmail, mountSearch, mountCount, mountLongText, mountComposer, cmContextHTML, cmModeHTML, cmModelsHTML, syncComposerParts } from "./input.js";
 import { numberFlow } from "./number.js";
 import { scrollArea } from "./scroll.js";
 import { mountProgress, toast, notify } from "./feedback.js";
@@ -229,11 +229,23 @@ export const createLongText = /* @__PURE__ */ defineComponent({ name: "longtext"
 } });
 // 提示词输入框的标记（和设计稿一样）：附件菜单（图片、视频、音频、文档）、自动长高的输入框、用量环、发送 / 停止按钮。
 // external：发送由外面接管（对话框里用），不在这里清空。图标是 data-i，挂载时换成 SVG
-export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach = true, send = tt("components.12"), external } = {}) =>
-  `<div class="sn-box-in sn-composer" data-composer${external ? " data-external" : ""} data-max="${+max}" data-max-lines="${+maxLines}"><div class="sn-cm-files"></div><textarea rows="1" placeholder="${esc(placeholder)}"></textarea><div class="sn-cm-bar">` +
+// 新对话那一套（可选，不给时标记和原来一模一样）：context 顶上的上下文栏、mode 模式 / 权限标签、models / model 模型选择；
+// 用了其中任何一样（或 fresh：对话里的新对话）输入框带 sn-cm-new——没写内容时提示原因、点附件缩略图看大图、发送按钮的图标随可发状态放大
+export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach = true, send = tt("components.12"), external, context, mode, models, model, fresh } = {}) =>
+  `<div class="sn-box-in sn-composer${fresh || context?.length || mode || models?.length ? " sn-cm-new" : ""}${context?.length ? " sn-has-ctx" : ""}" data-composer${external ? " data-external" : ""} data-max="${+max}" data-max-lines="${+maxLines}">${cmContextHTML(context)}<div class="sn-cm-files"></div><textarea rows="1" placeholder="${esc(placeholder)}"></textarea><div class="sn-cm-bar">` +
   (attach ? `<div class="sn-select sn-inline-menu sn-up"><button class="sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add" data-menubtn data-cm-attach data-tip="${esc(tt("components.6"))}" aria-label="${esc(tt("components.7"))}" data-i="plus"></button><div class="sn-menu" role="menu" style="min-width:208px"><div class="sn-item" data-add="img" data-i="image:before">${esc(tt("components.8"))}<span class="sn-key">JPG · PNG</span></div><div class="sn-item" data-add="vid" data-i="film:before">${esc(tt("components.9"))}<span class="sn-key">MP4 · MOV</span></div><div class="sn-item" data-add="aud" data-i="audio-lines:before">${esc(tt("components.10"))}<span class="sn-key">MP3 · WAV</span></div><div class="sn-item" data-add="doc" data-i="file-text:before">${esc(tt("components.11"))}<span class="sn-key">PDF · DOCX</span></div></div></div>` : "") +
-  `<span class="sn-grow"></span><span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg></span><button class="sn-cm-send" aria-label="${esc(send)}" data-tip="${esc(send)}" data-kbd="⌘↵"><svg class="sn-orbit" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19"/></svg><span class="sn-swap"><span class="sn-a" data-i="arrow-up"></span><span class="sn-b"><span class="sn-stop"></span></span></span></button></div></div>`;
-export const createComposer = /* @__PURE__ */ defineComponent({ name: "composer", html: (o) => composerHTML(o), mount(el, o, api) { injectIcons(el); const c = mountComposer(el, { onSend: (m) => api.emit("send", m), onStop: () => api.emit("stop"), upload: o.upload }); return ext(c, { destroy() { delete el._cm; } }); } });
+  cmModeHTML(mode) + `<span class="sn-grow"></span>${cmModelsHTML(models, model)}<span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg></span><button class="sn-cm-send" aria-label="${esc(send)}" data-tip="${esc(send)}" data-kbd="⌘↵"><svg class="sn-orbit" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19"/></svg><span class="sn-swap"><span class="sn-a" data-i="arrow-up"></span><span class="sn-b"><span class="sn-stop"></span></span></span></button></div></div>`;
+export const createComposer = /* @__PURE__ */ defineComponent({ name: "composer", html: (o) => composerHTML(o), mount(el, o, api) {
+  injectIcons(el);
+  const c = mountComposer(el, { onSend: (m) => api.emit("send", m), onStop: () => api.emit("stop"), upload: o.upload,
+    onModelChange: (v) => api.emit("modelChange", v), onModeChange: (v) => api.emit("modeChange", v),
+    onContextChange: (e) => api.emit("contextChange", { ...e, item: api.options.context?.[e.index] }), onContextClick: (index) => api.emit("contextClick", { index, item: api.options.context?.[index] }) });
+  return ext(c, {
+    fill: (text) => el._cm.fill(text),
+    update(n, p) { syncComposerParts(el._cm, n, p); },
+    destroy() { for (const h of el.querySelectorAll(".sn-select")) h._select?.dispose?.(); delete el._cm; },
+  });
+} });
 
 // ———— 数字滚动 ————
 // effect：变化的样子（roll 滚动 / blur 模糊 / push 推入 / fade 淡入）。旧名 style 也认——但在 React、Vue、自定义元素里 style 是写 CSS 的，所以框架封装只用 effect

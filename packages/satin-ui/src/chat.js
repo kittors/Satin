@@ -17,14 +17,31 @@ import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/chat.js";
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 import { composerHTML } from "./components.js";
-import { mountComposer } from "./input.js";
+import { mountComposer, syncComposerParts } from "./input.js";
 import { defineComponent } from "./lifecycle.js";
 // 对话框的标记（放进一个空的 .sn-chat 容器里）：顶栏（名字、状态、条数）、消息区（虚拟列表的画布、跳到最新）、底部提示词输入框。
 // mountChat 遇到空容器会自己用它填好，一般不用直接调
-export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true } = {}) =>
-  `<div class="sn-chat-hd"><div class="sn-tx"><b>${esc(title)}</b><span class="sn-sub"><span data-chat-status>${esc(status ?? tt("chat.0"))}</span>·<span data-chat-count class="sn-num"></span></span></div></div>` +
-  `<div class="sn-chat-body"><div class="sn-chat-vp"><div class="sn-chat-canvas"><div class="sn-chat-ph sn-top"></div><div class="sn-chat-ph sn-bot"></div></div></div><button class="sn-chat-jump" data-chat-jump aria-label="${esc(tt("chat.jump"))}"><span data-i="arrow-down"></span><span class="sn-badge" hidden>0</span></button></div>` +
-  `<div class="sn-chat-foot">${composerHTML({ placeholder, max, maxLines, attach, external: true })}</div>`;
+// 新对话（empty）：还没有消息时，消息区正中放单色图标、标题、副标题、几个建议（点了填进输入框）；给 true 只留一个空的容器（框架里自己画，见实例的 emptyEl）。
+// 不写 empty 也有一个默认的（对话图标 + "有什么可以帮你？"），给 false 才不要。给了 history 时先藏着，挂上以后没有消息才露出来。
+// 有空状态时顶栏的"· 已载入 N 条"包一层（空着的时候不显示），底部输入框带 sn-cm-new（新对话那一套交互）
+const emptyOf = (empty) => (empty === undefined ? { icon: "message-circle", title: tt("chat.empty") } : empty);
+const chatEmptyHTML = (e, hide) => {
+  if (!e) return "";
+  const o = e === true ? {} : e;
+  return `<div class="sn-chat-empty" data-chat-empty${hide ? " hidden" : ""}>` +
+    (o.icon ? `<span class="sn-chat-empty-ic" data-i="${esc(o.icon)}" aria-hidden="true"></span>` : "") +
+    // 标题、说明用 div（标题带 role="heading"）：页面上给 h3、p 写的样式（比如设计稿的 .spec h3）管不到这里
+    (o.title ? `<div class="sn-chat-empty-t" role="heading" aria-level="2">${esc(o.title)}</div>` : "") +
+    (o.subtitle ? `<div class="sn-chat-empty-sub">${esc(o.subtitle)}</div>` : "") +
+    (o.suggestions?.length ? `<div class="sn-chat-sugs">${o.suggestions.map((t) => `<button type="button" class="sn-chat-sug">${esc(t)}</button>`).join("")}</div>` : "") +
+    `</div>`;
+};
+export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true, empty: em, history, context, mode, models, model } = {}) => {
+  const empty = emptyOf(em);
+  return `<div class="sn-chat-hd"><div class="sn-tx"><b>${esc(title)}</b><span class="sn-sub"><span data-chat-status>${esc(status ?? tt("chat.0"))}</span>${empty ? `<span class="sn-chat-n">·<span data-chat-count class="sn-num"></span></span>` : `·<span data-chat-count class="sn-num"></span>`}</span></div></div>` +
+  `<div class="sn-chat-body"><div class="sn-chat-vp"><div class="sn-chat-canvas"><div class="sn-chat-ph sn-top"></div><div class="sn-chat-ph sn-bot"></div></div></div><button class="sn-chat-jump" data-chat-jump aria-label="${esc(tt("chat.jump"))}"><span data-i="arrow-down"></span><span class="sn-badge" hidden>0</span></button>${chatEmptyHTML(empty, !!history)}</div>` +
+  `<div class="sn-chat-foot">${composerHTML({ placeholder, max, maxLines, attach, external: true, context, mode, models, model, fresh: !!empty })}</div>`;
+};
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 // mountChat(.chat, { respond, history, hiRes })：
@@ -37,17 +54,20 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 //     条目：{ kind: "day", text } 日期分隔；{ kind: "msg", me, type: "text" | "image" | "video" | "audio" | "file", … }（不用带 id）
 //   hiRes(背景)：点开看大图时用的高清背景（默认原样）
 //   composer：底部输入框的选项（upload、attachments），输入框还没接时用
-//   返回 { send(text), receive(条目), sendText(text, { fail }), scrollToOldest(), destroy() }
-export function mountChat(box, { respond, history, hiRes = (g) => g, composer: cmOpts, ...view } = {}) {
+//   empty：新对话（见 chatHTML 上面）；onModelChange、onModeChange、onContextChange、onContextClick：底部输入框的模型、权限、上下文栏（createChat 里换成事件）
+//   返回 { send(text), receive(条目), sendText(text, { fail }), fill(text), emptyEl, scrollToOldest(), destroy() }
+export function mountChat(box, { respond, history, hiRes = (g) => g, composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, ...view } = {}) {
   if (!box || box._chat) return box?._chat;
   // 空容器：先按选项（title、status、placeholder、max……）填好标记
   if (!box.querySelector(".sn-chat-vp")) { box.classList.add("sn-chat"); box.innerHTML = chatHTML(view); injectIcons(box); }
   const vp = $(".sn-chat-vp", box), canvas = $(".sn-chat-canvas", vp), phTop = $(".sn-chat-ph.sn-top", canvas), phBot = $(".sn-chat-ph.sn-bot", canvas);
   const jump = $("[data-chat-jump]", box), badge = $(".sn-badge", jump), statusEl = $("[data-chat-status]", box), countEl = $("[data-chat-count]", box);
   const composer = $(".sn-composer", box), ta = $("textarea", composer);
+  const emptyEl = $("[data-chat-empty]", box); // 新对话那一块（见下面"新对话"）；先取好，发消息的路径里要用
+  let emptyGone = !emptyEl;
   // 底部的提示词输入框（data-external：发送 / 停止交给对话）：还没人接就在这里接上——页面不用再调 bindInputs。
   // cmOpts：传给输入框的选项（upload 上传函数、attachments 预置附件）
-  if (!composer._cm) mountComposer(composer, cmOpts || {});
+  if (!composer._cm) mountComposer(composer, { ...cmOpts, onModelChange, onModeChange, onContextChange, onContextClick });
   const PAD_T = 12, GAP = 16; // GAP = 条目自己的下内边距（.ci 的 padding-bottom）
   // 列表一直延伸到输入框底下（输入框浮在上面）：列表底部留出输入框那么高的地方，最后一条停在输入框上方；输入框变高时跟着让
   let PAD_B = 18; const foot = $(".sn-chat-foot", box);
@@ -210,6 +230,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   }
   // 贴底时插入新条目：先量出真实高度，再滚到底并让位
   function insert(arr, { dur = DY } = {}) {
+    hideEmpty();
     // "离底很远"只看插入前（用户原本翻到很久以前）；新内容本身再高，原本在底部就整段平滑让位
     const st0 = vp.scrollTop, far = maxTop() - st0 > vp.clientHeight; append(arr); render();
     for (const it of arr) { const el = live.get(it.id); if (el) it.h = el.offsetHeight; }
@@ -425,7 +446,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     if (!respond) return;
     const me = { stop: false }; job = me;
     const it = { id: ++seq, kind: "ai", me: false, keep: true, ph: "text", think: null, secs: 0, open: true, steps: [], text: "", cards: 0, cardList: [], img: null, acts: false, stopped: false };
-    composer._cm.setBusy(true);
+    composer._cm?.setBusy(true);
     await after; await wait(90); if (me.stop) return finish(it, me); // 用户的消息落地，停一拍再开始
     let inserted = false, th = null, tx = null, t0 = 0;
     const show = (ph) => {
@@ -509,7 +530,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
         el.classList.remove("sn-streaming");
       }
     }
-    composer._cm.setBusy(false); setStatus(tt("chat.0"));
+    // 回答还在流的时候对话被销毁了（框架里卸载、换页）：输入框的实例已经拆掉，这里什么都不做
+    composer._cm?.setBusy(false); setStatus(tt("chat.0"));
   }
   composer.addEventListener("compose", (e) => { const sent = send(e.detail.text); if (sent) reply(e.detail.text || tt("chat.25"), sent.landed); });
   composer.addEventListener("compose-stop", () => { if (job) job.stop = true; });
@@ -530,6 +552,37 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     colW = w; for (const it of items) { it.e = undefined; } relayout(1); if (pinned) vp.scrollTop = maxTop(); render();
   }).observe(vp);
 
+  // ———— 新对话（empty）：一条消息都没有时显示；第一条进来（发出去、收到）就淡出——只动透明度和位移，输入框原地不动 ————
+  // 进场：第一次露出来时图标、标题、说明、建议依次淡入、往上走一点（错开 50ms）；露出来之前先藏着，免得先闪一下全貌再播
+  const PARTS = () => (emptyEl ? [...emptyEl.children].flatMap((c) => (c.classList.contains("sn-chat-sugs") ? [...c.children] : [c])) : []);
+  function enter() {
+    emptyEl.classList.remove("sn-enter-wait");
+    if (reduced() || emptyGone) return;
+    PARTS().forEach((el, i) => el.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 480, delay: i * 50, easing: "cubic-bezier(.22,1,.36,1)", fill: "backwards" }));
+  }
+  function hideEmpty() {
+    if (emptyGone) return; emptyGone = true; box.classList.remove("sn-fresh"); emptyEl.classList.remove("sn-enter-wait");
+    if (reduced()) { emptyEl.hidden = true; return; }
+    for (const a of emptyEl.getAnimations({ subtree: true })) a.finish();
+    const a = emptyEl.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-12px)" }], { duration: 220, easing: "cubic-bezier(.42,0,1,1)", fill: "forwards" });
+    a.onfinish = () => { emptyEl.hidden = true; a.cancel(); };
+  }
+  if (emptyEl) {
+    if (msgCount > 0) { emptyGone = true; emptyEl.hidden = true; }
+    else {
+      emptyEl.hidden = false; box.classList.add("sn-fresh");
+      if (!reduced()) { emptyEl.classList.add("sn-enter-wait"); new IntersectionObserver((es, io) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); enter(); } }, { threshold: .15 }).observe(emptyEl); }
+    }
+    // 建议：点了填进输入框（不直接发，用户还能改），字淡入、光标在最后
+    emptyEl.addEventListener("click", (e) => { const b = e.target.closest(".sn-chat-sug"); if (b && emptyEl.contains(b)) composer._cm?.fill(b.textContent); });
+  }
+  // 新对话那一套的输入框：点附件里的图片缩略图看大图（看图从缩略图展开）
+  if (composer.classList.contains("sn-cm-new")) composer.addEventListener("click", (e) => {
+    const t = e.target.closest(".sn-cm-file.sn-tile"); if (!t || e.target.closest(".sn-x") || t.dataset.kind !== "img" || t.classList.contains("sn-leaving")) return;
+    const tiles = [...composer.querySelectorAll('.sn-cm-file.sn-tile[data-kind="img"]:not(.sn-leaving)')];
+    openLightbox(tiles.map((x) => ({ bg: hiRes(x.style.getPropertyValue("--sn-g")), ratio: 16 / 10, alt: x.dataset.name })), tiles.indexOf(t), { thumbOf: (i) => tiles[i]?.querySelector(".sn-clip") || tiles[i] });
+  });
+
   // ———— 开始：停在最新一条 ————
   colW = Math.min(760, vp.clientWidth - 40); relayout(1); syncCount(); // 内容一栏最宽 760（和 .ci 的左右留白一致）
   if (foot) {
@@ -543,7 +596,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   // 销毁：停掉正在生成的回答、放开实例（同一个容器可以再挂一次）。挂载时加的监听、观察器由 createChat 一起撤
   const destroy = () => { if (job) job.stop = true; job = null; if (box._chat === api) delete box._chat; };
   // 程序里发一条（和用户在输入框里发一样：飞进列表、然后回复）
-  const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, destroy };
+  const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, destroy,
+    fill: (text) => composer._cm?.fill(text), get emptyEl() { return emptyEl; } };
   return (box._chat = api);
 }
 
@@ -553,14 +607,21 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
 export const createChat = /* @__PURE__ */ defineComponent({
   name: "chat",
   html: (o) => `<div class="sn-chat">${chatHTML(o)}</div>`,
-  mount(el, o) {
+  mount(el, o, api) {
     if (!el.querySelector(".sn-chat-vp")) { el.classList.add("sn-chat"); el.innerHTML = chatHTML(o); }
     injectIcons(el);
-    const c = mountChat(el, o);
+    const c = mountChat(el, { ...o, onModelChange: (v) => api.emit("modelChange", v), onModeChange: (v) => api.emit("modeChange", v),
+      onContextChange: (e) => api.emit("contextChange", { ...e, item: api.options.context?.[e.index] }), onContextClick: (index) => api.emit("contextClick", { index, item: api.options.context?.[index] }) });
+    const cm = () => el.querySelector(".sn-composer")?._cm;
     return {
-      ...c,
-      update(next, prev) { if (next.status !== prev.status) { const s = el.querySelector("[data-chat-status]"); if (s) { s.textContent = next.status ?? tt("chat.0"); s.classList.toggle("sn-on", s.textContent !== tt("chat.0")); } } },
-      destroy: c.destroy,
+      send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, fill: c.fill,
+      get emptyEl() { return c.emptyEl; },
+      update(next, prev) {
+        if (next.status !== prev.status) { const s = el.querySelector("[data-chat-status]"); if (s) { s.textContent = next.status ?? tt("chat.0"); s.classList.toggle("sn-on", s.textContent !== tt("chat.0")); } }
+        // 底部输入框的上下文、模式、模型：只是选中项换了就只改选中（不发事件）；结构变了才换那一块
+        syncComposerParts(cm(), next, prev);
+      },
+      destroy() { c.destroy(); for (const h of el.querySelectorAll(".sn-select")) h._select?.dispose?.(); },
     };
   },
 });

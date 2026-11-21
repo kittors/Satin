@@ -28,5 +28,6 @@ export default {
   "chat.25": "图",
   "chat.26": "正在思考",
   "chat.jump": "跳到最新",
-  "chat.27": "发送失败，点一下重发"
+  "chat.27": "发送失败，点一下重发",
+  "chat.empty": "有什么可以帮你？"
 };

@@ -70,10 +70,37 @@ export interface LongTextOptions { value?: string; max?: number; maxLines?: numb
 /** 长文本的标记（空容器交给 createLongText 时就用它渲染） */
 export function longTextHTML(o?: LongTextOptions): string;
 export const createLongText: SatinFactory<LongTextOptions, { readonly value: string; focus(): void }>;
+/** 菜单里的一项（上下文栏能点开的那项、权限、模型） */
+export interface ComposerOption { value: string; label: string; /** 模型那一项：窄的时候按钮上只显示它（不给就取 label 里最后一个"·"后面的档位） */ short?: string }
+/** 输入框顶上上下文栏的一项（项目文件夹、本地 / 云端、分支……）：有 options 的点开是菜单（选了发 contextChange），没有的点了发 contextClick */
+export interface ComposerContextItem { icon?: string; text: string; options?: ComposerOption[]; value?: string }
+/** 状态色（小圆点）：ok 绿、warn 橙、bad 红、need 主色；不给是灰 */
+export type ComposerTone = "ok" | "warn" | "bad" | "need";
+/** 底部一行的模式 / 权限标签：有 options 的点开是菜单（选了发 modeChange），label、tone 跟着选中的那项 */
+export interface ComposerMode { label?: string; tone?: ComposerTone; options?: (ComposerOption & { tone?: ComposerTone })[]; value?: string }
+/** 新对话那一套（都可选，不给时输入框和原来一模一样） */
+export interface ComposerParts {
+  /** 输入框顶上的上下文栏 */
+  context?: ComposerContextItem[];
+  /** 模式 / 权限标签（直接给一段字也行） */
+  mode?: ComposerMode | string;
+  /** 模型选择：label 写成"名称 · 档位" */
+  models?: ComposerOption[];
+  /** 当前模型（models 里的 value） */
+  model?: string;
+}
+export interface ComposerPartEvents {
+  onModelChange?(value: string): void;
+  onModeChange?(value: string): void;
+  onContextChange?(e: { index: number; value: string; item: ComposerContextItem }): void;
+  onContextClick?(e: { index: number; item: ComposerContextItem }): void;
+}
+/** 附件菜单点了以后给出的一个附件（演示、自己接上传时用；真文件拖进来、粘贴进来的组件自己读） */
+export interface ComposerAttachment { kind: "img" | "vid" | "aud" | "doc"; name: string; size: number; g?: string; dur?: string; ext?: string; seed?: number; failAt?: number; bad?: string }
 /** 提示词输入框的标记（空容器交给 createComposer 时就用它渲染） */
-export function composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean }): string;
+export function composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string;
 /** 提示词输入框：onSend 返回 Promise 时，Promise 结束才退出"生成中"；message.files 是附件行元素（元素上的 _file 是原始 File） */
-export const createComposer: SatinFactory<{ placeholder?: string; max?: number; maxLines?: number; attach?: boolean; /** 发送按钮的名字 */ send?: string; external?: boolean; onSend?(message: { text: string; files: HTMLElement[] }): void | Promise<unknown>; onStop?(): void; upload?(file: File, progress: (p: number) => void): Promise<unknown> }, { setBusy(on: boolean): void; clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void; files(): HTMLElement[] }>;
+export const createComposer: SatinFactory<{ placeholder?: string; max?: number; maxLines?: number; attach?: boolean; /** 发送按钮的名字 */ send?: string; external?: boolean; onSend?(message: { text: string; files: HTMLElement[] }): void | Promise<unknown>; onStop?(): void; upload?(file: File, progress: (p: number) => void): Promise<unknown> } & ComposerParts & ComposerPartEvents, { setBusy(on: boolean): void; clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void; files(): HTMLElement[]; /** 填一段字进输入框（字淡入、光标在最后） */ fill(text: string): void }>;
 export interface ProgressCardApi { start(title: string, sub?: string, enter?: boolean): void; set(progress: number, sub?: string): void; finish(title?: string, sub?: string): void; cancel(title?: string, sub?: string): void }
 export const createProgressCard: SatinFactory<{ onCancel?(): void; onOpen?(): void }, ProgressCardApi>;
 /** 选择器选好值时的数据：text 是触发框里显示的文字（清除时是空字符串） */
@@ -201,6 +228,8 @@ export function bindInputs(root?: ParentNode, options?: { composer?: Record<stri
 export function bindPickers(root?: ParentNode, options?: Pick<PickerOptions, "today" | "now">): void;
 
 // ———— 表格（真数据） ————
+/** render 的第三个参数：cell 是这一格（字符串阶段——服务端渲染、第一帧——是 null，返回 HTML 字符串或先空着）；index 是现在的顺序里第几行（树形按整棵树数）；level 是第几级（0 起） */
+export interface TableCellContext { cell: HTMLElement | null; key: string; index: number; level: number }
 export interface TableColumn<R = any> {
   /** 取行里的哪个字段；拖列、改宽、合并、事件都按它认列 */ key: string;
   /** 表头文字 */ title?: string;
@@ -221,6 +250,15 @@ export interface TableColumn<R = any> {
   /** 自己画格子：返回 HTML 字符串、节点，或者自己改好 ctx.cell 返回 undefined */ render?(value: any, row: R, ctx: TableCellContext): string | number | Node | void;
   num?: boolean; className?: string;
 }
+/** spans 返回的一块合并：row 是看得见的行里第几行，key 是从哪一列开始，往下 rowSpan 行、往右 colSpan 列（按现在的列顺序） */
+export interface TableSpan { row: number; key: string; rowSpan?: number; colSpan?: number }
+export interface TableSort { key: string; dir: "asc" | "desc" }
+/** 展开 / 收起：keys 是现在展开着的所有行（有筛选时是筛选前的展开状态），key 是点的那一行 */
+export interface TableExpandEvent { keys: string[]; key: string; expanded: boolean }
+/** 拖行松手：key 是拖的那一行，parentKey 它的上级（第一级是 null），from / to 在兄弟里的位置，keys 是这一组兄弟的新顺序 */
+export interface TableRowReorderEvent { key: string; parentKey: string | null; from: number; to: number; keys: string[] }
+/** 改完一格：表格已经把新值写进行里（row[key]），再发这个 */
+export interface TableCellEditEvent<R = any> { row: R; key: string; value: unknown; oldValue: unknown }
 export interface TableOptions<R = any> {
   columns: TableColumn<R>[];
   /** 数据：一行一个对象；行里带 children 就是多级树 */ data?: R[];
@@ -274,8 +312,6 @@ export function sortRows<R>(rows: R[], columns: TableColumn<R>[], sort: TableSor
 /** 照设计稿写好的标记，在 root 里一次接上交互（下拉、复制、芯片、清除、显示密码、自动长高、滑块、验证码、输入框、折叠面板、日期选择器、浮层触发器、横幅），并把 data-i 换成图标。
  *  返回撤销函数（撤掉监听、观察器、包上去的滚动区域和"已接过"标记，同一段标记可以再接一次）。wire：同一个作用域里跑的自己的接线，撤销时一起撤 */
 export function enhance(root?: ParentNode | null, wire?: (root: ParentNode) => void): () => void;
-/** render 的第三个参数：cell 是这一格（字符串阶段——服务端渲染、第一帧——是 null，返回 HTML 字符串或先空着）；index 是现在的顺序里第几行（树形按整棵树数）；level 是第几级（0 起） */
-export interface TableCellContext { cell: HTMLElement | null; key: string; index: number; level: number }
 /** 表单类的标记一次接上（enhance 里已经包含） */
 export function bindForms(root?: ParentNode): void;
 export function bindBanners(root?: ParentNode): void;
@@ -285,12 +321,3 @@ export function closeBanner(wrap: HTMLElement): void;
 export function autoGrow(box: HTMLElement): void;
 /** 长文本的用量环（传包着 textarea 和 .sn-ta-count 的容器，data-max 是上限） */
 export function longCount(box: HTMLElement, o?: { showFrom?: number }): void;
-/** spans 返回的一块合并：row 是看得见的行里第几行，key 是从哪一列开始，往下 rowSpan 行、往右 colSpan 列（按现在的列顺序） */
-export interface TableSpan { row: number; key: string; rowSpan?: number; colSpan?: number }
-export interface TableSort { key: string; dir: "asc" | "desc" }
-/** 展开 / 收起：keys 是现在展开着的所有行（有筛选时是筛选前的展开状态），key 是点的那一行 */
-export interface TableExpandEvent { keys: string[]; key: string; expanded: boolean }
-/** 拖行松手：key 是拖的那一行，parentKey 它的上级（第一级是 null），from / to 在兄弟里的位置，keys 是这一组兄弟的新顺序 */
-export interface TableRowReorderEvent { key: string; parentKey: string | null; from: number; to: number; keys: string[] }
-/** 改完一格：表格已经把新值写进行里（row[key]），再发这个 */
-export interface TableCellEditEvent<R = any> { row: R; key: string; value: unknown; oldValue: unknown }

@@ -289,6 +289,37 @@
 .sn-fx-clip > .sn-fx-bg { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-raised)); }
 .sn-fx-clip > .sn-bubble, .sn-fx-src { color: var(--sn-label); }
 .sn-fx-g.sn-card > .sn-bubble { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-raised)); color: var(--sn-label); }
+/* ———— 新对话（createChat 的 empty）————
+   还没有消息时，消息区（输入框上面那一片）正中：单色图标、标题、副标题、几个建议胶囊（点了填进输入框）；
+   发出第一条就淡出（只动透明度和位移），输入框原地不动。不加光晕、渐变，颜色只用文字的三档灰 */
+.sn-chat-empty { position: absolute; z-index: 1; inset: 0 0 var(--sn-foot-h, 0px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 24px 40px; text-align: center; pointer-events: none; }
+.sn-chat-empty[hidden] { display: none; }
+.sn-chat-empty > * { pointer-events: auto; }
+.sn-chat-empty-ic { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 18px; color: var(--sn-label3); }
+.sn-chat-empty-ic .sn-ic { width: 44px; height: 44px; stroke-width: 1; }
+.sn-chat-empty-t { margin: 0; max-width: 560px; font: 600 calc(24px * var(--sn-font-scale, 1))/calc(32px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.01em; color: var(--sn-label); text-wrap: balance; }
+.sn-chat-empty-sub { margin: 8px 0 0; max-width: 440px; font: 400 calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-wrap: pretty; }
+.sn-chat-sugs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 560px; margin-top: 28px; }
+.sn-chat-sug { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: var(--sn-r-full); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); background: var(--sn-fill-subtle); cursor: pointer;
+  transition: background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong); }
+/* 悬停：浅底加深、往上浮 1px；按下缩到 .98 */
+@media (hover: hover) {
+.sn-chat-sug:hover { background: var(--sn-fill-active); color: var(--sn-label); transform: translateY(-1px); } }
+.sn-chat-sug:active { transform: scale(.98); transition-duration: .15s, .15s, .08s; }
+.sn-chat-sug:focus-visible { box-shadow: 0 0 0 3px var(--sn-ring); }
+/* 进场前先藏着（JS 在第一次露出来时依次淡入）；减少动态效果时不加这个类 */
+.sn-chat-empty.sn-enter-wait > *, .sn-chat-empty.sn-enter-wait .sn-chat-sug { opacity: 0; }
+/* 还没有消息：顶栏不写"· 已载入 0 条"，列表顶上也不写"这是对话的开始"。包着"· N 条"的那层也按顶栏的间距排（点和条数之间 6px，和原来一样） */
+.sn-chat-hd .sn-chat-n { display: inline-flex; gap: 6px; }
+.sn-chat.sn-fresh .sn-chat-n { display: none; }
+.sn-chat.sn-fresh .sn-ci-more { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .sn-chat-sug, .sn-chat-sug:hover, .sn-chat-sug:active { transform: none; } }
+@media (max-width: 480px) {
+  .sn-chat-empty { padding: 16px 16px 28px; }
+  .sn-chat-empty-ic { width: 40px; height: 40px; margin-bottom: 14px; } .sn-chat-empty-ic .sn-ic { width: 40px; height: 40px; }
+  .sn-chat-empty-t { font-size: calc(20px * var(--sn-font-scale, 1)); line-height: calc(28px * var(--sn-font-scale, 1)); }
+  .sn-chat-sugs { margin-top: 20px; }
+}
 /* 回复下面的操作：图标灰、悬停才有底；赞 / 踩按下后留底色；时间在最后 */
 .sn-ai-acts { display: flex; align-items: center; gap: 2px; margin-left: -6px; }
 .sn-ai-acts .sn-btn { --sn-fg: var(--sn-label3); }

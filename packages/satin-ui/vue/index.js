@@ -85,7 +85,7 @@ export const Search = /* @__PURE__ */ wrap(S.createSearch, { name: "SnSearch", p
 export const CountInput = /* @__PURE__ */ wrap(S.createCount, { name: "SnCountInput", props: ["value", "max", "placeholder", "size", "id", "name"] });
 export const LongText = /* @__PURE__ */ wrap(S.createLongText, { name: "SnLongText", props: ["value", "max", "maxLines", "rows", "placeholder", "hint", "label", "id", "name"], events: ["change", "submit"] });
 // 提示词输入框：@send 返回 Promise 时发送后进入"生成中"，Promise 结束回到可发送（所以 send 不走 emit，直接调 @send 拿返回值）
-export const Composer = /* @__PURE__ */ wrap(S.createComposer, { name: "SnComposer", props: ["placeholder", "max", "maxLines", "attach", "send", "upload"], events: ["send", "stop"], returns: ["send"], modelEvent: null });
+export const Composer = /* @__PURE__ */ wrap(S.createComposer, { name: "SnComposer", props: ["placeholder", "max", "maxLines", "attach", "send", "upload", "context", "mode", "models", "model"], events: ["send", "stop", "modelChange", "modeChange", "contextChange", "contextClick"], returns: ["send"], modelEvent: null, also: { modelChange: "update:model" } });
 export const Stepper = /* @__PURE__ */ wrap(S.createStepper, { name: "SnStepper", props: ["value", "min", "max", "unit", "label"] });
 export const NumberFlow = /* @__PURE__ */ wrap(S.createNumberFlow, { name: "SnNumberFlow", props: ["value", "effect", "format"], events: [] });
 // 日期、时间、地址选择器：kind（date | range | time | datetime | region）、placeholder、label；@change 拿到 { text }（触发框里显示的文字）。

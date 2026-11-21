@@ -254,6 +254,63 @@
       "names": {
         "js": "external"
       }
+    },
+    {
+      "name": "context",
+      "type": "ComposerContextItem[]",
+      "default": "—",
+      "required": false,
+      "desc": "输入框顶上的上下文栏（项目文件夹、本地 / 云端、分支……）：每项 `{ icon?, text }`；给了 `options`（`[{ value, label }]`）和 `value` 的那项点开是菜单，选了发 `contextChange`，没有的点了发 `contextClick`。只是选中项换了不重画。",
+      "names": {
+        "js": "context",
+        "react": "context",
+        "preact": "context",
+        "vue": "context"
+      }
+    },
+    {
+      "name": "mode",
+      "type": "ComposerMode | string",
+      "default": "—",
+      "required": false,
+      "desc": "底部一行加号旁边的模式 / 权限标签：`{ label, tone }`，tone 用状态色的小圆点（ok 绿、warn 橙、bad 红、need 主色）；给了 `options`（`[{ value, label, tone }]`）和 `value` 点开是菜单，选了发 `modeChange`。",
+      "names": {
+        "js": "mode",
+        "react": "mode",
+        "preact": "mode",
+        "vue": "mode"
+      }
+    },
+    {
+      "name": "models",
+      "type": "ComposerOption[]",
+      "default": "—",
+      "required": false,
+      "desc": "模型选择（发送按钮左边）：每项 `{ value, label }`，label 写成\"名称 · 档位\"；点开往上长菜单、选中项打勾，键盘上下选、回车定；换了以后按钮上的字平滑换掉；底部一行放不下全名时按钮上只显示档位（每项的 `short`，不写就取 label 里最后一个\"·\"后面那段），全名在菜单里、也是读屏名。",
+      "names": {
+        "js": "models",
+        "react": "models",
+        "preact": "models",
+        "vue": "models"
+      }
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "default": "models 的第一项",
+      "required": false,
+      "desc": "现在用的模型（models 里的 value）。",
+      "descBy": {
+        "react": "现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。",
+        "preact": "现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。",
+        "vue": "现在用的模型：`v-model:model` 绑定。"
+      },
+      "names": {
+        "js": "model",
+        "react": "model",
+        "preact": "model",
+        "vue": "model（v-model:model）"
+      }
     }
   ],
   "events": [
@@ -280,6 +337,66 @@
         "vue": "@stop",
         "html": "onStop"
       }
+    },
+    {
+      "name": "modelChange",
+      "payload": "string",
+      "when": "在模型菜单里选了别的模型（程序里改 model 不发）。",
+      "names": {
+        "js": "onModelChange",
+        "react": "onModelChange",
+        "preact": "onModelChange",
+        "vue": "@model-change / @update:model",
+        "angular": "onModelChange（选项）",
+        "solid": "onModelChange（选项）",
+        "svelte": "onModelChange（选项）",
+        "html": "onModelChange（选项），或 实例.on(\"modelChange\", fn)"
+      }
+    },
+    {
+      "name": "modeChange",
+      "payload": "string",
+      "when": "在模式 / 权限菜单里选了别的一项（mode 带 options 时）。",
+      "names": {
+        "js": "onModeChange",
+        "react": "onModeChange",
+        "preact": "onModeChange",
+        "vue": "@mode-change",
+        "angular": "onModeChange（选项）",
+        "solid": "onModeChange（选项）",
+        "svelte": "onModeChange（选项）",
+        "html": "onModeChange（选项），或 实例.on(\"modeChange\", fn)"
+      }
+    },
+    {
+      "name": "contextChange",
+      "payload": "{ index: number; value: string; item: ComposerContextItem }",
+      "when": "在上下文栏某一项的菜单里选了别的（那一项带 options 时）。",
+      "names": {
+        "js": "onContextChange",
+        "react": "onContextChange",
+        "preact": "onContextChange",
+        "vue": "@context-change",
+        "angular": "onContextChange（选项）",
+        "solid": "onContextChange（选项）",
+        "svelte": "onContextChange（选项）",
+        "html": "onContextChange（选项），或 实例.on(\"contextChange\", fn)"
+      }
+    },
+    {
+      "name": "contextClick",
+      "payload": "{ index: number; item: ComposerContextItem }",
+      "when": "点了上下文栏里没有菜单的那项（比如项目文件夹：自己打开选择器）。",
+      "names": {
+        "js": "onContextClick",
+        "react": "onContextClick",
+        "preact": "onContextClick",
+        "vue": "@context-click",
+        "angular": "onContextClick（选项）",
+        "solid": "onContextClick（选项）",
+        "svelte": "onContextClick（选项）",
+        "html": "onContextClick（选项），或 实例.on(\"contextClick\", fn)"
+      }
     }
   ],
   "slots": [],
@@ -304,12 +421,19 @@
       "signature": "files(): HTMLElement[]",
       "returns": "HTMLElement[]",
       "desc": "现在的附件（缩略图元素）。"
+    },
+    {
+      "name": "fill",
+      "kind": "method",
+      "signature": "fill(text: string): void",
+      "returns": "void",
+      "desc": "把一段字填进输入框（字淡入、拿到焦点、光标在最后），不发。"
     }
   ],
   "functions": [
     {
       "name": "composerHTML",
-      "signature": "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean }): string",
+      "signature": "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string",
       "returns": "string",
       "from": "satin-ui",
       "desc": "拼出提示词输入框的标记（服务端渲染、模板里用）。"
@@ -340,7 +464,13 @@
     }
   ],
   "types": [
-    "ComposerProps"
+    "ComposerProps",
+    "ComposerParts",
+    "ComposerPartEvents",
+    "ComposerContextItem",
+    "ComposerOption",
+    "ComposerMode",
+    "ComposerTone"
   ],
   "keyboard": [
     {
@@ -432,6 +562,21 @@
         "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\nconst upload = (file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n\n@Component({\n  selector: \"demo-prompt-upload\",\n  template: `<div #host></div>`,\n})\nexport class PromptUploadComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 拖进来、粘贴截图、点 + 都能加附件；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createComposer(this.host().nativeElement, { placeholder: \"拖进参考图，或者点左下角的 +\", send: \"生成\", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
         "solid": "import { onSettled } from \"solid-js\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\nconst upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n\nexport default function PromptWithFiles() {\n  let host;\n  // 拖进来、粘贴截图、点 + 都能加附件；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createComposer(host, { placeholder: \"拖进参考图，或者点左下角的 +\", send: \"生成\", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
         "preact": "import { Composer, toast } from \"satin-ui/react\";\n\n// upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\nconst upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n\nexport default function PromptWithFiles() {\n  return <Composer placeholder=\"拖进参考图，或者点左下角的 +\" send=\"生成\" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;\n}\n"
+      }
+    },
+    {
+      "slug": "prompt-parts",
+      "title": "上下文、权限、模型（模型受控）",
+      "why": "context 是顶上的上下文栏，mode 是权限标签，models / model 是模型选择；带 options 的点开是菜单，选了发事件。",
+      "html": "<div id=\"prompt-parts\"></div>",
+      "code": {
+        "html": "<div id=\"prompt-parts\"></div>\n\n<script type=\"module\">\n  import { createComposer, toast } from \"satin-ui\";\n  // 输入框顶上的上下文栏：带 options 的那项点开是菜单\n  const CONTEXT = [\n    { icon: \"folder\", text: \"雨夜车站\" },\n    { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n  ];\n  // 权限：小圆点的颜色表示风险；模型：名称 · 档位\n  const MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"read\" };\n  const MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n  // 发送以后返回 Promise：按钮变成\"停止\"，结束回到可发送\n  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n  // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件\n  createComposer(document.getElementById(\"prompt-parts\"), { placeholder: \"随心输入\", send: \"生成\", context: CONTEXT, mode: MODE, models: MODELS, model: \"fine\",\n    onSend: generate, onModelChange: (v) => console.log(\"换了模型\", v) });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Composer, toast } from \"satin-ui/react\";\n\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险；模型：名称 · 档位\nconst MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"read\" };\nconst MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n// 发送以后返回 Promise：按钮变成\"停止\"，结束回到可发送\nconst generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\nexport default function PromptParts() {\n  const [model, setModel] = useState(\"fine\");\n  // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件\n  return <Composer placeholder=\"随心输入\" send=\"生成\" context={CONTEXT} mode={MODE} models={MODELS} model={model} onModelChange={setModel} onSend={generate} />;\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Composer, toast } from \"satin-ui/vue\";\n\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险；模型：名称 · 档位\nconst MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"read\" };\nconst MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n// 发送以后返回 Promise：按钮变成\"停止\"，结束回到可发送\nconst generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\nconst model = ref(\"fine\");\n</script>\n\n<template>\n  <!-- 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件 -->\n  <Composer placeholder=\"随心输入\" send=\"生成\" :context=\"CONTEXT\" :mode=\"MODE\" :models=\"MODELS\" v-model:model=\"model\" @send=\"generate\" />\n</template>\n",
+        "svelte": "<script>\n  import { createComposer, toast } from \"satin-ui\";\n  // 输入框顶上的上下文栏：带 options 的那项点开是菜单\n  const CONTEXT = [\n    { icon: \"folder\", text: \"雨夜车站\" },\n    { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n  ];\n  // 权限：小圆点的颜色表示风险；模型：名称 · 档位\n  const MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"read\" };\n  const MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n  // 发送以后返回 Promise：按钮变成\"停止\"，结束回到可发送\n  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\n  // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件；挂上以后建，卸载时 destroy()\n  let host;\n  $effect(() => {\n    const it = createComposer(host, { placeholder: \"随心输入\", send: \"生成\", context: CONTEXT, mode: MODE, models: MODELS, model: \"fine\",\n      onSend: generate, onModelChange: (v) => console.log(\"换了模型\", v) });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createComposer, toast } from \"satin-ui\";\nimport type { ComposerContextItem, ComposerMode, ComposerOption } from \"satin-ui/components\";\n\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT: ComposerContextItem[] = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险；模型：名称 · 档位\nconst MODE: ComposerMode = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"read\" };\nconst MODELS: ComposerOption[] = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n// 发送以后返回 Promise：按钮变成\"停止\"，结束回到可发送\nconst generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\n@Component({\n  selector: \"demo-prompt-parts\",\n  template: `<div #host></div>`,\n})\nexport class PromptPartsComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createComposer(this.host().nativeElement, { placeholder: \"随心输入\", send: \"生成\", context: CONTEXT, mode: MODE, models: MODELS, model: \"fine\",\n        onSend: generate, onModelChange: (v: string) => console.log(\"换了模型\", v) });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险；模型：名称 · 档位\nconst MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"read\" };\nconst MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n// 发送以后返回 Promise：按钮变成\"停止\"，结束回到可发送\nconst generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\nexport default function PromptParts() {\n  let host;\n  // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createComposer(host, { placeholder: \"随心输入\", send: \"生成\", context: CONTEXT, mode: MODE, models: MODELS, model: \"fine\",\n      onSend: generate, onModelChange: (v) => console.log(\"换了模型\", v) });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Composer, toast } from \"satin-ui/react\";\n\n// 输入框顶上的上下文栏：带 options 的那项点开是菜单\nconst CONTEXT = [\n  { icon: \"folder\", text: \"雨夜车站\" },\n  { icon: \"git-branch\", text: \"第三集\", options: [{ value: \"ep3\", label: \"第三集\" }, { value: \"ep4\", label: \"第四集\" }], value: \"ep3\" },\n];\n// 权限：小圆点的颜色表示风险；模型：名称 · 档位\nconst MODE = { options: [{ value: \"read\", label: \"只读\", tone: \"ok\" }, { value: \"full\", label: \"完全访问\", tone: \"warn\" }], value: \"read\" };\nconst MODELS = [{ value: \"fine\", label: \"分镜模型 · 精细\" }, { value: \"fast\", label: \"分镜模型 · 快速\" }];\n// 发送以后返回 Promise：按钮变成\"停止\"，结束回到可发送\nconst generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\nexport default function PromptParts() {\n  const [model, setModel] = useState(\"fine\");\n  // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件\n  return <Composer placeholder=\"随心输入\" send=\"生成\" context={CONTEXT} mode={MODE} models={MODELS} model={model} onModelChange={setModel} onSend={generate} />;\n}\n"
       }
     }
   ]

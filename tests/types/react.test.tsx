@@ -86,3 +86,11 @@ export function Demo2() {
     </div>
   );
 }
+
+// 新对话（satin-ui/react/chat 的 Chat、主入口的 Composer）：空状态、自己画的空状态、上下文栏、权限、模型
+import { Chat as ChatR } from "satin-ui/react/chat";
+import { Composer as ComposerR } from "satin-ui/react";
+export const chatNew = <ChatR title="新对话" empty={{ icon: "clapperboard", title: "今天拍哪一段？", suggestions: ["把第三集拆成镜头"] }}
+  context={[{ icon: "folder", text: "雨夜车站" }]} mode={{ label: "完全访问", tone: "warn" }} models={[{ value: "fine", label: "分镜模型 · 精细" }]} model="fine" onModelChange={(v) => { const s: string = v; void s; }} />;
+export const chatOwnEmpty = <ChatR renderEmpty={() => <p>自己画的空状态</p>} />;
+export const composerNew = <ComposerR context={[{ text: "本地", options: [{ value: "local", label: "本地" }], value: "local" }]} onContextChange={(e) => { const v: string = e.value; void v; }} mode="只读" />;
