@@ -37,7 +37,7 @@ export const FRAMEWORKS = {
     scripts: { dev: "ng serve", start: "ng serve", build: "ng build" },
     deps: { "@angular/core": ANGULAR, "@angular/common": ANGULAR, "@angular/compiler": ANGULAR, "@angular/platform-browser": ANGULAR, rxjs: "^7.8.2", tslib: "^2.9.1" },
     dev: { "@angular/cli": ANGULAR, "@angular/build": ANGULAR, "@angular/compiler-cli": ANGULAR, typescript: "~6.0.3" },
-    builds: { esbuild: true, lmdb: true, "msgpackr-extract": true },
+    builds: { esbuild: true, lmdb: true, "msgpackr-extract": true, "@parcel/watcher": true }, // @parcel/watcher：Angular 的开发服务器用（pnpm 12 不列进来就装不上）
   },
   solid: {
     title: "Solid（Vite，Solid 2）", variant: "solid", src: ["src", "index.html"], module: true, scripts: VITE,

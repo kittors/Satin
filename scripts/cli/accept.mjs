@@ -94,7 +94,8 @@ for (const [i, fw] of ONLY.entries()) {
         const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, colorScheme: theme, deviceScaleFactor: 2 });
         const page = await ctx.newPage(), errs = [];
         page.on("pageerror", (e) => errs.push("pageerror " + e.message));
-        page.on("console", (m) => { if (m.type() === "error" && !/favicon/.test(m.text())) errs.push("console " + m.text()); });
+        // "Failed to load resource" 不带网址：真的资源失败由下面的 response 记（带网址、筛掉 favicon），这里不重复记
+        page.on("console", (m) => { if (m.type() === "error" && !/favicon|Failed to load resource/.test(m.text())) errs.push("console " + m.text()); });
         page.on("response", (res) => { if (res.status() >= 400 && !/favicon/.test(res.url())) errs.push(res.status() + " " + res.url()); });
         await page.goto(url, { waitUntil: "load" });
         await page.waitForSelector("h1:has-text('新建项目')", { timeout: 15000 });
