@@ -632,7 +632,8 @@ function contractHTML(c, k) {
   out.push(anchor("examples", "示例"));
   for (const ex of k.examples || []) out.push(`<h3 class="d-h3" id="ex-${ex.slug}">${esc(ex.title)}</h3>`, ex.why ? `<p>${md(ex.why)}</p>` : "", playBox(c, ex));
   // 设计稿里的完整演示（更丰富的组合）
-  if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示")); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n }))); }
+  // 完整演示：设计稿里更丰富的组合，只放现场演示（写法以上面的示例为准）
+  if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示"), `<p>设计稿里把几种用法组合在一起的样子，可以直接操作；代码看上面的示例。</p>`); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n, code: false }))); }
   // 4. API（按当前框架的叫法）
   out.push(anchor("api", "API"));
   if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => tbl(["名称", "类型", "默认值", "必填", "说明"], k.props.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", x.required ? "是" : "", md(x.desc) + (x.example ? `<br><code>${esc(x.example)}</code>` : "")]))));

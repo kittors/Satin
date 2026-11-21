@@ -1,8 +1,15 @@
 # 进度（web-v1）
 
-> 主会话巡检用。每完成一步或至少每 15 分钟更新一次。最后更新：2026-11-21 10:10（北京时间）。
+> 主会话巡检用。每完成一步或至少每 15 分钟更新一次。最后更新：2026-11-21 10:25（北京时间）。
 
 ## 现在在做
+- **10:25**
+  - 主会话验收组件文档样板：七部分结构对、说明好，**代码不合格**（React / Vue 里写 `<button className="sn-btn">` + 每个示例套 setup / enhance 样板，是机械翻译）。返工中：
+    子任务在写库里缺的封装（React / Vue 的 DatePicker、DataGrid；新增 satin-ui/svelte 的 Select、DatePicker、DataGrid、Dialog 组件，支持 bind:value）和 5 个样板每个示例的 7 种地道写法（React 组件 + 受控、Vue 组件 + v-model、Svelte 组件、Angular / Solid / Preact / 纯 HTML 写自定义元素，页面级 setup 只在入口）；
+    主线这边：全量示例各框架的入口页统一在入口调一次 setup / defineElements / app.use(Satin)；有契约的组件页"完整演示"只放现场演示；快速上手写清"页面级行为只在入口装一次"
+  - 数据表格拖列的影子改成只动 translate（原来动 left），改值闪一下改成叠一层只动透明度（原来动 background-color）；逐帧验收排在队列 5
+  - 复测：框架泄漏 React、Vue 都通过（脱离文档的节点 0，堆第三批 +0.19 / +0.79 MB）；Next.js 构建失败（契约里手写的 React 写法没标 "use client"，已在生成器里补）、Angular 一处类型（通知示例，已改）——队列 5 重建
+  - 排队：改造后轨迹（TC）跑完 → 队列 5（示例重建、全量示例逐块比对、官网验收截图）；队列 4 末尾加了 CLI 完整验收和评测第 5 轮（先用 CLI 起项目）
 - **10:10 进展**
   - 全站框架偏好已接上：HTML / React / Vue / Svelte / Angular / Solid / Preact（Next.js、Nuxt 是环境子选项），localStorage + `?fw=`；顶栏、抽屉、文档页窄屏顶上、每个代码块头上都能换，不刷新；
     组件页、配方页的代码读 examples/<框架>/ 的文件（冒烟：Vue → Svelte 切换后代码、文件名、网址参数都跟着变）

@@ -264,7 +264,8 @@ export const QUICK = {
     ["h2", "在已有项目里装"],
     ["fw", perFw((id, x) => [["p", x.note], ["files", x.files]])],
     ["h2", "写组件"],
-    ["p", "纯样式的组件（按钮、输入框、开关、标签……）就是类名，变体、尺寸也是类名，图标写成 <code>data-i</code> 占位；有交互的组件用当前框架的写法。组件页上每个演示的代码都是当前框架的写法，取自构建、截图比对过的全量示例，复制就能跑。"],
+    ["p", "<b>页面级行为只在应用入口装一次</b>（Tooltip、浮层栈、Esc 关闭、自定义元素）：React 的组件第一次挂载时自动装；Vue 是 <code>app.use(Satin)</code>；Svelte、Angular、Solid、Preact 和纯 HTML 在入口调一次 <code>setup()</code> 和 <code>defineElements()</code>（上面各框架的入口文件里都写了）。组件页上的示例都默认入口已经装好，组件文件里不再重复。"],
+    ["p", "React、Vue 用 <code>satin-ui/react</code>、<code>satin-ui/vue</code> 的组件（受控、<code>v-model</code>）；Svelte 用 <code>satin-ui/svelte</code> 的组件（<code>bind:value</code>）；Angular、Solid、Preact 和纯 HTML 写自定义元素 <code>&lt;sn-xxx&gt;</code>，放进页面自动挂载、移出自动销毁。纯样式的组件（按钮、输入框、标签……）在哪里都直接写 <code>sn-</code> 类名。组件页上每个示例的代码都是当前框架的写法，取自构建、截图比对过的全量示例，复制就能跑。"],
     ...ST.body.slice(ST.body.findIndex((b) => b[0] === "h2" && b[1] === "文件一览")),
   ],
 };
