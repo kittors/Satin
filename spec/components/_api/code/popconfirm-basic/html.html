@@ -1,0 +1,16 @@
+<sn-enhance>
+  <button type="button" class="sn-btn sn-danger-soft" data-pc="popconfirm-basic" aria-haspopup="dialog" aria-expanded="false">永久删除</button>
+  <div class="sn-pop sn-popconfirm" id="popconfirm-basic" role="alertdialog" aria-labelledby="popconfirm-basic-q" aria-describedby="popconfirm-basic-d">
+    <div class="sn-q"><span data-i="triangle-alert"></span><div><div id="popconfirm-basic-q">永久删除这个镜头？</div><div class="sn-d" id="popconfirm-basic-d">删除后无法恢复。</div></div></div>
+    <div class="sn-acts"><button type="button" class="sn-btn sn-ghost sn-sm" data-no>取消</button><button type="button" class="sn-btn sn-danger sn-sm" data-yes>永久删除</button></div>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { openPopover, popoverOf, toast } from "satin-ui";
+  // 打开：锚在按钮上，焦点先落在"取消"（data-no）上；Esc、点外面关上
+  const btn = document.querySelector('[data-pc="popconfirm-basic"]'), panel = document.getElementById("popconfirm-basic");
+  btn.addEventListener("click", () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: "end" }); });
+  panel.querySelector("[data-no]").addEventListener("click", () => popoverOf(panel)?.close(true));
+  panel.querySelector("[data-yes]").addEventListener("click", () => { popoverOf(panel)?.close(false); toast({ text: "已永久删除镜头" }); });
+</script>
