@@ -1,4 +1,4 @@
-import { onCleanup, onMount } from "solid-js";
+import { onSettled } from "solid-js";
 import { createCommandPalette, toast } from "satin-ui";
 
 const GROUPS = [
@@ -8,15 +8,15 @@ const GROUPS = [
 
 export default function CommandsWithEmpty() {
   let cmdk;
-  onMount(() => {
+  onSettled(() => {
     cmdk = createCommandPalette(GROUPS, {
       onRun: (it) => toast({ text: "执行：" + it.name }),
       // 没有结果时说清楚搜了什么，再给一个出口：带 data-empty-act 的按钮点了（或直接回车）调 onEmpty
       empty: (q) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`,
       onEmpty: (q) => toast({ text: "去素材库搜：" + q }),
     });
+    return () => cmdk.destroy();
   });
-  onCleanup(() => cmdk?.destroy());
   return (
     <sn-enhance>
       <button type="button" class="sn-btn sn-secondary" onClick={() => cmdk?.open()}><span data-i="search:before"></span>搜索或执行命令<span class="sn-key">⌘K</span></button>

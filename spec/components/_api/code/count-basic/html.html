@@ -1,0 +1,7 @@
+<div id="count-basic"></div>
+
+<script type="module">
+  import { createCount } from "satin-ui";
+  // 写到 90% 变成提醒色，写满再敲时计数抖一下
+  createCount(document.getElementById("count-basic"), { max: 20, placeholder: "一句话说清这个镜头", id: "shot-title", size: "lg" });
+</script>

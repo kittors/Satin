@@ -28,6 +28,9 @@
   import LinkTextbtn from "./demos/link-textbtn.svelte";
   import LinkBasic from "./demos/link-basic.svelte";
   import LinkDemo0 from "./demos/link-0.svelte";
+  import CompoundBasic from "./demos/compound-basic.svelte";
+  import CompoundCopy from "./demos/compound-copy.svelte";
+  import CompoundSplit from "./demos/compound-split.svelte";
   import CompoundDemo0 from "./demos/compound-0.svelte";
   import ChipRemovable from "./demos/chip-removable.svelte";
   import ChipControlled from "./demos/chip-controlled.svelte";
@@ -43,7 +46,13 @@
   import InputDemo0 from "./demos/input-0.svelte";
   import InputDemo1 from "./demos/input-1.svelte";
   import InputDemo2 from "./demos/input-2.svelte";
+  import SpecialBasic from "./demos/special-basic.svelte";
+  import SpecialEmail from "./demos/special-email.svelte";
+  import SpecialPassword from "./demos/special-password.svelte";
   import SpecialDemo0 from "./demos/special-0.svelte";
+  import CountLongtext from "./demos/count-longtext.svelte";
+  import CountControlled from "./demos/count-controlled.svelte";
+  import CountBasic from "./demos/count-basic.svelte";
   import CountDemo0 from "./demos/count-0.svelte";
   import TaginputHint from "./demos/taginput-hint.svelte";
   import TaginputControlled from "./demos/taginput-controlled.svelte";
@@ -53,6 +62,9 @@
   import NumberControlled from "./demos/number-controlled.svelte";
   import NumberBasic from "./demos/number-basic.svelte";
   import NumberDemo0 from "./demos/number-0.svelte";
+  import PromptUpload from "./demos/prompt-upload.svelte";
+  import PromptStop from "./demos/prompt-stop.svelte";
+  import PromptBasic from "./demos/prompt-basic.svelte";
   import PromptDemo0 from "./demos/prompt-0.svelte";
   import SelectDemo0 from "./demos/select-0.svelte";
   import PickerDemo0 from "./demos/picker-0.svelte";
@@ -276,6 +288,9 @@
   </section>
   <section id="compound">
     <h2>组合按钮</h2>
+    <div class="demo" data-demo="compound-basic"><CompoundBasic /></div>
+    <div class="demo" data-demo="compound-copy"><CompoundCopy /></div>
+    <div class="demo" data-demo="compound-split"><CompoundSplit /></div>
     <div class="demo" data-demo="compound-0"><CompoundDemo0 /></div>
   </section>
   <section id="chip">
@@ -303,10 +318,16 @@
   </section>
   <section id="special">
     <h2>搜索、密码、邮箱</h2>
+    <div class="demo" data-demo="special-basic"><SpecialBasic /></div>
+    <div class="demo" data-demo="special-email"><SpecialEmail /></div>
+    <div class="demo" data-demo="special-password"><SpecialPassword /></div>
     <div class="demo" data-demo="special-0"><SpecialDemo0 /></div>
   </section>
   <section id="count">
     <h2>字数统计</h2>
+    <div class="demo" data-demo="count-longtext"><CountLongtext /></div>
+    <div class="demo" data-demo="count-controlled"><CountControlled /></div>
+    <div class="demo" data-demo="count-basic"><CountBasic /></div>
     <div class="demo" data-demo="count-0"><CountDemo0 /></div>
   </section>
   <section id="taginput">
@@ -325,6 +346,9 @@
   </section>
   <section id="prompt">
     <h2>提示词输入框</h2>
+    <div class="demo" data-demo="prompt-upload"><PromptUpload /></div>
+    <div class="demo" data-demo="prompt-stop"><PromptStop /></div>
+    <div class="demo" data-demo="prompt-basic"><PromptBasic /></div>
     <div class="demo" data-demo="prompt-0"><PromptDemo0 /></div>
   </section>
   <section id="select">

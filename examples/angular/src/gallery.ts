@@ -28,6 +28,9 @@ import { LinkArrowComponent } from "./demos/link-arrow";
 import { LinkTextbtnComponent } from "./demos/link-textbtn";
 import { LinkBasicComponent } from "./demos/link-basic";
 import { LinkDemo0Component } from "./demos/link-0";
+import { CompoundBasicComponent } from "./demos/compound-basic";
+import { CompoundCopyComponent } from "./demos/compound-copy";
+import { CompoundSplitComponent } from "./demos/compound-split";
 import { CompoundDemo0Component } from "./demos/compound-0";
 import { ChipRemovableComponent } from "./demos/chip-removable";
 import { ChipControlledComponent } from "./demos/chip-controlled";
@@ -43,7 +46,13 @@ import { InputBasicComponent } from "./demos/input-basic";
 import { InputDemo0Component } from "./demos/input-0";
 import { InputDemo1Component } from "./demos/input-1";
 import { InputDemo2Component } from "./demos/input-2";
+import { SpecialBasicComponent } from "./demos/special-basic";
+import { SpecialEmailComponent } from "./demos/special-email";
+import { SpecialPasswordComponent } from "./demos/special-password";
 import { SpecialDemo0Component } from "./demos/special-0";
+import { CountLongtextComponent } from "./demos/count-longtext";
+import { CountControlledComponent } from "./demos/count-controlled";
+import { CountBasicComponent } from "./demos/count-basic";
 import { CountDemo0Component } from "./demos/count-0";
 import { TaginputHintComponent } from "./demos/taginput-hint";
 import { TaginputControlledComponent } from "./demos/taginput-controlled";
@@ -53,6 +62,9 @@ import { NumberRangeComponent } from "./demos/number-range";
 import { NumberControlledComponent } from "./demos/number-controlled";
 import { NumberBasicComponent } from "./demos/number-basic";
 import { NumberDemo0Component } from "./demos/number-0";
+import { PromptUploadComponent } from "./demos/prompt-upload";
+import { PromptStopComponent } from "./demos/prompt-stop";
+import { PromptBasicComponent } from "./demos/prompt-basic";
 import { PromptDemo0Component } from "./demos/prompt-0";
 import { SelectDemo0Component } from "./demos/select-0";
 import { PickerDemo0Component } from "./demos/picker-0";
@@ -213,7 +225,7 @@ import { SelectMenuComponent } from "./demos/select-menu";
 
 @Component({
   selector: "app-root",
-  imports: [ColorDemo0Component, TypeDemo0Component, TypeDemo1Component, TypeDemo2Component, SpacingDemo0Component, SpacingDemo1Component, SpacingDemo2Component, SpacingDemo3Component, LayoutDemo0Component, LayoutDemo1Component, SpaceDemo0Component, SpaceDemo1Component, ElevationDemo0Component, MotionDemo0Component, IconsDemo0Component, ButtonDemo0Component, ButtonDemo1Component, ButtonDemo2Component, ButtonDemo3Component, IconbuttonControlledComponent, IconbuttonStatesComponent, IconbuttonVariantsComponent, IconbuttonBasicComponent, IconbuttonDemo0Component, LinkArrowComponent, LinkTextbtnComponent, LinkBasicComponent, LinkDemo0Component, CompoundDemo0Component, ChipRemovableComponent, ChipControlledComponent, ChipBasicComponent, ChipDemo0Component, FieldOptionalComponent, FieldErrorComponent, FieldBasicComponent, FieldDemo0Component, InputControlledComponent, InputSizesComponent, InputBasicComponent, InputDemo0Component, InputDemo1Component, InputDemo2Component, SpecialDemo0Component, CountDemo0Component, TaginputHintComponent, TaginputControlledComponent, TaginputBasicComponent, TaginputDemo0Component, NumberRangeComponent, NumberControlledComponent, NumberBasicComponent, NumberDemo0Component, PromptDemo0Component, SelectDemo0Component, PickerDemo0Component, ChoiceControlledComponent, ChoiceRadioComponent, ChoiceBasicComponent, ChoiceDemo0Component, SegmentedSizesComponent, SegmentedControlledComponent, SegmentedBasicComponent, SegmentedDemo0Component, SliderMaxComponent, SliderControlledComponent, SliderBasicComponent, SliderDemo0Component, OtpLengthComponent, OtpCompleteComponent, OtpBasicComponent, OtpDemo0Component, TooltipTruncateComponent, TooltipKbdComponent, TooltipBasicComponent, TooltipDemo0Component, PopoverAlignComponent, PopoverControlledComponent, PopoverBasicComponent, PopoverDemo0Component, PopconfirmDemo0Component, CtxmenuSubmenuComponent, CtxmenuContextComponent, CtxmenuBasicComponent, CtxmenuDemo0Component, DialogDemo0Component, DrawerFooterComponent, DrawerControlledComponent, DrawerBasicComponent, DrawerDemo0Component, CmdkHotkeyComponent, CmdkEmptyComponent, CmdkBasicComponent, CmdkDemo0Component, ToastProgressComponent, ToastActionComponent, ToastBasicComponent, ToastDemo0Component, NotifyFailComponent, NotifyActionsComponent, NotifyBasicComponent, NotifyDemo0Component, BannerErrorComponent, BannerDismissComponent, BannerBasicComponent, BannerDemo0Component, EmptyErrorComponent, EmptySearchComponent, EmptyBasicComponent, EmptyDemo0Component, LoadingQuietComponent, LoadingListComponent, LoadingBasicComponent, LoadingDemo0Component, ProgressControlledComponent, ProgressRingComponent, ProgressBasicComponent, ProgressDemo0Component, NumflowStylesComponent, NumflowCounterComponent, NumflowBasicComponent, NumflowDemo0Component, TableDemo0Component, TableDemo1Component, TableDemo2Component, TableDemo3Component, TableDemo4Component, TableDemo5Component, TableDemo6Component, TableDemo7Component, TableDemo8Component, GridStatesComponent, GridEditComponent, GridRemoteComponent, GridRenderComponent, GridSelectComponent, GridSortComponent, GridDemo0Component, CgridControlledComponent, CgridEventsComponent, CgridMillionComponent, CgridBasicComponent, CgridDemo0Component, ListSwitchComponent, ListKvComponent, ListBasicComponent, ListDemo0Component, CardSelectComponent, CardGridComponent, CardBasicComponent, CardDemo0Component, TagsAvatarComponent, TagsBadgeComponent, TagsBasicComponent, TagsDemo0Component, CollapseControlledComponent, CollapseSingleComponent, CollapseBasicComponent, CollapseDemo0Component, ScrollareaDemo0Component, ScrollareaDemo1Component, ScrollareaDemo2Component, ScrollareaDemo3Component, ScrollareaDemo4Component, ScrollareaDemo5Component, ScrollareaDemo6Component, VlistDemo0Component, ChatDemo0Component, MdDemo0Component, FlowDemo0Component, FlowstressDemo0Component, ImageDemo0Component, MediaDemo0Component, UploadDemo0Component, SidebarDemo0Component, TabsStepsComponent, TabsPagerComponent, TabsControlledComponent, TabsBasicComponent, TabsDemo0Component, ReorderDemo0Component, AddremoveDemo0Component, OptimisticDemo0Component, ButtonBasicComponent, ButtonVariantsComponent, ButtonSizesComponent, ButtonIconsComponent, ButtonStatesComponent, ButtonBusyComponent, ButtonActionsComponent, ButtonMobileComponent, DialogBasicComponent, DialogDangerComponent, DialogGuardComponent, DialogEventsComponent, DialogControlledComponent, GridBasicComponent, PickerBasicComponent, PickerRangeComponent, PickerTimeComponent, PickerDatetimeComponent, PickerRegionComponent, PickerEventsComponent, SelectBasicComponent, SelectPlaceholderComponent, SelectOptionsComponent, SelectFieldComponent, SelectEventsComponent, SelectControlledComponent, SelectMenuComponent],
+  imports: [ColorDemo0Component, TypeDemo0Component, TypeDemo1Component, TypeDemo2Component, SpacingDemo0Component, SpacingDemo1Component, SpacingDemo2Component, SpacingDemo3Component, LayoutDemo0Component, LayoutDemo1Component, SpaceDemo0Component, SpaceDemo1Component, ElevationDemo0Component, MotionDemo0Component, IconsDemo0Component, ButtonDemo0Component, ButtonDemo1Component, ButtonDemo2Component, ButtonDemo3Component, IconbuttonControlledComponent, IconbuttonStatesComponent, IconbuttonVariantsComponent, IconbuttonBasicComponent, IconbuttonDemo0Component, LinkArrowComponent, LinkTextbtnComponent, LinkBasicComponent, LinkDemo0Component, CompoundBasicComponent, CompoundCopyComponent, CompoundSplitComponent, CompoundDemo0Component, ChipRemovableComponent, ChipControlledComponent, ChipBasicComponent, ChipDemo0Component, FieldOptionalComponent, FieldErrorComponent, FieldBasicComponent, FieldDemo0Component, InputControlledComponent, InputSizesComponent, InputBasicComponent, InputDemo0Component, InputDemo1Component, InputDemo2Component, SpecialBasicComponent, SpecialEmailComponent, SpecialPasswordComponent, SpecialDemo0Component, CountLongtextComponent, CountControlledComponent, CountBasicComponent, CountDemo0Component, TaginputHintComponent, TaginputControlledComponent, TaginputBasicComponent, TaginputDemo0Component, NumberRangeComponent, NumberControlledComponent, NumberBasicComponent, NumberDemo0Component, PromptUploadComponent, PromptStopComponent, PromptBasicComponent, PromptDemo0Component, SelectDemo0Component, PickerDemo0Component, ChoiceControlledComponent, ChoiceRadioComponent, ChoiceBasicComponent, ChoiceDemo0Component, SegmentedSizesComponent, SegmentedControlledComponent, SegmentedBasicComponent, SegmentedDemo0Component, SliderMaxComponent, SliderControlledComponent, SliderBasicComponent, SliderDemo0Component, OtpLengthComponent, OtpCompleteComponent, OtpBasicComponent, OtpDemo0Component, TooltipTruncateComponent, TooltipKbdComponent, TooltipBasicComponent, TooltipDemo0Component, PopoverAlignComponent, PopoverControlledComponent, PopoverBasicComponent, PopoverDemo0Component, PopconfirmDemo0Component, CtxmenuSubmenuComponent, CtxmenuContextComponent, CtxmenuBasicComponent, CtxmenuDemo0Component, DialogDemo0Component, DrawerFooterComponent, DrawerControlledComponent, DrawerBasicComponent, DrawerDemo0Component, CmdkHotkeyComponent, CmdkEmptyComponent, CmdkBasicComponent, CmdkDemo0Component, ToastProgressComponent, ToastActionComponent, ToastBasicComponent, ToastDemo0Component, NotifyFailComponent, NotifyActionsComponent, NotifyBasicComponent, NotifyDemo0Component, BannerErrorComponent, BannerDismissComponent, BannerBasicComponent, BannerDemo0Component, EmptyErrorComponent, EmptySearchComponent, EmptyBasicComponent, EmptyDemo0Component, LoadingQuietComponent, LoadingListComponent, LoadingBasicComponent, LoadingDemo0Component, ProgressControlledComponent, ProgressRingComponent, ProgressBasicComponent, ProgressDemo0Component, NumflowStylesComponent, NumflowCounterComponent, NumflowBasicComponent, NumflowDemo0Component, TableDemo0Component, TableDemo1Component, TableDemo2Component, TableDemo3Component, TableDemo4Component, TableDemo5Component, TableDemo6Component, TableDemo7Component, TableDemo8Component, GridStatesComponent, GridEditComponent, GridRemoteComponent, GridRenderComponent, GridSelectComponent, GridSortComponent, GridDemo0Component, CgridControlledComponent, CgridEventsComponent, CgridMillionComponent, CgridBasicComponent, CgridDemo0Component, ListSwitchComponent, ListKvComponent, ListBasicComponent, ListDemo0Component, CardSelectComponent, CardGridComponent, CardBasicComponent, CardDemo0Component, TagsAvatarComponent, TagsBadgeComponent, TagsBasicComponent, TagsDemo0Component, CollapseControlledComponent, CollapseSingleComponent, CollapseBasicComponent, CollapseDemo0Component, ScrollareaDemo0Component, ScrollareaDemo1Component, ScrollareaDemo2Component, ScrollareaDemo3Component, ScrollareaDemo4Component, ScrollareaDemo5Component, ScrollareaDemo6Component, VlistDemo0Component, ChatDemo0Component, MdDemo0Component, FlowDemo0Component, FlowstressDemo0Component, ImageDemo0Component, MediaDemo0Component, UploadDemo0Component, SidebarDemo0Component, TabsStepsComponent, TabsPagerComponent, TabsControlledComponent, TabsBasicComponent, TabsDemo0Component, ReorderDemo0Component, AddremoveDemo0Component, OptimisticDemo0Component, ButtonBasicComponent, ButtonVariantsComponent, ButtonSizesComponent, ButtonIconsComponent, ButtonStatesComponent, ButtonBusyComponent, ButtonActionsComponent, ButtonMobileComponent, DialogBasicComponent, DialogDangerComponent, DialogGuardComponent, DialogEventsComponent, DialogControlledComponent, GridBasicComponent, PickerBasicComponent, PickerRangeComponent, PickerTimeComponent, PickerDatetimeComponent, PickerRegionComponent, PickerEventsComponent, SelectBasicComponent, SelectPlaceholderComponent, SelectOptionsComponent, SelectFieldComponent, SelectEventsComponent, SelectControlledComponent, SelectMenuComponent],
   encapsulation: ViewEncapsulation.None,
   styleUrl: "../../shared/gallery.css",
   template: `
@@ -281,6 +293,9 @@ import { SelectMenuComponent } from "./demos/select-menu";
   </section>
   <section id="compound">
     <h2>组合按钮</h2>
+    <div class="demo" data-demo="compound-basic"><demo-compound-basic /></div>
+    <div class="demo" data-demo="compound-copy"><demo-compound-copy /></div>
+    <div class="demo" data-demo="compound-split"><demo-compound-split /></div>
     <div class="demo" data-demo="compound-0"><demo-compound-0 /></div>
   </section>
   <section id="chip">
@@ -308,10 +323,16 @@ import { SelectMenuComponent } from "./demos/select-menu";
   </section>
   <section id="special">
     <h2>搜索、密码、邮箱</h2>
+    <div class="demo" data-demo="special-basic"><demo-special-basic /></div>
+    <div class="demo" data-demo="special-email"><demo-special-email /></div>
+    <div class="demo" data-demo="special-password"><demo-special-password /></div>
     <div class="demo" data-demo="special-0"><demo-special-0 /></div>
   </section>
   <section id="count">
     <h2>字数统计</h2>
+    <div class="demo" data-demo="count-longtext"><demo-count-longtext /></div>
+    <div class="demo" data-demo="count-controlled"><demo-count-controlled /></div>
+    <div class="demo" data-demo="count-basic"><demo-count-basic /></div>
     <div class="demo" data-demo="count-0"><demo-count-0 /></div>
   </section>
   <section id="taginput">
@@ -330,6 +351,9 @@ import { SelectMenuComponent } from "./demos/select-menu";
   </section>
   <section id="prompt">
     <h2>提示词输入框</h2>
+    <div class="demo" data-demo="prompt-upload"><demo-prompt-upload /></div>
+    <div class="demo" data-demo="prompt-stop"><demo-prompt-stop /></div>
+    <div class="demo" data-demo="prompt-basic"><demo-prompt-basic /></div>
     <div class="demo" data-demo="prompt-0"><demo-prompt-0 /></div>
   </section>
   <section id="select">

@@ -1,6 +1,6 @@
 # 组件清单
 
-每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`chip`、`field`、`input`、`taginput`、`number`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`grid`、`cgrid`、`list`、`card`、`tags`、`collapse`、`tabs`。
+每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`grid`、`cgrid`、`list`、`card`、`tags`、`collapse`、`tabs`。
 
 ## 契约格式（手写的 API 契约）
 
@@ -79,7 +79,7 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | `button` | 按钮（Button） | ✓ | 扁平：纯色面或 1px 细边，不用渐变和投影。悬停加深一档，按下再加深一档并轻轻缩一下。6 种变体由强到弱，每个区域只放一个主按钮。顶栏"评审"可以切换圆角来比… |
 | `iconbutton` | 纯图标按钮（IconButton） | ✓ | 没有文字的按钮必须有名称：悬停 500ms 后用 Tooltip 显示，读屏也读这个名称。默认没有面，悬停时出现底色、图标变深，按下时缩一下；需要更明显时用带底… |
 | `link` | 文字链接与文字按钮（Link · TextButton） | ✓ | 放在句子里的是链接：一条淡下划线，悬停时变实。独立的纯文字操作是文字按钮：平时只有文字，悬停时出现一层底色，按下再深一档并缩一下；带箭头的悬停时箭头右移 2px… |
-| `compound` | 组合按钮（ButtonGroup · SplitButton · CopyButton） |  | 相关的几个操作连成一组；主操作带若干备选时用分裂按钮；复制按钮复制成功后图标原地变成对勾 1.2 秒，不另弹 Toast。 |
+| `compound` | 组合按钮（ButtonGroup · SplitButton · CopyButton） | ✓ | 相关的几个操作连成一组；主操作带若干备选时用分裂按钮；复制按钮复制成功后图标原地变成对勾 1.2 秒，不另弹 Toast。 |
 | `chip` | 切换芯片（ToggleChip · Tag） | ✓ | 筛选条件、多选标签。选中时前面长出一个对勾；可以移除的标签，移除时先收起宽度再消失，旁边的芯片平滑补位。 |
 
 ## 表单
@@ -88,11 +88,11 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | --- | --- | --- | --- |
 | `field` | 字段与错误（FormField） | ✓ | 每个表单项 = 标签 + 控件 + 帮助文字 + 错误。标签在上；只标"可选"，不标必填。错误放在字段下方展开，边框变红、左右抖两下；一开始输入就收起。 |
 | `input` | 输入框（TextField） | ✓ | 四种高度：28 用在表格和工具条，32 默认，36 用在主要表单，40 只用在登录和欢迎页。聚焦时边框加深，外加 3px 的柔环。 |
-| `special` | 搜索、密码、邮箱（SearchField · SecretInput · EmailField） |  | 搜索：空着时显示快捷键，一输入就换成清除按钮；等结果超过 300ms 时放大镜换成转圈，结果数量从右边淡入。密码：强度条从左往右依次点亮，文字滚动换掉；大写锁定… |
-| `count` | 字数统计（Counter · LongText） |  | 单行：聚焦或有内容时，右边淡入"已写/上限"，数字滚动变化；写到 90% 变成提醒色，写满再敲时计数抖一下。长文本：输入框随内容平滑长高，到上限高度后在里面滚动… |
+| `special` | 搜索、密码、邮箱（SearchField · SecretInput · EmailField） | ✓ | 搜索：空着时显示快捷键，一输入就换成清除按钮；等结果超过 300ms 时放大镜换成转圈，结果数量从右边淡入。密码：强度条从左往右依次点亮，文字滚动换掉；大写锁定… |
+| `count` | 字数统计（Counter · LongText） | ✓ | 单行：聚焦或有内容时，右边淡入"已写/上限"，数字滚动变化；写到 90% 变成提醒色，写满再敲时计数抖一下。长文本：输入框随内容平滑长高，到上限高度后在里面滚动… |
 | `taginput` | 标签输入（TagInput） | ✓ | 输入后按回车或逗号变成标签，新标签弹出来；空着时按一次退格先选中最后一个标签，再按一次才删；粘贴"雨夜，车站，悬疑"会拆成多个标签依次出现；重复的标签不再添加，… |
 | `number` | 数字步进（Stepper） | ✓ | 点加减数字滚动变化；按住会连发、越按越快；到边界时那一侧的按钮变灰，再按抖一下。在数字上左右拖动可以直接调，上下方向键也行，按住 Shift 一次走 10。 |
-| `prompt` | 提示词输入框（Composer） |  | 生成画面时用。框随内容长高；可以加参考图；有内容时右下角的发送按钮才亮起来。发送后按钮变成"停止"，外圈转动表示正在生成，点一下就停；⌘↵ 也能发送。 |
+| `prompt` | 提示词输入框（Composer） | ✓ | 生成画面时用。框随内容长高；可以加参考图；有内容时右下角的发送按钮才亮起来。发送后按钮变成"停止"，外圈转动表示正在生成，点一下就停；⌘↵ 也能发送。 |
 | `select` | 下拉选择与菜单（Select · Menu） | ✓ | 面板从触发器那里长出来，带一点回弹，全程不透明，不会透出背后的字。上下键移动、回车选中、Esc 关闭；收起比展开快。 |
 | `picker` | 日期、时间、地址（DatePicker · TimePicker · RegionPicker） | ✓ | 触发框和下拉选择同一个样子，面板和菜单同一种开合。日历换月时网格往所去的方向滑，点标题切到月份；时间两列滚动吸附到中间的选中带；地址按省、市、区三级走，选完一级… |
 | `choice` | 复选、单选、开关（Checkbox · Radio · Switch） | ✓ | 勾选时对勾一笔画出来并轻轻弹一下；单选的内点弹出；开关的圆钮弹到另一边，按住时圆钮横向拉长。都能用 Tab 聚焦、空格切换。 |

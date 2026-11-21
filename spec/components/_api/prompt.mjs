@@ -1,0 +1,88 @@
+// 提示词输入框的 API 契约（手写）。格式见 spec/components/_api/README.md
+import { code } from "./_code.mjs";
+
+export default {
+  title: "提示词输入框",
+  lead: "生成画面时用：框随内容长高，可以加参考图；有内容时右下角的发送按钮才亮起来。发送后按钮变成\"停止\"，外圈转动表示正在生成，点一下就停；⌘↵ 也能发送。",
+  whenToUse: ["给 AI 生成写提示词：画面、镜头、配音。", "对话里的输入框（对话组件里已经带了）。"],
+  whenNotToUse: [
+    { text: "普通的多行文字（简介、备注）：用长文本。", use: "count" },
+    { text: "一行的搜索：用搜索框。", use: "special" },
+  ],
+  related: [
+    { id: "chat", diff: "对话组件底部就是它；单独用时自己接 onSend。" },
+    { id: "count", diff: "长文本只管写；提示词输入框还能发送、停止、加附件。" },
+    { id: "upload", diff: "附件的上传进度在附件缩略图上；整块的拖放上传用上传组件。" },
+  ],
+  import: {
+    html: 'import { createComposer } from "satin-ui"; // 给一个空容器',
+    react: 'import { Composer } from "satin-ui/react";',
+    vue: 'import { Composer } from "satin-ui/vue";',
+    svelte: 'import Satin from "satin-ui/svelte/Satin.svelte"; import { createComposer } from "satin-ui";',
+    angular: 'import { createComposer } from "satin-ui";',
+    solid: 'import { createComposer } from "satin-ui";',
+    preact: 'import { Composer } from "satin-ui/react"; // 经 preact/compat',
+  },
+  importNote: {
+    react: "`<Composer onSend>`：`onSend({ text, files })` 返回 Promise 时，发送后进入\"生成中\"（按钮变停止），Promise 结束回到可发送；`onStop` 接住停止；`upload(file, progress)` 真上传附件。",
+    preact: "经 preact/compat 用 `satin-ui/react` 的 `Composer`。",
+    vue: "`<Composer @send @stop>`：`@send` 的处理函数返回 Promise 时发送后进入\"生成中\"；`:upload` 真上传附件。",
+    svelte: "没有专门的 Svelte 组件：用 `Satin.svelte` 包 `createComposer`，`onSend` 写在 `options` 里。",
+    angular: "没有专门的组件：`afterNextRender` 里 `createComposer(元素, 选项)`，`DestroyRef.onDestroy` 里 `destroy()`。",
+    solid: "没有专门的组件：`onSettled` 里 `createComposer(元素, 选项)`，返回的函数里 `destroy()`。",
+    html: "给空容器 `createComposer(容器, { onSend, onStop, upload })`；返回的实例 `setBusy(on)`、`clear()`、`files()`。",
+  },
+  dts: { factory: "createComposer", react: "Composer", vue: "Composer", functions: ["composerHTML"] },
+  props: [
+    { name: "placeholder", type: "string", default: "\"\"", required: false, desc: "空着时的提示：写个例子。", names: { js: "placeholder", react: "placeholder", preact: "placeholder", vue: "placeholder" } },
+    { name: "max", type: "number", default: "500", required: false, desc: "字数上限（右下角的用量环）。", names: { js: "max", react: "max", preact: "max", vue: "max" } },
+    { name: "maxLines", type: "number", default: "5", required: false, desc: "最多长到几行，再多在里面滚。", names: { js: "maxLines", react: "maxLines", preact: "maxLines", vue: "maxLines（模板里写 max-lines）" } },
+    { name: "attach", type: "boolean", default: "true", required: false, desc: "左下角的 +（加图片、视频、音频、文档）。", names: { js: "attach", react: "attach", preact: "attach", vue: "attach" } },
+    { name: "send", type: "string", default: "\"发送\"", required: false, desc: "发送按钮的名字（读屏、提示里）：\"生成\"。", names: { js: "send", react: "send", preact: "send", vue: "send" } },
+    { name: "upload", type: "(file: File, progress: (p: number) => void) => Promise<unknown>", default: "演示用的假进度", required: false,
+      desc: "真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。", names: { js: "upload", react: "upload", preact: "upload", vue: "upload" } },
+    { name: "external", type: "boolean", default: "false", required: false, desc: "发送由外面接管（对话组件里用），发送后不在这里清空。", names: { js: "external" } },
+  ],
+  events: [
+    { name: "send", payload: "{ text: string; files: HTMLElement[] }", when: "点发送或按 ⌘↵（有内容时）。返回 Promise 时进入\"生成中\"，结束回到可发送。", names: { js: "onSend", react: "onSend", preact: "onSend", vue: "@send", html: "onSend" } },
+    { name: "stop", payload: "—", when: "生成中点了停止。", names: { js: "onStop", react: "onStop", preact: "onStop", vue: "@stop", html: "onStop" } },
+  ],
+  slots: [],
+  methods: [
+    { name: "setBusy", kind: "method", signature: "setBusy(on: boolean): void", returns: "void", desc: "手动进入 / 退出\"生成中\"（不用 Promise 时）。" },
+    { name: "clear", kind: "method", signature: "clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void", returns: "void", desc: "清空（`smooth` 时文字淡出、框缩回去）。" },
+    { name: "files", kind: "method", signature: "files(): HTMLElement[]", returns: "HTMLElement[]", desc: "现在的附件（缩略图元素）。" },
+  ],
+  functions: [
+    { name: "composerHTML", signature: "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean }): string", returns: "string", from: "satin-ui", desc: "拼出提示词输入框的标记（服务端渲染、模板里用）。" },
+  ],
+  cssVars: [
+    { name: "--sn-field", desc: "输入框底色", default: "白（深色主题深灰）", token: true },
+    { name: "--sn-accent", desc: "发送按钮（有内容时亮起来）", default: "#1d1d1f", token: true },
+  ],
+  classes: [
+    { name: ".sn-box-in.sn-composer[data-composer]", desc: "提示词输入框（data-max、data-max-lines）" },
+    { name: ".sn-cm-files / .sn-cm-bar / .sn-cm-send", desc: "附件 / 底栏 / 发送按钮（生成中 .sn-busy）" },
+  ],
+  types: ["ComposerProps"],
+  keyboard: [{ keys: "⌘↵ / Ctrl+↵", does: "发送。" }, { keys: "⇧↵", does: "换行。" }],
+  a11y: {
+    roles: ["发送按钮写 `aria-label`（\"生成\"），生成中换成\"停止\"；附件按钮写\"添加附件\"。"],
+    focus: ["发送以后焦点留在输入框；停止以后回到可以接着写。"],
+    notes: ["没有内容时发送按钮是暗的，但还能聚焦（读屏读得到）。"],
+  },
+  design: {
+    do: ["placeholder 写一个具体的例子。", "生成中让人随时能停。"],
+    dont: [
+      { text: "发送按钮用渐变、发光。", rule: "no-colored-shadow" },
+      { text: "生成中把整个页面锁住。", rule: "no-overlap" },
+    ],
+    copy: ["\"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\"。"],
+    motion: [{ what: "框长高", easing: "ease.out", duration: "180ms" }, { what: "发送按钮亮起来", easing: "ease.out", duration: "150ms" }, { what: "生成中外圈转动", easing: "linear", duration: "1.2s 一圈" }],
+  },
+  examples: [
+    { slug: "prompt-basic", title: "最简单的用法", why: "onSend 返回 Promise：发送后按钮变成停止、外圈转动，结束回到可发送。", html: `<div id="prompt-basic"></div>`, code: code("prompt-basic") },
+    { slug: "prompt-stop", title: "停止生成", why: "生成中点停止：onStop 里取消请求，onSend 的 Promise 结束就回到可发送。", html: `<div id="prompt-stop"></div>`, code: code("prompt-stop") },
+    { slug: "prompt-upload", title: "附件真上传", why: "upload(file, progress)：在这里上传，progress 更新附件上的进度环。", html: `<div id="prompt-upload"></div>`, code: code("prompt-upload") },
+  ],
+};

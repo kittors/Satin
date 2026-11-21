@@ -97,6 +97,342 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "发送按钮写 `aria-label`（\"生成\"），生成中换成\"停止\"；附件按钮写\"添加附件\"。"
+    ],
+    "focus": [
+      "发送以后焦点留在输入框；停止以后回到可以接着写。"
+    ],
+    "notes": [
+      "没有内容时发送按钮是暗的，但还能聚焦（读屏读得到）。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "提示词输入框",
+  "lead": "生成画面时用：框随内容长高，可以加参考图；有内容时右下角的发送按钮才亮起来。发送后按钮变成\"停止\"，外圈转动表示正在生成，点一下就停；⌘↵ 也能发送。",
+  "whenToUse": [
+    "给 AI 生成写提示词：画面、镜头、配音。",
+    "对话里的输入框（对话组件里已经带了）。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "普通的多行文字（简介、备注）：用长文本。",
+      "use": "count"
+    },
+    {
+      "text": "一行的搜索：用搜索框。",
+      "use": "special"
+    }
+  ],
+  "related": [
+    {
+      "id": "chat",
+      "diff": "对话组件底部就是它；单独用时自己接 onSend。"
+    },
+    {
+      "id": "count",
+      "diff": "长文本只管写；提示词输入框还能发送、停止、加附件。"
+    },
+    {
+      "id": "upload",
+      "diff": "附件的上传进度在附件缩略图上；整块的拖放上传用上传组件。"
+    }
+  ],
+  "import": {
+    "html": "import { createComposer } from \"satin-ui\"; // 给一个空容器",
+    "react": "import { Composer } from \"satin-ui/react\";",
+    "vue": "import { Composer } from \"satin-ui/vue\";",
+    "svelte": "import Satin from \"satin-ui/svelte/Satin.svelte\"; import { createComposer } from \"satin-ui\";",
+    "angular": "import { createComposer } from \"satin-ui\";",
+    "solid": "import { createComposer } from \"satin-ui\";",
+    "preact": "import { Composer } from \"satin-ui/react\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`<Composer onSend>`：`onSend({ text, files })` 返回 Promise 时，发送后进入\"生成中\"（按钮变停止），Promise 结束回到可发送；`onStop` 接住停止；`upload(file, progress)` 真上传附件。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Composer`。",
+    "vue": "`<Composer @send @stop>`：`@send` 的处理函数返回 Promise 时发送后进入\"生成中\"；`:upload` 真上传附件。",
+    "svelte": "没有专门的 Svelte 组件：用 `Satin.svelte` 包 `createComposer`，`onSend` 写在 `options` 里。",
+    "angular": "没有专门的组件：`afterNextRender` 里 `createComposer(元素, 选项)`，`DestroyRef.onDestroy` 里 `destroy()`。",
+    "solid": "没有专门的组件：`onSettled` 里 `createComposer(元素, 选项)`，返回的函数里 `destroy()`。",
+    "html": "给空容器 `createComposer(容器, { onSend, onStop, upload })`；返回的实例 `setBusy(on)`、`clear()`、`files()`。"
+  },
+  "dts": {
+    "factory": "createComposer",
+    "react": "Composer",
+    "vue": "Composer",
+    "functions": [
+      "composerHTML"
+    ]
+  },
+  "props": [
+    {
+      "name": "placeholder",
+      "type": "string",
+      "default": "\"\"",
+      "required": false,
+      "desc": "空着时的提示：写个例子。",
+      "names": {
+        "js": "placeholder",
+        "react": "placeholder",
+        "preact": "placeholder",
+        "vue": "placeholder"
+      }
+    },
+    {
+      "name": "max",
+      "type": "number",
+      "default": "500",
+      "required": false,
+      "desc": "字数上限（右下角的用量环）。",
+      "names": {
+        "js": "max",
+        "react": "max",
+        "preact": "max",
+        "vue": "max"
+      }
+    },
+    {
+      "name": "maxLines",
+      "type": "number",
+      "default": "5",
+      "required": false,
+      "desc": "最多长到几行，再多在里面滚。",
+      "names": {
+        "js": "maxLines",
+        "react": "maxLines",
+        "preact": "maxLines",
+        "vue": "maxLines（模板里写 max-lines）"
+      }
+    },
+    {
+      "name": "attach",
+      "type": "boolean",
+      "default": "true",
+      "required": false,
+      "desc": "左下角的 +（加图片、视频、音频、文档）。",
+      "names": {
+        "js": "attach",
+        "react": "attach",
+        "preact": "attach",
+        "vue": "attach"
+      }
+    },
+    {
+      "name": "send",
+      "type": "string",
+      "default": "\"发送\"",
+      "required": false,
+      "desc": "发送按钮的名字（读屏、提示里）：\"生成\"。",
+      "names": {
+        "js": "send",
+        "react": "send",
+        "preact": "send",
+        "vue": "send"
+      }
+    },
+    {
+      "name": "upload",
+      "type": "(file: File, progress: (p: number) => void) => Promise<unknown>",
+      "default": "演示用的假进度",
+      "required": false,
+      "desc": "真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。",
+      "names": {
+        "js": "upload",
+        "react": "upload",
+        "preact": "upload",
+        "vue": "upload"
+      }
+    },
+    {
+      "name": "external",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "发送由外面接管（对话组件里用），发送后不在这里清空。",
+      "names": {
+        "js": "external"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "send",
+      "payload": "{ text: string; files: HTMLElement[] }",
+      "when": "点发送或按 ⌘↵（有内容时）。返回 Promise 时进入\"生成中\"，结束回到可发送。",
+      "names": {
+        "js": "onSend",
+        "react": "onSend",
+        "preact": "onSend",
+        "vue": "@send",
+        "html": "onSend"
+      }
+    },
+    {
+      "name": "stop",
+      "payload": "—",
+      "when": "生成中点了停止。",
+      "names": {
+        "js": "onStop",
+        "react": "onStop",
+        "preact": "onStop",
+        "vue": "@stop",
+        "html": "onStop"
+      }
+    }
+  ],
+  "slots": [],
+  "methods": [
+    {
+      "name": "setBusy",
+      "kind": "method",
+      "signature": "setBusy(on: boolean): void",
+      "returns": "void",
+      "desc": "手动进入 / 退出\"生成中\"（不用 Promise 时）。"
+    },
+    {
+      "name": "clear",
+      "kind": "method",
+      "signature": "clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void",
+      "returns": "void",
+      "desc": "清空（`smooth` 时文字淡出、框缩回去）。"
+    },
+    {
+      "name": "files",
+      "kind": "method",
+      "signature": "files(): HTMLElement[]",
+      "returns": "HTMLElement[]",
+      "desc": "现在的附件（缩略图元素）。"
+    }
+  ],
+  "functions": [
+    {
+      "name": "composerHTML",
+      "signature": "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean }): string",
+      "returns": "string",
+      "from": "satin-ui",
+      "desc": "拼出提示词输入框的标记（服务端渲染、模板里用）。"
+    }
+  ],
+  "cssVars": [
+    {
+      "name": "--sn-field",
+      "desc": "输入框底色",
+      "default": "白（深色主题深灰）",
+      "token": true
+    },
+    {
+      "name": "--sn-accent",
+      "desc": "发送按钮（有内容时亮起来）",
+      "default": "#1d1d1f",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-box-in.sn-composer[data-composer]",
+      "desc": "提示词输入框（data-max、data-max-lines）"
+    },
+    {
+      "name": ".sn-cm-files / .sn-cm-bar / .sn-cm-send",
+      "desc": "附件 / 底栏 / 发送按钮（生成中 .sn-busy）"
+    }
+  ],
+  "types": [
+    "ComposerProps"
+  ],
+  "keyboard": [
+    {
+      "keys": "⌘↵ / Ctrl+↵",
+      "does": "发送。"
+    },
+    {
+      "keys": "⇧↵",
+      "does": "换行。"
+    }
+  ],
+  "design": {
+    "do": [
+      "placeholder 写一个具体的例子。",
+      "生成中让人随时能停。"
+    ],
+    "dont": [
+      {
+        "text": "发送按钮用渐变、发光。",
+        "rule": "no-colored-shadow"
+      },
+      {
+        "text": "生成中把整个页面锁住。",
+        "rule": "no-overlap"
+      }
+    ],
+    "copy": [
+      "\"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\"。"
+    ],
+    "motion": [
+      {
+        "what": "框长高",
+        "easing": "ease.out",
+        "duration": "180ms"
+      },
+      {
+        "what": "发送按钮亮起来",
+        "easing": "ease.out",
+        "duration": "150ms"
+      },
+      {
+        "what": "生成中外圈转动",
+        "easing": "linear",
+        "duration": "1.2s 一圈"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "prompt-basic",
+      "title": "最简单的用法",
+      "why": "onSend 返回 Promise：发送后按钮变成停止、外圈转动，结束回到可发送。",
+      "html": "<div id=\"prompt-basic\"></div>",
+      "code": {
+        "html": "<div id=\"prompt-basic\"></div>\n\n<script type=\"module\">\n  import { createComposer, toast } from \"satin-ui\";\n  // 发送以后返回 Promise：按钮变成\"停止\"、外圈转动；Promise 结束回到可发送\n  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n  // 有内容时发送按钮才亮；⌘↵ 也能发送\n  createComposer(document.getElementById(\"prompt-basic\"), {\n    placeholder: \"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\",\n    max: 300,\n    send: \"生成\",\n    onSend: generate,\n  });\n</script>\n",
+        "react": "import { Composer, toast } from \"satin-ui/react\";\n\n// 发送以后返回 Promise：按钮变成\"停止\"、外圈转动；Promise 结束回到可发送\nconst generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\nexport default function ScenePrompt() {\n  return <Composer placeholder=\"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\" max={300} send=\"生成\" onSend={generate} />;\n}\n",
+        "vue": "<script setup>\nimport { Composer, toast } from \"satin-ui/vue\";\n\n// 发送以后返回 Promise：按钮变成\"停止\"、外圈转动；Promise 结束回到可发送\nconst generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n</script>\n\n<template>\n  <!-- @send 返回 Promise：发送后按钮变成\"停止\"，结束回到可发送 -->\n  <Composer placeholder=\"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\" :max=\"300\" send=\"生成\" @send=\"generate\" />\n</template>\n",
+        "svelte": "<script>\n  import Satin from \"satin-ui/svelte/Satin.svelte\";\n  import { createComposer, toast } from \"satin-ui\";\n  // 发送以后返回 Promise：按钮变成\"停止\"、外圈转动；Promise 结束回到可发送\n  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\n  // 有内容时发送按钮才亮；⌘↵ 也能发送\n  const options = {\n    placeholder: \"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\",\n    max: 300,\n    send: \"生成\",\n    onSend: generate,\n  };\n</script>\n\n<!-- 这个组件没有单独的 Svelte 封装：用 Satin 包 createComposer，选项写在 options 里 -->\n<Satin create={createComposer} {options} />\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// 发送以后返回 Promise：按钮变成\"停止\"、外圈转动；Promise 结束回到可发送\nconst generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\n@Component({\n  selector: \"demo-prompt-basic\",\n  template: `<div #host></div>`,\n})\nexport class PromptBasicComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 有内容时发送按钮才亮；⌘↵ 也能发送；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createComposer(this.host().nativeElement, {\n        placeholder: \"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\",\n        max: 300,\n        send: \"生成\",\n        onSend: generate,\n      });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// 发送以后返回 Promise：按钮变成\"停止\"、外圈转动；Promise 结束回到可发送\nconst generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\nexport default function ScenePrompt() {\n  let host;\n  // 有内容时发送按钮才亮；⌘↵ 也能发送；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createComposer(host, {\n      placeholder: \"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\",\n      max: 300,\n      send: \"生成\",\n      onSend: generate,\n    });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Composer, toast } from \"satin-ui/react\";\n\n// 发送以后返回 Promise：按钮变成\"停止\"、外圈转动；Promise 结束回到可发送\nconst generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: \"已生成：\" + text.slice(0, 12) }); done(); }, 2000));\n\nexport default function ScenePrompt() {\n  return <Composer placeholder=\"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\" max={300} send=\"生成\" onSend={generate} />;\n}\n"
+      }
+    },
+    {
+      "slug": "prompt-stop",
+      "title": "停止生成",
+      "why": "生成中点停止：onStop 里取消请求，onSend 的 Promise 结束就回到可发送。",
+      "html": "<div id=\"prompt-stop\"></div>",
+      "code": {
+        "html": "<div id=\"prompt-stop\"></div>\n\n<script type=\"module\">\n  import { createComposer, toast } from \"satin-ui\";\n  // 点\"停止\"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送\n  let cancel = null;\n  const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error(\"已停止\")); }; });\n  const stop = () => { cancel?.(); toast({ text: \"已停止生成\" }); };\n  // 生成中点停止，onStop 里取消\n  createComposer(document.getElementById(\"prompt-stop\"), { placeholder: \"描述画面，发送后可以随时停止\", send: \"生成\", onSend: generate, onStop: stop });\n</script>\n",
+        "react": "import { Composer, toast } from \"satin-ui/react\";\n\n// 点\"停止\"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送\nlet cancel = null;\nconst generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error(\"已停止\")); }; });\nconst stop = () => { cancel?.(); toast({ text: \"已停止生成\" }); };\n\nexport default function StoppablePrompt() {\n  return <Composer placeholder=\"描述画面，发送后可以随时停止\" send=\"生成\" onSend={generate} onStop={stop} />;\n}\n",
+        "vue": "<script setup>\nimport { Composer, toast } from \"satin-ui/vue\";\n\n// 点\"停止\"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送\nlet cancel = null;\nconst generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error(\"已停止\")); }; });\nconst stop = () => { cancel?.(); toast({ text: \"已停止生成\" }); };\n</script>\n\n<template>\n  <Composer placeholder=\"描述画面，发送后可以随时停止\" send=\"生成\" @send=\"generate\" @stop=\"stop\" />\n</template>\n",
+        "svelte": "<script>\n  import Satin from \"satin-ui/svelte/Satin.svelte\";\n  import { createComposer, toast } from \"satin-ui\";\n  // 点\"停止\"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送\n  let cancel = null;\n  const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error(\"已停止\")); }; });\n  const stop = () => { cancel?.(); toast({ text: \"已停止生成\" }); };\n\n  // 生成中点停止，onStop 里取消\n  const options = { placeholder: \"描述画面，发送后可以随时停止\", send: \"生成\", onSend: generate, onStop: stop };\n</script>\n\n<!-- 这个组件没有单独的 Svelte 封装：用 Satin 包 createComposer，选项写在 options 里 -->\n<Satin create={createComposer} {options} />\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// 点\"停止\"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送\nlet cancel: (() => void) | null = null;\nconst generate = () => new Promise<void>((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error(\"已停止\")); }; });\nconst stop = () => { cancel?.(); toast({ text: \"已停止生成\" }); };\n\n@Component({\n  selector: \"demo-prompt-stop\",\n  template: `<div #host></div>`,\n})\nexport class PromptStopComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 生成中点停止，onStop 里取消；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createComposer(this.host().nativeElement, { placeholder: \"描述画面，发送后可以随时停止\", send: \"生成\", onSend: generate, onStop: stop });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// 点\"停止\"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送\nlet cancel = null;\nconst generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error(\"已停止\")); }; });\nconst stop = () => { cancel?.(); toast({ text: \"已停止生成\" }); };\n\nexport default function StoppablePrompt() {\n  let host;\n  // 生成中点停止，onStop 里取消；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createComposer(host, { placeholder: \"描述画面，发送后可以随时停止\", send: \"生成\", onSend: generate, onStop: stop });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Composer, toast } from \"satin-ui/react\";\n\n// 点\"停止\"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送\nlet cancel = null;\nconst generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error(\"已停止\")); }; });\nconst stop = () => { cancel?.(); toast({ text: \"已停止生成\" }); };\n\nexport default function StoppablePrompt() {\n  return <Composer placeholder=\"描述画面，发送后可以随时停止\" send=\"生成\" onSend={generate} onStop={stop} />;\n}\n"
+      }
+    },
+    {
+      "slug": "prompt-upload",
+      "title": "附件真上传",
+      "why": "upload(file, progress)：在这里上传，progress 更新附件上的进度环。",
+      "html": "<div id=\"prompt-upload\"></div>",
+      "code": {
+        "html": "<div id=\"prompt-upload\"></div>\n\n<script type=\"module\">\n  import { createComposer, toast } from \"satin-ui\";\n  // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\n  const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n  // 拖进来、粘贴截图、点 + 都能加附件\n  createComposer(document.getElementById(\"prompt-upload\"), { placeholder: \"拖进参考图，或者点左下角的 +\", send: \"生成\", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) });\n</script>\n",
+        "react": "import { Composer, toast } from \"satin-ui/react\";\n\n// upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\nconst upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n\nexport default function PromptWithFiles() {\n  return <Composer placeholder=\"拖进参考图，或者点左下角的 +\" send=\"生成\" upload={upload} onSend={({ files }) => toast({ text: `带着 ${files.length} 个附件发送` })} />;\n}\n",
+        "vue": "<script setup>\nimport { Composer, toast } from \"satin-ui/vue\";\n\n// upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\nconst upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n</script>\n\n<template>\n  <Composer placeholder=\"拖进参考图，或者点左下角的 +\" send=\"生成\" :upload=\"upload\" @send=\"({ files }) => toast({ text: `带着 ${files.length} 个附件发送` })\" />\n</template>\n",
+        "svelte": "<script>\n  import Satin from \"satin-ui/svelte/Satin.svelte\";\n  import { createComposer, toast } from \"satin-ui\";\n  // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\n  const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n\n  // 拖进来、粘贴截图、点 + 都能加附件\n  const options = { placeholder: \"拖进参考图，或者点左下角的 +\", send: \"生成\", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) };\n</script>\n\n<!-- 这个组件没有单独的 Svelte 封装：用 Satin 包 createComposer，选项写在 options 里 -->\n<Satin create={createComposer} {options} />\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\nconst upload = (file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n\n@Component({\n  selector: \"demo-prompt-upload\",\n  template: `<div #host></div>`,\n})\nexport class PromptUploadComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 拖进来、粘贴截图、点 + 都能加附件；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createComposer(this.host().nativeElement, { placeholder: \"拖进参考图，或者点左下角的 +\", send: \"生成\", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createComposer, toast } from \"satin-ui\";\n\n// upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\nconst upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n\nexport default function PromptWithFiles() {\n  let host;\n  // 拖进来、粘贴截图、点 + 都能加附件；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createComposer(host, { placeholder: \"拖进参考图，或者点左下角的 +\", send: \"生成\", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Composer, toast } from \"satin-ui/react\";\n\n// upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise\nconst upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });\n\nexport default function PromptWithFiles() {\n  return <Composer placeholder=\"拖进参考图，或者点左下角的 +\" send=\"生成\" upload={upload} onSend={({ files }) => toast({ text: `带着 ${files.length} 个附件发送` })} />;\n}\n"
+      }
+    }
+  ]
 }

@@ -259,6 +259,36 @@
   "css": true
  },
  {
+  "slug": "compound-basic",
+  "id": "compound",
+  "n": -1,
+  "name": "组合按钮",
+  "group": "按钮",
+  "cap": "最简单的用法：按钮组",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "compound-copy",
+  "id": "compound",
+  "n": -1,
+  "name": "组合按钮",
+  "group": "按钮",
+  "cap": "复制按钮",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "compound-split",
+  "id": "compound",
+  "n": -1,
+  "name": "组合按钮",
+  "group": "按钮",
+  "cap": "分裂按钮",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "compound-0",
   "id": "compound",
   "n": 0,
@@ -403,6 +433,36 @@
   "css": true
  },
  {
+  "slug": "special-basic",
+  "id": "special",
+  "n": -1,
+  "name": "搜索、密码、邮箱",
+  "group": "表单",
+  "cap": "最简单的用法：搜索框",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "special-email",
+  "id": "special",
+  "n": -1,
+  "name": "搜索、密码、邮箱",
+  "group": "表单",
+  "cap": "受控：邮箱",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "special-password",
+  "id": "special",
+  "n": -1,
+  "name": "搜索、密码、邮箱",
+  "group": "表单",
+  "cap": "设置密码",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "special-0",
   "id": "special",
   "n": 0,
@@ -410,6 +470,36 @@
   "group": "表单",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "count-longtext",
+  "id": "count",
+  "n": -1,
+  "name": "字数统计",
+  "group": "表单",
+  "cap": "长文本",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "count-controlled",
+  "id": "count",
+  "n": -1,
+  "name": "字数统计",
+  "group": "表单",
+  "cap": "受控：从外面改值",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "count-basic",
+  "id": "count",
+  "n": -1,
+  "name": "字数统计",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "count-0",
@@ -497,6 +587,36 @@
   "group": "表单",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "prompt-upload",
+  "id": "prompt",
+  "n": -1,
+  "name": "提示词输入框",
+  "group": "表单",
+  "cap": "附件真上传",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "prompt-stop",
+  "id": "prompt",
+  "n": -1,
+  "name": "提示词输入框",
+  "group": "表单",
+  "cap": "停止生成",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "prompt-basic",
+  "id": "prompt",
+  "n": -1,
+  "name": "提示词输入框",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "prompt-0",

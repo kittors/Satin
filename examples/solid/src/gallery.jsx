@@ -32,6 +32,9 @@ import LinkArrow from "./demos/link-arrow.jsx";
 import LinkTextbtn from "./demos/link-textbtn.jsx";
 import LinkBasic from "./demos/link-basic.jsx";
 import LinkDemo0 from "./demos/link-0.jsx";
+import CompoundBasic from "./demos/compound-basic.jsx";
+import CompoundCopy from "./demos/compound-copy.jsx";
+import CompoundSplit from "./demos/compound-split.jsx";
 import CompoundDemo0 from "./demos/compound-0.jsx";
 import ChipRemovable from "./demos/chip-removable.jsx";
 import ChipControlled from "./demos/chip-controlled.jsx";
@@ -47,7 +50,13 @@ import InputBasic from "./demos/input-basic.jsx";
 import InputDemo0 from "./demos/input-0.jsx";
 import InputDemo1 from "./demos/input-1.jsx";
 import InputDemo2 from "./demos/input-2.jsx";
+import SpecialBasic from "./demos/special-basic.jsx";
+import SpecialEmail from "./demos/special-email.jsx";
+import SpecialPassword from "./demos/special-password.jsx";
 import SpecialDemo0 from "./demos/special-0.jsx";
+import CountLongtext from "./demos/count-longtext.jsx";
+import CountControlled from "./demos/count-controlled.jsx";
+import CountBasic from "./demos/count-basic.jsx";
 import CountDemo0 from "./demos/count-0.jsx";
 import TaginputHint from "./demos/taginput-hint.jsx";
 import TaginputControlled from "./demos/taginput-controlled.jsx";
@@ -57,6 +66,9 @@ import NumberRange from "./demos/number-range.jsx";
 import NumberControlled from "./demos/number-controlled.jsx";
 import NumberBasic from "./demos/number-basic.jsx";
 import NumberDemo0 from "./demos/number-0.jsx";
+import PromptUpload from "./demos/prompt-upload.jsx";
+import PromptStop from "./demos/prompt-stop.jsx";
+import PromptBasic from "./demos/prompt-basic.jsx";
 import PromptDemo0 from "./demos/prompt-0.jsx";
 import SelectDemo0 from "./demos/select-0.jsx";
 import PickerDemo0 from "./demos/picker-0.jsx";
@@ -281,6 +293,9 @@ function Gallery() {
       </section>
       <section id="compound">
         <h2>组合按钮</h2>
+        <div class="demo" data-demo="compound-basic"><CompoundBasic /></div>
+        <div class="demo" data-demo="compound-copy"><CompoundCopy /></div>
+        <div class="demo" data-demo="compound-split"><CompoundSplit /></div>
         <div class="demo" data-demo="compound-0"><CompoundDemo0 /></div>
       </section>
       <section id="chip">
@@ -308,10 +323,16 @@ function Gallery() {
       </section>
       <section id="special">
         <h2>搜索、密码、邮箱</h2>
+        <div class="demo" data-demo="special-basic"><SpecialBasic /></div>
+        <div class="demo" data-demo="special-email"><SpecialEmail /></div>
+        <div class="demo" data-demo="special-password"><SpecialPassword /></div>
         <div class="demo" data-demo="special-0"><SpecialDemo0 /></div>
       </section>
       <section id="count">
         <h2>字数统计</h2>
+        <div class="demo" data-demo="count-longtext"><CountLongtext /></div>
+        <div class="demo" data-demo="count-controlled"><CountControlled /></div>
+        <div class="demo" data-demo="count-basic"><CountBasic /></div>
         <div class="demo" data-demo="count-0"><CountDemo0 /></div>
       </section>
       <section id="taginput">
@@ -330,6 +351,9 @@ function Gallery() {
       </section>
       <section id="prompt">
         <h2>提示词输入框</h2>
+        <div class="demo" data-demo="prompt-upload"><PromptUpload /></div>
+        <div class="demo" data-demo="prompt-stop"><PromptStop /></div>
+        <div class="demo" data-demo="prompt-basic"><PromptBasic /></div>
         <div class="demo" data-demo="prompt-0"><PromptDemo0 /></div>
       </section>
       <section id="select">

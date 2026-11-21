@@ -1,0 +1,7 @@
+<div id="count-controlled"></div>
+
+<script type="module">
+  import { createCount } from "satin-ui";
+  // onChange 拿到新值；程序里改值用 update({ value })
+  createCount(document.getElementById("count-controlled"), { max: 8, value: "林夏", id: "role-name", onChange: (v) => console.log("角色名：", v) });
+</script>

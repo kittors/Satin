@@ -29,6 +29,9 @@ import LinkArrow from "../demos/link-arrow.vue";
 import LinkTextbtn from "../demos/link-textbtn.vue";
 import LinkBasic from "../demos/link-basic.vue";
 import LinkDemo0 from "../demos/link-0.vue";
+import CompoundBasic from "../demos/compound-basic.vue";
+import CompoundCopy from "../demos/compound-copy.vue";
+import CompoundSplit from "../demos/compound-split.vue";
 import CompoundDemo0 from "../demos/compound-0.vue";
 import ChipRemovable from "../demos/chip-removable.vue";
 import ChipControlled from "../demos/chip-controlled.vue";
@@ -44,7 +47,13 @@ import InputBasic from "../demos/input-basic.vue";
 import InputDemo0 from "../demos/input-0.vue";
 import InputDemo1 from "../demos/input-1.vue";
 import InputDemo2 from "../demos/input-2.vue";
+import SpecialBasic from "../demos/special-basic.vue";
+import SpecialEmail from "../demos/special-email.vue";
+import SpecialPassword from "../demos/special-password.vue";
 import SpecialDemo0 from "../demos/special-0.vue";
+import CountLongtext from "../demos/count-longtext.vue";
+import CountControlled from "../demos/count-controlled.vue";
+import CountBasic from "../demos/count-basic.vue";
 import CountDemo0 from "../demos/count-0.vue";
 import TaginputHint from "../demos/taginput-hint.vue";
 import TaginputControlled from "../demos/taginput-controlled.vue";
@@ -54,6 +63,9 @@ import NumberRange from "../demos/number-range.vue";
 import NumberControlled from "../demos/number-controlled.vue";
 import NumberBasic from "../demos/number-basic.vue";
 import NumberDemo0 from "../demos/number-0.vue";
+import PromptUpload from "../demos/prompt-upload.vue";
+import PromptStop from "../demos/prompt-stop.vue";
+import PromptBasic from "../demos/prompt-basic.vue";
 import PromptDemo0 from "../demos/prompt-0.vue";
 import SelectDemo0 from "../demos/select-0.vue";
 import PickerDemo0 from "../demos/picker-0.vue";
@@ -278,6 +290,9 @@ import SelectMenu from "../demos/select-menu.vue";
   </section>
   <section id="compound">
     <h2>组合按钮</h2>
+    <div class="demo" data-demo="compound-basic"><CompoundBasic /></div>
+    <div class="demo" data-demo="compound-copy"><CompoundCopy /></div>
+    <div class="demo" data-demo="compound-split"><CompoundSplit /></div>
     <div class="demo" data-demo="compound-0"><CompoundDemo0 /></div>
   </section>
   <section id="chip">
@@ -305,10 +320,16 @@ import SelectMenu from "../demos/select-menu.vue";
   </section>
   <section id="special">
     <h2>搜索、密码、邮箱</h2>
+    <div class="demo" data-demo="special-basic"><SpecialBasic /></div>
+    <div class="demo" data-demo="special-email"><SpecialEmail /></div>
+    <div class="demo" data-demo="special-password"><SpecialPassword /></div>
     <div class="demo" data-demo="special-0"><SpecialDemo0 /></div>
   </section>
   <section id="count">
     <h2>字数统计</h2>
+    <div class="demo" data-demo="count-longtext"><CountLongtext /></div>
+    <div class="demo" data-demo="count-controlled"><CountControlled /></div>
+    <div class="demo" data-demo="count-basic"><CountBasic /></div>
     <div class="demo" data-demo="count-0"><CountDemo0 /></div>
   </section>
   <section id="taginput">
@@ -327,6 +348,9 @@ import SelectMenu from "../demos/select-menu.vue";
   </section>
   <section id="prompt">
     <h2>提示词输入框</h2>
+    <div class="demo" data-demo="prompt-upload"><PromptUpload /></div>
+    <div class="demo" data-demo="prompt-stop"><PromptStop /></div>
+    <div class="demo" data-demo="prompt-basic"><PromptBasic /></div>
     <div class="demo" data-demo="prompt-0"><PromptDemo0 /></div>
   </section>
   <section id="select">

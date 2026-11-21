@@ -1,4 +1,4 @@
-import { onCleanup, onMount } from "solid-js";
+import { onSettled } from "solid-js";
 import { createCommandPalette, toast } from "satin-ui";
 
 const GROUPS = [
@@ -8,8 +8,10 @@ const GROUPS = [
 export default function RecentProjects() {
   let cmdk;
   // hotkey: false：页面里 ⌘K 已经有别的用处时关掉快捷键，只从按钮打开；sub 写在每条右边
-  onMount(() => { cmdk = createCommandPalette(GROUPS, { hotkey: false, placeholder: "搜索最近打开的项目", onRun: (it) => toast({ text: "打开：" + it.name }) }); });
-  onCleanup(() => cmdk?.destroy());
+  onSettled(() => {
+    cmdk = createCommandPalette(GROUPS, { hotkey: false, placeholder: "搜索最近打开的项目", onRun: (it) => toast({ text: "打开：" + it.name }) });
+    return () => cmdk.destroy(); // 卸载时撤掉这次加的命令和 ⌘K 监听
+  });
   return (
     <sn-enhance>
       <button type="button" class="sn-btn sn-secondary" onClick={() => cmdk?.open()}><span data-i="clock:before"></span>最近打开</button>
