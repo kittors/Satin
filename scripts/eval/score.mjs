@@ -32,7 +32,7 @@ const TASKS = JSON.parse(fs.readFileSync(path.join(ROOT, "eval/tasks.json"), "ut
 const runs = [];
 for (const model of fs.existsSync(BASE) ? fs.readdirSync(BASE) : []) {
   if (arg("model") && model !== arg("model").replace(/[^\w.-]+/g, "_")) continue;
-  for (const cond of ["with", "without"]) for (const fw of ["react", "vue", "html"]) for (const task of TASKS) {
+  for (const cond of ["with", "without", "cli"]) for (const fw of ["react", "vue", "html"]) for (const task of TASKS) {
     const dir = path.join(BASE, model, cond, fw, task.id);
     if (!fs.existsSync(path.join(dir, "_done.json"))) continue;
     if (ONLY && !`${cond}/${fw}/${task.id}`.includes(ONLY)) continue;

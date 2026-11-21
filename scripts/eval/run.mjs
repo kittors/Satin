@@ -2,7 +2,8 @@
 // 每一份都在 /tmp/satin-eval/<批次>/ 下自己的目录里做（不在仓库里），codex 只能写这个目录（workspace-write 沙箱，不联网）；
 // 依赖事先装好（React / Vue 的 Vite 模板；有技能的那份多装 satin-ui 的本地包），技能放进 .agents/skills/satin，再写一份 AGENTS.md。
 // 做完以后的打分在 scripts/eval/score.mjs。
-// 用法：node scripts/eval/run.mjs --batch b1 --model clirelay/gpt-6-luna [--cond with,without] [--fw react,vue,html] [--tasks admin-table,settings] [--jobs 2] [--timeout 30]
+// cond：without（不给技能）、with（技能 + AGENTS.md 手动放进模板项目）、cli（先用 satin init 起项目：样式、theme-boot、技能、AGENTS.md 都是 CLI 配的）
+// 用法：node scripts/eval/run.mjs --batch b1 --model clirelay/gpt-6-luna [--cond with,without,cli] [--fw react,vue,html] [--tasks admin-table,settings] [--jobs 2] [--timeout 30]
 import fs from "node:fs";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
@@ -27,6 +28,7 @@ const sh = (cmd, args, cwd, extra = {}) => { const r = spawnSync(cmd, args, { cw
 // ———— 模板：每种框架 × 有 / 没有 satin-ui 各装一份，评测目录从这里拷（node_modules 用 pnpm 离线装，硬链接，快） ————
 const TPL = path.join(BASE, "_templates");
 function template(fw, satin) {
+  if (satin === "cli") return cliTemplate(fw);
   const dir = path.join(TPL, `${fw}${satin ? "-satin" : ""}`);
   const stamp = satin ? PKG_HASH : "plain";
   if (fs.existsSync(path.join(dir, ".ready")) && fs.readFileSync(path.join(dir, ".ready"), "utf8") === stamp) return dir;
@@ -55,6 +57,17 @@ function template(fw, satin) {
   return dir;
 }
 
+// CLI 起的模板：satin init（不装依赖、satin-ui 用这次打的本地包），再用 pnpm 走共享缓存装依赖
+function cliTemplate(fw) {
+  const dir = path.join(TPL, `${fw}-cli`), stamp = PKG_HASH + "-cli";
+  if (fs.existsSync(path.join(dir, ".ready")) && fs.readFileSync(path.join(dir, ".ready"), "utf8") === stamp) return dir;
+  fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(path.dirname(dir), { recursive: true });
+  sh("node", [path.join(ROOT, "packages/satin-cli/bin/satin.js"), "init", "--framework", fw, "--dir", dir, "--no-install", "--yes", "--pm", "pnpm", "--satin", `file:${PKG}`], TPL);
+  sh("pnpm", ["install", "--config.node-linker=hoisted", "--ignore-workspace", "--prefer-offline"], dir);
+  fs.writeFileSync(path.join(dir, ".ready"), stamp);
+  return dir;
+}
+
 // ———— 一份评测的目录 ————
 const ENV = {
   react: "这是一个 React 19 + Vite 项目（入口 src/main.jsx，页面写在 src/ 里）。依赖已经装好，不能联网，不要装新的依赖。做完以后 `npm run build` 要能通过。",
@@ -66,8 +79,15 @@ function prepare(task, fw, cond) {
   const dir = path.join(OUT, cond, fw, task.id);
   if (fs.existsSync(path.join(dir, "_done.json"))) return { dir, skip: true };
   fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(path.dirname(dir), { recursive: true });
-  const tpl = template(fw, cond === "with");
+  const tpl = template(fw, cond === "cli" ? "cli" : cond === "with");
   sh("cp", ["-Rc", tpl, dir], BASE); // APFS 写时复制：不占额外空间 fs.rmSync(path.join(dir, ".ready"), { force: true });
+  if (cond === "cli") {
+    // CLI 已经写好 AGENTS.md（Satin 那一段）和项目级技能：只在前面补一段项目说明
+    const own = fs.existsSync(path.join(dir, "AGENTS.md")) ? fs.readFileSync(path.join(dir, "AGENTS.md"), "utf8") : "";
+    const where = { react: "入口 src/main.jsx，起步页 src/App.jsx", vue: "入口 src/main.js，起步页 src/App.vue", html: "页面 index.html，脚本 main.js" }[fw];
+    fs.writeFileSync(path.join(dir, "AGENTS.md"), `# 项目说明\n\n这是用 satin init 建好的项目（${where}；起步页只是示例，按需求换掉）。依赖已经装好，不能联网，不要装新的依赖。${fw === "html" ? "用浏览器打开 index.html 能看。" : "做完以后 `npm run build` 要能通过。"}\n（评测环境：检查器只跑 static 模式就行，dom 模式和截图由评测方统一跑。）\n\n${own}`);
+    return { dir, skip: false };
+  }
   let agents = `# 项目说明\n\n${ENV[fw]}\n`;
   if (cond === "with") {
     const sk = path.join(dir, ".agents/skills/satin");

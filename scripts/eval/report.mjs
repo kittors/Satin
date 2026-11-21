@@ -20,9 +20,11 @@ let md = `\n## ${TITLE}\n\n`;
 const models = [...new Set(scores.map((s) => s.model))];
 for (const model of models) {
   const S = scores.filter((s) => s.model === model);
-  md += `### ${model.replace(/_/g, "/")}\n\n| 指标 | 没有技能 | 有 Satin 技能 |\n|---|---|---|\n`;
+  // 有 CLI 那一组（先 satin init 起项目）就多一列
+  const hasCli = S.some((s) => s.cond === "cli"), conds = hasCli ? ["without", "with", "cli"] : ["without", "with"];
+  md += `### ${model.replace(/_/g, "/")}\n\n| 指标 | 没有技能 | 有 Satin 技能 |${hasCli ? " 用 CLI 起项目 |" : ""}\n|---|---|---|${hasCli ? "---|" : ""}\n`;
   const by = (cond) => S.filter((s) => s.cond === cond);
-  const row = (label, fn) => (md += `| ${label} | ${fn(by("without"))} | ${fn(by("with"))} |\n`);
+  const row = (label, fn) => (md += `| ${label} | ${conds.map((c) => fn(by(c))).join(" | ")} |\n`);
   row("份数", (x) => String(x.length));
   row("跑完（没超时）", (x) => pct(x.filter((s) => !s.done?.timeout).length, x.length));
   row("构建 / 打开成功", (x) => pct(x.filter((s) => s.build?.ok).length, x.length));
@@ -41,7 +43,7 @@ for (const model of models) {
     if (!a && !b) continue;
     md += `| ${t.title} | ${fw} | ${cell(a)} | ${cell(b)} |\n`;
   }
-  const notes = S.map((s) => manual[key(s)]?.note && `- ${s.cond === "with" ? "有技能" : "没有技能"} · ${s.fw} · ${s.task}：${manual[key(s)].note}`).filter(Boolean);
+  const notes = S.map((s) => manual[key(s)]?.note && `- ${s.cond === "with" ? "有技能" : s.cond === "cli" ? "CLI 起项目" : "没有技能"} · ${s.fw} · ${s.task}：${manual[key(s)].note}`).filter(Boolean);
   if (notes.length) md += `\n看图记录：\n${notes.join("\n")}\n`;
   md += "\n";
 }
