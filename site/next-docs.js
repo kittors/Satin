@@ -12,8 +12,10 @@ import { mountMobileNav } from "./mnav.js";
 import { USAGE, TALL, EX, WIN } from "./usage.js";
 import { EXAMPLES, API } from "./examples.js";
 import { img } from "./media.js";
+import { variants, demoCSS, guessInline, guessFlex } from "./variants.js";
 
 const side = $("[data-side]"), main = $("[data-main]"), toc = $("[data-toc]"), cat = await loadCatalog();
+const DEMO_SHEET = await fetch(new URL("../demo/kit-demo.css", import.meta.url)).then((r) => r.text()).catch(() => "");
 const OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
@@ -101,7 +103,7 @@ function demoBox(id, { code = true, n } = {}) {
   return `<div class="dx${w ? " is-win" : ""}" data-demo="${id}"${n != null ? ` data-n="${n}"` : ""}>
     <div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div>
     <div class="dx-stage">${w ? `<img class="dx-wall" src="${img("mist", 1800, 70)}" alt="" decoding="async">` : ""}${w ? MAC(w.title, frame) : frame}</div>
-    ${code && c ? ((fs) => `<div class="dx-code" data-sig="${sigOf(fs)}">${codePanel(fs, { fold: 8 })}</div>`)(filesOf(c, null, n)) : ""}
+    ${code && c ? codeSlot(variantFiles(c, null, n)) : ""}
   </div>`;
 }
 // iframe 里内容高度变了会发消息来：框跟着变。第一条消息 = 演示好了：换页等待里、不在视口里、或者记下的高度没变，直接出来；
@@ -158,6 +160,44 @@ function codeOf(demo, doc) {
   }
   return fmtHTML(t.content);
 }
+// ———— 写法切换：同一个演示的 HTML、React、Vue、自定义元素四种写法（variants.js 从标记和脚本生成）。选了哪种记住，整站都换 ————
+const VARS = [["html", "HTML"], ["react", "React"], ["vue", "Vue"], ["element", "自定义元素"]];
+let curVar = localStorage.getItem("satin-docs-variant"); if (!VARS.some(([k]) => k === curVar)) curVar = "html";
+// keys：这一块有哪几种写法（配方没有"自定义元素"）；当前选的那种这一块没有，就显示 HTML
+const varsOf = (keys) => VARS.filter(([k]) => keys.includes(k));
+const pick = (fs) => fs[curVar] || fs.html;
+const varRow = (keys = VARS.map(([k]) => k)) => `<div class="dx-vars" data-keys="${keys.join(",")}"><div class="sn-seg sn-sm" role="tablist" aria-label="写法"><span class="sn-thumb"></span>${varsOf(keys).map(([k, t]) => `<button data-v="${k}">${t}</button>`).join("")}</div></div>`;
+const codeSlot = (fs, fold = 8) => `<div class="dx-code" data-sig="${sigOf(fs)}" data-fold="${fold}">${varRow(Object.keys(fs))}<div class="dx-cx">${codePanel(pick(fs), { fold })}</div></div>`;
+// 计算样式拿来判断空白要不要留：在演示文档里找同样标签、同样类名的元素
+const liveOf = (doc, el) => { if (!doc || !el.classList?.length) return null; try { return doc.querySelector(el.localName + "." + [...el.classList].map((c) => CSS.escape(c)).join(".")); } catch { return null; } };
+const inlineIn = (doc) => (el) => { const l = liveOf(doc, el); return l ? /^inline/.test(doc.defaultView.getComputedStyle(l).display) : guessInline(el); };
+const flexIn = (doc) => (el) => { const l = el.nodeType === 1 && liveOf(doc, el); return l ? /flex|grid/.test(doc.defaultView.getComputedStyle(l).display) : guessFlex(el); };
+function variantFiles(c, doc, n) {
+  const html = filesOf(c, doc, n), ex = EXAMPLES[c.id]?.[n ?? 0];
+  const src = ex?.files || html, markup = src.find((f) => f.lang === "html")?.code || "", js = src.find((f) => f.lang === "js")?.code || "";
+  const extra = src.filter((f) => f.lang !== "html" && f.lang !== "js");
+  const tp = document.createElement("template"); tp.innerHTML = markup;
+  const css = DEMO_SHEET ? demoCSS(DEMO_SHEET, tp.content) : "", cssFile = css ? [{ name: "demo.css", lang: "css", code: css }] : [];
+  const v = variants({ node: tp.content, js, css, name: c.id, htmlCode: markup, inline: inlineIn(doc), flex: flexIn(doc) });
+  return { html: [...html, ...cssFile], react: [...v.react, ...extra], vue: [...v.vue, ...extra], element: [...v.element, ...extra] };
+}
+// 代码区放进页面以后：接上写法切换（组件库的分段控件）；切了一个，整页的演示一起换
+function mountVars(scope) {
+  for (const row of $$(".dx-vars:not([data-ready])", scope)) {
+    row.dataset.ready = "";
+    const keys = row.dataset.keys.split(",");
+    row._keys = keys; row._seg = initSeg($(".sn-seg", row), (v) => setVar(v, row), Math.max(0, keys.indexOf(curVar)));
+  }
+}
+function setVar(v, from) {
+  if (v === curVar) return; curVar = v; localStorage.setItem("satin-docs-variant", v);
+  for (const slot of $$(".dx-code", main)) {
+    const row = $(".dx-vars", slot); if (row && row !== from) row._seg?.go(Math.max(0, row._keys.indexOf(v)), false, true);
+    const fs = slot._fs; if (!fs) continue;
+    const cx = $(".dx-cx", slot), open = cx.querySelector(".cx")?.classList.contains("sn-open");
+    cx.innerHTML = codePanel(pick(fs), { fold: +slot.dataset.fold || 8 }); mountCode(cx); if (open) cx.querySelector(".cx-more")?.click();
+  }
+}
 // 一个演示的代码：手写的用法（examples.js）优先——整套替换（files），或者在标记后面补 JS、前面补别的文件；
 // 没写的就给这个演示的标记（脚本生成的从 iframe 里取），第一个演示再带上通用的 JS 调用（EX）
 function filesOf(c, doc, n) {
@@ -196,11 +236,11 @@ function wireDemo(box, c) {
   // 整页加载完（有的演示标记是脚本后来才生成的）再核对一次；内容没变不重画
   const code = (doc) => {
     const slot = box.querySelector(".dx-code"); if (!slot || !c || !doc) return;
-    const files = filesOf(c, doc, box.dataset.n != null ? +box.dataset.n : undefined), sig = sigOf(files);
-    if (slot.dataset.sig === sig) return;
-    const open = slot.querySelector(".cx")?.classList.contains("sn-open");
-    slot.dataset.sig = sig; slot.innerHTML = codePanel(files, { fold: 8 }); mountCode(slot);
-    if (open) slot.querySelector(".cx-more")?.click();
+    const fs = variantFiles(c, doc, box.dataset.n != null ? +box.dataset.n : undefined), sig = sigOf(fs);
+    slot._fs = fs; if (slot.dataset.sig === sig) return;
+    const cx = $(".dx-cx", slot), open = cx.querySelector(".cx")?.classList.contains("sn-open");
+    slot.dataset.sig = sig; cx.innerHTML = codePanel(pick(fs), { fold: 8 }); mountCode(cx);
+    if (open) cx.querySelector(".cx-more")?.click();
   };
   f.__code = code;
   // 浮层处理：演示文档一解析完就接上（模块脚本在这之前已经跑完；等两帧，初始化里排的第一帧也走完）
@@ -518,12 +558,22 @@ const loadRecipe = (r) => RMD.get(r.id) || (RMD.set(r.id, fetch(new URL(`../spec
   const before = md.slice(md.indexOf("\n", md.indexOf("# ")) + 1, i).trim().split(/\n+/), after = md.slice(j + 3).trim().split(/\n+/).filter(Boolean);
   return { title, lead: before, code: md.slice(md.indexOf("\n", i) + 1, j).trimEnd(), notes: after };
 })), RMD.get(r.id));
+// 配方的三种写法：标记里的 <meta>、<link> 属于 <head>，组件里不要；<script> 里的接线搬进组件的挂载
+// doc：预览 iframe 里载好的配方页（按计算样式判断空白要不要留）；没给就按标签猜
+function recipeFiles(r, d, doc) {
+  if (d.fs && !doc) return d.fs;
+  const tp = document.createElement("template"); tp.innerHTML = d.code;
+  const js = [...tp.content.querySelectorAll("script")].map((x) => x.textContent.replace(/^\n|\s+$/g, "").split("\n").map((l) => l.replace(/^ {2}/, "")).join("\n")).join("\n");
+  for (const x of tp.content.querySelectorAll("script, meta, link, title")) x.remove();
+  const v = variants({ node: tp.content, js, name: r.id.replace(/-./g, (m) => m[1].toUpperCase()) + "Page", ...(doc ? { inline: inlineIn(doc), flex: flexIn(doc) } : {}) });
+  return (d.fs = { html: [{ name: "HTML", lang: "html", code: d.code }], react: v.react, vue: v.vue });
+}
 const ASYNC = {
   async recipe(id) {
     const r = RECIPES.find((x) => x.id === id), d = await loadRecipe(r);
     const lead = $("[data-async-lead]", main); if (lead) lead.outerHTML = md2html(d.lead.join(" "));
     return anchor("preview", "预览") + `<div class="d-rframe"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>`
-      + anchor("code", "代码") + `<div class="dx-code d-rcode">${codePanel([{ name: "HTML", lang: "html", code: d.code }], { fold: 24, solo: true })}</div>`
+      + anchor("code", "代码") + `<div class="d-rcode" data-recipe-code="${id}">${codeSlot(recipeFiles(r, d), 24)}</div>`
       + (d.notes.length ? anchor("notes", "补充说明") + `<ul class="d-list">${d.notes.map((n) => `<li>${md2html(n)}</li>`).join("")}</ul>` : "");
   },
   async rules() {
@@ -556,6 +606,16 @@ async function fillAsync(scope, base) {
   if (curPage?.hash !== base) return; // 载入期间已经换页了
   injectIcons(main); mountCode(main);
   for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
+  for (const box of $$("[data-recipe-code]", main)) {
+    const r = RECIPES.find((x) => x.id === box.dataset.recipeCode), slot = $(".dx-code", box); if (!r || !slot) continue;
+    const d = await loadRecipe(r); slot._fs = recipeFiles(r, d);
+    // 预览载好以后按真实的排版重新生成一遍（行内元素之间的空格要不要留），变了才重画
+    const f = $(".d-rframe iframe", main), redo = () => { let doc = null; try { doc = f.contentDocument; } catch {} if (!doc || doc.URL === "about:blank") return;
+      const fs = recipeFiles(r, d, doc), sig = sigOf(fs); slot._fs = fs; if (slot.dataset.sig === sig) return; slot.dataset.sig = sig;
+      const cx = $(".dx-cx", slot); cx.innerHTML = codePanel(pick(fs), { fold: 24 }); mountCode(cx); };
+    if (f) { f.addEventListener("load", redo, { once: true }); if (f.contentDocument?.readyState === "complete") redo(); }
+  }
+  mountVars(main);
   buildToc(base);
 }
 function textPage(pg) {
@@ -633,6 +693,8 @@ function swapPage(pg, part) {
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     for (const w of $$(".dx-wall", main)) { const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); }
     for (const box of $$(".dx", main)) wireDemo(box, pg.c || cat.byId[box.dataset.demo]);
+    mountVars(main);
+    for (const slot of $$(".dx-code", main)) if (!slot._fs) { const box = slot.closest(".dx"), c = pg.c || cat.byId[box?.dataset.demo]; if (c) slot._fs = variantFiles(c, null, box.dataset.n != null ? +box.dataset.n : undefined); }
     buildToc(pg.hash); fillAsync(main, pg.hash); fitPrev();
     document.title = `${pg.title} · Satin`;
     if (!first && !document.startViewTransition && !reduced()) main.firstElementChild.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: OUT_STRONG });

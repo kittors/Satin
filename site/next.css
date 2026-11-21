@@ -629,3 +629,8 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .s-mode-seg .sn-ic { width: 15px; height: 15px; }
 .s-mode-seg button { padding: 0 8px; }
 @media (max-width: 860px) { .s-nav .s-mode-seg { display: none; } .d-rframe { height: 560px; } }
+
+/* 演示框的代码区：写法切换（HTML / React / Vue / 自定义元素）在代码上面一行 */
+.dx-vars { display: flex; align-items: center; gap: 8px; padding: 10px 10px 2px; overflow-x: auto; scrollbar-width: none; }
+.dx-vars::-webkit-scrollbar { display: none; }
+.dx-vars .sn-seg button { padding: 0 12px; }

@@ -3,6 +3,7 @@
 //   <sn-segmented items='["网格","列表"]' value="网格"></sn-segmented>
 //   el.addEventListener("sn-change", (e) => e.detail)
 // 属性：JSON 能解析的按 JSON（数组、数字、true/false），否则按字符串；横线名转驼峰（default-value → defaultValue）
+// <sn-enhance>…</sn-enhance>：包住写在标记上的一段组件，放进页面自动接上交互、移出页面自动撤掉
 // 导入本身没有副作用：调 defineElements() 才注册（Node / SSR 里调也不会报错，只是什么都不做）
 import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
@@ -40,4 +41,16 @@ export function defineElements(prefix = "sn") {
       get instance() { return this.inst; }
     });
   }
+  // <sn-enhance>：包住一段照设计稿写好的标记（按钮、表单、浮层触发器、折叠面板……），放进页面自动 setup() + enhance()，
+  // 移出页面自动撤掉（监听、包上去的滚动区域、"已接过"标记）。纯 HTML、Svelte、Angular、Solid 里不用写挂载 / 卸载的代码
+  const tag = `${prefix}-enhance`;
+  if (!customElements.get(tag)) customElements.define(tag, class extends HTMLElement {
+    connectedCallback() {
+      if (this.off || this.pending) return; this.pending = true;
+      const go = () => { this.pending = false; if (!this.isConnected || this.off) return; const unsetup = setup(), done = S.enhance(this); this.off = () => { done(); unsetup(); }; };
+      // 页面还在解析（元素先定义、标记后到）：等子元素都解析完再接；否则等这一轮同步代码跑完（框架先插元素再填内容）
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go, { once: true }); else queueMicrotask(go);
+    }
+    disconnectedCallback() { if (this.pending) return; const f = this.off; this.off = null; f?.(); }
+  });
 }

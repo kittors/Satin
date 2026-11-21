@@ -59,6 +59,7 @@
 /* 只在页面的一部分用 Satin（嵌进别的设计系统里）：外面包一层 sn-root，拿到和整页一样的底色、文字色、字体字号（reset.css 写在 body 上的那一套） */
 .sn-root { background: var(--sn-canvas); color: var(--sn-label); font: calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); -webkit-font-smoothing: antialiased; }
 /* 扩大点击区（手机上的小图标按钮、关闭按钮、行内链接）：样子不变，能点到的范围至少 44×44（09 号 §11 触控尺寸） */
+sn-enhance { display: contents; } /* 自定义元素 <sn-enhance> 只是个壳，不占排版 */
 .sn-tap { position: relative; }
 .sn-tap::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); translate: -50% -50%; }
 }
