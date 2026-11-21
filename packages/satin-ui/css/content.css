@@ -175,12 +175,9 @@
 /* 光标：正文末尾一个柔和的圆点 */
 .sn-ai-text .sn-caret { display: inline-block; width: 7px; height: 7px; margin-left: 4px; border-radius: 50%; background: var(--sn-label3); /* 中性色：跟着主题色变红时像出错 */ vertical-align: 1px; animation: sn-caret-pulse 1.1s var(--sn-ease-in-out) infinite; }
 @keyframes sn-caret-pulse { 50% { opacity: .25; scale: .7; } }
-/* 回答的第一段还没来：三个中性色的点轮流淡入淡出（只动透明度），读屏读"正在思考"；减少动态效果时三个点静止 */
-.sn-ai-wait { display: inline-flex; align-items: center; gap: 5px; height: 26px; }
-.sn-ai-wait i { width: 6px; height: 6px; border-radius: 50%; background: var(--sn-label3); opacity: .3; animation: sn-ai-wait 1.2s var(--sn-ease-in-out) infinite; }
-.sn-ai-wait i:nth-child(2) { animation-delay: .16s; } .sn-ai-wait i:nth-child(3) { animation-delay: .32s; }
-@keyframes sn-ai-wait { 30% { opacity: 1; } 60% { opacity: .3; } }
-@media (prefers-reduced-motion: reduce) { .sn-ai-wait i { animation: none; opacity: .6; } }
+/* 回答的第一段还没来：一行"正在思考"（中性色、和正文同一档字号），字的透明度慢慢起伏（只动透明度，和思考折叠条的写法一样）；减少动态效果时不动 */
+.sn-ai-wait { font: 400 calc(15px * var(--sn-font-scale, 1))/calc(26px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); animation: sn-think-pulse 1.6s var(--sn-ease-in-out) infinite; }
+@media (prefers-reduced-motion: reduce) { .sn-ai-wait { animation: none; } }
 .sn-ai-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 8px; }
 .sn-ai-card { border-radius: 12px; overflow: hidden; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); }
 .sn-ai-card i { display: block; aspect-ratio: 16 / 9; background: var(--sn-g); }
@@ -278,9 +275,14 @@
 /* ———— 对话：ChatGPT / Codex 的样子 ————
    不放头像；用户是浅灰气泡（靠右），助手直接是正文（靠左），内容居中一栏最宽 760；回复下面一排操作和时间；
    回到底部的圆键在输入框上方正中；输入框一整块大圆角，消息从它上面淡出去。没有分隔线。 */
-.sn-chat { border: 0; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); }
+.sn-chat { border: 0; background: var(--sn-raised); } /* 外圈 1px 的线画在 ::after 上（见下面"输入框浮在列表上面"那段），只画一次 */
 .sn-chat-hd { height: 52px; padding: 0 20px; background: transparent; }
 .sn-chat-hd b { font-size: calc(14px * var(--sn-font-scale, 1)); }
+/* 顶栏两侧的按钮（menu、newChat 选项）：单色细线图标、ghost，按下有反馈（sn-btn 自带）；标题夹在中间 */
+.sn-chat-hd.sn-has-btns { padding: 0 8px; gap: 4px; }
+.sn-chat-hd.sn-has-btns .sn-tx { flex: 1; min-width: 0; padding: 0 8px; }
+.sn-chat-hd .sn-chat-hb { --sn-h: 36px; flex: none; width: 36px; }
+.sn-chat-hd .sn-chat-hb .sn-ic { width: 20px; height: 20px; }
 .sn-ci { padding: 0 max(20px, calc((100% - 760px) / 2)) 16px; }
 :where(.sn-chat) .sn-msg { gap: 8px; }
 .sn-msg .sn-av, .sn-msg .sn-av-gap { display: none; }
@@ -365,6 +367,8 @@
   background: linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised) 32px); }
 .sn-chat-foot > * { pointer-events: auto; }
 .sn-chat-foot { will-change: transform; } /* 自己一个合成层：列表在下面滚时不用重画这一段淡出 */
+/* 外圈 1px 的线画在最上面一层：画在 .sn-chat 自己身上（内阴影）会被输入框那一段的底色（淡出）盖住，左、右、下三边断开 */
+.sn-chat::after { content: ""; position: absolute; inset: 0; z-index: 7; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--sn-card-line); pointer-events: none; }
 .sn-chat-jump { bottom: calc(var(--sn-foot-h, 120px) + 4px); }
 /* 手机上（窄于 640）对话铺满，不是一张卡片：去掉圆角和外圈的线；顶栏像手机应用的导航栏（标题居中、让出刘海）；输入框贴底、让出底部安全区。
    参照 ChatGPT、Codex 的手机端。设计稿的演示在 demo/doc.css 里照旧画成卡片 */
@@ -372,6 +376,12 @@
   .sn-chat { min-height: 0; border-radius: 0; box-shadow: none; }
   .sn-chat-hd { justify-content: center; padding-top: env(safe-area-inset-top); box-sizing: content-box; }
   .sn-chat-hd .sn-tx { justify-items: center; text-align: center; }
+  /* 两侧有按钮时三栏：按钮各 40（手指点得到），标题在正中间（只有一边有按钮也居中） */
+  .sn-chat-hd.sn-has-btns { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; padding-left: 6px; padding-right: 6px; }
+  .sn-chat-hd.sn-has-btns .sn-tx { grid-column: 2; padding: 0; }
+  .sn-chat-hd .sn-chat-hb { --sn-h: 40px; width: 40px; }
+  .sn-chat-hd .sn-chat-hb[data-chat-menu] { grid-column: 1; } .sn-chat-hd .sn-chat-hb[data-chat-new] { grid-column: 3; }
+  .sn-chat::after { display: none; }
   .sn-chat-foot { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
 }
 

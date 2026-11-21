@@ -11,7 +11,7 @@ import { createPortal } from "react-dom";
 import { createChat } from "../src/chat.js";
 import { wrap, useIso } from "./wrap.js";
 
-const Base = /* @__PURE__ */ wrap(createChat, { events: ["modelChange", "modeChange", "contextChange", "contextClick"], displayName: "ChatInstance" });
+const Base = /* @__PURE__ */ wrap(createChat, { events: ["modelChange", "modeChange", "contextChange", "contextClick", "menu", "newChat"], displayName: "ChatInstance" });
 export const Chat = /* @__PURE__ */ forwardRef(function Chat(props, ref) {
   const latest = useRef(props); latest.current = props;
   const [respond] = useState(() => (text, ctx) => latest.current.respond?.(text, ctx));

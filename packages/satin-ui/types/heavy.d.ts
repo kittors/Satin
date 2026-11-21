@@ -22,9 +22,18 @@ export interface ChatProps extends ComposerParts {
   /** 底部输入框的选项（输入框还没接上时用）：upload 上传函数；attachments 附件菜单每一项（img / vid / aud / doc）点了以后给出的附件 */
   composer?: { upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: Partial<Record<"img" | "vid" | "aud" | "doc", (counter: { n: number }) => ComposerAttachment>> };
   hiRes?(bg: string): string;
+  /** 顶栏左边放"会话列表"按钮（单色图标），点了发 menu */
+  menu?: boolean;
+  /** 顶栏右边放"新对话"按钮（单色图标），点了发 newChat */
+  newChat?: boolean;
 }
-/** createChat 的选项：上面那些 + 输入框部件的事件回调 */
-export interface ChatOptions extends ChatProps, ComposerPartEvents {}
+/** createChat 的选项：上面那些 + 输入框部件的事件回调 + 顶栏按钮的回调 */
+export interface ChatOptions extends ChatProps, ComposerPartEvents {
+  /** 点了顶栏左边的"会话列表"（menu: true 时才有） */
+  onMenu?(): void;
+  /** 点了顶栏右边的"新对话"（newChat: true 时才有） */
+  onNewChat?(): void;
+}
 /** 新对话的样子：图标（单色，图标名）、标题、说明、2～4 个建议（点了填进输入框） */
 export interface ChatEmpty { icon?: string; title?: string; subtitle?: string; suggestions?: string[] }
 export interface ChatApi { send(text: string): void; receive(item: Partial<ChatItem>): unknown; sendText(text: string, o?: { fail?: boolean }): unknown; scrollToOldest(): void;
@@ -35,7 +44,7 @@ export interface ChatApi { send(text: string): void; receive(item: Partial<ChatI
 export function mountChat(box: HTMLElement, o?: ChatOptions): ChatApi & { destroy(): void };
 /** 对话（统一写法）：空容器按选项渲染；update({ status }) 改顶栏状态；destroy 停掉生成中的回答、撤掉监听、清空容器 */
 export const createChat: SatinFactory<ChatOptions, ChatApi>;
-export function chatHTML(o?: { title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean }): string;
+export function chatHTML(o?: { title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean; menu?: boolean; newChat?: boolean }): string;
 export interface FlowNode {
   id: string; x: number; y: number;
   /** 标题（短名 t） */ title?: string; t?: string;

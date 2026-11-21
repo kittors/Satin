@@ -9,12 +9,12 @@ import { defineComponent, h, ref, computed, shallowRef, onMounted, Teleport } fr
 import { createChat } from "../src/chat.js";
 import { wrap } from "./wrap.js";
 
-const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model"];
-const Base = /* @__PURE__ */ wrap(createChat, { name: "SnChatInstance", props: KEYS, events: ["modelChange", "modeChange", "contextChange", "contextClick"], modelEvent: null });
+const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model", "menu", "newChat"];
+const Base = /* @__PURE__ */ wrap(createChat, { name: "SnChatInstance", props: KEYS, events: ["modelChange", "modeChange", "contextChange", "contextClick", "menu", "newChat"], modelEvent: null });
 export const Chat = /* @__PURE__ */ defineComponent({
   name: "SnChat", inheritAttrs: false,
   props: Object.fromEntries(KEYS.map((k) => [k, { type: null, default: undefined }])),
-  emits: ["modelChange", "modeChange", "contextChange", "contextClick", "update:model"],
+  emits: ["modelChange", "modeChange", "contextChange", "contextClick", "menu", "newChat", "update:model"],
   setup(p, { attrs, expose, slots, emit }) {
     const inner = ref(null), emptyEl = shallowRef(null);
     // 交给库的是固定的转发函数：父组件换了 respond 也用最新的
@@ -22,7 +22,7 @@ export const Chat = /* @__PURE__ */ defineComponent({
     expose({ instance: computed(() => inner.value?.instance ?? null) });
     // #empty 插槽：库只留一个空容器（empty: true），子组件挂好以后（它的 onMounted 先跑）把插槽传送进去
     onMounted(() => { if (slots.empty) emptyEl.value = inner.value?.instance?.emptyEl ?? null; });
-    const on = { onModelChange: (v) => { emit("modelChange", v); emit("update:model", v); }, onModeChange: (v) => emit("modeChange", v), onContextChange: (e) => emit("contextChange", e), onContextClick: (e) => emit("contextClick", e) };
+    const on = { onModelChange: (v) => { emit("modelChange", v); emit("update:model", v); }, onModeChange: (v) => emit("modeChange", v), onContextChange: (e) => emit("contextChange", e), onContextClick: (e) => emit("contextClick", e), onMenu: () => emit("menu"), onNewChat: () => emit("newChat") };
     return () => [
       h(Base, { ...attrs, ...p, ...on, empty: slots.empty ? true : p.empty, respond, hiRes: p.hiRes ? hiRes : undefined, ref: inner }),
       emptyEl.value && slots.empty ? h(Teleport, { to: emptyEl.value }, slots.empty()) : null,

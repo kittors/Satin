@@ -19,6 +19,8 @@ export default {
   "chat.23": "Thought for {p0}s",
   "chat.24": "\n\n(Something went wrong — the answer is incomplete.)",
   "chat.25": "image",
+  "chat.menu": "Conversations",
+  "chat.newChat": "New chat",
   "chat.jump": "Jump to latest",
   "chat.26": "Thinking",
   "chat.27": "Failed to send, tap to retry",

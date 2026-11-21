@@ -246,6 +246,32 @@
       }
     },
     {
+      "name": "menu",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "顶栏左边放\"会话列表\"按钮（单色细线图标），点了发 `menu`——自己打开会话列表、侧栏。手机上像 ChatGPT / Codex 的导航栏。",
+      "names": {
+        "js": "menu",
+        "react": "menu",
+        "preact": "menu",
+        "vue": "menu"
+      }
+    },
+    {
+      "name": "newChat",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "顶栏右边放\"新对话\"按钮（单色细线图标），点了发 `newChat`——自己清空、开一段新对话。",
+      "names": {
+        "js": "newChat",
+        "react": "newChat",
+        "preact": "newChat",
+        "vue": "newChat（模板里写 new-chat）"
+      }
+    },
+    {
       "name": "placeholder",
       "type": "string",
       "default": "\"\"",
@@ -464,6 +490,36 @@
         "solid": "onContextClick（选项）",
         "svelte": "onContextClick（选项）",
         "html": "onContextClick（选项），或 实例.on(\"contextClick\", fn)"
+      }
+    },
+    {
+      "name": "menu",
+      "payload": "—",
+      "when": "点了顶栏左边的\"会话列表\"（menu: true 时才有）。",
+      "names": {
+        "js": "onMenu",
+        "react": "onMenu",
+        "preact": "onMenu",
+        "vue": "@menu",
+        "angular": "onMenu（选项）",
+        "solid": "onMenu（选项）",
+        "svelte": "onMenu（选项）",
+        "html": "onMenu（选项），或 实例.on(\"menu\", fn)"
+      }
+    },
+    {
+      "name": "newChat",
+      "payload": "—",
+      "when": "点了顶栏右边的\"新对话\"（newChat: true 时才有）。",
+      "names": {
+        "js": "onNewChat",
+        "react": "onNewChat",
+        "preact": "onNewChat",
+        "vue": "@new-chat",
+        "angular": "onNewChat（选项）",
+        "solid": "onNewChat（选项）",
+        "svelte": "onNewChat（选项）",
+        "html": "onNewChat（选项），或 实例.on(\"newChat\", fn)"
       }
     }
   ],

@@ -1,6 +1,6 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 251,
+  "var(--sn-ease-out)": 253,
   "var(--sn-ease-out-strong)": 58,
   "linear": 37,
   "var(--sn-ease-overshoot)": 10,
@@ -265,13 +265,13 @@
   },
   {
    "file": "packages/satin-ui/css/content.css",
-   "selector": ".sn-ai-wait i",
+   "selector": ".sn-ai-wait",
    "prop": "animation",
-   "value": "sn-ai-wait 1.2s var(--sn-ease-in-out) infinite"
+   "value": "sn-think-pulse 1.6s var(--sn-ease-in-out) infinite"
   },
   {
    "file": "packages/satin-ui/css/content.css",
-   "selector": ".sn-ai-wait i",
+   "selector": ".sn-ai-wait",
    "prop": "animation",
    "value": "none"
   },
@@ -1978,6 +1978,12 @@
    "selector": ".sn-sa.sn-js-driven .sn-sa-vp",
    "prop": "animation",
    "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/shell.css",
+   "selector": ".sn-page-hd > .sn-back",
+   "prop": "transition",
+   "value": "color .15s var(--sn-ease-out), background-color .15s var(--sn-ease-out)"
   }
  ],
  "js": [

@@ -20,6 +20,8 @@ export default {
   "chat.24": "\n\n（出错了，没能回答完。）",
   "chat.25": "图",
   "chat.26": "正在思考",
+  "chat.menu": "会话列表",
+  "chat.newChat": "新对话",
   "chat.jump": "跳到最新",
   "chat.27": "发送失败，点一下重发",
   "chat.empty": "有什么可以帮你？"

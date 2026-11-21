@@ -1059,6 +1059,8 @@ export default function Storyboard() {
 | `history` | `ChatHistory` | — | 否 | 历史：`initial()` 一开始的条目（从旧到新），往上翻到顶时 `older()` 要更早的一页（可以是 Promise），`hasMore()` 还有没有。只在创建时用。 | createXxx 选项：`history`；React：`history`；Preact：`history`；Vue：`history` |
 | `title` | `string` | "" | 否 | 顶栏的名字（空容器时用）。 | createXxx 选项：`title`；React：`title`；Preact：`title`；Vue：`title` |
 | `status` | `string` | 不写 | 否 | 顶栏标题下面那行字，默认不写（AI 助手的生成状态只在消息里显示一次，顶栏只留标题）；人和人聊天写"在线""正在输入…"，变了就更新。 | createXxx 选项：`status`；React：`status`；Preact：`status`；Vue：`status` |
+| `menu` | `boolean` | false | 否 | 顶栏左边放"会话列表"按钮（单色细线图标），点了发 `menu`——自己打开会话列表、侧栏。手机上像 ChatGPT / Codex 的导航栏。 | createXxx 选项：`menu`；React：`menu`；Preact：`menu`；Vue：`menu` |
+| `newChat` | `boolean` | false | 否 | 顶栏右边放"新对话"按钮（单色细线图标），点了发 `newChat`——自己清空、开一段新对话。 | createXxx 选项：`newChat`；React：`newChat`；Preact：`newChat`；Vue：`newChat（模板里写 new-chat）` |
 | `placeholder` | `string` | "" | 否 | 底部输入框的占位提示。 | createXxx 选项：`placeholder`；React：`placeholder`；Preact：`placeholder`；Vue：`placeholder` |
 | `max` | `number` | 500 | 否 | 输入框最多几个字。 | createXxx 选项：`max`；React：`max`；Preact：`max`；Vue：`max` |
 | `maxLines` | `number` | 5 | 否 | 输入框最多长到几行，再多在框里滚。 | createXxx 选项：`maxLines`；React：`maxLines`；Preact：`maxLines`；Vue：`maxLines（模板里写 max-lines）` |
@@ -1080,6 +1082,8 @@ export default function Storyboard() {
 | `modeChange` | `string` | 在模式 / 权限菜单里选了别的一项（mode 带 options 时）。 | createXxx 选项：`onModeChange`；React：`onModeChange`；Preact：`onModeChange`；Vue：`@mode-change`；Angular：`onModeChange（选项）`；Solid：`onModeChange（选项）`；Svelte：`onModeChange（选项）`；纯 HTML：`onModeChange（选项），或 实例.on("modeChange", fn)` |
 | `contextChange` | `{ index: number; value: string; item: ComposerContextItem }` | 在上下文栏某一项的菜单里选了别的（那一项带 options 时）。 | createXxx 选项：`onContextChange`；React：`onContextChange`；Preact：`onContextChange`；Vue：`@context-change`；Angular：`onContextChange（选项）`；Solid：`onContextChange（选项）`；Svelte：`onContextChange（选项）`；纯 HTML：`onContextChange（选项），或 实例.on("contextChange", fn)` |
 | `contextClick` | `{ index: number; item: ComposerContextItem }` | 点了上下文栏里没有菜单的那项（比如项目文件夹：自己打开选择器）。 | createXxx 选项：`onContextClick`；React：`onContextClick`；Preact：`onContextClick`；Vue：`@context-click`；Angular：`onContextClick（选项）`；Solid：`onContextClick（选项）`；Svelte：`onContextClick（选项）`；纯 HTML：`onContextClick（选项），或 实例.on("contextClick", fn)` |
+| `menu` | `—` | 点了顶栏左边的"会话列表"（menu: true 时才有）。 | createXxx 选项：`onMenu`；React：`onMenu`；Preact：`onMenu`；Vue：`@menu`；Angular：`onMenu（选项）`；Solid：`onMenu（选项）`；Svelte：`onMenu（选项）`；纯 HTML：`onMenu（选项），或 实例.on("menu", fn)` |
+| `newChat` | `—` | 点了顶栏右边的"新对话"（newChat: true 时才有）。 | createXxx 选项：`onNewChat`；React：`onNewChat`；Preact：`onNewChat`；Vue：`@new-chat`；Angular：`onNewChat（选项）`；Solid：`onNewChat（选项）`；Svelte：`onNewChat（选项）`；纯 HTML：`onNewChat（选项），或 实例.on("newChat", fn)` |
 
 ## 插槽 / 子元素
 

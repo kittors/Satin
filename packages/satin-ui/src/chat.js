@@ -36,9 +36,11 @@ const chatEmptyHTML = (e, hide) => {
     (o.suggestions?.length ? `<div class="sn-chat-sugs">${o.suggestions.map((t) => `<button type="button" class="sn-chat-sug">${esc(t)}</button>`).join("")}</div>` : "") +
     `</div>`;
 };
-export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true, empty: em, history, context, mode, models, model } = {}) => {
+export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true, empty: em, history, context, mode, models, model, menu, newChat } = {}) => {
   const empty = emptyOf(em);
-  return `<div class="sn-chat-hd"><div class="sn-tx"><b>${esc(title)}</b><span class="sn-sub"><span data-chat-status>${esc(status ?? "")}</span></span></div></div>` +
+  // 顶栏两侧（可选）：左边会话列表、右边新对话，像 ChatGPT / Codex 的手机端；单色细线图标，点了发 menu / newChat
+  const hb = (on, k, ic, label) => (on ? `<button type="button" class="sn-btn sn-ghost sn-ibtn sn-chat-hb" data-chat-${k} data-tip="${esc(label)}" aria-label="${esc(label)}" data-i="${ic}"></button>` : "");
+  return `<div class="sn-chat-hd${menu || newChat ? " sn-has-btns" : ""}">${hb(menu, "menu", "menu", tt("chat.menu"))}<div class="sn-tx"><b>${esc(title)}</b><span class="sn-sub"><span data-chat-status>${esc(status ?? "")}</span></span></div>${hb(newChat, "new", "square-pen", tt("chat.newChat"))}</div>` +
   `<div class="sn-chat-body"><div class="sn-chat-vp"><div class="sn-chat-canvas"><div class="sn-chat-ph sn-top"></div><div class="sn-chat-ph sn-bot"></div></div></div><button class="sn-chat-jump" data-chat-jump aria-label="${esc(tt("chat.jump"))}"><span data-i="arrow-down"></span><span class="sn-badge" hidden>0</span></button>${chatEmptyHTML(empty, !!history)}</div>` +
   `<div class="sn-chat-foot">${composerHTML({ placeholder, max, maxLines, attach, external: true, context, mode, models, model, fresh: !!empty })}</div>`;
 };
@@ -56,12 +58,14 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 //   composer：底部输入框的选项（upload、attachments），输入框还没接时用
 //   empty：新对话（见 chatHTML 上面）；onModelChange、onModeChange、onContextChange、onContextClick：底部输入框的模型、权限、上下文栏（createChat 里换成事件）
 //   返回 { send(text), receive(条目), sendText(text, { fail }), fill(text), emptyEl, scrollToOldest(), destroy() }
-export function mountChat(box, { respond, history, hiRes = (g) => g, composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, ...view } = {}) {
+export function mountChat(box, { respond, history, hiRes = (g) => g, composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, onMenu, onNewChat, ...view } = {}) {
   if (!box || box._chat) return box?._chat;
   // 空容器：先按选项（title、status、placeholder、max……）填好标记
   if (!box.querySelector(".sn-chat-vp")) { box.classList.add("sn-chat"); box.innerHTML = chatHTML(view); injectIcons(box); }
   const vp = $(".sn-chat-vp", box), canvas = $(".sn-chat-canvas", vp), phTop = $(".sn-chat-ph.sn-top", canvas), phBot = $(".sn-chat-ph.sn-bot", canvas);
   const jump = $("[data-chat-jump]", box), badge = $(".sn-badge", jump);
+  // 顶栏两侧的按钮（menu、newChat 选项）：点了交给外面——打开会话列表、开一段新对话
+  $(".sn-chat-hd", box)?.addEventListener("click", (e) => { const b = e.target.closest("[data-chat-menu], [data-chat-new]"); if (!b) return; if (b.hasAttribute("data-chat-menu")) onMenu?.(); else onNewChat?.(); });
   const composer = $(".sn-composer", box), ta = $("textarea", composer);
   const emptyEl = $("[data-chat-empty]", box); // 新对话那一块（见下面"新对话"）；先取好，发消息的路径里要用
   let emptyGone = !emptyEl;
@@ -397,7 +401,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   // ———— AI 回复 ————
   function aiHTML(it) {
     const think = it.think == null ? "" : `<div class="sn-think${it.open ? " sn-open" : ""}${it.ph === "think" ? " sn-live" : ""}"><button class="sn-think-hd" type="button"><span class="sn-think-t">${it.ph === "think" ? tt("chat.26") : tt("chat.23", { p0: it.secs })}</span>${icon("chevron-down", 14)}</button><div class="sn-think-bd"><div><p class="sn-think-txt">${esc(it.think)}</p></div></div></div>`;
-    const wait = it.ph === "wait" ? `<div class="sn-ai-wait" role="status" aria-label="${tt("chat.26")}"><i></i><i></i><i></i></div>` : "";
+    // 第一段来之前：一行"正在思考"，字的透明度慢慢起伏（三个小点太淡，用户看不出在想）
+    const wait = it.ph === "wait" ? `<div class="sn-ai-wait" role="status">${tt("chat.26")}</div>` : "";
     const steps = it.steps.length ? `<ol class="sn-ai-plan">${it.steps.map(stepHTML).join("")}</ol>` : "";
     const text = it.text || it.ph === "text" ? `<div class="sn-ai-text">${esc(it.text)}${it.ph === "text" ? '<span class="sn-caret"></span>' : ""}</div>` : "";
     const cards = it.cards ? `<div class="sn-ai-cards">${it.cardList.slice(0, it.cards).map(cardHTML).join("")}</div>` : "";
@@ -618,7 +623,8 @@ export const createChat = /* @__PURE__ */ defineComponent({
     if (!el.querySelector(".sn-chat-vp")) { el.classList.add("sn-chat"); el.innerHTML = chatHTML(o); }
     injectIcons(el);
     const c = mountChat(el, { ...o, onModelChange: (v) => api.emit("modelChange", v), onModeChange: (v) => api.emit("modeChange", v),
-      onContextChange: (e) => api.emit("contextChange", { ...e, item: api.options.context?.[e.index] }), onContextClick: (index) => api.emit("contextClick", { index, item: api.options.context?.[index] }) });
+      onContextChange: (e) => api.emit("contextChange", { ...e, item: api.options.context?.[e.index] }), onContextClick: (index) => api.emit("contextClick", { index, item: api.options.context?.[index] }),
+      onMenu: () => api.emit("menu"), onNewChat: () => api.emit("newChat") });
     const cm = () => el.querySelector(".sn-composer")?._cm;
     return {
       send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, fill: c.fill,
