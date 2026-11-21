@@ -1,22 +1,8 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { setup, enhance } from "satin-ui";
-import { createDataGrid } from "satin-ui/grid";
-
-const root = ref(null);
-let off = () => {};
-onMounted(() => {
-  const unsetup = setup();
-  const done = enhance(root.value, (root) => {
-    createDataGrid(root.querySelector('[data-ex="grid2"]'), { rows: 2000, seed: 7, label: "镜头清单，2000 行" });
-  });
-  off = () => { done(); unsetup(); };
-});
-onBeforeUnmount(() => off());
+import { DataGrid } from "satin-ui/vue/grid";
 </script>
 
 <template>
-  <div ref="root">
-    <div data-ex="grid2"></div>
-  </div>
+  <!-- 同一个 seed 每次生成一样的数据（截图、自动化测试用）；行数少一点载得更快 -->
+  <DataGrid :rows="2000" :seed="7" label="镜头清单，2000 行" />
 </template>

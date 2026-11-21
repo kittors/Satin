@@ -1,28 +1,15 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { setup, enhance } from "satin-ui";
-import { Select as SnSelect } from "satin-ui/vue";
+import { ref } from "vue";
+import { Select } from "satin-ui/vue";
 
-const root = ref(null);
-let off = () => {};
-onMounted(() => {
-  const unsetup = setup();
-  const done = enhance(root.value, (root) => {
-    const box = root.querySelector('[data-ex="ratio"]');
-    box.addEventListener("sn-change", (e) => {
-      box.querySelector("[data-out]").textContent = "当前：" + e.detail;
-    });
-  });
-  off = () => { done(); unsetup(); };
-});
-onBeforeUnmount(() => off());
+const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+const current = ref("16:9 · 横屏");
 </script>
 
 <template>
-  <div ref="root">
-    <div class="sn-stack sn-gap-8" data-ex="ratio">
-      <SnSelect :items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例" />
-      <span class="sn-help" data-out="">当前：16:9 · 横屏</span>
-    </div>
+  <div class="sn-stack sn-gap-8">
+    <!-- 只给 value：组件自己管选中；@change 拿到选中的值 -->
+    <Select :items="ratios" value="16:9 · 横屏" label="画面比例" @change="(v) => (current = v)" />
+    <span class="sn-help">当前：{{ current }}</span>
   </div>
 </template>

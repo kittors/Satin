@@ -31,9 +31,22 @@
       "types": "./types/react.d.ts",
       "default": "./react/index.js"
     },
+    "./react/*": {
+      "types": "./types/react-*.d.ts",
+      "default": "./react/*.js"
+    },
     "./vue": {
       "types": "./types/vue.d.ts",
       "default": "./vue/index.js"
+    },
+    "./vue/*": {
+      "types": "./types/vue-*.d.ts",
+      "default": "./vue/*.js"
+    },
+    "./svelte/*.svelte": {
+      "types": "./types/svelte-*.d.ts",
+      "svelte": "./svelte/*.svelte",
+      "default": "./svelte/*.svelte"
     },
     "./elements": {
       "types": "./types/elements.d.ts",
@@ -100,6 +113,7 @@
     "types",
     "react",
     "vue",
+    "svelte",
     "elements",
     "tokens",
     "vite",
@@ -107,13 +121,17 @@
   ],
   "peerDependencies": {
     "react": ">=18",
-    "vue": ">=3.3"
+    "vue": ">=3.3",
+    "svelte": ">=5.20"
   },
   "peerDependenciesMeta": {
     "react": {
       "optional": true
     },
     "vue": {
+      "optional": true
+    },
+    "svelte": {
       "optional": true
     }
   }

@@ -1,20 +1,7 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
-import { useEffect, useRef } from "react";
-import { setup, enhance } from "satin-ui";
-import { createDataGrid } from "satin-ui/grid";
+"use client";
+import { DataGrid } from "satin-ui/react/grid";
 
-export default function GridSeed() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数
-    const off = enhance(ref.current, (root) => {
-      createDataGrid(root.querySelector('[data-ex="grid2"]'), { rows: 2000, seed: 7, label: "镜头清单，2000 行" });
-    }); // 接上标记里的交互，返回撤销函数
-    return () => { off(); unsetup(); };
-  }, []);
-  return (
-    <div ref={ref}>
-      <div data-ex="grid2"></div>
-    </div>
-  );
+export default function ShotListFixture() {
+  // 同一个 seed 每次生成一样的数据（截图、自动化测试用）；行数少一点载得更快
+  return <DataGrid rows={2000} seed={7} label="镜头清单，2000 行" />;
 }

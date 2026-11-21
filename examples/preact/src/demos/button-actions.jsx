@@ -1,21 +1,12 @@
-import { useEffect, useRef } from "preact/hooks";
-import { setup, enhance } from "satin-ui";
+import { Button } from "satin-ui/react";
 
-export default function ButtonActions() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup();
-    const off = enhance(ref.current);
-    return () => { off(); unsetup(); };
-  }, []);
+export default function FormActions() {
   return (
-    <div ref={ref}>
-      <div class="sn-row sn-between">
-        <button type="button" class="sn-btn sn-ghost">不保存</button>
-        <div class="sn-row sn-gap-8">
-          <button type="button" class="sn-btn sn-secondary">取消</button>
-          <button type="button" class="sn-btn sn-primary">保存</button>
-        </div>
+    <div class="sn-row sn-between">
+      <Button variant="ghost">不保存</Button>
+      <div class="sn-row sn-gap-8">
+        <Button>取消</Button>
+        <Button variant="primary">保存</Button>
       </div>
     </div>
   );

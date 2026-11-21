@@ -1,17 +1,12 @@
-<sn-enhance id="demo-select-events">
-  <div class="sn-stack sn-gap-8" data-ex="ratio">
-    <sn-select items="[&quot;16:9 · 横屏&quot;,&quot;9:16 · 竖屏&quot;,&quot;1:1 · 方形&quot;]" value="16:9 · 横屏" label="画面比例"></sn-select>
-    <span class="sn-help" data-out="">当前：16:9 · 横屏</span>
-  </div>
-</sn-enhance>
+<div class="sn-stack sn-gap-8" id="ratio-events">
+  <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
+  <span class="sn-help">当前：16:9 · 横屏</span>
+</div>
 
 <script type="module">
-  import { defineElements } from "satin-ui/elements";
-
-  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
-  const root = document.getElementById("demo-select-events");
-  const box = root.querySelector('[data-ex="ratio"]');
+  const box = document.getElementById("ratio-events");
+  // 选中一项时 <sn-select> 发 sn-change（冒泡），e.detail 是选中的值
   box.addEventListener("sn-change", (e) => {
-    box.querySelector("[data-out]").textContent = "当前：" + e.detail;
+    box.querySelector(".sn-help").textContent = "当前：" + e.detail;
   });
 </script>

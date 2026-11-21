@@ -1,6 +1,6 @@
 // satin-ui/vue
 import type { DefineComponent, Plugin } from "vue";
-import type { Item, ToastOptions, ToastHandle, NotifyOptions } from "./components";
+import type { Item, ToastOptions, ToastHandle, NotifyOptions, PickerOptions } from "./components";
 type C<P> = DefineComponent<P & { modelValue?: any }>;
 export const Password: C<{ value?: string; label?: string; help?: string; name?: string; id?: string; placeholder?: string; meter?: boolean; size?: "sm" | "lg" | "xl"; autocomplete?: string }>;
 export const Email: C<{ value?: string; label?: string; help?: string; name?: string; id?: string; placeholder?: string; size?: "sm" | "lg" | "xl"; autocomplete?: string }>;
@@ -15,8 +15,10 @@ export const Collapse: C<{ items: { title: string; content?: string; html?: stri
 export const TagInput: C<{ tags?: string[]; max?: number; placeholder?: string; hint?: string }>;
 export const Stepper: C<{ value?: number; min?: number; max?: number; unit?: string; label?: string }>;
 export const NumberFlow: C<{ value: number; style?: string; format?(v: number): string }>;
+/** 日期、时间、地址选择器：@change 拿到 { text }（触发框里显示的文字）；没有 v-model（现在只能读出选中的结果） */
+export const DatePicker: DefineComponent<Omit<PickerOptions, "onChange">>;
 export const Icon: DefineComponent<{ name: string; size?: number }>;
-export const Button: DefineComponent<{ variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; round?: boolean; selected?: boolean; busy?: boolean; disabled?: boolean; tip?: string; type?: string }>;
+export const Button: DefineComponent<{ variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string; type?: string }>;
 export const Input: C<{ size?: "sm" | "md" | "lg" | "xl"; invalid?: boolean }>;
 export const Field: DefineComponent<{ label?: string; help?: string; error?: string; for?: string }>;
 export const Checkbox: C<{ label?: string; indeterminate?: boolean; disabled?: boolean }>;
@@ -27,8 +29,11 @@ export const Spinner: DefineComponent<{ size?: "lg" }>;
 export const Steps: DefineComponent<{ steps: string[]; current?: number }>;
 export const Text: DefineComponent<{ as?: string; level?: string; tone?: string; num?: boolean; truncate?: boolean }>;
 export const Tooltip: DefineComponent<{ text: string; kbd?: string }>;
-export const Dialog: DefineComponent<{ open: boolean; title?: string; description?: string }>;
+/** 弹窗：v-model:open；@close 关完以后、@submit 表单提交；guard 拦下关闭；footerClass 加在底栏上；#footer 插槽放按钮 */
+export const Dialog: DefineComponent<{ open: boolean; title?: string; description?: string; icon?: string; guard?(close: () => void): void; footerClass?: string }>;
 export const Drawer: DefineComponent<{ open: boolean; title?: string }>;
+/** v-enhance：照设计稿写好的一段标记放进这个元素，挂上时接上交互、卸载时撤掉（和 <sn-enhance> 一样） */
+export const vEnhance: import("vue").ObjectDirective<HTMLElement>;
 export function toast(o: ToastOptions): ToastHandle;
 export function notify(o: NotifyOptions): import("./components").NotifyHandle;
 declare const plugin: Plugin;

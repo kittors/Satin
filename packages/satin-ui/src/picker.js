@@ -10,7 +10,16 @@ import { scrollArea } from "./scroll.js";
 import { $, reduced, injectIcons } from "./core.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/picker.js";
-const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
+// pickerHTML（文件末尾）生成标记用的文字：键接着 picker.142 往下排（中文原文先放在这里，setLocale({ "picker.143": "…" }) 照样能换；以后挪进 locales/zh-CN/picker.js）
+const MARKUP = {
+  "picker.143": "选择日期", "picker.144": "选择开始和结束日期", "picker.145": "选择日期范围", "picker.146": "选择时间", "picker.147": "选择日期和时间",
+  "picker.148": "选择省 / 市 / 区", "picker.149": "选择地址", "picker.150": "清除", "picker.151": "今天", "picker.152": "最近 7 天", "picker.153": "最近 30 天",
+  "picker.154": "本月", "picker.155": "上个月", "picker.156": "重置", "picker.157": "确定", "picker.158": "此刻", "picker.159": "时间",
+  "picker.160": "搜索省、市、区，比如：西湖", "picker.161": "搜索地址", "picker.162": "常用",
+};
+const tt = /* @__PURE__ */ scoped({ ...I18N_DEFAULTS, ...MARKUP });
+import { svg } from "./svg.js";
+import { calendar, clock, mapPin, x as xIcon } from "./icons/index.js";
 // bindPickers(root = document, { today, now })：把 root 里写了 data-pk 的选择器都接上——
 //   data-pk="date"（日期）| "range"（日期范围，两个月并排、左边快捷预设）| "time"（时、分两列）| "datetime"（定时发布：日历 + 时间）| "region"（省 / 市 / 区）。
 //   选好时在宿主上发 pick 事件（冒泡，detail: { text }）；today / now 默认是真实的今天、现在。接过的不重复接
@@ -324,4 +333,32 @@ export function bindPickers(root = document, { today, now } = {}) {
     h._clear = () => { path = []; setVal(h, ""); };
   }
   void injectIcons;
+}
+
+// ———— 标记：pickerHTML({ kind, placeholder, label }) ————
+// 生成一个选择器的标记，和设计稿（index.html"选择器"一节）里写的一模一样——只是图标已经是 <svg>（设计稿写 data-i，enhance() 换成同样的 <svg>），
+// 所以空容器里渲染、服务端渲染出来的第一帧就是接上交互以后的样子。createPicker.html 就是它（React、Vue、Svelte 的 DatePicker 都靠它渲染）。
+//   kind：date（默认）| range | time | datetime | region
+//   placeholder：还没选时触发框里的字；不写按种类给（"选择日期""选择开始和结束日期"……）
+//   label：面板（role="dialog"）的读屏名称；不写时日期、时间、定时发布和 placeholder 一样，范围是"选择日期范围"，地址是"选择地址"
+const PK = { date: ["calendar", calendar, 0, "picker.143"], range: ["calendar", calendar, 260, "picker.144"], time: ["clock", clock, 140, "picker.146"], datetime: ["calendar", calendar, 250, "picker.147"], region: ["map-pin", mapPin, 250, "picker.148"] };
+// 常用城市：一键到市（地名是数据，不翻译）
+const HOT = [["北京市/北京市", "北京"], ["上海市/上海市", "上海"], ["广东省/广州市", "广州"], ["广东省/深圳市", "深圳"], ["浙江省/杭州市", "杭州"], ["四川省/成都市", "成都"]];
+const escH = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+export function pickerHTML({ kind = "date", placeholder, label } = {}) {
+  const [icName, icPaths, minW, phKey] = PK[kind] || PK.date; if (!PK[kind]) kind = "date";
+  const ph = escH(placeholder || tt(phKey)), name = escH(label || (kind === "range" ? tt("picker.145") : kind === "region" ? tt("picker.149") : ph));
+  const btn = (look, attr, key) => `<button class="sn-btn sn-${look} sn-sm" type="button" ${attr}>${tt(key)}</button>`, grow = `<span class="sn-grow"></span>`, note = `<span class="sn-note"></span>`;
+  const trigger = `<button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="${ph}">${ph}</span><span class="sn-end sn-swap"><span class="sn-a">${svg(icPaths, 16, icName)}</span><span class="sn-b" role="button" aria-label="${tt("picker.150")}">${svg(xIcon, 16, "x")}</span></span></button>`;
+  const body = {
+    date: `<div class="sn-cal-slot"></div><div class="sn-pk-foot">${btn("ghost", "data-today", "picker.151")}${grow}${btn("ghost", "data-clear", "picker.150")}</div>`,
+    range: `<div class="sn-pk-range"><div class="sn-pk-presets">${[["today", "picker.151"], ["d7", "picker.152"], ["d30", "picker.153"], ["month", "picker.154"], ["last", "picker.155"]].map(([p, k]) => `<button type="button" data-p="${p}">${tt(k)}</button>`).join("")}</div><div class="sn-cal-slot"></div></div>`
+      + `<div class="sn-pk-foot">${btn("ghost", "data-reset", "picker.156")}${note}${grow}${btn("primary", "data-ok", "picker.157")}</div>`,
+    time: `<div class="sn-tc-slot"></div><div class="sn-pk-foot">${btn("ghost", "data-now", "picker.158")}${grow}${btn("primary", "data-ok", "picker.157")}</div>`,
+    datetime: `<div class="sn-pk-dt"><div class="sn-cal-slot"></div><div class="sn-tside"><span class="sn-cap">${tt("picker.159")}</span><div class="sn-tc-slot"></div></div></div><div class="sn-pk-foot">${note}${grow}${btn("primary", "data-ok", "picker.157")}</div>`,
+    region: `<div class="sn-rg-search"><input class="sn-input sn-sm" type="text" enterkeyhint="search" placeholder="${tt("picker.160")}" aria-label="${tt("picker.161")}"></div>`
+      + `<div class="sn-rg-hot">${tt("picker.162")}${HOT.map(([p, t]) => `<button type="button" data-path="${p}">${t}</button>`).join("")}</div>`
+      + `<div class="sn-rg-tabs" role="tablist"><span class="sn-ink"></span></div><div class="sn-rg-vp"><div class="sn-rg-res sn-sa-vp sn-fy" role="listbox" hidden></div></div>`,
+  }[kind];
+  return `<div class="sn-pk" data-pk="${kind}"${minW ? ` style="min-width:${minW}px"` : ""}>${trigger}<div class="sn-pk-panel${kind === "region" ? " sn-rg" : ""}" role="dialog" aria-label="${name}">${body}</div></div>`;
 }

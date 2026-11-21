@@ -62,7 +62,7 @@ function contractMD(c) {
   if (c.whenToUse?.length) o += `## 什么时候用\n\n${c.whenToUse.map((x) => `- ${pr(x)}`).join("\n")}\n\n`;
   if (c.whenNotToUse?.length) o += `## 什么时候别用\n\n${c.whenNotToUse.map((x) => `- ${pr(x.text)}${x.use ? `（换成 \`${x.use}\`）` : ""}`).join("\n")}\n\n`;
   if (c.related?.length) o += `## 相近的组件\n\n${c.related.map((x) => `- \`${x.id}\`：${pr(x.diff)}`).join("\n")}\n\n`;
-  if (c.import) o += `## 引入\n\n` + tbl(["写法", "引入"], Object.entries(c.import).map(([k, v]) => [FW_NAME[k] || k, "`" + String(v).replace(/\n/g, "` `") + "`"])) + (c.importNote ? pr(c.importNote) + "\n\n" : "");
+  if (c.import) o += `## 引入\n\n` + tbl(["写法", "引入"], Object.entries(c.import).map(([k, v]) => [FW_NAME[k] || k, "`" + String(v).replace(/\n/g, "` `") + "`"])) + (c.importNote ? (typeof c.importNote === "object" ? Object.entries(c.importNote).map(([k, v]) => `- ${FW_NAME[k] || k}：${pr(v)}`).join("\n") : pr(c.importNote)) + "\n\n" : "");
   if (c.examples?.length) {
     o += `## 示例（由浅入深）\n\n`;
     for (const e of c.examples) {

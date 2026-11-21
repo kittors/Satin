@@ -32,3 +32,29 @@ import { wrapSatin } from "satin-ui/react";
 import { createChat as createChat2 } from "satin-ui/chat";
 const Chat = wrapSatin(createChat2, { events: [] });
 export const chatEl = <Chat title="助手" placeholder="说点什么" />;
+
+// 按钮的等待、成功、文字后的图标；日期选择；数据表格（子路径）；弹窗的图标、提交、底栏类名
+import { DatePicker } from "satin-ui/react";
+import { DataGrid } from "satin-ui/react/grid";
+import type { DatePickerProps } from "satin-ui/react";
+import type { PickDetail } from "satin-ui";
+export function Demo2() {
+  const [saving, setSaving] = useState(false), [due, setDue] = useState(""), [open, setOpen] = useState(false);
+  const onPick = (d: PickDetail) => setDue(d.text);
+  const props: DatePickerProps = { kind: "range", placeholder: "选择开始和结束日期", today: new Date(2026, 10, 19) };
+  return (
+    <div>
+      <Button variant="primary" size="lg" loading={saving} done={!saving && due !== ""} onClick={() => setSaving(true)}>保存修改</Button>
+      <Button iconAfter="arrow-right">下一步</Button>
+      <DatePicker onChange={onPick} />
+      <DatePicker kind="datetime" placeholder="选择发布时间" label="选择发布时间" now={new Date()} />
+      <DatePicker {...props} />
+      {/* @ts-expect-error 种类写错要报错 */}
+      <DatePicker kind="week" />
+      <DataGrid rows={2000} seed={7} label="镜头清单" />
+      {/* @ts-expect-error rows 是数字 */}
+      <DataGrid rows="2000" />
+      <Dialog open={open} onClose={() => setOpen(false)} onSubmit={(e) => e.preventDefault()} icon="trash-2" title="删除项目？" footerClassName="sn-two" footer={<Button variant="danger" type="submit">删除</Button>} />
+    </div>
+  );
+}

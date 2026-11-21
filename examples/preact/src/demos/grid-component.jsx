@@ -1,19 +1,17 @@
-import { useEffect, useRef } from "preact/hooks";
-import { setup, enhance } from "satin-ui";
-import { createDataGrid } from "satin-ui/grid";
+import { useState } from "preact/hooks";
+import { Button } from "satin-ui/react";
+import { DataGrid } from "satin-ui/react/grid";
 
-export default function GridComponent() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup();
-    const off = enhance(ref.current, (root) => {
-      createDataGrid(root.querySelector('[data-ex="grid3"]'), { rows: 100000, seed: 11 });
-    });
-    return () => { off(); unsetup(); };
-  }, []);
+export default function ReseedGrid() {
+  const [seed, setSeed] = useState(11);
   return (
-    <div ref={ref}>
-      <div data-ex="grid3"></div>
+    <div class="sn-stack sn-gap-8">
+      <div class="sn-row">
+        <Button size="sm" onClick={() => setSeed((s) => s + 1)}>换一批数据</Button>
+        <span class="sn-help">种子 {seed}</span>
+      </div>
+      {/* rows、seed 只在创建时用（数据在后台线程里按它们生成）：变了组件自己换一张新表 */}
+      <DataGrid rows={2000} seed={seed} label="镜头清单" />
     </div>
   );
 }

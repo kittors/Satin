@@ -3,7 +3,8 @@
 // · 模板 ref 拿到 Satin 实例（expose 出 instance）
 // · SSR 安全：服务端输出和浏览器第一帧一样的标记（createXxx.html），水合以后再接交互；导入时不碰 document
 // · 第一次挂载任何组件时自动调 setup()（Tooltip、浮层栈这些页面级行为），最后一个组件卸载时撤掉
-import { defineComponent, h, ref, onMounted, onBeforeUnmount, watch, shallowRef, cloneVNode } from "vue";
+import * as Vue from "vue";
+import { defineComponent, h, ref, onMounted, onBeforeUnmount, watch, cloneVNode } from "vue";
 import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
@@ -11,37 +12,12 @@ import { ICONS } from "../src/icons.js";
 import { CHECK } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
+import { wrap, cx } from "./wrap.js";
 const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
-
-const cx = (...a) => a.filter(Boolean).join(" ");
-// 把 createXxx 包成 Vue 组件。props：组件的选项名；valueKey：v-model 绑定的那一项
-function wrap(create, { name, props = [], valueKey = "value", events = ["change"], modelEvent = "change" }) {
-  return defineComponent({
-    name,
-    inheritAttrs: false,
-    props: Object.fromEntries([...props, "modelValue"].map((p) => [p, { type: null, default: undefined }])),
-    emits: [...events, "update:modelValue"],
-    setup(p, { emit, expose, attrs }) {
-      const host = ref(null), inst = shallowRef(null);
-      const opts = () => { const o = {}; for (const k of props) if (p[k] !== undefined) o[k] = p[k]; if (p.modelValue !== undefined) o[valueKey] = p.modelValue; return o; };
-      const html = create.html(opts());
-      let unsetup = null;
-      onMounted(() => {
-        unsetup = setup();
-        const handlers = {};
-        for (const ev of events) handlers["on" + ev[0].toUpperCase() + ev.slice(1)] = (v) => { emit(ev, v); if (ev === modelEvent) emit("update:modelValue", v); };
-        inst.value = create(host.value.firstElementChild, { ...opts(), ...handlers });
-      });
-      watch(opts, (o) => inst.value?.update(o), { deep: true });
-      onBeforeUnmount(() => { inst.value?.destroy(); inst.value = null; unsetup?.(); });
-      expose({ instance: inst });
-      return () => h("div", { ...attrs, ref: host, class: cx("sn-host", attrs.class), style: ["display: contents", attrs.style], innerHTML: html });
-    },
-  });
-}
 
 // 自己包：重组件（对话、Markdown、流程图、数据表格……，各自单独引入）或别的 createXxx 也能变成 Vue 组件。props 列出要传给组件的选项名
 //   import { createChat } from "satin-ui/chat";  const SnChat = wrapSatin(createChat, { name: "SnChat", props: ["title", "respond", "placeholder"], events: [] });
+//   数据表格已经包好了：import { DataGrid } from "satin-ui/vue/grid"
 export const wrapSatin = (create, opts) => wrap(create, opts);
 
 export const Segmented = /* @__PURE__ */ wrap(S.createSegmented, { name: "SnSegmented", props: ["items", "value", "size", "label"] });
@@ -59,20 +35,42 @@ export const Email = /* @__PURE__ */ wrap(S.createEmail, { name: "SnEmail", prop
 export const Table = /* @__PURE__ */ wrap(S.createTable, { name: "SnTable", props: ["columns", "rows", "rowKey", "sort", "sortLocal", "selectable", "selected", "empty", "loading", "skeleton", "label", "striped", "compact", "plain", "lines", "maxHeight"], valueKey: "selected", events: ["select", "sort", "rowClick"], modelEvent: "select" });
 export const Stepper = /* @__PURE__ */ wrap(S.createStepper, { name: "SnStepper", props: ["value", "min", "max", "unit", "label"] });
 export const NumberFlow = /* @__PURE__ */ wrap(S.createNumberFlow, { name: "SnNumberFlow", props: ["value", "style", "format"], events: [] });
+// 日期、时间、地址选择器：kind（date | range | time | datetime | region）、placeholder、label；@change 拿到 { text }（触发框里显示的文字）。
+// 没有 v-model：选择器现在只能读出选中的结果，不能从外面设值。today / now 固定"今天""现在"；kind、placeholder、label 只在创建时用（要换就换 :key）
+export const DatePicker = /* @__PURE__ */ wrap(S.createPicker, { name: "SnDatePicker", props: ["kind", "placeholder", "label", "today", "now"], modelEvent: null });
 
 // ———— 纯样式组件 ————
 export const Icon = /* @__PURE__ */ defineComponent({
   name: "SnIcon", props: { name: String, size: { type: Number, default: 16 } },
   setup: (p) => () => h("svg", { class: "sn-ic", "data-icon": p.name, width: p.size, height: p.size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true", innerHTML: ICONS[p.name] || "" }),
 });
+// 按钮：loading、done 写了（true 或 false）才套等待要用的结构（.sn-label > .sn-spin + .sn-tick + .sn-txt），宽度全程不跳；没写就和手写的 <button class="sn-btn"> 一样。
+// loading 变成 true 以后过了 300ms 还没结束才转圈，转圈出现后至少留 500ms（和 busy() 函数同一条规矩）；done 为 true 时原地打勾（等转圈收起以后）。等待中、打勾时点了不触发 click
+const TICK = () => h("svg", { class: "sn-tick", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round" }, [h("path", { d: "M3.5 8.5l3 3 6-7" })]);
 export const Button = /* @__PURE__ */ defineComponent({
   name: "SnButton",
-  props: { variant: { type: String, default: "secondary" }, size: String, icon: String, round: Boolean, selected: Boolean, busy: Boolean, disabled: Boolean, tip: String, type: { type: String, default: "button" } },
+  props: { variant: { type: String, default: "secondary" }, size: String, icon: String, iconAfter: String, round: Boolean, selected: Boolean, loading: { type: Boolean, default: undefined }, done: { type: Boolean, default: undefined }, disabled: Boolean, tip: String, type: { type: String, default: "button" } },
   setup(p, { slots, attrs }) {
+    // 一挂上就在等：直接转圈（300ms 是防"从不等待变成等待"时闪一下的），服务端输出也带 sn-busy
+    const spin = ref(!!p.loading); let at = 0, timer = 0;
+    // 只在浏览器里跑（服务端渲染不起定时器）
+    onMounted(() => watch(() => !!p.loading, (on) => {
+      clearTimeout(timer);
+      if (on) { if (!spin.value) timer = setTimeout(() => { at = performance.now(); spin.value = true; }, 300); }
+      else if (spin.value) timer = setTimeout(() => (spin.value = false), Math.max(0, 500 - (performance.now() - at)));
+    }, { immediate: true }));
+    onBeforeUnmount(() => clearTimeout(timer));
     return () => {
-      const kids = slots.default?.(), iconOnly = !kids && p.icon;
-      return h("button", { ...attrs, type: p.type, class: cx("sn-btn", `sn-${p.variant}`, p.size && p.size !== "md" && `sn-${p.size}`, iconOnly && "sn-ibtn", p.round && "sn-round", p.selected && "sn-selected", p.disabled && "sn-is-disabled", p.busy && "sn-busy"), "aria-disabled": p.disabled ? "true" : undefined, "data-tip": p.tip, "aria-label": iconOnly ? attrs["aria-label"] ?? p.tip : attrs["aria-label"], onClick: p.disabled ? undefined : attrs.onClick },
-        [p.icon ? h(Icon, { name: p.icon, size: iconOnly ? (p.size === "sm" ? 16 : 20) : 16 }) : null, kids]);
+      const kids = slots.default?.(), iconOnly = !kids && p.icon && !p.iconAfter, ok = !!p.done && !spin.value, blocked = p.disabled || p.loading || ok;
+      const lead = p.icon ? h(Icon, { name: p.icon }) : null, tail = p.iconAfter ? h(Icon, { name: p.iconAfter, class: "sn-after" }) : null;
+      return h("button", {
+        ...attrs, type: p.type,
+        class: cx("sn-btn", `sn-${p.variant}`, p.size && p.size !== "md" && `sn-${p.size}`, iconOnly && "sn-ibtn", p.round && "sn-round", p.selected && "sn-selected", p.disabled && "sn-is-disabled", spin.value && "sn-busy", ok && "sn-ok"),
+        "aria-disabled": p.disabled ? "true" : undefined, "data-tip": p.tip, "aria-label": iconOnly ? attrs["aria-label"] ?? p.tip : attrs["aria-label"],
+        onClick: blocked ? undefined : attrs.onClick,
+      }, p.loading !== undefined || p.done !== undefined
+        ? [h("span", { class: "sn-sheen" }), h("span", { class: "sn-label" }, [h("span", { class: "sn-spin" }), TICK(), h("span", { class: "sn-txt" }, [lead, kids, tail])])]
+        : [lead, kids, tail]);
     };
   },
 });
@@ -113,16 +111,24 @@ export const Text = /* @__PURE__ */ defineComponent({
 // Tooltip：给默认插槽里的第一个元素加 data-tip
 export const Tooltip = /* @__PURE__ */ defineComponent({ name: "SnTooltip", props: { text: String, kbd: String }, setup: (p, { slots }) => () => { const [v] = slots.default?.() || []; return v ? cloneVNode(v, { "data-tip": p.text, "data-kbd": p.kbd }) : null; } });
 
+// 弹窗：v-model:open 控制开关；关完（Esc、取消、程序关）发 close。取消按钮写 data-cancel、关闭按钮写 data-x：和 Esc 一样先走 guard 再关。
+// @submit 接住表单提交（主按钮写 type="submit"，输入框里按回车也算），弹窗不会因为提交自己关。icon：标题左边的图标；footer-class 加在底栏上
+let dlgN = 0;
 export const Dialog = /* @__PURE__ */ defineComponent({
-  name: "SnDialog", props: { open: Boolean, title: String, description: String }, emits: ["close", "update:open"],
+  name: "SnDialog", props: { open: Boolean, title: String, description: String, icon: String, guard: Function, footerClass: null }, emits: ["close", "update:open", "submit"],
   setup(p, { slots, emit }) {
-    const el = ref(null);
-    onMounted(() => { const d = el.value; wireDialog(d); d.addEventListener("close", () => { emit("close"); emit("update:open", false); }); if (p.open) openDialog(d, document.activeElement); });
+    const el = ref(null), tid = Vue.useId?.() ?? "sn-dlg-" + ++dlgN;
+    onMounted(() => {
+      const d = el.value; wireDialog(d);
+      d.guard = () => (p.guard ? p.guard(() => closeDialog(d)) : closeDialog(d));
+      d.addEventListener("close", () => { emit("close"); emit("update:open", false); });
+      if (p.open) openDialog(d, document.activeElement);
+    });
     watch(() => p.open, (o) => { const d = el.value; if (!d) return; if (o && !d.open) openDialog(d, document.activeElement); else if (!o && d.open) closeDialog(d); });
-    return () => h("dialog", { ref: el, class: "sn-dlg" }, [h("form", { method: "dialog" }, [
-      p.title || p.description ? h("div", { class: "sn-hd" }, [h("div", { style: "flex:1" }, [p.title ? h("h3", p.title) : null, p.description ? h("div", { class: "sn-sub" }, p.description) : null])]) : null,
-      h("div", { class: "sn-bd" }, slots.default?.()),
-      slots.footer ? h("div", { class: "sn-ft" }, slots.footer()) : null,
+    return () => h("dialog", { ref: el, class: "sn-dlg", "aria-labelledby": p.title ? tid : undefined }, [h("form", { method: "dialog", onSubmit: (e) => emit("submit", e) }, [
+      p.title || p.description || p.icon ? h("div", { class: "sn-hd" }, [p.icon ? h("span", { class: "sn-dlg-icon" }, [h(Icon, { name: p.icon })]) : null, h("div", { style: "flex:1" }, [p.title ? h("h3", { id: tid }, p.title) : null, p.description ? h("div", { class: "sn-sub" }, p.description) : null])]) : null,
+      slots.default ? h("div", { class: "sn-bd" }, slots.default()) : null,
+      slots.footer ? h("div", { class: ["sn-ft", p.footerClass] }, slots.footer()) : null,
     ])]);
   },
 });
@@ -138,7 +144,21 @@ export const Drawer = /* @__PURE__ */ defineComponent({
   },
 });
 
+// v-enhance：照设计稿写好的一段标记（菜单按钮、浮层触发器、折叠面板……）放进这个元素，挂上时接上交互、卸载时撤掉（和 <sn-enhance> 一样，不用配置自定义元素）
+//   <script setup> import { vEnhance } from "satin-ui/vue"; </script>   <div v-enhance>…标记…</div>
+export const vEnhance = {
+  mounted(el) { const unsetup = setup(), off = S.enhance(el); el._snEnhance = () => { off(); unsetup(); }; },
+  beforeUnmount(el) { const f = el._snEnhance; el._snEnhance = null; f?.(); },
+};
+
 export const toast = (o) => (setup(), S.toast(o));
 export const notify = (o) => (setup(), S.notify(o));
-// 全局注册：app.use(Satin) 以后模板里直接写 <SnButton>、<SnSegmented v-model="x" />……
-export default { install(app) { for (const [k, c] of Object.entries({ Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, NumberFlow, Icon, Button, Input, Field, Checkbox, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c); } };
+// 全局注册：app.use(Satin) 以后模板里直接写 <SnButton>、<SnSegmented v-model="x" />、<SnDatePicker>……、v-enhance，同时装好页面级行为（Tooltip、浮层栈、Esc 关闭，和 setup() 一样；应用卸载时撤掉）。
+// 数据表格这类重组件不在这里注册：import { DataGrid } from "satin-ui/vue/grid"
+export default {
+  install(app) {
+    for (const [k, c] of Object.entries({ Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
+    app.directive("enhance", vEnhance);
+    const off = setup(); app.onUnmount?.(off); // setup() 在服务端直接返回，什么都不做
+  },
+};

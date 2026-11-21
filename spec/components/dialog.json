@@ -108,7 +108,7 @@
       "关上后焦点回到打开它的按钮。"
     ],
     "notes": [
-      "给 `<dialog>` 写 `aria-labelledby` 指向标题。还没做到：React、Vue 的 Dialog 组件没有自动加，读屏读不出弹窗的名字。",
+      "给 `<dialog>` 写 `aria-labelledby` 指向标题（React、Vue、Svelte 的 Dialog 给了 title 就自动加）。",
       "点背景不关，只轻轻顶一下，免得误点丢了填好的内容。"
     ]
   },
@@ -150,15 +150,23 @@
     }
   ],
   "import": {
-    "html": "import { setup, enhance, openDialog, closeDialog } from \"satin-ui\";",
+    "html": "import { closeDialog } from \"satin-ui\"; // 标记写 <dialog class=\"sn-dlg\">，包在 <sn-enhance> 里：data-dlg 触发按钮、Esc、取消自动接上",
     "react": "import { Dialog } from \"satin-ui/react\";",
-    "vue": "import { Dialog as SnDialog } from \"satin-ui/vue\";",
-    "svelte": "import { setup, enhance, closeDialog } from \"satin-ui\";",
-    "angular": "import { setup, enhance, closeDialog } from \"satin-ui\";",
-    "solid": "import { setup, enhance, closeDialog } from \"satin-ui\";",
-    "preact": "import { setup, enhance, closeDialog } from \"satin-ui\";"
+    "vue": "import { Dialog } from \"satin-ui/vue\"; // 入口里 app.use(Satin) 以后也可以不引，直接写 <SnDialog>",
+    "svelte": "import Dialog from \"satin-ui/svelte/Dialog.svelte\";",
+    "angular": "import { closeDialog, openDialog } from \"satin-ui\"; // 标记写 <dialog class=\"sn-dlg\">，包在 <sn-enhance> 里（组件加 CUSTOM_ELEMENTS_SCHEMA）",
+    "solid": "import { closeDialog, openDialog } from \"satin-ui\"; // 标记写 <dialog class=\"sn-dlg\">，包在 <sn-enhance> 里",
+    "preact": "import { Dialog } from \"satin-ui/react\"; // @preact/preset-vite 默认把 react 指到 preact/compat"
   },
-  "importNote": "React、Vue 用 Dialog 组件，open 控制开关；其余框架和纯 HTML 写 `<dialog class=\"sn-dlg\">`：触发按钮写 `data-dlg=\"弹窗 id\"`，`enhance()` 接上，代码里用 `openDialog()`、`closeDialog()`。",
+  "importNote": {
+    "react": "`Dialog` 组件：`open` 控制开关，`onClose` 里改回 `false`，表单提交走 `onSubmit`；取消按钮写 `data-cancel`，和 Esc 一样先问 `guard`。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Dialog`，用法和 React 一样：`open`、`onClose`、`onSubmit`、`guard`。",
+    "vue": "`Dialog` 组件：`v-model:open` 控制开关，关完发 `close`、表单提交发 `submit`；取消按钮写 `data-cancel`，和 Esc 一样先问 `guard`。",
+    "svelte": "`Dialog` 组件（`satin-ui/svelte/Dialog.svelte`）：`bind:open` 控制开关，底部按钮放进 `footer` 片段；取消按钮写 `data-cancel`。",
+    "angular": "写 `<dialog class=\"sn-dlg\">`，外面包一层 `<sn-enhance>`：触发按钮写 `data-dlg=\"弹窗 id\"` 就能打开，Esc、取消按钮自动接上；也可以自己调 `openDialog()`、`closeDialog()`。",
+    "solid": "写 `<dialog class=\"sn-dlg\">`，外面包一层 `<sn-enhance>`：触发按钮写 `data-dlg=\"弹窗 id\"` 就能打开；也可以自己调 `openDialog()`、`closeDialog()`。",
+    "html": "写 `<dialog class=\"sn-dlg\">`，外面包一层 `<sn-enhance>`：触发按钮写 `data-dlg=\"弹窗 id\"` 就能打开，Esc、取消按钮自动接上；也可以自己调 `openDialog(弹窗, 按钮)`、`closeDialog(弹窗)`。"
+  },
   "dts": {
     "functions": [
       "openDialog",
@@ -166,7 +174,8 @@
       "wireDialog"
     ],
     "react": "Dialog",
-    "vue": "Dialog"
+    "vue": "Dialog",
+    "svelte": "Dialog"
   },
   "props": [
     {
@@ -174,10 +183,12 @@
       "type": "boolean",
       "default": "false",
       "required": true,
-      "desc": "开着还是关着。React 里关上以后（Esc、取消、程序关）会调 onClose，在里面把它改回 false；Vue 用 v-model:open。纯 HTML 写法没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。",
+      "desc": "开着还是关着。关上以后（Esc、取消、程序关）React 调 onClose，在里面把它改回 false；Vue 用 v-model:open、Svelte 用 bind:open，会自己改回 false。手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。",
       "names": {
         "react": "open",
-        "vue": "v-model:open / open"
+        "vue": "v-model:open / open",
+        "svelte": "bind:open / open",
+        "preact": "open"
       }
     },
     {
@@ -185,11 +196,14 @@
       "type": "string",
       "default": "—",
       "required": false,
-      "desc": "标题，写要做的事：\"删除\"雨夜车站\"？\"。React 里可以是任意节点。",
+      "desc": "标题，写要做的事：\"删除\"雨夜车站\"？\"。React 里可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。",
       "names": {
         "react": "title",
         "vue": "title",
-        "markup": ".sn-hd h3"
+        "svelte": "title",
+        "preact": "title",
+        "markup": ".sn-hd h3",
+        "html": ".sn-hd h3（<dialog> 写 aria-labelledby 指向它）"
       },
       "types": {
         "react": "React.ReactNode",
@@ -205,7 +219,10 @@
       "names": {
         "react": "description",
         "vue": "description",
-        "markup": ".sn-hd .sn-sub"
+        "svelte": "description",
+        "preact": "description",
+        "markup": ".sn-hd .sn-sub",
+        "html": ".sn-hd .sn-sub"
       },
       "types": {
         "react": "React.ReactNode",
@@ -213,14 +230,45 @@
       }
     },
     {
+      "name": "icon",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "desc": "标题左边的图标，放在红色圆底里（危险确认用 trash-2）。",
+      "example": "icon=\"trash-2\"",
+      "names": {
+        "react": "icon",
+        "vue": "icon",
+        "svelte": "icon",
+        "preact": "icon",
+        "html": ".sn-hd 里先放 <span class=\"sn-dlg-icon\" data-i=\"trash-2\">"
+      }
+    },
+    {
       "name": "footer",
       "type": "React.ReactNode",
       "default": "—",
       "required": false,
-      "desc": "底部的按钮（主按钮放最右）。Vue 写在 #footer 插槽里。",
+      "desc": "底部的按钮（主按钮放最右）。Vue 写在 #footer 插槽里，Svelte 写在 footer 片段里。",
       "names": {
         "react": "footer",
-        "markup": ".sn-ft"
+        "preact": "footer",
+        "markup": ".sn-ft",
+        "html": ".sn-ft"
+      }
+    },
+    {
+      "name": "footerClass",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "desc": "加在底栏 `.sn-ft` 上的类名，比如两组按钮叠在一起原地切换的 `sn-two`、问的时候加的 `sn-asking`（见\"填了内容再关\"示例）。",
+      "names": {
+        "react": "footerClassName",
+        "vue": "footerClass（模板里写 footer-class）",
+        "svelte": "footerClass",
+        "preact": "footerClassName",
+        "html": "<div class=\"sn-ft sn-two\">"
       }
     },
     {
@@ -231,19 +279,29 @@
       "desc": "加在 `<dialog>` 上的类名，比如 sn-wide（宽 560，默认 440）。",
       "names": {
         "react": "className",
-        "markup": "<dialog class=\"sn-dlg sn-wide\">"
-      }
+        "svelte": "class",
+        "preact": "className",
+        "markup": "<dialog class=\"sn-dlg sn-wide\">",
+        "html": "<dialog class=\"sn-dlg sn-wide\">"
+      },
+      "native": [
+        "svelte"
+      ]
     },
     {
       "name": "guard",
       "type": "(close: () => void) => void",
       "default": "—",
       "required": false,
-      "desc": "关之前拦一下（Esc、取消、×）：比如填了内容就先在底栏问一句。React 里给的 close 调了才真关；纯 HTML 里 guard 不带参数，确认要关时自己调 `closeDialog(弹窗)`。",
+      "desc": "关之前拦一下（Esc、取消、×）：比如填了内容就先在底栏问一句。组件给的 close 调了才真关；手写标记里 guard 不带参数，确认要关时自己调 `closeDialog(弹窗)`。",
       "example": "guard={(close) => (dirty ? setAsking(true) : close())}",
       "names": {
         "react": "guard",
-        "markup": "弹窗元素的 guard 属性：dialog.guard = () => {}"
+        "vue": "guard",
+        "svelte": "guard",
+        "preact": "guard",
+        "markup": "弹窗元素的 guard 属性：dialog.guard = () => {}",
+        "html": "弹窗元素的 guard 属性：dialog.guard = () => {}"
       }
     }
   ],
@@ -255,30 +313,49 @@
       "names": {
         "react": "onClose",
         "vue": "@close（v-model:open 同时改成 false）",
-        "angular": "(close)",
-        "svelte": "onclose",
-        "solid": "onClose",
+        "svelte": "onclose（bind:open 同时改成 false）",
         "preact": "onClose",
+        "angular": "<dialog> 上的 (close)",
+        "solid": "<dialog> 上的 onClose",
         "html": "<dialog> 的原生 close 事件：addEventListener(\"close\")"
+      }
+    },
+    {
+      "name": "submit",
+      "payload": "SubmitEvent",
+      "when": "表单提交时（主按钮写 `type=\"submit\"`，输入框里按回车也算）。弹窗不会因为提交自己关：处理完把 open 改成 false（手写标记调 `closeDialog()`）。",
+      "names": {
+        "react": "onSubmit",
+        "vue": "@submit",
+        "svelte": "onsubmit",
+        "preact": "onSubmit",
+        "angular": "<form> 上的 (submit)",
+        "solid": "<form> 上的 onSubmit",
+        "html": "<form> 上 addEventListener(\"submit\")"
       }
     }
   ],
   "slots": [
     {
       "name": "default",
-      "desc": "弹窗的内容：字段、说明。",
+      "desc": "弹窗的内容：字段、说明。没有内容就不放这一块。",
       "names": {
         "react": "children",
         "vue": "默认插槽",
-        "markup": ".sn-bd"
+        "svelte": "children（默认内容）",
+        "preact": "children",
+        "markup": ".sn-bd",
+        "html": ".sn-bd"
       }
     },
     {
       "name": "footer",
-      "desc": "底部的按钮（React 里是 footer 属性）。",
+      "desc": "底部的按钮（React 里是 footer 属性）。取消按钮写 `data-cancel`：和 Esc 一样先走 guard 再关。",
       "names": {
         "vue": "#footer",
-        "markup": ".sn-ft"
+        "svelte": "footer（{#snippet footer()}）",
+        "markup": ".sn-ft",
+        "html": ".sn-ft"
       }
     }
   ],
@@ -450,40 +527,76 @@
     {
       "slug": "dialog-basic",
       "title": "基础用法：打开、取消、提交",
-      "why": "触发按钮写 `data-dlg=\"弹窗 id\"`，`enhance()` 接上：从按钮那里长出来，Esc、取消都会关。提交不会自动关，处理完自己调 `closeDialog()`。",
+      "why": "点按钮打开：从按钮那里长出来，焦点到第一个输入框；Esc、取消（`data-cancel`）都会关。提交不会自动关：保存成功了再关（组件把 open 改回 false，手写标记调 `closeDialog()`）。",
       "html": "<button type=\"button\" class=\"sn-btn sn-primary\" data-dlg=\"dlg-rename\">重命名</button>\n<dialog class=\"sn-dlg\" id=\"dlg-rename\" aria-labelledby=\"dlg-rename-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-rename-t\">重命名项目</h3><div class=\"sn-sub\">新名称会同步给所有协作者。</div></div></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-rename-name\">项目名称</label><input class=\"sn-input\" id=\"dlg-rename-name\" value=\"雨夜车站\" autocomplete=\"off\"></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n  </form>\n</dialog>",
-      "js": "import { closeDialog, toast } from \"satin-ui\";\n\nconst dlg = document.querySelector(\"#dlg-rename\");\n// 弹窗不会因为提交自己关：在这里保存，成功了再关\ndlg.querySelector(\"form\").addEventListener(\"submit\", () => {\n  const name = dlg.querySelector(\"input\").value.trim();\n  closeDialog(dlg);\n  toast({ text: \"已改名为：\" + name });\n});"
+      "code": {
+        "html": "<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-primary\" data-dlg=\"dlg-rename\">重命名</button>\n  <dialog class=\"sn-dlg\" id=\"dlg-rename\" aria-labelledby=\"dlg-rename-t\">\n    <form method=\"dialog\">\n      <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-rename-t\">重命名项目</h3><div class=\"sn-sub\">新名称会同步给所有协作者。</div></div></div>\n      <div class=\"sn-bd\">\n        <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-rename-name\">项目名称</label><input class=\"sn-input\" id=\"dlg-rename-name\" value=\"雨夜车站\" autocomplete=\"off\"></div>\n      </div>\n      <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n    </form>\n  </dialog>\n</sn-enhance>\n\n<script type=\"module\">\n  import { closeDialog, toast } from \"satin-ui\";\n\n  const dlg = document.getElementById(\"dlg-rename\");\n  // 弹窗不会因为提交自己关：在这里保存，成功了再关\n  dlg.querySelector(\"form\").addEventListener(\"submit\", () => {\n    closeDialog(dlg);\n    toast({ text: \"已改名为：\" + dlg.querySelector(\"input\").value.trim() });\n  });\n</script>\n",
+        "react": "import { useId, useState } from \"react\";\nimport { Button, Dialog, toast } from \"satin-ui/react\";\n\nexport default function RenameProject() {\n  const [open, setOpen] = useState(false);\n  const [name, setName] = useState(\"雨夜车站\");\n  const nameId = useId();\n  // 弹窗不会因为提交自己关：在这里保存，成功了再关\n  function save(e) {\n    e.preventDefault();\n    setOpen(false);\n    toast({ text: \"已改名为：\" + name.trim() });\n  }\n  return (\n    <>\n      <Button variant=\"primary\" onClick={() => setOpen(true)}>重命名</Button>\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        onSubmit={save}\n        title=\"重命名项目\"\n        description=\"新名称会同步给所有协作者。\"\n        footer={<>\n          {/* data-cancel：和 Esc 一样关上 */}\n          <Button variant=\"ghost\" data-cancel>取消</Button>\n          <Button variant=\"primary\" type=\"submit\">保存</Button>\n        </>}\n      >\n        <div className=\"sn-field\">\n          <label className=\"sn-lbl\" htmlFor={nameId}>项目名称</label>\n          <input className=\"sn-input\" id={nameId} value={name} onChange={(e) => setName(e.target.value)} autoComplete=\"off\" />\n        </div>\n      </Dialog>\n    </>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref, useId } from \"vue\";\nimport { Button, Dialog, toast } from \"satin-ui/vue\";\n\nconst open = ref(false), name = ref(\"雨夜车站\"), nameId = useId();\n// 弹窗不会因为提交自己关：在这里保存，成功了再关\nfunction save() {\n  open.value = false;\n  toast({ text: \"已改名为：\" + name.value.trim() });\n}\n</script>\n\n<template>\n  <Button variant=\"primary\" @click=\"open = true\">重命名</Button>\n  <Dialog v-model:open=\"open\" title=\"重命名项目\" description=\"新名称会同步给所有协作者。\" @submit=\"save\">\n    <div class=\"sn-field\">\n      <label class=\"sn-lbl\" :for=\"nameId\">项目名称</label>\n      <input class=\"sn-input\" :id=\"nameId\" v-model=\"name\" autocomplete=\"off\" />\n    </div>\n    <template #footer>\n      <!-- data-cancel：和 Esc 一样关上 -->\n      <Button variant=\"ghost\" data-cancel>取消</Button>\n      <Button variant=\"primary\" type=\"submit\">保存</Button>\n    </template>\n  </Dialog>\n</template>\n",
+        "svelte": "<script>\n  import Dialog from \"satin-ui/svelte/Dialog.svelte\";\n  import { toast } from \"satin-ui\";\n\n  const nameId = $props.id();\n  let open = $state(false), name = $state(\"雨夜车站\");\n  // 弹窗不会因为提交自己关：在这里保存，成功了再关\n  function save() {\n    open = false;\n    toast({ text: \"已改名为：\" + name.trim() });\n  }\n</script>\n\n<button type=\"button\" class=\"sn-btn sn-primary\" onclick={() => (open = true)}>重命名</button>\n<Dialog bind:open title=\"重命名项目\" description=\"新名称会同步给所有协作者。\" onsubmit={save}>\n  <div class=\"sn-field\">\n    <label class=\"sn-lbl\" for={nameId}>项目名称</label>\n    <input class=\"sn-input\" id={nameId} bind:value={name} autocomplete=\"off\" />\n  </div>\n  {#snippet footer()}\n    <!-- data-cancel：和 Esc 一样关上 -->\n    <button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button>\n    <button type=\"submit\" class=\"sn-btn sn-primary\">保存</button>\n  {/snippet}\n</Dialog>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, viewChild } from \"@angular/core\";\nimport { closeDialog, toast } from \"satin-ui\";\n\n@Component({\n  selector: \"demo-dialog-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 接上 data-dlg 触发按钮、Esc、取消\n  template: `\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-primary\" data-dlg=\"dlg-rename\">重命名</button>\n      <dialog #dlg class=\"sn-dlg\" id=\"dlg-rename\" aria-labelledby=\"dlg-rename-t\">\n        <form method=\"dialog\" (submit)=\"save()\">\n          <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-rename-t\">重命名项目</h3><div class=\"sn-sub\">新名称会同步给所有协作者。</div></div></div>\n          <div class=\"sn-bd\">\n            <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-rename-name\">项目名称</label><input #name class=\"sn-input\" id=\"dlg-rename-name\" value=\"雨夜车站\" autocomplete=\"off\"></div>\n          </div>\n          <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n        </form>\n      </dialog>\n    </sn-enhance>\n  `,\n})\nexport class DialogBasicComponent {\n  private dlg = viewChild.required<ElementRef<HTMLDialogElement>>(\"dlg\");\n  private name = viewChild.required<ElementRef<HTMLInputElement>>(\"name\");\n  // 弹窗不会因为提交自己关：在这里保存，成功了再关\n  save() {\n    closeDialog(this.dlg().nativeElement);\n    toast({ text: \"已改名为：\" + this.name().nativeElement.value.trim() });\n  }\n}\n",
+        "solid": "import { closeDialog, toast } from \"satin-ui\";\n\n// 标记照设计稿写，<sn-enhance> 接上 data-dlg 触发按钮、Esc、取消\nexport default function RenameProject() {\n  let dlg, input;\n  // 弹窗不会因为提交自己关：在这里保存，成功了再关\n  function save() {\n    closeDialog(dlg);\n    toast({ text: \"已改名为：\" + input.value.trim() });\n  }\n  return (\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-primary\" data-dlg=\"dlg-rename\">重命名</button>\n      <dialog ref={(el) => (dlg = el)} class=\"sn-dlg\" id=\"dlg-rename\" aria-labelledby=\"dlg-rename-t\">\n        <form method=\"dialog\" onSubmit={save}>\n          <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-rename-t\">重命名项目</h3><div class=\"sn-sub\">新名称会同步给所有协作者。</div></div></div>\n          <div class=\"sn-bd\">\n            <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-rename-name\">项目名称</label><input ref={(el) => (input = el)} class=\"sn-input\" id=\"dlg-rename-name\" value=\"雨夜车站\" autocomplete=\"off\" /></div>\n          </div>\n          <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n        </form>\n      </dialog>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useId, useState } from \"preact/hooks\";\nimport { Button, Dialog, toast } from \"satin-ui/react\";\n\nexport default function RenameProject() {\n  const [open, setOpen] = useState(false);\n  const [name, setName] = useState(\"雨夜车站\");\n  const nameId = useId();\n  // 弹窗不会因为提交自己关：在这里保存，成功了再关\n  function save(e) {\n    e.preventDefault();\n    setOpen(false);\n    toast({ text: \"已改名为：\" + name.trim() });\n  }\n  return (\n    <>\n      <Button variant=\"primary\" onClick={() => setOpen(true)}>重命名</Button>\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        onSubmit={save}\n        title=\"重命名项目\"\n        description=\"新名称会同步给所有协作者。\"\n        footer={<>\n          {/* data-cancel：和 Esc 一样关上 */}\n          <Button variant=\"ghost\" data-cancel>取消</Button>\n          <Button variant=\"primary\" type=\"submit\">保存</Button>\n        </>}\n      >\n        <div class=\"sn-field\">\n          <label class=\"sn-lbl\" for={nameId}>项目名称</label>\n          <input class=\"sn-input\" id={nameId} value={name} onInput={(e) => setName(e.currentTarget.value)} autocomplete=\"off\" />\n        </div>\n      </Dialog>\n    </>\n  );\n}\n"
+      }
     },
     {
       "slug": "dialog-danger",
       "title": "危险确认",
-      "why": "不能撤销的操作才确认：标题写要做的事，正文列出会一起删掉什么，主按钮用 danger 并写清动作。",
+      "why": "不能撤销的操作才确认：标题写要做的事，正文列出会一起删掉什么，主按钮用 danger 并写清动作；标题左边放 trash-2 图标（组件写 `icon`）。",
       "html": "<button type=\"button\" class=\"sn-btn sn-danger-soft\" data-dlg=\"dlg-del\" data-i=\"trash-2:before\">删除项目…</button>\n<dialog class=\"sn-dlg\" id=\"dlg-del\" aria-labelledby=\"dlg-del-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><span class=\"sn-dlg-icon\" data-i=\"trash-2\"></span><div style=\"flex:1\"><h3 id=\"dlg-del-t\">删除\"雨夜车站\"？</h3><div class=\"sn-sub\">删除后无法恢复，协作者也会失去访问权限。</div></div></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-impact\"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-danger\">删除项目</button></div>\n  </form>\n</dialog>",
-      "js": "import { closeDialog, toast } from \"satin-ui\";\n\nconst dlg = document.querySelector(\"#dlg-del\");\ndlg.querySelector(\"form\").addEventListener(\"submit\", () => {\n  closeDialog(dlg);\n  toast({ text: \"已删除\\\"雨夜车站\\\"\" });\n});"
+      "code": {
+        "html": "<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-danger-soft\" data-dlg=\"dlg-del\" data-i=\"trash-2:before\">删除项目…</button>\n  <dialog class=\"sn-dlg\" id=\"dlg-del\" aria-labelledby=\"dlg-del-t\">\n    <form method=\"dialog\">\n      <div class=\"sn-hd\"><span class=\"sn-dlg-icon\" data-i=\"trash-2\"></span><div style=\"flex:1\"><h3 id=\"dlg-del-t\">删除\"雨夜车站\"？</h3><div class=\"sn-sub\">删除后无法恢复，协作者也会失去访问权限。</div></div></div>\n      <div class=\"sn-bd\">\n        <div class=\"sn-impact\"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>\n      </div>\n      <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-danger\">删除项目</button></div>\n    </form>\n  </dialog>\n</sn-enhance>\n\n<script type=\"module\">\n  import { closeDialog, toast } from \"satin-ui\";\n\n  const dlg = document.getElementById(\"dlg-del\");\n  dlg.querySelector(\"form\").addEventListener(\"submit\", () => {\n    closeDialog(dlg);\n    toast({ text: '已删除\"雨夜车站\"' });\n  });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, Dialog, toast } from \"satin-ui/react\";\n\nexport default function DeleteProject() {\n  const [open, setOpen] = useState(false);\n  function remove(e) {\n    e.preventDefault();\n    setOpen(false);\n    toast({ text: '已删除\"雨夜车站\"' });\n  }\n  return (\n    <>\n      <Button variant=\"danger-soft\" icon=\"trash-2\" onClick={() => setOpen(true)}>删除项目…</Button>\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        onSubmit={remove}\n        icon=\"trash-2\"\n        title='删除\"雨夜车站\"？'\n        description=\"删除后无法恢复，协作者也会失去访问权限。\"\n        footer={<>\n          <Button variant=\"ghost\" data-cancel>取消</Button>\n          <Button variant=\"danger\" type=\"submit\">删除项目</Button>\n        </>}\n      >\n        {/* 写清会一起删掉什么 */}\n        <div className=\"sn-impact\"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>\n      </Dialog>\n    </>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, Dialog, toast } from \"satin-ui/vue\";\n\nconst open = ref(false);\nfunction remove() {\n  open.value = false;\n  toast({ text: '已删除\"雨夜车站\"' });\n}\n</script>\n\n<template>\n  <Button variant=\"danger-soft\" icon=\"trash-2\" @click=\"open = true\">删除项目…</Button>\n  <Dialog v-model:open=\"open\" icon=\"trash-2\" title='删除\"雨夜车站\"？' description=\"删除后无法恢复，协作者也会失去访问权限。\" @submit=\"remove\">\n    <!-- 写清会一起删掉什么 -->\n    <div class=\"sn-impact\"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>\n    <template #footer>\n      <Button variant=\"ghost\" data-cancel>取消</Button>\n      <Button variant=\"danger\" type=\"submit\">删除项目</Button>\n    </template>\n  </Dialog>\n</template>\n",
+        "svelte": "<script>\n  import Dialog from \"satin-ui/svelte/Dialog.svelte\";\n  import Icon from \"satin-ui/svelte/Icon.svelte\";\n  import { toast } from \"satin-ui\";\n\n  let open = $state(false);\n  function remove() {\n    open = false;\n    toast({ text: '已删除\"雨夜车站\"' });\n  }\n</script>\n\n<button type=\"button\" class=\"sn-btn sn-danger-soft\" onclick={() => (open = true)}><Icon name=\"trash-2\" />删除项目…</button>\n<Dialog bind:open icon=\"trash-2\" title='删除\"雨夜车站\"？' description=\"删除后无法恢复，协作者也会失去访问权限。\" onsubmit={remove}>\n  <!-- 写清会一起删掉什么 -->\n  <div class=\"sn-impact\"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>\n  {#snippet footer()}\n    <button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button>\n    <button type=\"submit\" class=\"sn-btn sn-danger\">删除项目</button>\n  {/snippet}\n</Dialog>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, viewChild } from \"@angular/core\";\nimport { closeDialog, toast } from \"satin-ui\";\n\n@Component({\n  selector: \"demo-dialog-danger\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 接上 data-dlg 触发按钮、Esc、取消，把 data-i 换成图标\n  template: `\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-danger-soft\" data-dlg=\"dlg-del\" data-i=\"trash-2:before\">删除项目…</button>\n      <dialog #dlg class=\"sn-dlg\" id=\"dlg-del\" aria-labelledby=\"dlg-del-t\">\n        <form method=\"dialog\" (submit)=\"remove()\">\n          <div class=\"sn-hd\"><span class=\"sn-dlg-icon\" data-i=\"trash-2\"></span><div style=\"flex:1\"><h3 id=\"dlg-del-t\">删除\"雨夜车站\"？</h3><div class=\"sn-sub\">删除后无法恢复，协作者也会失去访问权限。</div></div></div>\n          <div class=\"sn-bd\">\n            <div class=\"sn-impact\"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>\n          </div>\n          <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-danger\">删除项目</button></div>\n        </form>\n      </dialog>\n    </sn-enhance>\n  `,\n})\nexport class DialogDangerComponent {\n  private dlg = viewChild.required<ElementRef<HTMLDialogElement>>(\"dlg\");\n  remove() {\n    closeDialog(this.dlg().nativeElement);\n    toast({ text: '已删除\"雨夜车站\"' });\n  }\n}\n",
+        "solid": "import { closeDialog, toast } from \"satin-ui\";\n\n// 标记照设计稿写，<sn-enhance> 接上 data-dlg 触发按钮、Esc、取消，把 data-i 换成图标\nexport default function DeleteProject() {\n  let dlg;\n  function remove() {\n    closeDialog(dlg);\n    toast({ text: '已删除\"雨夜车站\"' });\n  }\n  return (\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-danger-soft\" data-dlg=\"dlg-del\" data-i=\"trash-2:before\">删除项目…</button>\n      <dialog ref={(el) => (dlg = el)} class=\"sn-dlg\" id=\"dlg-del\" aria-labelledby=\"dlg-del-t\">\n        <form method=\"dialog\" onSubmit={remove}>\n          <div class=\"sn-hd\"><span class=\"sn-dlg-icon\" data-i=\"trash-2\"></span><div style=\"flex:1\"><h3 id=\"dlg-del-t\">删除\"雨夜车站\"？</h3><div class=\"sn-sub\">删除后无法恢复，协作者也会失去访问权限。</div></div></div>\n          <div class=\"sn-bd\">\n            <div class=\"sn-impact\"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>\n          </div>\n          <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-danger\">删除项目</button></div>\n        </form>\n      </dialog>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useState } from \"preact/hooks\";\nimport { Button, Dialog, toast } from \"satin-ui/react\";\n\nexport default function DeleteProject() {\n  const [open, setOpen] = useState(false);\n  function remove(e) {\n    e.preventDefault();\n    setOpen(false);\n    toast({ text: '已删除\"雨夜车站\"' });\n  }\n  return (\n    <>\n      <Button variant=\"danger-soft\" icon=\"trash-2\" onClick={() => setOpen(true)}>删除项目…</Button>\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        onSubmit={remove}\n        icon=\"trash-2\"\n        title='删除\"雨夜车站\"？'\n        description=\"删除后无法恢复，协作者也会失去访问权限。\"\n        footer={<>\n          <Button variant=\"ghost\" data-cancel>取消</Button>\n          <Button variant=\"danger\" type=\"submit\">删除项目</Button>\n        </>}\n      >\n        {/* 写清会一起删掉什么 */}\n        <div class=\"sn-impact\"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>\n      </Dialog>\n    </>\n  );\n}\n"
+      }
     },
     {
       "slug": "dialog-guard",
       "title": "填了内容再关：底栏原地问一句",
-      "why": "guard 拦下 Esc 和取消：填了内容就在底栏原地问\"放弃填写的内容？\"，不再叠第二个弹窗；确认要关时自己调 `closeDialog()`。",
+      "why": "guard 拦下 Esc 和取消：填了内容就在底栏原地问\"放弃填写的内容？\"，不再叠第二个弹窗；两组按钮叠在一起原地切换（底栏加 `sn-two`，问的时候加 `sn-asking`）。确认要关时调 guard 给的 `close()`（手写标记调 `closeDialog()`）。",
       "html": "<button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-note\">写备注</button>\n<dialog class=\"sn-dlg\" id=\"dlg-note\" aria-labelledby=\"dlg-note-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-note-t\">给第 3 场写备注</h3></div></div>\n    <div class=\"sn-bd\"><textarea class=\"sn-input\" rows=\"3\" aria-label=\"备注\" placeholder=\"比如：雨再大一点，站台的灯偏冷\"></textarea></div>\n    <div class=\"sn-ft sn-two\">\n      <div class=\"sn-g sn-a\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n      <div class=\"sn-g sn-b\" inert><span>放弃填写的内容？</span><button type=\"button\" class=\"sn-btn sn-ghost\" data-keep>继续填写</button><button type=\"button\" class=\"sn-btn sn-danger-soft\" data-discard>放弃</button></div>\n    </div>\n  </form>\n</dialog>",
-      "js": "import { closeDialog } from \"satin-ui\";\n\nconst dlg = document.querySelector(\"#dlg-note\"), note = dlg.querySelector(\"textarea\"), foot = dlg.querySelector(\".sn-ft\");\nconst ask = (on) => {\n  foot.classList.toggle(\"sn-asking\", on);\n  foot.querySelector(\".sn-g.sn-a\").inert = on;\n  foot.querySelector(\".sn-g.sn-b\").inert = !on;\n  (on ? foot.querySelector(\"[data-keep]\") : note).focus();\n};\n// Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关\ndlg.guard = () => (foot.classList.contains(\"sn-asking\") ? ask(false) : note.value.trim() ? ask(true) : closeDialog(dlg));\nfoot.querySelector(\"[data-keep]\").addEventListener(\"click\", () => ask(false));\nfoot.querySelector(\"[data-discard]\").addEventListener(\"click\", () => { closeDialog(dlg); note.value = \"\"; ask(false); });\ndlg.querySelector(\"form\").addEventListener(\"submit\", () => closeDialog(dlg));"
+      "code": {
+        "html": "<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-note\">写备注</button>\n  <dialog class=\"sn-dlg\" id=\"dlg-note\" aria-labelledby=\"dlg-note-t\">\n    <form method=\"dialog\">\n      <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-note-t\">给第 3 场写备注</h3></div></div>\n      <div class=\"sn-bd\"><textarea class=\"sn-input\" rows=\"3\" aria-label=\"备注\" placeholder=\"比如：雨再大一点，站台的灯偏冷\"></textarea></div>\n      <div class=\"sn-ft sn-two\">\n        <div class=\"sn-g sn-a\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n        <div class=\"sn-g sn-b\" inert><span>放弃填写的内容？</span><button type=\"button\" class=\"sn-btn sn-ghost\" data-keep>继续填写</button><button type=\"button\" class=\"sn-btn sn-danger-soft\" data-discard>放弃</button></div>\n      </div>\n    </form>\n  </dialog>\n</sn-enhance>\n\n<script type=\"module\">\n  import { closeDialog } from \"satin-ui\";\n\n  const dlg = document.getElementById(\"dlg-note\"), note = dlg.querySelector(\"textarea\"), foot = dlg.querySelector(\".sn-ft\");\n  // 底栏两组按钮原地切换：问的时候焦点到\"继续填写\"，回去接着填时回到输入框\n  const ask = (on) => {\n    foot.classList.toggle(\"sn-asking\", on);\n    foot.querySelector(\".sn-g.sn-a\").inert = on;\n    foot.querySelector(\".sn-g.sn-b\").inert = !on;\n    (on ? foot.querySelector(\"[data-keep]\") : note).focus();\n  };\n  // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关\n  dlg.guard = () => (foot.classList.contains(\"sn-asking\") ? ask(false) : note.value.trim() ? ask(true) : closeDialog(dlg));\n  foot.querySelector(\"[data-keep]\").addEventListener(\"click\", () => ask(false));\n  foot.querySelector(\"[data-discard]\").addEventListener(\"click\", () => { closeDialog(dlg); note.value = \"\"; ask(false); });\n  dlg.querySelector(\"form\").addEventListener(\"submit\", () => closeDialog(dlg));\n</script>\n",
+        "react": "import { useEffect, useRef, useState } from \"react\";\nimport { Button, Dialog } from \"satin-ui/react\";\n\nexport default function SceneNote() {\n  const [open, setOpen] = useState(false);\n  const [note, setNote] = useState(\"\");\n  const [asking, setAsking] = useState(false);\n  const noteRef = useRef(null), keepRef = useRef(null);\n  // 底栏两组按钮原地切换：问的时候焦点到\"继续填写\"，回去接着填时回到输入框（等这一轮把 inert 换过来再移焦点）\n  useEffect(() => { if (open) (asking ? keepRef : noteRef).current?.focus(); }, [asking]);\n  // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关\n  const guard = (close) => (asking ? setAsking(false) : note.trim() ? setAsking(true) : close());\n  function discard() {\n    setOpen(false);\n    setNote(\"\");\n    setAsking(false);\n  }\n  function save(e) {\n    e.preventDefault();\n    setOpen(false);\n  }\n  return (\n    <>\n      <Button onClick={() => setOpen(true)}>写备注</Button>\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        guard={guard}\n        onSubmit={save}\n        title=\"给第 3 场写备注\"\n        footerClassName={asking ? \"sn-two sn-asking\" : \"sn-two\"}\n        footer={<>\n          <div className=\"sn-g sn-a\" inert={asking}><Button variant=\"ghost\" data-cancel>取消</Button><Button variant=\"primary\" type=\"submit\">保存</Button></div>\n          <div className=\"sn-g sn-b\" inert={!asking}><span>放弃填写的内容？</span><Button variant=\"ghost\" ref={keepRef} onClick={() => setAsking(false)}>继续填写</Button><Button variant=\"danger-soft\" onClick={discard}>放弃</Button></div>\n        </>}\n      >\n        <textarea className=\"sn-input\" rows={3} aria-label=\"备注\" placeholder=\"比如：雨再大一点，站台的灯偏冷\" ref={noteRef} value={note} onChange={(e) => setNote(e.target.value)} />\n      </Dialog>\n    </>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref, watch, nextTick } from \"vue\";\nimport { Button, Dialog } from \"satin-ui/vue\";\n\nconst open = ref(false), note = ref(\"\"), asking = ref(false);\nconst noteEl = ref(null), keepBtn = ref(null);\n// 底栏两组按钮原地切换：问的时候焦点到\"继续填写\"，回去接着填时回到输入框\nwatch(asking, async (on) => {\n  await nextTick();\n  (on ? keepBtn.value?.$el : noteEl.value)?.focus();\n});\n// Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关\nconst guard = (close) => (asking.value ? (asking.value = false) : note.value.trim() ? (asking.value = true) : close());\nfunction discard() {\n  open.value = false;\n  note.value = \"\";\n  asking.value = false;\n}\n</script>\n\n<template>\n  <Button @click=\"open = true\">写备注</Button>\n  <Dialog v-model:open=\"open\" title=\"给第 3 场写备注\" :guard=\"guard\" :footer-class=\"asking ? 'sn-two sn-asking' : 'sn-two'\" @submit=\"open = false\">\n    <textarea ref=\"noteEl\" v-model=\"note\" class=\"sn-input\" rows=\"3\" aria-label=\"备注\" placeholder=\"比如：雨再大一点，站台的灯偏冷\"></textarea>\n    <template #footer>\n      <div class=\"sn-g sn-a\" :inert=\"asking\"><Button variant=\"ghost\" data-cancel>取消</Button><Button variant=\"primary\" type=\"submit\">保存</Button></div>\n      <div class=\"sn-g sn-b\" :inert=\"!asking\"><span>放弃填写的内容？</span><Button ref=\"keepBtn\" variant=\"ghost\" @click=\"asking = false\">继续填写</Button><Button variant=\"danger-soft\" @click=\"discard\">放弃</Button></div>\n    </template>\n  </Dialog>\n</template>\n",
+        "svelte": "<script>\n  import { tick } from \"svelte\";\n  import Dialog from \"satin-ui/svelte/Dialog.svelte\";\n\n  let open = $state(false), note = $state(\"\"), asking = $state(false);\n  let noteEl = $state(), keepBtn = $state();\n  // 底栏两组按钮原地切换：问的时候焦点到\"继续填写\"，回去接着填时回到输入框\n  async function ask(on) {\n    asking = on;\n    await tick();\n    (on ? keepBtn : noteEl).focus();\n  }\n  // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关\n  const guard = (close) => (asking ? ask(false) : note.trim() ? ask(true) : close());\n  function discard() {\n    open = false;\n    note = \"\";\n    asking = false;\n  }\n</script>\n\n<button type=\"button\" class=\"sn-btn sn-secondary\" onclick={() => (open = true)}>写备注</button>\n<Dialog bind:open title=\"给第 3 场写备注\" {guard} footerClass={asking ? \"sn-two sn-asking\" : \"sn-two\"} onsubmit={() => (open = false)}>\n  <textarea bind:this={noteEl} bind:value={note} class=\"sn-input\" rows=\"3\" aria-label=\"备注\" placeholder=\"比如：雨再大一点，站台的灯偏冷\"></textarea>\n  {#snippet footer()}\n    <div class=\"sn-g sn-a\" inert={asking}><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n    <div class=\"sn-g sn-b\" inert={!asking}><span>放弃填写的内容？</span><button type=\"button\" class=\"sn-btn sn-ghost\" bind:this={keepBtn} onclick={() => ask(false)}>继续填写</button><button type=\"button\" class=\"sn-btn sn-danger-soft\" onclick={discard}>放弃</button></div>\n  {/snippet}\n</Dialog>\n",
+        "angular": "import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, afterNextRender, inject, signal, viewChild } from \"@angular/core\";\nimport { closeDialog } from \"satin-ui\";\n\n@Component({\n  selector: \"demo-dialog-guard\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 接上 data-dlg 触发按钮、Esc、取消\n  template: `\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-note\">写备注</button>\n      <dialog #dlg class=\"sn-dlg\" id=\"dlg-note\" aria-labelledby=\"dlg-note-t\">\n        <form method=\"dialog\" (submit)=\"close()\">\n          <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-note-t\">给第 3 场写备注</h3></div></div>\n          <div class=\"sn-bd\"><textarea #note class=\"sn-input\" rows=\"3\" aria-label=\"备注\" placeholder=\"比如：雨再大一点，站台的灯偏冷\"></textarea></div>\n          <div class=\"sn-ft sn-two\" [class.sn-asking]=\"asking()\">\n            <div class=\"sn-g sn-a\" [attr.inert]=\"asking() ? '' : null\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n            <div class=\"sn-g sn-b\" [attr.inert]=\"asking() ? null : ''\"><span>放弃填写的内容？</span><button #keep type=\"button\" class=\"sn-btn sn-ghost\" (click)=\"ask(false)\">继续填写</button><button type=\"button\" class=\"sn-btn sn-danger-soft\" (click)=\"discard()\">放弃</button></div>\n          </div>\n        </form>\n      </dialog>\n    </sn-enhance>\n  `,\n})\nexport class DialogGuardComponent {\n  protected asking = signal(false);\n  private dlg = viewChild.required<ElementRef<HTMLDialogElement>>(\"dlg\");\n  private note = viewChild.required<ElementRef<HTMLTextAreaElement>>(\"note\");\n  private keep = viewChild.required<ElementRef<HTMLButtonElement>>(\"keep\");\n  private cdr = inject(ChangeDetectorRef);\n  constructor() {\n    // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关\n    afterNextRender(() => {\n      Object.assign(this.dlg().nativeElement, {\n        guard: () => (this.asking() ? this.ask(false) : this.note().nativeElement.value.trim() ? this.ask(true) : this.close()),\n      });\n    });\n  }\n  // 底栏两组按钮原地切换：问的时候焦点到\"继续填写\"，回去接着填时回到输入框（先把 inert 换过来再移焦点）\n  ask(on: boolean) {\n    this.asking.set(on);\n    this.cdr.detectChanges();\n    (on ? this.keep() : this.note()).nativeElement.focus();\n  }\n  close() {\n    closeDialog(this.dlg().nativeElement);\n  }\n  discard() {\n    this.close();\n    this.note().nativeElement.value = \"\";\n    this.asking.set(false);\n  }\n}\n",
+        "solid": "import { createSignal, onSettled } from \"solid-js\";\nimport { closeDialog } from \"satin-ui\";\n\n// 标记照设计稿写，<sn-enhance> 接上 data-dlg 触发按钮、Esc、取消\nexport default function SceneNote() {\n  const [asking, setAsking] = createSignal(false);\n  let dlg, note, keep;\n  const close = () => closeDialog(dlg);\n  // 底栏两组按钮原地切换：问的时候焦点到\"继续填写\"，回去接着填时回到输入框\n  function ask(on) {\n    setAsking(on);\n    onSettled(() => (on ? keep : note).focus());\n  }\n  function discard() {\n    close();\n    note.value = \"\";\n    setAsking(false);\n  }\n  // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关\n  onSettled(() => {\n    dlg.guard = () => (asking() ? ask(false) : note.value.trim() ? ask(true) : close());\n  });\n  return (\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-note\">写备注</button>\n      <dialog class=\"sn-dlg\" id=\"dlg-note\" aria-labelledby=\"dlg-note-t\" ref={(el) => (dlg = el)}>\n        <form method=\"dialog\" onSubmit={close}>\n          <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-note-t\">给第 3 场写备注</h3></div></div>\n          <div class=\"sn-bd\"><textarea class=\"sn-input\" rows=\"3\" aria-label=\"备注\" placeholder=\"比如：雨再大一点，站台的灯偏冷\" ref={(el) => (note = el)}></textarea></div>\n          <div class={asking() ? \"sn-ft sn-two sn-asking\" : \"sn-ft sn-two\"}>\n            <div class=\"sn-g sn-a\" inert={asking()}><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">保存</button></div>\n            <div class=\"sn-g sn-b\" inert={!asking()}><span>放弃填写的内容？</span><button type=\"button\" class=\"sn-btn sn-ghost\" ref={(el) => (keep = el)} onClick={() => ask(false)}>继续填写</button><button type=\"button\" class=\"sn-btn sn-danger-soft\" onClick={discard}>放弃</button></div>\n          </div>\n        </form>\n      </dialog>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useEffect, useRef, useState } from \"preact/hooks\";\nimport { Button, Dialog } from \"satin-ui/react\";\n\nexport default function SceneNote() {\n  const [open, setOpen] = useState(false);\n  const [note, setNote] = useState(\"\");\n  const [asking, setAsking] = useState(false);\n  const noteRef = useRef(null), keepRef = useRef(null);\n  // 底栏两组按钮原地切换：问的时候焦点到\"继续填写\"，回去接着填时回到输入框（等这一轮把 inert 换过来再移焦点）\n  useEffect(() => { if (open) (asking ? keepRef : noteRef).current?.focus(); }, [asking]);\n  // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关\n  const guard = (close) => (asking ? setAsking(false) : note.trim() ? setAsking(true) : close());\n  function discard() {\n    setOpen(false);\n    setNote(\"\");\n    setAsking(false);\n  }\n  function save(e) {\n    e.preventDefault();\n    setOpen(false);\n  }\n  return (\n    <>\n      <Button onClick={() => setOpen(true)}>写备注</Button>\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        guard={guard}\n        onSubmit={save}\n        title=\"给第 3 场写备注\"\n        footerClassName={asking ? \"sn-two sn-asking\" : \"sn-two\"}\n        footer={<>\n          <div class=\"sn-g sn-a\" inert={asking}><Button variant=\"ghost\" data-cancel>取消</Button><Button variant=\"primary\" type=\"submit\">保存</Button></div>\n          <div class=\"sn-g sn-b\" inert={!asking}><span>放弃填写的内容？</span><Button variant=\"ghost\" ref={keepRef} onClick={() => setAsking(false)}>继续填写</Button><Button variant=\"danger-soft\" onClick={discard}>放弃</Button></div>\n        </>}\n      >\n        <textarea class=\"sn-input\" rows={3} aria-label=\"备注\" placeholder=\"比如：雨再大一点，站台的灯偏冷\" ref={noteRef} value={note} onInput={(e) => setNote(e.currentTarget.value)} />\n      </Dialog>\n    </>\n  );\n}\n"
+      }
     },
     {
       "slug": "dialog-events",
       "title": "关上以后做点什么",
-      "why": "关完会发原生的 close 事件（React 是 onClose，Vue 是 @close）：在这里同步你自己的状态。",
-      "html": "<div class=\"sn-row\" data-ex=\"dlg-ev\">\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-ev-d\">导出设置</button>\n  <span class=\"sn-help\" data-out>还没打开过</span>\n</div>\n<dialog class=\"sn-dlg\" id=\"dlg-ev-d\" aria-labelledby=\"dlg-ev-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ev-t\">导出设置</h3><div class=\"sn-sub\">按 Esc 或点\"关闭\"，看下面那行字怎么变。</div></div></div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-primary\" data-cancel>关闭</button></div>\n  </form>\n</dialog>",
-      "js": "const out = document.querySelector('[data-ex=\"dlg-ev\"] [data-out]');\ndocument.querySelector(\"#dlg-ev-d\").addEventListener(\"close\", () => {\n  out.textContent = \"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\");\n});"
+      "why": "关完（Esc、取消、程序关）会发 close：React `onClose`、Vue `@close`、Svelte `onclose`，手写标记听 `<dialog>` 的原生 close 事件——在这里同步你自己的状态。",
+      "html": "<div class=\"sn-row\">\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-ev-d\">导出设置</button>\n  <span class=\"sn-help\" id=\"dlg-ev-out\">还没打开过</span>\n</div>\n<dialog class=\"sn-dlg\" id=\"dlg-ev-d\" aria-labelledby=\"dlg-ev-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ev-t\">导出设置</h3><div class=\"sn-sub\">按 Esc 或点\"关闭\"，看下面那行字怎么变。</div></div></div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-primary\" data-cancel>关闭</button></div>\n  </form>\n</dialog>",
+      "code": {
+        "html": "<sn-enhance>\n  <div class=\"sn-row\">\n    <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-ev-d\">导出设置</button>\n    <span class=\"sn-help\" id=\"dlg-ev-out\">还没打开过</span>\n  </div>\n  <dialog class=\"sn-dlg\" id=\"dlg-ev-d\" aria-labelledby=\"dlg-ev-t\">\n    <form method=\"dialog\">\n      <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ev-t\">导出设置</h3><div class=\"sn-sub\">按 Esc 或点\"关闭\"，看下面那行字怎么变。</div></div></div>\n      <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-primary\" data-cancel>关闭</button></div>\n    </form>\n  </dialog>\n</sn-enhance>\n\n<script type=\"module\">\n  // 关完（Esc、取消、closeDialog()）都会发原生的 close 事件：在这里同步自己的状态\n  document.getElementById(\"dlg-ev-d\").addEventListener(\"close\", () => {\n    document.getElementById(\"dlg-ev-out\").textContent = \"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\");\n  });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, Dialog } from \"satin-ui/react\";\n\nexport default function ExportSettings() {\n  const [open, setOpen] = useState(false);\n  const [status, setStatus] = useState(\"还没打开过\");\n  // 关完（Esc、取消、程序关）都会调 onClose：在这里同步自己的状态\n  function closed() {\n    setOpen(false);\n    setStatus(\"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\"));\n  }\n  return (\n    <>\n      <div className=\"sn-row\">\n        <Button onClick={() => setOpen(true)}>导出设置</Button>\n        <span className=\"sn-help\">{status}</span>\n      </div>\n      <Dialog open={open} onClose={closed} title=\"导出设置\" description='按 Esc 或点\"关闭\"，看下面那行字怎么变。' footer={<Button variant=\"primary\" data-cancel>关闭</Button>} />\n    </>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, Dialog } from \"satin-ui/vue\";\n\nconst open = ref(false), status = ref(\"还没打开过\");\n// 关完（Esc、取消、程序关）都会发 close：在这里同步自己的状态（v-model:open 已经改回 false）\nfunction closed() {\n  status.value = \"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\");\n}\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <Button @click=\"open = true\">导出设置</Button>\n    <span class=\"sn-help\">{{ status }}</span>\n  </div>\n  <Dialog v-model:open=\"open\" title=\"导出设置\" description='按 Esc 或点\"关闭\"，看下面那行字怎么变。' @close=\"closed\">\n    <template #footer>\n      <Button variant=\"primary\" data-cancel>关闭</Button>\n    </template>\n  </Dialog>\n</template>\n",
+        "svelte": "<script>\n  import Dialog from \"satin-ui/svelte/Dialog.svelte\";\n\n  let open = $state(false), status = $state(\"还没打开过\");\n  // 关完（Esc、取消、程序关）都会调 onclose：在这里同步自己的状态（bind:open 已经改回 false）\n  function closed() {\n    status = \"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\");\n  }\n</script>\n\n<div class=\"sn-row\">\n  <button type=\"button\" class=\"sn-btn sn-secondary\" onclick={() => (open = true)}>导出设置</button>\n  <span class=\"sn-help\">{status}</span>\n</div>\n<Dialog bind:open title=\"导出设置\" description='按 Esc 或点\"关闭\"，看下面那行字怎么变。' onclose={closed}>\n  {#snippet footer()}\n    <button type=\"button\" class=\"sn-btn sn-primary\" data-cancel>关闭</button>\n  {/snippet}\n</Dialog>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-dialog-events\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 接上 data-dlg 触发按钮、Esc、取消\n  template: `\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-ev-d\">导出设置</button>\n        <span class=\"sn-help\">{{ status() }}</span>\n      </div>\n      <!-- 关完（Esc、取消、closeDialog()）都会发原生的 close 事件 -->\n      <dialog (close)=\"closed()\" class=\"sn-dlg\" id=\"dlg-ev-d\" aria-labelledby=\"dlg-ev-t\">\n        <form method=\"dialog\">\n          <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ev-t\">导出设置</h3><div class=\"sn-sub\">按 Esc 或点\"关闭\"，看下面那行字怎么变。</div></div></div>\n          <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-primary\" data-cancel>关闭</button></div>\n        </form>\n      </dialog>\n    </sn-enhance>\n  `,\n})\nexport class DialogEventsComponent {\n  protected status = signal(\"还没打开过\");\n  closed() {\n    this.status.set(\"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\"));\n  }\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\n// 标记照设计稿写，<sn-enhance> 接上 data-dlg 触发按钮、Esc、取消\nexport default function ExportSettings() {\n  const [status, setStatus] = createSignal(\"还没打开过\");\n  // 关完（Esc、取消、closeDialog()）都会发原生的 close 事件\n  const closed = () => setStatus(\"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\"));\n  return (\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-ev-d\">导出设置</button>\n        <span class=\"sn-help\">{status()}</span>\n      </div>\n      <dialog onClose={closed} class=\"sn-dlg\" id=\"dlg-ev-d\" aria-labelledby=\"dlg-ev-t\">\n        <form method=\"dialog\">\n          <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ev-t\">导出设置</h3><div class=\"sn-sub\">按 Esc 或点\"关闭\"，看下面那行字怎么变。</div></div></div>\n          <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-primary\" data-cancel>关闭</button></div>\n        </form>\n      </dialog>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useState } from \"preact/hooks\";\nimport { Button, Dialog } from \"satin-ui/react\";\n\nexport default function ExportSettings() {\n  const [open, setOpen] = useState(false);\n  const [status, setStatus] = useState(\"还没打开过\");\n  // 关完（Esc、取消、程序关）都会调 onClose：在这里同步自己的状态\n  function closed() {\n    setOpen(false);\n    setStatus(\"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\"));\n  }\n  return (\n    <>\n      <div class=\"sn-row\">\n        <Button onClick={() => setOpen(true)}>导出设置</Button>\n        <span class=\"sn-help\">{status}</span>\n      </div>\n      <Dialog open={open} onClose={closed} title=\"导出设置\" description='按 Esc 或点\"关闭\"，看下面那行字怎么变。' footer={<Button variant=\"primary\" data-cancel>关闭</Button>} />\n    </>\n  );\n}\n"
+      }
     },
     {
       "slug": "dialog-controlled",
       "title": "受控：开关放在自己的状态里",
-      "why": "React 用 open + onClose，Vue 用 v-model:open；纯 HTML 和其他框架用 `data-dlg` 打开、`closeDialog()` 关。",
-      "html": "<button type=\"button\" class=\"sn-btn sn-primary\" data-dlg=\"dlg-ctl\">新建项目</button>\n<dialog class=\"sn-dlg\" id=\"dlg-ctl\" aria-labelledby=\"dlg-ctl-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ctl-t\">新建项目</h3><div class=\"sn-sub\">名称之后随时可以改。</div></div></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-ctl-name\">项目名称</label><input class=\"sn-input\" id=\"dlg-ctl-name\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\"></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">创建项目</button></div>\n  </form>\n</dialog>",
-      "js": "import { closeDialog, toast } from \"satin-ui\";\n\nconst dlg = document.querySelector(\"#dlg-ctl\");\ndlg.querySelector(\"form\").addEventListener(\"submit\", () => {\n  const name = dlg.querySelector(\"input\").value.trim() || \"未命名项目\";\n  closeDialog(dlg);\n  toast({ text: \"已创建：\" + name });\n});",
+      "why": "React 用 open + onClose，Vue 用 v-model:open，Svelte 用 bind:open；手写标记自己调 `openDialog(弹窗, 按钮)` 打开（从按钮那里长出来，顺便接上 Esc、取消）、`closeDialog()` 关。",
+      "html": "<button type=\"button\" class=\"sn-btn sn-primary\" id=\"new-project\">新建项目</button>\n<dialog class=\"sn-dlg\" id=\"dlg-ctl\" aria-labelledby=\"dlg-ctl-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ctl-t\">新建项目</h3><div class=\"sn-sub\">名称之后随时可以改。</div></div></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-ctl-name\">项目名称</label><input class=\"sn-input\" id=\"dlg-ctl-name\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\"></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">创建项目</button></div>\n  </form>\n</dialog>",
       "code": {
-        "react": "import { useState } from \"react\";\nimport { Button, Dialog, toast } from \"satin-ui/react\";\n\nexport default function NewProject() {\n  const [open, setOpen] = useState(false);\n  const [name, setName] = useState(\"\");\n  const create = () => { setOpen(false); toast({ text: \"已创建：\" + (name.trim() || \"未命名项目\") }); };\n  return (\n    <>\n      <Button variant=\"primary\" onClick={() => setOpen(true)}>新建项目</Button>\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        title=\"新建项目\"\n        description=\"名称之后随时可以改。\"\n        footer={<>\n          <Button variant=\"ghost\" onClick={() => setOpen(false)}>取消</Button>\n          <Button variant=\"primary\" onClick={create}>创建项目</Button>\n        </>}\n      >\n        <div className=\"sn-field\">\n          <label className=\"sn-lbl\" htmlFor=\"new-name\">项目名称</label>\n          <input className=\"sn-input\" id=\"new-name\" placeholder=\"比如：雨夜车站\" autoComplete=\"off\" value={name} onChange={(e) => setName(e.target.value)} />\n        </div>\n      </Dialog>\n    </>\n  );\n}",
-        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button as SnButton, Dialog as SnDialog, toast } from \"satin-ui/vue\";\nconst open = ref(false), name = ref(\"\");\nconst create = () => { open.value = false; toast({ text: \"已创建：\" + (name.value.trim() || \"未命名项目\") }); };\n</script>\n\n<template>\n  <SnButton variant=\"primary\" @click=\"open = true\">新建项目</SnButton>\n  <SnDialog v-model:open=\"open\" title=\"新建项目\" description=\"名称之后随时可以改。\">\n    <div class=\"sn-field\">\n      <label class=\"sn-lbl\" for=\"new-name\">项目名称</label>\n      <input class=\"sn-input\" id=\"new-name\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\" v-model=\"name\" />\n    </div>\n    <template #footer>\n      <SnButton variant=\"ghost\" @click=\"open = false\">取消</SnButton>\n      <SnButton variant=\"primary\" @click=\"create\">创建项目</SnButton>\n    </template>\n  </SnDialog>\n</template>"
+        "html": "<button type=\"button\" class=\"sn-btn sn-primary\" id=\"new-project\">新建项目</button>\n<dialog class=\"sn-dlg\" id=\"dlg-ctl\" aria-labelledby=\"dlg-ctl-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ctl-t\">新建项目</h3><div class=\"sn-sub\">名称之后随时可以改。</div></div></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-ctl-name\">项目名称</label><input class=\"sn-input\" id=\"dlg-ctl-name\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\"></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">创建项目</button></div>\n  </form>\n</dialog>\n\n<script type=\"module\">\n  import { openDialog, closeDialog, toast } from \"satin-ui\";\n\n  const button = document.getElementById(\"new-project\"), dlg = document.getElementById(\"dlg-ctl\");\n  // 自己控制开关：openDialog 从按钮那里长出来（顺便接上 Esc、取消），closeDialog 原路缩回\n  button.addEventListener(\"click\", () => openDialog(dlg, button));\n  dlg.querySelector(\"form\").addEventListener(\"submit\", () => {\n    const name = dlg.querySelector(\"input\").value.trim() || \"未命名项目\";\n    closeDialog(dlg);\n    toast({ text: \"已创建：\" + name });\n  });\n</script>\n",
+        "react": "import { useId, useState } from \"react\";\nimport { Button, Dialog, toast } from \"satin-ui/react\";\n\nexport default function NewProject() {\n  const [open, setOpen] = useState(false);\n  const [name, setName] = useState(\"\");\n  const nameId = useId();\n  function create(e) {\n    e.preventDefault();\n    setOpen(false);\n    toast({ text: \"已创建：\" + (name.trim() || \"未命名项目\") });\n  }\n  return (\n    <>\n      <Button variant=\"primary\" onClick={() => setOpen(true)}>新建项目</Button>\n      {/* 开关放在自己的状态里：open 打开；关上（Esc、取消、程序关）以后 onClose 把它改回 false */}\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        onSubmit={create}\n        title=\"新建项目\"\n        description=\"名称之后随时可以改。\"\n        footer={<>\n          <Button variant=\"ghost\" data-cancel>取消</Button>\n          <Button variant=\"primary\" type=\"submit\">创建项目</Button>\n        </>}\n      >\n        <div className=\"sn-field\">\n          <label className=\"sn-lbl\" htmlFor={nameId}>项目名称</label>\n          <input className=\"sn-input\" id={nameId} placeholder=\"比如：雨夜车站\" autoComplete=\"off\" value={name} onChange={(e) => setName(e.target.value)} />\n        </div>\n      </Dialog>\n    </>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref, useId } from \"vue\";\nimport { Button, Dialog, toast } from \"satin-ui/vue\";\n\nconst open = ref(false), name = ref(\"\"), nameId = useId();\nfunction create() {\n  open.value = false;\n  toast({ text: \"已创建：\" + (name.value.trim() || \"未命名项目\") });\n}\n</script>\n\n<template>\n  <Button variant=\"primary\" @click=\"open = true\">新建项目</Button>\n  <!-- 开关放在自己的状态里：v-model:open，关上（Esc、取消、程序关）以后自动改回 false -->\n  <Dialog v-model:open=\"open\" title=\"新建项目\" description=\"名称之后随时可以改。\" @submit=\"create\">\n    <div class=\"sn-field\">\n      <label class=\"sn-lbl\" :for=\"nameId\">项目名称</label>\n      <input class=\"sn-input\" :id=\"nameId\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\" v-model=\"name\" />\n    </div>\n    <template #footer>\n      <Button variant=\"ghost\" data-cancel>取消</Button>\n      <Button variant=\"primary\" type=\"submit\">创建项目</Button>\n    </template>\n  </Dialog>\n</template>\n",
+        "svelte": "<script>\n  import Dialog from \"satin-ui/svelte/Dialog.svelte\";\n  import { toast } from \"satin-ui\";\n\n  const nameId = $props.id();\n  let open = $state(false), name = $state(\"\");\n  function create() {\n    open = false;\n    toast({ text: \"已创建：\" + (name.trim() || \"未命名项目\") });\n  }\n</script>\n\n<button type=\"button\" class=\"sn-btn sn-primary\" onclick={() => (open = true)}>新建项目</button>\n<!-- 开关放在自己的状态里：bind:open，关上（Esc、取消、程序关）以后自动改回 false -->\n<Dialog bind:open title=\"新建项目\" description=\"名称之后随时可以改。\" onsubmit={create}>\n  <div class=\"sn-field\">\n    <label class=\"sn-lbl\" for={nameId}>项目名称</label>\n    <input class=\"sn-input\" id={nameId} placeholder=\"比如：雨夜车站\" autocomplete=\"off\" bind:value={name} />\n  </div>\n  {#snippet footer()}\n    <button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button>\n    <button type=\"submit\" class=\"sn-btn sn-primary\">创建项目</button>\n  {/snippet}\n</Dialog>\n",
+        "angular": "import { Component, ElementRef, viewChild } from \"@angular/core\";\nimport { closeDialog, openDialog, toast } from \"satin-ui\";\n\n@Component({\n  selector: \"demo-dialog-controlled\",\n  template: `\n    <button type=\"button\" class=\"sn-btn sn-primary\" (click)=\"open($event)\">新建项目</button>\n    <dialog #dlg class=\"sn-dlg\" id=\"dlg-ctl\" aria-labelledby=\"dlg-ctl-t\">\n      <form method=\"dialog\" (submit)=\"create()\">\n        <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ctl-t\">新建项目</h3><div class=\"sn-sub\">名称之后随时可以改。</div></div></div>\n        <div class=\"sn-bd\">\n          <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-ctl-name\">项目名称</label><input #name class=\"sn-input\" id=\"dlg-ctl-name\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\"></div>\n        </div>\n        <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">创建项目</button></div>\n      </form>\n    </dialog>\n  `,\n})\nexport class DialogControlledComponent {\n  private dlg = viewChild.required<ElementRef<HTMLDialogElement>>(\"dlg\");\n  private name = viewChild.required<ElementRef<HTMLInputElement>>(\"name\");\n  // 自己控制开关：openDialog 从按钮那里长出来（顺便接上 Esc、取消），closeDialog 原路缩回\n  open(e: MouseEvent) {\n    openDialog(this.dlg().nativeElement, e.currentTarget as HTMLElement);\n  }\n  create() {\n    const name = this.name().nativeElement.value.trim() || \"未命名项目\";\n    closeDialog(this.dlg().nativeElement);\n    toast({ text: \"已创建：\" + name });\n  }\n}\n",
+        "solid": "import { closeDialog, openDialog, toast } from \"satin-ui\";\n\nexport default function NewProject() {\n  let dlg, input;\n  function create() {\n    const name = input.value.trim() || \"未命名项目\";\n    closeDialog(dlg);\n    toast({ text: \"已创建：\" + name });\n  }\n  // 自己控制开关：openDialog 从按钮那里长出来（顺便接上 Esc、取消），closeDialog 原路缩回\n  return (\n    <>\n      <button type=\"button\" class=\"sn-btn sn-primary\" onClick={(e) => openDialog(dlg, e.currentTarget)}>新建项目</button>\n      <dialog ref={(el) => (dlg = el)} class=\"sn-dlg\" id=\"dlg-ctl\" aria-labelledby=\"dlg-ctl-t\">\n        <form method=\"dialog\" onSubmit={create}>\n          <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ctl-t\">新建项目</h3><div class=\"sn-sub\">名称之后随时可以改。</div></div></div>\n          <div class=\"sn-bd\">\n            <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-ctl-name\">项目名称</label><input ref={(el) => (input = el)} class=\"sn-input\" id=\"dlg-ctl-name\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\" /></div>\n          </div>\n          <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">创建项目</button></div>\n        </form>\n      </dialog>\n    </>\n  );\n}\n",
+        "preact": "import { useId, useState } from \"preact/hooks\";\nimport { Button, Dialog, toast } from \"satin-ui/react\";\n\nexport default function NewProject() {\n  const [open, setOpen] = useState(false);\n  const [name, setName] = useState(\"\");\n  const nameId = useId();\n  function create(e) {\n    e.preventDefault();\n    setOpen(false);\n    toast({ text: \"已创建：\" + (name.trim() || \"未命名项目\") });\n  }\n  return (\n    <>\n      <Button variant=\"primary\" onClick={() => setOpen(true)}>新建项目</Button>\n      {/* 开关放在自己的状态里：open 打开；关上（Esc、取消、程序关）以后 onClose 把它改回 false */}\n      <Dialog\n        open={open}\n        onClose={() => setOpen(false)}\n        onSubmit={create}\n        title=\"新建项目\"\n        description=\"名称之后随时可以改。\"\n        footer={<>\n          <Button variant=\"ghost\" data-cancel>取消</Button>\n          <Button variant=\"primary\" type=\"submit\">创建项目</Button>\n        </>}\n      >\n        <div class=\"sn-field\">\n          <label class=\"sn-lbl\" for={nameId}>项目名称</label>\n          <input class=\"sn-input\" id={nameId} placeholder=\"比如：雨夜车站\" autocomplete=\"off\" value={name} onInput={(e) => setName(e.currentTarget.value)} />\n        </div>\n      </Dialog>\n    </>\n  );\n}\n"
       }
     }
   ]

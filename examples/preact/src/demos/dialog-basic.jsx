@@ -1,44 +1,36 @@
-import { useEffect, useRef } from "preact/hooks";
-import { setup, enhance, closeDialog, toast } from "satin-ui";
+import { useId, useState } from "preact/hooks";
+import { Button, Dialog, toast } from "satin-ui/react";
 
-export default function DialogBasic() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup();
-    const off = enhance(ref.current, (root) => {
-      const dlg = root.querySelector("#dlg-rename");
-      // 弹窗不会因为提交自己关：在这里保存，成功了再关
-      dlg.querySelector("form").addEventListener("submit", () => {
-        const name = dlg.querySelector("input").value.trim();
-        closeDialog(dlg);
-        toast({ text: "已改名为：" + name });
-      });
-    });
-    return () => { off(); unsetup(); };
-  }, []);
+export default function RenameProject() {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("雨夜车站");
+  const nameId = useId();
+  // 弹窗不会因为提交自己关：在这里保存，成功了再关
+  function save(e) {
+    e.preventDefault();
+    setOpen(false);
+    toast({ text: "已改名为：" + name.trim() });
+  }
   return (
-    <div ref={ref}>
-      <button type="button" class="sn-btn sn-primary" data-dlg="dlg-rename">重命名</button>
-      <dialog class="sn-dlg" id="dlg-rename" aria-labelledby="dlg-rename-t">
-        <form method="dialog">
-          <div class="sn-hd">
-            <div style="flex:1">
-              <h3 id="dlg-rename-t">重命名项目</h3>
-              <div class="sn-sub">新名称会同步给所有协作者。</div>
-            </div>
-          </div>
-          <div class="sn-bd">
-            <div class="sn-field">
-              <label class="sn-lbl" for="dlg-rename-name">项目名称</label>
-              <input class="sn-input" id="dlg-rename-name" value="雨夜车站" autocomplete="off" />
-            </div>
-          </div>
-          <div class="sn-ft">
-            <button type="button" class="sn-btn sn-ghost" data-cancel="">取消</button>
-            <button type="submit" class="sn-btn sn-primary">保存</button>
-          </div>
-        </form>
-      </dialog>
-    </div>
+    <>
+      <Button variant="primary" onClick={() => setOpen(true)}>重命名</Button>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={save}
+        title="重命名项目"
+        description="新名称会同步给所有协作者。"
+        footer={<>
+          {/* data-cancel：和 Esc 一样关上 */}
+          <Button variant="ghost" data-cancel>取消</Button>
+          <Button variant="primary" type="submit">保存</Button>
+        </>}
+      >
+        <div class="sn-field">
+          <label class="sn-lbl" for={nameId}>项目名称</label>
+          <input class="sn-input" id={nameId} value={name} onInput={(e) => setName(e.currentTarget.value)} autocomplete="off" />
+        </div>
+      </Dialog>
+    </>
   );
 }

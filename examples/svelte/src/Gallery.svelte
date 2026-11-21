@@ -16,14 +16,6 @@
   import MotionDemo0 from "./demos/motion-0.svelte";
   import IconsDemo0 from "./demos/icons-0.svelte";
   import ButtonDemo0 from "./demos/button-0.svelte";
-  import ButtonDemo0 from "./demos/button-0.svelte";
-  import ButtonDemo0 from "./demos/button-0.svelte";
-  import ButtonDemo0 from "./demos/button-0.svelte";
-  import ButtonDemo0 from "./demos/button-0.svelte";
-  import ButtonDemo0 from "./demos/button-0.svelte";
-  import ButtonDemo0 from "./demos/button-0.svelte";
-  import ButtonDemo0 from "./demos/button-0.svelte";
-  import ButtonDemo0 from "./demos/button-0.svelte";
   import ButtonDemo1 from "./demos/button-1.svelte";
   import ButtonDemo2 from "./demos/button-2.svelte";
   import ButtonDemo3 from "./demos/button-3.svelte";
@@ -41,19 +33,6 @@
   import NumberDemo0 from "./demos/number-0.svelte";
   import PromptDemo0 from "./demos/prompt-0.svelte";
   import SelectDemo0 from "./demos/select-0.svelte";
-  import SelectDemo0 from "./demos/select-0.svelte";
-  import SelectDemo0 from "./demos/select-0.svelte";
-  import SelectDemo0 from "./demos/select-0.svelte";
-  import SelectDemo0 from "./demos/select-0.svelte";
-  import SelectDemo0 from "./demos/select-0.svelte";
-  import SelectDemo0 from "./demos/select-0.svelte";
-  import SelectDemo0 from "./demos/select-0.svelte";
-  import PickerDemo0 from "./demos/picker-0.svelte";
-  import PickerDemo0 from "./demos/picker-0.svelte";
-  import PickerDemo0 from "./demos/picker-0.svelte";
-  import PickerDemo0 from "./demos/picker-0.svelte";
-  import PickerDemo0 from "./demos/picker-0.svelte";
-  import PickerDemo0 from "./demos/picker-0.svelte";
   import PickerDemo0 from "./demos/picker-0.svelte";
   import ChoiceDemo0 from "./demos/choice-0.svelte";
   import SegmentedDemo0 from "./demos/segmented-0.svelte";
@@ -63,11 +42,6 @@
   import PopoverDemo0 from "./demos/popover-0.svelte";
   import PopconfirmDemo0 from "./demos/popconfirm-0.svelte";
   import CtxmenuDemo0 from "./demos/ctxmenu-0.svelte";
-  import DialogDemo0 from "./demos/dialog-0.svelte";
-  import DialogDemo0 from "./demos/dialog-0.svelte";
-  import DialogDemo0 from "./demos/dialog-0.svelte";
-  import DialogDemo0 from "./demos/dialog-0.svelte";
-  import DialogDemo0 from "./demos/dialog-0.svelte";
   import DialogDemo0 from "./demos/dialog-0.svelte";
   import DrawerDemo0 from "./demos/drawer-0.svelte";
   import CmdkDemo0 from "./demos/cmdk-0.svelte";
@@ -87,9 +61,6 @@
   import TableDemo6 from "./demos/table-6.svelte";
   import TableDemo7 from "./demos/table-7.svelte";
   import TableDemo8 from "./demos/table-8.svelte";
-  import GridDemo0 from "./demos/grid-0.svelte";
-  import GridDemo0 from "./demos/grid-0.svelte";
-  import GridDemo0 from "./demos/grid-0.svelte";
   import GridDemo0 from "./demos/grid-0.svelte";
   import CgridDemo0 from "./demos/cgrid-0.svelte";
   import ListDemo0 from "./demos/list-0.svelte";
@@ -190,14 +161,6 @@
   <section id="button">
     <h2>按钮</h2>
     <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
-    <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
-    <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
-    <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
-    <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
-    <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
-    <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
-    <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
-    <div class="demo" data-demo="button-0"><ButtonDemo0 /></div>
     <div class="demo" data-demo="button-1"><ButtonDemo1 /></div>
     <div class="demo" data-demo="button-2"><ButtonDemo2 /></div>
     <div class="demo" data-demo="button-3"><ButtonDemo3 /></div>
@@ -251,22 +214,9 @@
   <section id="select">
     <h2>下拉选择与菜单</h2>
     <div class="demo" data-demo="select-0"><SelectDemo0 /></div>
-    <div class="demo" data-demo="select-0"><SelectDemo0 /></div>
-    <div class="demo" data-demo="select-0"><SelectDemo0 /></div>
-    <div class="demo" data-demo="select-0"><SelectDemo0 /></div>
-    <div class="demo" data-demo="select-0"><SelectDemo0 /></div>
-    <div class="demo" data-demo="select-0"><SelectDemo0 /></div>
-    <div class="demo" data-demo="select-0"><SelectDemo0 /></div>
-    <div class="demo" data-demo="select-0"><SelectDemo0 /></div>
   </section>
   <section id="picker">
     <h2>日期、时间、地址</h2>
-    <div class="demo" data-demo="picker-0"><PickerDemo0 /></div>
-    <div class="demo" data-demo="picker-0"><PickerDemo0 /></div>
-    <div class="demo" data-demo="picker-0"><PickerDemo0 /></div>
-    <div class="demo" data-demo="picker-0"><PickerDemo0 /></div>
-    <div class="demo" data-demo="picker-0"><PickerDemo0 /></div>
-    <div class="demo" data-demo="picker-0"><PickerDemo0 /></div>
     <div class="demo" data-demo="picker-0"><PickerDemo0 /></div>
   </section>
   <section id="choice">
@@ -303,11 +253,6 @@
   </section>
   <section id="dialog">
     <h2>弹窗</h2>
-    <div class="demo" data-demo="dialog-0"><DialogDemo0 /></div>
-    <div class="demo" data-demo="dialog-0"><DialogDemo0 /></div>
-    <div class="demo" data-demo="dialog-0"><DialogDemo0 /></div>
-    <div class="demo" data-demo="dialog-0"><DialogDemo0 /></div>
-    <div class="demo" data-demo="dialog-0"><DialogDemo0 /></div>
     <div class="demo" data-demo="dialog-0"><DialogDemo0 /></div>
   </section>
   <section id="drawer">
@@ -360,9 +305,6 @@
   </section>
   <section id="grid">
     <h2>数据表格</h2>
-    <div class="demo" data-demo="grid-0"><GridDemo0 /></div>
-    <div class="demo" data-demo="grid-0"><GridDemo0 /></div>
-    <div class="demo" data-demo="grid-0"><GridDemo0 /></div>
     <div class="demo" data-demo="grid-0"><GridDemo0 /></div>
   </section>
   <section id="cgrid">

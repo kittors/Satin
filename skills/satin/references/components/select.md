@@ -30,24 +30,118 @@
 
 | 写法 | 引入 |
 |---|---|
-| 纯 HTML | `import { defineElements } from "satin-ui/elements";` |
+| 纯 HTML | `import { defineElements } from "satin-ui/elements"; // 入口里调一次，页面里写 <sn-select>` |
 | React | `import { Select } from "satin-ui/react";` |
-| Vue | `import { Select as SnSelect } from "satin-ui/vue";` |
-| Svelte | `import { defineElements } from "satin-ui/elements";` |
-| Angular | `import { defineElements } from "satin-ui/elements";` |
-| Solid | `import { defineElements } from "satin-ui/elements";` |
-| Preact | `import { defineElements } from "satin-ui/elements";` |
+| Vue | `import { Select } from "satin-ui/vue"; // 入口里 app.use(Satin) 以后也可以不引，直接写 <SnSelect>` |
+| Svelte | `import Select from "satin-ui/svelte/Select.svelte";` |
+| Angular | `import { defineElements } from "satin-ui/elements"; // main.ts 里调一次；组件加 CUSTOM_ELEMENTS_SCHEMA，模板写 <sn-select>` |
+| Solid | `import { defineElements } from "satin-ui/elements"; // 入口里调一次，JSX 里写 <sn-select>` |
+| Preact | `import { Select } from "satin-ui/react"; // @preact/preset-vite 默认把 react 指到 preact/compat` |
 
-React、Vue 用组件；其余框架和纯 HTML 调一次 `defineElements()`，写 `<sn-select>`。也可以不用自定义元素：`createSelect(元素, 选项)`（satin-ui）给空容器就按选项渲染，给已经写好的 `.sn-select` 标记就在上面接交互。
+- React：`Select` 组件：给 `value` + `onChange` 是受控，只给 `defaultValue` 是非受控；`items` 是字符串或 `{ value, label, disabled }`。
+- Preact：经 preact/compat 用 `satin-ui/react` 的 `Select`：`value` + `onChange` 受控，`defaultValue` 非受控。
+- Vue：`Select` 组件：`v-model` 绑选中的值；`items` 是字符串或 `{ value, label, disabled }`。
+- Svelte：`Select` 组件（`satin-ui/svelte/Select.svelte`）：`bind:value` 双向绑定；`items` 是字符串或 `{ value, label, disabled }`。
+- Angular：写 `<sn-select>` 自定义元素（组件加 `CUSTOM_ELEMENTS_SCHEMA`）：`[attr.items]` 传 JSON，选中时发冒泡的 `(sn-change)`，`$event.detail` 是值。
+- Solid：写 `<sn-select>` 自定义元素：`items` 写成 JSON 字符串，选中时发冒泡的 `sn-change`，`e.detail` 是值。
+- 纯 HTML：写 `<sn-select>`：`items` 写成 JSON，选中时发冒泡的 `sn-change`，`e.detail` 是值；也可以 `createSelect(元素, 选项)`，给空容器就按选项渲染。
 
 ## 示例（由浅入深）
 
 ### 基础用法
 
-给选项和当前值就行。自定义元素在 React 里换成 `<Select>`，Vue 里换成 `<SnSelect>`，属性一样。
+给选项和当前值就行。React 只给 `defaultValue` 时组件自己管选中，Vue、Svelte 绑一个变量。
 
 ```html
 <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
+```
+
+纯 HTML 的写法：
+
+```jsx
+<sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
+```
+
+React 的写法：
+
+```jsx
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioSelect() {
+  return <Select items={RATIOS} defaultValue="16:9 · 横屏" label="画面比例" />;
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { Select } from "satin-ui/vue";
+
+const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+const ratio = ref("16:9 · 横屏");
+</script>
+
+<template>
+  <Select v-model="ratio" :items="ratios" label="画面比例" />
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import Select from "satin-ui/svelte/Select.svelte";
+
+  const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+  let ratio = $state("16:9 · 横屏");
+</script>
+
+<Select items={ratios} bind:value={ratio} label="画面比例" />
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-select-basic",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-select>
+  template: `
+    <sn-select [attr.items]="ratios" value="16:9 · 横屏" label="画面比例"></sn-select>
+  `,
+})
+export class SelectBasicComponent {
+  // 自定义元素的属性只认字符串：数组写成 JSON
+  protected ratios = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+}
+```
+
+Solid 的写法：
+
+```jsx
+// 自定义元素的属性只认字符串：数组写成 JSON
+const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+
+export default function RatioSelect() {
+  return <sn-select items={RATIOS} value="16:9 · 横屏" label="画面比例"></sn-select>;
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioSelect() {
+  return <Select items={RATIOS} defaultValue="16:9 · 横屏" label="画面比例" />;
+}
 ```
 
 ### 还没选：占位文字
@@ -58,12 +152,212 @@ React、Vue 用组件；其余框架和纯 HTML 调一次 `defineElements()`，�
 <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' placeholder="选择画面比例" label="画面比例"></sn-select>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' placeholder="选择画面比例" label="画面比例"></sn-select>
+```
+
+React 的写法：
+
+```jsx
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioSelect() {
+  return <Select items={RATIOS} placeholder="选择画面比例" label="画面比例" />;
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { Select } from "satin-ui/vue";
+
+const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+const ratio = ref();
+</script>
+
+<template>
+  <Select v-model="ratio" :items="ratios" placeholder="选择画面比例" label="画面比例" />
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import Select from "satin-ui/svelte/Select.svelte";
+
+  const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+  let ratio = $state();
+</script>
+
+<Select items={ratios} bind:value={ratio} placeholder="选择画面比例" label="画面比例" />
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-select-placeholder",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-select>
+  template: `
+    <sn-select [attr.items]="ratios" placeholder="选择画面比例" label="画面比例"></sn-select>
+  `,
+})
+export class SelectPlaceholderComponent {
+  // 自定义元素的属性只认字符串：数组写成 JSON
+  protected ratios = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+}
+```
+
+Solid 的写法：
+
+```jsx
+// 自定义元素的属性只认字符串：数组写成 JSON
+const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+
+export default function RatioSelect() {
+  return <sn-select items={RATIOS} placeholder="选择画面比例" label="画面比例"></sn-select>;
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioSelect() {
+  return <Select items={RATIOS} placeholder="选择画面比例" label="画面比例" />;
+}
+```
+
 ### 值和文字分开、不能选的项
 
 拿到的是 value（draft），显示的是 label（草稿）；disabled 的那一项点不了，键盘高亮到它按回车也选不中。
 
 ```html
 <sn-select items='[{"value":"draft","label":"草稿"},{"value":"review","label":"待审核"},{"value":"done","label":"已完成","disabled":true}]' value="draft" label="状态"></sn-select>
+```
+
+纯 HTML 的写法：
+
+```jsx
+<sn-select items='[{"value":"draft","label":"草稿"},{"value":"review","label":"待审核"},{"value":"done","label":"已完成","disabled":true}]' value="draft" label="状态"></sn-select>
+```
+
+React 的写法：
+
+```jsx
+import { Select } from "satin-ui/react";
+
+const STATUSES = [
+  { value: "draft", label: "草稿" },
+  { value: "review", label: "待审核" },
+  { value: "done", label: "已完成", disabled: true },
+];
+
+export default function StatusSelect() {
+  return <Select items={STATUSES} defaultValue="draft" label="状态" />;
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { Select } from "satin-ui/vue";
+
+const statuses = [
+  { value: "draft", label: "草稿" },
+  { value: "review", label: "待审核" },
+  { value: "done", label: "已完成", disabled: true },
+];
+const status = ref("draft");
+</script>
+
+<template>
+  <Select v-model="status" :items="statuses" label="状态" />
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import Select from "satin-ui/svelte/Select.svelte";
+
+  const statuses = [
+    { value: "draft", label: "草稿" },
+    { value: "review", label: "待审核" },
+    { value: "done", label: "已完成", disabled: true },
+  ];
+  let status = $state("draft");
+</script>
+
+<Select items={statuses} bind:value={status} label="状态" />
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-select-options",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-select>
+  template: `
+    <sn-select [attr.items]="statuses" value="draft" label="状态"></sn-select>
+  `,
+})
+export class SelectOptionsComponent {
+  // 自定义元素的属性只认字符串：数组写成 JSON
+  protected statuses = JSON.stringify([
+    { value: "draft", label: "草稿" },
+    { value: "review", label: "待审核" },
+    { value: "done", label: "已完成", disabled: true },
+  ]);
+}
+```
+
+Solid 的写法：
+
+```jsx
+// 自定义元素的属性只认字符串：数组写成 JSON
+const STATUSES = JSON.stringify([
+  { value: "draft", label: "草稿" },
+  { value: "review", label: "待审核" },
+  { value: "done", label: "已完成", disabled: true },
+]);
+
+export default function StatusSelect() {
+  return <sn-select items={STATUSES} value="draft" label="状态"></sn-select>;
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Select } from "satin-ui/react";
+
+const STATUSES = [
+  { value: "draft", label: "草稿" },
+  { value: "review", label: "待审核" },
+  { value: "done", label: "已完成", disabled: true },
+];
+
+export default function StatusSelect() {
+  return <Select items={STATUSES} defaultValue="draft" label="状态" />;
+}
 ```
 
 ### 放进表单字段
@@ -78,41 +372,154 @@ React、Vue 用组件；其余框架和纯 HTML 调一次 `defineElements()`，�
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<div class="sn-field">
+  <span class="sn-lbl">画面比例</span>
+  <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
+  <div class="sn-help">导出成片时用这个比例。</div>
+</div>
+```
+
+React 的写法：
+
+```jsx
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioField() {
+  return (
+    <div className="sn-field">
+      <span className="sn-lbl">画面比例</span>
+      <Select items={RATIOS} defaultValue="16:9 · 横屏" label="画面比例" />
+      <div className="sn-help">导出成片时用这个比例。</div>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { Select } from "satin-ui/vue";
+
+const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+const ratio = ref("16:9 · 横屏");
+</script>
+
+<template>
+  <div class="sn-field">
+    <span class="sn-lbl">画面比例</span>
+    <Select v-model="ratio" :items="ratios" label="画面比例" />
+    <div class="sn-help">导出成片时用这个比例。</div>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import Select from "satin-ui/svelte/Select.svelte";
+
+  const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+  let ratio = $state("16:9 · 横屏");
+</script>
+
+<div class="sn-field">
+  <span class="sn-lbl">画面比例</span>
+  <Select items={ratios} bind:value={ratio} label="画面比例" />
+  <div class="sn-help">导出成片时用这个比例。</div>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-select-field",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-select>
+  template: `
+    <div class="sn-field">
+      <span class="sn-lbl">画面比例</span>
+      <sn-select [attr.items]="ratios" value="16:9 · 横屏" label="画面比例"></sn-select>
+      <div class="sn-help">导出成片时用这个比例。</div>
+    </div>
+  `,
+})
+export class SelectFieldComponent {
+  // 自定义元素的属性只认字符串：数组写成 JSON
+  protected ratios = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+}
+```
+
+Solid 的写法：
+
+```jsx
+// 自定义元素的属性只认字符串：数组写成 JSON
+const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+
+export default function RatioField() {
+  return (
+    <div class="sn-field">
+      <span class="sn-lbl">画面比例</span>
+      <sn-select items={RATIOS} value="16:9 · 横屏" label="画面比例"></sn-select>
+      <div class="sn-help">导出成片时用这个比例。</div>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioField() {
+  return (
+    <div class="sn-field">
+      <span class="sn-lbl">画面比例</span>
+      <Select items={RATIOS} defaultValue="16:9 · 横屏" label="画面比例" />
+      <div class="sn-help">导出成片时用这个比例。</div>
+    </div>
+  );
+}
+```
+
 ### 监听选中
 
-选中一项时组件在自己的根元素上发 sn-change（冒泡），e.detail 是选中的值。各框架叫法不同（React onChange、Vue @change），拿到的都是这个值。
+选中一项时拿到选中的值：React `onChange`、Vue `@change`、Svelte `onchange`；自定义元素在自己身上发冒泡的 `sn-change`，`e.detail` 是值。
 
 ```html
-<div class="sn-stack sn-gap-8" data-ex="ratio">
+<div class="sn-stack sn-gap-8" id="ratio-events">
   <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
-  <span class="sn-help" data-out>当前：16:9 · 横屏</span>
+  <span class="sn-help">当前：16:9 · 横屏</span>
 </div>
 ```
 
-```js
-const box = document.querySelector('[data-ex="ratio"]');
-box.addEventListener("sn-change", (e) => {
-  box.querySelector("[data-out]").textContent = "当前：" + e.detail;
-});
-```
+纯 HTML 的写法：
 
-### 受控：值放在自己的状态里
-
-React 用 value + onChange，Vue 用 v-model；其他框架用自定义元素的 value 属性 + sn-change 事件，自己改属性。
-
-```html
-<div class="sn-stack sn-gap-8" data-ex="ratio2">
-  <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="9:16 · 竖屏" label="画面比例"></sn-select>
-  <span class="sn-help" data-out>当前：9:16 · 竖屏</span>
+```jsx
+<div class="sn-stack sn-gap-8" id="ratio-events">
+  <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
+  <span class="sn-help">当前：16:9 · 横屏</span>
 </div>
-```
 
-```js
-const box = document.querySelector('[data-ex="ratio2"]'), select = box.querySelector("sn-select");
-box.addEventListener("sn-change", (e) => {
-  select.setAttribute("value", e.detail); // 自己保管值：改属性，组件跟着更新
-  box.querySelector("[data-out]").textContent = "当前：" + e.detail;
-});
+<script type="module">
+  const box = document.getElementById("ratio-events");
+  // 选中一项时 <sn-select> 发 sn-change（冒泡），e.detail 是选中的值
+  box.addEventListener("sn-change", (e) => {
+    box.querySelector(".sn-help").textContent = "当前：" + e.detail;
+  });
+</script>
 ```
 
 React 的写法：
@@ -121,11 +528,167 @@ React 的写法：
 import { useState } from "react";
 import { Select } from "satin-ui/react";
 
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioEvents() {
+  const [current, setCurrent] = useState("16:9 · 横屏");
+  return (
+    <div className="sn-stack sn-gap-8">
+      {/* 只给 defaultValue：组件自己管选中；onChange 拿到选中的值 */}
+      <Select items={RATIOS} defaultValue="16:9 · 横屏" label="画面比例" onChange={setCurrent} />
+      <span className="sn-help">当前：{current}</span>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { Select } from "satin-ui/vue";
+
+const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+const current = ref("16:9 · 横屏");
+</script>
+
+<template>
+  <div class="sn-stack sn-gap-8">
+    <!-- 只给 value：组件自己管选中；@change 拿到选中的值 -->
+    <Select :items="ratios" value="16:9 · 横屏" label="画面比例" @change="(v) => (current = v)" />
+    <span class="sn-help">当前：{{ current }}</span>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import Select from "satin-ui/svelte/Select.svelte";
+
+  const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+  let current = $state("16:9 · 横屏");
+</script>
+
+<div class="sn-stack sn-gap-8">
+  <!-- 只给 value：组件自己管选中；onchange 拿到选中的值 -->
+  <Select items={ratios} value="16:9 · 横屏" label="画面比例" onchange={(v) => (current = v)} />
+  <span class="sn-help">当前：{current}</span>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
+
+@Component({
+  selector: "demo-select-events",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-select>
+  template: `
+    <div class="sn-stack sn-gap-8">
+      <sn-select [attr.items]="ratios" value="16:9 · 横屏" label="画面比例" (sn-change)="onChange($event)"></sn-select>
+      <span class="sn-help">当前：{{ current() }}</span>
+    </div>
+  `,
+})
+export class SelectEventsComponent {
+  // 自定义元素的属性只认字符串：数组写成 JSON
+  protected ratios = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+  protected current = signal("16:9 · 横屏");
+  // sn-change 冒泡，e.detail 是选中的值
+  onChange(e: Event) {
+    this.current.set((e as CustomEvent<string>).detail);
+  }
+}
+```
+
+Solid 的写法：
+
+```jsx
+import { createSignal } from "solid-js";
+
+// 自定义元素的属性只认字符串：数组写成 JSON
+const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+// 名字带横线的原生事件用 ref 挂（Solid 2 的 onXxx 只认驼峰的事件名）
+const on = (type, fn) => (el) => el.addEventListener(type, fn);
+
+export default function RatioEvents() {
+  const [current, setCurrent] = createSignal("16:9 · 横屏");
+  return (
+    <div class="sn-stack sn-gap-8">
+      {/* sn-change 冒泡，e.detail 是选中的值 */}
+      <sn-select items={RATIOS} value="16:9 · 横屏" label="画面比例" ref={on("sn-change", (e) => setCurrent(e.detail))}></sn-select>
+      <span class="sn-help">当前：{current()}</span>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { useState } from "preact/hooks";
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioEvents() {
+  const [current, setCurrent] = useState("16:9 · 横屏");
+  return (
+    <div class="sn-stack sn-gap-8">
+      {/* 只给 defaultValue：组件自己管选中；onChange 拿到选中的值 */}
+      <Select items={RATIOS} defaultValue="16:9 · 横屏" label="画面比例" onChange={setCurrent} />
+      <span class="sn-help">当前：{current}</span>
+    </div>
+  );
+}
+```
+
+### 受控：值放在自己的状态里
+
+React 用 value + onChange，Vue 用 v-model，Svelte 用 bind:value；自定义元素把值放在自己的状态里，`sn-change` 时写回 value 属性。
+
+```html
+<div class="sn-stack sn-gap-8" id="ratio-controlled">
+  <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="9:16 · 竖屏" label="画面比例"></sn-select>
+  <span class="sn-help">当前：9:16 · 竖屏</span>
+</div>
+```
+
+纯 HTML 的写法：
+
+```jsx
+<div class="sn-stack sn-gap-8" id="ratio-controlled">
+  <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="9:16 · 竖屏" label="画面比例"></sn-select>
+  <span class="sn-help">当前：9:16 · 竖屏</span>
+</div>
+
+<script type="module">
+  const box = document.getElementById("ratio-controlled"), select = box.querySelector("sn-select");
+  box.addEventListener("sn-change", (e) => {
+    select.setAttribute("value", e.detail); // 自己保管值：改属性，组件跟着更新
+    box.querySelector(".sn-help").textContent = "当前：" + e.detail;
+  });
+</script>
+```
+
+React 的写法：
+
+```jsx
+import { useState } from "react";
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
 export default function RatioSelect() {
   const [ratio, setRatio] = useState("9:16 · 竖屏");
   return (
     <div className="sn-stack sn-gap-8">
-      <Select items={["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]} value={ratio} onChange={setRatio} label="画面比例" />
+      {/* 给 value 就是受控：onChange 里不改 ratio，选中项会退回去 */}
+      <Select items={RATIOS} value={ratio} onChange={setRatio} label="画面比例" />
       <span className="sn-help">当前：{ratio}</span>
     </div>
   );
@@ -137,21 +700,107 @@ Vue 的写法：
 ```vue
 <script setup>
 import { ref } from "vue";
-import { Select as SnSelect } from "satin-ui/vue";
+import { Select } from "satin-ui/vue";
+
+const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
 const ratio = ref("9:16 · 竖屏");
 </script>
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <SnSelect v-model="ratio" :items='["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]' label="画面比例" />
+    <Select v-model="ratio" :items="ratios" label="画面比例" />
     <span class="sn-help">当前：{{ ratio }}</span>
   </div>
 </template>
 ```
 
+Svelte 的写法：
+
+```jsx
+<script>
+  import Select from "satin-ui/svelte/Select.svelte";
+
+  const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+  let ratio = $state("9:16 · 竖屏");
+</script>
+
+<div class="sn-stack sn-gap-8">
+  <Select items={ratios} bind:value={ratio} label="画面比例" />
+  <span class="sn-help">当前：{ratio}</span>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
+
+@Component({
+  selector: "demo-select-controlled",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-select>
+  template: `
+    <div class="sn-stack sn-gap-8">
+      <!-- 值放在 signal 里：选中时写回去，[attr.value] 跟着变，组件跟着更新 -->
+      <sn-select [attr.items]="ratios" [attr.value]="ratio()" label="画面比例" (sn-change)="onChange($event)"></sn-select>
+      <span class="sn-help">当前：{{ ratio() }}</span>
+    </div>
+  `,
+})
+export class SelectControlledComponent {
+  // 自定义元素的属性只认字符串：数组写成 JSON
+  protected ratios = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+  protected ratio = signal("9:16 · 竖屏");
+  onChange(e: Event) {
+    this.ratio.set((e as CustomEvent<string>).detail);
+  }
+}
+```
+
+Solid 的写法：
+
+```jsx
+import { createSignal } from "solid-js";
+
+// 自定义元素的属性只认字符串：数组写成 JSON
+const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
+// 名字带横线的原生事件用 ref 挂（Solid 2 的 onXxx 只认驼峰的事件名）
+const on = (type, fn) => (el) => el.addEventListener(type, fn);
+
+export default function RatioSelect() {
+  const [ratio, setRatio] = createSignal("9:16 · 竖屏");
+  return (
+    <div class="sn-stack sn-gap-8">
+      {/* 值放在 signal 里：选中时写回去，value 跟着变，组件跟着更新 */}
+      <sn-select items={RATIOS} value={ratio()} label="画面比例" ref={on("sn-change", (e) => setRatio(e.detail))}></sn-select>
+      <span class="sn-help">当前：{ratio()}</span>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { useState } from "preact/hooks";
+import { Select } from "satin-ui/react";
+
+const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+
+export default function RatioSelect() {
+  const [ratio, setRatio] = useState("9:16 · 竖屏");
+  return (
+    <div class="sn-stack sn-gap-8">
+      {/* 给 value 就是受控：onChange 里不改 ratio，选中项会退回去 */}
+      <Select items={RATIOS} value={ratio} onChange={setRatio} label="画面比例" />
+      <span class="sn-help">当前：{ratio}</span>
+    </div>
+  );
+}
+```
+
 ### 菜单按钮
 
-不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。条目里写 `data-i="check:chk"` 留出对勾的位置。
+不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，包一层 `<sn-enhance>`（Vue 用 `v-enhance` 指令）接上交互；每一项后面留出对勾的位置。
 
 ```html
 <div class="sn-select">
@@ -164,20 +813,171 @@ const ratio = ref("9:16 · 竖屏");
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<sn-enhance>
+  <div class="sn-select">
+    <button type="button" class="sn-btn sn-secondary" data-menubtn data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
+    <div class="sn-menu" role="menu">
+      <div class="sn-item sn-sel" data-i="check:chk">最近更新</div>
+      <div class="sn-item" data-i="check:chk">名称</div>
+      <div class="sn-item" data-i="check:chk">创建时间</div>
+    </div>
+  </div>
+</sn-enhance>
+```
+
+React 的写法：
+
+```jsx
+import { Button, Icon } from "satin-ui/react";
+
+const SORTS = ["最近更新", "名称", "创建时间"];
+
+// 菜单按钮：标记照设计稿写，<sn-enhance> 接上交互（选了就收起，按钮文字换成 前缀 + 选中项）
+export default function SortMenu() {
+  return (
+    <sn-enhance>
+      <div className="sn-select">
+        <Button data-menubtn="" data-prefix="排序：">排序：最近更新<Icon name="chevron-down" className="sn-caret" /></Button>
+        <div className="sn-menu" role="menu">
+          {SORTS.map((s, i) => (
+            <div key={s} className={i === 0 ? "sn-item sn-sel" : "sn-item"}>{s}<span className="sn-chk"><Icon name="check" /></span></div>
+          ))}
+        </div>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { Button, Icon, vEnhance } from "satin-ui/vue";
+
+const sorts = ["最近更新", "名称", "创建时间"];
+</script>
+
+<template>
+  <!-- 菜单按钮：标记照设计稿写，v-enhance 接上交互（选了就收起，按钮文字换成 前缀 + 选中项） -->
+  <div v-enhance>
+    <div class="sn-select">
+      <Button data-menubtn data-prefix="排序：">排序：最近更新<Icon name="chevron-down" class="sn-caret" /></Button>
+      <div class="sn-menu" role="menu">
+        <div v-for="(s, i) in sorts" :key="s" :class="['sn-item', { 'sn-sel': i === 0 }]">{{ s }}<span class="sn-chk"><Icon name="check" /></span></div>
+      </div>
+    </div>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import Icon from "satin-ui/svelte/Icon.svelte";
+
+  const sorts = ["最近更新", "名称", "创建时间"];
+</script>
+
+<sn-enhance>
+  <div class="sn-select">
+    <button type="button" class="sn-btn sn-secondary" data-menubtn data-prefix="排序：">排序：最近更新<Icon name="chevron-down" class="sn-caret" /></button>
+    <div class="sn-menu" role="menu">
+      {#each sorts as s, i (s)}
+        <div class={i === 0 ? "sn-item sn-sel" : "sn-item"}>{s}<span class="sn-chk"><Icon name="check" /></span></div>
+      {/each}
+    </div>
+  </div>
+</sn-enhance>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+// 菜单按钮：标记照设计稿写，<sn-enhance> 接上交互（选了就收起，按钮文字换成 前缀 + 选中项）
+@Component({
+  selector: "demo-select-menu",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-select">
+        <button type="button" class="sn-btn sn-secondary" data-menubtn data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
+        <div class="sn-menu" role="menu">
+          <div class="sn-item sn-sel" data-i="check:chk">最近更新</div>
+          <div class="sn-item" data-i="check:chk">名称</div>
+          <div class="sn-item" data-i="check:chk">创建时间</div>
+        </div>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class SelectMenuComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+// 菜单按钮：标记照设计稿写，<sn-enhance> 接上交互（选了就收起，按钮文字换成 前缀 + 选中项）
+export default function SortMenu() {
+  return (
+    <sn-enhance>
+      <div class="sn-select">
+        <button type="button" class="sn-btn sn-secondary" data-menubtn data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
+        <div class="sn-menu" role="menu">
+          <div class="sn-item sn-sel" data-i="check:chk">最近更新</div>
+          <div class="sn-item" data-i="check:chk">名称</div>
+          <div class="sn-item" data-i="check:chk">创建时间</div>
+        </div>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Button, Icon } from "satin-ui/react";
+
+const SORTS = ["最近更新", "名称", "创建时间"];
+
+// 菜单按钮：标记照设计稿写，<sn-enhance> 接上交互（选了就收起，按钮文字换成 前缀 + 选中项）
+export default function SortMenu() {
+  return (
+    <sn-enhance>
+      <div class="sn-select">
+        <Button data-menubtn="" data-prefix="排序：">排序：最近更新<Icon name="chevron-down" class="sn-caret" /></Button>
+        <div class="sn-menu" role="menu">
+          {SORTS.map((s, i) => (
+            <div key={s} class={i === 0 ? "sn-item sn-sel" : "sn-item"}>{s}<span class="sn-chk"><Icon name="check" /></span></div>
+          ))}
+        </div>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
 ## 属性
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `items` | `Item[]` | [] | 是 | 选项：字符串，或者 { value, label, disabled }。value 是选中后拿到的值，label 是显示的文字，disabled 的那一项点不了。createSelect 接已经写好的标记时可以不给。（例：`items={["16:9 · 横屏", { value: "9:16", label: "9:16 · 竖屏" }]}`） | createXxx 选项：`items`；React：`items`；Vue：`items`；自定义元素：`items（写成 JSON）`；标记：`.sn-menu > .sn-item（data-v 是值）` |
-| `value` | `string` | —（没有选中，显示 placeholder） | 否 | 选中项的值。React 里给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控；Vue 用 v-model。 | createXxx 选项：`value`；React：`value / defaultValue`；Vue：`v-model / value`；自定义元素：`value`；标记：`.sn-item.sn-sel` |
-| `placeholder` | `string` | "" | 否 | 还没选时触发器里显示的字，写要选什么："选择画面比例"。 | createXxx 选项：`placeholder`；React：`placeholder`；Vue：`placeholder`；自定义元素：`placeholder` |
-| `label` | `string` | — | 否 | 触发器的读屏名称（`aria-label`）。页面上看得见的标签另外写在 `.sn-lbl` 里。 | createXxx 选项：`label`；React：`label`；Vue：`label`；自定义元素：`label` |
+| `items` | `Item[]` | [] | 是 | 选项：字符串，或者 { value, label, disabled }。value 是选中后拿到的值，label 是显示的文字，disabled 的那一项点不了。createSelect 接已经写好的标记时可以不给。（例：`items={["16:9 · 横屏", { value: "9:16", label: "9:16 · 竖屏" }]}`） | createXxx 选项：`items`；React：`items`；Vue：`items`；Svelte：`items`；Preact：`items`；自定义元素：`items（写成 JSON）`；Angular：`[attr.items]（JSON 字符串）`；标记：`.sn-menu > .sn-item（data-v 是值）` |
+| `value` | `string` | —（没有选中，显示 placeholder） | 否 | 选中项的值。React 里给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控；Vue 用 v-model，Svelte 用 bind:value；自定义元素改 value 属性，组件跟着更新。 | createXxx 选项：`value`；React：`value / defaultValue`；Vue：`v-model / value`；Svelte：`bind:value / value`；Preact：`value / defaultValue`；自定义元素：`value`；Angular：`[attr.value]`；标记：`.sn-item.sn-sel` |
+| `placeholder` | `string` | "" | 否 | 还没选时触发器里显示的字，写要选什么："选择画面比例"。 | createXxx 选项：`placeholder`；React：`placeholder`；Vue：`placeholder`；Svelte：`placeholder`；Preact：`placeholder`；自定义元素：`placeholder` |
+| `label` | `string` | — | 否 | 触发器的读屏名称（`aria-label`）。页面上看得见的标签另外写在 `.sn-lbl` 里。 | createXxx 选项：`label`；React：`label`；Vue：`label`；Svelte：`label`；Preact：`label`；自定义元素：`label` |
 
 ## 事件
 
 | 名称 | 参数 | 什么时候 | 各写法 |
 |---|---|---|---|
-| `change` | `string` | 选中一项（点、回车）时；程序里改 value、调 `update({ value })` 不触发。 | createXxx 选项：`onChange`；React：`onChange`；Vue：`@change（v-model 同时更新）`；自定义元素：`sn-change（e.detail 是值）`；Angular：`(sn-change)`；Svelte：`onsn-change`；Solid：`ref 里 addEventListener("sn-change")`；Preact：`onsn-change`；纯 HTML：`addEventListener("sn-change")` |
+| `change` | `string` | 选中一项（点、回车）时；程序里改 value、调 `update({ value })` 不触发。 | createXxx 选项：`onChange`；React：`onChange`；Vue：`@change（v-model 同时更新）`；Svelte：`onchange（bind:value 同时更新）`；Preact：`onChange`；自定义元素：`sn-change（e.detail 是值）`；Angular：`(sn-change)`；Solid：`ref 里 addEventListener("sn-change")`；纯 HTML：`addEventListener("sn-change")` |
 | `select` | `{ value: string; item: HTMLElement }` | 同上，在 `.sn-select` 上冒泡；mountSelect、bindSelects 接的手写标记用它。 | 纯 HTML：`addEventListener("select")` |
 
 ## 实例方法（createXxx 的返回值、React / Vue 的 ref）

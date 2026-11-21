@@ -5,7 +5,7 @@
 // · SSR 安全：服务端输出和浏览器第一帧一样的标记（createXxx.html），水合以后再接交互；导入时不碰 document
 // · StrictMode 下挂两次、卸载一次也不漏：每次挂载都配对一次 destroy
 // · 第一次挂载任何组件时自动调 setup()（Tooltip、浮层栈这些页面级行为），最后一个组件卸载时撤掉
-import { createElement as h, forwardRef, useEffect, useLayoutEffect, useRef, useState, useImperativeHandle, useCallback, cloneElement, isValidElement, Children } from "react";
+import { createElement as h, forwardRef, useEffect, useRef, useState, useId, useCallback, cloneElement, isValidElement, Children } from "react";
 import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
@@ -14,46 +14,13 @@ import { ICONS } from "../src/icons.js";
 import { CHECK } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
+import { wrap, useIso, cx } from "./wrap.js";
 const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
-
-const useIso = typeof window === "undefined" ? useEffect : useLayoutEffect;
-const cx = (...a) => a.filter(Boolean).join(" ");
-const cap = (s) => s[0].toUpperCase() + s.slice(1);
-
-// 把 createXxx 包成 React 组件。valueKey：受控的那个属性（value / page / tags……）；events：组件会发的事件名
-function wrap(create, { valueKey = "value", events = ["change"], displayName } = {}) {
-  const C = forwardRef(function SatinComponent(props, ref) {
-    const { className, style, id, ...rest } = props;
-    const host = useRef(null), inst = useRef(null), latest = useRef(props);
-    latest.current = props;
-    const defKey = "default" + cap(valueKey), controlled = props[valueKey] !== undefined;
-    // 传给 Satin 的选项：去掉回调（回调走下面固定的转发函数，props 换了也不用重新挂）和 defaultValue
-    const optsOf = (p) => { const o = {}; for (const [k, v] of Object.entries(p)) if (!/^on[A-Z]/.test(k) && k !== defKey && k !== "className" && k !== "style" && k !== "id" && k !== "children") o[k] = v; if (p[valueKey] === undefined && p[defKey] !== undefined) o[valueKey] = p[defKey]; return o; };
-    const [html] = useState(() => create.html({ ...optsOf(props) }));
-    useIso(() => {
-      const unsetup = setup();
-      const handlers = {};
-      for (const ev of events) handlers["on" + cap(ev)] = (v) => {
-        latest.current["on" + cap(ev)]?.(v);
-        // 受控：父组件没把新值传回来，就退回到父组件给的值
-        if (ev === "change" && latest.current[valueKey] !== undefined) setTimeout(() => { const want = latest.current[valueKey]; if (inst.current && want !== undefined && JSON.stringify(inst.current[valueKey]) !== JSON.stringify(want)) inst.current.update({ [valueKey]: want }); });
-      };
-      inst.current = create(host.current.firstElementChild, { ...optsOf(latest.current), ...handlers });
-      return () => { inst.current?.destroy(); inst.current = null; unsetup(); };
-    }, []);
-    // 每次渲染把最新的选项交给实例（实例自己判断有没有变化、要不要动画）
-    useIso(() => { inst.current?.update(optsOf(props)); });
-    useImperativeHandle(ref, () => inst.current, []);
-    void controlled;
-    return h("div", { ref: host, id, className: cx("sn-host", className), style: { display: "contents", ...style }, dangerouslySetInnerHTML: { __html: html }, suppressHydrationWarning: true });
-  });
-  C.displayName = displayName || create.componentName;
-  return C;
-}
 
 // 自己包：重组件（对话、Markdown、流程图、数据表格……，各自单独引入）或别的 createXxx 也能变成 React 组件，用法和下面这些一样。
 //   import { createChat } from "satin-ui/chat";  const Chat = wrapSatin(createChat, { events: [] });  <Chat title="助手" respond={respond} />
 //   valueKey：受控的那个属性；events：组件会发的事件名（onXxx 转过去）
+//   数据表格已经包好了：import { DataGrid } from "satin-ui/react/grid"
 export const wrapSatin = (create, opts) => wrap(create, opts);
 
 // ———— 有交互的组件 ————
@@ -72,15 +39,36 @@ export const Password = /* @__PURE__ */ wrap(S.createPassword, { displayName: "P
 export const Email = /* @__PURE__ */ wrap(S.createEmail, { displayName: "Email" });
 // 表格：columns + rows；selected 受控（onSelect 里更新）；onSort、onRowClick
 export const Table = /* @__PURE__ */ wrap(S.createTable, { valueKey: "selected", events: ["sort", "select", "rowClick"], displayName: "Table" });
+// 日期、时间、地址选择器：kind（date | range | time | datetime | region）、placeholder、label；onChange({ text }) 拿到触发框里显示的文字。
+// today / now 固定"今天""现在"（测试、截图用）。kind、placeholder、label 只在创建时用：要换种类就换 key 重新挂
+export const DatePicker = /* @__PURE__ */ wrap(S.createPicker, { displayName: "DatePicker" });
 
 // ———— 纯样式组件：直接渲染元素（子节点、事件都是 React 自己的） ————
-export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "secondary", size, icon, round, selected, busy, disabled, tip, className, children, onClick, type = "button", ...rest }, ref) {
-  const iconOnly = !children && icon;
+// 等待：loading 变成 true 以后过了 300ms 还没结束才转圈；转圈出现后至少留 500ms（和 busy() 函数同一条规矩，快的请求不闪）
+function useSpin(on) {
+  // 一挂上就在等：直接转圈（300ms 是防"从不等待变成等待"时闪一下的，本来就在等没有这个问题），服务端输出也一样
+  const [shown, setShown] = useState(on), at = useRef(0);
+  useEffect(() => {
+    if (on) { if (shown) return; const t = setTimeout(() => { at.current = performance.now(); setShown(true); }, 300); return () => clearTimeout(t); }
+    if (!shown) return;
+    const t = setTimeout(() => setShown(false), Math.max(0, 500 - (performance.now() - at.current)));
+    return () => clearTimeout(t);
+  }, [on, shown]);
+  return shown;
+}
+const Tick = () => h("svg", { className: "sn-tick", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, h("path", { d: "M3.5 8.5l3 3 6-7" }));
+// loading、done 写了（true 或 false）才套等待要用的结构（.sn-label > .sn-spin + .sn-tick + .sn-txt）：从一开始就在，转圈、打勾时宽度不跳；
+// 没写就和手写的 <button class="sn-btn"> 一模一样。等待中、打勾时点了不触发 onClick
+export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "secondary", size, icon, iconAfter, round, selected, loading, done, disabled, tip, className, children, onClick, type = "button", ...rest }, ref) {
+  const iconOnly = !children && icon && !iconAfter, spin = useSpin(!!loading), ok = !!done && !spin; // 转圈收起以后再打勾
+  const lead = icon ? h(Icon, { name: icon }) : null, tail = iconAfter ? h(Icon, { name: iconAfter, className: "sn-after" }) : null;
   return h("button", {
-    ref, type, ...rest, className: cx("sn-btn", `sn-${variant}`, size && size !== "md" && `sn-${size}`, iconOnly && "sn-ibtn", round && "sn-round", selected && "sn-selected", disabled && "sn-is-disabled", busy && "sn-busy", className),
+    ref, type, ...rest, className: cx("sn-btn", `sn-${variant}`, size && size !== "md" && `sn-${size}`, iconOnly && "sn-ibtn", round && "sn-round", selected && "sn-selected", disabled && "sn-is-disabled", spin && "sn-busy", ok && "sn-ok", className),
     "aria-disabled": disabled ? "true" : undefined, "data-tip": tip, "aria-label": iconOnly ? rest["aria-label"] ?? tip : rest["aria-label"],
-    onClick: disabled ? undefined : onClick,
-  }, icon ? h(Icon, { name: icon, size: iconOnly ? (size === "sm" ? 16 : 20) : 16 }) : null, children);
+    onClick: disabled || loading || ok ? undefined : onClick,
+  }, ...(loading !== undefined || done !== undefined
+    ? [h("span", { className: "sn-sheen", key: "sheen" }), h("span", { className: "sn-label", key: "label" }, h("span", { className: "sn-spin" }), h(Tick), h("span", { className: "sn-txt" }, lead, children, tail))]
+    : [lead, children, tail]));
 });
 // 图标：satin-ui/icons 里的名字。直接渲染 <svg class="sn-ic">（和 icon() 生成的一模一样，按钮里 .sn-btn > .sn-ic 这类选择器照样命中）
 export function Icon({ name, size = 16, className }) {
@@ -129,17 +117,19 @@ export function Tooltip({ text, kbd, children }) {
 }
 
 // ———— 对话框：open 控制开关；标题、说明、内容、底部按钮都是 React 节点 ————
-export function Dialog({ open, onClose, title, description, footer, children, className, guard }) {
-  const ref = useRef(null), was = useRef(false);
+// 取消按钮写 data-cancel、关闭按钮写 data-x：和 Esc 一样先走 guard 再关。onSubmit 接住表单提交（主按钮写 type="submit"，输入框里按回车也算），弹窗不会因为提交自己关
+// icon：标题左边的图标（危险确认用 trash-2）；footerClassName 加在底栏上（比如两组按钮原地切换的 sn-two、sn-asking）
+export function Dialog({ open, onClose, title, description, icon, footer, footerClassName, children, className, guard, onSubmit }) {
+  const ref = useRef(null), was = useRef(false), tid = useId();
   useIso(() => { const d = ref.current; wireDialog(d); const off = () => onCloseRef.current?.(); d.addEventListener("close", off); return () => d.removeEventListener("close", off); }, []);
   const onCloseRef = useRef(onClose); onCloseRef.current = onClose;
   useIso(() => { const d = ref.current; d.guard = guard ? () => guard(() => closeDialog(d)) : undefined; });
   useIso(() => { const d = ref.current; if (open && !d.open) { was.current = document.activeElement; openDialog(d, was.current); } else if (!open && d.open) closeDialog(d); }, [open]);
-  return h("dialog", { ref, className: cx("sn-dlg", className) },
-    h("form", { method: "dialog" },
-      title || description ? h("div", { className: "sn-hd" }, h("div", { style: { flex: 1 } }, title ? h("h3", null, title) : null, description ? h("div", { className: "sn-sub" }, description) : null)) : null,
-      h("div", { className: "sn-bd" }, children),
-      footer ? h("div", { className: "sn-ft" }, footer) : null));
+  return h("dialog", { ref, className: cx("sn-dlg", className), "aria-labelledby": title ? tid : undefined },
+    h("form", { method: "dialog", onSubmit },
+      title || description || icon ? h("div", { className: "sn-hd" }, icon ? h("span", { className: "sn-dlg-icon" }, h(Icon, { name: icon })) : null, h("div", { style: { flex: 1 } }, title ? h("h3", { id: tid }, title) : null, description ? h("div", { className: "sn-sub" }, description) : null)) : null,
+      children != null && children !== false ? h("div", { className: "sn-bd" }, children) : null,
+      footer ? h("div", { className: cx("sn-ft", footerClassName) }, footer) : null));
 }
 // 抽屉：从右边滑进来
 export function Drawer({ open, onClose, title, children, footer, className }) {
@@ -148,6 +138,14 @@ export function Drawer({ open, onClose, title, children, footer, className }) {
   return h("aside", { ref, className: cx("sn-drawer", className), role: "dialog", "aria-modal": "true", tabIndex: -1 },
     h("div", { className: "sn-hd" }, h("h3", null, title), h("button", { className: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": tt("components.close"), "data-tip": tt("components.close"), "data-kbd": "Esc" }, h(Icon, { name: "x", size: 16 }))),
     h("div", { className: "sn-bd" }, children), footer ? h("div", { className: "sn-ft" }, footer) : null);
+}
+
+// ———— 应用根部：页面级行为（Tooltip、浮层栈、Esc 关浮层、复选框的弹跳……）装一次 ————
+// 放在应用最外面：createRoot(el).render(<SatinProvider><App /></SatinProvider>)。
+// 不放也能用（任何一个 Satin 组件第一次挂载时会自己装上），放了以后 Toast、通知、纯类名写的按钮这些从第一帧起就有完整的行为；卸载时撤掉
+export function SatinProvider({ children }) {
+  useIso(() => setup(), []);
+  return children ?? null;
 }
 
 // ———— 命令式：Toast、通知 ————

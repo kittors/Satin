@@ -1,22 +1,13 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
-import { useEffect, useRef } from "react";
-import { setup, enhance } from "satin-ui";
+"use client";
+import { Button } from "satin-ui/react";
 
-export default function ButtonActions() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数
-    const off = enhance(ref.current); // 接上标记里的交互，返回撤销函数
-    return () => { off(); unsetup(); };
-  }, []);
+export default function FormActions() {
   return (
-    <div ref={ref}>
-      <div className="sn-row sn-between">
-        <button type="button" className="sn-btn sn-ghost">不保存</button>
-        <div className="sn-row sn-gap-8">
-          <button type="button" className="sn-btn sn-secondary">取消</button>
-          <button type="button" className="sn-btn sn-primary">保存</button>
-        </div>
+    <div className="sn-row sn-between">
+      <Button variant="ghost">不保存</Button>
+      <div className="sn-row sn-gap-8">
+        <Button>取消</Button>
+        <Button variant="primary">保存</Button>
       </div>
     </div>
   );

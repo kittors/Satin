@@ -12,6 +12,10 @@
 <body>
 <main class="play"></main>
 <script type="module">
+// 页面入口：页面级行为和自定义元素先装好（演示的片段里不再写）
+import { setup } from "satin-ui";
+import { defineElements } from "satin-ui/elements";
+setup(); defineElements();
 // 演示的片段（demos/<slug>.html）：标记放进来，模块脚本照原样跑——和复制到自己页面里一样
 const q = new URLSearchParams(location.search), slug = q.get("demo"), box = document.querySelector(".play");
 if (q.get("center")) box.classList.add("center");

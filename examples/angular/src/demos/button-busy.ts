@@ -1,39 +1,21 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
-import { setup, enhance, busy, succeed } from "satin-ui";
+import { Component, ElementRef, viewChild } from "@angular/core";
+import { busy, succeed } from "satin-ui";
+
+// 换成真实的请求，比如 firstValueFrom(this.http.put("/api/projects/42", body))
+const request = () => new Promise((done) => setTimeout(done, 1200));
 
 @Component({
   selector: "demo-button-busy",
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素
-  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式
+  // 先写好 .sn-label 结构，转圈、打勾时宽度不跳
   template: `
-    <div #root>
-      <button type="button" class="sn-btn sn-primary" data-act="save">
-        <span class="sn-sheen"></span>
-        <span class="sn-label">
-          <span class="sn-spin"></span>
-          <svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3.5 8.5l3 3 6-7"></path>
-          </svg>
-          <span class="sn-txt">保存修改</span>
-        </span>
-      </button>
-    </div>`,
+    <button #save type="button" class="sn-btn sn-primary" (click)="onSave()"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+  `,
 })
 export class ButtonBusyComponent {
-  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;
-  private off = () => {};
-  ngAfterViewInit() {
-    const unsetup = setup();
-    const done = enhance(this.root.nativeElement, (root: any) => {
-      const save = root.querySelector('[data-act="save"]');
-      // 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
-      const request = () => new Promise((done?: any) => setTimeout(done, 1200));
-      save.addEventListener("click", async () => {
-        await busy(save, request());
-        succeed(save);
-      });
-    });
-    this.off = () => { done(); unsetup(); };
+  private save = viewChild.required<ElementRef<HTMLButtonElement>>("save");
+  async onSave() {
+    const button = this.save().nativeElement;
+    await busy(button, request()); // 300ms 内回来不转圈；转圈出现后至少留 500ms
+    succeed(button); // 原地打勾 1.5 秒
   }
-  ngOnDestroy() { this.off(); }
 }

@@ -1,55 +1,30 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { setup, enhance, closeDialog } from "satin-ui";
+import { ref, watch, nextTick } from "vue";
+import { Button, Dialog } from "satin-ui/vue";
 
-const root = ref(null);
-let off = () => {};
-onMounted(() => {
-  const unsetup = setup();
-  const done = enhance(root.value, (root) => {
-    const dlg = root.querySelector("#dlg-note"), note = dlg.querySelector("textarea"), foot = dlg.querySelector(".sn-ft");
-    const ask = (on) => {
-      foot.classList.toggle("sn-asking", on);
-      foot.querySelector(".sn-g.sn-a").inert = on;
-      foot.querySelector(".sn-g.sn-b").inert = !on;
-      (on ? foot.querySelector("[data-keep]") : note).focus();
-    };
-    // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关
-    dlg.guard = () => (foot.classList.contains("sn-asking") ? ask(false) : note.value.trim() ? ask(true) : closeDialog(dlg));
-    foot.querySelector("[data-keep]").addEventListener("click", () => ask(false));
-    foot.querySelector("[data-discard]").addEventListener("click", () => { closeDialog(dlg); note.value = ""; ask(false); });
-    dlg.querySelector("form").addEventListener("submit", () => closeDialog(dlg));
-  });
-  off = () => { done(); unsetup(); };
+const open = ref(false), note = ref(""), asking = ref(false);
+const noteEl = ref(null), keepBtn = ref(null);
+// 底栏两组按钮原地切换：问的时候焦点到"继续填写"，回去接着填时回到输入框
+watch(asking, async (on) => {
+  await nextTick();
+  (on ? keepBtn.value?.$el : noteEl.value)?.focus();
 });
-onBeforeUnmount(() => off());
+// Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关
+const guard = (close) => (asking.value ? (asking.value = false) : note.value.trim() ? (asking.value = true) : close());
+function discard() {
+  open.value = false;
+  note.value = "";
+  asking.value = false;
+}
 </script>
 
 <template>
-  <div ref="root">
-    <button type="button" class="sn-btn sn-secondary" data-dlg="dlg-note">写备注</button>
-    <dialog class="sn-dlg" id="dlg-note" aria-labelledby="dlg-note-t">
-      <form method="dialog">
-        <div class="sn-hd">
-          <div style="flex:1">
-            <h3 id="dlg-note-t">给第 3 场写备注</h3>
-          </div>
-        </div>
-        <div class="sn-bd">
-          <textarea class="sn-input" rows="3" aria-label="备注" placeholder="比如：雨再大一点，站台的灯偏冷"></textarea>
-        </div>
-        <div class="sn-ft sn-two">
-          <div class="sn-g sn-a">
-            <button type="button" class="sn-btn sn-ghost" data-cancel="">取消</button>
-            <button type="submit" class="sn-btn sn-primary">保存</button>
-          </div>
-          <div class="sn-g sn-b" inert>
-            <span>放弃填写的内容？</span>
-            <button type="button" class="sn-btn sn-ghost" data-keep="">继续填写</button>
-            <button type="button" class="sn-btn sn-danger-soft" data-discard="">放弃</button>
-          </div>
-        </div>
-      </form>
-    </dialog>
-  </div>
+  <Button @click="open = true">写备注</Button>
+  <Dialog v-model:open="open" title="给第 3 场写备注" :guard="guard" :footer-class="asking ? 'sn-two sn-asking' : 'sn-two'" @submit="open = false">
+    <textarea ref="noteEl" v-model="note" class="sn-input" rows="3" aria-label="备注" placeholder="比如：雨再大一点，站台的灯偏冷"></textarea>
+    <template #footer>
+      <div class="sn-g sn-a" :inert="asking"><Button variant="ghost" data-cancel>取消</Button><Button variant="primary" type="submit">保存</Button></div>
+      <div class="sn-g sn-b" :inert="!asking"><span>放弃填写的内容？</span><Button ref="keepBtn" variant="ghost" @click="asking = false">继续填写</Button><Button variant="danger-soft" @click="discard">放弃</Button></div>
+    </template>
+  </Dialog>
 </template>

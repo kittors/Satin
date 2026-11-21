@@ -358,7 +358,9 @@
         const end = a.effect?.getComputedTiming().endTime;
         if (!animKey.has(a)) { animKey.set(a, ++animN); const d = describeAnim(a); d.id = animN; d.frame = rec.frames.length; d.t = f.t; rec.anims.push(d); }
         // 无限循环的（转圈）只比动画本身，不逐帧记位置：旋转中的外框每帧都在变，取到哪一帧看运气
-        const tg = a.effect?.target; if (tg && a.playState === "running" && a.timeline === document.timeline && end !== Infinity) rec.watch.add(tg);
+        // 帧时钟接管的动画两帧之间是暂停的（playState 是 paused），也算在播：不然同一帧里帧时钟先跑、记录器后跑时这个元素就漏记了，
+        // 记不记取决于动画在第一帧还是不是 pending（真实时间），两次跑的结果会不一样（2026-11-21 改，改前改后的轨迹不混着比）
+        const tg = a.effect?.target; if (tg && (a.playState === "running" || P.isControlled?.(a)) && a.timeline === document.timeline && end !== Infinity) rec.watch.add(tg);
       }
       for (const el of rec.watch) { if (!el.isConnected) continue; const p = P.path(el), v = stateOf(el); if (rec.last.get(p) !== v) { f.s[p] = v; rec.last.set(p, v); } }
       for (const el of scrollers) { const p = P.path(el), v = Math.round(el.scrollTop) + "," + Math.round(el.scrollLeft); if (rec.last.get("sc:" + p) !== v) { f.sc[p] = v; rec.last.set("sc:" + p, v); } }

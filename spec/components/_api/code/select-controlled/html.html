@@ -1,0 +1,12 @@
+<div class="sn-stack sn-gap-8" id="ratio-controlled">
+  <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="9:16 · 竖屏" label="画面比例"></sn-select>
+  <span class="sn-help">当前：9:16 · 竖屏</span>
+</div>
+
+<script type="module">
+  const box = document.getElementById("ratio-controlled"), select = box.querySelector("sn-select");
+  box.addEventListener("sn-change", (e) => {
+    select.setAttribute("value", e.detail); // 自己保管值：改属性，组件跟着更新
+    box.querySelector(".sn-help").textContent = "当前：" + e.detail;
+  });
+</script>

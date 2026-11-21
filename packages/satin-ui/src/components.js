@@ -16,7 +16,7 @@ import { mountTagInput, mountStepper, mountPassword, mountEmail, mountSearch, mo
 import { numberFlow } from "./number.js";
 import { scrollArea } from "./scroll.js";
 import { mountProgress, toast, notify } from "./feedback.js";
-import { bindPickers } from "./picker.js";
+import { bindPickers, pickerHTML } from "./picker.js";
 import { mountInfiniteList } from "./list.js";
 import { mountPlayer, mountAudio, playerHTML, audioHTML } from "./media.js";
 import { openPopover, popoverOf, openDialog, closeDialog, openDrawer, closeDrawer, mountCmdk, openMenu, closeMenu } from "./overlay.js";
@@ -232,6 +232,8 @@ export const createProgressCard = /* @__PURE__ */ defineComponent({
 // ———— 日期、时间、定时、地址选择器（标记见展示页"选择器"） ————
 export const createPicker = /* @__PURE__ */ defineComponent({
   name: "picker",
+  // 给空容器：按 kind（date | range | time | datetime | region）、placeholder、label 渲染和设计稿一样的标记（React、Vue、Svelte 的 DatePicker 用它）
+  html: (o) => pickerHTML(o),
   // 选择器选好了值会在元素上发 pick（detail.text 是显示的文字），转成 onChange / sn-change
   // 只接 el 这一个（原来按父元素找，会把旁边的选择器也接上）；destroy 时撤掉标记，同一个元素可以再接一次
   mount(el, o, api) { bindPickers(el, { today: o.today, now: o.now }); el.addEventListener("pick", (e) => api.emit("change", e.detail)); return { destroy() { for (const h of [el, ...el.querySelectorAll("[data-pk]")]) delete h._pk; } }; },

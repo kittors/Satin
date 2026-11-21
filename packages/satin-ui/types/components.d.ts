@@ -76,7 +76,10 @@ export const createProgressCard: SatinFactory<{ onCancel?(): void; onOpen?(): vo
 /** 选择器选好值时的数据：text 是触发框里显示的文字（清除时是空字符串） */
 export interface PickDetail { text: string }
 /** 日期、时间、定时、地址选择器：在已有的 [data-pk] 标记上接交互。today / now 默认真实的今天、现在 */
-export interface PickerOptions { today?: Date; now?: Date; onChange?(detail: PickDetail): void }
+/** 选择器的种类：日期、日期范围、时间、定时发布（日期 + 时间）、省市区 */
+export type PickerKind = "date" | "range" | "time" | "datetime" | "region";
+/** kind、placeholder、label 给空容器渲染标记时用（createPicker.html）；today、now 固定"今天""现在"；onChange 拿到触发框里显示的文字 */
+export interface PickerOptions { kind?: PickerKind; placeholder?: string; label?: string; today?: Date; now?: Date; onChange?(detail: PickDetail): void }
 export const createPicker: SatinFactory<PickerOptions>;
 export const createUpload: SatinFactory<{ list?: HTMLElement; accept?: RegExp; maxSize?: number; /** 类型不对时那一行的提示 */ badType?: string; /** 超过 maxSize 时那一行的提示 */ tooBig?: string; upload?(file: File, progress: (p: number) => void): Promise<unknown> }, { add(files: FileList | File[]): void }>;
 export const createReorder: SatinFactory<{ row?: string; onReorder?(e: { from: number; to: number; row: HTMLElement }): void }>;

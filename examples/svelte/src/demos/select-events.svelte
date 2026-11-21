@@ -1,25 +1,12 @@
 <script>
-  import { onMount } from "svelte";
-  import { setup, enhance } from "satin-ui";
-  import { defineElements } from "satin-ui/elements";
-  defineElements();
+  import Select from "satin-ui/svelte/Select.svelte";
 
-  let root;
-  onMount(() => {
-    const unsetup = setup();
-    const off = enhance(root, (root) => {
-      const box = root.querySelector('[data-ex="ratio"]');
-      box.addEventListener("sn-change", (e) => {
-        box.querySelector("[data-out]").textContent = "当前：" + e.detail;
-      });
-    });
-    return () => { off(); unsetup(); };
-  });
+  const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+  let current = $state("16:9 · 横屏");
 </script>
 
-<div bind:this={root}>
-  <div class="sn-stack sn-gap-8" data-ex="ratio">
-    <sn-select items="[&quot;16:9 · 横屏&quot;,&quot;9:16 · 竖屏&quot;,&quot;1:1 · 方形&quot;]" value="16:9 · 横屏" label="画面比例"></sn-select>
-    <span class="sn-help" data-out="">当前：16:9 · 横屏</span>
-  </div>
+<div class="sn-stack sn-gap-8">
+  <!-- 只给 value：组件自己管选中；onchange 拿到选中的值 -->
+  <Select items={ratios} value="16:9 · 横屏" label="画面比例" onchange={(v) => (current = v)} />
+  <span class="sn-help">当前：{current}</span>
 </div>

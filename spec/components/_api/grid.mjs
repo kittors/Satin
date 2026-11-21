@@ -1,4 +1,6 @@
-// 数据表格（DOM 版，十万行）的 API 契约（手写）。格式见 spec/components/README.md；node scripts/spec/build.mjs 合并进 spec/components/grid.json
+// 数据表格（DOM 版，十万行）的 API 契约（手写）。格式见 spec/components/_api/README.md；node scripts/spec/build.mjs 合并进 spec/components/grid.json
+// 示例的 7 种写法在 code/<slug>/ 里（_code.mjs 读进来）
+import { code } from "./_code.mjs";
 export default {
   title: "数据表格",
   lead: "十万行的表格：只渲染看得见的行，筛选、排序在后台线程里做，能拖列、改列宽、拖行、编辑格子、合并单元格、切成树形。",
@@ -19,25 +21,33 @@ export default {
   ],
   import: {
     html: 'import { createDataGrid } from "satin-ui/grid";',
-    react: 'import { wrapSatin } from "satin-ui/react";\nimport { createDataGrid } from "satin-ui/grid";',
-    vue: 'import { wrapSatin } from "satin-ui/vue";\nimport { createDataGrid } from "satin-ui/grid";',
-    svelte: 'import { createDataGrid } from "satin-ui/grid";',
+    react: 'import { DataGrid } from "satin-ui/react/grid";',
+    vue: 'import { DataGrid } from "satin-ui/vue/grid";',
+    svelte: 'import DataGrid from "satin-ui/svelte/DataGrid.svelte";',
     angular: 'import { createDataGrid } from "satin-ui/grid";',
     solid: 'import { createDataGrid } from "satin-ui/grid";',
-    preact: 'import { createDataGrid } from "satin-ui/grid";',
+    preact: 'import { DataGrid } from "satin-ui/react/grid"; // @preact/preset-vite 默认把 react 指到 preact/compat',
   },
-  importNote: "重组件单独引入（satin-ui/grid），不拉进主入口。给一个空容器调 createDataGrid，卸载时 `destroy()`；React、Vue 里用 wrapSatin 包成组件，挂载、卸载都处理好了。",
-  dts: { factory: "createDataGrid", functions: ["mountDataGrid", "dataGridHTML"] },
+  importNote: {
+    react: "重组件单独引入，不拉进主入口：从子路径 `satin-ui/react/grid` 引 `DataGrid`；挂载、卸载（后台线程、`<head>` 里的样式）都处理好了，`rows`、`seed` 变了自己换一张新表。",
+    preact: "经 preact/compat 从 `satin-ui/react/grid` 引 `DataGrid`，用法和 React 一样。",
+    vue: "重组件单独引入，不拉进主入口：从子路径 `satin-ui/vue/grid` 引 `DataGrid`；`rows`、`seed` 变了自己换一张新表。",
+    svelte: "从 `satin-ui/svelte/DataGrid.svelte` 引；`rows`、`seed` 变了自己换一张新表。",
+    angular: "给一个空容器调 `createDataGrid(容器, { rows, seed })`（satin-ui/grid），组件销毁时 `destroy()`。",
+    solid: "给一个空容器调 `createDataGrid(容器, { rows, seed })`（satin-ui/grid），`onCleanup` 里 `destroy()`。",
+    html: "给一个空容器调 `createDataGrid(容器, { rows, seed })`（satin-ui/grid），不用了 `destroy()`。",
+  },
+  dts: { factory: "createDataGrid", functions: ["mountDataGrid", "dataGridHTML"], react: "DataGrid", vue: "DataGrid", svelte: "DataGrid" },
   props: [
     { name: "rows", type: "number", default: "100000", required: false,
-      desc: "行数。数据是内置的演示项目表，在后台线程里生成、筛选、排序，按 100 行一块懒加载。",
-      names: { js: "rows" } },
+      desc: "行数。数据是内置的演示项目表，在后台线程里生成、筛选、排序，按 100 行一块懒加载。只在创建时用：组件里变了会换一张新表，createDataGrid 要自己拆掉重建。",
+      names: { js: "rows", react: "rows", vue: "rows", svelte: "rows", preact: "rows" } },
     { name: "seed", type: "number", default: "11", required: false,
-      desc: "生成演示数据的种子：同一个种子每次生成一样的数据（截图、测试时固定它）。",
-      names: { js: "seed" } },
+      desc: "生成演示数据的种子：同一个种子每次生成一样的数据（截图、测试时固定它）。只在创建时用，和 rows 一样。",
+      names: { js: "seed", react: "seed", vue: "seed", svelte: "seed", preact: "seed" } },
     { name: "label", type: "string", default: '"数据表格，十万行"', required: false,
       desc: "表格的读屏名称（`role=\"grid\"` 的 `aria-label`）；给空容器、由组件自己渲染时用。",
-      names: { js: "label" } },
+      names: { js: "label", react: "label", vue: "label", svelte: "label", preact: "label" } },
   ],
   events: [],
   slots: [],
@@ -62,7 +72,7 @@ export default {
     { name: '.sn-g-vp[role="grid"] > .sn-g-head + .sn-g-body', desc: "滚动视口、表头、表体" },
     { name: '[data-lines="row | grid"]', desc: "只画行线 / 画网格（网格下才能合并单元格）" },
   ],
-  types: ["GridOptions"],
+  types: ["GridOptions", "DataGridProps"],
   keyboard: [
     { keys: "方向键 / Tab / Shift + Tab", does: "在格子间移动（单击也能选中一个格子）。" },
     { keys: "Home / End", does: "到这一行的第一格 / 最后一格；加 ⌘（Ctrl）到第一行 / 最后一行。" },
@@ -102,45 +112,17 @@ export default {
     ],
   },
   examples: [
-    { slug: "grid-basic", title: "基础用法", why: "给一个空容器就行：工具条、表头、表体都由 createDataGrid 填好，只渲染看得见的行；卸载时 `destroy()` 会撤掉后台线程和放进 `<head>` 的样式。",
-      html: `<div data-ex="grid"></div>`,
-      js: `import { createDataGrid } from "satin-ui/grid";
-
-const grid = createDataGrid(document.querySelector('[data-ex="grid"]'), { rows: 100000 });
-// 不用了（换页、卸载）记得：grid.destroy();
-void grid;` },
+    { slug: "grid-basic", title: "基础用法", why: "给一个空容器（或者放一个组件）就行：工具条、表头、表体都填好，只渲染看得见的行；卸载时撤掉后台线程和放进 `<head>` 的样式。",
+      html: `<div id="shots-grid"></div>`, code: code("grid-basic") },
     { slug: "grid-seed", title: "固定数据：行数和种子", why: "截图、自动化测试要每次一样的数据：固定 seed；行数少一点载得更快。",
-      html: `<div data-ex="grid2"></div>`,
-      js: `import { createDataGrid } from "satin-ui/grid";
-
-createDataGrid(document.querySelector('[data-ex="grid2"]'), { rows: 2000, seed: 7, label: "镜头清单，2000 行" });` },
-    { slug: "grid-component", title: "在 React、Vue 里包成组件", why: "wrapSatin 把 createDataGrid 包成组件：属性就是选项，挂载、卸载（后台线程、样式）都处理好了。包一次，放在组件外面。",
-      html: `<div data-ex="grid3"></div>`,
-      js: `import { createDataGrid } from "satin-ui/grid";
-
-createDataGrid(document.querySelector('[data-ex="grid3"]'), { rows: 100000, seed: 11 });`,
-      code: {
-        react: `import { wrapSatin } from "satin-ui/react";
-import { createDataGrid } from "satin-ui/grid";
-
-// 包一次，放在组件外面
-const DataGrid = wrapSatin(createDataGrid, { events: [] });
-
-export default function Shots() {
-  return <DataGrid rows={100000} seed={11} />;
-}`,
-        vue: `<script>
-import { wrapSatin } from "satin-ui/vue";
-import { createDataGrid } from "satin-ui/grid";
-
-// 包一次，放在模块里（不放进 setup，免得每次挂载都包一遍）
-const SnDataGrid = wrapSatin(createDataGrid, { name: "SnDataGrid", props: ["rows", "seed", "label"], events: [] });
-export default { components: { SnDataGrid } };
-</script>
-
-<template>
-  <SnDataGrid :rows="100000" :seed="11" />
-</template>`,
-      } },
+      html: `<div id="shots-grid-7"></div>`, code: code("grid-seed") },
+    { slug: "grid-component", title: "换一批数据：rows、seed 变了换一张新表", why: "rows、seed 只在创建时用（数据在后台线程里按它们生成）。React、Vue、Svelte 的 DataGrid 变了自己换一张新表；直接用 createDataGrid 时拆掉旧表（`destroy()`）、建一张新的。",
+      html: `<div class="sn-stack sn-gap-8">
+  <div class="sn-row">
+    <button type="button" class="sn-btn sn-secondary sn-sm" id="reseed">换一批数据</button>
+    <span class="sn-help" id="reseed-out">种子 11</span>
+  </div>
+  <div id="reseed-grid"></div>
+</div>`, code: code("grid-component") },
   ],
 };

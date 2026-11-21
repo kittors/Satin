@@ -1,24 +1,8 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { setup, enhance } from "satin-ui";
-import { createDataGrid } from "satin-ui/grid";
-
-const root = ref(null);
-let off = () => {};
-onMounted(() => {
-  const unsetup = setup();
-  const done = enhance(root.value, (root) => {
-    const grid = createDataGrid(root.querySelector('[data-ex="grid"]'), { rows: 100000 });
-    // 不用了（换页、卸载）记得：grid.destroy();
-    void grid;
-  });
-  off = () => { done(); unsetup(); };
-});
-onBeforeUnmount(() => off());
+import { DataGrid } from "satin-ui/vue/grid";
 </script>
 
 <template>
-  <div ref="root">
-    <div data-ex="grid"></div>
-  </div>
+  <!-- 工具条、表头、表体都由组件填好，只渲染看得见的行；卸载时撤掉后台线程和放进 <head> 的样式 -->
+  <DataGrid :rows="100000" />
 </template>

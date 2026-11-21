@@ -1,23 +1,19 @@
-import { useEffect, useRef } from "preact/hooks";
-import { setup, enhance } from "satin-ui";
+import { Button, Icon } from "satin-ui/react";
 
-export default function SelectMenu() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup();
-    const off = enhance(ref.current);
-    return () => { off(); unsetup(); };
-  }, []);
+const SORTS = ["最近更新", "名称", "创建时间"];
+
+// 菜单按钮：标记照设计稿写，<sn-enhance> 接上交互（选了就收起，按钮文字换成 前缀 + 选中项）
+export default function SortMenu() {
   return (
-    <div ref={ref}>
+    <sn-enhance>
       <div class="sn-select">
-        <button type="button" class="sn-btn sn-secondary" data-menubtn="" data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
+        <Button data-menubtn="" data-prefix="排序：">排序：最近更新<Icon name="chevron-down" class="sn-caret" /></Button>
         <div class="sn-menu" role="menu">
-          <div class="sn-item sn-sel" data-i="check:chk">最近更新</div>
-          <div class="sn-item" data-i="check:chk">名称</div>
-          <div class="sn-item" data-i="check:chk">创建时间</div>
+          {SORTS.map((s, i) => (
+            <div key={s} class={i === 0 ? "sn-item sn-sel" : "sn-item"}>{s}<span class="sn-chk"><Icon name="check" /></span></div>
+          ))}
         </div>
       </div>
-    </div>
+    </sn-enhance>
   );
 }

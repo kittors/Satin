@@ -2,7 +2,8 @@
 // · createXxx 的选项（或 dts.options 写的选项接口）↔ 契约里 names.js 的属性 + names.js 的事件（onXxx）：名字、类型、是否可选
 // · createXxx 返回的实例（SatinFactory 的第二个类型参数）↔ 契约的 methods：名字、签名
 // · dts.functions 里的函数 ↔ 契约的 functions：签名
-// · React 组件的属性（react.d.ts）↔ 契约 names.react（属性、事件、子元素）；Vue 组件的属性（vue.d.ts）↔ names.vue（v-model 算 modelValue）
+// · React 组件的属性（react.d.ts，重组件在 react-<子路径>.d.ts）↔ 契约 names.react（属性、事件、子元素）；Vue 组件的属性（vue.d.ts、vue-<子路径>.d.ts）↔ names.vue（v-model 算 modelValue）
+// · Svelte 组件的属性（svelte.d.ts、svelte-<名字>.d.ts 里的 Component<属性>）↔ names.svelte（属性、事件、片段；bind:value 算 value）
 // · 自定义元素 <sn-xxx> 能写的属性（elements/index.js）↔ names.element
 // · 上面这些声明用到的、我们导出的类型（顺着引用一路找下去）↔ 契约的 types
 // 多了、少了都报错。没填契约的组件列为"未填"，不算失败；合并出来的 JSON 和 _api 源文件对不上（忘了重跑生成）也报错。
@@ -74,6 +75,8 @@ function fromRef(name, args, file, refs, seen) {
     if (tail === "DefineComponent" || tail === "ForwardRefExoticComponent") return membersOf(args[0], file, refs, seen); // 组件的外壳：看它的属性类型
     if (name.startsWith("React.") || name.startsWith("import(")) return out; // 框架自带的（原生属性、ref）
     if (tail === "Base" || tail === "Ref") return out; // react.d.ts 里所有组件都有的 className、style、id
+    if (/^svelte/.test(file) && (tail === "Attrs" || tail === "Inst")) return out; // svelte.d.ts 里所有组件都有的 class、style、id、data-*、bind:instance
+    if (tail === "Component" && /^svelte/.test(file)) return membersOf(args[0], file, refs, seen); // Svelte 组件的外壳 Component<属性, 导出, 能绑定的>：看属性
     if (tail === "Controlled") {
       const k = args[1] && ts.isLiteralTypeNode(args[1]) ? args[1].literal.text : "value", text = args[0]?.getText() ?? "unknown";
       collectRefs(args[0], file, refs, seen);
@@ -131,6 +134,9 @@ const ident = (s) => /^[A-Za-z_$][\w$]*$/.test(s);
 const tokens = (s) => String(s ?? "").split("/").map((x) => lead(x).trim()).filter(Boolean);
 const reactNames = (s) => tokens(s).filter(ident);
 const vueNames = (s) => tokens(s).map((x) => (x === "v-model" ? "modelValue" : x.startsWith("v-model:") ? x.slice(8) : x)).filter(ident);
+const svelteNames = (s) => tokens(s).map((x) => (x.startsWith("bind:") ? x.slice(5) : x)).filter(ident);
+// 组件声明在哪个文件：先找主入口的（react.d.ts），再找子路径的（react-grid.d.ts……）
+const findIn = (prefix, name) => { for (const f of [prefix + ".d.ts", ...Object.keys(files).filter((x) => x.startsWith(prefix + "-")).sort()]) { const d = files[f]?.decls.get(name); if (d) return [d, f]; } return [null, null]; };
 const elNames = (s) => tokens(s).filter((x) => /^[a-z][\w-]*$/.test(x));
 const diffSets = (want, have, label, out) => {
   const a = [...want].filter((x) => !have.has(x)), b = [...have].filter((x) => !want.has(x));
@@ -206,13 +212,13 @@ for (const id of ids) {
   }
   // 4. React 组件
   if (dts.react) {
-    const d = files["react.d.ts"].decls.get(dts.react);
+    const [d, rf] = findIn("react", dts.react);
     let pNode = null;
     if (d?.kind === "const" && d.node.type) pNode = d.node.type;
     else if (d?.kind === "fn") pNode = d.node.parameters[0]?.type;
-    if (!pNode) errs.push(`react.d.ts 里找不到组件 ${dts.react}`);
+    if (!pNode) errs.push(`react.d.ts（和 react-*.d.ts）里找不到组件 ${dts.react}`);
     else {
-      const m = membersOf(pNode, "react.d.ts", refs);
+      const m = membersOf(pNode, rf, refs);
       const want = new Set([
         ...props.filter((p) => !(p.native || []).includes("react")).flatMap((p) => reactNames(p.names?.react)),
         ...events.filter((e) => !e.native && !e.markupOnly).flatMap((e) => reactNames(e.names?.react)),
@@ -224,12 +230,26 @@ for (const id of ids) {
   }
   // 5. Vue 组件
   if (dts.vue) {
-    const d = files["vue.d.ts"].decls.get(dts.vue);
-    if (!d?.node.type) errs.push(`vue.d.ts 里找不到组件 ${dts.vue}`);
+    const [d, vf] = findIn("vue", dts.vue);
+    if (!d?.node.type) errs.push(`vue.d.ts（和 vue-*.d.ts）里找不到组件 ${dts.vue}`);
     else {
-      const m = membersOf(d.node.type, "vue.d.ts", refs);
+      const m = membersOf(d.node.type, vf, refs);
       const want = new Set(props.flatMap((p) => vueNames(p.names?.vue)));
       diffSets(want, new Set(m.keys()), `Vue ${dts.vue} 的属性`, errs);
+    }
+  }
+  // 5b. Svelte 组件
+  if (dts.svelte) {
+    const [d, sf] = findIn("svelte", dts.svelte);
+    if (!d?.node.type) errs.push(`svelte.d.ts（和 svelte-*.d.ts）里找不到组件 ${dts.svelte}`);
+    else {
+      const m = membersOf(d.node.type, sf, refs);
+      const want = new Set([
+        ...props.filter((p) => !(p.native || []).includes("svelte")).flatMap((p) => svelteNames(p.names?.svelte)),
+        ...events.filter((e) => !e.native && !e.markupOnly).flatMap((e) => svelteNames(e.names?.svelte)),
+        ...slots.filter((x) => !(x.native || []).includes("svelte")).flatMap((x) => svelteNames(x.names?.svelte)),
+      ]);
+      diffSets(want, new Set(m.keys()), `Svelte ${dts.svelte} 的属性`, errs);
     }
   }
   // 6. 自定义元素
@@ -243,7 +263,7 @@ for (const id of ids) {
   for (const t of c.types || []) if (!EXPORTED_TYPES.has(t)) errs.push(`导出的类型 ${t} 在 .d.ts 里没有导出`);
 
   if (errs.length) { bad++; console.log(`✗ ${id}`); for (const e of errs) console.log(`    ${e}`); }
-  else console.log(`✓ ${id}：选项、实例方法、函数、${[dts.react && "React", dts.vue && "Vue", dts.element && "自定义元素"].filter(Boolean).join("、") || "（没有框架组件）"}、类型都和 .d.ts 一致`);
+  else console.log(`✓ ${id}：选项、实例方法、函数、${[dts.react && "React", dts.vue && "Vue", dts.svelte && "Svelte", dts.element && "自定义元素"].filter(Boolean).join("、") || "（没有框架组件）"}、类型都和 .d.ts 一致`);
 }
 if (!ONLY) console.log(`未填契约（不算失败）：${unfilled.length} 个`);
 console.log(bad ? `契约 ↔ 类型：${bad} 个组件对不上（共填了 ${filled.length} 个）` : `契约 ↔ 类型：填了契约的 ${filled.length} 个组件全部一致`);

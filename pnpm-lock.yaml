@@ -386,11 +386,16 @@ importers:
         specifier: latest
         version: 8.3.8(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.108.2)(sass@1.108.2)(terser@5.51.2)
 
+  packages/satin-cli: {}
+
   packages/satin-ui:
     dependencies:
       react:
         specifier: '>=18'
         version: 19.3.1
+      svelte:
+        specifier: '>=5.20'
+        version: 5.58.0
       vue:
         specifier: '>=3.3'
         version: 3.5.45(typescript@5.9.3)

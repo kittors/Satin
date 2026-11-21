@@ -10,6 +10,8 @@ const ENTER = "cubic-bezier(.25,.1,.25,1)", EASE_IN = "cubic-bezier(.42,0,1,1)",
 const RING = 2 * Math.PI * 6.5;
 // 文案转成 HTML：文件名包进 .sn-fname，不让中英文自动留空插到"第三集.mp4"中间
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+// 通知里按钮的外观：variant 写 "secondary"、"ghost"……（和 <Button variant> 一样），类名加上 sn- 前缀（已经带了就不再加）
+const btnVariant = (v = "secondary") => (v.startsWith("sn-") ? v : "sn-" + v);
 export const fmt = (s) => esc(s).replace(/[^\s&;·，。"]+\.[a-z][a-z0-9]{1,4}\b/gi, (m) => `<span class="sn-fname">${m}</span>`);
 const ringSVG =() => `<svg class="sn-ring" viewBox="0 0 16 16" aria-hidden="true"><circle class="sn-track" cx="8" cy="8" r="6.5"/><circle class="sn-left" cx="8" cy="8" r="6.5" style="stroke-dasharray:${RING};stroke-dashoffset:0"/></svg>`;
 let host = null, z = 0;
@@ -163,7 +165,7 @@ export function notify(o = {}) {
   const host = notifHost(), time = o.time ?? new Date().toTimeString().slice(0, 5);
   const c = document.createElement("div"); c.className = "sn-notif"; c.setAttribute("role", o.tone === "bad" ? "alert" : "status");
   c.innerHTML = `<button class="sn-x" aria-label="${tt("feedback.1")}"></button><span class="sn-src ${o.tone ? "sn-" + o.tone : ""}">${o.icon ? icon(o.icon, 16) : ""}</span><div class="sn-top"><h5>${esc(o.title || "")}</h5><time>${esc(time)}</time></div>${o.body ? `<p>${fmt(o.body)}</p>` : ""}`
-    + (o.actions?.length ? `<div class="sn-acts">${o.actions.map((a, i) => `<button class="sn-btn ${a.variant || "sn-secondary"} sn-sm" data-k="${i}">${esc(a.label)}</button>`).join("")}</div>` : "");
+    + (o.actions?.length ? `<div class="sn-acts">${o.actions.map((a, i) => `<button class="sn-btn ${btnVariant(a.variant)} sn-sm" data-k="${i}">${esc(a.label)}</button>`).join("")}</div>` : "");
   c.querySelector(".sn-x").innerHTML = icon("x", 14);
   host.append(c); nCards.unshift(c);
   c.style.transition = "none"; c.style.transform = "translateY(-56px)"; c.style.opacity = "0"; void c.offsetWidth; c.style.transition = ""; c.style.opacity = "";

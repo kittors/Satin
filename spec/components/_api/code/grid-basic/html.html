@@ -1,0 +1,9 @@
+<div id="shots-grid"></div>
+
+<script type="module">
+  import { createDataGrid } from "satin-ui/grid";
+
+  // 给一个空容器：工具条、表头、表体都由 createDataGrid 填好，只渲染看得见的行
+  const grid = createDataGrid(document.getElementById("shots-grid"), { rows: 100000 });
+  // 不用了（单页应用换页时）调 grid.destroy()：撤掉后台线程和放进 <head> 的样式
+</script>

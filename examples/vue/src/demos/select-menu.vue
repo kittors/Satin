@@ -1,25 +1,16 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { setup, enhance } from "satin-ui";
+import { Button, Icon, vEnhance } from "satin-ui/vue";
 
-const root = ref(null);
-let off = () => {};
-onMounted(() => {
-  const unsetup = setup();
-  const done = enhance(root.value);
-  off = () => { done(); unsetup(); };
-});
-onBeforeUnmount(() => off());
+const sorts = ["最近更新", "名称", "创建时间"];
 </script>
 
 <template>
-  <div ref="root">
+  <!-- 菜单按钮：标记照设计稿写，v-enhance 接上交互（选了就收起，按钮文字换成 前缀 + 选中项） -->
+  <div v-enhance>
     <div class="sn-select">
-      <button type="button" class="sn-btn sn-secondary" data-menubtn="" data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
+      <Button data-menubtn data-prefix="排序：">排序：最近更新<Icon name="chevron-down" class="sn-caret" /></Button>
       <div class="sn-menu" role="menu">
-        <div class="sn-item sn-sel" data-i="check:chk">最近更新</div>
-        <div class="sn-item" data-i="check:chk">名称</div>
-        <div class="sn-item" data-i="check:chk">创建时间</div>
+        <div v-for="(s, i) in sorts" :key="s" :class="['sn-item', { 'sn-sel': i === 0 }]">{{ s }}<span class="sn-chk"><Icon name="check" /></span></div>
       </div>
     </div>
   </div>

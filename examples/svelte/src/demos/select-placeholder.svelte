@@ -1,17 +1,8 @@
 <script>
-  import { onMount } from "svelte";
-  import { setup, enhance } from "satin-ui";
-  import { defineElements } from "satin-ui/elements";
-  defineElements();
+  import Select from "satin-ui/svelte/Select.svelte";
 
-  let root;
-  onMount(() => {
-    const unsetup = setup();
-    const off = enhance(root);
-    return () => { off(); unsetup(); };
-  });
+  const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
+  let ratio = $state();
 </script>
 
-<div bind:this={root}>
-  <sn-select items="[&quot;16:9 · 横屏&quot;,&quot;9:16 · 竖屏&quot;,&quot;1:1 · 方形&quot;]" placeholder="选择画面比例" label="画面比例"></sn-select>
-</div>
+<Select items={ratios} bind:value={ratio} placeholder="选择画面比例" label="画面比例" />

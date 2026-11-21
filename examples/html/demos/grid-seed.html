@@ -1,12 +1,9 @@
-<sn-enhance id="demo-grid-seed">
-  <div data-ex="grid2"></div>
-</sn-enhance>
+<div id="shots-grid-7"></div>
 
 <script type="module">
-  import { defineElements } from "satin-ui/elements";
   import { createDataGrid } from "satin-ui/grid";
 
-  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
-  const root = document.getElementById("demo-grid-seed");
-  createDataGrid(root.querySelector('[data-ex="grid2"]'), { rows: 2000, seed: 7, label: "镜头清单，2000 行" });
+  // 同一个 seed 每次生成一样的数据（截图、自动化测试用）；行数少一点载得更快
+  const grid = createDataGrid(document.getElementById("shots-grid-7"), { rows: 2000, seed: 7, label: "镜头清单，2000 行" });
+  // 不用了（单页应用换页时）调 grid.destroy()：撤掉后台线程和放进 <head> 的样式
 </script>

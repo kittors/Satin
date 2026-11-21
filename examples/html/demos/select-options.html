@@ -1,9 +1,1 @@
-<sn-enhance id="demo-select-options">
-  <sn-select items="[{&quot;value&quot;:&quot;draft&quot;,&quot;label&quot;:&quot;草稿&quot;},{&quot;value&quot;:&quot;review&quot;,&quot;label&quot;:&quot;待审核&quot;},{&quot;value&quot;:&quot;done&quot;,&quot;label&quot;:&quot;已完成&quot;,&quot;disabled&quot;:true}]" value="draft" label="状态"></sn-select>
-</sn-enhance>
-
-<script type="module">
-  import { defineElements } from "satin-ui/elements";
-
-  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
-</script>
+<sn-select items='[{"value":"draft","label":"草稿"},{"value":"review","label":"待审核"},{"value":"done","label":"已完成","disabled":true}]' value="draft" label="状态"></sn-select>

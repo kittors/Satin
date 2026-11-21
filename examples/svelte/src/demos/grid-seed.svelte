@@ -1,18 +1,6 @@
 <script>
-  import { onMount } from "svelte";
-  import { setup, enhance } from "satin-ui";
-  import { createDataGrid } from "satin-ui/grid";
-
-  let root;
-  onMount(() => {
-    const unsetup = setup();
-    const off = enhance(root, (root) => {
-      createDataGrid(root.querySelector('[data-ex="grid2"]'), { rows: 2000, seed: 7, label: "镜头清单，2000 行" });
-    });
-    return () => { off(); unsetup(); };
-  });
+  import DataGrid from "satin-ui/svelte/DataGrid.svelte";
 </script>
 
-<div bind:this={root}>
-  <div data-ex="grid2"></div>
-</div>
+<!-- 同一个 seed 每次生成一样的数据（截图、自动化测试用）；行数少一点载得更快 -->
+<DataGrid rows={2000} seed={7} label="镜头清单，2000 行" />

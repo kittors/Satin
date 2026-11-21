@@ -187,6 +187,8 @@ const FWR = [];
 const fwr = (fn) => `<div class="d-fwr" data-fwr="${FWR.push(fn) - 1}">${fn()}</div>`;
 // 各框架里的叫法：Next.js 看 React、Nuxt 看 Vue；"自定义元素"那一列给 Svelte、Angular、Solid、Preact、纯 HTML 兜底
 const nameKey = () => { const e = getEnv()?.id; return e === "next" ? "react" : e === "nuxt" ? "vue" : getFw().id; };
+// 说明文字按框架分：契约里的文字可以写成 { react, vue, svelte, angular, solid, preact, html, default }，只显示当前框架那一句（没写的框架用 default）
+const fwText = (t) => (t && typeof t === "object" && !Array.isArray(t) ? t[nameKey()] ?? t[getFw().id] ?? t.default ?? "" : t || "");
 const nameOf = (x) => { const n = x.names || {}, k = nameKey(); return n[k] ?? (["svelte", "angular", "solid", "preact", "html"].includes(k) ? n.element ?? n.html : undefined) ?? n.js ?? x.name; };
 // 一个演示 / 配方在当前框架下的文件；这个框架还没有对应写法时明说，给自定义元素写法（纯 HTML 那份），不悄悄换成别的框架
 async function codeFiles(kind, key) {
@@ -238,7 +240,8 @@ function variantFiles(c, doc, n) {
   return { html: [...html, ...cssFile], react: [...v.react, ...extra], vue: [...v.vue, ...extra], element: [...v.html, ...extra], all: v, extra, markup, js, css };
 }
 // 给 scripts/examples/gallery.mjs 用：这一页每个演示（等演示载好、按真实排版判断空白以后）7 种写法的文件
-window.__satinDemoFiles = () => $$(".dx", main).filter((box) => box.querySelector(".dx-code")).map((box) => {
+// 设计稿里的演示（有契约的组件页上"完整演示"那几块不带代码面板，也要算；契约示例的框 data-play 另外按契约生成，不算在这里）
+window.__satinDemoFiles = () => $$(".dx[data-demo]", main).filter((box) => !box.dataset.play).map((box) => {
   const c = cat.byId[box.dataset.demo], n = box.dataset.n != null ? +box.dataset.n : 0, f = box.querySelector("iframe");
   let doc = null; try { doc = f.contentDocument; } catch {}
   const ready = !!(doc && doc.__dx), fs = variantFiles(c, ready ? doc : null, n);
@@ -627,7 +630,7 @@ function contractHTML(c, k) {
   if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">什么时候别用</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${x.use && cat.byId[x.use] ? ` → <a href="#/c/${x.use}">${esc(cat.byId[x.use].name)}</a>` : ""}</li>`).join("")}</ul>`);
   if (k.related?.length) out.push(`<h3 class="d-h3">和相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [cat.byId[r.id] ? `<a href="#/c/${r.id}">${esc(cat.byId[r.id].name)}</a>` : esc(r.id), md(r.diff)])));
   // 2. 引入（当前框架）
-  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return snippet("js", line, `${getFw().name}${getEnv() ? " · " + getEnv().name : ""}`); }), k.importNote ? `<p>${md(k.importNote)}</p>` : "");
+  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return snippet("js", line, `${getFw().name}${getEnv() ? " · " + getEnv().name : ""}`); }), k.importNote ? fwr(() => { const t = fwText(k.importNote); return t ? `<p>${md(t)}</p>` : ""; }) : "");
   // 3. 示例：由浅入深，每个都是现场演示 + 当前框架的代码
   out.push(anchor("examples", "示例"));
   for (const ex of k.examples || []) out.push(`<h3 class="d-h3" id="ex-${ex.slug}">${esc(ex.title)}</h3>`, ex.why ? `<p>${md(ex.why)}</p>` : "", playBox(c, ex));

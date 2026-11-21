@@ -1,20 +1,12 @@
-import { onSettled, onCleanup } from "solid-js";
-import { setup, enhance } from "satin-ui";
+import { onSettled } from "solid-js";
 import { createDataGrid } from "satin-ui/grid";
 
-export default function GridSeed() {
-  let root, off = () => {};
+export default function ShotListFixture() {
+  let host;
+  // 挂上以后建表格（工具条、表头、表体都由 createDataGrid 填好）；卸载时撤掉后台线程和放进 <head> 的样式
   onSettled(() => {
-    const unsetup = setup();
-    const done = enhance(root, (root) => {
-      createDataGrid(root.querySelector('[data-ex="grid2"]'), { rows: 2000, seed: 7, label: "镜头清单，2000 行" });
-    });
-    off = () => { done(); unsetup(); };
+    const grid = createDataGrid(host, { rows: 2000, seed: 7, label: "镜头清单，2000 行" });
+    return () => grid.destroy();
   });
-  onCleanup(() => off());
-  return (
-    <div ref={(el) => (root = el)}>
-      <div data-ex="grid2"></div>
-    </div>
-  );
+  return <div ref={(el) => (host = el)}></div>;
 }

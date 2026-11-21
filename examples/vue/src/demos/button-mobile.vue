@@ -1,22 +1,10 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { setup, enhance } from "satin-ui";
-
-const root = ref(null);
-let off = () => {};
-onMounted(() => {
-  const unsetup = setup();
-  const done = enhance(root.value);
-  off = () => { done(); unsetup(); };
-});
-onBeforeUnmount(() => off());
+import { Button } from "satin-ui/vue";
 </script>
 
 <template>
-  <div ref="root">
-    <div class="sn-bottom-bar">
-      <span class="sn-grow sn-num">合计 ¥ 1,280</span>
-      <button type="button" class="sn-btn sn-primary sn-lg">提交订单</button>
-    </div>
+  <div class="sn-bottom-bar">
+    <span class="sn-grow sn-num">合计 ¥ 1,280</span>
+    <Button variant="primary" size="lg">提交订单</Button>
   </div>
 </template>

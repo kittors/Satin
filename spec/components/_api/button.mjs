@@ -1,4 +1,6 @@
-// 按钮的 API 契约（手写）。格式见 spec/components/README.md；node scripts/spec/build.mjs 合并进 spec/components/button.json
+// 按钮的 API 契约（手写）。格式见 spec/components/_api/README.md；node scripts/spec/build.mjs 合并进 spec/components/button.json
+// 示例的 7 种写法在 code/<slug>/ 里（_code.mjs 读进来）
+import { code } from "./_code.mjs";
 const TICK = '<svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>';
 
 export default {
@@ -7,7 +9,7 @@ export default {
   whenToUse: [
     "点了就执行的动作：保存修改、新建项目、导出成片。",
     "一个区域里最重要的那一个动作用主按钮（primary），其余用次按钮、浅底按钮或幽灵按钮。",
-    "要等结果的动作（发请求）：用 `busy()` 显示等待，完成后用 `succeed()` 原地打勾。",
+    "要等结果的动作（发请求）：React、Vue 改 `loading`、`done` 两个属性；其余写法用 `busy()` 显示等待、`succeed()` 原地打勾。",
   ],
   whenNotToUse: [
     { text: "去别的页面、打开一个地址：用链接（`<a>`），不要用按钮。", use: "link" },
@@ -21,63 +23,75 @@ export default {
     { id: "chip", diff: "芯片是能选中、能取消的筛选条件，不是一次性的动作。" },
   ],
   import: {
-    html: 'import { setup, enhance, busy, succeed } from "satin-ui";',
+    html: 'import { busy, succeed } from "satin-ui"; // 只有"等待 → 成功"要用；按钮本身写类名 sn-btn',
     react: 'import { Button } from "satin-ui/react";',
-    vue: 'import { Button as SnButton } from "satin-ui/vue";',
-    svelte: 'import { setup, enhance, busy, succeed } from "satin-ui";',
-    angular: 'import { setup, enhance, busy, succeed } from "satin-ui";',
-    solid: 'import { setup, enhance, busy, succeed } from "satin-ui";',
-    preact: 'import { setup, enhance, busy, succeed } from "satin-ui";',
+    vue: 'import { Button } from "satin-ui/vue"; // 入口里 app.use(Satin) 以后也可以不引，直接写 <SnButton>',
+    svelte: 'import Icon from "satin-ui/svelte/Icon.svelte"; // 按钮写类名 sn-btn；等待 → 成功用 satin-ui 的 busy()、succeed()',
+    angular: 'import { busy, succeed } from "satin-ui"; // 按钮写类名 sn-btn；带图标的包一层 <sn-enhance>（组件加 CUSTOM_ELEMENTS_SCHEMA）',
+    solid: 'import { busy, succeed } from "satin-ui"; // 按钮写类名 sn-btn；带图标的包一层 <sn-enhance>',
+    preact: 'import { Button } from "satin-ui/react"; // @preact/preset-vite 默认把 react 指到 preact/compat',
   },
-  importNote: "React、Vue 用组件；其余框架和纯 HTML 直接写 `<button class=\"sn-btn\">`，样式在 page.css 里，图标和 Tooltip 由 `setup()` + `enhance()` 接上，等待、成功用 `busy()`、`succeed()`。",
+  importNote: {
+    react: "`Button` 组件：`variant`、`size`、`icon`、`loading`、`done` 都是属性，`onClick` 照常写；原生 `<button>` 的属性（`type`、`aria-label`……）也能直接写。",
+    preact: "经 preact/compat 用 `satin-ui/react` 的 `Button` 组件，属性和 React 一样：`variant`、`size`、`icon`、`loading`、`done`、`onClick`。",
+    vue: "`Button` 组件（`app.use(Satin)` 以后也能直接写 `<SnButton>`）：`variant`、`size`、`icon`、`loading`、`done` 都是属性，事件用 `@click`。",
+    svelte: "直接写 `<button type=\"button\" class=\"sn-btn sn-primary\">`（样式在 page.css 里），图标用 `<Icon name>`；要等结果的动作调 `busy(按钮, 请求)`，成功后 `succeed(按钮)`。",
+    angular: "直接写 `<button type=\"button\" class=\"sn-btn sn-primary\">`（样式在 page.css 里），图标写 `data-i`、外面包一层 `<sn-enhance>`（组件加 `CUSTOM_ELEMENTS_SCHEMA`）；要等结果的动作调 `busy()`、`succeed()`。",
+    solid: "直接写 `<button type=\"button\" class=\"sn-btn sn-primary\">`（样式在 page.css 里），图标写 `data-i`、外面包一层 `<sn-enhance>`；要等结果的动作调 `busy()`、`succeed()`。",
+    html: "直接写 `<button type=\"button\" class=\"sn-btn sn-primary\">`（样式在 page.css 里），图标写 `data-i`、外面包一层 `<sn-enhance>`；要等结果的动作调 `busy(按钮, 请求)`，成功后 `succeed(按钮)`。",
+  },
   dts: { options: "ButtonHTMLOptions", functions: ["buttonHTML", "busy", "succeed", "prepBusy"], react: "Button", vue: "Button" },
   props: [
     { name: "variant", type: '"primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"', default: '"secondary"', required: false,
       desc: "外观，由强到弱：primary 主按钮（一个区域只放一个）、secondary 次按钮、tertiary 浅底、ghost 只有文字（悬停才有底色）、danger 删除这类不能撤销的动作、danger-soft 危险但不是这一屏的主操作。",
       example: 'variant="primary"',
-      names: { js: "variant", react: "variant", vue: "variant", markup: "类名 sn-primary / sn-secondary / sn-tertiary / sn-ghost / sn-danger / sn-danger-soft" } },
+      names: { js: "variant", react: "variant", vue: "variant", preact: "variant", markup: "类名 sn-primary / sn-secondary / sn-tertiary / sn-ghost / sn-danger / sn-danger-soft", html: "类名 sn-primary / sn-secondary / sn-tertiary / sn-ghost / sn-danger / sn-danger-soft" } },
     { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', required: false,
       desc: "高度 28 / 32 / 40。sm 用在表格行和工具条；lg 用在登录页和手机上的主操作。",
-      names: { js: "size", react: "size", vue: "size", markup: "类名 sn-sm / sn-lg（md 不用写）" } },
+      names: { js: "size", react: "size", vue: "size", preact: "size", markup: "类名 sn-sm / sn-lg（md 不用写）", html: "类名 sn-sm / sn-lg（md 不用写）" } },
     { name: "icon", type: "string", default: "—", required: false,
       desc: "图标名（satin-ui/icons 里的名字），放在文字前面；没有文字时就是纯图标按钮，这时一定要写 tip。",
       example: 'icon="plus"',
-      names: { js: "icon", react: "icon", vue: "icon", markup: 'data-i="plus:before"（enhance() 换成图标）' } },
+      names: { js: "icon", react: "icon", vue: "icon", preact: "icon", svelte: "文字前面放 <Icon name>", markup: 'data-i="plus:before"（enhance() 换成图标）', html: 'data-i="plus:before"（<sn-enhance> 换成图标）' } },
     { name: "iconAfter", type: "string", default: "—", required: false,
-      desc: "放在文字后面的图标，比如\"下一步 →\"；悬停时往右挪 2px。React、Vue 里把 `<Icon class=\"sn-after\">` 写进子元素。",
-      names: { js: "iconAfter", markup: 'data-i="arrow-right:after"' } },
+      desc: "放在文字后面的图标，比如\"下一步 →\"；悬停时往右挪 2px。",
+      example: 'iconAfter="arrow-right"',
+      names: { js: "iconAfter", react: "iconAfter", vue: "iconAfter（模板里写 icon-after）", preact: "iconAfter", svelte: '文字后面放 <Icon name class="sn-after">', markup: 'data-i="arrow-right:after"', html: 'data-i="arrow-right:after"' } },
     { name: "round", type: "boolean", default: "false", required: false,
       desc: "圆形，配合纯图标按钮用。",
-      names: { js: "round", react: "round", vue: "round", markup: "类名 sn-round" } },
+      names: { js: "round", react: "round", vue: "round", preact: "round", markup: "类名 sn-round", html: "类名 sn-round" } },
     { name: "selected", type: "boolean", default: "false", required: false,
       desc: "选中态，给切换型的纯图标按钮用（比如\"显示网格\"）。",
-      names: { js: "selected", react: "selected", vue: "selected", markup: "类名 sn-selected" } },
+      names: { js: "selected", react: "selected", vue: "selected", preact: "selected", markup: "类名 sn-selected", html: "类名 sn-selected" } },
     { name: "disabled", type: "boolean", default: "false", required: false,
       desc: "不能点。用 `aria-disabled` 实现：还能聚焦，悬停时 tip 说明为什么不能点，点了不触发 click。不要只写原生的 disabled——读屏会跳过它，原因也看不到。",
-      names: { js: "disabled", react: "disabled", vue: "disabled", markup: 'aria-disabled="true" + 类名 sn-is-disabled' } },
-    { name: "busy", type: "boolean", default: "false", required: false,
-      desc: "等待态（转圈）。发请求时用 `busy()` 函数更好：300ms 内完成就不闪转圈，出现后至少留 500ms。",
-      names: { js: "busy", react: "busy", vue: "busy", markup: "类名 sn-busy（按钮里要有 .sn-label 结构，见\"等待 → 成功\"示例）" } },
+      names: { js: "disabled", react: "disabled", vue: "disabled", preact: "disabled", markup: 'aria-disabled="true" + 类名 sn-is-disabled', html: 'aria-disabled="true" + 类名 sn-is-disabled' } },
+    { name: "loading", type: "boolean", default: "false", required: false,
+      desc: "等待（转圈）。React、Vue 的 loading 变成 true 以后 300ms 内结束就不转圈，转圈出现后至少留 500ms，期间点了不触发 click；手写标记的写法用 `busy(按钮, 请求)` 函数，同一条规矩。",
+      names: { js: "busy", react: "loading", vue: "loading", preact: "loading", markup: "类名 sn-busy（一般由 busy() 加上；按钮里要有 .sn-label 结构）", html: "类名 sn-busy（一般由 busy() 加上；按钮里要有 .sn-label 结构）" } },
+    { name: "done", type: "boolean", default: "false", required: false,
+      desc: "成功：原地换成对勾、扫一道光（转圈收起以后才打勾）。React、Vue 里请求成功时设成 true、1.5 秒后改回 false；手写标记的写法调 `succeed(按钮)`。写了 loading 或 done 组件才套等待要用的结构（`.sn-label` > `.sn-spin` + `.sn-tick` + `.sn-txt`），转圈、打勾时宽度不跳。",
+      names: { react: "done", vue: "done", preact: "done", markup: "类名 sn-ok（一般由 succeed() 加上）", html: "类名 sn-ok（一般由 succeed() 加上）" } },
     { name: "tip", type: "string", default: "—", required: false,
       desc: "悬停 500ms 后显示的 Tooltip；纯图标按钮同时写成 `aria-label`；禁用时写不能点的原因。",
       example: 'tip="输入项目名称后才能删除"',
-      names: { js: "tip", react: "tip", vue: "tip", markup: "data-tip" } },
+      names: { js: "tip", react: "tip", vue: "tip", preact: "tip", markup: "data-tip", html: "data-tip（纯图标按钮再写一样的 aria-label）" } },
     { name: "type", type: '"button" | "submit" | "reset"', default: '"button"', required: false,
       desc: "表单里的提交按钮写 submit。组件默认 button，放进表单也不会意外提交；手写标记时原生 `<button>` 默认是 submit，记得写 `type=\"button\"`。",
-      names: { js: "type", react: "type", vue: "type", markup: "type" }, native: ["react"] },
+      names: { js: "type", react: "type", vue: "type", preact: "type", markup: "type", html: "type" }, native: ["react"] },
     { name: "text", type: "string", default: '""', required: false,
-      desc: "按钮文字（buttonHTML 用；React、Vue 写在子元素 / 默认插槽里）。",
+      desc: "按钮文字（buttonHTML 用；组件写在子元素 / 默认插槽里）。",
       names: { js: "text" } },
     { name: "attrs", type: "Record<string, string>", default: "{}", required: false,
       desc: "其余要写到 `<button>` 上的属性（buttonHTML 用），比如 { \"`data-act`\": \"save\" }。",
       names: { js: "attrs" } },
   ],
   events: [
-    { name: "click", payload: "MouseEvent", when: "点按钮，或者聚焦时按回车、空格；禁用（`aria-disabled`）和等待中（sn-busy）时不触发。", native: true,
+    { name: "click", payload: "MouseEvent", when: "点按钮，或者聚焦时按回车、空格；禁用（`aria-disabled`）、等待中、打勾时不触发。", native: true,
       names: { react: "onClick", vue: "@click", angular: "(click)", svelte: "onclick", solid: "onClick", preact: "onClick", html: 'addEventListener("click")' } },
   ],
   slots: [
-    { name: "default", desc: "按钮文字，可以放图标。", names: { react: "children", vue: "默认插槽", markup: "<button> 里的内容" }, native: ["react"] },
+    { name: "default", desc: "按钮文字，可以放图标。", names: { react: "children", vue: "默认插槽", preact: "children", markup: "<button> 里的内容", html: "<button> 里的内容" }, native: ["react"] },
   ],
   methods: [],
   functions: [
@@ -152,11 +166,11 @@ export default {
     ],
   },
   examples: [
-    { slug: "button-basic", title: "基础用法", why: "一个区域只放一个主按钮，次要的动作用 secondary。手写标记时写上 `type=\"button\"`，放进表单也不会意外提交。",
+    { slug: "button-basic", title: "基础用法", why: "一个区域只放一个主按钮，次要的动作用 secondary（组件的默认值）。手写标记时写上 `type=\"button\"`，放进表单也不会意外提交（组件默认就是 button）。",
       html: `<div class="sn-row">
   <button type="button" class="sn-btn sn-secondary">取消</button>
   <button type="button" class="sn-btn sn-primary">保存修改</button>
-</div>` },
+</div>`, code: code("button-basic") },
     { slug: "button-variants", title: "变体", why: "由强到弱：一屏只有一个 primary；danger 只给删除这类不能撤销的动作，danger-soft 给危险但不是主操作的地方，比如列表里的\"移出团队\"。",
       html: `<div class="sn-row">
   <button type="button" class="sn-btn sn-primary">新建项目</button>
@@ -165,37 +179,28 @@ export default {
   <button type="button" class="sn-btn sn-ghost">跳过</button>
   <button type="button" class="sn-btn sn-danger">删除项目</button>
   <button type="button" class="sn-btn sn-danger-soft">移出团队</button>
-</div>` },
+</div>`, code: code("button-variants") },
     { slug: "button-sizes", title: "尺寸", why: "sm（28）用在表格行和工具条；默认 32；lg（40）用在登录页和手机上的主操作，再加上外边距，点击区够 44。",
       html: `<div class="sn-row">
   <button type="button" class="sn-btn sn-primary sn-sm">保存修改</button>
   <button type="button" class="sn-btn sn-primary">保存修改</button>
   <button type="button" class="sn-btn sn-primary sn-lg">保存修改</button>
-</div>` },
-    { slug: "button-icons", title: "带图标", why: "图标在前说明动作，在后表示\"往前走\"（悬停时箭头右移）。只有图标的按钮必须写 `data-tip` 和 `aria-label`，悬停和读屏都靠它。",
+</div>`, code: code("button-sizes") },
+    { slug: "button-icons", title: "带图标", why: "图标在前说明动作，在后表示\"往前走\"（悬停时箭头右移）。只有图标的按钮必须有名称：组件写 `tip`（同时写成 `aria-label`），手写标记写 `data-tip` 和 `aria-label`。",
       html: `<div class="sn-row">
   <button type="button" class="sn-btn sn-primary" data-i="plus:before">新建项目</button>
   <button type="button" class="sn-btn sn-secondary" data-i="arrow-right:after">下一步</button>
   <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="settings" data-tip="设置" aria-label="设置"></button>
   <button type="button" class="sn-btn sn-ghost sn-ibtn sn-selected" data-i="layout-grid" data-tip="网格视图" aria-label="网格视图"></button>
-</div>` },
-    { slug: "button-states", title: "状态：禁用、等待、成功", why: "禁用不用原生 disabled：还能聚焦，悬停时 tip 说出原因。等待和成功一般由 `busy()`、`succeed()` 自动加上，这里把样子静态摆出来。",
+</div>`, code: code("button-icons") },
+    { slug: "button-states", title: "状态：禁用、等待、成功", why: "禁用不用原生 disabled：还能聚焦，悬停时 tip 说出原因。等待、成功平时跟着请求变（见下一个示例），这里固定成那个样子。",
       html: `<div class="sn-row">
   <button type="button" class="sn-btn sn-danger sn-is-disabled" aria-disabled="true" data-tip="输入项目名称后才能删除">删除项目</button>
   <button type="button" class="sn-btn sn-primary sn-busy"><span class="sn-label"><span class="sn-spin"></span>${TICK}<span class="sn-txt">正在保存</span></span></button>
   <button type="button" class="sn-btn sn-primary sn-ok"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span>${TICK}<span class="sn-txt">保存修改</span></span></button>
-</div>` },
-    { slug: "button-busy", title: "等待 → 成功（发请求）", why: "`busy()` 等请求：300ms 内回来就不闪转圈，转圈出现后至少留 500ms；成功后 `succeed()` 原地打勾 1.5 秒。按钮里先写好 `.sn-label` 结构，宽度全程不变。",
-      html: `<button type="button" class="sn-btn sn-primary" data-act="save"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span>${TICK}<span class="sn-txt">保存修改</span></span></button>`,
-      js: `import { busy, succeed } from "satin-ui";
-
-const save = document.querySelector('[data-act="save"]');
-// 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
-const request = () => new Promise((done) => setTimeout(done, 1200));
-save.addEventListener("click", async () => {
-  await busy(save, request());
-  succeed(save);
-});` },
+</div>`, code: code("button-states") },
+    { slug: "button-busy", title: "等待 → 成功（发请求）", why: "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒。React、Vue 改 `loading`、`done` 两个属性；其余写法调 `busy()`、`succeed()`，按钮里先写好 `.sn-label` 结构，宽度全程不变。",
+      html: `<button type="button" class="sn-btn sn-primary" id="save-project"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span>${TICK}<span class="sn-txt">保存修改</span></span></button>`, code: code("button-busy") },
     { slug: "button-actions", title: "组合：底部操作区", why: "主按钮在最右，取消紧挨着它；\"不保存\"这类第三个出口放到最左，和前两个隔开，免得误点。",
       html: `<div class="sn-row sn-between">
   <button type="button" class="sn-btn sn-ghost">不保存</button>
@@ -203,11 +208,11 @@ save.addEventListener("click", async () => {
     <button type="button" class="sn-btn sn-secondary">取消</button>
     <button type="button" class="sn-btn sn-primary">保存</button>
   </div>
-</div>` },
-    { slug: "button-mobile", title: "手机上：底部操作栏", why: "手机上主操作放在底部贴边的操作栏里，用 sn-lg；操作栏自己会避开 iPhone 底部横条和弹起的软键盘。",
+</div>`, code: code("button-actions") },
+    { slug: "button-mobile", title: "手机上：底部操作栏", why: "手机上主操作放在底部贴边的操作栏里，用 lg；操作栏自己会避开 iPhone 底部横条和弹起的软键盘。",
       html: `<div class="sn-bottom-bar">
   <span class="sn-grow sn-num">合计 ¥ 1,280</span>
   <button type="button" class="sn-btn sn-primary sn-lg">提交订单</button>
-</div>` },
+</div>`, code: code("button-mobile") },
   ],
 };

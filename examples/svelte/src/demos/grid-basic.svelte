@@ -1,20 +1,6 @@
 <script>
-  import { onMount } from "svelte";
-  import { setup, enhance } from "satin-ui";
-  import { createDataGrid } from "satin-ui/grid";
-
-  let root;
-  onMount(() => {
-    const unsetup = setup();
-    const off = enhance(root, (root) => {
-      const grid = createDataGrid(root.querySelector('[data-ex="grid"]'), { rows: 100000 });
-      // 不用了（换页、卸载）记得：grid.destroy();
-      void grid;
-    });
-    return () => { off(); unsetup(); };
-  });
+  import DataGrid from "satin-ui/svelte/DataGrid.svelte";
 </script>
 
-<div bind:this={root}>
-  <div data-ex="grid"></div>
-</div>
+<!-- 工具条、表头、表体都由组件填好，只渲染看得见的行；卸载时撤掉后台线程和放进 <head> 的样式 -->
+<DataGrid rows={100000} />

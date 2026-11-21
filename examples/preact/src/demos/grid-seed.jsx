@@ -1,19 +1,6 @@
-import { useEffect, useRef } from "preact/hooks";
-import { setup, enhance } from "satin-ui";
-import { createDataGrid } from "satin-ui/grid";
+import { DataGrid } from "satin-ui/react/grid";
 
-export default function GridSeed() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup();
-    const off = enhance(ref.current, (root) => {
-      createDataGrid(root.querySelector('[data-ex="grid2"]'), { rows: 2000, seed: 7, label: "镜头清单，2000 行" });
-    });
-    return () => { off(); unsetup(); };
-  }, []);
-  return (
-    <div ref={ref}>
-      <div data-ex="grid2"></div>
-    </div>
-  );
+export default function ShotListFixture() {
+  // 同一个 seed 每次生成一样的数据（截图、自动化测试用）；行数少一点载得更快
+  return <DataGrid rows={2000} seed={7} label="镜头清单，2000 行" />;
 }

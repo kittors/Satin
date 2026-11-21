@@ -53,14 +53,6 @@
   <section id="button">
     <h2>按钮</h2>
     <div class="demo" data-demo="button-0"></div>
-    <div class="demo" data-demo="button-0"></div>
-    <div class="demo" data-demo="button-0"></div>
-    <div class="demo" data-demo="button-0"></div>
-    <div class="demo" data-demo="button-0"></div>
-    <div class="demo" data-demo="button-0"></div>
-    <div class="demo" data-demo="button-0"></div>
-    <div class="demo" data-demo="button-0"></div>
-    <div class="demo" data-demo="button-0"></div>
     <div class="demo" data-demo="button-1"></div>
     <div class="demo" data-demo="button-2"></div>
     <div class="demo" data-demo="button-3"></div>
@@ -114,22 +106,9 @@
   <section id="select">
     <h2>下拉选择与菜单</h2>
     <div class="demo" data-demo="select-0"></div>
-    <div class="demo" data-demo="select-0"></div>
-    <div class="demo" data-demo="select-0"></div>
-    <div class="demo" data-demo="select-0"></div>
-    <div class="demo" data-demo="select-0"></div>
-    <div class="demo" data-demo="select-0"></div>
-    <div class="demo" data-demo="select-0"></div>
-    <div class="demo" data-demo="select-0"></div>
   </section>
   <section id="picker">
     <h2>日期、时间、地址</h2>
-    <div class="demo" data-demo="picker-0"></div>
-    <div class="demo" data-demo="picker-0"></div>
-    <div class="demo" data-demo="picker-0"></div>
-    <div class="demo" data-demo="picker-0"></div>
-    <div class="demo" data-demo="picker-0"></div>
-    <div class="demo" data-demo="picker-0"></div>
     <div class="demo" data-demo="picker-0"></div>
   </section>
   <section id="choice">
@@ -166,11 +145,6 @@
   </section>
   <section id="dialog">
     <h2>弹窗</h2>
-    <div class="demo" data-demo="dialog-0"></div>
-    <div class="demo" data-demo="dialog-0"></div>
-    <div class="demo" data-demo="dialog-0"></div>
-    <div class="demo" data-demo="dialog-0"></div>
-    <div class="demo" data-demo="dialog-0"></div>
     <div class="demo" data-demo="dialog-0"></div>
   </section>
   <section id="drawer">
@@ -223,9 +197,6 @@
   </section>
   <section id="grid">
     <h2>数据表格</h2>
-    <div class="demo" data-demo="grid-0"></div>
-    <div class="demo" data-demo="grid-0"></div>
-    <div class="demo" data-demo="grid-0"></div>
     <div class="demo" data-demo="grid-0"></div>
   </section>
   <section id="cgrid">
@@ -356,6 +327,10 @@
   </section>
 </main>
 <script type="module">
+// 页面入口：页面级行为和自定义元素先装好（每个演示的片段里不再写）
+import { setup } from "satin-ui";
+import { defineElements } from "satin-ui/elements";
+setup(); defineElements();
 // 每个演示的片段：标记放进框里，模块脚本照原样跑（和复制到自己页面里一样）
 for (const box of document.querySelectorAll("[data-demo]")) {
   const html = await (await fetch("demos/" + box.dataset.demo + ".html")).text();

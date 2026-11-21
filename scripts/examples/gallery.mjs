@@ -62,7 +62,8 @@ for (const sec of SECTIONS) {
     await page.waitForFunction((i) => { const f = document.querySelectorAll(".dx")[i].querySelector("iframe"); try { return !!f.contentDocument?.__dx; } catch { return false; } }, i, { timeout: 20000 }).catch(() => {});
   }
   await sleep(800);
-  const got = await page.evaluate(() => window.__satinDemoFiles());
+  // 同一个演示只留一份（同一页上同一个演示出现两次时）
+  const got = (await page.evaluate(() => window.__satinDemoFiles())).filter((d, i, a) => a.findIndex((x) => x.slug === d.slug) === i);
   const bad = got.filter((d) => !d.ready).map((d) => d.slug);
   demos.push(...got.map((d) => ({ ...d, section: sec })));
   console.log(`${sec.id.padEnd(12)} ${got.length} 个演示${bad.length ? `（没等到载好：${bad.join(", ")}，按标签猜的空白）` : ""}`);

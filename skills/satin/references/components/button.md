@@ -10,7 +10,7 @@
 
 - 点了就执行的动作：保存修改、新建项目、导出成片。
 - 一个区域里最重要的那一个动作用主按钮（primary），其余用次按钮、浅底按钮或幽灵按钮。
-- 要等结果的动作（发请求）：用 `busy()` 显示等待，完成后用 `succeed()` 原地打勾。
+- 要等结果的动作（发请求）：React、Vue 改 `loading`、`done` 两个属性；其余写法用 `busy()` 显示等待、`succeed()` 原地打勾。
 
 ## 什么时候别用
 
@@ -29,27 +29,126 @@
 
 | 写法 | 引入 |
 |---|---|
-| 纯 HTML | `import { setup, enhance, busy, succeed } from "satin-ui";` |
+| 纯 HTML | `import { busy, succeed } from "satin-ui"; // 只有"等待 → 成功"要用；按钮本身写类名 sn-btn` |
 | React | `import { Button } from "satin-ui/react";` |
-| Vue | `import { Button as SnButton } from "satin-ui/vue";` |
-| Svelte | `import { setup, enhance, busy, succeed } from "satin-ui";` |
-| Angular | `import { setup, enhance, busy, succeed } from "satin-ui";` |
-| Solid | `import { setup, enhance, busy, succeed } from "satin-ui";` |
-| Preact | `import { setup, enhance, busy, succeed } from "satin-ui";` |
+| Vue | `import { Button } from "satin-ui/vue"; // 入口里 app.use(Satin) 以后也可以不引，直接写 <SnButton>` |
+| Svelte | `import Icon from "satin-ui/svelte/Icon.svelte"; // 按钮写类名 sn-btn；等待 → 成功用 satin-ui 的 busy()、succeed()` |
+| Angular | `import { busy, succeed } from "satin-ui"; // 按钮写类名 sn-btn；带图标的包一层 <sn-enhance>（组件加 CUSTOM_ELEMENTS_SCHEMA）` |
+| Solid | `import { busy, succeed } from "satin-ui"; // 按钮写类名 sn-btn；带图标的包一层 <sn-enhance>` |
+| Preact | `import { Button } from "satin-ui/react"; // @preact/preset-vite 默认把 react 指到 preact/compat` |
 
-React、Vue 用组件；其余框架和纯 HTML 直接写 `<button class="sn-btn">`，样式在 page.css 里，图标和 Tooltip 由 `setup()` + `enhance()` 接上，等待、成功用 `busy()`、`succeed()`。
+- React：`Button` 组件：`variant`、`size`、`icon`、`loading`、`done` 都是属性，`onClick` 照常写；原生 `<button>` 的属性（`type`、`aria-label`……）也能直接写。
+- Preact：经 preact/compat 用 `satin-ui/react` 的 `Button` 组件，属性和 React 一样：`variant`、`size`、`icon`、`loading`、`done`、`onClick`。
+- Vue：`Button` 组件（`app.use(Satin)` 以后也能直接写 `<SnButton>`）：`variant`、`size`、`icon`、`loading`、`done` 都是属性，事件用 `@click`。
+- Svelte：直接写 `<button type="button" class="sn-btn sn-primary">`（样式在 page.css 里），图标用 `<Icon name>`；要等结果的动作调 `busy(按钮, 请求)`，成功后 `succeed(按钮)`。
+- Angular：直接写 `<button type="button" class="sn-btn sn-primary">`（样式在 page.css 里），图标写 `data-i`、外面包一层 `<sn-enhance>`（组件加 `CUSTOM_ELEMENTS_SCHEMA`）；要等结果的动作调 `busy()`、`succeed()`。
+- Solid：直接写 `<button type="button" class="sn-btn sn-primary">`（样式在 page.css 里），图标写 `data-i`、外面包一层 `<sn-enhance>`；要等结果的动作调 `busy()`、`succeed()`。
+- 纯 HTML：直接写 `<button type="button" class="sn-btn sn-primary">`（样式在 page.css 里），图标写 `data-i`、外面包一层 `<sn-enhance>`；要等结果的动作调 `busy(按钮, 请求)`，成功后 `succeed(按钮)`。
 
 ## 示例（由浅入深）
 
 ### 基础用法
 
-一个区域只放一个主按钮，次要的动作用 secondary。手写标记时写上 `type="button"`，放进表单也不会意外提交。
+一个区域只放一个主按钮，次要的动作用 secondary（组件的默认值）。手写标记时写上 `type="button"`，放进表单也不会意外提交（组件默认就是 button）。
 
 ```html
 <div class="sn-row">
   <button type="button" class="sn-btn sn-secondary">取消</button>
   <button type="button" class="sn-btn sn-primary">保存修改</button>
 </div>
+```
+
+纯 HTML 的写法：
+
+```jsx
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-secondary">取消</button>
+  <button type="button" class="sn-btn sn-primary">保存修改</button>
+</div>
+```
+
+React 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function SaveActions() {
+  return (
+    <div className="sn-row">
+      <Button>取消</Button>
+      <Button variant="primary">保存修改</Button>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { Button } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-row">
+    <Button>取消</Button>
+    <Button variant="primary">保存修改</Button>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-secondary">取消</button>
+  <button type="button" class="sn-btn sn-primary">保存修改</button>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "demo-button-basic",
+  template: `
+    <div class="sn-row">
+      <button type="button" class="sn-btn sn-secondary">取消</button>
+      <button type="button" class="sn-btn sn-primary">保存修改</button>
+    </div>
+  `,
+})
+export class ButtonBasicComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function SaveActions() {
+  return (
+    <div class="sn-row">
+      <button type="button" class="sn-btn sn-secondary">取消</button>
+      <button type="button" class="sn-btn sn-primary">保存修改</button>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function SaveActions() {
+  return (
+    <div class="sn-row">
+      <Button>取消</Button>
+      <Button variant="primary">保存修改</Button>
+    </div>
+  );
+}
 ```
 
 ### 变体
@@ -67,6 +166,127 @@ React、Vue 用组件；其余框架和纯 HTML 直接写 `<button class="sn-btn
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-primary">新建项目</button>
+  <button type="button" class="sn-btn sn-secondary">导入原文</button>
+  <button type="button" class="sn-btn sn-tertiary">预览</button>
+  <button type="button" class="sn-btn sn-ghost">跳过</button>
+  <button type="button" class="sn-btn sn-danger">删除项目</button>
+  <button type="button" class="sn-btn sn-danger-soft">移出团队</button>
+</div>
+```
+
+React 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function ButtonVariants() {
+  return (
+    <div className="sn-row">
+      <Button variant="primary">新建项目</Button>
+      <Button variant="secondary">导入原文</Button>
+      <Button variant="tertiary">预览</Button>
+      <Button variant="ghost">跳过</Button>
+      <Button variant="danger">删除项目</Button>
+      <Button variant="danger-soft">移出团队</Button>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { Button } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-row">
+    <Button variant="primary">新建项目</Button>
+    <Button variant="secondary">导入原文</Button>
+    <Button variant="tertiary">预览</Button>
+    <Button variant="ghost">跳过</Button>
+    <Button variant="danger">删除项目</Button>
+    <Button variant="danger-soft">移出团队</Button>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-primary">新建项目</button>
+  <button type="button" class="sn-btn sn-secondary">导入原文</button>
+  <button type="button" class="sn-btn sn-tertiary">预览</button>
+  <button type="button" class="sn-btn sn-ghost">跳过</button>
+  <button type="button" class="sn-btn sn-danger">删除项目</button>
+  <button type="button" class="sn-btn sn-danger-soft">移出团队</button>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "demo-button-variants",
+  template: `
+    <div class="sn-row">
+      <button type="button" class="sn-btn sn-primary">新建项目</button>
+      <button type="button" class="sn-btn sn-secondary">导入原文</button>
+      <button type="button" class="sn-btn sn-tertiary">预览</button>
+      <button type="button" class="sn-btn sn-ghost">跳过</button>
+      <button type="button" class="sn-btn sn-danger">删除项目</button>
+      <button type="button" class="sn-btn sn-danger-soft">移出团队</button>
+    </div>
+  `,
+})
+export class ButtonVariantsComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function ButtonVariants() {
+  return (
+    <div class="sn-row">
+      <button type="button" class="sn-btn sn-primary">新建项目</button>
+      <button type="button" class="sn-btn sn-secondary">导入原文</button>
+      <button type="button" class="sn-btn sn-tertiary">预览</button>
+      <button type="button" class="sn-btn sn-ghost">跳过</button>
+      <button type="button" class="sn-btn sn-danger">删除项目</button>
+      <button type="button" class="sn-btn sn-danger-soft">移出团队</button>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function ButtonVariants() {
+  return (
+    <div class="sn-row">
+      <Button variant="primary">新建项目</Button>
+      <Button variant="secondary">导入原文</Button>
+      <Button variant="tertiary">预览</Button>
+      <Button variant="ghost">跳过</Button>
+      <Button variant="danger">删除项目</Button>
+      <Button variant="danger-soft">移出团队</Button>
+    </div>
+  );
+}
+```
+
 ### 尺寸
 
 sm（28）用在表格行和工具条；默认 32；lg（40）用在登录页和手机上的主操作，再加上外边距，点击区够 44。
@@ -79,9 +299,109 @@ sm（28）用在表格行和工具条；默认 32；lg（40）用在登录页和
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-primary sn-sm">保存修改</button>
+  <button type="button" class="sn-btn sn-primary">保存修改</button>
+  <button type="button" class="sn-btn sn-primary sn-lg">保存修改</button>
+</div>
+```
+
+React 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function ButtonSizes() {
+  return (
+    <div className="sn-row">
+      <Button variant="primary" size="sm">保存修改</Button>
+      <Button variant="primary">保存修改</Button>
+      <Button variant="primary" size="lg">保存修改</Button>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { Button } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-row">
+    <Button variant="primary" size="sm">保存修改</Button>
+    <Button variant="primary">保存修改</Button>
+    <Button variant="primary" size="lg">保存修改</Button>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-primary sn-sm">保存修改</button>
+  <button type="button" class="sn-btn sn-primary">保存修改</button>
+  <button type="button" class="sn-btn sn-primary sn-lg">保存修改</button>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "demo-button-sizes",
+  template: `
+    <div class="sn-row">
+      <button type="button" class="sn-btn sn-primary sn-sm">保存修改</button>
+      <button type="button" class="sn-btn sn-primary">保存修改</button>
+      <button type="button" class="sn-btn sn-primary sn-lg">保存修改</button>
+    </div>
+  `,
+})
+export class ButtonSizesComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function ButtonSizes() {
+  return (
+    <div class="sn-row">
+      <button type="button" class="sn-btn sn-primary sn-sm">保存修改</button>
+      <button type="button" class="sn-btn sn-primary">保存修改</button>
+      <button type="button" class="sn-btn sn-primary sn-lg">保存修改</button>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function ButtonSizes() {
+  return (
+    <div class="sn-row">
+      <Button variant="primary" size="sm">保存修改</Button>
+      <Button variant="primary">保存修改</Button>
+      <Button variant="primary" size="lg">保存修改</Button>
+    </div>
+  );
+}
+```
+
 ### 带图标
 
-图标在前说明动作，在后表示"往前走"（悬停时箭头右移）。只有图标的按钮必须写 `data-tip` 和 `aria-label`，悬停和读屏都靠它。
+图标在前说明动作，在后表示"往前走"（悬停时箭头右移）。只有图标的按钮必须有名称：组件写 `tip`（同时写成 `aria-label`），手写标记写 `data-tip` 和 `aria-label`。
 
 ```html
 <div class="sn-row">
@@ -92,9 +412,131 @@ sm（28）用在表格行和工具条；默认 32；lg（40）用在登录页和
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<sn-enhance>
+  <div class="sn-row">
+    <button type="button" class="sn-btn sn-primary" data-i="plus:before">新建项目</button>
+    <button type="button" class="sn-btn sn-secondary" data-i="arrow-right:after">下一步</button>
+    <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="settings" data-tip="设置" aria-label="设置"></button>
+    <button type="button" class="sn-btn sn-ghost sn-ibtn sn-selected" data-i="layout-grid" data-tip="网格视图" aria-label="网格视图"></button>
+  </div>
+</sn-enhance>
+```
+
+React 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function ButtonIcons() {
+  return (
+    <div className="sn-row">
+      <Button variant="primary" icon="plus">新建项目</Button>
+      <Button iconAfter="arrow-right">下一步</Button>
+      {/* 只有图标：tip 同时写成 aria-label */}
+      <Button variant="ghost" icon="settings" tip="设置" />
+      <Button variant="ghost" icon="layout-grid" tip="网格视图" selected />
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { Button } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-row">
+    <Button variant="primary" icon="plus">新建项目</Button>
+    <Button icon-after="arrow-right">下一步</Button>
+    <!-- 只有图标：tip 同时写成 aria-label -->
+    <Button variant="ghost" icon="settings" tip="设置" />
+    <Button variant="ghost" icon="layout-grid" tip="网格视图" selected />
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import Icon from "satin-ui/svelte/Icon.svelte";
+</script>
+
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-primary"><Icon name="plus" />新建项目</button>
+  <button type="button" class="sn-btn sn-secondary">下一步<Icon name="arrow-right" class="sn-after" /></button>
+  <!-- 只有图标：data-tip 和 aria-label 都要写 -->
+  <button type="button" class="sn-btn sn-ghost sn-ibtn" data-tip="设置" aria-label="设置"><Icon name="settings" /></button>
+  <button type="button" class="sn-btn sn-ghost sn-ibtn sn-selected" data-tip="网格视图" aria-label="网格视图"><Icon name="layout-grid" /></button>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-button-icons",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-row">
+        <button type="button" class="sn-btn sn-primary" data-i="plus:before">新建项目</button>
+        <button type="button" class="sn-btn sn-secondary" data-i="arrow-right:after">下一步</button>
+        <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="settings" data-tip="设置" aria-label="设置"></button>
+        <button type="button" class="sn-btn sn-ghost sn-ibtn sn-selected" data-i="layout-grid" data-tip="网格视图" aria-label="网格视图"></button>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class ButtonIconsComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function ButtonIcons() {
+  return (
+    <sn-enhance>
+      <div class="sn-row">
+        <button type="button" class="sn-btn sn-primary" data-i="plus:before">新建项目</button>
+        <button type="button" class="sn-btn sn-secondary" data-i="arrow-right:after">下一步</button>
+        <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="settings" data-tip="设置" aria-label="设置"></button>
+        <button type="button" class="sn-btn sn-ghost sn-ibtn sn-selected" data-i="layout-grid" data-tip="网格视图" aria-label="网格视图"></button>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function ButtonIcons() {
+  return (
+    <div class="sn-row">
+      <Button variant="primary" icon="plus">新建项目</Button>
+      <Button iconAfter="arrow-right">下一步</Button>
+      {/* 只有图标：tip 同时写成 aria-label */}
+      <Button variant="ghost" icon="settings" tip="设置" />
+      <Button variant="ghost" icon="layout-grid" tip="网格视图" selected />
+    </div>
+  );
+}
+```
+
 ### 状态：禁用、等待、成功
 
-禁用不用原生 disabled：还能聚焦，悬停时 tip 说出原因。等待和成功一般由 `busy()`、`succeed()` 自动加上，这里把样子静态摆出来。
+禁用不用原生 disabled：还能聚焦，悬停时 tip 说出原因。等待、成功平时跟着请求变（见下一个示例），这里固定成那个样子。
 
 ```html
 <div class="sn-row">
@@ -104,24 +546,286 @@ sm（28）用在表格行和工具条；默认 32；lg（40）用在登录页和
 </div>
 ```
 
-### 等待 → 成功（发请求）
+纯 HTML 的写法：
 
-`busy()` 等请求：300ms 内回来就不闪转圈，转圈出现后至少留 500ms；成功后 `succeed()` 原地打勾 1.5 秒。按钮里先写好 `.sn-label` 结构，宽度全程不变。
-
-```html
-<button type="button" class="sn-btn sn-primary" data-act="save"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+```jsx
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-danger sn-is-disabled" aria-disabled="true" data-tip="输入项目名称后才能删除">删除项目</button>
+  <button type="button" class="sn-btn sn-primary sn-busy"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">正在保存</span></span></button>
+  <button type="button" class="sn-btn sn-primary sn-ok"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+</div>
 ```
 
-```js
-import { busy, succeed } from "satin-ui";
+React 的写法：
 
-const save = document.querySelector('[data-act="save"]');
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function ButtonStates() {
+  return (
+    <div className="sn-row">
+      {/* 禁用：还能聚焦，悬停时 tip 说出原因；点了不触发 onClick */}
+      <Button variant="danger" disabled tip="输入项目名称后才能删除">删除项目</Button>
+      {/* 等待、成功：平时跟着请求改 loading / done（见下一个示例），这里固定成那个样子 */}
+      <Button variant="primary" loading>正在保存</Button>
+      <Button variant="primary" done>保存修改</Button>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { Button } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-row">
+    <!-- 禁用：还能聚焦，悬停时 tip 说出原因；点了不触发 click -->
+    <Button variant="danger" disabled tip="输入项目名称后才能删除">删除项目</Button>
+    <!-- 等待、成功：平时跟着请求改 loading / done（见下一个示例），这里固定成那个样子 -->
+    <Button variant="primary" loading>正在保存</Button>
+    <Button variant="primary" done>保存修改</Button>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<div class="sn-row">
+  <button type="button" class="sn-btn sn-danger sn-is-disabled" aria-disabled="true" data-tip="输入项目名称后才能删除">删除项目</button>
+  <button type="button" class="sn-btn sn-primary sn-busy"><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">正在保存</span></span></button>
+  <button type="button" class="sn-btn sn-primary sn-ok"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "demo-button-states",
+  template: `
+    <div class="sn-row">
+      <button type="button" class="sn-btn sn-danger sn-is-disabled" aria-disabled="true" data-tip="输入项目名称后才能删除">删除项目</button>
+      <button type="button" class="sn-btn sn-primary sn-busy"><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">正在保存</span></span></button>
+      <button type="button" class="sn-btn sn-primary sn-ok"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+    </div>
+  `,
+})
+export class ButtonStatesComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function ButtonStates() {
+  return (
+    <div class="sn-row">
+      <button type="button" class="sn-btn sn-danger sn-is-disabled" aria-disabled="true" data-tip="输入项目名称后才能删除">删除项目</button>
+      <button type="button" class="sn-btn sn-primary sn-busy"><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">正在保存</span></span></button>
+      <button type="button" class="sn-btn sn-primary sn-ok"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function ButtonStates() {
+  return (
+    <div class="sn-row">
+      {/* 禁用：还能聚焦，悬停时 tip 说出原因；点了不触发 onClick */}
+      <Button variant="danger" disabled tip="输入项目名称后才能删除">删除项目</Button>
+      {/* 等待、成功：平时跟着请求改 loading / done（见下一个示例），这里固定成那个样子 */}
+      <Button variant="primary" loading>正在保存</Button>
+      <Button variant="primary" done>保存修改</Button>
+    </div>
+  );
+}
+```
+
+### 等待 → 成功（发请求）
+
+请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒。React、Vue 改 `loading`、`done` 两个属性；其余写法调 `busy()`、`succeed()`，按钮里先写好 `.sn-label` 结构，宽度全程不变。
+
+```html
+<button type="button" class="sn-btn sn-primary" id="save-project"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+```
+
+纯 HTML 的写法：
+
+```jsx
+<button type="button" class="sn-btn sn-primary" id="save-project"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+
+<script type="module">
+  import { busy, succeed } from "satin-ui";
+
+  const save = document.getElementById("save-project");
+  // 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
+  const request = () => new Promise((done) => setTimeout(done, 1200));
+  save.addEventListener("click", async () => {
+    await busy(save, request()); // 300ms 内回来不转圈；转圈出现后至少留 500ms
+    succeed(save); // 原地打勾 1.5 秒
+  });
+</script>
+```
+
+React 的写法：
+
+```jsx
+import { useState } from "react";
+import { Button } from "satin-ui/react";
+
 // 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
 const request = () => new Promise((done) => setTimeout(done, 1200));
-save.addEventListener("click", async () => {
-  await busy(save, request());
-  succeed(save);
-});
+
+export default function SaveButton() {
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  async function save() {
+    setSaving(true);
+    try {
+      await request();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500); // 对勾留 1.5 秒
+    } finally {
+      setSaving(false);
+    }
+  }
+  // loading：300ms 内回来不转圈，转圈出现后至少留 500ms；done：转圈收起以后原地打勾
+  return <Button variant="primary" loading={saving} done={saved} onClick={save}>保存修改</Button>;
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { Button } from "satin-ui/vue";
+
+const saving = ref(false), saved = ref(false);
+// 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
+const request = () => new Promise((done) => setTimeout(done, 1200));
+async function save() {
+  saving.value = true;
+  try {
+    await request();
+    saved.value = true;
+    setTimeout(() => (saved.value = false), 1500); // 对勾留 1.5 秒
+  } finally {
+    saving.value = false;
+  }
+}
+</script>
+
+<template>
+  <!-- loading：300ms 内回来不转圈，转圈出现后至少留 500ms；done：转圈收起以后原地打勾 -->
+  <Button variant="primary" :loading="saving" :done="saved" @click="save">保存修改</Button>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import { busy, succeed } from "satin-ui";
+
+  let button;
+  // 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
+  const request = () => new Promise((done) => setTimeout(done, 1200));
+  async function save() {
+    await busy(button, request()); // 300ms 内回来不转圈；转圈出现后至少留 500ms
+    succeed(button); // 原地打勾 1.5 秒
+  }
+</script>
+
+<!-- 先写好 .sn-label 结构，转圈、打勾时宽度不跳 -->
+<button type="button" class="sn-btn sn-primary" bind:this={button} onclick={save}><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, ElementRef, viewChild } from "@angular/core";
+import { busy, succeed } from "satin-ui";
+
+// 换成真实的请求，比如 firstValueFrom(this.http.put("/api/projects/42", body))
+const request = () => new Promise((done) => setTimeout(done, 1200));
+
+@Component({
+  selector: "demo-button-busy",
+  // 先写好 .sn-label 结构，转圈、打勾时宽度不跳
+  template: `
+    <button #save type="button" class="sn-btn sn-primary" (click)="onSave()"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
+  `,
+})
+export class ButtonBusyComponent {
+  private save = viewChild.required<ElementRef<HTMLButtonElement>>("save");
+  async onSave() {
+    const button = this.save().nativeElement;
+    await busy(button, request()); // 300ms 内回来不转圈；转圈出现后至少留 500ms
+    succeed(button); // 原地打勾 1.5 秒
+  }
+}
+```
+
+Solid 的写法：
+
+```jsx
+import { busy, succeed } from "satin-ui";
+
+// 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
+const request = () => new Promise((done) => setTimeout(done, 1200));
+
+export default function SaveButton() {
+  let button;
+  async function save() {
+    await busy(button, request()); // 300ms 内回来不转圈；转圈出现后至少留 500ms
+    succeed(button); // 原地打勾 1.5 秒
+  }
+  // 先写好 .sn-label 结构，转圈、打勾时宽度不跳
+  return (
+    <button type="button" class="sn-btn sn-primary" ref={(el) => (button = el)} onClick={save}>
+      <span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7" /></svg><span class="sn-txt">保存修改</span></span>
+    </button>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { useState } from "preact/hooks";
+import { Button } from "satin-ui/react";
+
+// 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
+const request = () => new Promise((done) => setTimeout(done, 1200));
+
+export default function SaveButton() {
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  async function save() {
+    setSaving(true);
+    try {
+      await request();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500); // 对勾留 1.5 秒
+    } finally {
+      setSaving(false);
+    }
+  }
+  // loading：300ms 内回来不转圈，转圈出现后至少留 500ms；done：转圈收起以后原地打勾
+  return <Button variant="primary" loading={saving} done={saved} onClick={save}>保存修改</Button>;
+}
 ```
 
 ### 组合：底部操作区
@@ -138,9 +842,123 @@ save.addEventListener("click", async () => {
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<div class="sn-row sn-between">
+  <button type="button" class="sn-btn sn-ghost">不保存</button>
+  <div class="sn-row sn-gap-8">
+    <button type="button" class="sn-btn sn-secondary">取消</button>
+    <button type="button" class="sn-btn sn-primary">保存</button>
+  </div>
+</div>
+```
+
+React 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function FormActions() {
+  return (
+    <div className="sn-row sn-between">
+      <Button variant="ghost">不保存</Button>
+      <div className="sn-row sn-gap-8">
+        <Button>取消</Button>
+        <Button variant="primary">保存</Button>
+      </div>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { Button } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-row sn-between">
+    <Button variant="ghost">不保存</Button>
+    <div class="sn-row sn-gap-8">
+      <Button>取消</Button>
+      <Button variant="primary">保存</Button>
+    </div>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<div class="sn-row sn-between">
+  <button type="button" class="sn-btn sn-ghost">不保存</button>
+  <div class="sn-row sn-gap-8">
+    <button type="button" class="sn-btn sn-secondary">取消</button>
+    <button type="button" class="sn-btn sn-primary">保存</button>
+  </div>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "demo-button-actions",
+  template: `
+    <div class="sn-row sn-between">
+      <button type="button" class="sn-btn sn-ghost">不保存</button>
+      <div class="sn-row sn-gap-8">
+        <button type="button" class="sn-btn sn-secondary">取消</button>
+        <button type="button" class="sn-btn sn-primary">保存</button>
+      </div>
+    </div>
+  `,
+})
+export class ButtonActionsComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function FormActions() {
+  return (
+    <div class="sn-row sn-between">
+      <button type="button" class="sn-btn sn-ghost">不保存</button>
+      <div class="sn-row sn-gap-8">
+        <button type="button" class="sn-btn sn-secondary">取消</button>
+        <button type="button" class="sn-btn sn-primary">保存</button>
+      </div>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function FormActions() {
+  return (
+    <div class="sn-row sn-between">
+      <Button variant="ghost">不保存</Button>
+      <div class="sn-row sn-gap-8">
+        <Button>取消</Button>
+        <Button variant="primary">保存</Button>
+      </div>
+    </div>
+  );
+}
+```
+
 ### 手机上：底部操作栏
 
-手机上主操作放在底部贴边的操作栏里，用 sn-lg；操作栏自己会避开 iPhone 底部横条和弹起的软键盘。
+手机上主操作放在底部贴边的操作栏里，用 lg；操作栏自己会避开 iPhone 底部横条和弹起的软键盘。
 
 ```html
 <div class="sn-bottom-bar">
@@ -149,34 +967,128 @@ save.addEventListener("click", async () => {
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<div class="sn-bottom-bar">
+  <span class="sn-grow sn-num">合计 ¥ 1,280</span>
+  <button type="button" class="sn-btn sn-primary sn-lg">提交订单</button>
+</div>
+```
+
+React 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function CheckoutBar() {
+  return (
+    <div className="sn-bottom-bar">
+      <span className="sn-grow sn-num">合计 ¥ 1,280</span>
+      <Button variant="primary" size="lg">提交订单</Button>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { Button } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-bottom-bar">
+    <span class="sn-grow sn-num">合计 ¥ 1,280</span>
+    <Button variant="primary" size="lg">提交订单</Button>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<div class="sn-bottom-bar">
+  <span class="sn-grow sn-num">合计 ¥ 1,280</span>
+  <button type="button" class="sn-btn sn-primary sn-lg">提交订单</button>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "demo-button-mobile",
+  template: `
+    <div class="sn-bottom-bar">
+      <span class="sn-grow sn-num">合计 ¥ 1,280</span>
+      <button type="button" class="sn-btn sn-primary sn-lg">提交订单</button>
+    </div>
+  `,
+})
+export class ButtonMobileComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function CheckoutBar() {
+  return (
+    <div class="sn-bottom-bar">
+      <span class="sn-grow sn-num">合计 ¥ 1,280</span>
+      <button type="button" class="sn-btn sn-primary sn-lg">提交订单</button>
+    </div>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { Button } from "satin-ui/react";
+
+export default function CheckoutBar() {
+  return (
+    <div class="sn-bottom-bar">
+      <span class="sn-grow sn-num">合计 ¥ 1,280</span>
+      <Button variant="primary" size="lg">提交订单</Button>
+    </div>
+  );
+}
+```
+
 ## 属性
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `variant` | `"primary" \| "secondary" \| "tertiary" \| "ghost" \| "danger" \| "danger-soft"` | "secondary" | 否 | 外观，由强到弱：primary 主按钮（一个区域只放一个）、secondary 次按钮、tertiary 浅底、ghost 只有文字（悬停才有底色）、danger 删除这类不能撤销的动作、danger-soft 危险但不是这一屏的主操作。（例：`variant="primary"`） | createXxx 选项：`variant`；React：`variant`；Vue：`variant`；标记：`类名 sn-primary / sn-secondary / sn-tertiary / sn-ghost / sn-danger / sn-danger-soft` |
-| `size` | `"sm" \| "md" \| "lg"` | "md" | 否 | 高度 28 / 32 / 40。sm 用在表格行和工具条；lg 用在登录页和手机上的主操作。 | createXxx 选项：`size`；React：`size`；Vue：`size`；标记：`类名 sn-sm / sn-lg（md 不用写）` |
-| `icon` | `string` | — | 否 | 图标名（satin-ui/icons 里的名字），放在文字前面；没有文字时就是纯图标按钮，这时一定要写 tip。（例：`icon="plus"`） | createXxx 选项：`icon`；React：`icon`；Vue：`icon`；标记：`data-i="plus:before"（enhance() 换成图标）` |
-| `iconAfter` | `string` | — | 否 | 放在文字后面的图标，比如"下一步 →"；悬停时往右挪 2px。React、Vue 里把 `<Icon class="sn-after">` 写进子元素。 | createXxx 选项：`iconAfter`；标记：`data-i="arrow-right:after"` |
-| `round` | `boolean` | false | 否 | 圆形，配合纯图标按钮用。 | createXxx 选项：`round`；React：`round`；Vue：`round`；标记：`类名 sn-round` |
-| `selected` | `boolean` | false | 否 | 选中态，给切换型的纯图标按钮用（比如"显示网格"）。 | createXxx 选项：`selected`；React：`selected`；Vue：`selected`；标记：`类名 sn-selected` |
-| `disabled` | `boolean` | false | 否 | 不能点。用 `aria-disabled` 实现：还能聚焦，悬停时 tip 说明为什么不能点，点了不触发 click。不要只写原生的 disabled——读屏会跳过它，原因也看不到。 | createXxx 选项：`disabled`；React：`disabled`；Vue：`disabled`；标记：`aria-disabled="true" + 类名 sn-is-disabled` |
-| `busy` | `boolean` | false | 否 | 等待态（转圈）。发请求时用 `busy()` 函数更好：300ms 内完成就不闪转圈，出现后至少留 500ms。 | createXxx 选项：`busy`；React：`busy`；Vue：`busy`；标记：`类名 sn-busy（按钮里要有 .sn-label 结构，见"等待 → 成功"示例）` |
-| `tip` | `string` | — | 否 | 悬停 500ms 后显示的 Tooltip；纯图标按钮同时写成 `aria-label`；禁用时写不能点的原因。（例：`tip="输入项目名称后才能删除"`） | createXxx 选项：`tip`；React：`tip`；Vue：`tip`；标记：`data-tip` |
-| `type` | `"button" \| "submit" \| "reset"` | "button" | 否 | 表单里的提交按钮写 submit。组件默认 button，放进表单也不会意外提交；手写标记时原生 `<button>` 默认是 submit，记得写 `type="button"`。 | createXxx 选项：`type`；React：`type`；Vue：`type`；标记：`type` |
-| `text` | `string` | "" | 否 | 按钮文字（buttonHTML 用；React、Vue 写在子元素 / 默认插槽里）。 | createXxx 选项：`text` |
+| `variant` | `"primary" \| "secondary" \| "tertiary" \| "ghost" \| "danger" \| "danger-soft"` | "secondary" | 否 | 外观，由强到弱：primary 主按钮（一个区域只放一个）、secondary 次按钮、tertiary 浅底、ghost 只有文字（悬停才有底色）、danger 删除这类不能撤销的动作、danger-soft 危险但不是这一屏的主操作。（例：`variant="primary"`） | createXxx 选项：`variant`；React：`variant`；Vue：`variant`；Preact：`variant`；标记：`类名 sn-primary / sn-secondary / sn-tertiary / sn-ghost / sn-danger / sn-danger-soft`；纯 HTML：`类名 sn-primary / sn-secondary / sn-tertiary / sn-ghost / sn-danger / sn-danger-soft` |
+| `size` | `"sm" \| "md" \| "lg"` | "md" | 否 | 高度 28 / 32 / 40。sm 用在表格行和工具条；lg 用在登录页和手机上的主操作。 | createXxx 选项：`size`；React：`size`；Vue：`size`；Preact：`size`；标记：`类名 sn-sm / sn-lg（md 不用写）`；纯 HTML：`类名 sn-sm / sn-lg（md 不用写）` |
+| `icon` | `string` | — | 否 | 图标名（satin-ui/icons 里的名字），放在文字前面；没有文字时就是纯图标按钮，这时一定要写 tip。（例：`icon="plus"`） | createXxx 选项：`icon`；React：`icon`；Vue：`icon`；Preact：`icon`；Svelte：`文字前面放 <Icon name>`；标记：`data-i="plus:before"（enhance() 换成图标）`；纯 HTML：`data-i="plus:before"（<sn-enhance> 换成图标）` |
+| `iconAfter` | `string` | — | 否 | 放在文字后面的图标，比如"下一步 →"；悬停时往右挪 2px。（例：`iconAfter="arrow-right"`） | createXxx 选项：`iconAfter`；React：`iconAfter`；Vue：`iconAfter（模板里写 icon-after）`；Preact：`iconAfter`；Svelte：`文字后面放 <Icon name class="sn-after">`；标记：`data-i="arrow-right:after"`；纯 HTML：`data-i="arrow-right:after"` |
+| `round` | `boolean` | false | 否 | 圆形，配合纯图标按钮用。 | createXxx 选项：`round`；React：`round`；Vue：`round`；Preact：`round`；标记：`类名 sn-round`；纯 HTML：`类名 sn-round` |
+| `selected` | `boolean` | false | 否 | 选中态，给切换型的纯图标按钮用（比如"显示网格"）。 | createXxx 选项：`selected`；React：`selected`；Vue：`selected`；Preact：`selected`；标记：`类名 sn-selected`；纯 HTML：`类名 sn-selected` |
+| `disabled` | `boolean` | false | 否 | 不能点。用 `aria-disabled` 实现：还能聚焦，悬停时 tip 说明为什么不能点，点了不触发 click。不要只写原生的 disabled——读屏会跳过它，原因也看不到。 | createXxx 选项：`disabled`；React：`disabled`；Vue：`disabled`；Preact：`disabled`；标记：`aria-disabled="true" + 类名 sn-is-disabled`；纯 HTML：`aria-disabled="true" + 类名 sn-is-disabled` |
+| `loading` | `boolean` | false | 否 | 等待（转圈）。React、Vue 的 loading 变成 true 以后 300ms 内结束就不转圈，转圈出现后至少留 500ms，期间点了不触发 click；手写标记的写法用 `busy(按钮, 请求)` 函数，同一条规矩。 | createXxx 选项：`busy`；React：`loading`；Vue：`loading`；Preact：`loading`；标记：`类名 sn-busy（一般由 busy() 加上；按钮里要有 .sn-label 结构）`；纯 HTML：`类名 sn-busy（一般由 busy() 加上；按钮里要有 .sn-label 结构）` |
+| `done` | `boolean` | false | 否 | 成功：原地换成对勾、扫一道光（转圈收起以后才打勾）。React、Vue 里请求成功时设成 true、1.5 秒后改回 false；手写标记的写法调 `succeed(按钮)`。写了 loading 或 done 组件才套等待要用的结构（`.sn-label` > `.sn-spin` + `.sn-tick` + `.sn-txt`），转圈、打勾时宽度不跳。 | React：`done`；Vue：`done`；Preact：`done`；标记：`类名 sn-ok（一般由 succeed() 加上）`；纯 HTML：`类名 sn-ok（一般由 succeed() 加上）` |
+| `tip` | `string` | — | 否 | 悬停 500ms 后显示的 Tooltip；纯图标按钮同时写成 `aria-label`；禁用时写不能点的原因。（例：`tip="输入项目名称后才能删除"`） | createXxx 选项：`tip`；React：`tip`；Vue：`tip`；Preact：`tip`；标记：`data-tip`；纯 HTML：`data-tip（纯图标按钮再写一样的 aria-label）` |
+| `type` | `"button" \| "submit" \| "reset"` | "button" | 否 | 表单里的提交按钮写 submit。组件默认 button，放进表单也不会意外提交；手写标记时原生 `<button>` 默认是 submit，记得写 `type="button"`。 | createXxx 选项：`type`；React：`type`；Vue：`type`；Preact：`type`；标记：`type`；纯 HTML：`type` |
+| `text` | `string` | "" | 否 | 按钮文字（buttonHTML 用；组件写在子元素 / 默认插槽里）。 | createXxx 选项：`text` |
 | `attrs` | `Record<string, string>` | {} | 否 | 其余要写到 `<button>` 上的属性（buttonHTML 用），比如 { "`data-act`": "save" }。 | createXxx 选项：`attrs` |
 
 ## 事件
 
 | 名称 | 参数 | 什么时候 | 各写法 |
 |---|---|---|---|
-| `click` | `MouseEvent` | 点按钮，或者聚焦时按回车、空格；禁用（`aria-disabled`）和等待中（sn-busy）时不触发。 | React：`onClick`；Vue：`@click`；Angular：`(click)`；Svelte：`onclick`；Solid：`onClick`；Preact：`onClick`；纯 HTML：`addEventListener("click")` |
+| `click` | `MouseEvent` | 点按钮，或者聚焦时按回车、空格；禁用（`aria-disabled`）、等待中、打勾时不触发。 | React：`onClick`；Vue：`@click`；Angular：`(click)`；Svelte：`onclick`；Solid：`onClick`；Preact：`onClick`；纯 HTML：`addEventListener("click")` |
 
 ## 插槽 / 子元素
 
 | 名称 | 说明 | 各写法 |
 |---|---|---|
-| `default` | 按钮文字，可以放图标。 | React：`children`；Vue：`默认插槽`；标记：`<button> 里的内容` |
+| `default` | 按钮文字，可以放图标。 | React：`children`；Vue：`默认插槽`；Preact：`children`；标记：`<button> 里的内容`；纯 HTML：`<button> 里的内容` |
 
 ## 函数
 

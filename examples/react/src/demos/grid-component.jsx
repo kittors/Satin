@@ -1,10 +1,18 @@
 "use client";
-import { wrapSatin } from "satin-ui/react";
-import { createDataGrid } from "satin-ui/grid";
+import { useState } from "react";
+import { Button } from "satin-ui/react";
+import { DataGrid } from "satin-ui/react/grid";
 
-// 包一次，放在组件外面
-const DataGrid = wrapSatin(createDataGrid, { events: [] });
-
-export default function Shots() {
-  return <DataGrid rows={100000} seed={11} />;
+export default function ReseedGrid() {
+  const [seed, setSeed] = useState(11);
+  return (
+    <div className="sn-stack sn-gap-8">
+      <div className="sn-row">
+        <Button size="sm" onClick={() => setSeed((s) => s + 1)}>换一批数据</Button>
+        <span className="sn-help">种子 {seed}</span>
+      </div>
+      {/* rows、seed 只在创建时用（数据在后台线程里按它们生成）：变了组件自己换一张新表 */}
+      <DataGrid rows={2000} seed={seed} label="镜头清单" />
+    </div>
+  );
 }

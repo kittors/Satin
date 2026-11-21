@@ -1,20 +1,10 @@
-import { onSettled, onCleanup } from "solid-js";
-import { setup, enhance } from "satin-ui";
-import { defineElements } from "satin-ui/elements";
+// 自定义元素的属性只认字符串：数组写成 JSON
+const STATUSES = JSON.stringify([
+  { value: "draft", label: "草稿" },
+  { value: "review", label: "待审核" },
+  { value: "done", label: "已完成", disabled: true },
+]);
 
-defineElements();
-
-export default function SelectOptions() {
-  let root, off = () => {};
-  onSettled(() => {
-    const unsetup = setup();
-    const done = enhance(root);
-    off = () => { done(); unsetup(); };
-  });
-  onCleanup(() => off());
-  return (
-    <div ref={(el) => (root = el)}>
-      <sn-select items='[{"value":"draft","label":"草稿"},{"value":"review","label":"待审核"},{"value":"done","label":"已完成","disabled":true}]' value="draft" label="状态"></sn-select>
-    </div>
-  );
+export default function StatusSelect() {
+  return <sn-select items={STATUSES} value="draft" label="状态"></sn-select>;
 }

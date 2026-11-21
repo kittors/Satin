@@ -1,43 +1,35 @@
-import { useEffect, useRef } from "preact/hooks";
-import { setup, enhance, closeDialog, toast } from "satin-ui";
+import { useId, useState } from "preact/hooks";
+import { Button, Dialog, toast } from "satin-ui/react";
 
-export default function DialogControlled() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup();
-    const off = enhance(ref.current, (root) => {
-      const dlg = root.querySelector("#dlg-ctl");
-      dlg.querySelector("form").addEventListener("submit", () => {
-        const name = dlg.querySelector("input").value.trim() || "未命名项目";
-        closeDialog(dlg);
-        toast({ text: "已创建：" + name });
-      });
-    });
-    return () => { off(); unsetup(); };
-  }, []);
+export default function NewProject() {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const nameId = useId();
+  function create(e) {
+    e.preventDefault();
+    setOpen(false);
+    toast({ text: "已创建：" + (name.trim() || "未命名项目") });
+  }
   return (
-    <div ref={ref}>
-      <button type="button" class="sn-btn sn-primary" data-dlg="dlg-ctl">新建项目</button>
-      <dialog class="sn-dlg" id="dlg-ctl" aria-labelledby="dlg-ctl-t">
-        <form method="dialog">
-          <div class="sn-hd">
-            <div style="flex:1">
-              <h3 id="dlg-ctl-t">新建项目</h3>
-              <div class="sn-sub">名称之后随时可以改。</div>
-            </div>
-          </div>
-          <div class="sn-bd">
-            <div class="sn-field">
-              <label class="sn-lbl" for="dlg-ctl-name">项目名称</label>
-              <input class="sn-input" id="dlg-ctl-name" placeholder="比如：雨夜车站" autocomplete="off" />
-            </div>
-          </div>
-          <div class="sn-ft">
-            <button type="button" class="sn-btn sn-ghost" data-cancel="">取消</button>
-            <button type="submit" class="sn-btn sn-primary">创建项目</button>
-          </div>
-        </form>
-      </dialog>
-    </div>
+    <>
+      <Button variant="primary" onClick={() => setOpen(true)}>新建项目</Button>
+      {/* 开关放在自己的状态里：open 打开；关上（Esc、取消、程序关）以后 onClose 把它改回 false */}
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={create}
+        title="新建项目"
+        description="名称之后随时可以改。"
+        footer={<>
+          <Button variant="ghost" data-cancel>取消</Button>
+          <Button variant="primary" type="submit">创建项目</Button>
+        </>}
+      >
+        <div class="sn-field">
+          <label class="sn-lbl" for={nameId}>项目名称</label>
+          <input class="sn-input" id={nameId} placeholder="比如：雨夜车站" autocomplete="off" value={name} onInput={(e) => setName(e.currentTarget.value)} />
+        </div>
+      </Dialog>
+    </>
   );
 }

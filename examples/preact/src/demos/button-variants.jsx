@@ -1,23 +1,14 @@
-import { useEffect, useRef } from "preact/hooks";
-import { setup, enhance } from "satin-ui";
+import { Button } from "satin-ui/react";
 
 export default function ButtonVariants() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup();
-    const off = enhance(ref.current);
-    return () => { off(); unsetup(); };
-  }, []);
   return (
-    <div ref={ref}>
-      <div class="sn-row">
-        <button type="button" class="sn-btn sn-primary">新建项目</button>
-        <button type="button" class="sn-btn sn-secondary">导入原文</button>
-        <button type="button" class="sn-btn sn-tertiary">预览</button>
-        <button type="button" class="sn-btn sn-ghost">跳过</button>
-        <button type="button" class="sn-btn sn-danger">删除项目</button>
-        <button type="button" class="sn-btn sn-danger-soft">移出团队</button>
-      </div>
+    <div class="sn-row">
+      <Button variant="primary">新建项目</Button>
+      <Button variant="secondary">导入原文</Button>
+      <Button variant="tertiary">预览</Button>
+      <Button variant="ghost">跳过</Button>
+      <Button variant="danger">删除项目</Button>
+      <Button variant="danger-soft">移出团队</Button>
     </div>
   );
 }

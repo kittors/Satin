@@ -1,25 +1,26 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
-import { setup, enhance } from "satin-ui";
+import { Component, ElementRef, afterRenderEffect, signal, viewChild } from "@angular/core";
 import { createDataGrid } from "satin-ui/grid";
 
 @Component({
   selector: "demo-grid-component",
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素
-  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式
   template: `
-    <div #root>
-      <div data-ex="grid3"></div>
-    </div>`,
+    <div class="sn-stack sn-gap-8">
+      <div class="sn-row">
+        <button type="button" class="sn-btn sn-secondary sn-sm" (click)="seed.set(seed() + 1)">换一批数据</button>
+        <span class="sn-help">种子 {{ seed() }}</span>
+      </div>
+      <div #host></div>
+    </div>
+  `,
 })
 export class GridComponentComponent {
-  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;
-  private off = () => {};
-  ngAfterViewInit() {
-    const unsetup = setup();
-    const done = enhance(this.root.nativeElement, (root: any) => {
-      createDataGrid(root.querySelector('[data-ex="grid3"]'), { rows: 100000, seed: 11 });
+  protected seed = signal(11);
+  private host = viewChild.required<ElementRef<HTMLElement>>("host");
+  constructor() {
+    // rows、seed 只在创建时用（数据在后台线程里按它们生成）：seed 变了就拆掉旧表（先跑清理函数）、建一张新的；组件销毁时也会跑清理函数
+    afterRenderEffect((onCleanup) => {
+      const grid = createDataGrid(this.host().nativeElement, { rows: 2000, seed: this.seed(), label: "镜头清单" });
+      onCleanup(() => grid.destroy());
     });
-    this.off = () => { done(); unsetup(); };
   }
-  ngOnDestroy() { this.off(); }
 }

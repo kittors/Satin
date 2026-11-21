@@ -1,45 +1,21 @@
 <script>
-  import { onMount } from "svelte";
-  import { setup, enhance, closeDialog, toast } from "satin-ui";
+  import Dialog from "satin-ui/svelte/Dialog.svelte";
+  import Icon from "satin-ui/svelte/Icon.svelte";
+  import { toast } from "satin-ui";
 
-  let root;
-  onMount(() => {
-    const unsetup = setup();
-    const off = enhance(root, (root) => {
-      const dlg = root.querySelector("#dlg-del");
-      dlg.querySelector("form").addEventListener("submit", () => {
-        closeDialog(dlg);
-        toast({ text: "已删除\"雨夜车站\"" });
-      });
-    });
-    return () => { off(); unsetup(); };
-  });
+  let open = $state(false);
+  function remove() {
+    open = false;
+    toast({ text: '已删除"雨夜车站"' });
+  }
 </script>
 
-<div bind:this={root}>
-  <button type="button" class="sn-btn sn-danger-soft" data-dlg="dlg-del" data-i="trash-2:before">删除项目…</button>
-  <dialog class="sn-dlg" id="dlg-del" aria-labelledby="dlg-del-t">
-    <form method="dialog">
-      <div class="sn-hd">
-        <span class="sn-dlg-icon" data-i="trash-2"></span>
-        <div style="flex:1">
-          <h3 id="dlg-del-t">删除"雨夜车站"？</h3>
-          <div class="sn-sub">删除后无法恢复，协作者也会失去访问权限。</div>
-        </div>
-      </div>
-      <div class="sn-bd">
-        <div class="sn-impact">
-          <b>将一起删除</b>
-          <ul>
-            <li>12 个镜头和全部画面版本</li>
-            <li>3 段配音、2 个已导出的成片</li>
-          </ul>
-        </div>
-      </div>
-      <div class="sn-ft">
-        <button type="button" class="sn-btn sn-ghost" data-cancel="">取消</button>
-        <button type="submit" class="sn-btn sn-danger">删除项目</button>
-      </div>
-    </form>
-  </dialog>
-</div>
+<button type="button" class="sn-btn sn-danger-soft" onclick={() => (open = true)}><Icon name="trash-2" />删除项目…</button>
+<Dialog bind:open icon="trash-2" title='删除"雨夜车站"？' description="删除后无法恢复，协作者也会失去访问权限。" onsubmit={remove}>
+  <!-- 写清会一起删掉什么 -->
+  <div class="sn-impact"><b>将一起删除</b><ul><li>12 个镜头和全部画面版本</li><li>3 段配音、2 个已导出的成片</li></ul></div>
+  {#snippet footer()}
+    <button type="button" class="sn-btn sn-ghost" data-cancel>取消</button>
+    <button type="submit" class="sn-btn sn-danger">删除项目</button>
+  {/snippet}
+</Dialog>

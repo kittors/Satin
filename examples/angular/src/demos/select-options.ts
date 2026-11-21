@@ -1,25 +1,17 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
-import { setup, enhance } from "satin-ui";
-import { defineElements } from "satin-ui/elements";
-
-defineElements();
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 
 @Component({
   selector: "demo-select-options",
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素
-  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-select>
   template: `
-    <div #root>
-      <sn-select items="[{&quot;value&quot;:&quot;draft&quot;,&quot;label&quot;:&quot;草稿&quot;},{&quot;value&quot;:&quot;review&quot;,&quot;label&quot;:&quot;待审核&quot;},{&quot;value&quot;:&quot;done&quot;,&quot;label&quot;:&quot;已完成&quot;,&quot;disabled&quot;:true}]" value="draft" label="状态"></sn-select>
-    </div>`,
+    <sn-select [attr.items]="statuses" value="draft" label="状态"></sn-select>
+  `,
 })
 export class SelectOptionsComponent {
-  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;
-  private off = () => {};
-  ngAfterViewInit() {
-    const unsetup = setup();
-    const done = enhance(this.root.nativeElement);
-    this.off = () => { done(); unsetup(); };
-  }
-  ngOnDestroy() { this.off(); }
+  // 自定义元素的属性只认字符串：数组写成 JSON
+  protected statuses = JSON.stringify([
+    { value: "draft", label: "草稿" },
+    { value: "review", label: "待审核" },
+    { value: "done", label: "已完成", disabled: true },
+  ]);
 }

@@ -1,24 +1,20 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
-import { useEffect, useRef } from "react";
-import { setup, enhance } from "satin-ui";
+"use client";
+import { Button, Icon } from "satin-ui/react";
 
-export default function SelectMenu() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数
-    const off = enhance(ref.current); // 接上标记里的交互，返回撤销函数
-    return () => { off(); unsetup(); };
-  }, []);
+const SORTS = ["最近更新", "名称", "创建时间"];
+
+// 菜单按钮：标记照设计稿写，<sn-enhance> 接上交互（选了就收起，按钮文字换成 前缀 + 选中项）
+export default function SortMenu() {
   return (
-    <div ref={ref}>
+    <sn-enhance>
       <div className="sn-select">
-        <button type="button" className="sn-btn sn-secondary" data-menubtn="" data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
+        <Button data-menubtn="" data-prefix="排序：">排序：最近更新<Icon name="chevron-down" className="sn-caret" /></Button>
         <div className="sn-menu" role="menu">
-          <div className="sn-item sn-sel" data-i="check:chk">最近更新</div>
-          <div className="sn-item" data-i="check:chk">名称</div>
-          <div className="sn-item" data-i="check:chk">创建时间</div>
+          {SORTS.map((s, i) => (
+            <div key={s} className={i === 0 ? "sn-item sn-sel" : "sn-item"}>{s}<span className="sn-chk"><Icon name="check" /></span></div>
+          ))}
         </div>
       </div>
-    </div>
+    </sn-enhance>
   );
 }

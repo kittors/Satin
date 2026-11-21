@@ -8,10 +8,10 @@ import { START } from "./pages.js";
 // ———— 框架接入：每个框架一段能直接跑的最小例子（分段控件 + 按钮 + 轻提示） ————
 const ITEMS = '["网格", "列表", "时间线"]';
 const FW = [
-  ["React", "Vite 新建项目以后，改下面三个文件。组件在 <code>satin-ui/react</code> 里：给 <code>value</code> 就是受控，只给 <code>defaultValue</code> 是非受控；第一个组件挂载时自动装好页面级行为（Tooltip、浮层栈、Esc 关闭）。", [
+  ["React", "Vite 新建项目以后，改下面三个文件。应用最外面包一层 <code>&lt;SatinProvider&gt;</code>，页面级行为（Tooltip、浮层栈、Esc 关闭）只在这里装一次，各个页面、组件里不用再写；组件在 <code>satin-ui/react</code> 里：给 <code>value</code> 就是受控，只给 <code>defaultValue</code> 是非受控。", [
     { name: "终端", lang: "sh", code: "npm create vite@latest my-app -- --template react\ncd my-app\nnpm i satin-ui\nnpm run dev" },
     { name: "vite.config.js", lang: "js", code: 'import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport satin from "satin-ui/vite"; // 把 theme-boot 内联进 <head>：第一帧之前写好深浅主题，刷新不闪\n\nexport default defineConfig({ plugins: [react(), satin()] });' },
-    { name: "src/main.jsx", lang: "jsx", code: 'import { StrictMode } from "react";\nimport { createRoot } from "react-dom/client";\nimport "satin-ui/css/page.css"; // 令牌 + 页面级重置 + 全部组件样式\nimport App from "./App.jsx";\n\ncreateRoot(document.getElementById("root")).render(<StrictMode><App /></StrictMode>);' },
+    { name: "src/main.jsx", lang: "jsx", code: 'import { StrictMode } from "react";\nimport { createRoot } from "react-dom/client";\nimport { SatinProvider } from "satin-ui/react";\nimport "satin-ui/css/page.css"; // 令牌 + 页面级重置 + 全部组件样式\nimport App from "./App.jsx";\n\n// 页面级行为在应用最外面装一次\ncreateRoot(document.getElementById("root")).render(\n  <StrictMode>\n    <SatinProvider>\n      <App />\n    </SatinProvider>\n  </StrictMode>,\n);' },
     { name: "src/App.jsx", lang: "jsx", code: `import { useState } from "react";\nimport { Button, Segmented, toast } from "satin-ui/react";\n\nexport default function App() {\n  const [view, setView] = useState("网格");\n  return (\n    <main className="sn-page sn-stack">\n      <Segmented items={${ITEMS}} value={view} onChange={setView} />\n      <div className="sn-row">\n        <Button variant="primary" onClick={() => toast({ text: "已新建，视图：" + view })}>新建项目</Button>\n      </div>\n    </main>\n  );\n}` },
   ]],
   ["Vue", "<code>app.use(Satin)</code> 以后，模板里直接写 <code>&lt;SnButton&gt;</code>、<code>&lt;SnSegmented v-model&gt;</code>。", [

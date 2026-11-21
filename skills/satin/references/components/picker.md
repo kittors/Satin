@@ -27,21 +27,27 @@
 
 | 写法 | 引入 |
 |---|---|
-| 纯 HTML | `import { setup, enhance, createPicker } from "satin-ui";` |
-| React | `import { createPicker } from "satin-ui";` |
-| Vue | `import { createPicker } from "satin-ui";` |
-| Svelte | `import { createPicker } from "satin-ui";` |
-| Angular | `import { createPicker } from "satin-ui";` |
-| Solid | `import { createPicker } from "satin-ui";` |
-| Preact | `import { createPicker } from "satin-ui";` |
+| 纯 HTML | `import { createPicker } from "satin-ui"; // 或者标记照示例写、包一层 <sn-enhance>，不用写脚本` |
+| React | `import { DatePicker } from "satin-ui/react";` |
+| Vue | `import { DatePicker } from "satin-ui/vue"; // 入口里 app.use(Satin) 以后也可以不引，直接写 <SnDatePicker>` |
+| Svelte | `import DatePicker from "satin-ui/svelte/DatePicker.svelte";` |
+| Angular | `import type { PickDetail } from "satin-ui"; // 标记照示例写、包一层 <sn-enhance>（组件加 CUSTOM_ELEMENTS_SCHEMA），(pick) 拿到 { text }` |
+| Solid | `// 标记照示例写、包一层 <sn-enhance>（入口里调过 defineElements()），听冒泡上来的 pick 事件` |
+| Preact | `import { DatePicker } from "satin-ui/react"; // @preact/preset-vite 默认把 react 指到 preact/compat` |
 
-选择器在各框架里都是"写好标记 + 挂载时接上"：`enhance()` 会接上里面所有 `[data-pk]`；要监听选中或者固定"今天"，就在挂载时对那个 `.sn-pk` 调 `createPicker(元素, 选项)`，卸载时 `destroy()`。React、Vue 还没有封装好的组件。
+- React：`DatePicker` 组件：`kind` 选种类（date、range、time、datetime、region），选好、清除时 `onChange` 拿到 `{ text }`。还没做到：不能从外面设值，没有受控的 `value`。
+- Preact：经 preact/compat 用 `satin-ui/react` 的 `DatePicker`：`kind` 选种类，`onChange` 拿到 `{ text }`。
+- Vue：`DatePicker` 组件：`kind` 选种类，选好、清除时 `@change` 拿到 `{ text }`。还没做到：不能从外面设值，所以没有 `v-model`。
+- Svelte：`DatePicker` 组件（`satin-ui/svelte/DatePicker.svelte`）：`kind` 选种类，`onchange` 拿到 `{ text }`。还没做到：没有 `bind:value`。
+- Angular：把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `(pick)` 事件（`$event.detail.text`）。
+- Solid：把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `pick` 事件（`e.detail.text`）。
+- 纯 HTML：把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `pick` 事件（`e.detail.text`）；也可以 `createPicker(空容器, { kind })` 渲染并接上，卸载时 `destroy()`。
 
 ## 示例（由浅入深）
 
 ### 基础用法：选一天
 
-标记照这样写，`enhance()` 接上：日历、"今天""清除"都能用。外面套一个 `.sn-field` 写看得见的标签。
+默认就是选一天：日历、"今天""清除"都有。外面套一个 `.sn-field` 写看得见的标签；手写标记照这样写、包一层 `<sn-enhance>` 接上。
 
 ```html
 <div class="sn-field"><span class="sn-lbl">交付日期</span>
@@ -50,6 +56,119 @@
     <div class="sn-pk-panel" role="dialog" aria-label="选择日期"><div class="sn-cal-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-today>今天</button><span class="sn-grow"></span><button class="sn-btn sn-ghost sn-sm" type="button" data-clear>清除</button></div></div>
   </div>
 </div>
+```
+
+纯 HTML 的写法：
+
+```jsx
+<sn-enhance>
+  <div class="sn-field">
+    <span class="sn-lbl">交付日期</span>
+    <div class="sn-pk" data-pk="date">
+      <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择日期">选择日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+      <div class="sn-pk-panel" role="dialog" aria-label="选择日期"><div class="sn-cal-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-today>今天</button><span class="sn-grow"></span><button class="sn-btn sn-ghost sn-sm" type="button" data-clear>清除</button></div></div>
+    </div>
+  </div>
+</sn-enhance>
+```
+
+React 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function DueDate() {
+  return (
+    <div className="sn-field">
+      <span className="sn-lbl">交付日期</span>
+      <DatePicker />
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { DatePicker } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-field">
+    <span class="sn-lbl">交付日期</span>
+    <DatePicker />
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import DatePicker from "satin-ui/svelte/DatePicker.svelte";
+</script>
+
+<div class="sn-field">
+  <span class="sn-lbl">交付日期</span>
+  <DatePicker />
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-picker-basic",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">交付日期</span>
+        <div class="sn-pk" data-pk="date">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择日期">选择日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel" role="dialog" aria-label="选择日期"><div class="sn-cal-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-today>今天</button><span class="sn-grow"></span><button class="sn-btn sn-ghost sn-sm" type="button" data-clear>清除</button></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class PickerBasicComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function DueDate() {
+  return (
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">交付日期</span>
+        <div class="sn-pk" data-pk="date">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择日期">选择日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel" role="dialog" aria-label="选择日期"><div class="sn-cal-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-today>今天</button><span class="sn-grow"></span><button class="sn-btn sn-ghost sn-sm" type="button" data-clear>清除</button></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function DueDate() {
+  return (
+    <div class="sn-field">
+      <span class="sn-lbl">交付日期</span>
+      <DatePicker />
+    </div>
+  );
+}
 ```
 
 ### 日期范围
@@ -66,6 +185,122 @@
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<sn-enhance>
+  <div class="sn-field">
+    <span class="sn-lbl">统计范围</span>
+    <div class="sn-pk" data-pk="range" style="min-width:260px">
+      <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择开始和结束日期">选择开始和结束日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+      <div class="sn-pk-panel" role="dialog" aria-label="选择日期范围"><div class="sn-pk-range"><div class="sn-pk-presets"><button type="button" data-p="today">今天</button><button type="button" data-p="d7">最近 7 天</button><button type="button" data-p="d30">最近 30 天</button><button type="button" data-p="month">本月</button><button type="button" data-p="last">上个月</button></div><div class="sn-cal-slot"></div></div>
+        <div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-reset>重置</button><span class="sn-note"></span><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+    </div>
+  </div>
+</sn-enhance>
+```
+
+React 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function StatsRange() {
+  return (
+    <div className="sn-field">
+      <span className="sn-lbl">统计范围</span>
+      <DatePicker kind="range" />
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { DatePicker } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-field">
+    <span class="sn-lbl">统计范围</span>
+    <DatePicker kind="range" />
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import DatePicker from "satin-ui/svelte/DatePicker.svelte";
+</script>
+
+<div class="sn-field">
+  <span class="sn-lbl">统计范围</span>
+  <DatePicker kind="range" />
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-picker-range",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">统计范围</span>
+        <div class="sn-pk" data-pk="range" style="min-width:260px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择开始和结束日期">选择开始和结束日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel" role="dialog" aria-label="选择日期范围"><div class="sn-pk-range"><div class="sn-pk-presets"><button type="button" data-p="today">今天</button><button type="button" data-p="d7">最近 7 天</button><button type="button" data-p="d30">最近 30 天</button><button type="button" data-p="month">本月</button><button type="button" data-p="last">上个月</button></div><div class="sn-cal-slot"></div></div>
+            <div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-reset>重置</button><span class="sn-note"></span><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class PickerRangeComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function StatsRange() {
+  return (
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">统计范围</span>
+        <div class="sn-pk" data-pk="range" style="min-width:260px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择开始和结束日期">选择开始和结束日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel" role="dialog" aria-label="选择日期范围"><div class="sn-pk-range"><div class="sn-pk-presets"><button type="button" data-p="today">今天</button><button type="button" data-p="d7">最近 7 天</button><button type="button" data-p="d30">最近 30 天</button><button type="button" data-p="month">本月</button><button type="button" data-p="last">上个月</button></div><div class="sn-cal-slot"></div></div>
+            <div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-reset>重置</button><span class="sn-note"></span><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function StatsRange() {
+  return (
+    <div class="sn-field">
+      <span class="sn-lbl">统计范围</span>
+      <DatePicker kind="range" />
+    </div>
+  );
+}
+```
+
 ### 时间
 
 时、分两列，滚动吸附到中间的选中带；"此刻"一键回到现在。
@@ -79,9 +314,122 @@
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<sn-enhance>
+  <div class="sn-field">
+    <span class="sn-lbl">每天提醒</span>
+    <div class="sn-pk" data-pk="time" style="min-width:140px">
+      <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择时间">选择时间</span><span class="sn-end sn-swap"><span class="sn-a" data-i="clock"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+      <div class="sn-pk-panel" role="dialog" aria-label="选择时间"><div class="sn-tc-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-now>此刻</button><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+    </div>
+  </div>
+</sn-enhance>
+```
+
+React 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function ReminderTime() {
+  return (
+    <div className="sn-field">
+      <span className="sn-lbl">每天提醒</span>
+      <DatePicker kind="time" />
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { DatePicker } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-field">
+    <span class="sn-lbl">每天提醒</span>
+    <DatePicker kind="time" />
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import DatePicker from "satin-ui/svelte/DatePicker.svelte";
+</script>
+
+<div class="sn-field">
+  <span class="sn-lbl">每天提醒</span>
+  <DatePicker kind="time" />
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-picker-time",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">每天提醒</span>
+        <div class="sn-pk" data-pk="time" style="min-width:140px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择时间">选择时间</span><span class="sn-end sn-swap"><span class="sn-a" data-i="clock"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel" role="dialog" aria-label="选择时间"><div class="sn-tc-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-now>此刻</button><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class PickerTimeComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function ReminderTime() {
+  return (
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">每天提醒</span>
+        <div class="sn-pk" data-pk="time" style="min-width:140px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择时间">选择时间</span><span class="sn-end sn-swap"><span class="sn-a" data-i="clock"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel" role="dialog" aria-label="选择时间"><div class="sn-tc-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-now>此刻</button><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function ReminderTime() {
+  return (
+    <div class="sn-field">
+      <span class="sn-lbl">每天提醒</span>
+      <DatePicker kind="time" />
+    </div>
+  );
+}
+```
+
 ### 定时发布：日期 + 时间
 
-日历和时间放在一个面板里；早于现在的时间"确定"不能点，原因写在面板底部。
+日历和时间放在一个面板里；早于现在的时间"确定"不能点，原因写在面板底部。placeholder 写要选什么（"选择发布时间"），面板的读屏名称跟着它。
 
 ```html
 <div class="sn-field"><span class="sn-lbl">定时发布</span>
@@ -91,6 +439,122 @@
       <div class="sn-pk-foot"><span class="sn-note"></span><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
   </div>
 </div>
+```
+
+纯 HTML 的写法：
+
+```jsx
+<sn-enhance>
+  <div class="sn-field">
+    <span class="sn-lbl">定时发布</span>
+    <div class="sn-pk" data-pk="datetime" style="min-width:250px">
+      <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择发布时间">选择发布时间</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+      <div class="sn-pk-panel" role="dialog" aria-label="选择发布时间"><div class="sn-pk-dt"><div class="sn-cal-slot"></div><div class="sn-tside"><span class="sn-cap">时间</span><div class="sn-tc-slot"></div></div></div>
+        <div class="sn-pk-foot"><span class="sn-note"></span><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+    </div>
+  </div>
+</sn-enhance>
+```
+
+React 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function PublishAt() {
+  return (
+    <div className="sn-field">
+      <span className="sn-lbl">定时发布</span>
+      <DatePicker kind="datetime" placeholder="选择发布时间" />
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { DatePicker } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-field">
+    <span class="sn-lbl">定时发布</span>
+    <DatePicker kind="datetime" placeholder="选择发布时间" />
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import DatePicker from "satin-ui/svelte/DatePicker.svelte";
+</script>
+
+<div class="sn-field">
+  <span class="sn-lbl">定时发布</span>
+  <DatePicker kind="datetime" placeholder="选择发布时间" />
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-picker-datetime",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">定时发布</span>
+        <div class="sn-pk" data-pk="datetime" style="min-width:250px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择发布时间">选择发布时间</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel" role="dialog" aria-label="选择发布时间"><div class="sn-pk-dt"><div class="sn-cal-slot"></div><div class="sn-tside"><span class="sn-cap">时间</span><div class="sn-tc-slot"></div></div></div>
+            <div class="sn-pk-foot"><span class="sn-note"></span><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class PickerDatetimeComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function PublishAt() {
+  return (
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">定时发布</span>
+        <div class="sn-pk" data-pk="datetime" style="min-width:250px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择发布时间">选择发布时间</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel" role="dialog" aria-label="选择发布时间"><div class="sn-pk-dt"><div class="sn-cal-slot"></div><div class="sn-tside"><span class="sn-cap">时间</span><div class="sn-tc-slot"></div></div></div>
+            <div class="sn-pk-foot"><span class="sn-note"></span><span class="sn-grow"></span><button class="sn-btn sn-primary sn-sm" type="button" data-ok>确定</button></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function PublishAt() {
+  return (
+    <div class="sn-field">
+      <span class="sn-lbl">定时发布</span>
+      <DatePicker kind="datetime" placeholder="选择发布时间" />
+    </div>
+  );
+}
 ```
 
 ### 省 / 市 / 区
@@ -108,44 +572,326 @@
 </div>
 ```
 
+纯 HTML 的写法：
+
+```jsx
+<sn-enhance>
+  <div class="sn-field">
+    <span class="sn-lbl">寄送地址</span>
+    <div class="sn-pk" data-pk="region" style="min-width:250px">
+      <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择省 / 市 / 区">选择省 / 市 / 区</span><span class="sn-end sn-swap"><span class="sn-a" data-i="map-pin"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+      <div class="sn-pk-panel sn-rg" role="dialog" aria-label="选择地址"><div class="sn-rg-search"><input class="sn-input sn-sm" type="text" enterkeyhint="search" placeholder="搜索省、市、区，比如：西湖" aria-label="搜索地址"></div>
+        <div class="sn-rg-hot">常用<button type="button" data-path="北京市/北京市">北京</button><button type="button" data-path="上海市/上海市">上海</button><button type="button" data-path="广东省/广州市">广州</button><button type="button" data-path="广东省/深圳市">深圳</button><button type="button" data-path="浙江省/杭州市">杭州</button><button type="button" data-path="四川省/成都市">成都</button></div>
+        <div class="sn-rg-tabs" role="tablist"><span class="sn-ink"></span></div><div class="sn-rg-vp"><div class="sn-rg-res sn-sa-vp sn-fy" role="listbox" hidden></div></div></div>
+    </div>
+  </div>
+</sn-enhance>
+```
+
+React 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function ShippingRegion() {
+  return (
+    <div className="sn-field">
+      <span className="sn-lbl">寄送地址</span>
+      <DatePicker kind="region" />
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { DatePicker } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-field">
+    <span class="sn-lbl">寄送地址</span>
+    <DatePicker kind="region" />
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import DatePicker from "satin-ui/svelte/DatePicker.svelte";
+</script>
+
+<div class="sn-field">
+  <span class="sn-lbl">寄送地址</span>
+  <DatePicker kind="region" />
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-picker-region",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">寄送地址</span>
+        <div class="sn-pk" data-pk="region" style="min-width:250px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择省 / 市 / 区">选择省 / 市 / 区</span><span class="sn-end sn-swap"><span class="sn-a" data-i="map-pin"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel sn-rg" role="dialog" aria-label="选择地址"><div class="sn-rg-search"><input class="sn-input sn-sm" type="text" enterkeyhint="search" placeholder="搜索省、市、区，比如：西湖" aria-label="搜索地址"></div>
+            <div class="sn-rg-hot">常用<button type="button" data-path="北京市/北京市">北京</button><button type="button" data-path="上海市/上海市">上海</button><button type="button" data-path="广东省/广州市">广州</button><button type="button" data-path="广东省/深圳市">深圳</button><button type="button" data-path="浙江省/杭州市">杭州</button><button type="button" data-path="四川省/成都市">成都</button></div>
+            <div class="sn-rg-tabs" role="tablist"><span class="sn-ink"></span></div><div class="sn-rg-vp"><div class="sn-rg-res sn-sa-vp sn-fy" role="listbox" hidden></div></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class PickerRegionComponent {}
+```
+
+Solid 的写法：
+
+```jsx
+export default function ShippingRegion() {
+  return (
+    <sn-enhance>
+      <div class="sn-field">
+        <span class="sn-lbl">寄送地址</span>
+        <div class="sn-pk" data-pk="region" style="min-width:250px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择省 / 市 / 区">选择省 / 市 / 区</span><span class="sn-end sn-swap"><span class="sn-a" data-i="map-pin"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+          <div class="sn-pk-panel sn-rg" role="dialog" aria-label="选择地址"><div class="sn-rg-search"><input class="sn-input sn-sm" type="text" enterkeyhint="search" placeholder="搜索省、市、区，比如：西湖" aria-label="搜索地址" /></div>
+            <div class="sn-rg-hot">常用<button type="button" data-path="北京市/北京市">北京</button><button type="button" data-path="上海市/上海市">上海</button><button type="button" data-path="广东省/广州市">广州</button><button type="button" data-path="广东省/深圳市">深圳</button><button type="button" data-path="浙江省/杭州市">杭州</button><button type="button" data-path="四川省/成都市">成都</button></div>
+            <div class="sn-rg-tabs" role="tablist"><span class="sn-ink"></span></div><div class="sn-rg-vp"><div class="sn-rg-res sn-sa-vp sn-fy" role="listbox" hidden></div></div></div>
+        </div>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { DatePicker } from "satin-ui/react";
+
+export default function ShippingRegion() {
+  return (
+    <div class="sn-field">
+      <span class="sn-lbl">寄送地址</span>
+      <DatePicker kind="region" />
+    </div>
+  );
+}
+```
+
 ### 拿到选中的值
 
-选好、清除时选择器上会冒泡一个 pick 事件，e.detail.text 是触发框里显示的文字；要交给接口时按需要的格式自己转。
+选好、清除时拿到 `{ text }`：组件是 `onChange`（Vue `@change`、Svelte `onchange`），手写标记听冒泡上来的 `pick`。text 是触发框里显示的文字，交给接口时按需要的格式自己转。
 
 ```html
-<div class="sn-stack sn-gap-8" data-ex="due">
+<div class="sn-stack sn-gap-8" id="due-events">
   <div class="sn-field"><span class="sn-lbl">交付日期</span>
     <div class="sn-pk" data-pk="date">
     <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择日期">选择日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
     <div class="sn-pk-panel" role="dialog" aria-label="选择日期"><div class="sn-cal-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-today>今天</button><span class="sn-grow"></span><button class="sn-btn sn-ghost sn-sm" type="button" data-clear>清除</button></div></div>
   </div>
   </div>
-  <span class="sn-help" data-out>还没选交付日期</span>
+  <span class="sn-help">还没选交付日期</span>
 </div>
 ```
 
-```js
-const box = document.querySelector('[data-ex="due"]');
-box.addEventListener("pick", (e) => {
-  box.querySelector("[data-out]").textContent = e.detail.text ? "交付日期：" + e.detail.text : "还没选交付日期";
-});
+纯 HTML 的写法：
+
+```jsx
+<sn-enhance>
+  <div class="sn-stack sn-gap-8" id="due-events">
+    <div class="sn-field">
+      <span class="sn-lbl">交付日期</span>
+      <div class="sn-pk" data-pk="date">
+        <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择日期">选择日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+        <div class="sn-pk-panel" role="dialog" aria-label="选择日期"><div class="sn-cal-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-today>今天</button><span class="sn-grow"></span><button class="sn-btn sn-ghost sn-sm" type="button" data-clear>清除</button></div></div>
+      </div>
+    </div>
+    <span class="sn-help">还没选交付日期</span>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  const box = document.getElementById("due-events");
+  // 选好、清除时选择器上冒泡一个 pick 事件，e.detail.text 是触发框里显示的文字（清除时是空字符串）
+  box.addEventListener("pick", (e) => {
+    box.querySelector(".sn-help").textContent = e.detail.text ? "交付日期：" + e.detail.text : "还没选交付日期";
+  });
+</script>
+```
+
+React 的写法：
+
+```jsx
+import { useState } from "react";
+import { DatePicker } from "satin-ui/react";
+
+export default function DueDate() {
+  const [due, setDue] = useState("");
+  return (
+    <div className="sn-stack sn-gap-8">
+      <div className="sn-field">
+        <span className="sn-lbl">交付日期</span>
+        {/* 选好、清除时调 onChange；text 是触发框里显示的文字（清除时是空字符串），交给接口时按需要的格式自己转 */}
+        <DatePicker onChange={(d) => setDue(d.text)} />
+      </div>
+      <span className="sn-help">{due ? "交付日期：" + due : "还没选交付日期"}</span>
+    </div>
+  );
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { DatePicker } from "satin-ui/vue";
+
+const due = ref("");
+</script>
+
+<template>
+  <div class="sn-stack sn-gap-8">
+    <div class="sn-field">
+      <span class="sn-lbl">交付日期</span>
+      <!-- 选好、清除时发 change；text 是触发框里显示的文字（清除时是空字符串），交给接口时按需要的格式自己转 -->
+      <DatePicker @change="(d) => (due = d.text)" />
+    </div>
+    <span class="sn-help">{{ due ? "交付日期：" + due : "还没选交付日期" }}</span>
+  </div>
+</template>
+```
+
+Svelte 的写法：
+
+```jsx
+<script>
+  import DatePicker from "satin-ui/svelte/DatePicker.svelte";
+
+  let due = $state("");
+</script>
+
+<div class="sn-stack sn-gap-8">
+  <div class="sn-field">
+    <span class="sn-lbl">交付日期</span>
+    <!-- 选好、清除时调 onchange；text 是触发框里显示的文字（清除时是空字符串），交给接口时按需要的格式自己转 -->
+    <DatePicker onchange={(d) => (due = d.text)} />
+  </div>
+  <span class="sn-help">{due ? "交付日期：" + due : "还没选交付日期"}</span>
+</div>
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
+import type { PickDetail } from "satin-ui";
+
+@Component({
+  selector: "demo-picker-events",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-stack sn-gap-8" (pick)="onPick($event)">
+        <div class="sn-field">
+          <span class="sn-lbl">交付日期</span>
+          <div class="sn-pk" data-pk="date">
+            <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择日期">选择日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+            <div class="sn-pk-panel" role="dialog" aria-label="选择日期"><div class="sn-cal-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-today>今天</button><span class="sn-grow"></span><button class="sn-btn sn-ghost sn-sm" type="button" data-clear>清除</button></div></div>
+          </div>
+        </div>
+        <span class="sn-help">{{ due() ? "交付日期：" + due() : "还没选交付日期" }}</span>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class PickerEventsComponent {
+  protected due = signal("");
+  // 选好、清除时选择器上冒泡一个 pick 事件，detail.text 是触发框里显示的文字（清除时是空字符串）
+  onPick(e: Event) {
+    this.due.set((e as CustomEvent<PickDetail>).detail.text);
+  }
+}
+```
+
+Solid 的写法：
+
+```jsx
+import { createSignal } from "solid-js";
+
+// 名字不是驼峰的原生事件用 ref 挂（Solid 2 的 onXxx 只认驼峰的事件名）
+const on = (type, fn) => (el) => el.addEventListener(type, fn);
+
+export default function DueDate() {
+  const [due, setDue] = createSignal("");
+  // 选好、清除时选择器上冒泡一个 pick 事件，e.detail.text 是触发框里显示的文字（清除时是空字符串）
+  return (
+    <sn-enhance>
+      <div class="sn-stack sn-gap-8" ref={on("pick", (e) => setDue(e.detail.text))}>
+        <div class="sn-field">
+          <span class="sn-lbl">交付日期</span>
+          <div class="sn-pk" data-pk="date">
+            <button class="sn-pk-trigger" type="button" aria-haspopup="dialog"><span class="sn-val sn-ph" data-ph="选择日期">选择日期</span><span class="sn-end sn-swap"><span class="sn-a" data-i="calendar"></span><span class="sn-b" data-i="x" role="button" aria-label="清除"></span></span></button>
+            <div class="sn-pk-panel" role="dialog" aria-label="选择日期"><div class="sn-cal-slot"></div><div class="sn-pk-foot"><button class="sn-btn sn-ghost sn-sm" type="button" data-today>今天</button><span class="sn-grow"></span><button class="sn-btn sn-ghost sn-sm" type="button" data-clear>清除</button></div></div>
+          </div>
+        </div>
+        <span class="sn-help">{due() ? "交付日期：" + due() : "还没选交付日期"}</span>
+      </div>
+    </sn-enhance>
+  );
+}
+```
+
+Preact 的写法：
+
+```jsx
+import { useState } from "preact/hooks";
+import { DatePicker } from "satin-ui/react";
+
+export default function DueDate() {
+  const [due, setDue] = useState("");
+  return (
+    <div class="sn-stack sn-gap-8">
+      <div class="sn-field">
+        <span class="sn-lbl">交付日期</span>
+        {/* 选好、清除时调 onChange；text 是触发框里显示的文字（清除时是空字符串），交给接口时按需要的格式自己转 */}
+        <DatePicker onChange={(d) => setDue(d.text)} />
+      </div>
+      <span class="sn-help">{due ? "交付日期：" + due : "还没选交付日期"}</span>
+    </div>
+  );
+}
 ```
 
 ## 属性
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `kind` | `"date" \| "range" \| "time" \| "datetime" \| "region"` | — | 是 | 选择器的种类：日期、日期范围、时间、定时发布（日期 + 时间）、省市区。（例：`data-pk="range"`） | 标记：`data-pk（写在 .sn-pk 上）` |
-| `placeholder` | `string` | — | 否 | 还没选时触发框里的字，写要选什么："选择日期"。 | 标记：`data-ph（写在 .sn-val 上，里面的文字和它一样）` |
-| `today` | `Date` | 今天 | 否 | 日历里的"今天"（数字下面一个小点、"今天"按钮、快捷范围）。测试、截图时可以固定成某一天。 | createXxx 选项：`today` |
-| `now` | `Date` | 现在 | 否 | "此刻"按钮、定时发布"不能早于现在"的判断用的时间。 | createXxx 选项：`now` |
+| `kind` | `PickerKind（"date" \| "range" \| "time" \| "datetime" \| "region"）` | "date" | 否 | 选择器的种类：日期、日期范围（两个月并排，左边快捷项）、时间（时、分两列）、定时发布（日期 + 时间）、省市区。只在创建时用：要换种类就换 key 重新挂。（例：`kind="range"`） | createXxx 选项：`kind`；React：`kind`；Vue：`kind`；Svelte：`kind`；Preact：`kind`；标记：`data-pk（写在 .sn-pk 上）`；纯 HTML：`data-pk（写在 .sn-pk 上）` |
+| `placeholder` | `string` | 按种类："选择日期""选择开始和结束日期""选择时间""选择日期和时间""选择省 / 市 / 区" | 否 | 还没选时触发框里的字，写要选什么："选择发布时间"。 | createXxx 选项：`placeholder`；React：`placeholder`；Vue：`placeholder`；Svelte：`placeholder`；Preact：`placeholder`；标记：`data-ph（写在 .sn-val 上，里面的文字和它一样）`；纯 HTML：`data-ph（写在 .sn-val 上，里面的文字和它一样）` |
+| `label` | `string` | 单选和 placeholder 一样；范围是"选择日期范围"，地址是"选择地址" | 否 | 面板（`role="dialog"`）的读屏名称。 | createXxx 选项：`label`；React：`label`；Vue：`label`；Svelte：`label`；Preact：`label`；纯 HTML：`.sn-pk-panel 的 aria-label` |
+| `today` | `Date` | 今天 | 否 | 日历里的"今天"（数字下面一个小点、"今天"按钮、快捷范围）。测试、截图时可以固定成某一天。 | createXxx 选项：`today`；React：`today`；Vue：`today`；Svelte：`today`；Preact：`today` |
+| `now` | `Date` | 现在 | 否 | "此刻"按钮、定时发布"不能早于现在"的判断用的时间。 | createXxx 选项：`now`；React：`now`；Vue：`now`；Svelte：`now`；Preact：`now` |
 
 ## 事件
 
 | 名称 | 参数 | 什么时候 | 各写法 |
 |---|---|---|---|
-| `change` | `PickDetail（{ text: string }）` | 值变了（选中、清除）时；text 是触发框里显示的文字（比如"11 月 19 日 星期四"），清除时是空字符串。 | createXxx 选项：`onChange`；纯 HTML：`addEventListener("sn-change")（createPicker 接的）`；React：`createPicker 的 onChange`；Vue：`createPicker 的 onChange`；Angular：`(sn-change)`；Svelte：`onsn-change`；Solid：`addEventListener("sn-change")`；Preact：`onsn-change` |
-| `pick` | `PickDetail（{ text: string }）` | 同上，在 `.sn-pk` 上冒泡；`enhance()`、`bindPickers()` 接的标记都有。 | 纯 HTML：`addEventListener("pick")` |
+| `change` | `PickDetail（{ text: string }）` | 值变了（选中、清除）时；text 是触发框里显示的文字（比如"11 月 19 日 星期四"），清除时是空字符串。 | createXxx 选项：`onChange`；React：`onChange`；Vue：`@change`；Svelte：`onchange`；Preact：`onChange`；纯 HTML：`createPicker 的 onChange，或者元素上冒泡的 sn-change`；Angular：`（手写标记的写法听下面的 pick）`；Solid：`（手写标记的写法听下面的 pick）` |
+| `pick` | `PickDetail（{ text: string }）` | 同上，在 `.sn-pk` 上冒泡；`enhance()`、`<sn-enhance>`、`bindPickers()` 接的标记都有。 | 纯 HTML：`addEventListener("pick")`；Angular：`(pick)`；Solid：`ref 里 addEventListener("pick")` |
 
 ## 函数
 
@@ -164,7 +910,7 @@ box.addEventListener("pick", (e) => {
 
 | 类名 / 属性 | 作用 |
 |---|---|
-| `.sn-pk[data-pk]` | 选择器；`data-pk` 是种类 |
+| `.sn-pk[data-pk]` | 选择器；`data-pk` 是种类（`createPicker.html({ kind })` 生成的就是这一整段） |
 | `.sn-pk-trigger > .sn-val[data-ph]` | 触发框和里面显示的文字；没选时 `.sn-val` 带 `.sn-ph` |
 | `.sn-end.sn-swap > .sn-a / .sn-b` | 右边的图标；有值时悬停换成清除（`.sn-b`） |
 | `.sn-pk-panel[role="dialog"]` | 面板；写 `aria-label` |
@@ -176,7 +922,7 @@ box.addEventListener("pick", (e) => {
 
 ## 导出的类型
 
-`PickerOptions`、`PickDetail`
+`PickerOptions`、`PickDetail`、`PickerKind`、`DatePickerProps`
 
 ## 键盘
 
