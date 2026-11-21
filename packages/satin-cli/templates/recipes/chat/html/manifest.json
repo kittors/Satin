@@ -1,0 +1,7 @@
+{
+  "title": "AI 对话",
+  "files": [
+    "chat.html"
+  ],
+  "entry": "chat.html"
+}

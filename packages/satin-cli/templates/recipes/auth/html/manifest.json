@@ -1,0 +1,7 @@
+{
+  "title": "登录 / 注册",
+  "files": [
+    "auth.html"
+  ],
+  "entry": "auth.html"
+}

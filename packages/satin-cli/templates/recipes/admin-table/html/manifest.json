@@ -1,0 +1,7 @@
+{
+  "title": "后台列表（侧栏 + 搜索筛选 + 表格 + 分页）",
+  "files": [
+    "admin-table.html"
+  ],
+  "entry": "admin-table.html"
+}

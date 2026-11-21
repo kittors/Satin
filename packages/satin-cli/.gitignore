@@ -1,0 +1,4 @@
+# prepack 时从仓库拷进来的（见 scripts/prepack.mjs），不进 git
+templates/skill/
+templates/meta.json
+*.tgz

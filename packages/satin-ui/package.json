@@ -11,6 +11,9 @@
   "main": "./src/index.js",
   "module": "./src/index.js",
   "types": "./types/index.d.ts",
+  "bin": {
+    "satin-ui": "./bin/satin-ui.js"
+  },
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
@@ -99,7 +102,8 @@
     "vue",
     "elements",
     "tokens",
-    "vite"
+    "vite",
+    "bin"
   ],
   "peerDependencies": {
     "react": ">=18",

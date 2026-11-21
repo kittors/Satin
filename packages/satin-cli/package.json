@@ -1,0 +1,27 @@
+{
+  "name": "satin-cli",
+  "version": "0.1.0",
+  "description": "Satin 的命令行工具：一条命令建好用 Satin 的项目（9 种框架），装好给编码助手的技能和 AGENTS.md，拷页面配方，跑去 AI 味检查，查项目配置",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "satin": "./bin/satin.js"
+  },
+  "exports": {
+    ".": "./src/cli.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "src",
+    "starters",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "prepack": "node scripts/prepack.mjs"
+  }
+}

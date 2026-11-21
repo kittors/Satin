@@ -1,0 +1,7 @@
+{
+  "title": "移动端 H5 下单",
+  "files": [
+    "mobile-order.html"
+  ],
+  "entry": "mobile-order.html"
+}

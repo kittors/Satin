@@ -1,0 +1,7 @@
+{
+  "title": "表单向导（多步）",
+  "files": [
+    "wizard.html"
+  ],
+  "entry": "wizard.html"
+}
