@@ -39,14 +39,15 @@
     ],
     "api": [
       [
-        "createCanvasGrid(空容器或 .sn-grid, { rows, seed })",
+        "createCanvasGrid(空容器, { columns, data 或 dataSource, rowKey })",
         "satin-ui/canvas-grid"
       ]
     ]
   },
   "example": {
     "0": {
-      "js": "import { createCanvasGrid } from \"satin-ui/canvas-grid\";\nimport \"satin-ui/css/grid.css\";\nimport \"satin-ui/css/data.css\";\n\n// 整张表画在一块画布上：百万行照样流畅；交互和 DOM 版一致\nconst grid = createCanvasGrid(document.querySelector(\"#grid\"), { rows: 1000000 }); // 卸载时 grid.destroy()"
+      "html": "<div id=\"grid\"></div>",
+      "js": "import { createCanvasGrid } from \"satin-ui/canvas-grid\";\nimport \"satin-ui/css/grid.css\";\nimport \"satin-ui/css/data.css\";\n\nconst STATUS = [\"待开始\", \"生成中\", \"审核中\", \"已完成\", \"已暂停\"];\nconst SCENES = [\"雨夜车站\", \"候车厅\", \"站台\", \"列车上\", \"终点站\", \"海边\", \"旧城区\", \"天台\"];\n// 第 i 行：假的服务端按行号算出来（真的项目里换成 fetch，按 start、end 返回这一段）\nconst rowAt = (i) => {\n  const h = Math.imul(i + 1, 2654435761) >>> 0; // 按行号算出看起来随机的值\n  return { id: i + 1, name: `${SCENES[i % 8]} ${i + 1}`, status: STATUS[h % 5], shots: 4 + ((h >>> 12) % 120), dur: 15 + ((h >>> 16) % 1800), prog: (h >>> 20) % 101 };\n};\n\nconst columns = [\n  { key: \"name\", title: \"名称\", width: 200, primary: true },\n  { key: \"status\", title: \"状态\", type: \"status\", width: 116, options: STATUS },\n  { key: \"shots\", title: \"镜头\", type: \"int\", width: 88 },\n  { key: \"dur\", title: \"时长\", type: \"dur\", width: 96 },\n  { key: \"prog\", title: \"进度\", type: \"prog\", width: 148 },\n];\n\n// 整张表画在一块画布上：一百万行在服务端，按块要（一块 200 行），滚到哪要到哪，还没到的行画占位条。\n// 这个假的服务端不会搜索、排序：不要工具条（toolbar: false），列也不写 sortable\nconst grid = createCanvasGrid(document.querySelector(\"#grid\"), {\n  columns, rowKey: \"id\", toolbar: false, label: \"一百万个镜头\",\n  dataSource: {\n    total: 1000000,\n    async load({ start, end }) {\n      await new Promise((r) => setTimeout(r, 200)); // 模拟网络\n      return Array.from({ length: end - start }, (_, k) => rowAt(start + k));\n    },\n  },\n});\n// 卸载时调 grid.destroy()"
     }
   },
   "demos": [

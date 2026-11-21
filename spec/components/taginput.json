@@ -74,7 +74,7 @@
   "example": {
     "0": {
       "html": "<div class=\"sn-box-in sn-tagin\" data-tagin data-max=\"8\">\n  <input placeholder=\"输入标签，回车确认\" aria-label=\"添加标签\">\n</div>\n<div class=\"sn-tagin-foot\">\n  <span>回车或逗号添加 · 退格删除</span><span class=\"sn-num\"><span class=\"sn-roll\"><span>0</span></span> / 8</span>\n</div>",
-      "js": "import { createTagInput } from \"satin-ui/components\";\nimport \"satin-ui/css/input.css\";\n\n// 回车或逗号加标签；重复的抖一下；超过 data-max 个不让加；\n// 退格先\"点亮\"最后一个、再按才删；粘贴一串自动拆开；中文输入法拼字时不响应\nconst tags = createTagInput(document.querySelector(\"[data-tagin]\"), {\n  tags: [\"雨夜\", \"车站\"],\n  onChange: (list) => console.log(list),\n});\ntags.tags;    // [\"雨夜\", \"车站\"]\n\n// 不写标记也行：给一个空容器，按选项渲染（输入框 + 下面的计数行）\ncreateTagInput(document.querySelector(\"#tags\"), { tags: [\"雨夜\"], max: 8 });"
+      "js": "import { createTagInput } from \"satin-ui/components\";\nimport \"satin-ui/css/input.css\";\n\n// 回车或逗号加标签；重复的抖一下；超过 data-max 个不让加；\n// 退格先\"点亮\"最后一个、再按才删；粘贴一串自动拆开；中文输入法拼字时不响应\nconst tags = createTagInput(document.querySelector(\"[data-tagin]\"), {\n  tags: [\"雨夜\", \"车站\"],\n  onChange: (list) => console.log(list),\n});\ntags.tags;    // [\"雨夜\", \"车站\"]\n\n// 不写标记也行：createTagInput(空容器, { tags: [\"雨夜\"], max: 8 }) 按选项渲染（输入框 + 下面的计数行）"
     }
   },
   "demos": [

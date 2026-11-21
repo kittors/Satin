@@ -43,7 +43,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createStepper } from \"satin-ui/components\";\n\n// <div class=\"sn-stepper\" data-stepper data-min=\"1\" data-max=\"60\" data-value=\"4\">…</div>\n// 按住连发（400ms 起、越来越快，最快 50ms 一次）；在数字上左右拖每 8px 一格；方向键一格、Shift 十格\nconst dur = createStepper(document.querySelector(\"[data-stepper]\"), {\n  onChange: (v) => console.log(\"时长\", v),\n});\ndur.set(10);\ndur.value; // 10\n\n// 不写标记也行：给一个空容器，按选项渲染\ncreateStepper(document.querySelector(\"#dur\"), { value: 4, min: 1, max: 60, unit: \"秒\", label: \"镜头时长\" });"
+      "js": "import { createStepper } from \"satin-ui/components\";\n\n// <div class=\"sn-stepper\" data-stepper data-min=\"1\" data-max=\"60\" data-value=\"4\">…</div>\n// 按住连发（400ms 起、越来越快，最快 50ms 一次）；在数字上左右拖每 8px 一格；方向键一格、Shift 十格\nconst dur = createStepper(document.querySelector(\"[data-stepper]\"), {\n  onChange: (v) => console.log(\"时长\", v),\n});\ndur.set(10);\ndur.value; // 10\n\n// 不写标记也行：createStepper(空容器, { value: 4, min: 1, max: 60, unit: \"秒\", label: \"镜头时长\" }) 按选项渲染"
     }
   },
   "demos": [

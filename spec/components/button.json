@@ -94,7 +94,7 @@
   "example": {
     "3": {
       "html": "<!-- 可等待的按钮：busy() 会把内容包成 .sn-label，转圈和对勾都放在里面 -->\n<button class=\"sn-btn sn-primary\" id=\"save\">保存修改</button>",
-      "js": "import { busy, succeed } from \"satin-ui/components\";\nimport \"satin-ui/css/buttons.css\";\n\nconst save = document.querySelector(\"#save\");\nsave.addEventListener(\"click\", async () => {\n  // 300ms 内回来不转圈；转圈出现后至少留 500ms；等待期间点不了\n  await busy(save, fetch(\"/api/projects/42\", { method: \"PUT\" }));\n  succeed(save); // 原地换成对勾，一会儿换回文字\n});"
+      "js": "import { busy, succeed } from \"satin-ui/components\";\nimport \"satin-ui/css/buttons.css\";\n\nconst save = document.querySelector(\"#save\");\nconst request = () => new Promise((done) => setTimeout(done, 1200)); // 换成你的请求，比如 fetch(\"/api/projects/42\", { method: \"PUT\" })\nsave.addEventListener(\"click\", async () => {\n  // 300ms 内回来不转圈；转圈出现后至少留 500ms；等待期间点不了\n  await busy(save, request());\n  succeed(save); // 原地换成对勾，一会儿换回文字\n});"
     }
   },
   "demos": [

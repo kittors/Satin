@@ -68,7 +68,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createCollapse, bindCollapses } from \"satin-ui/components\";\n\n// 点条目标题展开 / 收起（高度过渡）；single：同时只开一项\nconst faq = createCollapse(document.querySelector(\".sn-acc\"), {\n  single: true,\n  onToggle: ({ open }) => console.log(open ? \"展开\" : \"收起\"),\n});\nfaq.open(0);\n\n// 或者把页面上所有 .sn-acc 一次接上\nbindCollapses(document);\n\n// 不写标记也行：给一个空容器，按选项渲染\ncreateCollapse(document.querySelector(\"#faq\"), {\n  items: [{ title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里。\" }, { title: \"能多人一起编辑吗？\", content: \"可以，在设置里邀请协作者。\" }],\n  open: [0],\n});"
+      "js": "import { createCollapse, bindCollapses } from \"satin-ui/components\";\n\n// 点条目标题展开 / 收起（高度过渡）；single：同时只开一项\nconst faq = createCollapse(document.querySelector(\".sn-acc\"), {\n  single: true,\n  onToggle: ({ open }) => console.log(open ? \"展开\" : \"收起\"),\n});\nfaq.open(0);\n\n// 或者把页面上所有 .sn-acc 一次接上\nbindCollapses(document);\n\n// 不写标记也行：createCollapse(空容器, { items: [{ title, content }], open: [0] }) 按选项渲染"
     }
   },
   "demos": [
