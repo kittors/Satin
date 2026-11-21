@@ -78,6 +78,9 @@ import GridDemo0 from "./demos/grid-0.vue";
 import CgridDemo0 from "./demos/cgrid-0.vue";
 import ListDemo0 from "./demos/list-0.vue";
 import CardDemo0 from "./demos/card-0.vue";
+import TagsAvatar from "./demos/tags-avatar.vue";
+import TagsBadge from "./demos/tags-badge.vue";
+import TagsBasic from "./demos/tags-basic.vue";
 import TagsDemo0 from "./demos/tags-0.vue";
 import CollapseDemo0 from "./demos/collapse-0.vue";
 import ScrollareaDemo0 from "./demos/scrollarea-0.vue";
@@ -348,6 +351,9 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="tags">
     <h2>标签、徽标与头像</h2>
+    <div class="demo" data-demo="tags-avatar"><TagsAvatar /></div>
+    <div class="demo" data-demo="tags-badge"><TagsBadge /></div>
+    <div class="demo" data-demo="tags-basic"><TagsBasic /></div>
     <div class="demo" data-demo="tags-0"><TagsDemo0 /></div>
   </section>
   <section id="collapse">

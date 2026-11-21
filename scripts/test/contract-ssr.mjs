@@ -48,7 +48,7 @@ function norm(html) {
         const REF = new Set(["for", "aria-labelledby", "aria-describedby", "aria-controls", "aria-owns", "list"]);
         // 属性名不分大小写（React 的 autoComplete）；data-x="true" 和 data-x="" 一样（库只看有没有）；受控输入框的空 value="" 不算
         const attrs = [...c.attributes].map((a) => [a.name.toLowerCase(), a.value]).filter(([k, v]) => !WIRING.has(k) && !(k === "value" && v === "" && /^(INPUT|TEXTAREA)$/.test(c.tagName)))
-          .map(([k, v]) => [k, k === "class" ? v.split(/\s+/).filter(Boolean).sort().join(" ") : REF.has(k) ? "·" : k.startsWith("data-") && v === "true" ? "" : v]).sort((a, b) => a[0].localeCompare(b[0]));
+          .map(([k, v]) => [k, k === "class" ? v.split(/\s+/).filter(Boolean).sort().join(" ") : k === "style" ? v.split(";").map((d) => d.trim().replace(/\s*:\s*/, ":")).filter(Boolean).sort().join(";") : REF.has(k) ? "·" : k.startsWith("data-") && v === "true" ? "" : v]).sort((a, b) => a[0].localeCompare(b[0]));
         for (const a of [...c.attributes]) c.removeAttribute(a.name);
         for (const [k, v] of attrs) c.setAttribute(k, v);
         walk(c);

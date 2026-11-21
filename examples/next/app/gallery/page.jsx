@@ -78,6 +78,9 @@ import GridDemo0 from "../demos/grid-0.jsx";
 import CgridDemo0 from "../demos/cgrid-0.jsx";
 import ListDemo0 from "../demos/list-0.jsx";
 import CardDemo0 from "../demos/card-0.jsx";
+import TagsAvatar from "../demos/tags-avatar.jsx";
+import TagsBadge from "../demos/tags-badge.jsx";
+import TagsBasic from "../demos/tags-basic.jsx";
 import TagsDemo0 from "../demos/tags-0.jsx";
 import CollapseDemo0 from "../demos/collapse-0.jsx";
 import ScrollareaDemo0 from "../demos/scrollarea-0.jsx";
@@ -348,6 +351,9 @@ export default function Gallery() {
       </section>
       <section id="tags">
         <h2>标签、徽标与头像</h2>
+        <div className="demo" data-demo="tags-avatar"><TagsAvatar /></div>
+        <div className="demo" data-demo="tags-badge"><TagsBadge /></div>
+        <div className="demo" data-demo="tags-basic"><TagsBasic /></div>
         <div className="demo" data-demo="tags-0"><TagsDemo0 /></div>
       </section>
       <section id="collapse">

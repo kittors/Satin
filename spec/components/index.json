@@ -365,7 +365,7 @@
     "en": "Tag · Badge · Avatar",
     "group": "数据展示",
     "summary": "标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块。头像没有照片时用名字的第一个字，底色从几种低饱和色里按名字固定取一种。",
-    "contract": 0
+    "contract": 1
   },
   {
     "id": "collapse",

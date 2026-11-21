@@ -78,6 +78,9 @@
   import CgridDemo0 from "./demos/cgrid-0.svelte";
   import ListDemo0 from "./demos/list-0.svelte";
   import CardDemo0 from "./demos/card-0.svelte";
+  import TagsAvatar from "./demos/tags-avatar.svelte";
+  import TagsBadge from "./demos/tags-badge.svelte";
+  import TagsBasic from "./demos/tags-basic.svelte";
   import TagsDemo0 from "./demos/tags-0.svelte";
   import CollapseDemo0 from "./demos/collapse-0.svelte";
   import ScrollareaDemo0 from "./demos/scrollarea-0.svelte";
@@ -347,6 +350,9 @@
   </section>
   <section id="tags">
     <h2>标签、徽标与头像</h2>
+    <div class="demo" data-demo="tags-avatar"><TagsAvatar /></div>
+    <div class="demo" data-demo="tags-badge"><TagsBadge /></div>
+    <div class="demo" data-demo="tags-basic"><TagsBasic /></div>
     <div class="demo" data-demo="tags-0"><TagsDemo0 /></div>
   </section>
   <section id="collapse">

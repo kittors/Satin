@@ -715,6 +715,36 @@
   "css": false
  },
  {
+  "slug": "tags-avatar",
+  "id": "tags",
+  "n": -1,
+  "name": "标签、徽标与头像",
+  "group": "数据展示",
+  "cap": "头像与头像组",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tags-badge",
+  "id": "tags",
+  "n": -1,
+  "name": "标签、徽标与头像",
+  "group": "数据展示",
+  "cap": "数量徽标",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tags-basic",
+  "id": "tags",
+  "n": -1,
+  "name": "标签、徽标与头像",
+  "group": "数据展示",
+  "cap": "状态标签",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "tags-0",
   "id": "tags",
   "n": 0,
