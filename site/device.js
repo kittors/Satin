@@ -31,30 +31,39 @@ const save = (p) => { try { localStorage.setItem(KEY, JSON.stringify(p)); } catc
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 let n = 0;
 // 状态栏（竖屏）：iPhone 时间在灵动岛左边那块的正中、图标在右边那块；SE 时间居中、信号在左、电量在右；安卓时间靠左、图标靠右。图形只用 currentColor
+// 三个图标一样高（12）、底边对齐、间距统一（iPhone 5px、安卓 6px），视觉分量相当：
+// · 信号：4 格等宽（3）、顶部圆角、高度递增（4.5 → 12）
+// · Wi-Fi：以底部一点为圆心的三层——最下面一个小扇形，上面两段同心弧（粗 2、端点圆），上宽下窄，±45°；层与层间隔一样（1.5）
+// · 电量：描边的圆角矩形（描边淡一点），里面一截电量（约 3/4，不是整块实心），右边一个小凸头
+// 安卓（Material）同样的标准：Wi-Fi 是一整块扇形、信号是直角三角形（拐角都是圆的），电池竖着、描边 + 电量 + 顶上凸头
 const SVG = (w, h, vb, body) => `<svg width="${w}" height="${h}" viewBox="${vb}" fill="currentColor" aria-hidden="true">${body}</svg>`;
+const bar = (x, y) => `<path d="M${x} 12V${y + 1}a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1V12Z"/>`;
 const IOS = {
-  sig: SVG(17, 11, "0 0 17 11", '<rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.67" y="5" width="3" height="6" rx="1"/><rect x="9.33" y="2.5" width="3" height="8.5" rx="1"/><rect x="14" y="0" width="3" height="11" rx="1"/>'),
-  wifi: SVG(15, 11, "0 0 15 11", '<path d="M7.5 2.3c2.1 0 4 .8 5.5 2.2l1.1-1.1A9.3 9.3 0 0 0 7.5.7 9.3 9.3 0 0 0 .9 3.4L2 4.5a7.7 7.7 0 0 1 5.5-2.2Z"/><path d="M7.5 5.6c1.2 0 2.3.5 3.2 1.3l1.1-1.1a6.1 6.1 0 0 0-8.6 0l1.1 1.1c.9-.8 2-1.3 3.2-1.3Z"/><path d="M7.5 8.4 9.4 10.3 7.5 11 5.6 10.3Z"/>'),
-  bat: SVG(25, 12, "0 0 25 12", '<rect x=".5" y=".5" width="21" height="11" rx="3.2" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="18" height="8" rx="1.9"/><path d="M23 4v4c.8-.3 1.3-1.1 1.3-2S23.8 4.3 23 4Z" opacity=".45"/>'),
+  sig: SVG(17, 12, "0 0 17 12", bar(0, 7.5) + bar(4.67, 5.5) + bar(9.33, 3) + bar(14, 0)),
+  wifi: SVG(18, 12, "0 0 18 12", '<path d="M9 11.1 6.1 8.2a4.1 4.1 0 0 1 5.8 0Z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>'
+    + '<path d="M4 6.6a7.1 7.1 0 0 1 10 0M1.5 4.1a10.6 10.6 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'),
+  bat: SVG(27, 12, "0 0 27 12", '<rect x=".5" y=".5" width="23" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="15" height="8" rx="2"/><path d="M25 4v4c.9-.3 1.5-1.1 1.5-2S25.9 4.3 25 4Z" opacity=".45"/>'),
 };
 const DROID = {
-  wifi: SVG(15, 12, "0 0 15 12", '<path d="M7.5 11.6 0 3.2A11.4 11.4 0 0 1 7.5.4 11.4 11.4 0 0 1 15 3.2Z"/>'),
-  sig: SVG(12, 12, "0 0 12 12", '<path d="M12 0v12H0Z"/>'),
-  bat: SVG(7, 12, "0 0 7 12", '<rect x="2" y="0" width="3" height="1.6" rx=".5"/><rect x="0" y="1.2" width="7" height="10.8" rx="1.4"/>'),
+  wifi: SVG(16, 12, "0 0 16 12", '<path d="M8 11.3.9 4.3a10 10 0 0 1 14.2 0Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>'),
+  sig: SVG(12, 12, "0 0 12 12", '<path d="M11.4 .9v10.5H.9Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>'),
+  bat: SVG(8, 12, "0 0 8 12", '<rect x="2.5" y="0" width="3" height="1.6" rx=".6"/><rect x=".5" y="1.5" width="7" height="10" rx="1.6" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="5" width="4" height="5" rx=".8"/>'),
 };
 const sbHTML = (kind) => kind === "island" ? `<span class="s-sb-t">9:41</span><span class="s-sb-ic">${IOS.sig}${IOS.wifi}${IOS.bat}</span>`
   : kind === "home" ? `<span class="s-sb-ic s-sb-l">${IOS.sig}${IOS.wifi}</span><span class="s-sb-t">9:41</span><span class="s-sb-ic s-sb-r">${IOS.bat}</span>`
   : `<span class="s-sb-t">12:30</span><span class="s-sb-ic">${DROID.wifi}${DROID.sig}${DROID.bat}</span>`;
 
 // fit："sticky"（钉在一侧，按视口高度缩放）/ "block"（正文里一块，最高 maxH）
-export function deviceHTML({ src, title = "手机预览", fit = "block", maxH = 760 }) {
+// under：内容页（仪表盘、下单页这类按内容往下排的页面）——像 iOS 那样内容能滚到状态栏底下：iframe 顶到屏幕最上沿，页面顶上让出状态栏那么高（往 iframe 里加一条样式），
+//   状态栏那一条是半透明的页面底色加模糊，滚上去的内容在底下糊开，不跟时间、信号叠在一起。app 式页面（整页一个应用、自己占满一屏）不这样，iframe 从状态栏下面开始
+export function deviceHTML({ src, title = "手机预览", fit = "block", maxH = 760, under = false }) {
   const id = "dev-menu-" + ++n, p = pref(), d = byId[p.id];
   const items = DEVICES.map((x) => `<div class="sn-item s-dev-item${x.id === d.id ? " sn-sel" : ""}" data-dev-id="${x.id}" role="menuitemradio" aria-checked="${x.id === d.id}"><span class="s-dev-n">${esc(x.name)}</span><span class="s-dev-v">${x.w} × ${x.h}</span><span class="s-dev-ck">${icon("check")}</span></div>`).join("");
-  return `<div class="s-devbox" data-devbox data-src="${esc(src)}" data-fit="${fit}" data-max-h="${maxH}" data-title="${esc(title)}">`
+  return `<div class="s-devbox" data-devbox data-src="${esc(src)}" data-fit="${fit}" data-max-h="${maxH}" data-title="${esc(title)}"${under ? " data-under" : ""}>`
     + `<div class="s-devbar"><button class="s-dev-btn" type="button" data-fmenu="${id}" aria-label="换机型：${esc(d.name)}"><span class="s-dev-name">${esc(d.name)}</span>${icon("chevron-down").replace('class="sn-ic"', 'class="sn-ic s-dev-caret"')}</button>`
     + `<div class="sn-menu sn-float s-dev-menu" id="${id}" role="menu" tabindex="-1" aria-label="机型">${items}</div>`
     + `<div class="sn-seg sn-sm s-dev-orient" role="tablist" aria-label="方向"><span class="sn-thumb"></span><button data-v="p">竖屏</button><button data-v="l">横屏</button></div></div>`
-    + `<div class="s-devfit"><div class="s-dev"><div class="s-dev-screen"><div class="s-dev-sb" aria-hidden="true"></div><iframe title="${esc(title)}" loading="lazy"></iframe></div><i class="s-dev-cut" aria-hidden="true"></i><i class="s-dev-ind" aria-hidden="true"></i><i class="s-dev-home" aria-hidden="true"></i><i class="s-dev-spk" aria-hidden="true"></i></div></div></div>`;
+    + `<div class="s-devfit"><div class="s-dev"><div class="s-dev-screen"><div class="s-dev-sb" aria-hidden="true"></div><i class="s-dev-band-l" aria-hidden="true"></i><i class="s-dev-band-r" aria-hidden="true"></i><iframe title="${esc(title)}" loading="lazy"></iframe></div><i class="s-dev-cut" aria-hidden="true"></i><i class="s-dev-ind" aria-hidden="true"></i><i class="s-dev-home" aria-hidden="true"></i><i class="s-dev-spk" aria-hidden="true"></i></div></div></div>`;
 }
 
 const boxes = new Set();
@@ -67,8 +76,10 @@ function paint(box, { fade = false } = {}) {
     const sa = d.safe[land ? "l" : "p"], sb = $(".s-dev-sb", dev);
     if (dev.dataset.kind !== d.kind) sb.innerHTML = sbHTML(d.kind);
     dev.dataset.kind = d.kind; dev.classList.toggle("s-land", land); dev.classList.toggle("s-has-sb", !land && sa[0] >= 20); // 横屏不画状态栏（iPhone 横屏系统也不显示）
+    const under = box.hasAttribute("data-under") && !land && sa[0] > 0; dev.classList.toggle("s-under", under); box.__top = under ? sa[0] : 0; // 内容页：iframe 顶到最上沿，页面里让出状态栏的高度
     for (const [k, v] of Object.entries({ "--dw": W + "px", "--dh": H + "px", "--dr": d.r + "px", "--bt": b[0] + "px", "--br": b[1] + "px", "--bb": b[2] + "px", "--bl": b[3] + "px",
-      "--sa-t": sa[0] + "px", "--sa-r": sa[1] + "px", "--sa-b": sa[2] + "px", "--sa-l": sa[3] + "px", "--sb-h": sa[0] + "px" })) dev.style.setProperty(k, v);
+      "--sa-t": sa[0] + "px", "--sa-r": sa[1] + "px", "--sa-b": sa[2] + "px", "--sa-l": sa[3] + "px", "--sb-h": sa[0] + "px", "--fr-t": (under ? 0 : sa[0]) + "px" })) dev.style.setProperty(k, v);
+    inset(box);
     box.dataset.ow = OW; box.dataset.oh = OH; fit(box);
     const src = box.dataset.src;
     if (f.getAttribute("src") !== src) f.setAttribute("src", src);
@@ -108,36 +119,54 @@ function fit(box) {
   const s = Math.max(0.3, Math.min(1, availW / OW, availH / OH));
   dev.style.transform = `scale(${s})`; fitEl.style.width = OW * s + "px"; fitEl.style.height = OH * s + "px";
 }
-// 安全区让出来的那一圈涂成页面自己的底色（iframe 同源，读 body / html 的背景色；读不到就用画布色）。
-// 页面上 / 下边贴着固定或吸附的栏（顶栏、贴底操作栏）时，状态栏 / 横条那一条用这条栏的颜色——真机上栏的底色会一直延伸到屏幕边上，
-// 不然白色操作栏和下面那条页面底色之间有一道接缝。栏出现 / 消失（滚动、换主题）时重新取
-const opaque = (c) => !!c && c !== "transparent" && !/^rgba\(.*,\s*0\)$/.test(c);
-function edgeBg(d, bottom) {
-  const w = d.defaultView, y = bottom ? w.innerHeight - 1 : 0; let first = "";
-  for (let el = d.elementFromPoint(w.innerWidth / 2, y); el && el !== d.body && el !== d.documentElement; el = el.parentElement) {
-    const cs = w.getComputedStyle(el); if (!first && opaque(cs.backgroundColor)) first = cs.backgroundColor;
-    if (cs.position === "fixed" || cs.position === "sticky") { const r = el.getBoundingClientRect(); if (bottom ? r.bottom >= w.innerHeight - 1 : r.top <= 0) return opaque(cs.backgroundColor) ? cs.backgroundColor : first; return ""; }
-  }
-  return "";
+// 安全区让出来的那一圈（上面状态栏、下面横条、横屏时左右两侧）涂成页面在这条边上实际画出来的颜色，像 Safari 按页面顶上的颜色给工具栏上色：
+// 沿着这条边、离边 1px 撒 5 个点，每个点从 elementFromPoint 拿到的元素往外找第一个不透明的底色，取出现次数最多的（打平取正中那个点的）。
+// 不直接用 body 的底色：对话这类页面 body 是灰的、整页铺着白色的对话区，用 body 色就成了"灰框里放了一块白"（主会话 11-22 转达用户截图）。
+// 贴边的是固定 / 吸附的栏（顶栏、贴底操作栏）时，点到的就是这条栏，颜色跟着栏走。页面滚动、换主题、内容变了时重新取（watchFrame，一帧最多一次）。
+// 内容页（under）上面那条压在页面上、半透明带模糊，底色用页面自己的底色：滚过去的卡片不该把它一会儿染白一会儿染灰
+const alphaOf = (c) => { if (!c || c === "transparent") return 0; const m = /rgba?\([^)]*?,\s*([\d.]+)\)$/.exec(c) || /\/\s*([\d.]+)\)$/.exec(c); return m && /rgba|\//.test(c) ? +m[1] : 1; };
+const opaque = (c) => alphaOf(c) >= .5;
+function edgeColor(d, side, fallback) {
+  const w = d.defaultView, W = w.innerWidth, H = w.innerHeight, cnt = new Map(); let mid = "";
+  [.1, .3, .5, .7, .9].forEach((k, i) => {
+    const [x, y] = side === "t" ? [W * k, 1] : side === "b" ? [W * k, H - 2] : side === "l" ? [1, H * k] : [W - 2, H * k];
+    let c = ""; for (let el = d.elementFromPoint(x, y); el; el = el.parentElement) { const bg = w.getComputedStyle(el).backgroundColor; if (opaque(bg)) { c = bg; break; } }
+    c ||= fallback; cnt.set(c, (cnt.get(c) || 0) + 1); if (i === 2) mid = c;
+  });
+  let best = mid, n = 0; for (const [c, k] of cnt) if (k > n || (k === n && c === mid)) { best = c; n = k; }
+  return best;
 }
 function syncBg(box) {
-  const f = $("iframe", box), scr = $(".s-dev-screen", box); let bg = "", top = "", bot = "";
+  const f = $("iframe", box), scr = $(".s-dev-screen", box), land = $(".s-dev", box).classList.contains("s-land"); let bg = "", e = {};
   try {
     const d = f.contentDocument, w = d?.defaultView;
     if (d && d.URL !== "about:blank" && d.body) {
       for (const el of [d.body, d.documentElement]) { const c = w.getComputedStyle(el).backgroundColor; if (opaque(c)) { bg = c; break; } }
-      top = edgeBg(d, false); bot = edgeBg(d, true);
+      const fb = bg || "var(--sn-canvas)";
+      e = { t: box.__top ? "" : edgeColor(d, "t", fb), b: edgeColor(d, "b", fb), l: land ? edgeColor(d, "l", fb) : "", r: land ? edgeColor(d, "r", fb) : "" };
     }
   } catch {}
   scr.style.setProperty("--s-page", bg || "var(--sn-canvas)");
-  scr.style.setProperty("--s-band-t", top || "var(--s-page)"); scr.style.setProperty("--s-band-b", bot || "var(--s-page)");
+  for (const k of ["t", "b", "l", "r"]) scr.style.setProperty("--s-band-" + k, e[k] || "var(--s-page)");
+}
+// 往设备里的页面加一条样式（同源，每次载入都加）：
+// · 滚动条藏起来——手机上是浮层滚动条，平时看不见；桌面浏览器在框里会画出一条常驻的灰条。只藏样子，照样能滚
+// · 内容页（under）顶上让出状态栏那么高：一打开时内容在状态栏下面，往上滚才滑到那条模糊的底色底下
+function inset(box) {
+  try {
+    const d = $("iframe", box).contentDocument; if (!d || d.URL === "about:blank" || !d.head) return;
+    let st = d.getElementById("s-dev-inset"); if (!st) { st = d.createElement("style"); st.id = "s-dev-inset"; d.head.append(st); }
+    const t = box.__top || 0;
+    st.textContent = "*{scrollbar-width:none!important}*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}"
+      + (t ? `html{padding-top:${t}px!important;scroll-padding-top:${t}px}` : "");
+  } catch {}
 }
 // iframe 里滚动、改尺寸、内容换了（play.html 是 load 以后才把示例插进来的）时重新取上下两条的颜色（一帧最多一次）
 function watchFrame(box) {
   const f = $("iframe", box); let raf = 0, mo = null;
   const again = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; syncBg(box); }); };
   f.addEventListener("load", () => {
-    syncBg(box); mo?.disconnect();
+    inset(box); syncBg(box); mo?.disconnect();
     try { const w = f.contentWindow, d = f.contentDocument; w.addEventListener("scroll", again, { passive: true }); w.addEventListener("resize", again); mo = new MutationObserver(again); mo.observe(d.body, { childList: true, subtree: true }); } catch {}
   });
 }

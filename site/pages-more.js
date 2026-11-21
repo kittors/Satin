@@ -190,7 +190,7 @@ export const AI_PAGES = [
         ["<code>dom</code>", "深浅两套 × 1440 / 768 / 390 三种宽度打开页面：渐变、彩色投影、毛玻璃、卡片套卡片、KPI 大字卡、彩色徽章、导航选中样式、装饰分隔线、遮挡、浮层被裁、按钮换行、横向溢出、对比度、触控尺寸；截图存在 <code>/tmp/satin-check/</code>"],
       ]],
       ["h2", "规则"],
-      ["p", "一共 26 条，每条的原因、正反例在<a href=\"#/guide/no-ai\">去 AI 感</a>里；规则文件是 <code>spec/rules/anti-ai.json</code>（技能里带了一份快照）。"],
+      ["p", "一共 <span data-n-rules>39</span> 条，每条的原因、正反例在<a href=\"#/guide/no-ai\">去 AI 感</a>里；规则文件是 <code>spec/rules/anti-ai.json</code>（技能里带了一份快照）。"],
       ["rules"],
     ],
   },
@@ -455,4 +455,5 @@ export const OTHER_PAGES = [
 export const RECIPES = [
   ["admin-table", "01-admin-table.md", "后台列表"], ["settings", "02-settings.md", "设置页"], ["auth", "03-auth.md", "登录注册"], ["dashboard", "04-dashboard.md", "仪表盘"],
   ["chat", "05-chat.md", "AI 对话"], ["landing", "06-landing.md", "落地页"], ["mobile-order", "07-mobile-order.md", "移动端下单"], ["wizard", "08-wizard.md", "表单向导"],
-].map(([id, file, title]) => ({ id, file, title, mobile: id === "mobile-order" })); // mobile：手机页面，预览默认放进设备框（device.js）
+].map(([id, file, title]) => ({ id, file, title, mobile: id === "mobile-order", shell: ["chat", "wizard", "admin-table", "auth"].includes(id) }));
+// mobile：手机页面，预览默认放进设备框（device.js）；shell：app 式配方（整页就是一个应用、自己占满一屏，页面本身不该滚），预览框固定高度——别的是内容页，预览框和内容一样高

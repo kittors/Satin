@@ -1,6 +1,6 @@
 // 组件文档页跨写法用词检查（2026-11-21 主会话要求）：每种写法的页面里不出现别的框架的专有词。
 // 8 种写法 + 两个环境：React、Vue、Svelte、Angular、Solid、Preact、纯 HTML，Next（按 React 算）、Nuxt（按 Vue 算）。
-// 查页面正文（不含代码面板：代码本来就按写法给），"列定义"那张表（columns 里每一项的字段，各框架写法一样）跳过。
+// 查页面正文（不含代码面板：代码本来就按写法给）；"列定义"（columns 里每一项的字段，各框架写法一样）、"纯 HTML 写法的类名、data 属性"（标记里的 #id）两节跳过。
 // 规则：ReactNode、React.、JSX.Element 只许出现在 React / Next；v-model、v-bind、defineProps、插槽写法 #xxx 只许出现在 Vue / Nuxt；
 //       Svelte 的 bind:、{#snippet}、{@render}、"片段" 只许出现在 Svelte；Angular 的 ngModel、[(…)]、[attr.] 只许出现在 Angular。
 // 用法（5192 起着）：node scripts/site/api-terms.mjs [--ids table,dialog] [--fw react,vue] [--out /tmp/site-api-terms]
@@ -16,7 +16,7 @@ fs.mkdirSync(OUT, { recursive: true });
 // 专有词 → 允许出现的写法
 const RULES = [
   { re: /ReactNode|React\.[A-Z]\w*|JSX\.Element/g, ok: ["react", "next"], who: "React" },
-  { re: /v-model|v-bind|defineProps|(?<![\w#])#(?:default|footer|header|empty|row|cell|item|title|description|icon|actions?|[a-z][\w-]*)(?=[\s，。、；）)]|$)/g, ok: ["vue", "nuxt"], who: "Vue" },
+  { re: /v-model|v-bind|defineProps|(?<![\w#{])#(?:default|footer|header|empty|row|cell|item|title|description|icon|actions?|[a-z][\w-]*)(?=[\s，。、；）)]|$)/g, ok: ["vue", "nuxt"], who: "Vue" },
   { re: /bind:\w+|\{#snippet|\{@render|片段/g, ok: ["svelte"], who: "Svelte" },
   { re: /ngModel|\[\([\w.]+\)\]|\[attr\./g, ok: ["angular"], who: "Angular" },
 ];
@@ -35,7 +35,9 @@ for (const w of WS) {
       const main = document.querySelector(".d-main") || document.body, clone = main.cloneNode(true);
       // 不看代码面板、示例框；"列定义"一节（从它的 h3 到下一个 h3 / h2）也不看
       clone.querySelectorAll(".cx, pre, .dx-stage, .dx-code, .d-fw .cx, .s-devbox, script, style").forEach((e) => e.remove());
-      const h = clone.querySelector("#api-columns"); if (h) { let n = h.nextElementSibling; while (n && !/^H[23]$/.test(n.tagName)) { const x = n.nextElementSibling; n.remove(); n = x; } h.remove(); }
+      // "列定义"（各框架写法一样）、"纯 HTML 写法的类名、data 属性"（本来就是标记里的 #id、.class）两节跳过
+      const skip = [clone.querySelector("#api-columns"), ...[...clone.querySelectorAll("h3")].filter((x) => x.textContent.trim().startsWith("纯 HTML 写法的类名"))].filter(Boolean);
+      for (const h of skip) { let n = h.nextElementSibling; while (n && !/^H[23]$/.test(n.tagName)) { const x = n.nextElementSibling; n.remove(); n = x; } h.remove(); }
       return clone.textContent;
     });
     for (const r of RULES) {

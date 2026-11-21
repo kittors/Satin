@@ -8,16 +8,24 @@
 //   每次先重载这个演示（状态干净），动作开始后逐帧量：在每个看得见的浮层上撒 20 个点，用 elementFromPoint 看点到的是不是
 //   这个演示的 iframe——不是，就是被演示框裁掉、被代码 / 顶栏挡住；挡整页的浮层（弹窗、抽屉、命令面板、看图）有没有铺满窗口；
 //   浮层超出页面底部、滚也滚不到；按 Esc 关上以后演示框回原样（不再伸着、不再铺满）、页面不再锁着、滚动位置没变
+// · AI 味（默认开，--no-ai 关；规则在 scripts/site/ai-flavor.js）：文档页本身、每个演示、配方预览框、页面上的设备框，
+//   宽 > 860 时再把每个"在手机上看"打开、量设备框里的页面——意外溢出、填不满、手机上的卡片、浏览器默认样式、文字头像、
+//   网格孤儿、颜色与状态不符、乱换行、设备框里看得见滚动条。每条问题截一张图、高亮框标出元素（--ai-shots 张数上限，默认 150），
+//   结构化结果写进 --out 目录的 ai.json。按钮折行算进"乱换行"，开着 AI 味时不再单独报"按钮文字换行"
 //
 // 用法（先起服务：python3 serve.py 5192 .）：
 //   node scripts/docs-audit.mjs                                  浅色、1440 宽，全部检查
 //   node scripts/docs-audit.mjs --theme dark --width 390
 //   node scripts/docs-audit.mjs --pages popover,select --no-floats  只查这几页（组件 id 或 #/… 地址），不点浮层
 //   node scripts/docs-audit.mjs --theme dark --part 1/3           按侧栏顺序分三段，只跑第一段
+//   node scripts/docs-audit.mjs --no-floats                       全站只查静态和 AI 味（快，浮层那一轮最费时间）
+//   node scripts/docs-audit.mjs --selftest --pages none           只跑自检：浮层被裁一组 + AI 味每条规则"该报 / 不该报"各一份小页面
 // 结果：终端打印汇总；--out 目录（默认 /tmp/satin-audit/主题-宽度）里有 report.json 和有问题时的截图。
 // 需要 Playwright 和本机 Chrome：PLAYWRIGHT 环境变量指向 playwright 包，默认用 TaleFrame 的
 import { createRequire } from "node:module";
 import fs from "node:fs";
+import { AI_PROBE, AI_RULES, AI_ROOTS, SPEC_OF, ROOT_OF, ROOT_OF_KIND } from "./site/ai-flavor.js";
+import { PNG } from "pngjs";
 
 const require = createRequire(import.meta.url);
 const pw = require(process.env.PLAYWRIGHT || "/Users/kittors/Developer/freelance/TaleFrame/apps/admin/node_modules/playwright");
@@ -25,11 +33,15 @@ const arg = (k, d) => { const i = process.argv.indexOf("--" + k); if (i < 0) ret
 const BASE = arg("base", "http://127.0.0.1:5192/site/next-docs.html");
 const THEME = arg("theme", "light"), W = +arg("width", 1440), H = +arg("height", W < 600 ? 844 : 900);
 const FLOATS = !arg("no-floats", false), ONLY = arg("pages", ""), MAXT = +arg("max-triggers", 14);
+// AI 味（默认开，--no-ai 关）：文档页、每个演示、配方预览、设备框（宽 > 860 时把每个"在手机上看"打开）里量 scripts/site/ai-flavor.js 那几条；
+// 每条问题截一张图（高亮框标出来），最多 --ai-shots 张（默认 150）；结构化结果在 --out 目录的 ai.json
+const AI = !arg("no-ai", false), AI_SHOTS = +arg("ai-shots", 150);
 const OUT = arg("out", `/tmp/satin-audit/${THEME}-${W}`);
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
 
 const issues = []; let where = "", shots = 0;
-const add = (kind, at, detail) => { issues.push({ kind, at, detail }); console.log(`  ✗ ${kind}  ${at}  ${detail}`); };
+let muted = false; // 自检里故意造出来的问题不往终端打
+const add = (kind, at, detail) => { issues.push({ kind, at, detail }); if (!muted) console.log(`  ✗ ${kind}  ${at}  ${detail}`); };
 
 // ———— 放进文档页里的探针 ————
 const PROBE = () => {
@@ -55,10 +67,10 @@ const PROBE = () => {
   const label = (el) => `${el.tagName.toLowerCase()}${el.id ? "#" + el.id : ""}${typeof el.className === "string" && el.className.trim() ? "." + el.className.trim().split(/\s+/).slice(0, 2).join(".") : ""} “${(el.getAttribute("aria-label") || el.dataset?.tip || el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 14)}”`;
   const btnWraps = (doc, win, root) => [...root.querySelectorAll(".sn-btn, button")].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 4 && r.height > 4 && win.getComputedStyle(b).visibility !== "hidden" && wrapped(doc, b); }).map(label);
   // 静态检查：文档页和每个演示
-  A.statics = () => {
+  A.statics = (noBtn) => { // noBtn：按钮换行交给 AI 味的"乱换行"报，这里不重复
     const out = [], de = document.documentElement;
     if (de.scrollWidth > innerWidth + 1) out.push(["文档页横向溢出", "页面", `${de.scrollWidth} > ${innerWidth}`]);
-    for (const b of btnWraps(document, window, document.body).filter((x) => !/iframe/.test(x))) out.push(["按钮文字换行", "文档页", b]);
+    if (!noBtn) for (const b of btnWraps(document, window, document.body).filter((x) => !/iframe/.test(x))) out.push(["按钮文字换行", "文档页", b]);
     for (const f of document.querySelectorAll(".dx .d-frame iframe")) {
       const dx = f.closest(".dx"), at = `${dx.dataset.demo}#${dx.dataset.n ?? "-"}`, doc = f.contentDocument, win = f.contentWindow; if (!doc?.body) continue;
       // 横向溢出只算看得见的内容：收起的面板（透明、隐藏）不算；滚动容器里的东西被它自己裁掉，只算容器本身
@@ -68,7 +80,7 @@ const PROBE = () => {
         const visit = (el, op) => { const cs = win.getComputedStyle(el); if (cs.display === "none") return; const o = op * +cs.opacity; if (o < .05) return; if (cs.visibility !== "hidden") { const r = el.getBoundingClientRect(); if (r.width > 0 && r.height > 0 && r.right > mx) { mx = r.right; who = label(el); } } if (cs.overflowX !== "visible") return; for (let c = el.firstElementChild; c; c = c.nextElementSibling) visit(c, o); };
         visit(sec, 1);
         if (mx > e.clientWidth + 1) out.push(["演示横向溢出（被裁掉）", at, `${Math.round(mx)} > ${e.clientWidth}：${who}`]);
-        for (const b of btnWraps(doc, win, sec)) out.push(["按钮文字换行", at, b]);
+        if (!noBtn) for (const b of btnWraps(doc, win, sec)) out.push(["按钮文字换行", at, b]);
       }
     }
     return out;
@@ -165,8 +177,9 @@ const PROBE = () => {
     r = el.getBoundingClientRect(); fr = f.getBoundingClientRect();
     return { x: fr.left + (r.left + r.right) / 2, y: fr.top + (r.top + r.bottom) / 2, sy: scrollY };
   };
-  // 关上以后的样子：浮层还有没有露在预览框（.d-frame，没伸出去时的大小）外面
-  A.state = () => { const f = A.cur, fl = A.floats(f), fr = f.getBoundingClientRect(), w = f.parentElement.getBoundingClientRect(); return { global: f.classList.contains("global"), lock: document.documentElement.classList.contains("dx-lock"), ext: f.parentElement.classList.contains("ext"), modal: fl.some((x) => x.modal && x.op > .3), loose: fl.some((x) => x.el.closest(".sn-toasts, .sn-notifs") && x.op > .05), out: fl.some((x) => x.op > .1 && (fr.top + x.r.top < w.top - 1 || fr.top + x.r.bottom > w.bottom + 1)), sy: scrollY, h: Math.round(w.height) }; };
+  // 关上以后的样子：浮层还有没有露在预览框（.d-frame，没伸出去时的大小）外面。容差 0.5px 和文档页伸画布的判断一致：
+  // 提示没关（库的提示 Esc 关不掉）、只露出 1px，文档页照样会把框伸着——那是浮层还开着，不是"没缩回"
+  A.state = () => { const f = A.cur, fl = A.floats(f), fr = f.getBoundingClientRect(), w = f.parentElement.getBoundingClientRect(); return { global: f.classList.contains("global"), lock: document.documentElement.classList.contains("dx-lock"), ext: f.parentElement.classList.contains("ext"), modal: fl.some((x) => x.modal && x.op > .3), loose: fl.some((x) => x.el.closest(".sn-toasts, .sn-notifs") && x.op > .05), out: fl.some((x) => x.op > .1 && (fr.top + x.r.top < w.top - .5 || fr.top + x.r.bottom > w.bottom + .5)), sy: scrollY, h: Math.round(w.height) }; };
 };
 
 // 滚动条常显（占宽度）：和用户的 Chrome 一样。测试浏览器默认把滚动条藏了，锁滚动时整页左右跳这类问题一直测不出来（2026-11-20）
@@ -182,15 +195,85 @@ try {
   page.on("response", (r) => { if (r.status() >= 400 && !/not-found\.png/.test(r.url())) add(/127\.0\.0\.1|localhost/.test(r.url()) ? "请求失败" : "外部资源失败", where, `${r.status()} ${r.url().slice(0, 110)}`); });
   page.on("requestfailed", (r) => { const e = r.failure()?.errorText || ""; if (!/ERR_ABORTED/.test(e) && !/not-found\.png/.test(r.url())) add(/127\.0\.0\.1|localhost/.test(r.url()) ? "请求失败" : "外部资源失败", where, `${e} ${r.url().slice(0, 110)}`); });
   await page.addInitScript(PROBE);
+  if (AI) await page.addInitScript(AI_PROBE);
   await page.goto(`${BASE}#/intro`); await page.waitForTimeout(1500);
   let pages = await page.evaluate(() => [...document.querySelectorAll("[data-side] a[href]")].map((a) => ({ h: a.getAttribute("href"), t: a.textContent.trim() })));
   if (ONLY) { const want = String(ONLY).split(","); pages = pages.filter((p) => want.some((w) => p.h === w || p.h === "#/c/" + w || p.h.endsWith("/" + w))); }
   // --part 2/3：按侧栏顺序切成几段，只跑第几段（全站一次跑太久，分段排队拿浏览器锁）
   const PART = arg("part", ""); if (PART) { const [k, n] = String(PART).split("/").map(Number), per = Math.ceil(pages.length / n); pages = pages.slice((k - 1) * per, k * per); }
   console.log(`${THEME} · ${W}×${H} · ${pages.length} 页 · 浮层${FLOATS ? "检查" : "不查"}`);
+  // AI 味：扫一页（文档页、演示、配方预览、看得见的设备框），再把每个"在手机上看"打开扫设备框里的页面；每条问题截一张带高亮框的图
+  const aiList = [], aiSeen = new Set(); let aiShots = 0;
+  const aiReport = async (pg, found) => {
+    for (const x of found) {
+      const name = AI_RULES[x.rule] || x.rule, key = `${x.rule}|${x.where}|${x.el}|${x.detail}`; if (aiSeen.has(key)) continue; aiSeen.add(key);
+      let shot = "";
+      if (x.i >= 0 && aiShots < AI_SHOTS) {
+        const clip = await page.evaluate((i) => __ai.focus(i), x.i).catch(() => null);
+        if (clip) { await page.waitForTimeout(120); shot = `${OUT}/ai-${String(++aiShots).padStart(3, "0")}-${x.rule}.png`; await page.screenshot({ path: shot, clip }).catch(() => { shot = ""; }); }
+        await page.evaluate(() => __ai.unfocus()).catch(() => {});
+      }
+      add(`AI·${name}`, `${pg.h} ${x.where} ${x.el}`, x.detail + (shot ? `  [${shot.split("/").pop()}]` : ""));
+      aiList.push({ rule: x.rule, name, page: pg.h, title: pg.t, where: x.where, el: x.el, detail: x.detail, shot });
+    }
+  };
+  // 设备框边缘颜色接缝：截一张图，在每条安全区（状态栏、横条、横屏两侧）和页面的分界线两边各 3px 取像素比，每个通道差 > 4 算接缝；
+  // 避开状态栏的字、灵动岛、横条指示（取 30% / 70% 处）；内容页（under）上面那条本来就压在页面上、半透明，不比
+  const seamCheck = async (pg, g) => {
+    if (!g) return; await page.waitForTimeout(150);
+    const png = PNG.sync.read(await page.screenshot()), bad = [];
+    const at = (x, y) => { const X = Math.round(g.x + x * g.s), Y = Math.round(g.y + y * g.s); if (X < 0 || Y < 0 || X >= png.width || Y >= png.height) return null; const o = (Y * png.width + X) * 4; return [png.data[o], png.data[o + 1], png.data[o + 2]]; };
+    // 差 > 6 算接缝：卡片阴影的尾巴拖到分界线上只差 4–6，看不出来；真的接缝（灰条接白页面）差 10 以上
+    const cmp = (what, a, b) => { if (a && b && Math.max(...a.map((v, i) => Math.abs(v - b[i]))) > 6) bad.push(`${what}（安全区 rgb(${a}) / 页面 rgb(${b})）`); };
+    for (const k of [.3, .7]) {
+      if (!g.under && g.t > 0) cmp("状态栏那条和页面顶上", at(g.W * k, g.t - 3), at(g.W * k, g.t + 3));
+      if (g.b > 0 && (!g.under || g.fixedBottom)) cmp("横条那条和页面底下", at(g.W * k, g.H - g.b + 3), at(g.W * k, g.H - g.b - 3)); // 内容页往下滚的内容在这里截断是正常的，只有贴底栏要连成一片
+      if (g.l > 0) cmp("左边那条和页面", at(g.l - 3, g.H * k), at(g.l + 3, g.H * k));
+      if (g.r > 0) cmp("右边那条和页面", at(g.W - g.r + 3, g.H * k), at(g.W - g.r - 3, g.H * k));
+    }
+    if (bad.length) await aiReport(pg, [{ rule: "edge-seam", where: g.where, el: "安全区", detail: [...new Set(bad)].join("；"), i: g.i }]);
+  };
+  const aiScan = async (pg) => {
+    where = `${pg.h} AI 味`;
+    for (let t = 0; t < 40 && !(await page.evaluate(() => __ai.framesReady())); t++) await page.waitForTimeout(150);
+    await page.waitForTimeout(300);
+    await aiReport(pg, await page.evaluate((W) => __ai.scanPage({ W }), W));
+    for (let j = 0, n = await page.evaluate(() => __ai.devCount()); j < n; j++) await seamCheck(pg, await page.evaluate((j) => __ai.devGeom(j), j));
+    if (W > 860) { // 窄屏不出设备框
+      const n = await page.evaluate(() => __ai.toggles().length);
+      for (let k = 0; k < n; k++) {
+        const what = await page.evaluate((k) => __ai.toggle(k, true), k); let ok = false;
+        for (let t = 0; t < 50 && !ok; t++) { await page.waitForTimeout(150); ok = await page.evaluate((k) => __ai.devReady(k), k); }
+        if (!ok) add("AI·设备框没载好", `${pg.h} ${what}`, "7 秒内没好");
+        else { await page.waitForTimeout(500); await aiReport(pg, await page.evaluate((k) => __ai.scanDev(k), k)); await seamCheck(pg, await page.evaluate((k) => __ai.devGeomOf(k), k)); }
+        await page.evaluate((k) => __ai.toggle(k, false), k);
+      }
+    }
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" })); where = pg.h;
+  };
   // 自检（--selftest）：用一条样式把弹出面板页演示的画布钉死、不许伸（模拟浮层处理失效），点"筛选"，巡检必须报出被裁——证明这套检查抓得到问题
+  // AI 味每条规则各有一份"该报"的、一份"不该报"的小页面（ai-flavor.js 的 selftest），该报的必须报出、不该报的必须不报
   if (arg("selftest", false)) {
     where = "自检";
+    if (AI) {
+      const st = await page.evaluate(() => __ai.selftest());
+      for (const x of st) console.log(`  ${x.ok ? "✓" : "✗"} AI 味自检 ${AI_RULES[x.rule]} · ${x.name}${x.ok ? `（报出：${x.bad[0]}）` : `  该报的报出 ${JSON.stringify(x.bad)}，不该报的报出 ${JSON.stringify(x.good)}`}`);
+      const bad = st.filter((x) => !x.ok);
+      console.log(bad.length ? `AI 味自检失败 ${bad.length} 组` : `AI 味自检通过：${new Set(st.map((x) => x.rule)).size} 条规则、${st.length} 组`); if (bad.length) process.exitCode = 1;
+      // 边缘颜色接缝（Node 这边比像素）："移动端与 H5"页的设备框，把横条那条故意涂成红的必须报出、恢复以后必须不报
+      await page.evaluate(() => { location.hash = "#/mobile"; }); await page.waitForTimeout(2200);
+      const seamRun = async (red) => {
+        await page.evaluate((red) => { document.getElementById("seam-test")?.remove(); if (red) document.head.insertAdjacentHTML("beforeend", '<style id="seam-test">[data-devbox] .s-dev-screen::after { background: rgb(255, 0, 0) !important; }</style>'); }, red);
+        await page.waitForTimeout(300); const n0 = aiList.length; aiSeen.clear(); muted = true;
+        await seamCheck({ h: "#/mobile", t: "自检" }, await page.evaluate(() => __ai.devGeom(0))); muted = false; const got = aiList.splice(n0); issues.splice(issues.length - got.length, got.length); return got;
+      };
+      if (W <= 860) console.log(`  · AI 味自检 ${AI_RULES["edge-seam"]}：窄屏（≤ 860）不出设备框，跳过`);
+      else {
+        const sb = await seamRun(true), sg = await seamRun(false), sok = sb.length > 0 && sg.length === 0;
+        console.log(`  ${sok ? "✓" : "✗"} AI 味自检 ${AI_RULES["edge-seam"]}${sok ? `（报出：${sb[0].detail}）` : `  涂红时 ${sb.length} 条、恢复后 ${sg.length} 条：${JSON.stringify(sg.map((x) => x.detail))}`}`);
+        if (!sok) process.exitCode = 1;
+      }
+    }
     await page.evaluate(() => { location.hash = "#/c/popover"; }); await page.waitForTimeout(1500);
     await page.evaluate(() => __audit.loadAll());
     // 弹出面板页现在是契约页：前面是示例框，"筛选"所在的设计稿演示在后面的"完整演示"里——挨个演示找有"筛选"按钮的那个
@@ -236,7 +319,9 @@ try {
     // 每个演示滚过去等它载好
     for (const x of await page.evaluate(() => __audit.loadAll())) { nDemo++; if (x.ms == null) add("演示没载出来", x.at, "4 秒内没好"); else { loadMs.push(x.ms); if (x.ms > 600) add("演示载入慢", x.at, `${x.ms}ms`); } }
     // 静态检查
-    for (const [k, at, d] of await page.evaluate(() => __audit.statics())) add(k, `${pg.h} ${at}`, d);
+    for (const [k, at, d] of await page.evaluate((noBtn) => __audit.statics(noBtn), AI)) add(k, `${pg.h} ${at}`, d);
+    // AI 味（出错只记一条，不让整轮停下）
+    if (AI) await aiScan(pg).catch((e) => add("巡检出错", `${pg.h} AI 味`, String(e).slice(0, 160)));
     // 浮层
     if (!FLOATS) continue;
     const nf = await page.evaluate(() => document.querySelectorAll(".dx .d-frame iframe").length);
@@ -289,6 +374,25 @@ try {
   const kinds = {}; for (const x of issues) kinds[x.kind] = (kinds[x.kind] || 0) + 1;
   const sum = { theme: THEME, width: W, pages: pages.length, demos: nDemo, triggers: nTrig, minutes: +((Date.now() - t0all) / 60000).toFixed(1), 换页露出ms: { 平均: avg(showMs), 最慢: mx(showMs) }, 演示载好ms: { 平均: avg(loadMs), 最慢: mx(loadMs) }, 问题: kinds };
   fs.writeFileSync(`${OUT}/report.json`, JSON.stringify({ sum, issues }, null, 1));
+  if (AI) {
+    // 按七个根源分组：每条属于哪类先看规则文件（spec/rules/anti-ai.json 的 root），没有就用 ai-flavor.js 的 ROOT_OF；
+    // 原来就有的"浮层被裁""横向溢出"这几项归第 6 类。写 ai.json（每条带 root）和 ai-report.md（给人看：类 → 位置、规则、细节、截图）
+    let spec = {}; try { for (const r of JSON.parse(fs.readFileSync(new URL("../spec/rules/anti-ai.json", import.meta.url), "utf8")).rules) spec[r.id] = r.root; } catch {}
+    const rootNo = (v) => { if (v == null) return null; if (/^\d$/.test(String(v))) return +v; if (typeof v === "object") return rootNo(v.id ?? v.no ?? v.name); const k = Object.entries(AI_ROOTS).find(([, n]) => n === String(v)); return k ? +k[0] : null; };
+    for (const x of aiList) x.root = rootNo(spec[SPEC_OF[x.rule]]) ?? ROOT_OF[x.rule] ?? 7;
+    const extra = issues.filter((x) => ROOT_OF_KIND[x.kind]).map((x) => ({ rule: x.kind, name: x.kind, page: x.at.split(" ")[0], where: x.at.split(" ").slice(1).join(" "), el: "", detail: x.detail, shot: "", root: ROOT_OF_KIND[x.kind] }));
+    const all = [...aiList, ...extra], md = [`# AI 味巡检：${THEME} · ${W}×${H} · ${pages.length} 页`, "", `共 ${all.length} 条。截图在同一个目录（文件名见"截图"一列），红框标出元素。`, ""];
+    console.log("\nAI 味（按根源）：");
+    for (const [no, name] of Object.entries(AI_ROOTS)) {
+      const list = all.filter((x) => x.root === +no); if (!list.length) continue;
+      const by = {}; for (const x of list) by[x.name] = (by[x.name] || 0) + 1;
+      console.log(`  ${no} ${name}：${list.length} 条（${Object.entries(by).map(([k, n]) => `${k} ${n}`).join("、")}）`);
+      md.push(`## ${no} ${name}（${list.length} 条）`, "", "| 位置 | 规则 | 细节 | 截图 |", "|---|---|---|---|");
+      for (const x of list) md.push(`| ${`${x.page} ${x.where} ${x.el}`.trim().replace(/\|/g, "\\|")} | ${x.name} | ${String(x.detail).replace(/\|/g, "\\|")} | ${x.shot ? x.shot.split("/").pop() : "—"} |`);
+      md.push("");
+    }
+    fs.writeFileSync(`${OUT}/ai.json`, JSON.stringify(all, null, 1)); fs.writeFileSync(`${OUT}/ai-report.md`, md.join("\n"));
+  }
   console.log("\n汇总", JSON.stringify(sum));
   console.log(issues.length ? `共 ${issues.length} 个问题，明细和截图在 ${OUT}` : "没有发现问题");
 } finally { await browser.close(); }

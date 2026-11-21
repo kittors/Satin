@@ -63,7 +63,8 @@ const BLOCK = {
   tokens: () => '<div data-async="tokens"></div>',
   img: (src, w, h, cap) => `<figure class="d-fig"><img src="${src}" width="${w}" height="${h}" alt="${esc(cap)}" loading="lazy" decoding="async"><figcaption>${cap}</figcaption></figure>`,
   do: (yes, no) => `<div class="d-dodont"><div class="do"><b><span data-i="check"></span>这样做</b><p>${yes}</p></div><div class="dont"><b><span data-i="x"></span>不要</b><p>${no}</p></div></div>`,
-  table: (head, rows) => `<div class="d-tablewrap"><table class="d-table"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`,
+  // 每格带上表头（data-l）：窄屏（< 640）表格改成一行一块，第一格当标题，后面每格前面一行小字写这一列叫什么（next.css），不横着滑
+  table: (head, rows) => `<div class="d-tablewrap"><table class="d-table"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => `<td data-l="${esc(plainOf(head[i] ?? ""))}">${cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`,
 };
 const blocks = (list) => list.map(([k, ...a]) => BLOCK[k](...a)).join("");
 
@@ -136,6 +137,16 @@ const reAnchor = () => { if (!anchorTo) return; const el = document.getElementBy
 for (const ev of ["wheel", "touchstart", "keydown", "pointerdown"]) addEventListener(ev, () => { anchorTo = null; }, { passive: true });
 onMode((t) => { for (const f of frames) try { f.contentDocument.documentElement.dataset.theme = t; } catch {} });
 addEventListener("resize", () => { for (const f of frames) try { f.contentDocument.documentElement.style.setProperty("--sn-vh", innerHeight + "px"); } catch {} });
+// 演示里的视频、图片进全屏：Chrome 全屏期间把整页的滚动条收起（文档根元素滚不动了），页面变宽，居中的内容横着挪半个滚动条宽（7.5px），
+// 退出全屏回来那一下看得见（巡检"开关浮层时页面左右跳"，原版就有）。平时一直记着滚动条多宽；进全屏时右边补上同样宽的内边距（和锁滚动 dx-lock 一个办法），退出时撤掉
+let sbw = 0;
+const measureSbw = () => { const de = document.documentElement; if (!document.fullscreenElement && !de.classList.contains("dx-lock")) sbw = innerWidth - de.clientWidth; };
+addEventListener("resize", measureSbw); addEventListener("load", measureSbw); new ResizeObserver(measureSbw).observe(document.documentElement);
+document.addEventListener("fullscreenchange", () => {
+  const de = document.documentElement, on = !!document.fullscreenElement;
+  if (on && sbw > 0 && de.clientWidth >= innerWidth) { de.style.setProperty("--fs-sbw", sbw + "px"); de.classList.add("dx-fs"); }
+  if (!on) { de.classList.remove("dx-fs"); requestAnimationFrame(measureSbw); }
+});
 
 // ———— 演示的代码 ————
 // 手写的演示直接给源码；内容是脚本生成的（源码里只有一个空容器），从 iframe 里取生成好的结构，整理成能抄的样子
@@ -189,6 +200,52 @@ const CONTRACTED = new Set([...DEMOS.values()].filter((d) => d.contract).map((d)
 // 跟着框架变的小块（引入那一行、API 表里的叫法）：换框架时只重画这些，演示框不动
 const FWR = [];
 const fwr = (fn) => `<div class="d-fwr" data-fwr="${FWR.push(fn) - 1}">${fn()}</div>`;
+// 键盘表的按键："⌘ / Ctrl + 回车"按" / "拆成几组，每组一个不折行的 <kbd>（只在" / "处换行）；末尾括号里的说明（"（图片、视频气泡上）"）放到 kbd 外面，小字
+const keysHTML = (s) => { const m = /^(.*?)\s*（([^）]*)）\s*$/.exec(String(s)), keys = (m ? m[1] : String(s)).split(/\s+\/\s+/); return keys.map((k) => `<kbd class="d-nw">${esc(k)}</kbd>`).join(" / ") + (m ? `<wbr><span class="d-k-note">（${esc(m[2])}）</span>` : ""); };
+// 正文里不许拆开的东西（乱换行）：行内代码一截一截不折行，只在空格处换行（一整截 ≤ 40 个字的不断开）；数字和单位、日期包成不折行的一块。
+// 渲染完、切框架重渲染以后各跑一遍（API 表、规则表里的代码已经自己包好了，带子元素的 code 不动）
+// 数字 + 单位、日期、时间；正文里没包代码样式的令牌名、类名（".sn-rg-tabs"、"--sn-label2"），都包成不折行的一块
+const NB_NUM = /(?:[¥$€£]\s?)?\d[\d,.]*\s?(?:px|ms|秒|分钟|分|小时|天|周|个月|月|日|年|号|%|％|元|GB|MB|KB|TB|条|行|个|项|次|人|件|张|帧|倍|位|字|岁|页|篇|台|笔|单|kg|km|cm|mm)(?:\s?\d{1,2}\s?[日号])?|\d{1,2}:\d{2}(?::\d{2})?|(?<![\w-])(?:--|\.)?sn-[\w-]+/g;
+// 短单元格（6 个字以内，或者 2 个词以内）不折行：表格挤的时候"整页""字号比例"这种被拆成两行（site.css 原来只让第一列不折行，长的第一列又把整张表撑宽）
+const shortCell = (t) => (/[㐀-鿿]/.test(t) ? t.replace(/\s/g, "").length <= 6 : t.split(/\s+/).length <= 2 && t.length <= 24);
+function nbProse(scope) {
+  for (const td of $$(".d-table td:not(.d-nw)", scope)) { const t = td.textContent.trim(); if (t && shortCell(t) && !td.querySelector("br")) td.classList.add("d-nw"); } // 带代码的短格子也算（"Popover（showPopover）"在全角括号前被折开）
+  for (const c of $$("code:not([data-nb])", scope)) {
+    c.dataset.nb = ""; if (c.children.length || c.closest("pre")) continue;
+    const t = c.textContent; if (!t.trim()) continue;
+    c.innerHTML = t.split(/(\s+)/).map((w) => (/\S/.test(w) ? nbWord(esc(w)) : esc(w))).join(""); // 和 API 表同一个包法（nbWord）
+  }
+  const tw = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT), hits = [];
+  for (let n = tw.nextNode(); n; n = tw.nextNode()) { NB_NUM.lastIndex = 0; if (NB_NUM.test(n.data) && !n.parentElement.closest("code, pre, kbd, script, style, textarea, svg, .d-nw, .dx-code, iframe")) hits.push(n); }
+  for (const n of hits) {
+    const frag = document.createDocumentFragment(); let last = 0; NB_NUM.lastIndex = 0;
+    for (let m = NB_NUM.exec(n.data); m; m = NB_NUM.exec(n.data)) { if (!/[\s-]/.test(m[0])) continue; frag.append(n.data.slice(last, m.index)); const sp = document.createElement("span"); sp.className = "d-nw"; sp.textContent = m[0]; frag.append(sp); last = m.index + m[0].length; } // 只包会被拆开的：中间有空格的数字 + 单位、带连字符的令牌名
+    if (last) { frag.append(n.data.slice(last)); n.replaceWith(frag); }
+  }
+  // 中文标点、中文字后面紧跟着代码或令牌（"…设 --md-code-max、--md-img-h、…"）：浏览器不在连字符前面断（"、" 和 "--" 之间没有换行机会），
+  // 几个令牌连着顿号就成了一整串断不开的，390 宽时把整页撑宽。在它们中间放一个 <wbr>：顿号留在上一行末尾，令牌整个到下一行
+  for (const c of $$("code, .d-nw", scope)) {
+    const prev = c.previousSibling;
+    if (prev?.nodeType === 3 && /[、，。；：！？）」』》】〉㐀-鿿]$/.test(prev.data) && !c.closest("pre, .d-nw > *, td.d-nw") && c.previousElementSibling?.tagName !== "WBR") c.before(document.createElement("wbr"));
+  }
+}
+// 卡片网格不留孤儿（3 + 1 这种）：按一张卡至少 220 宽算能放几列（c）；最后一行会只剩 1 张时（3 列 4 张、3 列 13 张、4 列 9 张……），
+// 最后 c + 1 张分成两行排（3 列 → 2 + 2，4 列 → 3 + 2），同一行的卡一样宽、左右边对齐。做法：网格切成 L 条细列（c 和后两行张数的最小公倍数），每张卡占几条（--sp）
+function balanceCards(scope) {
+  const gcd = (a, b) => (b ? gcd(b, a % b) : a), lcm = (...xs) => xs.reduce((a, b) => (a * b) / gcd(a, b), 1);
+  for (const g of $$(".d-cards:not([data-bal])", scope)) {
+    g.dataset.bal = "";
+    const fit = () => {
+      const kids = [...g.children], n = kids.length, W = g.clientWidth; if (!n || !W) return;
+      const gap = parseFloat(getComputedStyle(g).columnGap) || 12, c = Math.max(1, Math.floor((W + gap) / (220 + gap)));
+      let L = c, sp = kids.map(() => 1);
+      if (c >= 3 && n > c && n % c === 1) { const a = Math.ceil((c + 1) / 2), b = c + 1 - a; L = lcm(c, a, b); sp = kids.map((_, i) => (i < n - c - 1 ? L / c : i < n - b ? L / a : L / b)); }
+      const key = L + ":" + sp.join(","); if (g.dataset.balKey === key) return; g.dataset.balKey = key;
+      g.style.setProperty("--l", String(L)); kids.forEach((k, i) => k.style.setProperty("--sp", String(sp[i])));
+    };
+    fit(); if (typeof ResizeObserver === "function") new ResizeObserver(fit).observe(g);
+  }
+}
 // 各框架里的叫法：Next.js 看 React、Nuxt 看 Vue；"自定义元素"那一列给 Svelte、Angular、Solid、Preact、纯 HTML 兜底
 const nameKey = () => { const e = getEnv()?.id; return e === "next" ? "react" : e === "nuxt" ? "vue" : getFw().id; };
 // 说明文字按框架分：契约里的文字可以写成 { react, vue, svelte, angular, solid, preact, html, default }，只显示当前框架那一句（没写的框架用 default）
@@ -242,7 +299,7 @@ onFw(() => {
   fillAll();
   for (const el of $$(".d-fw[data-fwb]", main)) { el.innerHTML = renderFwb(FWB[+el.dataset.fwb]); injectIcons(el); mountCode(el); mountFwButtons(el); }
   for (const el of $$("[data-fw-name]", main)) el.textContent = getFw().name + (getEnv() ? " · " + getEnv().name : "");
-  for (const el of $$(".d-fwr[data-fwr]", main)) { el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); mountFwButtons(el); for (const w of $$(".d-tablewrap", el)) scrollArea(w, { fade: "x", size: 20 }); }
+  for (const el of $$(".d-fwr[data-fwr]", main)) { el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); mountFwButtons(el); nbProse(el); for (const w of $$(".d-tablewrap", el)) scrollArea(w, { fade: "x", size: 20 }); }
 });
 // 计算样式拿来判断空白要不要留：在演示文档里找同样标签、同样类名的元素
 const liveOf = (doc, el) => { if (!doc || !el.classList?.length) return null; try { return doc.querySelector(el.localName + "." + [...el.classList].map((c) => CSS.escape(c)).join(".")); } catch { return null; } };
@@ -651,6 +708,17 @@ function playBox(c, ex) {
 }
 const tbl = (head, rows) => BLOCK.table(head, rows);
 // 契约示例里带"手机"的（比如"手机上：底部操作栏"）：示例框顶上一个"在手机上看"开关，打开后同一份演示放进设备框（device.js）；手机上（≤ 860px）不出这个开关
+// 内容页配方的预览框跟着内容长高：iframe 载好以后量文档高度，内容变了（图片、字体载好，折叠展开）再量；框里不出滚动条
+function fitRecipes(scope) {
+  for (const box of $$('.d-rframe[data-fit="content"]:not([data-fitted])', scope)) {
+    box.dataset.fitted = ""; const f = $("iframe", box); let ro = null;
+    const set = () => { try { const d = f.contentDocument; if (!d || !d.body) return; const h = Math.ceil(d.documentElement.scrollHeight); if (h && Math.abs(f.offsetHeight - h) > 1) f.style.height = h + "px"; } catch {} };
+    f.addEventListener("load", () => {
+      try { const d = f.contentDocument, w = f.contentWindow; d.documentElement.style.overflow = "hidden"; if (ro) ro.disconnect(); ro = new w.ResizeObserver(set); ro.observe(d.body); } catch {}
+      set();
+    });
+  }
+}
 function mountPhoneToggles(scope) {
   // 桌面配方：预览上面同样一个开关，打开后整宽预览藏起来（还在页面里，示例生成器读它），换成设备框
   for (const wrap of $$(".d-rwrap[data-rphone]:not([data-phone-ready])", scope)) {
@@ -660,7 +728,7 @@ function mountPhoneToggles(scope) {
     btn.addEventListener("click", () => {
       const on = !wrap.classList.contains("d-rphone");
       wrap.classList.toggle("d-rphone", on); btn.setAttribute("aria-pressed", String(on));
-      if (on && !$(".s-devbox", wrap)) { bar.insertAdjacentHTML("afterend", deviceHTML({ src: `../tests/recipes/${wrap.dataset.rphone}.html`, title: `${wrap.dataset.title}（手机）`, fit: "block", maxH: 780 })); mountDevices(wrap); }
+      if (on && !$(".s-devbox", wrap)) { bar.insertAdjacentHTML("afterend", deviceHTML({ src: `../tests/recipes/${wrap.dataset.rphone}.html`, title: `${wrap.dataset.title}（手机）`, fit: "block", maxH: 780, under: !RECIPES.find((x) => x.id === wrap.dataset.rphone)?.shell })); mountDevices(wrap); }
     });
   }
   for (const box of $$(".dx[data-phone]:not([data-phone-ready])", scope)) {
@@ -683,18 +751,24 @@ function mountPhoneToggles(scope) {
 const plainOf = (s) => String(s).replace(/<[^>]+>/g, "").trim();
 // 类型、默认值、名称里的代码：只在空格处换行，一截（"确定"、"danger-soft"、GridColumn<Row>[]）放得下就不从中间断开——
 // 每截包成行内块（.d-nb，最宽不超过格子）：放得下整截换到下一行，比格子还宽才在里面折。不按字数定死，表格宽窄都对
-const nbText = (t) => t.split(/( +)/).map((w) => (/\S/.test(w) && w.replace(/&\w+;/g, "x").length <= 24 ? `<span class="d-nb">${w}</span>` : w)).join("");
+// 一截代码（已转义）怎么包：≤ 14 个字整截不折（"secondary"、ComposerContextItem[] 这类名字不从中间断开）；更长的只在 < ( { | , : => 后面可以断
+// （类型表达式的语法分界，不是从名字中间断），每一小截不折；带中文的长串照常折（中文本来就能在字和字之间换行），带中文的短串（≤ 6 个字）不折
+const nbWord = (w) => {
+  const plain = w.replace(/&\w+;/g, "x");
+  // 带中文的长串：中文那几段照常折，夹在里面的英文、属性名（aria-label="、data-i=）一段一段不折——不然在连字符处被拆开
+  // 中文那几段：≤ 6 个字的（"面板""镜头名""邮箱格式不对"）也整段不折，只在段和段之间断；更长的中文段才在字和字之间折
+  if (/[㐀-鿿぀-ヿ]/.test(plain)) return plain.length <= 6 ? `<span class="d-nb">${w}</span>` : w.split(/([㐀-鿿぀-ヿ]+)/).map((p) => (p && (!/[㐀-鿿぀-ヿ]/.test(p) || p.length <= 6) ? `<span class="d-nb">${p}</span>` : p)).join("");
+  if (plain.length <= 14) return `<span class="d-nb">${w}</span>`;
+  return w.split(/(?<=&lt;|=&gt;|[({|,:])(?=.{3,}$)/).map((p) => `<span class="d-nb">${p}</span>`).join("<wbr>");
+};
+const nbText = (t) => t.split(/( +)/).map((w) => (/\S/.test(w) ? nbWord(w) : w)).join("");
 const nbCode = (html) => html.replace(/<code>([^<]*)<\/code>/g, (_, t) => "<code>" + nbText(t) + "</code>");
 // 名称：契约里有的写法带括号说明（"confirmText（模板里写 confirm-text）"）——名字是代码，括号里的说明是小字，可以折到下一行，
 // 不然整串不折行，名称那列被撑得很宽，说明那列被挤成一小条
 const nbName = (html) => html.replace(/<code>([^<]*)<\/code>/g, (_, t) => { const i = t.indexOf("（"); return i > 0 ? `<code>${nbText(t.slice(0, i))}</code><wbr><span class="d-k-note">${t.slice(i)}</span>` : `<code>${nbText(t)}</code>`; });
-// 桌面上各列按表头给定宽度（固定排法）：浏览器自动分宽时，名称带说明、类型很长的那几页，"说明"会被挤成一小条、一格几十行
-const COLW = { 名称: 19, 字段: 19, 类型: 21, 默认值: 14, 必填: 8, 参数: 22, 签名: 34, "CSS 变量": 32, 默认: 18, 写法: 36, 按键: 18, 什么时候: 30 };
-const colgroup = (head, cols) => {
-  const hs = head.map(plainOf), ev = hs.includes("参数"); // 事件表：名称常是 @update:modelValue / @change 这种长名字，名称那列宽一点
-  const ws = hs.map((h, i) => (cols[i] === "d" ? null : ev && h === "名称" ? 26 : ev && h === "参数" ? 20 : COLW[h] ?? 20)), used = ws.reduce((a, w) => a + (w || 0), 0);
-  return `<colgroup>${ws.map((w) => `<col style="width:${w ?? Math.max(30, 100 - used)}%">`).join("")}</colgroup>`;
-};
+// 桌面上按内容排（table-layout: auto）：名称、类型、默认值这几列跟着内容走——每列至少和它最长的那一小截代码一样宽（代码不从名字中间断开）；
+// 说明那列要 40%，内容实在挤时浏览器先让前面几列拿够最长那截，说明拿剩下的（原来固定排法下窄列里的代码被从中间断开）
+const colgroup = (head, cols) => `<colgroup>${head.map((_, i) => (cols[i] === "d" ? '<col style="width:40%">' : "<col>")).join("")}</colgroup>`;
 const apiTbl = (head, rows, cols) => `<div class="d-tablewrap"><table class="d-table d-api">${colgroup(head, cols)}<thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => {
   const sum = [];
   const tds = r.map((c, i) => {
@@ -723,7 +797,8 @@ function contractHTML(c, k) {
   out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return codePanel([{ name: "", lang: "js", code: line }], { solo: true, lead: fwLead() }); }), k.importNote ? fwr(() => { const t = fwText(k.importNote); return t ? `<p>${md(t)}</p>` : ""; }) : "");
   // 3. 示例：由浅入深，每个都是现场演示 + 当前框架的代码
   out.push(anchor("examples", "示例"));
-  for (const ex of k.examples || []) out.push(`<h3 class="d-h3" id="ex-${ex.slug}">${esc(ex.title)}</h3>`, ex.why ? `<p>${md(ex.why)}</p>` : "", playBox(c, ex));
+  // 示例说明也按写法给（whyBy，或者写成 { react, vue, …, default }），换框架时跟着重画
+  for (const ex of k.examples || []) out.push(`<h3 class="d-h3" id="ex-${ex.slug}">${esc(ex.title)}</h3>`, ex.why || ex.whyBy ? fwr(() => { const w = fwText(by(ex, "why")); return w ? `<p>${md(w)}</p>` : ""; }) : "", playBox(c, ex));
   // 设计稿里的完整演示（更丰富的组合）
   // 完整演示：设计稿里更丰富的组合，只放现场演示（写法以上面的示例为准）
   if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示"), `<p>设计稿里把几种用法组合在一起的样子，可以直接操作；代码看上面的示例。</p>`); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n, code: false }))); }
@@ -742,7 +817,7 @@ function contractHTML(c, k) {
   // 5. 键盘与无障碍
   if (k.keyboard?.length || k.a11y) {
     out.push(anchor("a11y", "键盘与无障碍"));
-    if (k.keyboard?.length) out.push(apiTbl(["按键", "什么时候", "做什么"], k.keyboard.map((x) => [`<kbd>${esc(x.keys)}</kbd>`, md(x.when || ""), md(x.does)]), ["n", "m", "d"]));
+    if (k.keyboard?.length) out.push(apiTbl(["按键", "什么时候", "做什么"], k.keyboard.map((x) => [keysHTML(x.keys), md(x.when || ""), md(x.does)]), ["n", "m", "d"]));
     for (const [t, list] of [["角色", k.a11y?.roles], ["焦点", k.a11y?.focus], ["说明", k.a11y?.notes]]) if (list?.length) out.push(`<h3 class="d-h3">${t}</h3><ul class="d-list">${list.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
   }
   // 6. 设计规范
@@ -773,14 +848,33 @@ const ASYNC = {
     const lead = $("[data-async-lead]", main); if (lead) lead.outerHTML = md2html(d.lead.join(" "));
     // 手机页面（mobile）：桌面上放进设备框；原来的整宽预览留着（手机上显示，示例生成器也读它），桌面上藏起来
     // 桌面页面：预览上面一个"在手机上看"开关，打开后同一个页面放进设备框（mountPhoneToggles）
-    return anchor("preview", "预览") + (r.mobile ? `<div class="d-rdev">${deviceHTML({ src: `../tests/recipes/${id}.html`, title: `${r.title}预览`, fit: "block", maxH: 780 })}</div>` : `<div class="d-rwrap" data-rphone="${id}" data-title="${esc(r.title)}"><div class="d-rbar"></div>`)
-      + `<div class="d-rframe${r.mobile ? " d-rframe-m" : ""}"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>` + (r.mobile ? "" : "</div>")
+    return anchor("preview", "预览") + (r.mobile ? `<div class="d-rdev">${deviceHTML({ src: `../tests/recipes/${id}.html`, title: `${r.title}预览`, fit: "block", maxH: 780, under: true })}</div>` : `<div class="d-rwrap" data-rphone="${id}" data-title="${esc(r.title)}"><div class="d-rbar"></div>`)
+      // 预览框分两类：app 式（对话、向导、后台列表、登录——整页就是一个应用，自己占满一屏）固定高度；内容页（仪表盘、落地页、设置、下单）和内容一样高，框里不出滚动条（fitRecipes）
+      + `<div class="d-rframe${r.mobile ? " d-rframe-m" : ""}" data-fit="${r.shell ? "fixed" : "content"}"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>` + (r.mobile ? "" : "</div>")
       + anchor("code", "代码") + `<div class="dx-code d-rcode" data-recipe="${id}" data-fold="24"><div class="dx-cx"></div></div>`
       + (d.notes.length ? anchor("notes", "补充说明") + `<ul class="d-list">${d.notes.map((n) => `<li>${md2html(n)}</li>`).join("")}</ul>` : "");
   },
   async rules() {
-    const { rules } = await fetch(new URL("../spec/rules/anti-ai.json", location.href)).then((x) => x.json());
-    return BLOCK.table(["规则", "查法", "怎么改"], rules.map((r) => [`<b>${esc(r.title)}</b><br><code>${esc(r.id)}</code>`, r.check?.kind === "dom" ? "页面" : r.check?.kind === "both" ? "源码 + 页面" : "源码", esc(r.fix || "")]));
+    const data = await fetch(new URL("../spec/rules/anti-ai.json", location.href)).then((x) => x.json()), { rules } = data;
+    // "查法"是两三个字的短标签，不折行、按内容定宽；"怎么改"里的令牌名、类名、路径（规则文件里用反引号）渲染成整体不断开的代码，只在" / "、逗号这些地方换行（样式 .d-rules）
+    // 查法按规则文件的 check.kind：static 源码、dom 页面、static+dom 两样都查；上面那句"一共 N 条"按规则文件实际条数改
+    const how = (r) => { const k = r.check?.kind || "static"; return `<span class="d-nw">${k === "dom" ? "页面" : /\+|both/.test(k) ? "源码 + 页面" : "源码"}</span>`; };
+    const cnt = $("[data-n-rules]", main); if (cnt) cnt.textContent = String(rules.length);
+    // 规则文件还没给名字加反引号的，先按样子认出令牌名（--sn-…）、类名（sn-…）、路径（references/…）当代码；已经有反引号的照原样
+    const codeify = (t) => (/`/.test(t) ? t : t.replace(/(--sn-[A-Za-z0-9-]+(?:\/[a-z0-9]+)*(?:…\d+)?|(?<![\w-])sn-[a-z][\w-]*\*?|references\/[\w./-]+|SKILL\.md)/g, "`$1`"));
+    const table = (list) => BLOCK.table(["规则", "查法", "怎么改"], list.map((r) => [`<b>${esc(r.title)}</b><br><code>${esc(r.id)}</code>`, how(r), md2html(codeify(r.fix || "")).replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="d-table"', 'class="d-table d-rules"');
+    // 按七个根源组织（主会话 11-22）：规则文件给了根源（roots：编号、名字、自检问题）就先列根源和"先问自己"的问题；
+    // 规则带 root 字段就按根源分组，一类一张表；都还没有时照旧一张表。root 可以写编号、名字或者 { id }
+    const NAMES = ["自说自话", "假", "照搬", "堆信号", "语义错位", "只在理想条件下成立", "生硬"];
+    const noOf = (v) => { if (v == null) return null; if (typeof v === "object") return noOf(v.id ?? v.no ?? v.name); if (/^\d+$/.test(String(v))) return +v; const i = NAMES.indexOf(String(v)); return i < 0 ? null : i + 1; };
+    const roots = (Array.isArray(data.roots) ? data.roots : data.roots ? Object.entries(data.roots).map(([id, v]) => (typeof v === "string" ? { id, name: v } : { id, ...v })) : [])
+      .map((r, i) => ({ no: noOf(r.id ?? r.no) ?? i + 1, name: r.name || r.title || NAMES[i], ask: r.ask || r.question || r.check || "" }));
+    const head = roots.length ? BLOCK.table(["根源", "先问自己"], roots.map((r) => [`<span class="d-nw"><b>${r.no} ${esc(r.name)}</b></span>`, md2html(r.ask || "").replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="d-table"', 'class="d-table d-roots"') : "";
+    if (!rules.some((r) => noOf(r.root) != null)) return head + table(rules);
+    const groups = (roots.length ? roots : NAMES.map((name, i) => ({ no: i + 1, name }))).map((g) => ({ ...g, list: rules.filter((r) => noOf(r.root) === g.no) }));
+    const rest = rules.filter((r) => !groups.some((g) => g.list.includes(r)));
+    return head + groups.filter((g) => g.list.length).map((g) => `<h3 class="d-h3" id="root-${g.no}">${g.no} ${esc(g.name)}<span class="d-h2-sub">${g.list.length}</span></h3>` + table(g.list)).join("")
+      + (rest.length ? `<h3 class="d-h3" id="root-x">其他<span class="d-h2-sub">${rest.length}</span></h3>` + table(rest) : "");
   },
   async tokens() {
     const get = (f) => fetch(new URL(`../packages/satin-ui/tokens/${f}.tokens.json`, location.href)).then((x) => x.json());
@@ -808,7 +902,7 @@ async function fillAsync(scope, base) {
     try { el.outerHTML = await ASYNC[k](arg); } catch (e) { el.outerHTML = `<p class="d-err">这一块没能载入：${esc(e.message)}</p>`; }
   }));
   if (curPage?.hash !== base) return; // 载入期间已经换页了
-  injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main); mountDevices(main); mountPhoneToggles(main);
+  injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main); mountDevices(main); mountPhoneToggles(main); fitRecipes(main); nbProse(main); balanceCards(main);
   for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
   for (const box of $$(".dx:not([data-wired])", main)) { box.dataset.wired = ""; wireDemo(box, cat.byId[box.dataset.demo]); }
   pump();
@@ -819,7 +913,7 @@ function textPage(pg) {
   const p = pg.p, sec = p.rulesOf ? cat.byId[p.rulesOf] : null;
   // "移动端与 H5"：左边标题和讲解，右边从标题那一行起钉一个设备框跑真实的手机页面（移动端下单）；中等宽度放在标题下面，手机上不放（样式见 next.css .d-devpage）
   if (p.id === "mobile") return `<div class="d-devgrid"><div class="d-devhead">${head(pg, p.title, `${pg.group} <span>${esc(p.en)}</span>`, p.lead)}</div>`
-    + `<aside class="d-devside" aria-label="手机预览">${deviceHTML({ src: "../tests/recipes/mobile-order.html", title: "移动端下单页", fit: "sticky" })}</aside><div class="d-devmain">${blocks(p.body)}</div></div>`;
+    + `<aside class="d-devside" aria-label="手机预览">${deviceHTML({ src: "../tests/recipes/mobile-order.html", title: "移动端下单页", fit: "sticky", under: true })}</aside><div class="d-devmain">${blocks(p.body)}</div></div>`;
   return head(pg, p.title, `${pg.group} <span>${esc(p.en)}</span>`, p.lead)
     + (p.embed ? anchor("demo", "演示") + demoBox(p.embed, { code: false }) : "")
     + blocks(p.body) + (sec ? rulesHTML(sec.rules) : "");
@@ -898,7 +992,7 @@ function swapPage(pg, part) {
   } else {
     const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
     main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}${pg.p?.id === "mobile" ? " d-devpage" : ""}">${body}${pager(pg)}</article>`;
-    injectIcons(main); mountCode(main); mountFwButtons(main); mountDevices(main); mountPhoneToggles(main);
+    injectIcons(main); mountCode(main); mountFwButtons(main); mountDevices(main); mountPhoneToggles(main); fitRecipes(main); nbProse(main); balanceCards(main);
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     wireWalls(main);
     for (const box of $$(".dx", main)) { box.dataset.wired = ""; wireDemo(box, pg.c || cat.byId[box.dataset.demo]); }

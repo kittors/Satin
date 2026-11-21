@@ -29,10 +29,10 @@
 .cx-copy:hover { --sn-bg: color-mix(in srgb, var(--sn-label) 7%, var(--cx-bg)); }
 .cx-copy:active { --sn-bg: color-mix(in srgb, var(--sn-label) 11%, var(--cx-bg)); }
 .cx.has-hd .cx-copy { position: static; margin-left: auto; }
-.cx-hd { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 8px 0 10px; }
+.cx-hd { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px 0 10px; } /* 文件页签放不下时折成两行，头部跟着长高（一行时和原来一样高） */
 .cx-name { padding-left: 6px; font: 500 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); }
-.cx-tabs { display: flex; gap: 2px; }
-.cx-tabs button { all: unset; height: 28px; padding: 0 10px; border-radius: 8px; font: 500 calc(12px * var(--fsx))/28px var(--sn-mono); color: var(--sn-label3); cursor: pointer; transition: color .12s var(--sn-ease-out), background-color .12s var(--sn-ease-out); }
+.cx-tabs { display: flex; flex-wrap: wrap; gap: 2px; min-width: 0; padding: 4px 0; } /* 文件多、屏幕窄（390）时折成两行：每个页签整个不断开，不横着滑、不把整页撑宽 */
+.cx-tabs button { all: unset; flex: none; white-space: nowrap; height: 28px; padding: 0 10px; border-radius: 8px; font: 500 calc(12px * var(--fsx))/28px var(--sn-mono); color: var(--sn-label3); cursor: pointer; transition: color .12s var(--sn-ease-out), background-color .12s var(--sn-ease-out); }
 .cx-tabs button:hover { color: var(--sn-label); }
 .cx-tabs button[aria-selected="true"] { color: var(--sn-label); background: var(--sn-raised); box-shadow: 0 1px 2px rgba(0, 0, 0, .06), inset 0 0 0 1px var(--sn-line); }
 [data-theme="dark"] .cx-tabs button[aria-selected="true"] { background: var(--sn-fill-active); box-shadow: none; }
@@ -77,7 +77,7 @@
 .dx { --dx-bg: color-mix(in srgb, var(--sn-label) 5%, var(--sn-canvas)); margin-top: 16px; padding: 6px; border-radius: 22px; background: var(--dx-bg); }
 [data-theme="dark"] .dx { --dx-bg: color-mix(in srgb, var(--sn-label) 8%, var(--sn-canvas)); }
 .dx-bar { display: flex; align-items: center; gap: 12px; min-height: 34px; padding: 0 0 6px 6px; } /* 框顶一行：左边设置项，右边"在展示页打开"（不浮在预览上，免得压住演示角落里的东西） */
-.dx-ctl { display: flex; align-items: center; gap: 16px; }
+.dx-ctl { display: flex; align-items: center; gap: 16px; min-width: 0; flex-wrap: wrap; row-gap: 8px; } /* 设置项多、屏幕窄时折到下一行，不把整页撑宽（390 宽时对话页的框顶一行有 440 宽） */
 .dx-opt { display: flex; align-items: center; gap: 8px; font: 500 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
 .dx-note { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 400 calc(12px * var(--fsx))/calc(16px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
 /* 预览台：和页面同一个底色，组件放在正中 */
@@ -95,7 +95,7 @@
 .dx .mac .d-frame iframe { background: transparent; }
 .dx-code { position: relative; }
 .dx-code .cx { --cx-bg: var(--dx-bg); }
-.dx-code .cx-hd { box-shadow: none; padding: 6px 6px 0 6px; height: 40px; }
+.dx-code .cx-hd { box-shadow: none; padding: 6px 6px 0 6px; min-height: 40px; }
 .dx-code .cx-tabs button[aria-selected="true"] { background: var(--sn-canvas); box-shadow: none; }
 
 /* ———— 4. 文档：标题、小节、表格、翻页 ———— */
@@ -493,6 +493,8 @@
 /* 弹窗、看图时锁住整页：常显的滚动条收起，同时在右边补上滚动条那么宽的内边距（--sbw，锁之前量好），页面一像素都不挪、演示不重新排版。
    不用 scrollbar-gutter: stable 留着滚动条的位置：留着的那一条遮罩盖不到，看图时窗口右边一直亮着一条（2026-11-20 看图边界测试逐帧抓到） */
 html.dx-lock { overflow: hidden; padding-right: var(--sbw, 0px); }
+/* 演示进全屏时 Chrome 收起了整页滚动条：右边补上同样宽的内边距（--fs-sbw，进全屏前量好），全屏前后页面不挪（next-docs.js 的 fullscreenchange） */
+html.dx-fs { padding-right: var(--fs-sbw, 0px); }
 
 /* 组件页：第一个演示的小标题后面跟一句这一块是什么（比如"变体 × 尺寸"） */
 .d-h2-sub { margin-left: 10px; font: 400 calc(14px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
@@ -610,6 +612,9 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 
 /* ———— 9. 组件总览、配方总览、单个配方 ———— */
 .d-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 12px; margin-top: 16px; }
+/* 列数由 next-docs.js 的 balanceCards 按宽度和张数定：网格切成 --l 条细列，每张卡占 --sp 条——最后一行不只剩 1 张（3 列 4 张排成 2 + 2） */
+.d-cards[style*="--l"] { grid-template-columns: repeat(var(--l), minmax(0, 1fr)); }
+.d-cards[style*="--l"] > * { grid-column: span var(--sp, 1); }
 .d-card { display: grid; align-content: start; gap: 4px; padding: 14px 16px 16px; border-radius: 12px; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); text-decoration: none; color: var(--sn-label); transition: background-color .15s var(--sn-ease-out); }
 .n-docs .d-main a.d-card { text-decoration: none; color: var(--sn-label); }
 @media (hover: hover) { .d-card:hover { background: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); } }
@@ -624,6 +629,9 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .d-rprev iframe { position: absolute; top: 0; left: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; transform: scale(var(--k, .2)); pointer-events: none; }
 .d-rframe { margin-top: 12px; height: 640px; overflow: hidden; border-radius: 16px; background: var(--sn-canvas); box-shadow: inset 0 0 0 1px var(--sn-card-line); }
 .d-rframe iframe { display: block; width: 100%; height: 100%; border: 0; }
+/* 内容页配方：预览框跟着内容长高（fitRecipes 量好设 iframe 的高度），框里不出滚动条；app 式配方还是固定高度 */
+.d-rframe[data-fit="content"] { height: auto; }
+.d-rframe[data-fit="content"] iframe { height: 640px; }
 .d-rcode { margin-top: 12px; }
 .d-err { color: var(--sn-danger); }
 /* 顶栏的外观分段控件（跟随系统 / 浅色 / 深色） */
@@ -727,15 +735,30 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 /* 组件页 API 表（next-docs.js 的 apiTbl）：桌面是表格；窄屏（< 640px）每一项一块，不横着滑、不截断，行高跟着内容走——
    第一行名称（代码样式），右边小字"类型 · 默认 … · 必填"，太长就整行放到名称下面（.d-k-long，脚本按字数判断）；说明整行在下面，不加列线；项和项之间一条细线 */
 .n-docs .d-api .d-k-sum { display: none; }
-/* 类型、默认值、名称里的代码一截一截包成行内块（nbCode / nbName 的 .d-nb）：放得下整截就不从中间断开（"确定"、"danger-soft"、(close:），
-   比格子还宽才在里面折；"默认""必填""全局令牌"这几个小字不断开。
-   桌面表格固定排法，各列宽度按表头（apiTbl 的 colgroup），说明那列至少占三成，不再被名称、类型挤成一小条 */
-.n-docs .d-api .d-nb, .n-docs .d-api .d-kv { display: inline-block; max-width: 100%; }
+/* 类型、默认值、名称里的代码一截一截不折行（next-docs.js 的 nbWord 包成 .d-nb）：≤ 14 个字整截不断（"secondary"、ComposerContextItem[]），
+   更长的只在 < ( { | , : => 后面断；带中文的长串照常折。"默认""必填""全局令牌"这几个小字不断开。
+   桌面表格按内容排（table-layout: auto）：前几列至少和它最长的那一小截一样宽，说明那列要 40%（apiTbl 的 colgroup），在里面正常折行 */
+.n-docs .d-nb { white-space: nowrap; } /* 正文里的行内代码也是这样包的（nbProse） */
+.n-docs .d-api .d-kv { display: inline-block; max-width: 100%; }
+/* "给 AI 用"页的规则表：查法一列按内容定宽、不折行；规则 id、怎么改里的令牌名 / 类名 / 路径是整体不断开的代码，只在" / "、逗号这些地方换行 */
+.d-nw { white-space: nowrap; }
+.n-docs table.d-rules td:nth-child(2), .n-docs table.d-rules th:nth-child(2) { width: 1%; white-space: nowrap; }
+/* 规则表第一列是"规则名 + id"：规则名是一整句（"按钮、标签、页签、表头不折行；页面不横向溢出"），可以折行；id 是代码、不断开。
+   site.css 给文档表格第一列统一设了不折行，这里放开——不然第一列被撑到 340 宽，整张表比外框宽，最右边"怎么改"被裁掉一截（1024 宽时抓到） */
+.n-docs table.d-rules td:first-child { white-space: normal; }
+/* 文档表格的第一列也一样：长的（"拖表头换列：看得见的格子从旧位置滑过去"）照常折行，不然整张表被撑宽、最右一列要横着滑；
+   短的格子（任何一列，6 个字以内或 2 个词以内）由 nbProse 加 .d-nw 不折行 */
+.n-docs .d-table td:first-child { white-space: normal; }
+.n-docs .d-table td.d-nw { white-space: nowrap; }
+/* 七个根源那张表（规则文件给了 roots 时）：根源名一列按内容定宽、不折行 */
+.n-docs .d-roots td:first-child, .n-docs .d-roots th:first-child { width: 1%; white-space: nowrap; }
+/* 只管检查器页的规则表（table.d-rules）：组件页"要点"列表也叫 .d-rules（ul），那里的长代码要能在空格处换行，不然 390 宽时把整页撑宽 */
+.n-docs table.d-rules code { display: inline-block; max-width: 100%; white-space: nowrap; overflow-wrap: normal; line-height: 1.45; }
 /* 桌面表格里名称、类型、默认值格子里的代码本身也是行内块：一截比格子还宽、只能在里面折时，代码的底色跟着整块走（行内的底色只铺在最后一行上，会错位）；
    行高从 1 放到 1.45，折成两行时不挤在一起。手机上那行小字（.d-k-sum）里的代码照常是行内的：长的默认值紧跟在"默认"后面往下折 */
 .n-docs .d-api td.d-k-m code, .n-docs .d-api td.d-k-n code { display: inline-block; max-width: 100%; line-height: 1.45; }
 .n-docs .d-api .d-k-l, .n-docs .d-api .d-k-req, .n-docs .d-api td small { white-space: nowrap; }
-@media (min-width: 640px) { .n-docs .d-api { table-layout: fixed; } .n-docs .d-api td { overflow-wrap: anywhere; } }
+@media (min-width: 640px) { .n-docs .d-api td.d-k-d { overflow-wrap: anywhere; } }
 /* 名称那列：名字本身不断开，后面括号里的说明（模板里写 xxx、写成 JSON……）是小字，可以折到下一行（旧版表格第一列整列不折行，这里放开） */
 .n-docs .d-api td.d-k-n { white-space: normal; }
 .n-docs .d-api .d-k-note { margin-left: 2px; font: 400 calc(12px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
@@ -753,6 +776,17 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
   .n-docs .d-api td.d-k-d { order: 2; flex-basis: 100%; color: var(--sn-label2); }
   .n-docs .d-api .d-k-l { margin-right: var(--sn-sp-4); }
   .n-docs .d-api .d-k-dot { margin: 0 var(--sn-sp-6); font-style: normal; }
+  /* 别的文档表格（快速上手、令牌、动效、浏览器支持、规则表……）也是一行一块：第一格当标题，后面每格前面小字写这一列叫什么（BLOCK.table 的 data-l）。
+     原来照样是表格，390 宽时短格子不折行、代码不断开，表格比屏幕宽一点，框里横着滑几十像素（巡检"意外溢出"抓到十几处） */
+  .n-docs .d-table:not(.d-api), .n-docs .d-table:not(.d-api) tbody, .n-docs .d-table:not(.d-api) tr, .n-docs .d-table:not(.d-api) td { display: block; width: auto; }
+  .n-docs .d-table:not(.d-api) thead { display: none; }
+  .n-docs .d-table:not(.d-api) tr { padding: var(--sn-sp-12) var(--sn-sp-16); box-shadow: inset 0 -1px 0 var(--sn-line); }
+  .n-docs .d-table:not(.d-api) tr:last-child { box-shadow: none; }
+  .n-docs .d-table:not(.d-api) td { padding: 0; box-shadow: none; }
+  .n-docs .d-table:not(.d-api) td + td { margin-top: var(--sn-sp-4); }
+  .n-docs .d-table:not(.d-api) td:first-child { color: var(--sn-label); font-weight: 500; }
+  .n-docs .d-table:not(.d-api) td + td[data-l]:not([data-l=""])::before { content: attr(data-l); display: block; font: 400 calc(12px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
+  .n-docs table.d-rules td:nth-child(n), .n-docs table.d-roots td:nth-child(n) { width: auto; } /* 桌面上"查法""根源"那列按内容定宽（1%），一行一块时不要 */
 }
 
 /* ———— 11. 手机设备框（device.js）：iframe 里跑真实页面，按屏幕的 CSS 尺寸；整体按可用宽高缩放（只动 transform），换机型 / 横竖屏淡出淡入（只动 opacity）
@@ -778,24 +812,33 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .s-dev.s-dev-out { opacity: 0; }
 /* 屏幕：iframe 放在安全区以内，让出来的那一圈是页面自己的底色（--s-page，device.js 从页面里读） */
 .s-dev-screen { position: absolute; left: var(--bl); top: var(--bt); width: var(--dw); height: var(--dh); border-radius: var(--dr); overflow: hidden; background: var(--s-page, var(--sn-canvas)); }
-/* 安全区上下两条：页面边上贴着固定 / 吸附的栏时用栏的颜色（--s-band-t / -b，device.js 取），不然是页面底色；左右两侧（横屏）是页面底色 */
+/* 安全区上下两条：页面在上 / 下边上实际画出来的颜色（--s-band-t / -b，device.js 沿着边撒点取，贴边的是固定栏就是栏的颜色）；取不到时是页面底色 */
 .s-dev-screen::before, .s-dev-screen::after { content: ""; position: absolute; left: var(--sa-l, 0px); right: var(--sa-r, 0px); pointer-events: none; }
 .s-dev-screen::before { top: 0; height: var(--sa-t, 0px); background: var(--s-band-t, var(--s-page, var(--sn-canvas))); }
 .s-dev-screen::after { bottom: 0; height: var(--sa-b, 0px); background: var(--s-band-b, var(--s-page, var(--sn-canvas))); }
-.s-dev-screen iframe { position: absolute; display: block; left: var(--sa-l, 0px); top: var(--sa-t, 0px); width: calc(100% - var(--sa-l, 0px) - var(--sa-r, 0px)); height: calc(100% - var(--sa-t, 0px) - var(--sa-b, 0px)); border: 0; background: var(--s-page, var(--sn-canvas)); }
-/* 状态栏（竖屏）：时间、信号、Wi-Fi、电量，正文色，不加底；字号照真机 */
-.s-dev-sb { position: absolute; left: 0; right: 0; top: 0; height: var(--sb-h); display: none; align-items: center; color: var(--sn-label); pointer-events: none; user-select: none; font-variant-numeric: tabular-nums; }
+/* 横屏时左右两侧让出来的那两条：页面左 / 右边上实际画出来的颜色（--s-band-l / -r），整条竖着铺满（上下两角也归它） */
+.s-dev-band-l, .s-dev-band-r { position: absolute; top: 0; bottom: 0; pointer-events: none; }
+.s-dev-band-l { left: 0; width: var(--sa-l, 0px); background: var(--s-band-l, var(--s-page, var(--sn-canvas))); }
+.s-dev-band-r { right: 0; width: var(--sa-r, 0px); background: var(--s-band-r, var(--s-page, var(--sn-canvas))); }
+.s-dev-screen iframe { position: absolute; display: block; left: var(--sa-l, 0px); top: var(--fr-t, var(--sa-t, 0px)); width: calc(100% - var(--sa-l, 0px) - var(--sa-r, 0px)); height: calc(100% - var(--fr-t, var(--sa-t, 0px)) - var(--sa-b, 0px)); border: 0; background: var(--s-page, var(--sn-canvas)); }
+/* 内容页（.s-under，device.js 按调用方的 under 加）：iframe 顶到屏幕最上沿（页面里让出了状态栏那么高），状态栏那一条压在页面上面——
+   页面底色、略透一点，带模糊（像 iOS 的状态栏）：往上滚的内容滑进去是糊开的一片，不跟时间、信号叠成两层字。只在竖屏、有状态栏的机型上 */
+.s-dev.s-under .s-dev-screen::before { z-index: 1; background: color-mix(in srgb, var(--s-band-t, var(--s-page, var(--sn-canvas))) 82%, transparent); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+/* 状态栏（竖屏）：时间、信号、Wi-Fi、电量，正文色，不加底；字号照真机。压在页面和上面那条底色上面 */
+.s-dev-sb { position: absolute; z-index: 2; left: 0; right: 0; top: 0; height: var(--sb-h); display: none; align-items: center; color: var(--sn-label); pointer-events: none; user-select: none; font-variant-numeric: tabular-nums; }
 .s-dev.s-has-sb .s-dev-sb { display: grid; }
 .s-dev-sb svg { display: block; flex: none; }
-.s-sb-ic { display: flex; align-items: center; gap: 5px; }
+.s-sb-ic { display: flex; align-items: flex-end; gap: 5px; } /* 图标都是 12 高、底边对齐 */
 .s-dev[data-kind="island"] .s-dev-sb { top: 11px; height: 37px; grid-template-columns: minmax(0, 1fr) 126px minmax(0, 1fr); justify-items: center; font: 600 17px/1 var(--sn-sans); letter-spacing: -.01em; }
 .s-dev[data-kind="island"] .s-sb-ic { grid-column: 3; }
 .s-dev[data-kind="home"] .s-dev-sb { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding: 0 6px; font: 600 12px/1 var(--sn-sans); }
-.s-dev[data-kind="home"] .s-sb-ic { gap: 4px; }
+.s-dev[data-kind="home"] .s-sb-ic { gap: 5px; }
 .s-dev[data-kind="home"] .s-sb-r { justify-self: end; }
 .s-dev[data-kind="punch"] .s-dev-sb { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 2px 20px 0; font: 500 14px/1 var(--sn-sans); }
 .s-dev[data-kind="punch"] .s-sb-ic { justify-self: end; gap: 6px; }
-.s-dev > i { position: absolute; display: none; pointer-events: none; }
+/* 灵动岛、打孔、横条指示、Home 键压在一切上面（z-index 3）：内容页上面那条半透明模糊带（z 1）、时间图标（z 2）都在它下面——
+   不然模糊带盖住灵动岛，灵动岛糊成一团灰（主会话 11-22 转达用户截图）。灵动岛永远是清楚的黑色胶囊 */
+.s-dev > i { position: absolute; z-index: 3; display: none; pointer-events: none; }
 /* iPhone：灵动岛（126 × 37，离顶 11）、底部横条（134 × 5，离底 8）；横屏时岛在左边、横条变长 */
 .s-dev[data-kind="island"] .s-dev-cut { display: block; left: 50%; top: calc(var(--bt) + 11px); width: 126px; height: 37px; margin-left: -63px; border-radius: 19px; background: #000; }
 .s-dev[data-kind="island"].s-land .s-dev-cut { left: calc(var(--bl) + 11px); top: 50%; width: 37px; height: 126px; margin: -63px 0 0; }
