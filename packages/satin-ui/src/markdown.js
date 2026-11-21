@@ -2,7 +2,7 @@
 // 支持：标题（带锚点）、段落、粗体 / 斜体 / 删除线、行内代码、链接、自动链接、列表（有序 / 无序 / 任务 / 嵌套）、引用、提示块（> [!NOTE]）、
 // 表格（对齐、表头吸顶、限高滚动）、分隔线、代码块（高亮、行号、复制、换行开关、文件名、超高折叠）、图片（定高 / 定宽 / 比例、占位、失败、图注、点开放大）、
 // 公式（TeX 常用写法 → 浏览器原生 MathML：行内 $…$，块级 $$…$$；写法不认识时原样显示源码，不报错）。
-// 高度都能定：renderMarkdown(el, md, { codeMax, imgH, tableMax })，或容器上的 CSS 变量 --md-code-max / --md-img-h / --md-table-max；
+// 高度都能定：renderMarkdown(el, md, { codeMax, imgH, tableMax })，或容器上的 CSS 变量 --sn-md-code-max / --sn-md-img-h / --sn-md-table-max；
 // 单个块在 Markdown 里写：```js title=app.js maxh=120 wrap nonum   ![说明](url "图注" =x160)   =320x  =320x180  =16:9
 // 媒体：图片的写法，地址是视频（mp4 / webm / mov）就是视频播放器，是音频（mp3 / m4a / wav / ogg）就是音频条。
 // HTML：白名单里的标签（折叠块、图、视频、音频、表格、kbd、mark……）照样渲染，属性也只放行白名单；script / style / iframe 连内容一起去掉。
@@ -96,7 +96,7 @@ function inline(s, ctx) {
   return out;
 }
 const link = (href, inner, title) => { const u = safeUrl(href), ext = /^https?:/i.test(u); return `<a href="${esc(u)}"${title ? ` title="${esc(title)}"` : ""}${ext ? ' target="_blank" rel="noopener noreferrer"' : ""}>${inner}</a>`; };
-// 图片：=x160 定高、=320x 定宽、=320x180 都定、=16:9 定比例；块级图片默认用 --md-img-h 的高度，图片在框里完整显示（contain）
+// 图片：=x160 定高、=320x 定宽、=320x180 都定、=16:9 定比例；块级图片默认用 --sn-md-img-h 的高度，图片在框里完整显示（contain）
 const VIDEO = /\.(mp4|webm|mov|m4v)(?:[?#]|$)/i, AUDIO = /\.(mp3|m4a|aac|wav|ogg|oga|flac)(?:[?#]|$)/i;
 // 视频、音频直接用组件库的播放器和音频条（和展示页"视频与音频"同一个组件）
 function media(alt, src, title, st, ctx) {

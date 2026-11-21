@@ -97,9 +97,9 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     let bub;
     const cap = it.cap ? `<span class="sn-cap2">${esc(it.cap)}</span>` : "";
     if (it.type === "image") bub = `<div class="sn-bubble sn-img"><span class="sn-ph" tabindex="0" role="button" aria-label="${tt("chat.2")}"><span class="sn-pic" style="--sn-g:${esc(it.g)}"></span></span>${cap}</div>`;
-    else if (it.type === "video") bub = `<div class="sn-bubble sn-img sn-vid"><span class="sn-ph" tabindex="0" role="button" aria-label="${tt("chat.3")}"><span class="sn-pic" style="--sn-g:${esc(it.g)}"></span><span class="sn-play">${PLAY}</span><span class="sn-dur">${it.dur}</span></span>${cap}</div>`;
-    else if (it.type === "audio") bub = `<div class="sn-bubble sn-aud"><button class="sn-ap" type="button" aria-label="${tt("chat.4")}"><span class="sn-swap"><span class="sn-a">${PLAY}</span><span class="sn-b">${PAUSE}</span></span></button><span class="sn-wf">${waveBars(28, it.seed || 1)}<span class="sn-wf-on">${waveBars(28, it.seed || 1)}</span></span><span class="sn-dur">${it.dur}</span></div>`;
-    else if (it.type === "file") bub = `<div class="sn-bubble sn-fcard"><span class="sn-ext-card">${it.ext}</span><span class="sn-meta"><b class="sn-fname">${esc(midEllipsis(it.name, 20))}</b><span>${it.ext} · ${fmtSize(it.size)}</span></span></div>`;
+    else if (it.type === "video") bub = `<div class="sn-bubble sn-img sn-vid"><span class="sn-ph" tabindex="0" role="button" aria-label="${tt("chat.3")}"><span class="sn-pic" style="--sn-g:${esc(it.g)}"></span><span class="sn-play">${PLAY}</span><span class="sn-dur">${esc(it.dur ?? "")}</span></span>${cap}</div>`;
+    else if (it.type === "audio") bub = `<div class="sn-bubble sn-aud"><button class="sn-ap" type="button" aria-label="${tt("chat.4")}"><span class="sn-swap"><span class="sn-a">${PLAY}</span><span class="sn-b">${PAUSE}</span></span></button><span class="sn-wf">${waveBars(28, it.seed || 1)}<span class="sn-wf-on">${waveBars(28, it.seed || 1)}</span></span><span class="sn-dur">${esc(it.dur ?? "")}</span></div>`;
+    else if (it.type === "file") bub = `<div class="sn-bubble sn-fcard"><span class="sn-ext-card">${esc(it.ext ?? "")}</span><span class="sn-meta"><b class="sn-fname">${esc(midEllipsis(it.name, 20))}</b><span>${esc(it.ext ?? "")} · ${fmtSize(it.size)}</span></span></div>`;
     else bub = `<div class="sn-bubble">${esc(it.text)}</div>`;
     const st = it.me && it.status ? `<span class="sn-msg-state${it.status === "fail" ? " sn-bad" : ""}"${it.status === "fail" ? ` role="button" tabindex="0" title="${tt("chat.27")}"` : ""}>${STATE[it.status]}</span>` : "";
     return `<div class="sn-msg ${it.me ? "sn-me" : "sn-ai"}${cont ? " sn-cont" : ""}${it.flying ? " sn-flying" : ""}">${bub}${st}</div>` + (it.status === "fail" ? tt("chat.5") : "");
@@ -392,8 +392,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     if (on && !reduced()) b.querySelector(".sn-ic")?.animate([{ transform: "scale(1)" }, { transform: "scale(1.22) rotate(-8deg)", offset: .4 }, { transform: "scale(1)" }], { duration: 360, easing: "cubic-bezier(.34,1.56,.64,1)" });
   });
   const SI = { run: '<span class="sn-spinner"></span>', done: CHECK, stop: "", wait: "" };
-  const stepHTML = (s) => `<li class="${s.s && "sn-" + s.s}"><span class="sn-si">${SI[s.s]}</span><span>${esc(s.t)}</span><span class="sn-sn sn-num">${s.n || ""}</span></li>`;
-  const cardHTML = ([n, m, t, g]) => `<div class="sn-ai-card"><i style="--sn-g:${esc(g)}"></i><div><b>${tt("chat.19")}${n}</b><span>${m}</span><span>${t}</span></div></div>`;
+  const stepHTML = (s) => `<li class="${Object.hasOwn(SI, s.s) ? "sn-" + s.s : ""}"><span class="sn-si">${SI[s.s] ?? ""}</span><span>${esc(s.t)}</span><span class="sn-sn sn-num">${esc(s.n || "")}</span></li>`;
+  const cardHTML = ([n, m, t, g]) => `<div class="sn-ai-card"><i style="--sn-g:${esc(g)}"></i><div><b>${tt("chat.19")}${esc(n)}</b><span>${esc(m)}</span><span>${esc(t)}</span></div></div>`;
   canvas.addEventListener("click", (e) => {
     const hd = e.target.closest(".sn-think-hd"); if (!hd) return; const el = hd.closest(".sn-ci"), it = el?._it; if (!it) return;
     it.open = !it.open; hd.parentElement.classList.toggle("sn-open", it.open); userAt = performance.now();

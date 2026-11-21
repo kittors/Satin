@@ -1,5 +1,5 @@
 /* Satin：Markdown 渲染（kit-md.js）。字号行高跟正文一致（14 / 24），块之间的距离都在间距刻度上；
-   代码块、图片、表格的高度由 --md-code-max / --md-img-h / --md-table-max 决定，单个块可以在 Markdown 里覆盖。 */
+   代码块、图片、表格的高度由 --sn-md-code-max / --sn-md-img-h / --sn-md-table-max 决定，单个块可以在 Markdown 里覆盖。 */
 @layer satin {
 .sn-md {
   --sn-md-code-bg: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); --sn-md-code-max: 240px; --sn-md-img-h: 220px; --sn-md-table-max: none;
@@ -56,7 +56,7 @@
 .sn-md-callout-t svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .sn-md-callout > :not(.sn-md-callout-t) { margin: 4px 0 0; }
 
-/* 表格：表头吸顶；超过 --md-table-max 在框里滚 */
+/* 表格：表头吸顶；超过 --sn-md-table-max 在框里滚 */
 .sn-md-table { margin: 16px 0; max-height: var(--sn-md-table-max); overflow: auto; border: 1px solid var(--sn-line); border-radius: var(--sn-r-md); overscroll-behavior-x: none; overscroll-behavior-y: auto; } /* 表格里不回弹：横向滚到头就停；竖向滚到头交给页面接着滚 */
 .sn-md-table table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: calc(13px * var(--sn-font-scale, 1)); line-height: 20px; font-variant-numeric: tabular-nums; }
 .sn-md-table th { position: sticky; top: 0; z-index: 1; padding: 8px 12px; background: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); box-shadow: inset 0 -1px 0 var(--sn-line); font-weight: 600; text-align: left; white-space: nowrap; }
@@ -64,7 +64,7 @@
 .sn-md-table td, .sn-md-table th { word-break: keep-all; overflow-wrap: break-word; } /* 中文按词不拆（"已完成"不会断成两行）；放不下时表格在自己的框里横着滑 */
 .sn-md-table tr:last-child td { box-shadow: none; }
 
-/* 代码块：头部（文件名 / 语言、行数、自动换行、复制）+ 带行号的代码；超过 --md-code-max 折叠，底部渐隐 */
+/* 代码块：头部（文件名 / 语言、行数、自动换行、复制）+ 带行号的代码；超过 --sn-md-code-max 折叠，底部渐隐 */
 .sn-md-code { position: relative; margin: 16px 0; overflow: hidden; border: 1px solid var(--sn-line); border-radius: var(--sn-r-md); background: var(--sn-md-code-bg); } /* 用真边框：行号的底色贴着左边，内阴影画的框会被它盖掉 */
 .sn-md-code-hd { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 6px 0 14px; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-md-code-file { font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label); }
@@ -96,7 +96,7 @@
 .sn-t-fn { color: var(--sn-t-fn); } .sn-t-typ { color: var(--sn-t-typ); } .sn-t-prop, .sn-t-var { color: var(--sn-t-prop); } .sn-t-attr, .sn-t-dec, .sn-t-sel { color: var(--sn-t-attr); } .sn-t-tag { color: var(--sn-t-tag); }
 .sn-t-op { color: var(--sn-label2); } .sn-t-pun { color: var(--sn-label3); }
 
-/* 图片：块级图片在一个 --md-img-h 高的框里完整显示（不裁）；加载中是占位微光，失败给图标和说明；点开放大 */
+/* 图片：块级图片在一个 --sn-md-img-h 高的框里完整显示（不裁）；加载中是占位微光，失败给图标和说明；点开放大 */
 .sn-md-fig { margin: 16px 0; }
 .sn-md-fig figcaption { margin-top: 8px; font-size: calc(12px * var(--sn-font-scale, 1)); line-height: 18px; color: var(--sn-label3); text-align: center; }
 .sn-md-img { position: relative; display: inline-block; max-width: 100%; overflow: hidden; vertical-align: middle; border-radius: 6px; }

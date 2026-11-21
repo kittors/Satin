@@ -33,13 +33,13 @@ export function mountFlow(flow, { nodes: nodeList, edges: edgeList } = {}) {
   let sel = null, gid = 0;
 
   function mkEdge(a, b) { return { a, b, o1: { x: 0, y: 0 }, v1: { x: 0, y: 0 }, o2: { x: 0, y: 0 }, v2: { x: 0, y: 0 } }; }
-  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); // 没写说明（detail）的节点也能画
   const defs = document.createElementNS(NS, "defs"); svg.append(defs);
 
   // ———— 节点 ————
   function nodeEl(id, n) {
     const el = document.createElement("div"); el.className = "sn-fnode"; el.dataset.id = id; el.tabIndex = -1; el.style.setProperty("--sn-hue", HUE[n.k]);
-    el.innerHTML = `<div class="sn-hd"><span class="sn-nic">${icon(n.ic, 16)}</span><b>${esc(n.t)}</b><span class="sn-st"></span></div><div class="sn-bd">${n.bg != null ? `<span class="sn-th" style="--sn-g:${n.bg}"></span>` : ""}<span class="sn-fname">${esc(n.d)}</span><span class="sn-pb"><i></i></span></div>`
+    el.innerHTML = `<div class="sn-hd"><span class="sn-nic">${icon(n.ic, 16)}</span><b>${esc(n.t)}</b><span class="sn-st"></span></div><div class="sn-bd">${n.bg != null ? `<span class="sn-th" style="--sn-g:${esc(n.bg)}"></span>` : ""}<span class="sn-fname">${esc(n.d)}</span><span class="sn-pb"><i></i></span></div>`
       + tt("flow.0");
     n.el = el; place(n); layer.append(el); return el;
   }

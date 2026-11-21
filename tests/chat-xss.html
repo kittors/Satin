@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- 对话、流程图的 XSS 测试页：scripts/test/chat-xss.mjs 用。历史消息、模型给的思考 / 步骤 / 卡片 / 正文、流程图节点的字段里都塞注入代码 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<script src="../packages/satin-ui/src/theme-boot.js"></script>
+<link rel="stylesheet" href="../packages/satin-ui/css/page.css">
+<script type="importmap">{"imports":{"satin-ui":"../packages/satin-ui/src/index.js","satin-ui/chat":"../packages/satin-ui/src/chat.js","satin-ui/flow":"../packages/satin-ui/src/flow.js"}}</script>
+</head>
+<body>
+<div id="chat"></div>
+<div id="flow"></div>
+<script type="module">
+  import { setup } from "satin-ui";
+  import { createChat } from "satin-ui/chat";
+  import { createFlow } from "satin-ui/flow";
+  setup();
+  const P = '"><img src=x onerror="window.__pwned=1"><b data-x-injected="1">x</b>';
+  const history = { initial: () => [
+    { kind: "day", text: P },
+    { kind: "msg", me: false, text: P },
+    { kind: "msg", me: true, type: "image", g: P, cap: P },
+    { kind: "msg", me: false, type: "video", g: P, dur: P, cap: P },
+    { kind: "msg", me: true, type: "audio", dur: P, name: P },
+    { kind: "msg", me: true, type: "file", name: P, ext: P, size: 1234 },
+  ] };
+  async function* respond(_q, ctx) {
+    yield { think: P };
+    yield { step: { t: P, s: P, n: P } };
+    yield P;
+    yield { card: [P, P, P, P] };
+    yield { image: { g: P } };
+    yield { imageDone: true };
+  }
+  window.chat = createChat(document.getElementById("chat"), { title: P, status: P, history, respond });
+  window.flow = createFlow(document.getElementById("flow"), { label: P, nodes: [{ id: "a", x: 0, y: 0, title: P, detail: P, bg: P, kind: "text" }, { id: "b", x: 300, y: 0, title: P, kind: "out" }], edges: [["a", "b"]] });
+  window.ready = true;
+</script>
+</body>
+</html>

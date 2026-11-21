@@ -8,11 +8,14 @@ export function renderMarkdown(el: HTMLElement, md: string, opt?: Omit<MarkdownO
 export const createMarkdown: SatinFactory<MarkdownOptions, { readonly source: string }>;
 export function highlightLines(code: string, lang: string): string[];
 /** 对话：box 是空容器时按 title / status / placeholder / max 自己填好标记（或用 chatHTML 先填）；respond 返回流式的文字（异步迭代）或一整段 */
-export interface ChatItem { kind: "day" | "msg"; text?: string; me?: boolean; type?: "text" | "image" | "video" | "audio" | "file"; [k: string]: unknown }
+/** 一条：kind "day" 日期分隔（text 是日期）；"msg" 消息——me 是不是自己发的，type 决定画成什么：文字 text；图片、视频 g（CSS 背景，比如 "url(…) center / cover"）、cap 说明、dur 时长文字，视频再给 src、poster 才能点开播放；音频 dur；文件 name、ext、size（字节）。status 是自己发的消息的状态 */
+export interface ChatItem { kind: "day" | "msg"; text?: string; me?: boolean; type?: "text" | "image" | "video" | "audio" | "file"; g?: string; cap?: string; dur?: string; src?: string; poster?: string; name?: string; ext?: string; size?: number; status?: "sending" | "sent" | "fail"; [k: string]: unknown }
+/** 历史消息：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有更早的 */
+export interface ChatHistory { initial(): ChatItem[]; older?(): ChatItem[] | Promise<ChatItem[]>; hasMore?(): boolean }
 export interface ChatOptions {
   /** 接模型的口子：异步生成器一段段 yield 字符串（或 { text } / { think } / { step } …），或直接返回一整段 */
   respond?(text: string, ctx: { /** 用户点了"停止"以后变成 true（每次读都是现在的值） */ readonly stopped: boolean }): AsyncIterable<unknown> | Promise<string> | string;
-  history?: ChatItem[]; title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean;
+  history?: ChatHistory; title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean;
   /** 底部输入框的选项（输入框还没接上时用） */
   composer?: { upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: unknown[] };
   hiRes?(bg: string): string;
