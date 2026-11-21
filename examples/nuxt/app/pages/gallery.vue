@@ -20,6 +20,10 @@ import ButtonDemo0 from "../demos/button-0.vue";
 import ButtonDemo1 from "../demos/button-1.vue";
 import ButtonDemo2 from "../demos/button-2.vue";
 import ButtonDemo3 from "../demos/button-3.vue";
+import IconbuttonControlled from "../demos/iconbutton-controlled.vue";
+import IconbuttonStates from "../demos/iconbutton-states.vue";
+import IconbuttonVariants from "../demos/iconbutton-variants.vue";
+import IconbuttonBasic from "../demos/iconbutton-basic.vue";
 import IconbuttonDemo0 from "../demos/iconbutton-0.vue";
 import LinkDemo0 from "../demos/link-0.vue";
 import CompoundDemo0 from "../demos/compound-0.vue";
@@ -172,6 +176,10 @@ import SelectMenu from "../demos/select-menu.vue";
   </section>
   <section id="iconbutton">
     <h2>纯图标按钮</h2>
+    <div class="demo" data-demo="iconbutton-controlled"><IconbuttonControlled /></div>
+    <div class="demo" data-demo="iconbutton-states"><IconbuttonStates /></div>
+    <div class="demo" data-demo="iconbutton-variants"><IconbuttonVariants /></div>
+    <div class="demo" data-demo="iconbutton-basic"><IconbuttonBasic /></div>
     <div class="demo" data-demo="iconbutton-0"><IconbuttonDemo0 /></div>
   </section>
   <section id="link">

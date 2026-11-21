@@ -34,6 +34,407 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "原生 `<button>`；开关型的按钮另外写 `aria-pressed`（组件的 `selected` 只管样子）。"
+    ],
+    "focus": [
+      "键盘聚焦时 2px 焦点环，Tooltip 跟着出来。"
+    ],
+    "notes": [
+      "名称必须有：`tip` 会同时写成 `aria-label`；只写图标不写名称的按钮读屏只能读出\"按钮\"。",
+      "徽标的数字要在名称里也说出来（\"通知，3 条未读\"），读屏不会读右上角那个小块。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "纯图标按钮",
+  "lead": "没有文字的按钮：名称写在 Tooltip 和读屏里，平时没有面，悬停出底色、按下缩一下。",
+  "whenToUse": [
+    "工具栏、卡片角落、表格行尾这类放不下文字的地方，图标的意思大家都认得（设置、分享、更多、删除）。",
+    "播放器、浮动操作这类圆形按钮。",
+    "开关型的视图切换（显示网格、打开图层面板）：用选中态表示开着。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "图标的意思不是一眼能懂（自定义的业务图标）：写上文字，用普通按钮。",
+      "use": "button"
+    },
+    {
+      "text": "一个区域里最重要的那个动作：主操作要有文字。",
+      "use": "button"
+    },
+    {
+      "text": "在几个视图里选一个：用分段控件（每段可以只放图标）。",
+      "use": "segmented"
+    }
+  ],
+  "related": [
+    {
+      "id": "button",
+      "diff": "有文字的按钮；纯图标按钮是同一个组件不写文字，名称放在 tip 里。"
+    },
+    {
+      "id": "tooltip",
+      "diff": "纯图标按钮的名称就是用 Tooltip 显示的（悬停 500ms、键盘聚焦都会出来）。"
+    },
+    {
+      "id": "segmented",
+      "diff": "几个互斥的视图选一个；纯图标按钮是各管各的动作或开关。"
+    }
+  ],
+  "import": {
+    "html": "// 标记写类名 sn-btn sn-ibtn，图标写 data-i，外面包一层 <sn-enhance>（入口调过 defineElements）",
+    "react": "import { Button } from \"satin-ui/react\";",
+    "vue": "import { Button } from \"satin-ui/vue\";",
+    "svelte": "import Icon from \"satin-ui/svelte/Icon.svelte\";",
+    "angular": "// 标记写类名 sn-btn sn-ibtn，图标写 data-i，外面包一层 <sn-enhance>（组件加 CUSTOM_ELEMENTS_SCHEMA）",
+    "solid": "// 标记写类名 sn-btn sn-ibtn，图标写 data-i，外面包一层 <sn-enhance>",
+    "preact": "import { Button } from \"satin-ui/react\"; // @preact/preset-vite 默认把 react 指到 preact/compat"
+  },
+  "importNote": {
+    "react": "`Button` 只给 `icon`、不写文字就是纯图标按钮：`tip` 是名称（悬停的提示，也会写成 `aria-label`）；`round` 圆形，`selected` 选中，`badge` 右上角的计数或小红点。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Button`：只给 `icon` 和 `tip`，不写文字。",
+    "vue": "`Button` 只给 `icon`、不写文字就是纯图标按钮：`tip` 是名称（也会写成 `aria-label`）；`round`、`selected`、`badge` 都是属性。",
+    "svelte": "写 `<button class=\"sn-btn sn-ghost sn-ibtn\">`，里面放 `<Icon name>`；`data-tip` 和 `aria-label` 都写上名称。",
+    "angular": "写 `<button class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"settings\">`，`data-tip`、`aria-label` 写名称，外面包 `<sn-enhance>`；选中用 `[class.sn-selected]`。",
+    "solid": "写 `<button class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"settings\">`，`data-tip`、`aria-label` 写名称，外面包 `<sn-enhance>`；选中用 `classList`。",
+    "html": "写 `<button class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\">`，外面包 `<sn-enhance>`（换成图标、接上 Tooltip）。"
+  },
+  "dts": {
+    "react": "Button",
+    "vue": "Button"
+  },
+  "props": [
+    {
+      "name": "icon",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "desc": "图标名（satin-ui/icons 里的名字）。不写文字时按钮是正方形（32 × 32，sm 28 × 28，点击区仍扩到 32）。",
+      "names": {
+        "react": "icon",
+        "vue": "icon",
+        "preact": "icon",
+        "markup": "data-i=\"settings\"",
+        "html": "data-i=\"settings\""
+      }
+    },
+    {
+      "name": "tip",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "desc": "名称：悬停 500ms、键盘聚焦时用 Tooltip 显示，同时写成 `aria-label`（读屏读它）。组件里是可选的，但纯图标按钮一定要写。",
+      "names": {
+        "react": "tip",
+        "vue": "tip",
+        "preact": "tip",
+        "markup": "data-tip + aria-label",
+        "html": "data-tip + aria-label"
+      }
+    },
+    {
+      "name": "variant",
+      "type": "\"ghost\" | \"tertiary\" | \"secondary\" | \"primary\"",
+      "default": "\"secondary\"",
+      "required": false,
+      "desc": "外观：ghost 没有面（工具栏里最常用）、tertiary 浅底、secondary 带边框、primary 实色（播放这类主操作，配 round）。",
+      "names": {
+        "react": "variant",
+        "vue": "variant",
+        "preact": "variant",
+        "markup": "类名 sn-ghost / sn-tertiary / sn-secondary / sn-primary",
+        "html": "类名 sn-ghost / sn-tertiary / sn-secondary / sn-primary"
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\"",
+      "default": "\"md\"",
+      "required": false,
+      "desc": "sm 用在表格行、紧凑的工具条里。",
+      "names": {
+        "react": "size",
+        "vue": "size",
+        "preact": "size",
+        "markup": "类名 sn-sm",
+        "html": "类名 sn-sm"
+      }
+    },
+    {
+      "name": "round",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "圆形：播放器、浮动操作。",
+      "names": {
+        "react": "round",
+        "vue": "round",
+        "preact": "round",
+        "markup": "类名 sn-round",
+        "html": "类名 sn-round"
+      }
+    },
+    {
+      "name": "selected",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "选中（开关型按钮开着），底色加深；名称里写清状态（\"图层（已打开）\"）。",
+      "names": {
+        "react": "selected",
+        "vue": "selected",
+        "preact": "selected",
+        "markup": "类名 sn-selected",
+        "html": "类名 sn-selected"
+      }
+    },
+    {
+      "name": "badge",
+      "type": "number | string | boolean",
+      "default": "—",
+      "required": false,
+      "desc": "徽标：数字是右上角的计数（中性色、等宽数字），true 是小红点；0 不显示。",
+      "names": {
+        "react": "badge",
+        "vue": "badge",
+        "preact": "badge",
+        "markup": "<span class=\"sn-count\">3</span> / <span class=\"sn-dot\"></span>",
+        "html": "<span class=\"sn-count\">3</span> / <span class=\"sn-dot\"></span>"
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "不能点：用 `aria-disabled` 实现，还能聚焦，tip 写为什么不能点。",
+      "names": {
+        "react": "disabled",
+        "vue": "disabled",
+        "preact": "disabled",
+        "markup": "aria-disabled=\"true\" + 类名 sn-is-disabled",
+        "html": "aria-disabled=\"true\" + 类名 sn-is-disabled"
+      }
+    },
+    {
+      "name": "iconAfter",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "desc": "纯图标按钮用不到（和按钮一样，放在文字后面的图标）。",
+      "names": {
+        "react": "iconAfter",
+        "vue": "iconAfter",
+        "preact": "iconAfter"
+      }
+    },
+    {
+      "name": "loading",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "等待（转圈），和按钮一样；纯图标按钮一般不用。",
+      "names": {
+        "react": "loading",
+        "vue": "loading",
+        "preact": "loading"
+      }
+    },
+    {
+      "name": "done",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "成功（对勾），和按钮一样；纯图标按钮一般不用。",
+      "names": {
+        "react": "done",
+        "vue": "done",
+        "preact": "done"
+      }
+    },
+    {
+      "name": "type",
+      "type": "\"button\" | \"submit\" | \"reset\"",
+      "default": "\"button\"",
+      "required": false,
+      "desc": "和按钮一样，默认 button。",
+      "names": {
+        "react": "type",
+        "vue": "type",
+        "preact": "type"
+      },
+      "native": [
+        "react"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "click",
+      "payload": "MouseEvent",
+      "when": "点按钮，或者聚焦时按回车、空格；禁用时不触发。",
+      "native": true,
+      "names": {
+        "react": "onClick",
+        "vue": "@click",
+        "angular": "(click)",
+        "svelte": "onclick",
+        "solid": "onClick",
+        "preact": "onClick",
+        "html": "addEventListener(\"click\")"
+      }
+    }
+  ],
+  "slots": [],
+  "methods": [],
+  "functions": [],
+  "cssVars": [
+    {
+      "name": "--sn-h",
+      "desc": "边长（md 32、sm 28）",
+      "default": "32px"
+    },
+    {
+      "name": "--sn-icon",
+      "desc": "图标大小（md 18、sm 16）",
+      "default": "18px"
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-btn.sn-ibtn",
+      "desc": "纯图标按钮（宽 = 高）"
+    },
+    {
+      "name": ".sn-round",
+      "desc": "圆形"
+    },
+    {
+      "name": ".sn-selected",
+      "desc": "选中（开关开着）"
+    },
+    {
+      "name": ".sn-count / .sn-dot",
+      "desc": "右上角的计数 / 小红点"
+    },
+    {
+      "name": "data-tip、data-kbd",
+      "desc": "Tooltip 的文字和快捷键"
+    }
+  ],
+  "types": [
+    "ButtonProps",
+    "Variant"
+  ],
+  "keyboard": [
+    {
+      "keys": "Tab",
+      "does": "聚焦按钮，同时显示 Tooltip（名称）。"
+    },
+    {
+      "keys": "Enter / 空格",
+      "does": "按下按钮。"
+    }
+  ],
+  "design": {
+    "do": [
+      "一组纯图标按钮用同一种外观、同一个尺寸。",
+      "名称写动作：\"分享\"\"更多操作\"；开关型写清当前状态。",
+      "徽标只用中性色，数字等宽，新出现时轻轻弹一下。"
+    ],
+    "dont": [
+      {
+        "text": "自己画的、意思不明确的图标，或者把装饰性图标做成按钮。",
+        "rule": "no-ai-icons"
+      },
+      {
+        "text": "只放图标、不写名称。",
+        "rule": "focus-visible"
+      },
+      {
+        "text": "手机上用 28 的小按钮做主要操作。",
+        "rule": "touch-target"
+      }
+    ],
+    "copy": [
+      "名称两到四个字：\"设置\"\"复制链接\"\"更多操作\"。",
+      "禁用时名称写原因：\"还没有可以下载的成片\"。"
+    ],
+    "motion": [
+      {
+        "what": "按下缩一下",
+        "easing": "ease.out",
+        "duration": "100ms"
+      },
+      {
+        "what": "悬停 500ms 后出 Tooltip",
+        "easing": "ease.out",
+        "duration": "150ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "iconbutton-basic",
+      "title": "工具栏里的纯图标按钮",
+      "why": "没有面，悬停才出底色；每个都写上名称，悬停、键盘聚焦都能看到。",
+      "html": "<div class=\"sn-row\"><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"share\" data-tip=\"分享\" aria-label=\"分享\"></button><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"copy\" data-tip=\"复制链接\" aria-label=\"复制链接\"></button><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"trash-2\" data-tip=\"删除\" aria-label=\"删除\"></button><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"ellipsis\" data-tip=\"更多操作\" aria-label=\"更多操作\"></button></div>",
+      "code": {
+        "html": "<sn-enhance>\n  <div class=\"sn-row\">\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"share\" data-tip=\"分享\" aria-label=\"分享\"></button>\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"copy\" data-tip=\"复制链接\" aria-label=\"复制链接\"></button>\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"trash-2\" data-tip=\"删除\" aria-label=\"删除\"></button>\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"ellipsis\" data-tip=\"更多操作\" aria-label=\"更多操作\"></button>\n  </div>\n</sn-enhance>\n",
+        "react": "import { Button } from \"satin-ui/react\";\n\nexport default function Toolbar() {\n  return (\n    <div className=\"sn-row\">\n      <Button variant=\"ghost\" icon=\"share\" tip=\"分享\" />\n      <Button variant=\"ghost\" icon=\"copy\" tip=\"复制链接\" />\n      <Button variant=\"ghost\" icon=\"trash-2\" tip=\"删除\" />\n      <Button variant=\"ghost\" icon=\"ellipsis\" tip=\"更多操作\" />\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Button } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <Button variant=\"ghost\" icon=\"share\" tip=\"分享\" />\n    <Button variant=\"ghost\" icon=\"copy\" tip=\"复制链接\" />\n    <Button variant=\"ghost\" icon=\"trash-2\" tip=\"删除\" />\n    <Button variant=\"ghost\" icon=\"ellipsis\" tip=\"更多操作\" />\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Icon from \"satin-ui/svelte/Icon.svelte\";\n</script>\n\n<div class=\"sn-row\">\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-tip=\"分享\" aria-label=\"分享\"><Icon name=\"share\" /></button>\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-tip=\"复制链接\" aria-label=\"复制链接\"><Icon name=\"copy\" /></button>\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-tip=\"删除\" aria-label=\"删除\"><Icon name=\"trash-2\" /></button>\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-tip=\"更多操作\" aria-label=\"更多操作\"><Icon name=\"ellipsis\" /></button>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-iconbutton-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>\n  template: `\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"share\" data-tip=\"分享\" aria-label=\"分享\"></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"copy\" data-tip=\"复制链接\" aria-label=\"复制链接\"></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"trash-2\" data-tip=\"删除\" aria-label=\"删除\"></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"ellipsis\" data-tip=\"更多操作\" aria-label=\"更多操作\"></button>\n      </div>\n    </sn-enhance>\n  `,\n})\nexport class IconbuttonBasicComponent {}\n",
+        "solid": "export default function IconbuttonBasic() {\n  return (\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"share\" data-tip=\"分享\" aria-label=\"分享\"></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"copy\" data-tip=\"复制链接\" aria-label=\"复制链接\"></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"trash-2\" data-tip=\"删除\" aria-label=\"删除\"></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"ellipsis\" data-tip=\"更多操作\" aria-label=\"更多操作\"></button>\n      </div>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { Button } from \"satin-ui/react\";\n\nexport default function Toolbar() {\n  return (\n    <div class=\"sn-row\">\n      <Button variant=\"ghost\" icon=\"share\" tip=\"分享\" />\n      <Button variant=\"ghost\" icon=\"copy\" tip=\"复制链接\" />\n      <Button variant=\"ghost\" icon=\"trash-2\" tip=\"删除\" />\n      <Button variant=\"ghost\" icon=\"ellipsis\" tip=\"更多操作\" />\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "iconbutton-variants",
+      "title": "外观与圆形",
+      "why": "需要更明显时用浅底或带边框的；播放这类主操作用实色圆形。",
+      "html": "<div class=\"sn-row\"><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button><button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button><button type=\"button\" class=\"sn-btn sn-secondary sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button><button type=\"button\" class=\"sn-btn sn-primary sn-ibtn sn-round\" data-i=\"play\" data-tip=\"播放\" aria-label=\"播放\"></button><button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn sn-round\" data-i=\"rotate-ccw\" data-tip=\"重播\" aria-label=\"重播\"></button></div>",
+      "code": {
+        "html": "<sn-enhance>\n  <div class=\"sn-row\">\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n    <button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n    <button type=\"button\" class=\"sn-btn sn-secondary sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n    <button type=\"button\" class=\"sn-btn sn-primary sn-ibtn sn-round\" data-i=\"play\" data-tip=\"播放\" aria-label=\"播放\"></button>\n    <button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn sn-round\" data-i=\"rotate-ccw\" data-tip=\"重播\" aria-label=\"重播\"></button>\n  </div>\n</sn-enhance>\n",
+        "react": "import { Button } from \"satin-ui/react\";\n\nexport default function IconButtonVariants() {\n  return (\n    <div className=\"sn-row\">\n      <Button variant=\"ghost\" icon=\"settings\" tip=\"设置\" />\n      <Button variant=\"tertiary\" icon=\"settings\" tip=\"设置\" />\n      <Button variant=\"secondary\" icon=\"settings\" tip=\"设置\" />\n      <Button variant=\"primary\" round icon=\"play\" tip=\"播放\" />\n      <Button variant=\"tertiary\" round icon=\"rotate-ccw\" tip=\"重播\" />\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Button } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <Button variant=\"ghost\" icon=\"settings\" tip=\"设置\" />\n    <Button variant=\"tertiary\" icon=\"settings\" tip=\"设置\" />\n    <Button variant=\"secondary\" icon=\"settings\" tip=\"设置\" />\n    <Button variant=\"primary\" round icon=\"play\" tip=\"播放\" />\n    <Button variant=\"tertiary\" round icon=\"rotate-ccw\" tip=\"重播\" />\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Icon from \"satin-ui/svelte/Icon.svelte\";\n</script>\n\n<div class=\"sn-row\">\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-tip=\"设置\" aria-label=\"设置\"><Icon name=\"settings\" /></button>\n  <button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn\" data-tip=\"设置\" aria-label=\"设置\"><Icon name=\"settings\" /></button>\n  <button type=\"button\" class=\"sn-btn sn-secondary sn-ibtn\" data-tip=\"设置\" aria-label=\"设置\"><Icon name=\"settings\" /></button>\n  <button type=\"button\" class=\"sn-btn sn-primary sn-ibtn sn-round\" data-tip=\"播放\" aria-label=\"播放\"><Icon name=\"play\" /></button>\n  <button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn sn-round\" data-tip=\"重播\" aria-label=\"重播\"><Icon name=\"rotate-ccw\" /></button>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-iconbutton-variants\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>\n  template: `\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n        <button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n        <button type=\"button\" class=\"sn-btn sn-secondary sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n        <button type=\"button\" class=\"sn-btn sn-primary sn-ibtn sn-round\" data-i=\"play\" data-tip=\"播放\" aria-label=\"播放\"></button>\n        <button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn sn-round\" data-i=\"rotate-ccw\" data-tip=\"重播\" aria-label=\"重播\"></button>\n      </div>\n    </sn-enhance>\n  `,\n})\nexport class IconbuttonVariantsComponent {}\n",
+        "solid": "export default function IconbuttonVariants() {\n  return (\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n        <button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n        <button type=\"button\" class=\"sn-btn sn-secondary sn-ibtn\" data-i=\"settings\" data-tip=\"设置\" aria-label=\"设置\"></button>\n        <button type=\"button\" class=\"sn-btn sn-primary sn-ibtn sn-round\" data-i=\"play\" data-tip=\"播放\" aria-label=\"播放\"></button>\n        <button type=\"button\" class=\"sn-btn sn-tertiary sn-ibtn sn-round\" data-i=\"rotate-ccw\" data-tip=\"重播\" aria-label=\"重播\"></button>\n      </div>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { Button } from \"satin-ui/react\";\n\nexport default function IconButtonVariants() {\n  return (\n    <div class=\"sn-row\">\n      <Button variant=\"ghost\" icon=\"settings\" tip=\"设置\" />\n      <Button variant=\"tertiary\" icon=\"settings\" tip=\"设置\" />\n      <Button variant=\"secondary\" icon=\"settings\" tip=\"设置\" />\n      <Button variant=\"primary\" round icon=\"play\" tip=\"播放\" />\n      <Button variant=\"tertiary\" round icon=\"rotate-ccw\" tip=\"重播\" />\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "iconbutton-states",
+      "title": "徽标与禁用",
+      "why": "徽标只用中性色；禁用的按钮还能聚焦，名称里写清为什么不能点。",
+      "html": "<div class=\"sn-row\"><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"bell\" data-tip=\"通知，3 条未读\" aria-label=\"通知，3 条未读\"><span class=\"sn-count\">3</span></button><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"message-circle\" data-tip=\"评论，有新回复\" aria-label=\"评论，有新回复\"><span class=\"sn-dot\"></span></button><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn sn-is-disabled\" aria-disabled=\"true\" data-i=\"download\" data-tip=\"还没有可以下载的成片\" aria-label=\"还没有可以下载的成片\"></button></div>",
+      "code": {
+        "html": "<sn-enhance>\n  <div class=\"sn-row\">\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"bell\" data-tip=\"通知，3 条未读\" aria-label=\"通知，3 条未读\"><span class=\"sn-count\">3</span></button>\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"message-circle\" data-tip=\"评论，有新回复\" aria-label=\"评论，有新回复\"><span class=\"sn-dot\"></span></button>\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn sn-is-disabled\" aria-disabled=\"true\" data-i=\"download\" data-tip=\"还没有可以下载的成片\" aria-label=\"还没有可以下载的成片\"></button>\n  </div>\n</sn-enhance>\n",
+        "react": "import { Button } from \"satin-ui/react\";\n\nexport default function IconButtonStates() {\n  return (\n    <div className=\"sn-row\">\n      <Button variant=\"ghost\" icon=\"bell\" tip=\"通知，3 条未读\" badge={3} />\n      <Button variant=\"ghost\" icon=\"message-circle\" tip=\"评论，有新回复\" badge />\n      {/* 禁用：还能聚焦，名称里写原因；点了不触发 onClick */}\n      <Button variant=\"ghost\" icon=\"download\" tip=\"还没有可以下载的成片\" disabled />\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Button } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <Button variant=\"ghost\" icon=\"bell\" tip=\"通知，3 条未读\" :badge=\"3\" />\n    <Button variant=\"ghost\" icon=\"message-circle\" tip=\"评论，有新回复\" badge />\n    <!-- 禁用：还能聚焦，名称里写原因；点了不触发 click -->\n    <Button variant=\"ghost\" icon=\"download\" tip=\"还没有可以下载的成片\" disabled />\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Icon from \"satin-ui/svelte/Icon.svelte\";\n</script>\n\n<div class=\"sn-row\">\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-tip=\"通知，3 条未读\" aria-label=\"通知，3 条未读\"><Icon name=\"bell\" /><span class=\"sn-count\">3</span></button>\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-tip=\"评论，有新回复\" aria-label=\"评论，有新回复\"><Icon name=\"message-circle\" /><span class=\"sn-dot\"></span></button>\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn sn-is-disabled\" aria-disabled=\"true\" data-tip=\"还没有可以下载的成片\" aria-label=\"还没有可以下载的成片\"><Icon name=\"download\" /></button>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-iconbutton-states\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>\n  template: `\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"bell\" data-tip=\"通知，3 条未读\" aria-label=\"通知，3 条未读\"><span class=\"sn-count\">3</span></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"message-circle\" data-tip=\"评论，有新回复\" aria-label=\"评论，有新回复\"><span class=\"sn-dot\"></span></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn sn-is-disabled\" aria-disabled=\"true\" data-i=\"download\" data-tip=\"还没有可以下载的成片\" aria-label=\"还没有可以下载的成片\"></button>\n      </div>\n    </sn-enhance>\n  `,\n})\nexport class IconbuttonStatesComponent {}\n",
+        "solid": "export default function IconbuttonStates() {\n  return (\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"bell\" data-tip=\"通知，3 条未读\" aria-label=\"通知，3 条未读\"><span class=\"sn-count\">3</span></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" data-i=\"message-circle\" data-tip=\"评论，有新回复\" aria-label=\"评论，有新回复\"><span class=\"sn-dot\"></span></button>\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn sn-is-disabled\" aria-disabled=\"true\" data-i=\"download\" data-tip=\"还没有可以下载的成片\" aria-label=\"还没有可以下载的成片\"></button>\n      </div>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { Button } from \"satin-ui/react\";\n\nexport default function IconButtonStates() {\n  return (\n    <div class=\"sn-row\">\n      <Button variant=\"ghost\" icon=\"bell\" tip=\"通知，3 条未读\" badge={3} />\n      <Button variant=\"ghost\" icon=\"message-circle\" tip=\"评论，有新回复\" badge />\n      {/* 禁用：还能聚焦，名称里写原因；点了不触发 onClick */}\n      <Button variant=\"ghost\" icon=\"download\" tip=\"还没有可以下载的成片\" disabled />\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "iconbutton-controlled",
+      "title": "开关型（受控）",
+      "why": "显示网格、打开图层这类开关：选中态表示开着，状态放在父组件里，名称跟着变。",
+      "html": "<sn-enhance><div class=\"sn-row\"><button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn sn-selected\" aria-pressed=\"true\" data-i=\"layout-grid\" data-tip=\"网格（已打开）\" aria-label=\"网格（已打开）\"></button></div></sn-enhance>",
+      "code": {
+        "html": "<sn-enhance>\n  <div class=\"sn-row\">\n    <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn sn-selected\" aria-pressed=\"true\" data-i=\"layout-grid\" data-tip=\"网格（已打开）\" aria-label=\"网格（已打开）\" id=\"grid-toggle\"></button>\n  </div>\n</sn-enhance>\n<script type=\"module\">\n  // 开关：选中态和名称跟着变\n  const b = document.getElementById(\"grid-toggle\");\n  b.addEventListener(\"click\", () => {\n    const on = !b.classList.contains(\"sn-selected\");\n    b.classList.toggle(\"sn-selected\", on);\n    b.setAttribute(\"aria-pressed\", String(on));\n    b.dataset.tip = on ? \"网格（已打开）\" : \"网格（已关上）\";\n    b.setAttribute(\"aria-label\", b.dataset.tip);\n  });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Button } from \"satin-ui/react\";\n\nexport default function GridToggle() {\n  const [on, setOn] = useState(true);\n  return (\n    <div className=\"sn-row\">\n      <Button variant=\"ghost\" icon=\"layout-grid\" selected={on} aria-pressed={on} tip={on ? \"网格（已打开）\" : \"网格（已关上）\"} onClick={() => setOn(!on)} />\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button } from \"satin-ui/vue\";\n\nconst on = ref(true);\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <Button variant=\"ghost\" icon=\"layout-grid\" :selected=\"on\" :aria-pressed=\"on\" :tip=\"on ? '网格（已打开）' : '网格（已关上）'\" @click=\"on = !on\" />\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Icon from \"satin-ui/svelte/Icon.svelte\";\n\n  let on = $state(true);\n  const tip = $derived(on ? \"网格（已打开）\" : \"网格（已关上）\");\n</script>\n\n<div class=\"sn-row\">\n  <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" class:sn-selected={on} aria-pressed={on} data-tip={tip} aria-label={tip} onclick={() => (on = !on)}><Icon name=\"layout-grid\" /></button>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, computed } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-iconbutton-controlled\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>\n  template: `\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" [class.sn-selected]=\"on()\" [attr.aria-pressed]=\"on()\" data-i=\"layout-grid\" [attr.data-tip]=\"tip()\" [attr.aria-label]=\"tip()\" (click)=\"on.set(!on())\"></button>\n      </div>\n    </sn-enhance>\n  `,\n})\nexport class IconbuttonControlledComponent {\n  on = signal(true);\n  tip = computed(() => (this.on() ? \"网格（已打开）\" : \"网格（已关上）\"));\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\nexport default function GridToggle() {\n  const [on, setOn] = createSignal(true);\n  const tip = () => (on() ? \"网格（已打开）\" : \"网格（已关上）\");\n  return (\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-ghost sn-ibtn\" classList={{ \"sn-selected\": on() }} aria-pressed={on()} data-i=\"layout-grid\" data-tip={tip()} aria-label={tip()} onClick={() => setOn(!on())}></button>\n      </div>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Button } from \"satin-ui/react\";\n\nexport default function GridToggle() {\n  const [on, setOn] = useState(true);\n  return (\n    <div class=\"sn-row\">\n      <Button variant=\"ghost\" icon=\"layout-grid\" selected={on} aria-pressed={on} tip={on ? \"网格（已打开）\" : \"网格（已关上）\"} onClick={() => setOn(!on)} />\n    </div>\n  );\n}\n"
+      }
+    }
+  ]
 }

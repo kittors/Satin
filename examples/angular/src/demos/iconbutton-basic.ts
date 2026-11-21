@@ -1,0 +1,17 @@
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-iconbutton-basic",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  template: `
+    <sn-enhance>
+      <div class="sn-row">
+        <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="share" data-tip="分享" aria-label="分享"></button>
+        <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="copy" data-tip="复制链接" aria-label="复制链接"></button>
+        <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="trash-2" data-tip="删除" aria-label="删除"></button>
+        <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="ellipsis" data-tip="更多操作" aria-label="更多操作"></button>
+      </div>
+    </sn-enhance>
+  `,
+})
+export class IconbuttonBasicComponent {}

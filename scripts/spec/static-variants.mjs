@@ -43,7 +43,7 @@ function serialize(node, fw, icons) {
       if (k === "data-i" && icons === "component") {
         const [name, pos] = v.split(":");
         // 只有图标的空 span：整个换成 <Icon>
-        if (tag === "span" && !n.className && !n.childNodes.length) { out.push(iconTag(name)); return; }
+        if (tag === "span" && !n.className && !n.childNodes.length) { out.push(iconTag(name, pos && pos !== "before" && pos !== "chk" ? `sn-${pos}` : "")); return; }
         if (!pos || pos === "before") pre = iconTag(name);
         else if (pos === "chk") post = `<span ${fw === "react" ? "className" : "class"}="sn-chk">${iconTag(name)}</span>`;
         else post = iconTag(name, `sn-${pos}`);

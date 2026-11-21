@@ -25,7 +25,7 @@ export const NumberFlow: React.ForwardRefExoticComponent<Base & { value: number;
 export type Variant = "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft";
 /** 按钮的属性：原生 <button> 的属性照常能写（onClick、type、aria-label……）；disabled 用 aria-disabled 实现，点了不触发 onClick。
  *  busy：等待（300ms 内结束不转圈，转圈出现后至少留 500ms）；done：原地打勾。写了 busy 或 done 才套等待用的结构，宽度不跳；等待中、打勾时点了不触发 onClick */
-export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled"> & { variant?: Variant; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string };
+export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled"> & { variant?: Variant; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string; /** 徽标：数字是右上角的计数，true 是小红点 */ badge?: number | string | boolean };
 export const Button: React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>>;
 export function Icon(p: { name: string; size?: number; className?: string }): React.ReactElement;
 export const Input: React.ForwardRefExoticComponent<Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> & { size?: "sm" | "md" | "lg" | "xl"; invalid?: boolean } & React.RefAttributes<HTMLInputElement>>;

@@ -50,7 +50,7 @@ export const Icon = /* @__PURE__ */ defineComponent({
 const TICK = () => h("svg", { class: "sn-tick", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round" }, [h("path", { d: "M3.5 8.5l3 3 6-7" })]);
 export const Button = /* @__PURE__ */ defineComponent({
   name: "SnButton",
-  props: { variant: { type: String, default: "secondary" }, size: String, icon: String, iconAfter: String, round: Boolean, selected: Boolean, loading: { type: Boolean, default: undefined }, done: { type: Boolean, default: undefined }, disabled: Boolean, tip: String, type: { type: String, default: "button" } },
+  props: { variant: { type: String, default: "secondary" }, size: String, icon: String, iconAfter: String, round: Boolean, selected: Boolean, badge: { type: [Boolean, Number, String], default: undefined }, loading: { type: Boolean, default: undefined }, done: { type: Boolean, default: undefined }, disabled: Boolean, tip: String, type: { type: String, default: "button" } },
   setup(p, { slots, attrs }) {
     // 一挂上就在等：直接转圈（300ms 是防"从不等待变成等待"时闪一下的），服务端输出也带 sn-busy
     const spin = ref(!!p.loading); let at = 0, timer = 0;
@@ -69,9 +69,11 @@ export const Button = /* @__PURE__ */ defineComponent({
         class: cx("sn-btn", `sn-${p.variant}`, p.size && p.size !== "md" && `sn-${p.size}`, iconOnly && "sn-ibtn", p.round && "sn-round", p.selected && "sn-selected", p.disabled && "sn-is-disabled", spin.value && "sn-busy", ok && "sn-ok"),
         "aria-disabled": p.disabled ? "true" : undefined, "data-tip": p.tip, "aria-label": iconOnly ? attrs["aria-label"] ?? p.tip : attrs["aria-label"],
         onClick: blocked ? undefined : attrs.onClick,
-      }, p.loading !== undefined || p.done !== undefined
+      }, [...(p.loading !== undefined || p.done !== undefined
         ? [h("span", { class: "sn-sheen" }), h("span", { class: "sn-label" }, [h("span", { class: "sn-spin" }), TICK(), h("span", { class: "sn-txt" }, [lead, kids, tail])])]
-        : [lead, kids, tail]);
+        : [lead, kids, tail]),
+        // 徽标：数字 → 右上角的计数（.sn-count），true → 小红点（.sn-dot）
+        p.badge === true ? h("span", { class: "sn-dot" }) : (typeof p.badge === "number" && p.badge > 0) || (typeof p.badge === "string" && p.badge) ? h("span", { class: "sn-count" }, p.badge) : null]);
     };
   },
 });

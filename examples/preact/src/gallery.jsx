@@ -23,6 +23,10 @@ import ButtonDemo0 from "./demos/button-0.jsx";
 import ButtonDemo1 from "./demos/button-1.jsx";
 import ButtonDemo2 from "./demos/button-2.jsx";
 import ButtonDemo3 from "./demos/button-3.jsx";
+import IconbuttonControlled from "./demos/iconbutton-controlled.jsx";
+import IconbuttonStates from "./demos/iconbutton-states.jsx";
+import IconbuttonVariants from "./demos/iconbutton-variants.jsx";
+import IconbuttonBasic from "./demos/iconbutton-basic.jsx";
 import IconbuttonDemo0 from "./demos/iconbutton-0.jsx";
 import LinkDemo0 from "./demos/link-0.jsx";
 import CompoundDemo0 from "./demos/compound-0.jsx";
@@ -175,6 +179,10 @@ function Gallery() {
       </section>
       <section id="iconbutton">
         <h2>纯图标按钮</h2>
+        <div class="demo" data-demo="iconbutton-controlled"><IconbuttonControlled /></div>
+        <div class="demo" data-demo="iconbutton-states"><IconbuttonStates /></div>
+        <div class="demo" data-demo="iconbutton-variants"><IconbuttonVariants /></div>
+        <div class="demo" data-demo="iconbutton-basic"><IconbuttonBasic /></div>
         <div class="demo" data-demo="iconbutton-0"><IconbuttonDemo0 /></div>
       </section>
       <section id="link">

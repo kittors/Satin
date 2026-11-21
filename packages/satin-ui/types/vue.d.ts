@@ -18,7 +18,7 @@ export const NumberFlow: C<{ value: number; style?: string; format?(v: number): 
 /** 日期、时间、地址选择器：@change 拿到 { text }（触发框里显示的文字）；没有 v-model（现在只能读出选中的结果） */
 export const DatePicker: DefineComponent<Omit<PickerOptions, "onChange">>;
 export const Icon: DefineComponent<{ name: string; size?: number }>;
-export const Button: DefineComponent<{ variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string; type?: string }>;
+export const Button: DefineComponent<{ variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string; badge?: number | string | boolean; type?: string }>;
 export const Input: C<{ size?: "sm" | "md" | "lg" | "xl"; invalid?: boolean }>;
 export const Field: DefineComponent<{ label?: string; help?: string; error?: string; for?: string }>;
 export const Checkbox: C<{ label?: string; indeterminate?: boolean; disabled?: boolean }>;

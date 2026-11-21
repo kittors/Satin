@@ -171,6 +171,46 @@
   "css": false
  },
  {
+  "slug": "iconbutton-controlled",
+  "id": "iconbutton",
+  "n": -1,
+  "name": "纯图标按钮",
+  "group": "按钮",
+  "cap": "开关型（受控）",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "iconbutton-states",
+  "id": "iconbutton",
+  "n": -1,
+  "name": "纯图标按钮",
+  "group": "按钮",
+  "cap": "徽标与禁用",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "iconbutton-variants",
+  "id": "iconbutton",
+  "n": -1,
+  "name": "纯图标按钮",
+  "group": "按钮",
+  "cap": "外观与圆形",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "iconbutton-basic",
+  "id": "iconbutton",
+  "n": -1,
+  "name": "纯图标按钮",
+  "group": "按钮",
+  "cap": "工具栏里的纯图标按钮",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "iconbutton-0",
   "id": "iconbutton",
   "n": 0,

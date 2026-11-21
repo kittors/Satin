@@ -19,6 +19,10 @@
   import ButtonDemo1 from "./demos/button-1.svelte";
   import ButtonDemo2 from "./demos/button-2.svelte";
   import ButtonDemo3 from "./demos/button-3.svelte";
+  import IconbuttonControlled from "./demos/iconbutton-controlled.svelte";
+  import IconbuttonStates from "./demos/iconbutton-states.svelte";
+  import IconbuttonVariants from "./demos/iconbutton-variants.svelte";
+  import IconbuttonBasic from "./demos/iconbutton-basic.svelte";
   import IconbuttonDemo0 from "./demos/iconbutton-0.svelte";
   import LinkDemo0 from "./demos/link-0.svelte";
   import CompoundDemo0 from "./demos/compound-0.svelte";
@@ -170,6 +174,10 @@
   </section>
   <section id="iconbutton">
     <h2>纯图标按钮</h2>
+    <div class="demo" data-demo="iconbutton-controlled"><IconbuttonControlled /></div>
+    <div class="demo" data-demo="iconbutton-states"><IconbuttonStates /></div>
+    <div class="demo" data-demo="iconbutton-variants"><IconbuttonVariants /></div>
+    <div class="demo" data-demo="iconbutton-basic"><IconbuttonBasic /></div>
     <div class="demo" data-demo="iconbutton-0"><IconbuttonDemo0 /></div>
   </section>
   <section id="link">

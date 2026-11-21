@@ -56,10 +56,12 @@ function useSpin(on) {
   }, [on, shown]);
   return shown;
 }
+// 徽标：数字 → 右上角的计数（.sn-count），true → 小红点（.sn-dot）；0、false、不给都不显示
+const badgeOf = (b) => (b === true ? h("span", { className: "sn-dot", key: "badge" }) : typeof b === "number" && b > 0 || typeof b === "string" && b ? h("span", { className: "sn-count", key: "badge" }, b) : null);
 const Tick = () => h("svg", { className: "sn-tick", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, h("path", { d: "M3.5 8.5l3 3 6-7" }));
 // loading、done 写了（true 或 false）才套等待要用的结构（.sn-label > .sn-spin + .sn-tick + .sn-txt）：从一开始就在，转圈、打勾时宽度不跳；
 // 没写就和手写的 <button class="sn-btn"> 一模一样。等待中、打勾时点了不触发 onClick
-export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "secondary", size, icon, iconAfter, round, selected, loading, done, disabled, tip, className, children, onClick, type = "button", ...rest }, ref) {
+export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "secondary", size, icon, iconAfter, round, selected, loading, done, badge, disabled, tip, className, children, onClick, type = "button", ...rest }, ref) {
   const iconOnly = !children && icon && !iconAfter, spin = useSpin(!!loading), ok = !!done && !spin; // 转圈收起以后再打勾
   const lead = icon ? h(Icon, { name: icon }) : null, tail = iconAfter ? h(Icon, { name: iconAfter, className: "sn-after" }) : null;
   return h("button", {
@@ -68,7 +70,7 @@ export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "se
     onClick: disabled || loading || ok ? undefined : onClick,
   }, ...(loading !== undefined || done !== undefined
     ? [h("span", { className: "sn-sheen", key: "sheen" }), h("span", { className: "sn-label", key: "label" }, h("span", { className: "sn-spin" }), h(Tick), h("span", { className: "sn-txt" }, lead, children, tail))]
-    : [lead, children, tail]));
+    : [lead, children, tail]), badgeOf(badge));
 });
 // 图标：satin-ui/icons 里的名字。直接渲染 <svg class="sn-ic">（和 icon() 生成的一模一样，按钮里 .sn-btn > .sn-ic 这类选择器照样命中）
 export function Icon({ name, size = 16, className }) {

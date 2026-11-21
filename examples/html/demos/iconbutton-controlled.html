@@ -1,0 +1,16 @@
+<sn-enhance>
+  <div class="sn-row">
+    <button type="button" class="sn-btn sn-ghost sn-ibtn sn-selected" aria-pressed="true" data-i="layout-grid" data-tip="网格（已打开）" aria-label="网格（已打开）" id="grid-toggle"></button>
+  </div>
+</sn-enhance>
+<script type="module">
+  // 开关：选中态和名称跟着变
+  const b = document.getElementById("grid-toggle");
+  b.addEventListener("click", () => {
+    const on = !b.classList.contains("sn-selected");
+    b.classList.toggle("sn-selected", on);
+    b.setAttribute("aria-pressed", String(on));
+    b.dataset.tip = on ? "网格（已打开）" : "网格（已关上）";
+    b.setAttribute("aria-label", b.dataset.tip);
+  });
+</script>
