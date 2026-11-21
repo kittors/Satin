@@ -32,6 +32,7 @@ try {
         const errs = []; watchErrors(page, errs);
         await page.goto(embedURL(SIDE, id), { waitUntil: "load" });
         let st = await page.evaluate(() => window.__parity.settle(800, 12000, 1500));
+        if (await page.evaluate(() => window.__parity.dropAppended())) st = await page.evaluate(() => window.__parity.settle(400, 6000)); // 新加的演示先拿掉（见 inpage.js）
         if (await nudgeLive(page)) st = await page.evaluate(() => window.__parity.settle(400, 4000));
         await page.evaluate(() => window.__parity.freeze());
         await page.screenshot({ path: path.join(dir, id + ".png"), fullPage: true, animations: "disabled", caret: "hide" });
@@ -50,6 +51,7 @@ try {
       const ctx = await newContext(browser, { side: SIDE, theme, size, still: true }), page = await ctx.newPage(), errs = []; watchErrors(page, errs);
       await page.goto(SIDES[SIDE].url + "/index.html", { waitUntil: "load" });
       await page.evaluate(() => window.__parity.settle(800, 20000));
+      if (await page.evaluate(() => window.__parity.dropAppended())) await page.evaluate(() => window.__parity.settle(400, 6000)); // 新加的演示先拿掉，整页分屏和改造前对得上
       const H = await page.evaluate(() => document.documentElement.scrollHeight), vh = page.viewportSize().height;
       let n = 0;
       for (let y = 0; y < H; y += vh, n++) {

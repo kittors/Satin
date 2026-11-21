@@ -291,6 +291,9 @@
     await new Promise((ok) => setTimeout(ok, 60));
     return { ms: Math.round(performance.now() - t), anims: P.busyAnims() };
   };
+  // 改造后新加的演示（标了 data-parity-appended，比如对话一节的"新对话"）：比改造前之前先拿掉——先发 parity:drop 让接线销毁实例，再拿掉元素；
+  // 拿掉以后页面其余部分的排版和改造前一样（整页分屏也对得上）。新加的演示另有自己的截图和逐帧验收
+  P.dropAppended = () => { const els = [...document.querySelectorAll("[data-parity-appended]")]; for (const el of els) el.dispatchEvent(new CustomEvent("parity:drop", { bubbles: true })); for (const el of els) el.remove(); return els.length; };
   // 截图前：无限循环的动画（转圈、骨架屏扫光）停在第 0 毫秒，两边画面一样
   P.freeze = () => { let n = 0; for (const a of document.getAnimations()) { if (a.timeline !== document.timeline) continue; const end = a.effect?.getComputedTiming().endTime; if (end === Infinity) { a.pause(); a.currentTime = 0; n++; } } return n; };
 

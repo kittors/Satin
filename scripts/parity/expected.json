@@ -1,0 +1,55 @@
+[
+ {
+  "id": "differences-8",
+  "reason": "通知在 480 宽以下占满宽度、两边留 12（原来固定 360 宽、右边 24，390 宽的手机上左边只剩 6px）：docs/differences.md 第 8 条",
+  "dom": [
+   {
+    "match": "*/*-phone/*",
+    "ids": [
+     "notifs"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "differences-25",
+  "reason": "横幅的文字不再被聊天消息的全局规则弄成弹性布局（原版的 bug）：docs/differences.md 第 25 条",
+  "shots": [
+   {
+    "match": "embed/*-desktop/banner.png",
+    "box": [
+     120,
+     30,
+     400,
+     125
+    ]
+   },
+   {
+    "match": "embed/*-tablet/banner.png",
+    "box": [
+     120,
+     30,
+     400,
+     125
+    ]
+   },
+   {
+    "match": "embed/*-phone/banner.png",
+    "box": [
+     54,
+     30,
+     270,
+     165
+    ]
+   }
+  ],
+  "dom": [
+   {
+    "match": "embed/*/banner.json.gz",
+    "classes": [
+     "msg"
+    ]
+   }
+  ]
+ }
+]

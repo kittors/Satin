@@ -60,13 +60,15 @@
   background-image: linear-gradient(to bottom, var(--sn-fill-subtle) 0 40px, transparent 40px 132px), linear-gradient(to bottom, transparent 0 66px, color-mix(in srgb, var(--sn-label) 7%, transparent) 66px 102px, transparent 102px 132px);
   background-size: 52% 132px, 38% 132px; background-position: 54px 0, right 54px top 0; background-repeat: repeat-y; }
 
-.sn-msg { display: flex; gap: 10px; align-items: flex-end; }
+/* 只管对话里的消息行、气泡：原来写成全局的 .sn-msg / .sn-bubble，横幅、上传列表里同名的 .sn-msg 被弄成弹性布局（横幅的粗体和后面的字在手机上拆成两栏），
+   滑块的数值气泡 .sn-bubble 也吃到了聊天气泡的样子。用 :where() 限定在对话里，选择器权重不变（对话里的层叠和原来一模一样） */
+:where(.sn-chat) .sn-msg { display: flex; gap: 10px; align-items: flex-end; }
 .sn-msg.sn-me { flex-direction: row-reverse; }
 .sn-msg.sn-ai { align-items: flex-start; }
 .sn-msg .sn-av, .sn-msg .sn-av-gap { flex: none; width: 24px; }
 .sn-av.sn-ai-av { color: var(--sn-label); background: linear-gradient(140deg, color-mix(in srgb, var(--sn-label) 9%, transparent), color-mix(in srgb, var(--sn-label) 3%, transparent)); box-shadow: inset 0 0 0 1px var(--sn-line); }
 .sn-av.sn-ai-av .sn-ic { width: 13px; height: 13px; }
-.sn-bubble { position: relative; max-width: min(520px, 80%); padding: 8px 12px; border-radius: 18px; font: 400 calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line);
+:where(.sn-chat) .sn-bubble { position: relative; max-width: min(520px, 80%); padding: 8px 12px; border-radius: 18px; font: 400 calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line);
   white-space: pre-wrap; overflow-wrap: anywhere; }
 .sn-msg.sn-me .sn-bubble { background: var(--sn-accent); color: var(--sn-on-primary); box-shadow: none; }
 .sn-msg.sn-me.sn-cont .sn-bubble { border-top-right-radius: 8px; }
@@ -269,9 +271,9 @@
 .sn-chat-hd { height: 52px; padding: 0 20px; background: transparent; }
 .sn-chat-hd b { font-size: calc(14px * var(--sn-font-scale, 1)); }
 .sn-ci { padding: 0 max(20px, calc((100% - 760px) / 2)) 16px; }
-.sn-msg { gap: 8px; }
+:where(.sn-chat) .sn-msg { gap: 8px; }
 .sn-msg .sn-av, .sn-msg .sn-av-gap { display: none; }
-.sn-bubble { font-size: calc(15px * var(--sn-font-scale, 1)); line-height: calc(24px * var(--sn-font-scale, 1)); }
+:where(.sn-chat) .sn-bubble { font-size: calc(15px * var(--sn-font-scale, 1)); line-height: calc(24px * var(--sn-font-scale, 1)); }
 .sn-msg.sn-me .sn-bubble { max-width: min(560px, 78%); padding: 10px 16px; border-radius: 20px; background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-raised)); color: var(--sn-label); }
 .sn-msg.sn-me.sn-cont .sn-bubble { border-top-right-radius: 20px; }
 .sn-msg.sn-ai .sn-bubble, .sn-ai-text { font-size: calc(15px * var(--sn-font-scale, 1)); line-height: calc(26px * var(--sn-font-scale, 1)); }

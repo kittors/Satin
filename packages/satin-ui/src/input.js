@@ -311,7 +311,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   const setMeta = (el, msg) => { const st = $(".sn-st", el); if (st) st.textContent = msg || metaOf(el); el.title = msg || ""; };
   function addFile(f, file) {
     const el = document.createElement("span"), tile = f.kind === "img" || f.kind === "vid"; el._file = file;
-    el.className = `sn-cm-file k-${f.kind} ${tile ? "tile" : "bar"}`;
+    el.className = `sn-cm-file sn-k-${f.kind} ${tile ? "sn-tile" : "sn-bar"}`;
     Object.assign(el.dataset, { kind: f.kind, name: f.name, size: String(Math.round(f.size)), dur: f.dur || "", ext: f.ext || "", seed: String(f.seed || 1) });
     if (f.g) el.style.setProperty("--sn-g", f.g);
     el.innerHTML = tile ? tileHTML(f) : barHTML(f); injectIcons(el); files.append(el);

@@ -13,6 +13,18 @@ const OUT = path.resolve(arg("out", path.join(STORE, SIDE, "trace"))), ONLY = ar
 const VIEW = { desktop: [1440, 2000], tablet: [768, 2000], phone: [390, 1600] }[SIZE];
 const dir = ensureDir(path.join(OUT, `${THEME}-${SIZE}`));
 
+// 场景（2026-11-21 加）：自动触发器一次只点一个元素，走不到"先点 + 再点菜单里的一项"这种多步操作——
+// 附件的类名漏改前缀（加了附件只剩一排 ×）就是这样漏过去的。两边照同样的步骤录；选择器只用 data 属性，要用类名的拼上前缀
+const ATTACH = (P) => [
+  ["s:menu", "[data-cm-attach]", "click", 600],
+  ["s:add-img", '[data-add="img"]', "pick", 4200],
+  ["s:menu-2", "[data-cm-attach]", "click", 600],
+  ["s:add-doc", '[data-add="doc"]', "pick", 4200],
+  ["s:hover-img", '[data-kind="img"]', "hover", 600],
+  ["s:remove-img", `[data-kind="img"] .${P}x`, "click", 900],
+  ["s:remove-doc", `[data-kind="doc"] .${P}x`, "click", 900],
+];
+const SCENARIOS = { prompt: ATTACH, chat: ATTACH };
 const browser = await launch();
 const t0 = Date.now(), summary = {};
 const ids = ONLY ? String(ONLY).split(",") : await sectionIds(browser, SIDE);
@@ -30,6 +42,7 @@ try {
       await Promise.all([...document.images].filter((i) => !i.complete).map((i) => wait((r) => { i.addEventListener("load", r, { once: true }); i.addEventListener("error", r, { once: true }); })));
       await Promise.all([...document.querySelectorAll("video, audio")].filter((v) => v.preload !== "none" && v.readyState < 1).map((v) => wait((r) => { v.addEventListener("loadedmetadata", r, { once: true }); v.addEventListener("error", r, { once: true }); })));
     });
+    if (await page.evaluate(() => window.__parity.dropAppended())) await page.evaluate(() => window.__parity.settle(400, 4000)); // 新加的演示先拿掉（见 inpage.js）
     await page.evaluate(() => window.__parity.settle(400, 6000));
     await page.evaluate(() => window.__parity.clock?.(false));
     // 触发器：同一"签名"（标签 + 角色 + 类名 + data 属性名）最多取 PER 个，整块最多 MAX 个
@@ -79,6 +92,17 @@ try {
     const nTab = Math.min(24, trig.filter((t) => t.role !== "scroller").length + 2);
     for (let i = 0; i < nTab; i++) await rec("tab", { path: "tab-" + i }, () => page.keyboard.press("Tab"), 350);
     await rec("escape-end", null, () => page.keyboard.press("Escape"), 500);
+    if (SCENARIOS[id]) {
+      const P = await page.evaluate(() => window.__parityPrefix || "");
+      for (const [name, sel, how, wait] of SCENARIOS[id](P)) {
+        const p = await page.evaluate((q) => { const el = document.querySelector(q); if (!el) return null; const r = el.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2, w: r.width, h: r.height }; }, `#${id} ${sel}`);
+        if (!p || (how !== "pick" && (p.w < 1 || p.h < 1))) { actions.push({ name: "skip", path: "scenario " + name }); continue; }
+        // pick：菜单里的条目用元素自己的 click()（提示词输入框在页面最上面，附件菜单往上长到页面外面，鼠标点不着）
+        const act = how === "hover" ? () => page.mouse.move(p.x, p.y) : how === "pick" ? () => page.evaluate((q) => document.querySelector(q).click(), `#${id} ${sel}`) : () => page.mouse.click(p.x, p.y);
+        await rec(name, { path: "scenario " + name }, act, wait); // 路径只写步骤名：选择器里有类名，两边前缀不同
+      }
+      await rec("s:away", null, () => page.mouse.move(2, 2), 400);
+    }
     const final = await page.evaluate(({ id }) => window.__parity.snapshot(id, { styles: false }), { id });
     for (const a of await page.evaluate(() => window.__parity.auditLog || [])) errs.push(`前缀漏改 ${a.api} ${a.tok} @ ${a.at}`);
     fs.writeFileSync(path.join(dir, id + ".json.gz"), zlib.gzipSync(JSON.stringify({ id, triggers: trig, actions, final, errors: errs })));
