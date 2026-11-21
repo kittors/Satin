@@ -1,0 +1,18 @@
+<!-- <sn-enhance> 把 data-i 换成图标 -->
+<sn-enhance>
+  <div class="sn-drag-list" id="reorder-basic">
+    <div class="sn-drag-row"><button type="button" class="sn-grip" aria-label="拖动排序：镜头 07 · 车站外，雨刚停"><span data-i="grip-vertical"></span></button><span class="sn-cv" style="--sn-g:url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72) center / cover"></span><b>镜头 07 · 车站外，雨刚停</b><span class="sn-m">远景 · 4 秒</span></div>
+    <div class="sn-drag-row"><button type="button" class="sn-grip" aria-label="拖动排序：镜头 08 · 林夏走进候车厅"><span data-i="grip-vertical"></span></button><span class="sn-cv" style="--sn-g:url(https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72) center / cover"></span><b>镜头 08 · 林夏走进候车厅</b><span class="sn-m">全景 · 6 秒</span></div>
+    <div class="sn-drag-row"><button type="button" class="sn-grip" aria-label="拖动排序：镜头 09 · 站台上的最后一班车"><span data-i="grip-vertical"></span></button><span class="sn-cv" style="--sn-g:url(https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=96&h=56&q=72) center / cover"></span><b>镜头 09 · 站台上的最后一班车</b><span class="sn-m">中景 · 5 秒</span></div>
+    <div class="sn-drag-row"><button type="button" class="sn-grip" aria-label="拖动排序：镜头 10 · 车窗里的倒影"><span data-i="grip-vertical"></span></button><span class="sn-cv" style="--sn-g:url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72) center / cover"></span><b>镜头 10 · 车窗里的倒影</b><span class="sn-m">特写 · 3 秒</span></div>
+    <div class="sn-drag-row"><button type="button" class="sn-grip" aria-label="拖动排序：镜头 11 · 雨夜里的公交站"><span data-i="grip-vertical"></span></button><span class="sn-cv" style="--sn-g:url(https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72) center / cover"></span><b>镜头 11 · 雨夜里的公交站</b><span class="sn-m">近景 · 4 秒</span></div>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { createReorder } from "satin-ui";
+
+  const list = document.getElementById("reorder-basic");
+  // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
+  createReorder(list, { onReorder: ({ from, to }) => console.log(`第 ${from + 1} 个挪到了第 ${to + 1} 位`) });
+</script>

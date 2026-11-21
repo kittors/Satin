@@ -1,0 +1,30 @@
+<!-- <sn-enhance> 把 data-i 换成图标 -->
+<sn-enhance>
+  <div id="addremove-rows" class="sn-stack sn-gap-12">
+    <div class="sn-row"><button type="button" class="sn-btn sn-secondary" id="addremove-rows-add">新建镜头</button></div>
+    <div class="sn-stack sn-gap-8">
+      <div class="sn-opt-row"><span class="sn-nm">镜头 07 · 车站外，雨刚停</span><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" aria-label="删除 镜头 07 · 车站外，雨刚停"><span data-i="trash-2"></span></button></div>
+      <div class="sn-opt-row"><span class="sn-nm">镜头 08 · 林夏走进候车厅</span><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" aria-label="删除 镜头 08 · 林夏走进候车厅"><span data-i="trash-2"></span></button></div>
+      <div class="sn-opt-row"><span class="sn-nm">镜头 09 · 站台上的最后一班车</span><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" aria-label="删除 镜头 09 · 站台上的最后一班车"><span data-i="trash-2"></span></button></div>
+    </div>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { insertWithFlip, removeWithFlip, icon } from "satin-ui";
+
+  const root = document.getElementById("addremove-rows"), list = root.querySelector(".sn-stack.sn-gap-8");
+  let n = 0;
+  // 新的一行：文字用 textContent（不拼 HTML），图标用 icon() 生成
+  const rowOf = (name) => {
+    const row = document.createElement("div"), nm = document.createElement("span"), del = document.createElement("button");
+    row.className = "sn-opt-row"; nm.className = "sn-nm"; nm.textContent = name;
+    del.type = "button"; del.className = "sn-btn sn-ghost sn-sm sn-ibtn"; del.setAttribute("aria-label", "删除 " + name); del.innerHTML = icon("trash-2");
+    row.append(nm, del);
+    return row;
+  };
+  // 新建的一行插在最前面，下面的往下让
+  document.getElementById("addremove-rows-add").addEventListener("click", () => insertWithFlip(list, rowOf(`新镜头 ${++n}`), list.firstElementChild));
+  // 删一行：先脱离布局淡出，下面的用弹簧补位
+  list.addEventListener("click", (e) => { const b = e.target.closest(".sn-ibtn"); if (b) removeWithFlip(b.closest(".sn-opt-row")); });
+</script>

@@ -1,0 +1,30 @@
+<script setup>
+import { nextTick, ref } from "vue";
+import { flipSnapshot } from "satin-ui";
+import { Button, Chip, Input } from "satin-ui/vue";
+
+const tags = ref(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]), text = ref(""), box = ref(null), els = new Map();
+// 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播
+const add = async (t, at = tags.value.length) => {
+  if (!t || tags.value.includes(t)) return;
+  const play = flipSnapshot(box.value);
+  tags.value.splice(at, 0, t);
+  await nextTick();
+  play(els.get(t));
+};
+const submit = () => { add(text.value.trim()); text.value = ""; };
+const remove = (t) => (tags.value = tags.value.filter((x) => x !== t));
+</script>
+
+<template>
+  <div>
+    <div class="sn-add-row">
+      <Input v-model="text" placeholder="添加一个标签，回车确认" aria-label="添加标签" @keydown.enter="(e) => !e.isComposing && submit()" />
+      <Button @click="submit">添加</Button>
+    </div>
+    <div ref="box" class="sn-chips-box">
+      <!-- 删除：先脱离布局淡出，剩下的用弹簧补位：Chip 自己播动画，播完发 remove，这时再从数据里删 -->
+      <Chip v-for="t in tags" :key="t" :ref="(c) => (c ? els.set(t, c.$el) : els.delete(t))" removable selected @remove="remove(t)">{{ t }}</Chip>
+    </div>
+  </div>
+</template>
