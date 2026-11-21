@@ -258,13 +258,13 @@ export class LoadingListComponent {
 Solid 的写法：
 
 ```jsx
-import { onMount } from "solid-js";
+import { onSettled } from "solid-js";
 import { loadWithSkeleton } from "satin-ui";
 
 export default function ShotList() {
   // 容器交给 loadWithSkeleton 填（骨架和数据都是它写进去的 HTML），模板里留空
   let box;
-  onMount(() => {
+  onSettled(() => {
     loadWithSkeleton(box, {
       // 300ms 内回来就不显示骨架；显示了就至少留 500ms；数据到了逐行替换（每行晚 40ms 淡入）
       load: () => new Promise((ok) => setTimeout(() => ok([["1", "站台远景", "广角 · 6 秒"], ["2", "雨里的车灯", "近景 · 3 秒"], ["3", "推门进候车厅", "中景 · 5 秒"]]), 1200)),
