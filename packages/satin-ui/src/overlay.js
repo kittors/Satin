@@ -412,7 +412,7 @@ export function bindOverlays(root = document) {
   for (const t of root.querySelectorAll("[data-pop]")) {
     if (t._wired) continue; t._wired = true; const pop = byId(t.dataset.pop); if (!pop) continue;
     t.setAttribute("aria-haspopup", "dialog"); t.setAttribute("aria-expanded", "false");
-    t.addEventListener("click", () => { const l = popoverOf(pop); l ? l.close(false) : openPopover(pop, t); });
+    t.addEventListener("click", () => { const l = popoverOf(pop); l ? l.close(false) : openPopover(pop, t, { align: pop.dataset.align }); }); // data-align="end"：和按钮右边对齐
   }
   for (const b of root.querySelectorAll("[data-fmenu]")) {
     if (b._wired) continue; b._wired = true; const mEl = byId(b.dataset.fmenu); if (!mEl) continue;

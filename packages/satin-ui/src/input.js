@@ -162,7 +162,8 @@ export function mountTagInput(box, { initial = [], onChange } = {}) {
   if (box._tags) return box._tags;
   const input = $("input", box), max = Number(box.dataset.max), foot = box.nextElementSibling, countBox = $(".sn-roll", foot);
   const chips = () => $$(".sn-chip", box), find = (t) => chips().find((c) => c.firstChild.textContent === t);
-  const sync = () => { roll(countBox, chips().length); onChange?.(chips().map((c) => c.firstChild.textContent)); };
+  let quiet = false; // set() 照外面给的值改时不回调 onChange
+  const sync = () => { roll(countBox, chips().length); if (!quiet) onChange?.(chips().map((c) => c.firstChild.textContent)); };
   const disarm = () => chips().forEach((c) => c.classList.remove("sn-armed"));
   function add(raw, delay = 0) {
     const t = raw.trim(); if (!t) return;
@@ -194,8 +195,10 @@ export function mountTagInput(box, { initial = [], onChange } = {}) {
   });
   input.addEventListener("paste", (e) => { const t = e.clipboardData.getData("text"); if (/[,，、\n]/.test(t)) { e.preventDefault(); t.split(/[,，、\n]/).forEach((s, i) => add(s, i * 40)); } });
   box.addEventListener("click", (e) => { const x = e.target.closest(".sn-x"); if (x) remove(x.closest(".sn-chip")); else if (e.target === box) input.focus(); });
-  initial.forEach((t) => add(t)); sync();
-  return (box._tags = { get tags() { return chips().map((c) => c.firstChild.textContent); }, add: (t) => add(t), clear: () => { chips().forEach((c) => c.remove()); sync(); } });
+  quiet = true; initial.forEach((t) => add(t)); sync(); quiet = false; // 一开始给的标签不算"改了"，不回调 onChange
+  // set(list)：换成这些标签（受控同步用）：不在里面的直接去掉，缺的按顺序补上（补上的照常弹出来），不回调 onChange
+  const set = (list) => { quiet = true; try { for (const c of chips()) if (!list.includes(c.firstChild.textContent)) c.remove(); for (const t of list) if (!find(String(t).trim())) add(String(t)); } finally { quiet = false; } roll(countBox, chips().length); };
+  return (box._tags = { get tags() { return chips().map((c) => c.firstChild.textContent); }, add: (t) => add(t), clear: () => { chips().forEach((c) => c.remove()); sync(); }, set });
 }
 // ———— 8. 数字步进 ————
 // mountStepper([data-stepper] 容器, { onChange(value) })：data-min / data-max / data-value；按住连发（400ms 起、越来越快）；
@@ -205,7 +208,8 @@ export function mountStepper(st, { onChange } = {}) {
   const min = Number(st.dataset.min), max = Number(st.dataset.max), val = $(".sn-st-val", st), box = $(".sn-roll", val), [dec, inc] = $$(".sn-st-btn", st);
   let v = Number(st.dataset.value);
   const sync = () => { dec.setAttribute("aria-disabled", String(v <= min)); inc.setAttribute("aria-disabled", String(v >= max)); val.setAttribute("aria-valuenow", v); val.setAttribute("aria-valuemin", min); val.setAttribute("aria-valuemax", max); };
-  const set = (nv) => { nv = Math.max(min, Math.min(max, nv)); if (nv === v) { nudge(val); return false; } roll(box, nv, nv > v ? 1 : -1); v = nv; sync(); onChange?.(v); return true; };
+  // quiet：照外面给的值改（受控同步用），不回调 onChange
+  const set = (nv, quiet) => { nv = Math.max(min, Math.min(max, nv)); if (nv === v) { if (!quiet) nudge(val); return false; } roll(box, nv, nv > v ? 1 : -1); v = nv; sync(); if (!quiet) onChange?.(v); return true; };
   for (const b of [dec, inc]) {
     const d = Number(b.dataset.d); let t = 0;
     const stop = () => clearTimeout(t);
@@ -224,12 +228,12 @@ export function mountStepper(st, { onChange } = {}) {
   // 在数字上左右拖：每 8px 走一格
   val.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return; val.setPointerCapture(e.pointerId); const x0 = e.clientX, v0 = v;
-    const mv = (ev) => { const nv = Math.max(min, Math.min(max, v0 + Math.round((ev.clientX - x0) / 8))); if (nv !== v) { roll(box, nv, nv > v ? 1 : -1); v = nv; sync(); } };
+    const mv = (ev) => { const nv = Math.max(min, Math.min(max, v0 + Math.round((ev.clientX - x0) / 8))); if (nv !== v) { roll(box, nv, nv > v ? 1 : -1); v = nv; sync(); onChange?.(v); } };
     const up = () => { val.removeEventListener("pointermove", mv); val.removeEventListener("pointerup", up); };
     val.addEventListener("pointermove", mv); val.addEventListener("pointerup", up);
   });
   sync();
-  return (st._step = { get value() { return v; }, set: (nv) => set(nv) });
+  return (st._step = { get value() { return v; }, set: (nv, quiet) => set(nv, quiet) });
 }
 // ———— 9. 提示词输入框 ————
 // mountComposer([data-composer] 容器, { onSend, onStop, upload })：提示词输入框——自动长高、字数、附件（拖进来、粘贴截图、附件菜单）。

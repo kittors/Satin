@@ -34,13 +34,13 @@ export const createTabs: SatinFactory<TabsOptions, { readonly value: number; sel
 export interface PagerOptions { total?: number; page?: number; count?: number; onChange?(page: number): void }
 /** 分页：update({ total }) 总页数可以变（筛选以后），当前页超出就停在最后一页；update({ page }) 改页码不触发 onChange */
 export const createPager: SatinFactory<PagerOptions, { readonly page: number; readonly total: number; go(page: number, silent?: boolean): void }>;
-export interface CollapseOptions { items?: { title: string; content?: string; html?: string }[]; single?: boolean; open?: number[]; onToggle?(e: { index: number; open: boolean }): void }
-export const createCollapse: SatinFactory<CollapseOptions, { open(i: number): void; close(i: number): void }>;
-export interface TagInputOptions { tags?: string[]; max?: number; placeholder?: string; hint?: string; onChange?(tags: string[]): void }
-export const createTagInput: SatinFactory<TagInputOptions, { readonly tags: string[]; add(tag: string): void; clear(): void }>;
+export interface CollapseOptions { items?: { title: string; content?: string; html?: string }[]; single?: boolean; /** 展开的序号；update 里换了（按值比）就照它开合 */ open?: number[]; onToggle?(e: { index: number; open: boolean }): void; /** 一次操作以后现在展开的序号 */ onChange?(open: number[]): void }
+export const createCollapse: SatinFactory<CollapseOptions, { open(index: number): void; close(index: number): void; toggle(index: number): void; readonly expanded: number[] }>;
+export interface TagInputOptions { /** update 里换了（按值比）就照它显示 */ tags?: string[]; max?: number; placeholder?: string; hint?: string; onChange?(tags: string[]): void }
+export const createTagInput: SatinFactory<TagInputOptions, { readonly tags: string[]; add(tag: string): void; clear(): void; /** 换成这些标签，不发 change */ set(tags: string[]): void }>;
 export interface StepperOptions { value?: number; min?: number; max?: number; unit?: string; label?: string; onChange?(value: number): void }
 export const createStepper: SatinFactory<StepperOptions, { readonly value: number; set(value: number): void }>;
-export interface NumberFlowOptions { value?: number; style?: "roll" | "blur" | "push" | "fade"; format?(v: number): string; reduced?(): boolean }
+export interface NumberFlowOptions { value?: number; /** 变化的样子 */ effect?: "roll" | "blur" | "push" | "fade"; /** effect 的旧名 */ style?: "roll" | "blur" | "push" | "fade"; format?(v: number): string; reduced?(): boolean }
 export const createNumberFlow: SatinFactory<NumberFlowOptions, { readonly value: number; set(value: number): void; get(): number; setStyle(style: "roll" | "blur" | "push" | "fade"): void }>;
 export interface ScrollAreaOptions {
   /** 渐隐方向："y"（默认）| "x" | "both" | "none"，或者 "top bottom left right" 任意组合 */ fade?: "y" | "x" | "both" | "none" | (string & {});
@@ -132,11 +132,14 @@ export interface PopoverHandle { readonly pop: HTMLElement; close(refocus?: bool
 export function openPopoverAt(pop: HTMLElement, trigger: HTMLElement, o?: { align?: "start" | "center" | "end"; onClose?(): void }): PopoverHandle;
 /** 正开着的那一个弹出面板（没开返回 undefined） */
 export function popoverOf(pop: HTMLElement): PopoverHandle | undefined;
-export function openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | "window"; onSelect?(item: HTMLElement): void }): void;
+/** 菜单选中一项时给的东西（openMenu 的 onSelect，和根菜单上冒泡的 menuselect 事件的 detail） */
+export interface MenuSelectDetail { item: HTMLElement; label: string; /** 子菜单里的项：从根菜单往下经过的那几行的文字 */ path: string[]; menu: HTMLElement }
+export function openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | "window"; onSelect?(detail: MenuSelectDetail): void }): void;
 export function closeMenu(refocus?: boolean): void;
 /** 命令面板的一条：name 显示的名字；sub 灰色的补充；key 右边显示的快捷键；keys 额外的搜索词（比如英文名）。可以带自己的字段，onRun 原样拿到 */
 export interface CommandItem { name: string; icon?: string; sub?: string; key?: string; keys?: string; [k: string]: unknown }
-export function createCommandPalette<T extends CommandItem = CommandItem>(groups: { name: string; items: T[] }[], o?: { onRun?(item: T): void; placeholder?: string; /** 没有结果时显示的 HTML；里面带 data-empty-act 的按钮点了（或直接回车）调 onEmpty */ empty?(q: string): string; onEmpty?(q: string): void; hotkey?: boolean; enterLabel?: string }): { open(): void; close(): void; toggle(): void; readonly input: HTMLInputElement; readonly list: HTMLElement };
+/** 命令面板（整页一个）：empty(q) 是没有结果时显示的 HTML，里面带 data-empty-act 的按钮点了（或直接回车）调 onEmpty；destroy() 撤掉这次加的行和 ⌘K 监听（组件卸载时调） */
+export function createCommandPalette<T extends CommandItem = CommandItem>(groups: { name: string; items: T[] }[], o?: { onRun?(item: T): void; placeholder?: string; empty?(q: string): string; onEmpty?(q: string): void; hotkey?: boolean; enterLabel?: string }): { open(): void; close(): void; toggle(): void; destroy(): void; readonly input: HTMLInputElement; readonly list: HTMLElement };
 export function openLightbox(items: { src?: string; bg?: string; ratio?: number; video?: string; caption?: string }[], index: number, o?: { thumbOf?(i: number): HTMLElement | null; enabled?(i: number): boolean; onClose?(): void }): { close(): void };
 export function closeLightbox(): void;
 

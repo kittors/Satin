@@ -15,19 +15,21 @@ export const Pager: C<{ total: number; page?: number; count?: number }>;
 export const Collapse: C<{ items: { title: string; content?: string; html?: string }[]; single?: boolean; open?: number[] }>;
 export const TagInput: C<{ tags?: string[]; max?: number; placeholder?: string; hint?: string }>;
 export const Stepper: C<{ value?: number; min?: number; max?: number; unit?: string; label?: string }>;
-export const NumberFlow: C<{ value: number; style?: string; format?(v: number): string }>;
+export const NumberFlow: DefineComponent<{ value: number; /** 变化的样子 */ effect?: "roll" | "blur" | "push" | "fade"; format?(v: number): string }>; // 只显示，没有 v-model
 /** 日期、时间、地址选择器：@change 拿到 { text }（触发框里显示的文字）；没有 v-model（现在只能读出选中的结果） */
 export const DatePicker: DefineComponent<Omit<PickerOptions, "onChange">>;
 export const Icon: DefineComponent<{ name: string; size?: number }>;
-export const Button: DefineComponent<{ variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string; badge?: number | string | boolean; type?: string }>;
+export const Button: DefineComponent<{ variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; caret?: boolean; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string; badge?: number | string | boolean; type?: string }>;
 export const Input: C<{ size?: "sm" | "md" | "lg" | "xl"; invalid?: boolean }>;
 export const Field: DefineComponent<{ label?: string; help?: string; error?: string; for?: string }>;
 export const Checkbox: C<{ label?: string; indeterminate?: boolean; disabled?: boolean }>;
+/** 单选：v-model 绑这一组选中的值，value 是这一项的值 */
+export const Radio: C<{ value?: string | number; name?: string; label?: string; disabled?: boolean }>;
 export const Switch: C<{ label?: string; disabled?: boolean }>;
 /** 芯片：v-model（布尔）给了是能切换的筛选芯片；removable 是能移除的标签（@remove 在收起动画放完以后发）；selected 只显示选中的样子 */
 export const Chip: DefineComponent<{ modelValue?: boolean; selected?: boolean; removable?: boolean; removeLabel?: string }>;
-export const Progress: DefineComponent<{ value?: number; ring?: boolean; size?: "lg" }>;
-export const Spinner: DefineComponent<{ size?: "lg" }>;
+export const Progress: DefineComponent<{ value?: number; ring?: boolean; size?: "lg"; label?: string }>;
+export const Spinner: DefineComponent<{ size?: "lg"; label?: string }>;
 export const Steps: DefineComponent<{ steps: string[]; current?: number }>;
 export const Text: DefineComponent<{ as?: string; level?: string; tone?: string; num?: boolean; truncate?: boolean }>;
 export const Tooltip: DefineComponent<{ text: string; kbd?: string }>;

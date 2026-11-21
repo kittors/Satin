@@ -17,12 +17,17 @@ export const waveBars = (n, seed = 1) => Array.from({ length: n }, (_, i) => `<i
 export function mountCollapse(acc, { single = false, onToggle } = {}) {
   if (!acc || acc._acc) return acc?._acc;
   const items = () => [...acc.querySelectorAll(":scope > .sn-acc-item")];
-  const set = (it, on) => {
+  // quiet：照外面给的值开合（受控同步用），不回调 onToggle、也不管 single
+  const set = (it, on, quiet) => {
     if (!it || it.classList.contains("sn-open") === on) return;
-    if (on && single) for (const o of items()) if (o !== it) set(o, false);
-    it.classList.toggle("sn-open", on); it.querySelector(".sn-acc-hd")?.setAttribute("aria-expanded", String(on)); onToggle?.(it, on);
+    if (on && single && !quiet) for (const o of items()) if (o !== it) set(o, false);
+    it.classList.toggle("sn-open", on); it.querySelector(".sn-acc-hd")?.setAttribute("aria-expanded", String(on)); if (!quiet) onToggle?.(it, on);
   };
   acc.addEventListener("click", (e) => { const hd = e.target.closest(".sn-acc-hd"); const it = hd?.closest(".sn-acc-item"); if (it && it.parentElement === acc) set(it, !it.classList.contains("sn-open")); });
-  return (acc._acc = { open: (i) => set(items()[i], true), close: (i) => set(items()[i], false), toggle: (i) => { const it = items()[i]; set(it, !it?.classList.contains("sn-open")); } });
+  return (acc._acc = {
+    open: (i) => set(items()[i], true), close: (i) => set(items()[i], false), toggle: (i) => { const it = items()[i]; set(it, !it?.classList.contains("sn-open")); },
+    get expanded() { return items().flatMap((it, i) => (it.classList.contains("sn-open") ? [i] : [])); }, // 现在展开的是第几项
+    sync: (list) => items().forEach((it, i) => set(it, list.includes(i), true)), // 照给的序号开合，不发事件
+  });
 }
 export function bindCollapses(root = document) { for (const a of root.querySelectorAll(".sn-acc")) mountCollapse(a); }

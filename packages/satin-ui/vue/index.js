@@ -4,12 +4,12 @@
 // · SSR 安全：服务端输出和浏览器第一帧一样的标记（createXxx.html），水合以后再接交互；导入时不碰 document
 // · 第一次挂载任何组件时自动调 setup()（Tooltip、浮层栈这些页面级行为），最后一个组件卸载时撤掉
 import * as Vue from "vue";
-import { defineComponent, h, ref, onMounted, onBeforeUnmount, watch, cloneVNode } from "vue";
+import { defineComponent, h, ref, onMounted, onBeforeUnmount, watch, cloneVNode, mergeProps } from "vue";
 import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
 import { ICONS } from "../src/icons.js";
-import { CHECK, removeChip } from "../src/form.js";
+import { CHECK, removeChip, shakeInput } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
 import { wrap, cx } from "./wrap.js";
@@ -27,7 +27,7 @@ export const Select = /* @__PURE__ */ wrap(S.createSelect, { name: "SnSelect", p
 export const Otp = /* @__PURE__ */ wrap(S.createOtp, { name: "SnOtp", props: ["length"], events: ["complete"] });
 export const Tabs = /* @__PURE__ */ wrap(S.createTabs, { name: "SnTabs", props: ["tabs", "value"] });
 export const Pager = /* @__PURE__ */ wrap(S.createPager, { name: "SnPager", props: ["total", "page", "count"], valueKey: "page" });
-export const Collapse = /* @__PURE__ */ wrap(S.createCollapse, { name: "SnCollapse", props: ["items", "single", "open"], events: ["toggle"] });
+export const Collapse = /* @__PURE__ */ wrap(S.createCollapse, { name: "SnCollapse", props: ["items", "single", "open"], valueKey: "open", events: ["toggle", "change"] });
 export const TagInput = /* @__PURE__ */ wrap(S.createTagInput, { name: "SnTagInput", props: ["tags", "max", "placeholder", "hint"], valueKey: "tags" });
 // 密码框、邮箱框：v-model 绑值；label、help、name、placeholder（密码框 meter 出强度条）
 export const Password = /* @__PURE__ */ wrap(S.createPassword, { name: "SnPassword", props: ["value", "label", "help", "name", "id", "placeholder", "meter", "size", "autocomplete"] });
@@ -35,7 +35,7 @@ export const Email = /* @__PURE__ */ wrap(S.createEmail, { name: "SnEmail", prop
 // 表格：v-model 绑勾选的行键（selected）；@sort、@rowclick
 export const Table = /* @__PURE__ */ wrap(S.createTable, { name: "SnTable", props: ["columns", "rows", "rowKey", "sort", "sortLocal", "selectable", "selected", "empty", "loading", "skeleton", "label", "striped", "compact", "plain", "lines", "maxHeight"], valueKey: "selected", events: ["select", "sort", "rowClick"], modelEvent: "select" });
 export const Stepper = /* @__PURE__ */ wrap(S.createStepper, { name: "SnStepper", props: ["value", "min", "max", "unit", "label"] });
-export const NumberFlow = /* @__PURE__ */ wrap(S.createNumberFlow, { name: "SnNumberFlow", props: ["value", "style", "format"], events: [] });
+export const NumberFlow = /* @__PURE__ */ wrap(S.createNumberFlow, { name: "SnNumberFlow", props: ["value", "effect", "format"], events: [] });
 // 日期、时间、地址选择器：kind（date | range | time | datetime | region）、placeholder、label；@change 拿到 { text }（触发框里显示的文字）。
 // 没有 v-model：选择器现在只能读出选中的结果，不能从外面设值。today / now 固定"今天""现在"；kind、placeholder、label 只在创建时用（要换就换 :key）
 export const DatePicker = /* @__PURE__ */ wrap(S.createPicker, { name: "SnDatePicker", props: ["kind", "placeholder", "label", "today", "now"], modelEvent: null });
@@ -50,7 +50,7 @@ export const Icon = /* @__PURE__ */ defineComponent({
 const TICK = () => h("svg", { class: "sn-tick", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round" }, [h("path", { d: "M3.5 8.5l3 3 6-7" })]);
 export const Button = /* @__PURE__ */ defineComponent({
   name: "SnButton",
-  props: { variant: { type: String, default: "secondary" }, size: String, icon: String, iconAfter: String, round: Boolean, selected: Boolean, badge: { type: [Boolean, Number, String], default: undefined }, loading: { type: Boolean, default: undefined }, done: { type: Boolean, default: undefined }, disabled: Boolean, tip: String, type: { type: String, default: "button" } },
+  props: { variant: { type: String, default: "secondary" }, size: String, icon: String, iconAfter: String, caret: Boolean, round: Boolean, selected: Boolean, badge: { type: [Boolean, Number, String], default: undefined }, loading: { type: Boolean, default: undefined }, done: { type: Boolean, default: undefined }, disabled: Boolean, tip: String, type: { type: String, default: "button" } },
   setup(p, { slots, attrs }) {
     // 一挂上就在等：直接转圈（300ms 是防"从不等待变成等待"时闪一下的），服务端输出也带 sn-busy
     const spin = ref(!!p.loading); let at = 0, timer = 0;
@@ -63,7 +63,7 @@ export const Button = /* @__PURE__ */ defineComponent({
     onBeforeUnmount(() => clearTimeout(timer));
     return () => {
       const kids = slots.default?.(), iconOnly = !kids && p.icon && !p.iconAfter, ok = !!p.done && !spin.value, blocked = p.disabled || p.loading || ok;
-      const lead = p.icon ? h(Icon, { name: p.icon }) : null, tail = p.iconAfter ? h(Icon, { name: p.iconAfter, class: "sn-after" }) : null;
+      const lead = p.icon ? h(Icon, { name: p.icon }) : null, tail = p.iconAfter ? h(Icon, { name: p.iconAfter, class: "sn-after" }) : p.caret ? h(Icon, { name: "chevron-down", class: "sn-caret" }) : null; // caret：菜单按钮后面的小箭头
       return h("button", {
         ...attrs, type: p.type,
         class: cx("sn-btn", `sn-${p.variant}`, p.size && p.size !== "md" && `sn-${p.size}`, iconOnly && "sn-ibtn", p.round && "sn-round", p.selected && "sn-selected", p.disabled && "sn-is-disabled", spin.value && "sn-busy", ok && "sn-ok"),
@@ -79,16 +79,32 @@ export const Button = /* @__PURE__ */ defineComponent({
 });
 export const Input = /* @__PURE__ */ defineComponent({
   name: "SnInput", inheritAttrs: false, props: { modelValue: null, size: String, invalid: Boolean }, emits: ["update:modelValue"],
-  setup: (p, { attrs, emit }) => () => h("input", { ...attrs, class: cx("sn-input", p.size && p.size !== "md" && `sn-${p.size}`, attrs.class), value: p.modelValue, "aria-invalid": p.invalid ? "true" : undefined, onInput: (e) => emit("update:modelValue", e.target.value) }),
+  // mergeProps：写在组件上的 @input、class 和这里的合在一起（不会被盖掉）
+  setup: (p, { attrs, emit }) => () => h("input", mergeProps(attrs, { class: cx("sn-input", p.size && p.size !== "md" && `sn-${p.size}`), value: p.modelValue, "aria-invalid": p.invalid ? "true" : undefined, onInput: (e) => emit("update:modelValue", e.target.value) })),
 });
 export const Field = /* @__PURE__ */ defineComponent({
   name: "SnField", props: { label: String, help: String, error: { type: String, default: undefined }, for: String },
-  setup: (p, { slots }) => () => h("div", { class: cx("sn-field", p.error && "sn-bad") }, [p.label ? h("label", { class: "sn-lbl", for: p.for }, p.label) : null, slots.default?.(), p.help ? h("div", { class: "sn-help" }, p.help) : null, p.error != null ? h("div", { class: "sn-err" }, [h("span", p.error)]) : null]),
+  setup(p, { slots }) {
+    // 错误出现的那一下（从没有变成有）输入框左右抖两下，和 setFieldError 一样
+    const el = ref(null);
+    watch(() => !!p.error, (bad, was) => { if (bad && !was) shakeInput(el.value); });
+    return () => h("div", { ref: el, class: cx("sn-field", p.error && "sn-bad") }, [p.label ? h("label", { class: "sn-lbl", for: p.for }, p.label) : null, slots.default?.(), p.help ? h("div", { class: "sn-help" }, p.help) : null, p.error != null ? h("div", { class: "sn-err" }, [h("span", p.error)]) : null]);
+  },
 });
 const Box = () => h("span", { class: "sn-box" }, [h("svg", { viewBox: "0 0 12 12", fill: "none", stroke: "currentColor", "stroke-width": CHECK.stroke, "stroke-linecap": "round", "stroke-linejoin": "round" }, [h("path", { d: CHECK.path })]), h("span", { class: "sn-bar" })]);
 export const Checkbox = /* @__PURE__ */ defineComponent({
   name: "SnCheckbox", props: { modelValue: Boolean, label: String, indeterminate: Boolean, disabled: Boolean }, emits: ["update:modelValue"],
-  setup: (p, { slots, emit }) => () => h("label", { class: "sn-check" }, [h("input", { type: "checkbox", checked: p.modelValue, indeterminate: p.indeterminate, disabled: p.disabled, onChange: (e) => emit("update:modelValue", e.target.checked) }), h(Box), p.label ?? slots.default?.()]),
+  setup(p, { slots, emit }) {
+    // 半选只能用 DOM 属性设：没有对应的 HTML 属性，服务端渲染也不该写进标记
+    const input = ref(null);
+    onMounted(() => watch(() => p.indeterminate, (v) => { if (input.value) input.value.indeterminate = !!v; }, { immediate: true }));
+    return () => h("label", { class: "sn-check" }, [h("input", { ref: input, type: "checkbox", checked: p.modelValue, disabled: p.disabled, onChange: (e) => emit("update:modelValue", e.target.checked) }), h(Box), p.label ?? slots.default?.()]);
+  },
+});
+// 单选：v-model 绑这一组选中的值，value 是这一项的值；同一组写同一个 name
+export const Radio = /* @__PURE__ */ defineComponent({
+  name: "SnRadio", props: { modelValue: null, value: null, name: String, label: String, disabled: Boolean }, emits: ["update:modelValue"],
+  setup: (p, { slots, emit }) => () => h("label", { class: "sn-radio" }, [h("input", { type: "radio", name: p.name, value: p.value, checked: p.modelValue === undefined ? undefined : p.modelValue === p.value, disabled: p.disabled, onChange: () => emit("update:modelValue", p.value) }), h("span", { class: "sn-box" }), p.label ?? slots.default?.()]),
 });
 export const Switch = /* @__PURE__ */ defineComponent({
   name: "SnSwitch", props: { modelValue: Boolean, label: String, disabled: Boolean }, emits: ["update:modelValue"],
@@ -107,11 +123,13 @@ export const Chip = /* @__PURE__ */ defineComponent({
     };
   },
 });
+// 读屏：role="progressbar"、aria-valuenow（百分数），label 是读出来的名字
+const progressAria = (value, label) => ({ role: "progressbar", "aria-label": label, ...(value == null ? {} : { "aria-valuenow": Math.round(value * 100), "aria-valuemin": 0, "aria-valuemax": 100 }) });
 export const Progress = /* @__PURE__ */ defineComponent({
-  name: "SnProgress", props: { value: Number, ring: Boolean, size: String },
-  setup(p) { return () => { const v = p.value == null ? undefined : String(+p.value).replace(/^0\./, "."); return p.ring ? h("span", { class: cx("sn-pring", p.size === "lg" && "sn-lg"), style: { "--sn-p": v ?? "0" } }) : h("div", { class: cx("sn-pbar", p.value == null && "sn-indet"), style: v != null ? { "--sn-p": v } : undefined }, [h("i")]); }; },
+  name: "SnProgress", props: { value: Number, ring: Boolean, size: String, label: String },
+  setup(p) { return () => { const v = p.value == null ? undefined : String(+p.value).replace(/^0\./, "."); return p.ring ? h("span", { class: cx("sn-pring", p.size === "lg" && "sn-lg"), style: { "--sn-p": v ?? "0" }, ...progressAria(p.value ?? 0, p.label) }) : h("div", { class: cx("sn-pbar", p.value == null && "sn-indet"), ...progressAria(p.value, p.label), style: v != null ? { "--sn-p": v } : undefined }, [h("i")]); }; },
 });
-export const Spinner = /* @__PURE__ */ defineComponent({ name: "SnSpinner", props: { size: String }, setup: (p) => () => h("span", { class: cx("sn-spinner", p.size === "lg" && "sn-lg") }) });
+export const Spinner = /* @__PURE__ */ defineComponent({ name: "SnSpinner", props: { size: String, label: String }, setup: (p) => () => h("span", { class: cx("sn-spinner", p.size === "lg" && "sn-lg"), role: "status", "aria-label": p.label ?? tt("components.loading") }) });
 export const Steps = /* @__PURE__ */ defineComponent({
   name: "SnSteps", props: { steps: { type: Array, default: () => [] }, current: { type: Number, default: 0 } },
   setup: (p) => () => h("div", { class: "sn-steps" }, p.steps.flatMap((s, i) => [i ? h("span", { class: cx("sn-ln", i <= p.current && "sn-done") }, [h("i")]) : null, h("span", { class: cx("sn-st", i < p.current && "sn-done", i === p.current && "sn-cur") }, [h("span", { class: "sn-n" }, String(i + 1)), s])]).filter(Boolean)),
@@ -147,10 +165,10 @@ export const Dialog = /* @__PURE__ */ defineComponent({
 export const Drawer = /* @__PURE__ */ defineComponent({
   name: "SnDrawer", props: { open: Boolean, title: String }, emits: ["close", "update:open"],
   setup(p, { slots, emit }) {
-    const el = ref(null); let layer = null;
+    const el = ref(null), tid = Vue.useId?.() ?? "sn-drw-" + ++dlgN; let layer = null; // 标题的 id：抽屉 aria-labelledby 指向它
     watch(() => p.open, (o) => { if (o && !layer) layer = openDrawer(el.value, { trigger: document.activeElement, onClose: () => { layer = null; emit("close"); emit("update:open", false); } }); else if (!o && layer) { layer.close(true); layer = null; } });
-    return () => h("aside", { ref: el, class: "sn-drawer", role: "dialog", "aria-modal": "true", tabindex: "-1" }, [
-      h("div", { class: "sn-hd" }, [h("h3", p.title), h("button", { class: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": tt("components.close"), "data-tip": tt("components.close"), "data-kbd": "Esc" }, [h(Icon, { name: "x", size: 16 })])]),
+    return () => h("aside", { ref: el, class: "sn-drawer", role: "dialog", "aria-modal": "true", "aria-labelledby": p.title ? tid : undefined, tabindex: "-1" }, [
+      h("div", { class: "sn-hd" }, [h("h3", { id: tid }, p.title), h("button", { type: "button", class: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": tt("components.close"), "data-tip": tt("components.close"), "data-kbd": "Esc" }, [h(Icon, { name: "x", size: 16 })])]),
       h("div", { class: "sn-bd" }, slots.default?.()), slots.footer ? h("div", { class: "sn-ft" }, slots.footer()) : null,
     ]);
   },
@@ -169,7 +187,7 @@ export const notify = (o) => (setup(), S.notify(o));
 // 数据表格这类重组件不在这里注册：import { DataGrid } from "satin-ui/vue/grid"
 export default {
   install(app) {
-    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
+    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
     app.directive("enhance", vEnhance);
     const off = setup(); app.onUnmount?.(off); // setup() 在服务端直接返回，什么都不做
   },

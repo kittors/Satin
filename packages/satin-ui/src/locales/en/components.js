@@ -18,6 +18,7 @@ export default {
   "components.15": "Digit {p0}",
   "components.16": "{p0} items",
   "components.close": "Close",
+  "components.loading": "Loading",
   "components.remove": "Remove",
   "components.17": "Show password",
   "components.18": "Caps Lock is on",

@@ -11,7 +11,7 @@ import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
 import { initSeg } from "../src/core.js";
 import { ICONS } from "../src/icons.js";
-import { CHECK, removeChip } from "../src/form.js";
+import { CHECK, removeChip, shakeInput } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
 import { wrap, useIso, cx } from "./wrap.js";
@@ -30,7 +30,7 @@ export const Select = /* @__PURE__ */ wrap(S.createSelect, { displayName: "Selec
 export const Otp = /* @__PURE__ */ wrap(S.createOtp, { valueKey: "code", events: ["complete"], displayName: "Otp" });
 export const Tabs = /* @__PURE__ */ wrap(S.createTabs, { displayName: "Tabs" });
 export const Pager = /* @__PURE__ */ wrap(S.createPager, { valueKey: "page", displayName: "Pager" });
-export const Collapse = /* @__PURE__ */ wrap(S.createCollapse, { valueKey: "open", events: ["toggle"], displayName: "Collapse" });
+export const Collapse = /* @__PURE__ */ wrap(S.createCollapse, { valueKey: "open", events: ["toggle", "change"], stateKey: "expanded", displayName: "Collapse" });
 export const TagInput = /* @__PURE__ */ wrap(S.createTagInput, { valueKey: "tags", displayName: "TagInput" });
 export const Stepper = /* @__PURE__ */ wrap(S.createStepper, { displayName: "Stepper" });
 export const NumberFlow = /* @__PURE__ */ wrap(S.createNumberFlow, { events: [], displayName: "NumberFlow" });
@@ -61,12 +61,13 @@ const badgeOf = (b) => (b === true ? h("span", { className: "sn-dot", key: "badg
 const Tick = () => h("svg", { className: "sn-tick", viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, h("path", { d: "M3.5 8.5l3 3 6-7" }));
 // loading、done 写了（true 或 false）才套等待要用的结构（.sn-label > .sn-spin + .sn-tick + .sn-txt）：从一开始就在，转圈、打勾时宽度不跳；
 // 没写就和手写的 <button class="sn-btn"> 一模一样。等待中、打勾时点了不触发 onClick
-export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "secondary", size, icon, iconAfter, round, selected, loading, done, badge, disabled, tip, className, children, onClick, type = "button", ...rest }, ref) {
+export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "secondary", size, icon, iconAfter, caret, round, selected, loading, done, badge, disabled, tip, className, children, onClick, type = "button", ...rest }, ref) {
   const iconOnly = !children && icon && !iconAfter, spin = useSpin(!!loading), ok = !!done && !spin; // 转圈收起以后再打勾
-  const lead = icon ? h(Icon, { name: icon }) : null, tail = iconAfter ? h(Icon, { name: iconAfter, className: "sn-after" }) : null;
+  // caret：菜单按钮后面的小箭头（12px、半透明，菜单开着时转过去）
+  const lead = icon ? h(Icon, { name: icon }) : null, tail = iconAfter ? h(Icon, { name: iconAfter, className: "sn-after" }) : caret ? h(Icon, { name: "chevron-down", className: "sn-caret" }) : null;
   return h("button", {
     ref, type, ...rest, className: cx("sn-btn", `sn-${variant}`, size && size !== "md" && `sn-${size}`, iconOnly && "sn-ibtn", round && "sn-round", selected && "sn-selected", disabled && "sn-is-disabled", spin && "sn-busy", ok && "sn-ok", className),
-    "aria-disabled": disabled ? "true" : undefined, "data-tip": tip, "aria-label": iconOnly ? rest["aria-label"] ?? tip : rest["aria-label"],
+    "aria-disabled": disabled ? "true" : undefined, "data-tip": tip ?? rest["data-tip"], "aria-label": iconOnly ? rest["aria-label"] ?? tip : rest["aria-label"], // 外面包了 <Tooltip> 时 data-tip 从 rest 来
     onClick: disabled || loading || ok ? undefined : onClick,
   }, ...(loading !== undefined || done !== undefined
     ? [h("span", { className: "sn-sheen", key: "sheen" }), h("span", { className: "sn-label", key: "label" }, h("span", { className: "sn-spin" }), h(Tick), h("span", { className: "sn-txt" }, lead, children, tail))]
@@ -81,8 +82,10 @@ export const Input = /* @__PURE__ */ forwardRef(function Input({ size, invalid, 
 });
 export const Textarea = /* @__PURE__ */ forwardRef(function Textarea({ className, ...rest }, ref) { return h("textarea", { ref, ...rest, className: cx("sn-input", className) }); });
 export function Field({ label, help, error, htmlFor, className, children }) {
-  // 错误区：error 传了（空字符串也算）就一直在，有字时展开、清空时收起（有动画）；不传就没有
-  return h("div", { className: cx("sn-field", error && "sn-bad", className) }, label ? h("label", { className: "sn-lbl", htmlFor }, label) : null, children, help ? h("div", { className: "sn-help" }, help) : null, error != null ? h("div", { className: "sn-err" }, h("span", null, error)) : null);
+  // 错误区：error 传了（空字符串也算）就一直在，有字时展开、清空时收起（有动画）；不传就没有。错误出现的那一下输入框抖两下
+  const el = useRef(null), bad = !!error, was = useRef(bad);
+  useEffect(() => { if (bad && !was.current) shakeInput(el.current); was.current = bad; }, [bad]);
+  return h("div", { ref: el, className: cx("sn-field", error && "sn-bad", className) }, label ? h("label", { className: "sn-lbl", htmlFor }, label) : null, children, help ? h("div", { className: "sn-help" }, help) : null, error != null ? h("div", { className: "sn-err" }, h("span", null, error)) : null);
 }
 // 复选框的方框（和 form.js 的 BOX 同一份路径和线宽）：input 后面紧跟着它，样式靠 input:checked + .sn-box
 const Box = () => h("span", { className: "sn-box" }, h("svg", { viewBox: "0 0 12 12", fill: "none", stroke: "currentColor", strokeWidth: CHECK.stroke, strokeLinecap: "round", strokeLinejoin: "round" }, h("path", { d: CHECK.path })), h("span", { className: "sn-bar" }));
@@ -90,6 +93,10 @@ export const Checkbox = /* @__PURE__ */ forwardRef(function Checkbox({ label, ch
   const own = useRef(null);
   useIso(() => { if (own.current) own.current.indeterminate = !!indeterminate; });
   return h("label", { className: cx("sn-check", className) }, h("input", { ref: (n) => { own.current = n; if (typeof ref === "function") ref(n); else if (ref) ref.current = n; }, type: "checkbox", ...rest }), h(Box), label ?? children);
+});
+// 单选：同一组写同一个 name；checked + onChange 受控，defaultChecked 非受控（和原生 <input type="radio"> 一样）
+export const Radio = /* @__PURE__ */ forwardRef(function Radio({ label, children, className, ...rest }, ref) {
+  return h("label", { className: cx("sn-radio", className) }, h("input", { ref, type: "radio", ...rest }), h("span", { className: "sn-box" }), label ?? children);
 });
 export const Switch = /* @__PURE__ */ forwardRef(function Switch({ label, children, className, ...rest }, ref) {
   return h("label", { className: cx("sn-switch", className) }, h("input", { ref, type: "checkbox", role: "switch", ...rest }), h("span", { className: "sn-track" }, h("span", { className: "sn-knob" })), label ?? children);
@@ -112,12 +119,14 @@ export const Chip = /* @__PURE__ */ forwardRef(function Chip({ selected, default
   }
   return h("span", { ...rest, ref: setRefs, className: cx("sn-chip", on && "sn-on", className) }, children);
 });
-export function Progress({ value, ring, size, className }) {
+// 进度：value 0～1，不给是不知道还要多久；读屏：role="progressbar"、aria-valuenow（百分数），label 是读出来的名字
+const progressAria = (value, label) => ({ role: "progressbar", "aria-label": label, ...(value == null ? {} : { "aria-valuenow": Math.round(value * 100), "aria-valuemin": 0, "aria-valuemax": 100 }) });
+export function Progress({ value, ring, size, label, className }) {
   const v = value == null ? undefined : String(+value).replace(/^0\./, ".");
-  return ring ? h("span", { className: cx("sn-pring", size === "lg" && "sn-lg", className), style: { "--sn-p": v ?? "0" } })
-    : h("div", { className: cx("sn-pbar", value == null && "sn-indet", className), style: v != null ? { "--sn-p": v } : undefined }, h("i"));
+  return ring ? h("span", { className: cx("sn-pring", size === "lg" && "sn-lg", className), style: { "--sn-p": v ?? "0" }, ...progressAria(value ?? 0, label) })
+    : h("div", { className: cx("sn-pbar", value == null && "sn-indet", className), style: v != null ? { "--sn-p": v } : undefined, ...progressAria(value, label) }, h("i"));
 }
-export function Spinner({ size, className }) { return h("span", { className: cx("sn-spinner", size === "lg" && "sn-lg", className) }); }
+export function Spinner({ size, label, className }) { return h("span", { className: cx("sn-spinner", size === "lg" && "sn-lg", className), role: "status", "aria-label": label ?? tt("components.loading") }); }
 export function Steps({ steps = [], current = 0, className }) {
   const out = [];
   steps.forEach((s, i) => { if (i) out.push(h("span", { key: "l" + i, className: cx("sn-ln", i <= current && "sn-done") }, h("i"))); out.push(h("span", { key: "s" + i, className: cx("sn-st", i < current && "sn-done", i === current && "sn-cur") }, h("span", { className: "sn-n" }, i + 1), s)); });
@@ -150,10 +159,10 @@ export function Dialog({ open, onClose, title, description, icon, footer, footer
 }
 // 抽屉：从右边滑进来
 export function Drawer({ open, onClose, title, children, footer, className }) {
-  const ref = useRef(null), layer = useRef(null);
+  const ref = useRef(null), layer = useRef(null), tid = useId(); // 标题的 id：抽屉 aria-labelledby 指向它，读屏读得出这是什么抽屉
   useIso(() => { if (open && !layer.current) layer.current = openDrawer(ref.current, { trigger: document.activeElement, onClose: () => { layer.current = null; onClose?.(); } }); else if (!open && layer.current) { layer.current.close(true); layer.current = null; } }, [open]);
-  return h("aside", { ref, className: cx("sn-drawer", className), role: "dialog", "aria-modal": "true", tabIndex: -1 },
-    h("div", { className: "sn-hd" }, h("h3", null, title), h("button", { className: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": tt("components.close"), "data-tip": tt("components.close"), "data-kbd": "Esc" }, h(Icon, { name: "x", size: 16 }))),
+  return h("aside", { ref, className: cx("sn-drawer", className), role: "dialog", "aria-modal": "true", "aria-labelledby": title ? tid : undefined, tabIndex: -1 },
+    h("div", { className: "sn-hd" }, h("h3", { id: tid }, title), h("button", { type: "button", className: "sn-btn sn-ghost sn-sm sn-ibtn", "data-x": "", "aria-label": tt("components.close"), "data-tip": tt("components.close"), "data-kbd": "Esc" }, h(Icon, { name: "x", size: 16 }))),
     h("div", { className: "sn-bd" }, children), footer ? h("div", { className: "sn-ft" }, footer) : null);
 }
 

@@ -12,8 +12,9 @@ export const useIso = typeof window === "undefined" ? useEffect : useLayoutEffec
 export const cx = (...a) => a.filter(Boolean).join(" ");
 export const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
-// 把 createXxx 包成 React 组件。valueKey：受控的那个属性（value / page / tags……）；events：组件会发的事件名
-export function wrap(create, { valueKey = "value", events = ["change"], displayName } = {}) {
+// 把 createXxx 包成 React 组件。valueKey：受控的那个属性（value / page / tags……）；events：组件会发的事件名；
+// stateKey：实例上读当前值的那一项（默认和 valueKey 同名；折叠面板的 open 是方法，当前值在 expanded）
+export function wrap(create, { valueKey = "value", events = ["change"], stateKey = valueKey, displayName } = {}) {
   const C = forwardRef(function SatinComponent(props, ref) {
     const { className, style, id } = props;
     const host = useRef(null), inst = useRef(null), latest = useRef(props);
@@ -27,14 +28,15 @@ export function wrap(create, { valueKey = "value", events = ["change"], displayN
       const handlers = {};
       for (const ev of events) handlers["on" + cap(ev)] = (v) => {
         latest.current["on" + cap(ev)]?.(v);
-        // 受控：父组件没把新值传回来，就退回到父组件给的值
-        if (ev === "change" && latest.current[valueKey] !== undefined) setTimeout(() => { const want = latest.current[valueKey]; if (inst.current && want !== undefined && JSON.stringify(inst.current[valueKey]) !== JSON.stringify(want)) inst.current.update({ [valueKey]: want }); });
+        // 受控：父组件没把新值传回来，就退回到父组件给的值（组件只在"传进来的值换了"时跟过去，所以先清掉、再给一次）
+        if (ev === "change" && latest.current[valueKey] !== undefined) setTimeout(() => { const want = latest.current[valueKey]; if (inst.current && want !== undefined && JSON.stringify(inst.current[stateKey]) !== JSON.stringify(want)) inst.current.update({ [valueKey]: undefined }).update({ [valueKey]: want }); });
       };
       inst.current = create(host.current.firstElementChild, { ...optsOf(latest.current), ...handlers });
       return () => { inst.current?.destroy(); inst.current = null; unsetup(); };
     }, []);
-    // 每次渲染把最新的选项交给实例（实例自己判断有没有变化、要不要动画）
-    useIso(() => { inst.current?.update(optsOf(props)); });
+    // 每次渲染把最新的选项交给实例（实例自己判断有没有变化、要不要动画）。
+    // 非受控（没给 value、只给 defaultValue）时不带值：defaultValue 只管第一次，不然父组件一重新渲染，用户刚改的值就被打回去
+    useIso(() => { const o = optsOf(props); if (props[valueKey] === undefined) delete o[valueKey]; inst.current?.update(o); });
     useImperativeHandle(ref, () => inst.current, []);
     return h("div", { ref: host, id, className: cx("sn-host", className), style: { display: "contents", ...style }, dangerouslySetInnerHTML: { __html: html }, suppressHydrationWarning: true });
   });

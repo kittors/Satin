@@ -135,7 +135,11 @@ export function bindSelects(root = document) { for (const h of root.querySelecto
 // validateForm(form, 规则)：规则是 { 字段的 data-f: (值, 输入框) => 错误文字或假值 }；有错的都标出来、焦点到第一个，返回有没有通过
 export function setFieldError(f, msg) {
   const err = f.querySelector(".sn-err span"); if (err) err.textContent = msg; f.classList.add("sn-bad");
-  const input = f.querySelector(".sn-input"); input?.setAttribute("aria-invalid", "true");
+  f.querySelector(".sn-input")?.setAttribute("aria-invalid", "true"); shakeInput(f);
+}
+// 字段里的输入框左右抖两下（出错的那一下；React、Vue 的 Field 错误出现时也调它）。减少动态效果时不抖
+export function shakeInput(f) {
+  const input = f?.querySelector(".sn-input");
   if (input && !matchMedia("(prefers-reduced-motion: reduce)").matches && !document.documentElement.classList.contains("sn-reduce-motion")) { input.classList.remove("sn-shake"); void input.offsetWidth; input.classList.add("sn-shake"); }
 }
 export function clearFieldError(f) { f.classList.remove("sn-bad"); f.querySelector(".sn-input")?.removeAttribute("aria-invalid"); }

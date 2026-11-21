@@ -20,8 +20,8 @@ type PagerProps = Attrs & Inst & { total: number; count?: number; /** bind:page 
 type TagInputProps = Attrs & Inst & { max?: number; placeholder?: string; hint?: string; /** bind:tags 双向绑定 */ tags?: string[]; onchange?(tags: string[]): void };
 type StepperProps = Attrs & Inst & { min?: number; max?: number; unit?: string; label?: string; /** bind:value 双向绑定 */ value?: number; onchange?(value: number): void };
 type OtpProps = Attrs & Inst & { length?: number; oncomplete?(code: string): void };
-type CollapseProps = Attrs & Inst & { items: { title: string; content?: string; html?: string }[]; single?: boolean; open?: number[]; ontoggle?(e: { index: number; open: boolean }): void };
-type NumberFlowProps = Attrs & Inst & { value: number; style?: "roll" | "blur" | "push" | "fade"; format?(v: number): string };
+type CollapseProps = Attrs & Inst & { items: { title: string; content?: string; html?: string }[]; single?: boolean; /** 展开的序号；bind:open 双向绑定 */ open?: number[]; ontoggle?(e: { index: number; open: boolean }): void; onchange?(open: number[]): void };
+type NumberFlowProps = Attrs & Inst & { value: number; /** 变化的样子 */ effect?: "roll" | "blur" | "push" | "fade"; format?(v: number): string };
 /** 下拉选择：<Select items={…} bind:value label="…" /> */
 export const Select: Component<SelectProps, {}, "value" | "instance">;
 /** 日期、时间、地址选择器：<DatePicker kind="range" onchange={(d) => …} />；没有 bind:value（现在只能读出选中的结果） */
@@ -46,7 +46,7 @@ export const TagInput: Component<TagInputProps, {}, "tags" | "instance">;
 export const Stepper: Component<StepperProps, {}, "value" | "instance">;
 /** 验证码：<Otp length={6} oncomplete={(code) => …} /> */
 export const Otp: Component<OtpProps, {}, "instance">;
-/** 折叠面板：<Collapse items={[{ title: "…", content: "…" }]} single open={[0]} ontoggle={(e) => …} /> */
-export const Collapse: Component<CollapseProps, {}, "instance">;
-/** 数字滚动：<NumberFlow value={count} style="roll" />（value 变了数字滚过去） */
+/** 折叠面板：<Collapse items={[{ title: "…", content: "…" }]} single bind:open={open} ontoggle={(e) => …} /> */
+export const Collapse: Component<CollapseProps, {}, "open" | "instance">;
+/** 数字滚动：<NumberFlow value={count} effect="roll" />（value 变了数字滚过去） */
 export const NumberFlow: Component<NumberFlowProps, {}, "instance">;

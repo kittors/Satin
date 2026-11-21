@@ -20,7 +20,7 @@ const COMPONENTS = {
   collapse: [S.createCollapse, ["items", "single", "open"]],
   "tag-input": [S.createTagInput, ["tags", "max", "placeholder", "hint"]],
   stepper: [S.createStepper, ["value", "min", "max", "unit", "label"]],
-  "number-flow": [S.createNumberFlow, ["value", "style"]],
+  "number-flow": [S.createNumberFlow, ["value", "effect"]], // 不观察 style：那是写 CSS 的属性
 };
 export function defineElements(prefix = "sn") {
   if (typeof customElements === "undefined") return;

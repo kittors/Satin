@@ -5,7 +5,7 @@
 // · createXxx.html(options) 是纯字符串函数：Node / SSR 里也能调，生成和展示页一模一样的标记
 // 导入本身没有副作用。
 import { defineComponent, track } from "./lifecycle.js";
-import { initSeg, injectIcons } from "./core.js";
+import { initSeg, injectIcons, reduced as reducedMotion } from "./core.js";
 import { icon } from "./icons.js";
 import { svg } from "./svg.js";
 import { check, chevronDown, chevronLeft, chevronRight, minus, plus, x } from "./icons/index.js";
@@ -71,7 +71,8 @@ export const createSegmented = /* @__PURE__ */ defineComponent({
     const btns = () => [...el.querySelectorAll("button")], idxOf = (v) => Math.max(0, btns().findIndex((b) => (b.dataset.v ?? b.textContent.trim()) === String(v)));
     let value = o.value ?? (btns()[0]?.dataset.v ?? btns()[0]?.textContent.trim());
     const seg = initSeg(el, (v) => { value = String(v); api.emit("change", value); }, idxOf(value));
-    return { update(n, p) { if (n.value != null && String(n.value) !== String(value)) { value = String(n.value); seg.go(idxOf(value), false, true); } }, get value() { return value; }, select: (v) => { value = String(v); seg.go(idxOf(v), false, true); } };
+    // update：传进来的值换了（和上次给的比）、又和现在选中的不一样，才跟过去；只换了别的选项不动选中（不然非受控时会被打回初始值）
+    return { update(n, p) { if (n.value != null && String(n.value) !== String(p.value) && String(n.value) !== String(value)) { value = String(n.value); seg.go(idxOf(value), false, true); } }, get value() { return value; }, select: (v) => { value = String(v); seg.go(idxOf(v), false, true); } };
   },
 });
 
@@ -83,7 +84,7 @@ export const createSlider = /* @__PURE__ */ defineComponent({
   mount(el, o, api) {
     initSlider(el);
     el.addEventListener("slide", (e) => api.emit("change", e.detail));
-    return { update(n) { if (n.value != null && Number(n.value) !== Number(el.getAttribute("aria-valuenow"))) el.setValue(Number(n.value)); }, get value() { return Number(el.getAttribute("aria-valuenow")); }, destroy() { delete el.setValue; } };
+    return { update(n, p) { if (n.value != null && Number(n.value) !== Number(p.value) && Number(n.value) !== Number(el.getAttribute("aria-valuenow"))) el.setValue(Number(n.value)); }, get value() { return Number(el.getAttribute("aria-valuenow")); }, destroy() { delete el.setValue; } };
   },
 });
 
@@ -101,7 +102,7 @@ export const createSelect = /* @__PURE__ */ defineComponent({
     // 选项变了（异步载入、筛选）：按新选项重画菜单、重新接上；选中值留着（新选项里还有的话）
     const rebuild = (opts) => { s.close(); s.dispose(); const tmp = document.createElement("div"); tmp.innerHTML = createSelect.html(opts); el.replaceChildren(...tmp.firstElementChild.childNodes); s = mountSelect(el, { onChange: (v) => api.emit("change", v) }); };
     return {
-      update(n) { const ns = JSON.stringify(items(n.items)); if (ns !== sig) { sig = ns; rebuild(n); return; } if (n.value != null && n.value !== s.value) s.set(n.value); },
+      update(n, p) { const changed = n.value != null && String(n.value) !== String(p.value), ns = JSON.stringify(items(n.items)); if (ns !== sig) { sig = ns; rebuild({ ...n, value: changed ? n.value : s.value }); return; } if (changed && n.value !== s.value) s.set(n.value); },
       get value() { return s.value; }, open: () => s.open(), close: (r) => s.close(r), destroy() { s.close(); s.dispose(); selectsRelease(s); },
     };
   },
@@ -130,7 +131,7 @@ export const createTabs = /* @__PURE__ */ defineComponent({
     + `<div class="sn-tab-panels">${o.tabs.map((t, i) => `<div class="sn-tab-panel"${i === o.value ? "" : " hidden"}>${t.html ?? esc(t.content ?? "")}</div>`).join("")}</div></div>`,
   mount(el, o, api) {
     const t = mountTabs(el, { onChange: (i) => api.emit("change", i) });
-    return { update(n) { if (n.value != null && n.value !== t.index) t.select(n.value); }, get value() { return t.index; }, select: t.select, destroy() { delete el._tabs; } };
+    return { update(n, p) { if (n.value != null && n.value !== p.value && n.value !== t.index) t.select(n.value); }, get value() { return t.index; }, select: t.select, destroy() { delete el._tabs; } };
   },
 });
 
@@ -142,7 +143,7 @@ export const createPager = /* @__PURE__ */ defineComponent({
   mount(el, o, api) {
     const p = mountPager(el, { total: o.total, page: o.page, onChange: (n) => api.emit("change", n) });
     const total = () => el.querySelector(".sn-total");
-    return { update(n) { if (n.total != null) p.setTotal(n.total); if (n.page != null && n.page !== p.page) p.go(n.page, true); if (n.count != null && total()) total().textContent = tt("components.16", { p0: n.count }); }, get page() { return p.page; }, get total() { return p.total; }, go: p.go, destroy() { delete el._pg; } };
+    return { update(n, prev) { if (n.total != null && n.total !== prev.total) p.setTotal(n.total); if (n.page != null && n.page !== prev.page && n.page !== p.page) p.go(n.page, true); if (n.count != null && total()) total().textContent = tt("components.16", { p0: n.count }); }, get page() { return p.page; }, get total() { return p.total; }, go: p.go, destroy() { delete el._pg; } };
   },
 });
 
@@ -156,9 +157,18 @@ export const createCollapse = /* @__PURE__ */ defineComponent({
   defaults: { items: [], single: false, open: [] },
   html: (o) => `<div class="sn-acc">${o.items.map((it, i) => `<div class="${cx("sn-acc-item", o.open.includes(i) && "sn-open")}"><button class="sn-acc-hd" aria-expanded="${o.open.includes(i)}">${svg(chevronRight, 16, "chevron-right")}${esc(it.title)}</button><div class="sn-acc-bd"><div>${it.html ?? `<p>${esc(it.content ?? "")}</p>`}</div></div></div>`).join("")}</div>`,
   mount(el, o, api) {
-    // onToggle 给的是第几项（数字）和展开没有；mountCollapse 内部回调给的是条目元素
-    const a = mountCollapse(el, { single: o.single, onToggle: (it, open) => api.emit("toggle", { index: [...el.querySelectorAll(":scope > .sn-acc-item")].indexOf(it), open }) });
-    return { open: a.open, close: a.close, toggle: a.toggle, destroy() { delete el._acc; } };
+    // toggle 给的是第几项（数字）和展开没有（mountCollapse 内部回调给的是条目元素）；
+    // change 给的是现在展开的序号：一次点击可能关一项、开一项（single），攒到这一轮结束只发一次
+    let queued = false;
+    const a = mountCollapse(el, { single: o.single, onToggle: (it, open) => {
+      api.emit("toggle", { index: [...el.querySelectorAll(":scope > .sn-acc-item")].indexOf(it), open });
+      if (!queued) { queued = true; queueMicrotask(() => { queued = false; api.emit("change", a.expanded); }); }
+    } });
+    return {
+      // 受控：传进来的 open 换了（按值比）就照它开合，不发事件
+      update(n, p) { if (Array.isArray(n.open) && JSON.stringify(n.open) !== JSON.stringify(p.open)) a.sync(n.open); },
+      get expanded() { return a.expanded; }, open: a.open, close: a.close, toggle: a.toggle, destroy() { delete el._acc; },
+    };
   },
 });
 
@@ -170,7 +180,11 @@ export const createTagInput = /* @__PURE__ */ defineComponent({
   html: (o) => `<div class="sn-box-in sn-tagin" data-tagin data-max="${o.max}"><input placeholder="${esc(o.placeholder)}" aria-label="${tt("components.3")}"></div><div class="sn-tagin-foot"><span>${esc(o.hint ?? tt("components.13"))}</span><span class="sn-num"><span class="sn-roll"><span>0</span></span> / ${o.max}</span></div>`,
   mount(el, o, api) {
     const t = mountTagInput(el, { initial: o.tags, onChange: (tags) => api.emit("change", tags) });
-    return { get tags() { return t.tags; }, add: t.add, clear: t.clear, destroy() { delete el._tags; } };
+    return {
+      // 受控：传进来的 tags 换了（按值比）就照它显示，不发 change
+      update(n, p) { if (Array.isArray(n.tags) && JSON.stringify(n.tags) !== JSON.stringify(p.tags)) t.set(n.tags); },
+      get tags() { return t.tags; }, add: t.add, clear: t.clear, set: t.set, destroy() { delete el._tags; },
+    };
   },
 });
 export const createStepper = /* @__PURE__ */ defineComponent({
@@ -179,7 +193,7 @@ export const createStepper = /* @__PURE__ */ defineComponent({
   html: (o) => `<div class="sn-stepper" data-stepper data-min="${o.min}" data-max="${o.max}" data-value="${o.value}"><button class="sn-st-btn" data-d="-1" aria-label="${tt("components.4")}">${svg(minus, 16, "minus")}</button><span class="sn-st-val" tabindex="0" role="spinbutton"${attrs({ "aria-label": o.label })}><span class="sn-roll"><span>${o.value}</span></span></span>${o.unit ? `<span class="sn-st-unit">${esc(o.unit)}</span>` : ""}<button class="sn-st-btn" data-d="1" aria-label="${tt("components.5")}">${svg(plus, 16, "plus")}</button></div>`,
   mount(el, o, api) {
     const s = mountStepper(el, { onChange: (v) => api.emit("change", v) });
-    return { update(n) { if (n.value != null && n.value !== s.value) s.set(n.value); }, get value() { return s.value; }, set: s.set, destroy() { delete el._step; } };
+    return { update(n, p) { if (n.value != null && n.value !== p.value && n.value !== s.value) s.set(n.value, true); }, get value() { return s.value; }, set: (v) => s.set(v), destroy() { delete el._step; } };
   },
 });
 // 下面这几个是在已有的输入框标记上加强（标记见展示页"特殊输入框""字数统计"）
@@ -207,13 +221,16 @@ export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach
 export const createComposer = /* @__PURE__ */ defineComponent({ name: "composer", html: (o) => composerHTML(o), mount(el, o, api) { injectIcons(el); const c = mountComposer(el, { onSend: (m) => api.emit("send", m), onStop: () => api.emit("stop"), upload: o.upload }); return ext(c, { destroy() { delete el._cm; } }); } });
 
 // ———— 数字滚动 ————
+// effect：变化的样子（roll 滚动 / blur 模糊 / push 推入 / fade 淡入）。旧名 style 也认——但在 React、Vue、自定义元素里 style 是写 CSS 的，所以框架封装只用 effect
+const effectOf = (o) => o.effect ?? o.style;
 export const createNumberFlow = /* @__PURE__ */ defineComponent({
   name: "numberflow",
   defaults: { value: 0, style: "roll" },
   html: () => `<span class="sn-nf"></span>`,
   mount(el, o) {
-    const f = numberFlow(el, { value: o.value, format: o.format, style: o.style, reduced: o.reduced });
-    return { update(n) { if (n.value != null && n.value !== f.get()) f.set(n.value); if (n.style && n.style !== o.style) f.setStyle(n.style); }, get value() { return f.get(); }, set: f.set, get: f.get, setStyle: f.setStyle };
+    // reduced 默认跟系统的"减少动态效果"（和页面上的开关）：打开时直接换数字
+    const f = numberFlow(el, { value: o.value, format: o.format, style: effectOf(o), reduced: o.reduced ?? reducedMotion });
+    return { update(n, p) { if (n.value != null && n.value !== p.value && n.value !== f.get()) f.set(n.value); const e = effectOf(n); if (e && e !== effectOf(p)) f.setStyle(e); }, get value() { return f.get(); }, set: f.set, get: f.get, setStyle: f.setStyle };
   },
 });
 
@@ -252,7 +269,15 @@ export const createAudio = /* @__PURE__ */ defineComponent({ name: "audio", html
 // ———— 浮层：Popover、对话框、抽屉、命令面板、右键菜单、看图 ————
 // Popover：el 是浮层面板（.sn-pop），trigger 是按钮
 export function openPopoverAt(pop, trigger, options) { return openPopover(pop, trigger, options); }
-export { popoverOf, openDialog, closeDialog, openDrawer, closeDrawer, openMenu, closeMenu, mountCmdk as createCommandPalette, openLightbox, closeLightbox };
+export { popoverOf, openDialog, closeDialog, openDrawer, closeDrawer, openMenu, closeMenu, openLightbox, closeLightbox };
+// 命令面板：和 mountCmdk 一样，多一个 destroy()——撤掉这次加的行、⌘K 监听（面板是这次建的就连面板一起去掉）。组件卸载时调它
+export function createCommandPalette(groups, o) {
+  const had = !!document.getElementById("cmdk-panel"), before = had ? new Set(document.getElementById("cmdkList").children) : null;
+  const [api, dispose] = track(() => mountCmdk(groups, o));
+  const panel = document.getElementById("cmdk-panel"), scrim = document.getElementById("cmdkScrim"), added = [...document.getElementById("cmdkList").children].filter((c) => !before?.has(c));
+  let alive = true;
+  return Object.assign(api, { destroy() { if (!alive) return; alive = false; if (panel.classList.contains("sn-open")) api.close(); dispose(); for (const c of added) c.remove(); if (!had) { panel.remove(); scrim?.remove(); } } });
+}
 export { wireDialog } from "./overlay.js";
 export { icon } from "./icons.js";
 
