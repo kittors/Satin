@@ -47,23 +47,28 @@
 ## 用法
 
 ```js
-import { setup } from "satin-ui";
 import { openLightbox } from "satin-ui/lightbox";
 
-setup(); // 页面级行为（看图层的键盘操作），整页调一次
+// 缩略图：加载中显示骨架，加载好淡入（.sn-loaded），失败显示重试（.sn-failed）。这里用定时器模拟加载，第 4 张模拟失败
+const grid = document.querySelector("#imgGrid");
+const ims = () => [...grid.querySelectorAll(".sn-im")];
+function load() {
+  ims().forEach((im, i) => { im.classList.remove("sn-loaded", "sn-failed"); setTimeout(() => im.classList.add(i === 3 ? "sn-failed" : "sn-loaded"), 400 + i * 260 + Math.random() * 300); });
+}
+load();
+document.querySelector("[data-img-reload]").addEventListener("click", load);
 
-// 缩略图：加载中显示骨架，加载好模糊淡入（.sn-loaded），失败显示重试（.sn-failed）
-// 每一项：src（图片地址）+ size（原图宽高：适应窗口时不放大超过原图）；视频写 type: "video"
-const items = shots.map((s) => ({ src: s.url, size: [s.w, s.h], alt: s.title }));
-
+// 点开：从缩略图那里放大到铺满窗口，关上时缩回去；能放大缩小、拖动、旋转、还原，← → 翻页、Esc 关闭
+// 每一项：src（图片地址）+ size（原图宽高）；这里的缩略图是 CSS 背景，就传 bg + ratio
+const RATIO = new Map([["16:9", 16 / 9], ["1:1", 1], ["4:3", 4 / 3], ["9:16", 9 / 16]]);
+const items = () => ims().map((im) => ({ bg: getComputedStyle(im).getPropertyValue("--sn-g") || im.style.getPropertyValue("--sn-g"), ratio: RATIO.get(im.querySelector(".sn-tag-ratio")?.textContent.trim()) || 16 / 9 }));
+const thumbOf = (i) => grid.querySelector(`.sn-im[data-n="${i}"]`), enabled = (i) => thumbOf(i)?.classList.contains("sn-loaded");
 grid.addEventListener("click", (e) => {
-  const im = e.target.closest(".sn-im.sn-loaded"); if (!im) return;
-  // 从缩略图那里放大到铺满窗口，关上时缩回去；能放大缩小、拖动、旋转、还原，← → 翻页、Esc 关闭
-  openLightbox(items, +im.dataset.n, {
-    thumbOf: (i) => grid.querySelector(`.sn-im[data-n="${i}"]`),
-    enabled: (i) => grid.querySelector(`.sn-im[data-n="${i}"]`).classList.contains("sn-loaded"),
-  });
+  const retry = e.target.closest("[data-img-retry]"), im = e.target.closest(".sn-im");
+  if (retry) { im.classList.remove("sn-failed"); setTimeout(() => im.classList.add("sn-loaded"), 700); return; } // 换成真的重新请求
+  if (im?.classList.contains("sn-loaded")) openLightbox(items(), Number(im.dataset.n), { thumbOf, enabled });
 });
+grid.addEventListener("keydown", (e) => { const im = e.target.closest(".sn-im"); if (im && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); im.click(); } });
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

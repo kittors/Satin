@@ -27,14 +27,16 @@
 ```js
 import { createUpload } from "satin-ui/components";
 
-// 点了选文件、拖进来；每个文件一行：进度、失败可重试、取消 / 移除
-const upl = createUpload(document.querySelector(".sn-drop"), {
-  list: document.querySelector(".sn-files"),
-  accept: /\.(txt|docx|epub)$/i, badType: "格式不支持，只能上传 txt、docx、epub",
-  maxSize: 50 * 1024 * 1024, tooBig: "超过 50 MB",
-  upload: (file, onProgress) => uploadWithProgress("/api/upload", file, onProgress),
+// 点了选文件、拖进来；每个文件一行：进度、失败可重试、取消 / 移除。上传函数换成你的（报进度，结束 resolve，出错 reject）
+const fakeUpload = (file, onProgress) => new Promise((ok, fail) => {
+  let p = 0; const bad = /失败/.test(file.name);
+  const iv = setInterval(() => { p = Math.min(1, p + 0.08 + Math.random() * 0.08); onProgress(p); if (bad && p > 0.6) { clearInterval(iv); fail(new Error("网络断了")); } else if (p >= 1) { clearInterval(iv); ok(); } }, 180);
 });
-upl.add(filesFromSomewhere);
+createUpload(document.querySelector("#drop"), {
+  list: document.querySelector("#files"),
+  accept: /\.(txt|docx|epub)$/i, maxSize: 50 * 1024 * 1024,
+  upload: fakeUpload,
+});
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

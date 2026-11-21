@@ -51,7 +51,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createSidebar } from \"satin-ui/components\";\n\n// 选中的底色 / 指示条在条目之间滑动（.sn-app 上 data-navfx=\"slide | bar | fade | text\"）；\n// [data-collapse] 收起 / 展开（⌘\\\\ 也行），主区宽度连续变，.sn-app-grid 里的卡片按新列数从原位置滑过去\nconst side = createSidebar(document.querySelector(\".sn-app\"), {\n  onNavigate: (a) => router.go(a.getAttribute(\"href\")),\n});\nside.toggle();"
+      "js": "import { toast } from \"satin-ui/components\";\n\n// 侧栏布局 enhance() 已经接上：选中的底色 / 指示条在条目之间滑动（.sn-app 上 data-navfx=\"slide | bar | fade | text\"）；\n// [data-collapse] 收起 / 展开（⌘\\ 也行），主区宽度连续变，卡片按新列数从原位置滑过去；窄于 720 自动收成图标栏（data-collapse-below 可改）\n// 点导航：换成你的路由跳转\ndocument.querySelector(\".sn-side-nav\").addEventListener(\"click\", (e) => {\n  const a = e.target.closest(\"a[href]\"); if (!a) return;\n  e.preventDefault(); toast({ text: `打开\"${a.textContent.trim()}\"` });\n});\n// 自己创建也行：createSidebar(元素, { collapseBelow: 720, onNavigate(a) {} })，返回 { toggle(), select(a) }"
     }
   },
   "demos": [

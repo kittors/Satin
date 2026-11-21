@@ -66,7 +66,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createPlayer, createAudio, toast } from \"satin-ui/components\";\n\n// 视频：缓冲转圈、拖动进度、音量、画中画、全屏、键盘；不动时控件自己藏起来\n// box 是空容器：按选项渲染播放器并接上\nconst player = createPlayer(box, {\n  src: \"/media/ep3.mp4\", poster: \"/media/ep3.jpg\", label: \"第三集预览\",\n  onError: () => toast({ text: \"视频没能加载\" }),\n});\nplayer.play();\n\n// 音频：波形从音频本身算出来（拿不到就画平线，不编造）；同一时间只放一个\n// 列表里加一行：先插标记（createAudio.html 生成），再在这行标记上接交互\nlist.insertAdjacentHTML(\"beforeend\", createAudio.html({ src: \"/media/bgm.mp3\", title: \"配乐 · 雨夜\", sub: \"2:14\" }));\ncreateAudio(list.lastElementChild);"
+      "js": "import { toast } from \"satin-ui/components\";\nimport { createPlayer, createAudio } from \"satin-ui/components\";\n\n// 视频：缓冲转圈、拖动进度、音量、画中画、全屏、键盘；不动时控件自己藏起来。在写好的播放器标记上接交互（也可以给空容器按选项渲染）\ncreatePlayer(document.querySelector(\"#player\"), { onError: () => toast({ icon: \"circle-x\", tone: \"danger\", text: \"视频没能加载，检查网络后再试\", alert: true }) });\n\n// 音频：波形从音频本身算出来（拿不到就画平线，不编造）；同一时间只放一个\ncreateAudio(document.querySelector(\"#audio\"), { onError: () => toast({ icon: \"circle-x\", tone: \"danger\", text: \"音频没能加载，检查网络后再试\", alert: true }) });\n// 列表里加一行：先插标记（createAudio.html({ src, title, sub }) 生成），再在这行标记上 createAudio(那一行)"
     }
   },
   "demos": [

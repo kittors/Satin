@@ -31,19 +31,17 @@
 ## 用法
 
 ```js
-import { notify } from "satin-ui/components";
+import { notify, toast } from "satin-ui/components";
 
 // 卡片在右上角叠起来：后面的底边露出 12px、最多 3 层；指针移上去展开成列表；可以一键全部清除
-const n = notify({
-  icon: "circle-check", tone: "ok",          // tone："ok" | "bad" | "warn" | ""
-  title: "第三集生成完成",
-  body: "12 个镜头都生成好了，可以开始剪辑。",
-  actions: [{ label: "查看", variant: "secondary", run: (card) => { open(); card.close(); } }],
-});
-n.close();
-
-// 每来一条都会在 document 上发 notify 事件，铃铛这类地方可以跟着记未读
-document.addEventListener("notify", (e) => bell.add(e.detail));
+const NOTES = [
+  { icon: "circle-check", tone: "ok", title: "第三集生成完成", body: "12 个镜头都生成好了，可以开始剪辑。", actions: [{ label: "查看", variant: "secondary", run: (card) => { toast({ text: "打开第三集" }); card.close(); } }] },
+  { icon: "circle-x", tone: "bad", title: "镜头 11 没有生成", body: "画面描述里有不允许的内容，改一下再试。" },
+  { icon: "user-plus", tone: "", title: "周屿加入了项目", body: "可以编辑分镜和配音。" },
+];
+let i = 0;
+for (const b of document.querySelectorAll("[data-notify]")) b.addEventListener("click", () => notify(NOTES[i++ % NOTES.length]));
+// 每来一条都会在 document 上发 notify 事件，铃铛这类地方可以跟着记未读：document.addEventListener("notify", (e) => …)
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

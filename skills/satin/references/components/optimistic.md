@@ -18,18 +18,38 @@
 ## 用法
 
 ```js
-import { optimistic } from "satin-ui/components";
+import { optimistic, createNumberFlow, toast } from "satin-ui/components";
 
-// 先显示结果再保存；失败时恢复、整行抖两下、出一条带"重试"的提示
+// 先显示结果再保存；失败时恢复、整行抖两下、出一条带"重试"的提示（勾上"模拟保存失败"看失败的样子）
+const row = document.querySelector(".sn-opt-row"), star = document.querySelector("[data-star]");
+const nameEl = document.querySelector("[data-rename]"), failBox = document.querySelector("#optFail");
+let count = 24;
+const num = createNumberFlow(star.querySelector(".sn-n"), { value: count, style: "blur" });
+// 保存：换成你的接口。这里 700ms 后成功，勾上"模拟保存失败"时失败
+const save = () => new Promise((ok, fail) => setTimeout(() => (failBox.checked ? fail(new Error("保存失败")) : ok()), 700));
+
 star.addEventListener("click", () => {
   const on = !star.classList.contains("sn-on");
-  optimistic({
-    apply: () => star.classList.toggle("sn-on", on),
-    revert: () => star.classList.toggle("sn-on", !on),
-    save: () => fetch("/api/star", { method: on ? "POST" : "DELETE" }).then((r) => { if (!r.ok) throw r; }),
-    shake: row,
-  });
+  const show = (v) => { star.classList.toggle("sn-on", v); star.setAttribute("aria-pressed", String(v)); count += v ? 1 : -1; num.update({ value: count }); };
+  optimistic({ shake: row, apply: () => show(on), revert: () => show(!on), save });
 });
+
+// 改名：双击或按回车进入编辑；回车保存、Esc 放弃，同样先显示再保存
+function rename() {
+  const old = nameEl.textContent.trim(), inp = document.createElement("input");
+  inp.className = "sn-input sn-sm"; inp.value = old; nameEl.replaceChildren(inp); inp.focus(); inp.select();
+  let done = false;
+  const commit = (keep) => {
+    if (done) return; done = true; const v = inp.value.trim() || old;
+    if (!keep || v === old) { nameEl.textContent = old; return; }
+    optimistic({ shake: row, apply: () => (nameEl.textContent = v), revert: () => (nameEl.textContent = old), save })
+      .then(() => toast({ text: `已改名为"${v}"` }), () => {});
+  };
+  inp.addEventListener("keydown", (e) => { if (e.key === "Enter") commit(true); if (e.key === "Escape") { e.stopPropagation(); commit(false); } });
+  inp.addEventListener("blur", () => commit(true));
+}
+nameEl.addEventListener("dblclick", rename);
+nameEl.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target === nameEl) rename(); });
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

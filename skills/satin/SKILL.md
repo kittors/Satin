@@ -161,7 +161,7 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 加载 | `<Spinner>`；`loadWithSkeleton()` | 骨架见 `loading.md` | 快的请求不闪骨架 |
 | 进度 | `<Progress value={0.6}>`、`ring` | `progressHTML()` | |
 | 轻提示 | `toast({ text, tone, icon })` | | 操作结果用它；不要 `alert()` |
-| 通知 | `notify({ title, text })` | | |
+| 通知 | `notify({ title, body })` | | |
 | 横幅 | | `.sn-banner-wrap > .sn-banner.sn-warn` | 整页级的状态（额度、断网） |
 | 文字提示 | `<Tooltip text>` | `data-tip="说明"` | |
 | 弹窗 | `<Dialog open onClose title footer>` | `<dialog class="sn-dlg">` + `wireDialog` / `openDialog` | 只在必须停下来时用；主按钮在最右 |

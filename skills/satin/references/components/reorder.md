@@ -30,12 +30,13 @@
 ```
 
 ```js
-import { createReorder } from "satin-ui/components";
+import { createReorder, toast } from "satin-ui/components";
 
 // 按住 .sn-grip 拖（先动 4px 才算拿起）；其他行让位、落点画线；拿出列表 40px 外松手就取消；
 // 键盘：空格拿起、↑↓ 移动、空格放下、Esc 取消（读屏会播报位置）
-createReorder(document.querySelector(".sn-drag-list"), {
-  onReorder: ({ from, to, row }) => save(order()),
+const list = document.querySelector(".sn-drag-list");
+createReorder(list, {
+  onReorder: ({ from, to }) => toast({ text: `已从第 ${from + 1} 位移到第 ${to + 1} 位` }), // 换成你的保存
 });
 ```
 

@@ -74,16 +74,14 @@
 
 ```js
 import { createScrollArea } from "satin-ui/components";
-import "satin-ui/css/scroll.css";
 
-// 竖向：上下渐隐（默认），系统滚动条换成悬浮的细滚动条
-createScrollArea(document.querySelector(".sn-list"));
-
-// 横向长条：左右渐隐 40px；竖着滚滚轮也横向滚，滚到头放行给页面
-createScrollArea(document.querySelector(".sn-strip"), { fade: "x", size: 40, wheel: "x" });
-
-// 两个方向都能滚：四边渐隐
-createScrollArea(document.querySelector(".board"), { fade: "both" });
+// 写在标记上的滚动区域：data-sa="y | x | both | none | top bottom…" 是渐隐方向，其余选项写成 data-sa-*（size、bar、bar-size、inset、over、wheel）
+const num = (v) => (v == null || v === "" ? undefined : Number(v));
+for (const el of document.querySelectorAll("[data-sa]")) {
+  const d = el.dataset;
+  createScrollArea(el, { fade: d.sa || "y", wheel: d.saWheel || "auto", bar: d.saBar || "auto", overscroll: d.saOver || "auto", size: num(d.saSize), barSize: num(d.saBarSize), barInset: num(d.saInset) });
+}
+// 竖向：上下渐隐（默认）；横向长条：左右渐隐 40px，竖着滚滚轮也横向滚（wheel: "x"）；两个方向都能滚：四边渐隐（fade: "both"）
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

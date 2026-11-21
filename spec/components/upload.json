@@ -56,7 +56,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createUpload } from \"satin-ui/components\";\n\n// 点了选文件、拖进来；每个文件一行：进度、失败可重试、取消 / 移除\nconst upl = createUpload(document.querySelector(\".sn-drop\"), {\n  list: document.querySelector(\".sn-files\"),\n  accept: /\\.(txt|docx|epub)$/i, badType: \"格式不支持，只能上传 txt、docx、epub\",\n  maxSize: 50 * 1024 * 1024, tooBig: \"超过 50 MB\",\n  upload: (file, onProgress) => uploadWithProgress(\"/api/upload\", file, onProgress),\n});\nupl.add(filesFromSomewhere);"
+      "js": "import { createUpload } from \"satin-ui/components\";\n\n// 点了选文件、拖进来；每个文件一行：进度、失败可重试、取消 / 移除。上传函数换成你的（报进度，结束 resolve，出错 reject）\nconst fakeUpload = (file, onProgress) => new Promise((ok, fail) => {\n  let p = 0; const bad = /失败/.test(file.name);\n  const iv = setInterval(() => { p = Math.min(1, p + 0.08 + Math.random() * 0.08); onProgress(p); if (bad && p > 0.6) { clearInterval(iv); fail(new Error(\"网络断了\")); } else if (p >= 1) { clearInterval(iv); ok(); } }, 180);\n});\ncreateUpload(document.querySelector(\"#drop\"), {\n  list: document.querySelector(\"#files\"),\n  accept: /\\.(txt|docx|epub)$/i, maxSize: 50 * 1024 * 1024,\n  upload: fakeUpload,\n});"
     }
   },
   "demos": [

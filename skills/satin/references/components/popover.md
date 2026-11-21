@@ -47,22 +47,17 @@
 ```
 
 ```js
-import { setup } from "satin-ui";
-import { bindOverlays, openPopover, popoverOf } from "satin-ui/components";
-import "satin-ui/css/overlay.css";
+import { popoverOf, copied } from "satin-ui/components";
 
-setup(); // 页面级行为（Esc、点外面关上），整页调一次
-
-// 写在标记上：[data-pop="面板 id"] 点了开、再点关；Esc、点外面、焦点离开面板都会关
-bindOverlays(document);
-
-// 或者自己控制：贴着按钮打开（align: "end" 右对齐），返回的 close() 关上
-const btn = document.querySelector("#share"), pop = document.querySelector("#pop-share");
-btn.addEventListener("click", () => {
-  const open = popoverOf(pop);
-  if (open) open.close();
-  else openPopover(pop, btn, { align: "end", onClose: () => console.log("关了") });
+// 写在标记上：[data-pop="面板 id"] 点了开、再点关；Esc、点外面、焦点离开面板都会关——enhance() 已经接上
+// 面板里的操作做完以后关上：popoverOf(面板) 拿到正开着的那一层，close() 关上（焦点回到按钮）
+const pop = document.querySelector("#pop-share"), copyBtn = pop.querySelector(".sn-btn");
+copyBtn.addEventListener("click", async () => {
+  await navigator.clipboard?.writeText(location.href).catch(() => {});
+  copied(copyBtn);
+  setTimeout(() => popoverOf(pop)?.close(true), 700);
 });
+// 不用标记也行：openPopover(面板, 按钮, { align: "end", onClose })，返回的那一层有 close()
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

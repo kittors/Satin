@@ -55,7 +55,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createTabs, createPager, setStep } from \"satin-ui/components\";\n\n// 标签页：下划线前缘先走、后缘跟上；新内容从所选标签那一侧滑进来；← → 切换\ncreateTabs(document.querySelector(\".sn-tabs\"), { onChange: (i) => load(i) });\n\n// 分页：当前页的底色滑到新页码；页码多时中间用省略\nconst pager = createPager(document.querySelector(\".sn-pager\"), { total: 13, onChange: (p) => fetchPage(p) });\npager.go(5);\n\n// 步骤：第 i 步是当前，前面的都完成\nsetStep(document.querySelector(\".sn-steps\"), 2);"
+      "js": "import { createTabs, createPager, setStep } from \"satin-ui/components\";\n\n// 标签页：下划线前缘先走、后缘跟上；新内容从所选标签那一侧滑进来；← → 切换\ncreateTabs(document.querySelector(\".sn-tabs\"), { onChange: (i) => console.log(\"切到第\", i + 1, \"个标签\") });\n\n// 分页：当前页的底色滑到新页码；页码多时中间用省略（onChange 里换成你的取数）\ncreatePager(document.querySelector(\".sn-pager\"), { total: 13, onChange: (p) => console.log(\"第\", p, \"页\") });\n\n// 步骤：第 i 步是当前，前面的都完成\nconst steps = document.querySelector(\".sn-steps\"), max = steps.querySelectorAll(\".sn-st\").length - 1;\nlet cur = 1;\nfor (const b of document.querySelectorAll(\"[data-step]\")) b.addEventListener(\"click\", () => { cur = Math.max(0, Math.min(max, cur + Number(b.dataset.step))); setStep(steps, cur); });"
     }
   },
   "demos": [

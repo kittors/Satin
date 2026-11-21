@@ -38,22 +38,17 @@
 ## 用法
 
 ```js
-import { createComposer } from "satin-ui/components";
+import { createComposer, toast } from "satin-ui/components";
 
 // 提示词输入框：自动长高、字数、附件（拖进来、粘贴截图、附件菜单）；有文字或附件、附件传完才能发
-const composer = createComposer(document.querySelector("[data-composer]"), {
-  // 发送：期间"生成中"，发送键变成停止；生成完调 setBusy(false) 回到可发送
-  onSend: async ({ text, files }) => {
-    await generate(text, files);
-    composer.setBusy(false);
-  },
-  onStop: () => abortGeneration(),
-  // 真上传：报进度，结束就完成，出错就失败（点一下重试）
-  upload: (file, onProgress) => uploadFile(file, onProgress),
+let timer = 0;
+createComposer(document.querySelector("[data-composer]"), {
+  // 发送：返回 Promise，期间是"生成中"、发送键变成停止；Promise 结束回到可发送（换成你的生成请求）
+  onSend: ({ text }) => new Promise((done) => { timer = setTimeout(() => { done(); toast({ text: `已生成 3 个镜头：${text.slice(0, 12)}…` }); }, 2600); }),
+  onStop: () => clearTimeout(timer),
+  // 上传：报进度，结束就完成，出错就失败（点一下重试）；换成你的上传
+  upload: (file, onProgress) => new Promise((ok) => { let p = 0; const iv = setInterval(() => { p = Math.min(1, p + 0.2); onProgress(p); if (p >= 1) { clearInterval(iv); ok(); } }, 220); }),
 });
-
-composer.clear({ smooth: true }); // 清空：附件淡出、输入框平滑收起
-composer.files();                 // 现在的附件元素
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

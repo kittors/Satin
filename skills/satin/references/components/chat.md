@@ -45,19 +45,14 @@
 ```js
 import { createChat } from "satin-ui/chat";
 
-// 空容器：顶栏、消息区、底部输入框都由 createChat 填好、接好（已有设计稿里的 .sn-chat 标记也可以直接传）
-// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文
-// 不给 history 就从空的对话开始；要带历史：history: { initial(), older(), hasMore() }
-// React：const Chat = wrapSatin(createChat, { events: [] })（satin-ui/react）；自己在 effect 里创建的，卸载时调 chat.destroy()
-const chat = createChat(document.querySelector("#chat"), {
-  title: "分镜助手", placeholder: "和分镜助手一起改这一集",
+// 已有设计稿里的 .sn-chat 标记直接传（空容器也行：顶栏、消息区、底部输入框都由 createChat 填好、接好）
+// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文；先进缓冲、匀速放出来。这里用写好的一段话模拟
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+createChat(document.querySelector("#chatBox"), {
   respond: async function* (question, state) {
-    const res = await fetch("/api/chat", { method: "POST", body: JSON.stringify({ question }) });
-    for await (const ev of readEvents(res.body)) {
-      if (state.stopped) break;              // 用户点了停止
-      if (ev.type === "reasoning") yield { think: ev.text };
-      if (ev.type === "text") yield ev.text;   // 先进缓冲、匀速放出来
-    }
+    for (const piece of ["先看这一场的节奏：", "雨夜、车站、", "等最后一班车的人。"]) { if (state.stopped) return; yield { think: piece }; await wait(120); }
+    const text = `好的。"${question}"可以拆成三个镜头：远景站台、林夏的中景、车灯穿过雨幕的特写。`;
+    for (const ch of text) { if (state.stopped) return; yield ch; await wait(16); } // 换成你的模型流式输出
   },
 });
 ```

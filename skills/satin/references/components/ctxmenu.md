@@ -69,27 +69,15 @@
 ```
 
 ```js
-import { setup } from "satin-ui";
-import { bindOverlays, openMenu, closeMenu } from "satin-ui/components";
+import { toast } from "satin-ui/components";
 
-setup(); // 页面级行为（菜单的键盘操作、点外面关上），整页调一次
-bindOverlays(document);
-
+// 写在标记上：[data-ctx="菜单 id"] 右键（或 Shift+F10、菜单键）在指针处弹，触屏长按 500ms 弹；[data-fmenu="菜单 id"] 贴着按钮弹——enhance() 已经接上
 // 选中：根菜单上冒泡 menuselect，detail 里有条目文字和子菜单路径
-document.addEventListener("menuselect", (e) => {
-  const { label, path } = e.detail;   // 比如 "第二集"、["移动到"]
-  console.log([...path, label].join(" › "));
+document.querySelector("#m-shot").addEventListener("menuselect", (e) => {
+  const { label, path } = e.detail; // 比如 "第二集"、["移动到"]
+  toast({ text: [...path, label].join(" › ") });
 });
-
-// 自己控制：在指针处弹，只能待在某个容器里（子菜单也不出这个框）
-box.addEventListener("contextmenu", (e) => {
-  e.preventDefault();
-  openMenu(document.querySelector("#m-shot"), {
-    trigger: box, x: e.clientX, y: e.clientY, bound: box,
-    onSelect: ({ label }) => run(label),
-  });
-});
-// closeMenu() 关上整套菜单
+// 自己控制：openMenu(菜单, { trigger, x, y, bound })，在指针处弹、只待在 bound 这个框里；closeMenu() 关上整套菜单
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

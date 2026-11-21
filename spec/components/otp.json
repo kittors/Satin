@@ -43,7 +43,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createOtp } from \"satin-ui/components\";\n\n// 自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入\nconst otp = createOtp(document.querySelector(\"[data-otp]\"), {\n  onComplete: (code) => verify(code), // 6 位都填满时调\n});\notp.value;   // 现在填了的\notp.clear(); // 清空、焦点回第一格"
+      "js": "import { createOtp, toast } from \"satin-ui/components\";\n\n// 自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入\nconst otp = createOtp(document.querySelector(\"[data-otp]\"), {\n  onComplete: (code) => { // 6 位都填满时调：换成你的校验请求\n    toast({ text: `已提交验证码 ${code}` });\n    setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格\n  },\n});"
     }
   },
   "demos": [

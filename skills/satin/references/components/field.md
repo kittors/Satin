@@ -25,25 +25,26 @@
 ## 用法
 
 ```js
-import { setup } from "satin-ui";
-import { validateForm, setFieldError, clearFieldError } from "satin-ui/components";
-
-setup(); // 页面级行为：字段一改就自动收起错误，整页调一次
+import { validateForm, busy, succeed } from "satin-ui/components";
 
 // 每个要校验的字段写 data-f="名字"，下面放 <div class="sn-err"><span></span></div>
+const form = document.querySelector("#fieldDemo"), desc = document.querySelector("#f-desc"), count = form.querySelector(".sn-count");
 const rules = {
   name: (v) => !v.trim() && "请填写项目名称",
-  mail: (v) => v.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && "邮箱格式不对",
+  mail: (v) => v.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) && "邮箱格式不对",
+  desc: (v) => !v.trim() && "写一句话就好，方便以后找到",
 };
-form.addEventListener("submit", (e) => {
+// 字数：到上限变色
+desc.addEventListener("input", () => { count.textContent = `${desc.value.length}/80`; count.classList.toggle("sn-over", desc.value.length >= 80); });
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!validateForm(form, rules)) return; // 有错的都标出来（错误在下方展开、输入框抖两下），焦点到第一个
-  submit();
+  const btn = form.querySelector("button[type=submit]");
+  await busy(btn, 900); // 换成你的提交请求（Promise）
+  succeed(btn);
 });
-
-// 也能单独标：服务器说名字重复了
-setFieldError(form.querySelector('[data-f="name"]'), "已经有叫这个名字的项目了");
-// 一开始输入就自动收起；要手动收起：clearFieldError(字段)
+// 也能单独标：比如服务器说名字重复了 → setFieldError(form.querySelector('[data-f="name"]'), "已经有叫这个名字的项目了")
+// 一开始输入就自动收起（setup() 装好的页面级行为）
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

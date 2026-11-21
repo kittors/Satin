@@ -23,17 +23,14 @@
 ## 用法
 
 ```js
-import { createCount, createLongText, bindInputs } from "satin-ui/components";
+import { createCount, createLongText, toast } from "satin-ui/components";
 
 // 单行：<input maxlength="20" data-count>，右边的计数跟着滚动，快满变色，写满还在敲时抖一下
-createCount(document.querySelector("input[data-count]"));
+for (const input of document.querySelectorAll("input[data-count]")) createCount(input);
 
-// 长文本：<div data-ta data-max="200">…<textarea>…</div>
+// 长文本：<div data-ta data-max="120">…<textarea>…</div>
 // 自动长高 + 量环计数；快满"还剩 N 字"，超出"超出 N 字"并整框变红；⌘↵ 提交
-createLongText(document.querySelector("[data-ta]"), { onSubmit: (text) => save(text) });
-
-// 或者按标记一次接上页面上所有的
-bindInputs(document);
+createLongText(document.querySelector("[data-ta]"), { onSubmit: () => toast({ text: "画面描述已保存" }) });
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

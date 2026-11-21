@@ -38,29 +38,12 @@ createPassword(document.querySelector("input[data-pw]"));
 // 邮箱：停手 400ms 再判断，对了画对勾；离开时还不对才报错
 createEmail(document.querySelector("input[data-email]"));
 
-// 搜索：等待超过 300ms 才转圈、转了至少 500ms；search 返回结果数量（或数组）
+// 搜索：等待超过 300ms 才转圈、转了至少 500ms；search 返回结果数量（或 Promise）。换成你的搜索接口
+const SHOTS = ["车站外，雨刚停", "林夏走进候车厅", "站台上的最后一班车", "车窗里的倒影", "雨夜的公交站"];
 createSearch(document.querySelector("[data-search]"), {
-  search: async (q) => (await fetch("/api/search?q=" + encodeURIComponent(q)).then((r) => r.json())).length,
+  search: (q) => new Promise((done) => setTimeout(() => done(SHOTS.filter((s) => s.includes(q)).length), 400)),
 });
-
-// 清除按钮（[data-clearable]）：有内容时出现，点了清空并补发一次 input
-for (const w of document.querySelectorAll("[data-clearable]")) {
-  const input = w.querySelector("input"), sync = () => w.classList.toggle("sn-filled", !!input.value);
-  input.addEventListener("input", sync); sync();
-  w.querySelector(".sn-clear").addEventListener("click", () => {
-    input.value = ""; input.dispatchEvent(new Event("input", { bubbles: true })); input.focus();
-  });
-}
-// 显示密码（[data-eye]）：切换 type，图标原地换
-for (const b of document.querySelectorAll("[data-eye]")) {
-  b.addEventListener("click", () => {
-    const input = b.closest(".sn-ib").querySelector("input"), show = input.type === "password";
-    input.type = show ? "text" : "password";
-    b.querySelector(".sn-swap")?.classList.toggle("sn-on", show);
-    b.setAttribute("aria-label", show ? "隐藏密码" : "显示密码");
-    input.focus();
-  });
-}
+// 清除按钮（[data-clearable]）有内容时出现、点了清空，显示密码（[data-eye]）切换明文——这两个 enhance() 已经接上
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

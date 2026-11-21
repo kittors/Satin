@@ -21,14 +21,15 @@
 import { createTabs, createPager, setStep } from "satin-ui/components";
 
 // 标签页：下划线前缘先走、后缘跟上；新内容从所选标签那一侧滑进来；← → 切换
-createTabs(document.querySelector(".sn-tabs"), { onChange: (i) => load(i) });
+createTabs(document.querySelector(".sn-tabs"), { onChange: (i) => console.log("切到第", i + 1, "个标签") });
 
-// 分页：当前页的底色滑到新页码；页码多时中间用省略
-const pager = createPager(document.querySelector(".sn-pager"), { total: 13, onChange: (p) => fetchPage(p) });
-pager.go(5);
+// 分页：当前页的底色滑到新页码；页码多时中间用省略（onChange 里换成你的取数）
+createPager(document.querySelector(".sn-pager"), { total: 13, onChange: (p) => console.log("第", p, "页") });
 
 // 步骤：第 i 步是当前，前面的都完成
-setStep(document.querySelector(".sn-steps"), 2);
+const steps = document.querySelector(".sn-steps"), max = steps.querySelectorAll(".sn-st").length - 1;
+let cur = 1;
+for (const b of document.querySelectorAll("[data-step]")) b.addEventListener("click", () => { cur = Math.max(0, Math.min(max, cur + Number(b.dataset.step))); setStep(steps, cur); });
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

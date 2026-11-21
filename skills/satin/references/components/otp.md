@@ -17,14 +17,15 @@
 ## 用法
 
 ```js
-import { createOtp } from "satin-ui/components";
+import { createOtp, toast } from "satin-ui/components";
 
 // 自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入
 const otp = createOtp(document.querySelector("[data-otp]"), {
-  onComplete: (code) => verify(code), // 6 位都填满时调
+  onComplete: (code) => { // 6 位都填满时调：换成你的校验请求
+    toast({ text: `已提交验证码 ${code}` });
+    setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
+  },
 });
-otp.value;   // 现在填了的
-otp.clear(); // 清空、焦点回第一格
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

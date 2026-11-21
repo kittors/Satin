@@ -42,17 +42,15 @@
 ```
 
 ```js
-import { setup } from "satin-ui";
-import { openPopover } from "satin-ui/components";
-
-setup(); // 页面级行为（Esc、点外面关上），整页调一次
+import { openPopover, toast } from "satin-ui/components";
 
 // 气泡确认就是一个弹出面板：打开时焦点先落在"取消"上（防止回车误删）
 const btn = document.querySelector("#purge"), pc = document.querySelector("#pc");
 btn.addEventListener("click", () => {
   const confirm = openPopover(pc, btn, { align: "end" });
+  pc.querySelector("[data-no]").focus();
   pc.querySelector("[data-no]").onclick = () => confirm.close(true);
-  pc.querySelector("[data-yes]").onclick = () => { confirm.close(); removeShot(); };
+  pc.querySelector("[data-yes]").onclick = () => { confirm.close(); toast({ text: "镜头已永久删除" }); }; // 换成你的删除
 });
 ```
 

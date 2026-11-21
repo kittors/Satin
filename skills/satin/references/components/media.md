@@ -31,20 +31,15 @@
 ## 用法
 
 ```js
-import { createPlayer, createAudio, toast } from "satin-ui/components";
+import { toast } from "satin-ui/components";
+import { createPlayer, createAudio } from "satin-ui/components";
 
-// 视频：缓冲转圈、拖动进度、音量、画中画、全屏、键盘；不动时控件自己藏起来
-// box 是空容器：按选项渲染播放器并接上
-const player = createPlayer(box, {
-  src: "/media/ep3.mp4", poster: "/media/ep3.jpg", label: "第三集预览",
-  onError: () => toast({ text: "视频没能加载" }),
-});
-player.play();
+// 视频：缓冲转圈、拖动进度、音量、画中画、全屏、键盘；不动时控件自己藏起来。在写好的播放器标记上接交互（也可以给空容器按选项渲染）
+createPlayer(document.querySelector("#player"), { onError: () => toast({ icon: "circle-x", tone: "danger", text: "视频没能加载，检查网络后再试", alert: true }) });
 
 // 音频：波形从音频本身算出来（拿不到就画平线，不编造）；同一时间只放一个
-// 列表里加一行：先插标记（createAudio.html 生成），再在这行标记上接交互
-list.insertAdjacentHTML("beforeend", createAudio.html({ src: "/media/bgm.mp3", title: "配乐 · 雨夜", sub: "2:14" }));
-createAudio(list.lastElementChild);
+createAudio(document.querySelector("#audio"), { onError: () => toast({ icon: "circle-x", tone: "danger", text: "音频没能加载，检查网络后再试", alert: true }) });
+// 列表里加一行：先插标记（createAudio.html({ src, title, sub }) 生成），再在这行标记上 createAudio(那一行)
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）

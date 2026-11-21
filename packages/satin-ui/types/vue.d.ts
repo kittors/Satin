@@ -30,7 +30,7 @@ export const Tooltip: DefineComponent<{ text: string; kbd?: string }>;
 export const Dialog: DefineComponent<{ open: boolean; title?: string; description?: string }>;
 export const Drawer: DefineComponent<{ open: boolean; title?: string }>;
 export function toast(o: ToastOptions): ToastHandle;
-export function notify(o: NotifyOptions): { close(): void };
+export function notify(o: NotifyOptions): import("./components").NotifyHandle;
 declare const plugin: Plugin;
 export default plugin;
 

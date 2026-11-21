@@ -24,17 +24,26 @@
 ```js
 import { busy } from "satin-ui/components";
 
-// 横幅里的 [data-dismiss]：点了给 .sn-banner-wrap 加 .sn-closing，高度过渡收起，下面的内容跟着上来
-for (const x of document.querySelectorAll(".sn-banner-wrap [data-dismiss]")) {
-  x.addEventListener("click", () => x.closest(".sn-banner-wrap").classList.add("sn-closing"));
-}
+// 横幅里的 [data-dismiss]：enhance() 已经接上——点了给 .sn-banner-wrap 加 .sn-closing，高度过渡收起，下面的内容跟着上来
 
-// 问题解决了：原地变成成功，过一会儿自己收起
-retry.addEventListener("click", async () => {
-  await busy(retry, reconnect());
-  const banner = retry.closest(".sn-banner");
-  banner.classList.replace("sn-bad", "sn-ok");
+// 网络断了：点"重新连接"，等待结束后原地变成成功，过一会儿自己收起
+const net = document.querySelector("[data-retry-net]");
+net.addEventListener("click", async () => {
+  const banner = net.closest(".sn-banner");
+  await busy(net, 1000); // 换成你的重连请求（Promise）
+  banner.classList.replace("sn-bad", "sn-ok"); banner.setAttribute("role", "status");
+  banner.querySelector(".sn-msg").innerHTML = "<b>已重新连接</b>，改动都同步好了。";
+  net.remove();
   setTimeout(() => banner.parentElement.classList.add("sn-closing"), 1600);
+});
+
+// 条目上的失败：点"修改后重新生成"，成功后整行恢复正常
+const fix = document.querySelector("[data-fix]");
+fix?.addEventListener("click", async () => {
+  const row = fix.closest(".sn-shot-row");
+  await busy(fix, 1100); // 换成你的重新生成请求
+  row.classList.remove("sn-failed");
+  fix.parentElement.classList.add("sn-off");
 });
 ```
 

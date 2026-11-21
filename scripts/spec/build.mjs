@@ -2,13 +2,16 @@
 // · guides/：设计规范（原则、颜色、排版、间距……去 AI 感、可访问性、文案），来自官网的规范页数据
 // · components/：组件契约（名字、分组、说明、验收要点、标记、参数、用法、演示源码、状态 / 变体 / 尺寸、交互、动效、无障碍、移动端）
 // · motion/：曲线和时长（展示页"动效"一节的定义）+ 样式表和脚本里实际用到的过渡 / 动画清单
-// 用法：node scripts/spec/build.mjs   （改了展示页、官网规范页、组件契约的手写部分 spec/components/_extra.json 以后重跑）
+// 用法：node scripts/spec/build.mjs   （改了展示页、官网规范页、组件契约的手写部分 spec/components/_extra.json、_api/<id>.mjs 以后重跑）
+//      node scripts/spec/build.mjs --components   只重新生成组件契约（spec/components），别的不动
 import fs from "node:fs";
 import path from "node:path";
 import { parseHTML } from "linkedom";
 import postcss from "postcss";
+import { pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(import.meta.dirname, "../.."), SPEC = path.join(ROOT, "spec");
+const ONLY_COMPONENTS = process.argv.includes("--components");
 const w = (p, s) => { fs.mkdirSync(path.dirname(path.join(SPEC, p)), { recursive: true }); fs.writeFileSync(path.join(SPEC, p), s); };
 const strip = (h) => String(h).replace(/<code>(.*?)<\/code>/g, "`$1`").replace(/<b>(.*?)<\/b>/g, "**$1**").replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').trim();
 
@@ -24,20 +27,23 @@ const mdBlock = ([k, ...a]) => {
   return "";
 };
 const guideIndex = [];
-for (const g of GUIDES) {
+if (!ONLY_COMPONENTS) for (const g of GUIDES) {
   w(`guides/${g.id}.json`, JSON.stringify(g, null, 2) + "\n");
   // 有的章节没写一句话摘要（brief）：用导语的第一句
   const brief = g.brief ? strip(g.brief) : g.lead ? strip(g.lead).split(/(?<=[。；])/)[0] : "";
   w(`guides/${g.id}.md`, `# ${g.title}（${g.en}）\n\n${brief ? `> ${brief}\n\n` : ""}${g.lead ? strip(g.lead) + "\n\n" : ""}${(g.body || []).map(mdBlock).join("\n")}`);
   guideIndex.push(`| [${g.title}](${g.id}.md) | ${g.en} | ${brief} |`);
 }
-w("guides/README.md", `# 设计规范\n\n平台无关：Web、移动端、原生都照这一套。数值以 spec/tokens 为准。\n\n| 章节 | English | 一句话 |\n| --- | --- | --- |\n${guideIndex.join("\n")}\n`);
+if (!ONLY_COMPONENTS) w("guides/README.md", `# 设计规范\n\n平台无关：Web、移动端、原生都照这一套。数值以 spec/tokens 为准。\n\n| 章节 | English | 一句话 |\n| --- | --- | --- |\n${guideIndex.join("\n")}\n`);
 
 // ———— 2. 组件契约 ————
 const { document } = parseHTML(fs.readFileSync(path.join(ROOT, "index.html"), "utf8"));
 const { API, EXAMPLES } = await import(path.join(ROOT, "site/examples.js"));
 const { USAGE } = await import(path.join(ROOT, "site/usage.js"));
 const extra = fs.existsSync(path.join(SPEC, "components/_extra.json")) ? JSON.parse(fs.readFileSync(path.join(SPEC, "components/_extra.json"), "utf8")) : {};
+// 手写的 API 契约（属性、事件、方法、键盘、无障碍、设计规范、示例……，格式见 spec/components/_api/README.md）：有就合并进去，带 contract: 1
+const API_DIR = path.join(SPEC, "components/_api");
+const apiOf = async (id) => { const f = path.join(API_DIR, id + ".mjs"); return fs.existsSync(f) ? (await import(pathToFileURL(f).href)).default : null; };
 const groups = []; let g = null;
 for (const el of document.querySelector(".doc-nav").children) {
   if (el.tagName === "P") groups.push((g = { name: el.textContent.trim(), ids: [] }));
@@ -61,13 +67,18 @@ for (const grp of groups) for (const [id, navName] of grp.ids) {
     states: [], variants: [], sizes: [], interactions: [], motion: [], a11y: [], mobile: [],
     ...(extra[id] || {}),
   };
+  const hand = await apiOf(id);
+  if (hand) Object.assign(c, { contract: 1, ...hand, id });
   w(`components/${id}.json`, JSON.stringify(c, null, 2) + "\n");
-  index.push({ id, name: title, en, group: grp.name, summary: c.summary });
+  index.push({ id, name: title, en, group: grp.name, summary: c.summary, contract: c.contract ? 1 : 0 });
 }
 w("components/index.json", JSON.stringify(index, null, 2) + "\n");
-w("components/README.md", "# 组件清单\n\n每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。\n\n"
-  + groups.map((gr) => `## ${gr.name}\n\n| id | 组件 | 说明 |\n| --- | --- | --- |\n` + index.filter((x) => x.group === gr.name).map((x) => `| \`${x.id}\` | ${x.name}（${x.en}） | ${x.summary.slice(0, 80)}${x.summary.length > 80 ? "…" : ""} |`).join("\n")).join("\n\n") + "\n");
+const FORMAT = fs.existsSync(path.join(API_DIR, "README.md")) ? fs.readFileSync(path.join(API_DIR, "README.md"), "utf8").trim() + "\n\n" : "";
+w("components/README.md", "# 组件清单\n\n每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。"
+  + `已经填了手写 API 契约的（\`contract: 1\`，下表"契约"一列打勾）：${index.filter((x) => x.contract).map((x) => "`" + x.id + "`").join("、") || "还没有"}。\n\n` + FORMAT
+  + groups.map((gr) => `## ${gr.name}\n\n| id | 组件 | 契约 | 说明 |\n| --- | --- | --- | --- |\n` + index.filter((x) => x.group === gr.name).map((x) => `| \`${x.id}\` | ${x.name}（${x.en}） | ${x.contract ? "✓" : ""} | ${x.summary.slice(0, 80)}${x.summary.length > 80 ? "…" : ""} |`).join("\n")).join("\n\n") + "\n");
 
+if (!ONLY_COMPONENTS) {
 // ———— 3. 动效 ————
 // 曲线和时长档位：展示页"动效"一节（kit.js 的 CURVES、DURS）是唯一定义；这里照抄成数据
 const kitSrc = fs.readFileSync(path.join(ROOT, fs.existsSync(path.join(ROOT, "demo/main.js")) ? "demo/main.js" : "kit.js"), "utf8");
@@ -98,4 +109,5 @@ w("rules/anti-ai.md", `# 去 AI 味规则\n\n${rules.length} 条。每条都能�
   + rules.map((r) => `## ${r.title}（\`${r.id}\`，${r.severity === "error" ? "必须" : "建议"}）\n\n${r.why}\n\n- 这样做：${r.do}\n- 不要：${r.dont}\n- 判据（${r.check.kind}）：${r.check.how}\n- 修法：${r.fix}\n`).join("\n"));
 
 console.log(`规范：设计规范 ${GUIDES.length} 章、组件 ${index.length} 个、曲线 ${curves.length} 条、时长 ${durations.length} 档、过渡清单 ${inv.css.length}+${inv.js.length} 处`);
+} else console.log(`组件契约：${index.length} 个，填了手写 API 契约的 ${index.filter((x) => x.contract).length} 个（${index.filter((x) => x.contract).map((x) => x.id).join("、")}）`);
 void START;

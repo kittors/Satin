@@ -42,8 +42,17 @@ export interface StepperOptions { value?: number; min?: number; max?: number; un
 export const createStepper: SatinFactory<StepperOptions, { readonly value: number; set(value: number): void }>;
 export interface NumberFlowOptions { value?: number; style?: "roll" | "blur" | "push" | "fade"; format?(v: number): string; reduced?(): boolean }
 export const createNumberFlow: SatinFactory<NumberFlowOptions, { readonly value: number; set(value: number): void; get(): number; setStyle(style: "roll" | "blur" | "push" | "fade"): void }>;
-export interface ScrollAreaOptions { fade?: "y" | "x" | "both" | "none" | string; size?: number; bar?: "auto" | "hover" | "always" | "none" | "gutter"; wheel?: "x" | "y"; overscroll?: "contain" | "auto"; inner?: boolean }
-export const createScrollArea: SatinFactory<ScrollAreaOptions>;
+export interface ScrollAreaOptions {
+  /** 渐隐方向："y"（默认）| "x" | "both" | "none"，或者 "top bottom left right" 任意组合 */ fade?: "y" | "x" | "both" | "none" | (string & {});
+  /** 渐隐带宽度（px），默认 24 */ size?: number;
+  /** 滚动条："auto"（默认：滚动或悬停时出现）| "hover" | "always" | "gutter"（常驻、占自己的位置）| "none" */ bar?: "auto" | "hover" | "always" | "gutter" | "none";
+  /** 滚动条平时的粗细（px），默认 5 */ barSize?: number;
+  /** 滚动条离边的距离（px），默认 1 */ barInset?: number;
+  /** 滚到头："auto"（默认）| "contain"（两个方向都停住）| "bounce"（回弹）| "chain"（交给外层） */ overscroll?: "auto" | "contain" | "bounce" | "chain";
+  /** "auto"（默认）| "x"：竖着滚滚轮也横向滚 */ wheel?: "auto" | "x";
+  /** el 自己有定位（fixed / absolute / sticky 的面板）时为 true：在 el 里面套一层滚动视口 */ inner?: boolean;
+}
+export const createScrollArea: SatinFactory<ScrollAreaOptions, { readonly box: HTMLElement; readonly vp: HTMLElement; refresh(): void; set(options: Partial<ScrollAreaOptions>): void; readonly options: ScrollAreaOptions }>;
 interface InputBoxOptions { id?: string; name?: string; label?: string; help?: string; placeholder?: string; size?: "sm" | "lg" | "xl"; autocomplete?: string }
 /** 密码框：显示 / 隐藏按钮、大写锁定提示；meter: true 加强度条（注册、改密码用） */
 export const createPassword: SatinFactory<InputBoxOptions & { meter?: boolean; value?: string; onChange?(value: string): void }, { readonly value: string; focus(): void }>;
@@ -54,22 +63,28 @@ export function countHTML(o?: { id?: string; name?: string; placeholder?: string
 /** 邮箱框：停止输入 400ms 后格式对了出现对勾 */
 export const createEmail: SatinFactory<InputBoxOptions & { value?: string; onChange?(value: string): void }, { readonly value: string; focus(): void }>;
 /** 搜索框：防抖、转圈（300ms 内回来不转）、结果数、清除按钮、按 / 聚焦。search(q) 返回结果数 */
-export const createSearch: SatinFactory<{ search?(q: string): number; debounce?: number; onSearch?(q: string): void; placeholder?: string; label?: string; kbd?: string | false; id?: string; name?: string }>;
+export const createSearch: SatinFactory<{ search?(q: string): number | unknown[] | Promise<number | unknown[]>; debounce?: number; onSearch?(q: string): void; placeholder?: string; label?: string; kbd?: string | false; id?: string; name?: string }>;
 /** 带字数的输入框（max 默认 20） */
 export const createCount: SatinFactory<{ id?: string; name?: string; placeholder?: string; max?: number; value?: string; size?: "sm" | "lg" | "xl" }>;
 export const createLongText: SatinFactory<{ onSubmit?(value: string): void }>;
 /** 提示词输入框的标记（空容器交给 createComposer 时就用它渲染） */
 export function composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean }): string;
-export const createComposer: SatinFactory<{ onSend?(message: { text: string; files: File[] }): void; onStop?(): void; upload?(file: File, progress: (p: number) => void): Promise<unknown> }>;
-export const createProgressCard: SatinFactory<{ onCancel?(): void; onOpen?(): void }>;
-export const createPicker: SatinFactory<{ today?: Date; now?: Date; onChange?(detail: unknown): void }>;
-export const createUpload: SatinFactory<{ list?: HTMLElement; accept?: RegExp; maxSize?: number; upload?(file: File, progress: (p: number) => void): Promise<unknown> }>;
+/** 提示词输入框：onSend 返回 Promise 时，Promise 结束才退出"生成中"；message.files 是附件行元素（元素上的 _file 是原始 File） */
+export const createComposer: SatinFactory<{ onSend?(message: { text: string; files: HTMLElement[] }): void | Promise<unknown>; onStop?(): void; upload?(file: File, progress: (p: number) => void): Promise<unknown> }, { setBusy(on: boolean): void; clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void; files(): HTMLElement[] }>;
+export interface ProgressCardApi { start(title: string, sub?: string, enter?: boolean): void; set(progress: number, sub?: string): void; finish(title?: string, sub?: string): void; cancel(title?: string, sub?: string): void }
+export const createProgressCard: SatinFactory<{ onCancel?(): void; onOpen?(): void }, ProgressCardApi>;
+/** 选择器选好值时的数据：text 是触发框里显示的文字（清除时是空字符串） */
+export interface PickDetail { text: string }
+/** 日期、时间、定时、地址选择器：在已有的 [data-pk] 标记上接交互。today / now 默认真实的今天、现在 */
+export interface PickerOptions { today?: Date; now?: Date; onChange?(detail: PickDetail): void }
+export const createPicker: SatinFactory<PickerOptions>;
+export const createUpload: SatinFactory<{ list?: HTMLElement; accept?: RegExp; maxSize?: number; /** 类型不对时那一行的提示 */ badType?: string; /** 超过 maxSize 时那一行的提示 */ tooBig?: string; upload?(file: File, progress: (p: number) => void): Promise<unknown> }, { add(files: FileList | File[]): void }>;
 export const createReorder: SatinFactory<{ row?: string; onReorder?(e: { from: number; to: number; row: HTMLElement }): void }>;
 /** 侧栏布局（.sn-app）：选中切换、收起 / 展开（⌘\\）。collapseBelow：布局窄于这个宽度时自动收成图标栏（手机上用，比如 720） */
 export const createSidebar: SatinFactory<{ onNavigate?(link: HTMLElement): void; collapseBelow?: number }, { toggle(): void; select(link: HTMLElement): void; setFx(fx: "slide" | "bar" | "fade" | "text"): void }>;
-export const createInfiniteList: SatinFactory<{ loadPage(offset: number, size: number): Promise<unknown[]>; /** 把一行画出来：row 是行元素（会复用，子元素可以缓存在 row._d 上），item 是这一行的数据 */ renderRow(row: HTMLElement, item: any, index: number): void; rowHeight?: number; total?: number; pageSize?: number; onCount?(n: number): void }>;
-export const createPlayer: SatinFactory<{ src?: string; poster?: string; label?: string; onError?(e: unknown): void }>;
-export const createAudio: SatinFactory<{ src?: string; title?: string; sub?: string; wave?: string; onError?(e: unknown): void }>;
+export const createInfiniteList: SatinFactory<{ loadPage(offset: number, size: number): Promise<unknown[]>; /** 把一行画出来：row 是行元素（会复用，子元素可以缓存在 row._d 上），item 是这一行的数据 */ renderRow(row: HTMLElement, item: any, index: number): void; rowHeight?: number; total?: number; pageSize?: number; /** 数量变了调：loaded 已加载的条数；total 总数（mountInfiniteList 会给；createInfiniteList 现在只转第一个参数，total 是 undefined） */ onCount?(loaded: number, total?: number): void }, { reload(): void; scrollTop(): void; readonly count: number }>;
+export const createPlayer: SatinFactory<{ src?: string; poster?: string; label?: string; onError?(e: unknown): void }, { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; readonly video: HTMLVideoElement }>;
+export const createAudio: SatinFactory<{ src?: string; title?: string; sub?: string; wave?: string; onError?(e: unknown): void }, { toggle(): void; readonly audio: HTMLAudioElement }>;
 
 // 纯样式组件的标记
 export interface ButtonHTMLOptions { text?: string; variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; round?: boolean; selected?: boolean; disabled?: boolean; busy?: boolean; type?: "button" | "submit" | "reset"; tip?: string; attrs?: Record<string, string> }
@@ -88,17 +103,20 @@ export function esc(s: unknown): string;
 export function icon(name: string, size?: number): string;
 
 // 按钮状态、复制、芯片
-export function busy<T>(btn: HTMLElement, work: () => Promise<T> | T): Promise<T>;
+/** 按钮等待：work 是毫秒数或 Promise（真实请求）。300ms 内完成不转圈；转圈出现后至少留 500ms；期间点不了。结束后 resolve（没有值） */
+export function busy(btn: HTMLElement, work: number | PromiseLike<unknown>): Promise<void>;
 export function succeed(btn: HTMLElement, back?: number): void;
 export function copied(btn: HTMLElement): void;
 export function removeChip(chip: HTMLElement, o?: { onRemoved?(): void }): void;
 
 // 反馈
-export interface ToastOptions { text: string; kind?: "status" | "progress" | "undo"; tone?: "danger" | "success" | "warning"; icon?: string; duration?: number; action?: { label: string; run(t: ToastHandle): void }; progress?: number; alert?: boolean; done?: boolean }
-export interface ToastHandle { update(o: Partial<ToastOptions>): void; close(): void }
+export interface ToastOptions { text: string; /** "status"（默认，3 秒）| "action"（倒计时环 + 按钮，5 秒）| "progress"（进度环 + 百分比，直到 update 成结果） */ kind?: "status" | "action" | "progress"; /** 图标颜色："ok"（成功，status 默认）| "danger" | "info" */ tone?: "ok" | "danger" | "info"; icon?: string; duration?: number; action?: { label: string; run(t: ToastHandle): void }; progress?: number; alert?: boolean; done?: boolean }
+export interface ToastHandle { readonly el: HTMLElement; update(o: Partial<ToastOptions>): void; /** 暂停 / 继续倒计时（鼠标移上去时自动暂停） */ pause(on: boolean): void; close(): void }
 export function toast(o: ToastOptions): ToastHandle;
-export interface NotifyOptions { title: string; text?: string; icon?: string; tone?: string; time?: string; actions?: { label: string; run(): void }[] }
-export function notify(o: NotifyOptions): { close(): void };
+/** 通知卡片：body 是正文（不是 text）；actions 的 run 收到卡片本身，不写 run 点了就关 */
+export interface NotifyHandle { readonly el: HTMLElement; close(): void }
+export interface NotifyOptions { title: string; body?: string; icon?: string; /** 图标颜色："ok" 成功 | "bad" 失败 | "warn" 提醒 */ tone?: "ok" | "bad" | "warn"; time?: string; actions?: { label: string; variant?: string; run?(card: NotifyHandle): void }[] }
+export function notify(o: NotifyOptions): NotifyHandle;
 
 // 浮层
 export function openDialog(dialog: HTMLDialogElement, trigger?: HTMLElement | null): void;
@@ -106,11 +124,15 @@ export function closeDialog(dialog: HTMLDialogElement, refocus?: boolean): Promi
 export function wireDialog(dialog: HTMLDialogElement): void;
 export function openDrawer(drawer: HTMLElement, o?: { trigger?: HTMLElement | null; scrim?: HTMLElement; focus?: HTMLElement; onClose?(): void }): { close(refocus?: boolean): void };
 export function closeDrawer(refocus?: boolean): void;
-export function openPopoverAt(pop: HTMLElement, trigger: HTMLElement, o?: { align?: "start" | "center" | "end"; onClose?(): void }): unknown;
-export function popoverOf(pop: HTMLElement): unknown;
+export interface PopoverHandle { readonly pop: HTMLElement; close(refocus?: boolean): void }
+export function openPopoverAt(pop: HTMLElement, trigger: HTMLElement, o?: { align?: "start" | "center" | "end"; onClose?(): void }): PopoverHandle;
+/** 正开着的那一个弹出面板（没开返回 undefined） */
+export function popoverOf(pop: HTMLElement): PopoverHandle | undefined;
 export function openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | "window"; onSelect?(item: HTMLElement): void }): void;
 export function closeMenu(refocus?: boolean): void;
-export function createCommandPalette(groups: { name: string; items: { label: string; icon?: string; hint?: string; keys?: string; run?(): void }[] }[], o?: { onRun?(item: unknown): void; placeholder?: string; hotkey?: boolean; enterLabel?: string }): { open(): void; close(): void; toggle(): void };
+/** 命令面板的一条：name 显示的名字；sub 灰色的补充；key 右边显示的快捷键；keys 额外的搜索词（比如英文名）。可以带自己的字段，onRun 原样拿到 */
+export interface CommandItem { name: string; icon?: string; sub?: string; key?: string; keys?: string; [k: string]: unknown }
+export function createCommandPalette<T extends CommandItem = CommandItem>(groups: { name: string; items: T[] }[], o?: { onRun?(item: T): void; placeholder?: string; /** 没有结果时显示的 HTML；里面带 data-empty-act 的按钮点了（或直接回车）调 onEmpty */ empty?(q: string): string; onEmpty?(q: string): void; hotkey?: boolean; enterLabel?: string }): { open(): void; close(): void; toggle(): void; readonly input: HTMLInputElement; readonly list: HTMLElement };
 export function openLightbox(items: { src?: string; bg?: string; ratio?: number; video?: string; caption?: string }[], index: number, o?: { thumbOf?(i: number): HTMLElement | null; enabled?(i: number): boolean; onClose?(): void }): { close(): void };
 export function closeLightbox(): void;
 
@@ -125,7 +147,7 @@ export function prepBusy(button: HTMLElement): HTMLElement;
 /** 在已有的 .sn-slider 标记上接交互（一般用 createSlider） */
 export function initSlider(el: HTMLElement): void;
 /** 在已有的 .sn-select 标记上接交互（一般用 createSelect） */
-export function mountSelect(el: HTMLElement, options?: { onChange?(value: string): void }): { readonly value: string | null };
+export function mountSelect(el: HTMLElement, options?: { onChange?(value: string, item: HTMLElement): void }): { readonly value: string | null; open(): void; close(refocus?: boolean): void; set(value: string): void };
 /** 把 root 里所有 .sn-select 都接上 */
 export function bindSelects(root?: ParentNode): void;
 /** 插入一行：其余行平滑让位（FLIP） */
@@ -139,9 +161,9 @@ export function loadWithSkeleton<T>(el: HTMLElement, options: { load(): Promise<
 /** Toast 出现的位置：顶部居中（默认）或底部居中；记在 localStorage，刷新后保持 */
 export function setToastPos(pos: "top" | "bottom"): void;
 /** 在已有的生成进度卡片标记上接交互（一般用 createProgressCard） */
-export function mountProgress(el: HTMLElement, options?: { onCancel?(): void; onOpen?(): void }): unknown;
+export function mountProgress(el: HTMLElement, options?: { onCancel?(api: ProgressCardApi): void; onOpen?(api: ProgressCardApi): void }): ProgressCardApi;
 /** 在 trigger 旁边打开一个浮层（.sn-pop），点外面、Esc 关；onClose 在关掉时调 */
-export function openPopover(pop: HTMLElement, trigger: HTMLElement, options?: { align?: "start" | "center" | "end"; onClose?(): void }): void;
+export function openPopover(pop: HTMLElement, trigger: HTMLElement, options?: { align?: "start" | "center" | "end"; onClose?(): void }): PopoverHandle;
 /** 把 root 里浮层的触发器（data-pop、data-dialog、data-drawer、data-menu……）都接上 */
 export function bindOverlays(root?: ParentNode): void;
 /** 把 root 里的折叠面板（.sn-acc）都接上 */
@@ -149,7 +171,7 @@ export function bindCollapses(root?: ParentNode): void;
 /** 把 root 里的输入框（密码、邮箱、搜索、计数、长文本、提示词输入框）都接上 */
 export function bindInputs(root?: ParentNode, options?: { composer?: Record<string, unknown> }): void;
 /** 把 root 里的日期 / 时间选择器都接上 */
-export function bindPickers(root?: ParentNode, options?: { today?: Date; now?: Date }): void;
+export function bindPickers(root?: ParentNode, options?: Pick<PickerOptions, "today" | "now">): void;
 
 // ———— 表格（真数据） ————
 export interface TableColumn<R = any> {
@@ -176,8 +198,8 @@ export const createTable: SatinFactory<TableOptions, { readonly selected: string
 export function tableHTML(o: TableOptions): string;
 export function sortRows<R>(rows: R[], columns: TableColumn<R>[], sort: { key: string; dir: "asc" | "desc" } | null): R[];
 
-/** 照设计稿写好的标记，在 root 里一次接上交互（下拉、复制、芯片、清除、显示密码、自动长高、滑块、验证码、输入框、折叠面板、日期选择器、浮层触发器、横幅），并把 data-i 换成图标 */
-/** 把 root 里写在标记上的交互一次接上；返回撤销函数（撤掉监听、观察器、包上去的滚动区域和"已接过"标记，同一段标记可以再接一次）。wire：同一个作用域里跑的自己的接线，撤销时一起撤 */
+/** 照设计稿写好的标记，在 root 里一次接上交互（下拉、复制、芯片、清除、显示密码、自动长高、滑块、验证码、输入框、折叠面板、日期选择器、浮层触发器、横幅），并把 data-i 换成图标。
+ *  返回撤销函数（撤掉监听、观察器、包上去的滚动区域和"已接过"标记，同一段标记可以再接一次）。wire：同一个作用域里跑的自己的接线，撤销时一起撤 */
 export function enhance(root?: ParentNode | null, wire?: (root: ParentNode) => void): () => void;
 /** 表单类的标记一次接上（enhance 里已经包含） */
 export function bindForms(root?: ParentNode): void;

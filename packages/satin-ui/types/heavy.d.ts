@@ -10,7 +10,7 @@ export function highlightLines(code: string, lang: string): string[];
 export interface ChatItem { kind: "day" | "msg"; text?: string; me?: boolean; type?: "text" | "image" | "video" | "audio" | "file"; [k: string]: unknown }
 export interface ChatOptions {
   /** 接模型的口子：异步生成器一段段 yield 字符串（或 { text } / { think } / { step } …），或直接返回一整段 */
-  respond?(text: string, ctx: { stopped(): boolean }): AsyncIterable<unknown> | Promise<string> | string;
+  respond?(text: string, ctx: { /** 用户点了"停止"以后变成 true（每次读都是现在的值） */ readonly stopped: boolean }): AsyncIterable<unknown> | Promise<string> | string;
   history?: ChatItem[]; title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean;
   /** 底部输入框的选项（输入框还没接上时用） */
   composer?: { upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: unknown[] };
@@ -41,6 +41,6 @@ export function closeLightbox(): void;
 /** 页面上真正露出来的区域（视口坐标，比如固定顶栏下面那块）：缩略图被挡住的部分不算，图从露出来的那截飞出去；null 恢复整个窗口 */
 export function setLightboxBounds(b: { left: number; top: number; right: number; bottom: number } | null): void;
 export function playerHTML(o?: { src?: string; poster?: string; label?: string }): string;
-export function mountPlayer(el: HTMLElement, o?: { onError?(e: unknown): void }): { play(): void; pause(): void; toggle(): void; video: HTMLVideoElement; destroy(): void };
+export function mountPlayer(el: HTMLElement, o?: { onError?(e: unknown): void }): { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; video: HTMLVideoElement; destroy(): void };
 export function audioHTML(o?: { src?: string; title?: string; sub?: string; wave?: string }): string;
 export function mountAudio(el: HTMLElement, o?: { onError?(e: unknown): void }): { toggle(): void; audio: HTMLAudioElement; destroy(): void };

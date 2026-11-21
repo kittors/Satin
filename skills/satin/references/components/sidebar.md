@@ -24,14 +24,16 @@
 ## 用法
 
 ```js
-import { createSidebar } from "satin-ui/components";
+import { toast } from "satin-ui/components";
 
-// 选中的底色 / 指示条在条目之间滑动（.sn-app 上 data-navfx="slide | bar | fade | text"）；
-// [data-collapse] 收起 / 展开（⌘\\ 也行），主区宽度连续变，.sn-app-grid 里的卡片按新列数从原位置滑过去
-const side = createSidebar(document.querySelector(".sn-app"), {
-  onNavigate: (a) => router.go(a.getAttribute("href")),
+// 侧栏布局 enhance() 已经接上：选中的底色 / 指示条在条目之间滑动（.sn-app 上 data-navfx="slide | bar | fade | text"）；
+// [data-collapse] 收起 / 展开（⌘\ 也行），主区宽度连续变，卡片按新列数从原位置滑过去；窄于 720 自动收成图标栏（data-collapse-below 可改）
+// 点导航：换成你的路由跳转
+document.querySelector(".sn-side-nav").addEventListener("click", (e) => {
+  const a = e.target.closest("a[href]"); if (!a) return;
+  e.preventDefault(); toast({ text: `打开"${a.textContent.trim()}"` });
 });
-side.toggle();
+// 自己创建也行：createSidebar(元素, { collapseBelow: 720, onNavigate(a) {} })，返回 { toggle(), select(a) }
 ```
 
 ## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）
