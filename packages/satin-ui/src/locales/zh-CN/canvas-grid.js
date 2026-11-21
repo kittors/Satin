@@ -28,6 +28,6 @@ export default {
   "canvas-grid.27": "名称",
   "canvas-grid.28": "排序、筛选或展开状态",
   "canvas-grid.29": "排序或筛选",
-  "canvas-grid.30": "数据表格（画布绘制）",
+  "canvas-grid.30": "数据表格",
   "canvas-grid.31": "搜索{p0}"
 };

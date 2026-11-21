@@ -19,11 +19,11 @@ const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 import { composerHTML } from "./components.js";
 import { mountComposer, syncComposerParts } from "./input.js";
 import { defineComponent } from "./lifecycle.js";
-// 对话框的标记（放进一个空的 .sn-chat 容器里）：顶栏（名字、状态、条数）、消息区（虚拟列表的画布、跳到最新）、底部提示词输入框。
+// 对话框的标记（放进一个空的 .sn-chat 容器里）：顶栏（名字；写了 status 才有下面那行）、消息区（虚拟列表的画布、跳到最新）、底部提示词输入框。
 // mountChat 遇到空容器会自己用它填好，一般不用直接调
 // 新对话（empty）：还没有消息时，消息区正中放单色图标、标题、副标题、几个建议（点了填进输入框）；给 true 只留一个空的容器（框架里自己画，见实例的 emptyEl）。
 // 不写 empty 也有一个默认的（对话图标 + "有什么可以帮你？"），给 false 才不要。给了 history 时先藏着，挂上以后没有消息才露出来。
-// 有空状态时顶栏的"· 已载入 N 条"包一层（空着的时候不显示），底部输入框带 sn-cm-new（新对话那一套交互）
+// 有空状态时底部输入框带 sn-cm-new（新对话那一套交互）
 const emptyOf = (empty) => (empty === undefined ? { icon: "message-circle", title: tt("chat.empty") } : empty);
 const chatEmptyHTML = (e, hide) => {
   if (!e) return "";
@@ -38,7 +38,7 @@ const chatEmptyHTML = (e, hide) => {
 };
 export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true, empty: em, history, context, mode, models, model } = {}) => {
   const empty = emptyOf(em);
-  return `<div class="sn-chat-hd"><div class="sn-tx"><b>${esc(title)}</b><span class="sn-sub"><span data-chat-status>${esc(status ?? tt("chat.0"))}</span>${empty ? `<span class="sn-chat-n">·<span data-chat-count class="sn-num"></span></span>` : `·<span data-chat-count class="sn-num"></span>`}</span></div></div>` +
+  return `<div class="sn-chat-hd"><div class="sn-tx"><b>${esc(title)}</b><span class="sn-sub"><span data-chat-status>${esc(status ?? "")}</span></span></div></div>` +
   `<div class="sn-chat-body"><div class="sn-chat-vp"><div class="sn-chat-canvas"><div class="sn-chat-ph sn-top"></div><div class="sn-chat-ph sn-bot"></div></div></div><button class="sn-chat-jump" data-chat-jump aria-label="${esc(tt("chat.jump"))}"><span data-i="arrow-down"></span><span class="sn-badge" hidden>0</span></button>${chatEmptyHTML(empty, !!history)}</div>` +
   `<div class="sn-chat-foot">${composerHTML({ placeholder, max, maxLines, attach, external: true, context, mode, models, model, fresh: !!empty })}</div>`;
 };
@@ -61,7 +61,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   // 空容器：先按选项（title、status、placeholder、max……）填好标记
   if (!box.querySelector(".sn-chat-vp")) { box.classList.add("sn-chat"); box.innerHTML = chatHTML(view); injectIcons(box); }
   const vp = $(".sn-chat-vp", box), canvas = $(".sn-chat-canvas", vp), phTop = $(".sn-chat-ph.sn-top", canvas), phBot = $(".sn-chat-ph.sn-bot", canvas);
-  const jump = $("[data-chat-jump]", box), badge = $(".sn-badge", jump), statusEl = $("[data-chat-status]", box), countEl = $("[data-chat-count]", box);
+  const jump = $("[data-chat-jump]", box), badge = $(".sn-badge", jump);
   const composer = $(".sn-composer", box), ta = $("textarea", composer);
   const emptyEl = $("[data-chat-empty]", box); // 新对话那一块（见下面"新对话"）；先取好，发消息的路径里要用
   let emptyGone = !emptyEl;
@@ -74,7 +74,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   const sa = scrollArea(vp, { fade: "y", size: 20 }); Object.assign(sa.box.style, { height: "100%", minHeight: "0" });
   // 底部位置按算出来的内容高度，不用 scrollHeight：发送时画布在做让位动画，scrollHeight 会被 transform 临时撑大
   const maxTop = () => Math.max(0, PAD_T + off[items.length] + PAD_B - vp.clientHeight);
-  const setStatus = (s) => { statusEl.textContent = s; statusEl.classList.toggle("sn-on", s !== tt("chat.0")); };
+  // 顶栏标题下面那行只写选项 status（默认不写：AI 助手平时没什么状态可说；人和人聊天写"在线""正在输入…"，用 update({ status }) 换）。
+  // 生成时不在顶栏再写"正在思考…"——消息里已经有思考、步骤和逐字出来的正文，顶栏再说一遍是重复
 
   // ———— 数据：从旧到新 ————
   let seq = 0, msgCount = 0;
@@ -85,7 +86,6 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   const more = { id: ++seq, kind: "more", state: "idle" };
   if (!history || !history.hasMore?.()) more.state = "end";
   items.push(more, ...(history ? ingest(history.initial()) : [])); reindex();
-  const syncCount = () => { countEl.textContent = tt("chat.1", { p0: msgCount.toLocaleString("zh-CN") }); };
 
   // ———— 高度：先估，渲染后按实际量出来的缓存 ————
   let colW = 600;
@@ -124,7 +124,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     const st = it.me && it.status ? `<span class="sn-msg-state${it.status === "fail" ? " sn-bad" : ""}"${it.status === "fail" ? ` role="button" tabindex="0" title="${tt("chat.27")}"` : ""}>${STATE[it.status]}</span>` : "";
     return `<div class="sn-msg ${it.me ? "sn-me" : "sn-ai"}${cont ? " sn-cont" : ""}${it.flying ? " sn-flying" : ""}">${bub}${st}</div>` + (it.status === "fail" ? tt("chat.5") : "");
   }
-  const moreHTML = () => more.state === "loading" ? tt("chat.6") : more.state === "end" ? tt("chat.7") : tt("chat.8");
+  // 历史最上面那一行：正在加载只转圈（字留给读屏）；平时、到头了都不写字（"这是对话的开始""往上翻会继续加载"是明摆着的事）
+  const moreHTML = () => more.state === "loading" ? tt("chat.6") : "";
   function realEl(it, i) {
     const el = document.createElement("div"); el.className = "sn-ci";
     if (it.kind === "day") { el.classList.add("sn-ci-day"); el.innerHTML = `<span class="sn-day">${esc(it.text)}</span>`; }
@@ -262,7 +263,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     let added = 0; for (const it of b) added += hOf(it);
     vp.scrollTop = st + added;
     const firstOld = items[1 + b.length], el = firstOld && live.get(firstOld.id); if (el) drop(firstOld.id, el); // 它前面的人变了，头像分组要重算
-    more.state = history.hasMore() ? "idle" : "end"; patchMore(); syncCount(); loadingOld = false; render();
+    more.state = history.hasMore() ? "idle" : "end"; patchMore(); loadingOld = false; render();
   }
 
   // ———— 追加、更新 ————
@@ -316,7 +317,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     // 3. 新消息先藏着进列表：量好真实高度，滚到底，原来的消息让位
     const news = files.map((f) => ({ id: ++seq, kind: "msg", me: true, type: f.type, g: f.g, name: f.name, size: f.size, dur: f.dur, ext: f.ext, seed: f.seed, cap: "", status: "sending", flying: anim }));
     if (text) news.push({ id: ++seq, kind: "msg", me: true, type: "text", text, status: "sending", flying: anim });
-    pinned = true; msgCount += news.length; syncCount();
+    pinned = true; msgCount += news.length;
     insert(news);
     if (!anim) { news.forEach((it) => settle(it, fail)); return { news, landed: Promise.resolve() }; }
     holdUntil = now0() + DY + 80; motion(); // 输入框收起期间视口在变高，每帧贴底
@@ -451,28 +452,27 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     let inserted = false, th = null, tx = null, t0 = 0;
     const show = (ph) => {
       if (inserted) return; inserted = true; it.ph = ph; if (ph === "think") it.think = "";
-      setStatus(ph === "think" ? tt("chat.20") : ph === "steps" ? tt("chat.21") : tt("chat.22")); insert([it], { dur: DY }); msgCount++; syncCount();
+      insert([it], { dur: DY }); msgCount++;
       const el = liveEl(it); if (el) { el.classList.add("sn-streaming"); if (!reduced()) el.classList.add("sn-reveal"); }
       if (!pinned) { unread++; syncJump(); }
       t0 = performance.now();
     };
     // 思考收起成"已思考 N 秒"（后面的步骤、正文、卡片一来就收）
-    const closeThink = async (ph, status) => {
+    const closeThink = async (ph) => {
       if (it.ph !== "think") return;
       await th?.drain(); it.ph = ph; it.open = false; it.secs = Math.max(1, Math.round((performance.now() - t0) / 1000));
       const el = liveEl(it), t = el?.querySelector(".sn-think"); if (t) { t.classList.remove("sn-live", "sn-open"); t.querySelector(".sn-think-t").textContent = tt("chat.23", { p0: it.secs }); }
-      if (status) setStatus(status);
     };
     const toText = async () => {
       if (tx) return tx;
       if (!inserted) show("text");
       else { await closeThink("text"); it.ph = "text"; liveEl(it)?.querySelector(".sn-ai-body")?.insertAdjacentHTML("beforeend", '<div class="sn-ai-text"><span class="sn-caret"></span></div>'); }
-      setStatus(tt("chat.22")); tx = revealer(it, "text", ".sn-ai-text"); return tx;
+      tx = revealer(it, "text", ".sn-ai-text"); return tx;
     };
     // 正文告一段落（后面是卡片、画面）：先放完缓冲里的字，再去掉光标
     const endText = async () => { if (tx && it.ph === "text") { await tx.drain(); if (me.stop) return; it.ph = "cards"; liveEl(it)?.querySelector(".sn-ai-text .sn-caret")?.remove(); } };
     const addStep = async (st) => {
-      if (!inserted) show("steps"); else await closeThink("steps", tt("chat.21"));
+      if (!inserted) show("steps"); else await closeThink("steps");
       if (me.stop) return;
       it.steps.push(st); const el = liveEl(it); if (!el) return; let ol = el.querySelector(".sn-ai-plan"); if (!ol) { ol = document.createElement("ol"); ol.className = "sn-ai-plan"; const t = el.querySelector(".sn-think"); if (t) t.after(ol); else el.querySelector(".sn-ai-body").prepend(ol); } ol.insertAdjacentHTML("beforeend", stepHTML(st));
     };
@@ -531,14 +531,14 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
       }
     }
     // 回答还在流的时候对话被销毁了（框架里卸载、换页）：输入框的实例已经拆掉，这里什么都不做
-    composer._cm?.setBusy(false); setStatus(tt("chat.0"));
+    composer._cm?.setBusy(false);
   }
   composer.addEventListener("compose", (e) => { const sent = send(e.detail.text); if (sent) reply(e.detail.text || tt("chat.25"), sent.landed); });
   composer.addEventListener("compose-stop", () => { if (job) job.stop = true; });
 
   // ———— 外面驱动：收到一条消息、程序发一条（可以模拟发送失败）、平滑滚到最早 ————
   function receive(raw) {
-    const [it] = ingest([{ kind: "msg", me: false, type: "text", ...raw }]); syncCount();
+    const [it] = ingest([{ kind: "msg", me: false, type: "text", ...raw }]);
     insert([it]); if (!pinned) { unread++; syncJump(); }
     const el = liveEl(it); if (el && !reduced()) el.classList.add("sn-reveal");
     return it;
@@ -584,7 +584,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   });
 
   // ———— 开始：停在最新一条 ————
-  colW = Math.min(760, vp.clientWidth - 40); relayout(1); syncCount(); // 内容一栏最宽 760（和 .ci 的左右留白一致）
+  colW = Math.min(760, vp.clientWidth - 40); relayout(1); // 内容一栏最宽 760（和 .ci 的左右留白一致）
   if (foot) {
     const syncFoot = () => { const h = foot.offsetHeight; box.style.setProperty("--sn-foot-h", h + "px"); const nb = h + 8; if (nb === PAD_B) return; PAD_B = nb; relayout(1); if (pinned) vp.scrollTop = maxTop(); render(); };
     new ResizeObserver(syncFoot).observe(foot); syncFoot();
@@ -617,7 +617,7 @@ export const createChat = /* @__PURE__ */ defineComponent({
       send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, fill: c.fill,
       get emptyEl() { return c.emptyEl; },
       update(next, prev) {
-        if (next.status !== prev.status) { const s = el.querySelector("[data-chat-status]"); if (s) { s.textContent = next.status ?? tt("chat.0"); s.classList.toggle("sn-on", s.textContent !== tt("chat.0")); } }
+        if (next.status !== prev.status) { const s = el.querySelector("[data-chat-status]"); if (s) s.textContent = next.status ?? ""; }
         // 底部输入框的上下文、模式、模型：只是选中项换了就只改选中（不发事件）；结构变了才换那一块
         syncComposerParts(cm(), next, prev);
       },

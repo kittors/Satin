@@ -22,7 +22,7 @@
 .sn-th-pick { position: relative; display: inline-flex; align-items: center; gap: 6px; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); cursor: pointer; }
 .sn-th-pick input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .sn-th-pick i { width: 14px; height: 14px; border-radius: 50%; background: var(--sn-c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-label) 14%, transparent); }
-.sn-th-foot { display: flex; align-items: center; justify-content: space-between; }
+.sn-th-foot { display: flex; align-items: center; justify-content: flex-end; } /* 只剩"恢复默认"，照旧靠右 */
 .sn-cap { font: 500 calc(11px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); letter-spacing: .02em; }
 .sn-note { font-size: calc(12px * var(--sn-font-scale, 1)); line-height: 18px; color: var(--sn-label3); }
 /* ———— 3. 排版（04 号 §2.2；Text 组件 = 层级 × 色调） ———— */

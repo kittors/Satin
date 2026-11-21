@@ -314,7 +314,9 @@ export function mountCanvasGrid(root, o = {}) {
     return c;
   };
   const headUI = mountHead(head, model, { root, vp, src, injectIcons, apply, motion: () => draw(), autosize, reduced, selState, colGhost, onResize: (key, width) => emit("columnResize", { key, width }), onReorder: (keys) => emit("columnReorder", { keys: [...model.left, ...keys, ...model.right] }), onSelAll: () => { if (selMode === "single") return; const prev = visibleSel(); if (src.tree) tsel.setAll(selState() !== "all"); else if (selState() === "all") { selAll = false; selSet.clear(); } else { selAll = true; selSet.clear(); } checkFx(prev); paintBar(); headUI.paint(); schedule(); } });
-  const paintBar = () => { bar.paint(); selChanged(); };
+  // 行数给读屏：aria-rowcount（表头一行 + 现在这一版数据的行数；树形是展开着的行），读屏名里不再写"一百万行"
+  const rowCount = () => { const t = src.tree ? src.shown : src.total; if (!Number.isFinite(t)) return; const n = String(t + 1); if (vp.getAttribute("aria-rowcount") !== n) vp.setAttribute("aria-rowcount", n); };
+  const paintBar = () => { bar.paint(); rowCount(); selChanged(); };
   const bar = mountToolbar(root, src, model, { $, initSeg, seg: "cgmode", treeSeg: "cgtree", selCount, onMode: () => { vp.scrollTop = 0; sizeBody(); }, onTree: (on) => setTreeMode(on), onExpandAll: () => expandAll(), ...(opt.treeCount && { rootsText: (n) => opt.treeCount(n, -1) }) });
   const sbSeg = $('[data-seg="cgsb"]', root), lnSeg = $('[data-seg="cglines"]', root); // 设计稿的演示才有这两个开关
   if (sbSeg) initSeg(sbSeg, (v) => { bars.mode(v); shade(); schedule(); }, 0);

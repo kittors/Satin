@@ -4,14 +4,14 @@
   import { createChat } from "satin-ui/chat";
   // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
   async function* respond(question, ctx) {
-    const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+    const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
     for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
       await new Promise((r) => setTimeout(r, 40));
       yield answer.slice(i, i + 2);
     }
   }
   // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）
-  const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
+  const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
   // 输入框顶上的上下文栏：带 options 的那项点开是菜单
   const CONTEXT = [
     { icon: "folder", text: "雨夜车站" },

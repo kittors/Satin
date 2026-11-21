@@ -41,6 +41,8 @@
 .sn-chat-hd { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px 0 16px; background: var(--sn-raised); }
 .sn-chat-hd .sn-tx { display: grid; } .sn-chat-hd b { font: 600 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); }
 .sn-chat-hd .sn-sub { display: flex; gap: 6px; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+/* 没写 status（AI 助手）：顶栏只有标题，竖着居中 */
+.sn-chat-hd .sn-sub:has(> [data-chat-status]:empty:only-child) { display: none; }
 .sn-chat-hd [data-chat-status] { transition: color .15s; } .sn-chat-hd [data-chat-status].sn-on { color: var(--sn-label2); }
 .sn-chat-body { position: relative; min-height: 0; display: grid; }
 .sn-chat-body > .sn-sa { min-height: 0; }
@@ -52,6 +54,7 @@
 .sn-ci-day { display: flex; justify-content: center; padding-top: 10px; padding-bottom: 10px; }
 .sn-ci-more { display: flex; justify-content: center; align-items: center; gap: 8px; height: 44px; padding-bottom: 0; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-ci-more .sn-spinner { width: 13px; height: 13px; border-width: 1.5px; }
+.sn-ci-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } /* 只给读屏的字（"正在加载更早的消息"），屏幕上只转圈 */
 .sn-ci.sn-reveal { animation: sn-ci-reveal .2s var(--sn-ease-out) both; }
 @keyframes sn-ci-reveal { from { opacity: 0; } }
 /* 已经在内存里的消息永远直接画真内容，滚得再快也不换成骨架。
@@ -298,7 +301,7 @@
 .sn-chat-empty-ic { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 18px; color: var(--sn-label3); }
 .sn-chat-empty-ic .sn-ic { width: 44px; height: 44px; stroke-width: 1; }
 .sn-chat-empty-t { margin: 0; max-width: 560px; font: 600 calc(24px * var(--sn-font-scale, 1))/calc(32px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.01em; color: var(--sn-label); text-wrap: balance; }
-.sn-chat-empty-sub { margin: 8px 0 0; max-width: 440px; font: 400 calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-wrap: pretty; }
+.sn-chat-empty-sub { margin: 8px 0 0; max-width: 440px; font: 400 calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-wrap: balance; }
 .sn-chat-sugs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 560px; margin-top: 28px; }
 .sn-chat-sug { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: var(--sn-r-full); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); background: var(--sn-fill-subtle); cursor: pointer;
   transition: background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong); }
@@ -309,10 +312,6 @@
 .sn-chat-sug:focus-visible { box-shadow: 0 0 0 3px var(--sn-ring); }
 /* 进场前先藏着（JS 在第一次露出来时依次淡入）；减少动态效果时不加这个类 */
 .sn-chat-empty.sn-enter-wait > *, .sn-chat-empty.sn-enter-wait .sn-chat-sug { opacity: 0; }
-/* 还没有消息：顶栏不写"· 已载入 0 条"，列表顶上也不写"这是对话的开始"。包着"· N 条"的那层也按顶栏的间距排（点和条数之间 6px，和原来一样） */
-.sn-chat-hd .sn-chat-n { display: inline-flex; gap: 6px; }
-.sn-chat.sn-fresh .sn-chat-n { display: none; }
-.sn-chat.sn-fresh .sn-ci-more { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .sn-chat-sug, .sn-chat-sug:hover, .sn-chat-sug:active { transform: none; } }
 @media (max-width: 480px) {
   .sn-chat-empty { padding: 16px 16px 28px; }

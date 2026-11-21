@@ -8,7 +8,7 @@ export default function ShotDescription() {
     const it = createLongText(host, {
       max: 120,
       maxLines: 7,
-      placeholder: "写清楚人物、动作和光线，生成会更准。可以一直往下写，框会跟着长高。",
+      placeholder: "写清楚人物、动作和光线，生成会更准。",
       label: "画面描述",
       onSubmit: (text) => console.log("保存：", text),
     });

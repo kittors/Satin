@@ -28,7 +28,7 @@ for (const sub of fs.readdirSync(CUR).filter((d) => fs.statSync(path.join(CUR, d
       if (y.name === "skip") continue;
       let best = null;
       for (let j = 0; j < cand.length; j++) {
-        const d = hard(compareAction(cand[j].actions[i], y, label));
+        const d = hard(compareAction(cand[j].actions[i], y, label, c.id ?? f.replace(".json.gz", "")));
         if (!d.length) { best = null; used.set(j, (used.get(j) || 0) + 1); break; }
         if (!best || d.length < best.length) best = d;
       }

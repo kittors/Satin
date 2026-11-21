@@ -212,7 +212,7 @@
 .sn-cm-new .sn-cm-model { max-width: 100%; }
 .sn-cm-new .sn-cm-model .sn-cm-lbl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* 放不下全名（JS 量出来全名被省略了，输入框加 sn-cm-compact）：按钮上只显示档位，全名在菜单里、也是读屏名 */
-.sn-cm-lbl-s { display: none; }
+.sn-cm-lbl.sn-cm-lbl-s { display: none; } /* 两个类：比下面换字动画要的 .sn-cm-lbl { display: inline-block } 权重高，宽的时候档位不会跟在全名后面再显示一遍 */
 .sn-cm-compact .sn-cm-model .sn-cm-lbl:not(.sn-cm-lbl-s) { display: none; }
 .sn-cm-compact .sn-cm-model .sn-cm-lbl-s { display: inline-block; }
 /* 档位也放不下（sn-cm-tight，320 宽这种）：底部一行收紧——左右留白、用量环的右边距、权限标签的内边距和圆点间距都小一点 */

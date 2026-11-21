@@ -4,7 +4,7 @@
 import { fmtSize, midEllipsis, waveBars } from "./data.js";
 import { scrollArea } from "./scroll.js";
 import { EASE_CSS, setFieldError, clearFieldError, mountSelect } from "./form.js";
-import { $, $$, reduced, injectIcons } from "./core.js";
+import { $, $$, reduced, injectIcons, retip } from "./core.js";
 import { onCleanup } from "./lifecycle.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/input.js";
@@ -315,7 +315,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   const notify = (text) => { $(".sn-tx", note).textContent = text; note.classList.add("sn-on"); clearTimeout(noteT); noteT = setTimeout(() => { note.classList.remove("sn-on"); rejected = []; }, 5000); };
   const reject = (name, why) => { rejected.push(name); notify(rejected.length > 1 ? tt("input.12", { p0: rejected.length, p1: why }) : tt("input.13", { p0: midEllipsis(name, 22), p1: why })); };
   // data-external：发送和停止交给外面处理（比如聊天框），输入框只管三种状态；生成中仍然可以接着写下一条
-  const external = box.hasAttribute("data-external"), idleLabel = send.getAttribute("aria-label") || tt("input.14");
+  const external = box.hasAttribute("data-external"), idleLabel = send.getAttribute("aria-label") || tt("input.14"), idleKbd = send.dataset.kbd;
   let busy = false, timer = 0, fileN = 0;
   // 有文字或有附件就能发；超出字数不能发。正在收起的附件（.sn-leaving）不算
   const kept = () => [...files.children].filter((f) => !f.classList.contains("sn-leaving"));
@@ -325,10 +325,14 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     send.classList.toggle("sn-ready", ready && !busy); send.setAttribute("aria-disabled", String(!ready && !busy));
     // 新对话那一套（.sn-cm-new）：什么都没写时，提示写明为什么发不了
     if (!busy) send.dataset.tip = failed ? tt("input.15") : waiting ? tt("input.16") : !ready && !fs.length && !ta.value.trim() && box.classList.contains("sn-cm-new") ? tt("input.empty") : idleLabel;
+    retip(send); // 提示正开着（指针停在按钮上）就当场换成新状态的字
   };
   const setBusy = (on) => {
     busy = on; box.classList.toggle("sn-busy", on && !external); send.classList.toggle("sn-busy", on); swap.classList.toggle("sn-on", on); ta.readOnly = on && !external;
-    send.setAttribute("aria-label", on ? tt("input.17") : idleLabel); send.dataset.tip = on ? tt("input.17") : idleLabel; if (!on) clearTimeout(timer); sync();
+    send.setAttribute("aria-label", on ? tt("input.17") : idleLabel); send.dataset.tip = on ? tt("input.17") : idleLabel;
+    // 生成中 ⌘↵ 停不了（键盘只晃一下停止按钮），提示里就不带快捷键；回到能发送再带上
+    if (idleKbd) { if (on) delete send.dataset.kbd; else send.dataset.kbd = idleKbd; }
+    if (!on) clearTimeout(timer); sync();
   };
   const reset = () => { setBusy(false); ta.focus({ preventScroll: true }); };
   // 键盘提交：生成中不停止也不发送（停止是破坏性操作，只能点按钮），只轻轻晃一下停止按钮提示

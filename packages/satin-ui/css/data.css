@@ -251,7 +251,7 @@
 @media (hover: hover) {
 .sn-scrub:hover .sn-hover-t { opacity: 1; translate: -50% 0; } }
 /* 音量：悬停喇叭向右展开一条 64px 的音量条（只有控制条里几个元素重新排，开销很小）；喇叭的两道声波按音量淡入淡出，静音换叉号 */
-.sn-player .sn-vol { display: flex; align-items: center; --sn-v: .8; }
+.sn-player .sn-vol { display: flex; flex-direction: row-reverse; align-items: center; --sn-v: .8; } /* 音量条长在静音按钮左边：右边的画中画、全屏贴着右边，条往右长会把静音按钮往左推，指针落到音量条上，"静音"的提示就出不来；读屏和 Tab 的顺序照旧（先静音再音量） */
 .sn-player .sn-vs { position: relative; width: 0; height: 24px; overflow: hidden; cursor: pointer; touch-action: none; outline: none; transition: width .2s var(--sn-ease-out), margin .2s var(--sn-ease-out); }
 .sn-player .sn-vol:focus-within .sn-vs, .sn-player .sn-vs.sn-drag { width: 64px; margin-right: 4px; }
 @media (hover: hover) {

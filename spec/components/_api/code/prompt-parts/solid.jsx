@@ -10,7 +10,7 @@ const CONTEXT = [
 const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function PromptParts() {
   let host;

@@ -6,5 +6,5 @@ const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 
 const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
 export default function StoppablePrompt() {
-  return <Composer placeholder="描述画面，发送后可以随时停止" send="生成" onSend={generate} onStop={stop} />;
+  return <Composer placeholder="描述你想要的画面" send="生成" onSend={generate} onStop={stop} />;
 }

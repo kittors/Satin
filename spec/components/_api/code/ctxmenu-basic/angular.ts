@@ -1,6 +1,8 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { toast } from "satin-ui";
 
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+
 @Component({
   selector: "demo-ctxmenu-basic",
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 接上触发器、键盘导航、子菜单
@@ -18,5 +20,5 @@ import { toast } from "satin-ui";
 })
 export class CtxmenuBasicComponent {
   // 选了一项：菜单上冒泡 menuselect，detail.item 是那一行
-  pick(item: HTMLElement) { toast({ text: "选了：" + item.textContent }); }
+  pick(item: HTMLElement) { toast({ text: DONE[item.dataset["key"] ?? ""] }); }
 }

@@ -4,7 +4,7 @@
 //   audioHTML({ src, title, sub, wave }) → 音频条的标记；mountAudio(el) 接上交互（波形：给了 wave 地址就用它，没给就从音频本身算）
 // 规矩照 09 号 §10：控制条叠在画面上（玻璃）；播放时指针停 2 秒不动，控制条和指针一起淡出；进度每帧连续往前走，只改 scale；
 // 点进度条平滑跳过去（150ms），拖动时跟手；播放 / 暂停、全屏的图标互相转换（.swap），不硬切。
-import { reduced } from "./core.js";
+import { reduced, retip } from "./core.js";
 import { icon } from "./icons.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/media.js";
@@ -46,7 +46,7 @@ export function mountPlayer(pl, { onError } = {}) {
   const run = () => { if (!raf) raf = requestAnimationFrame(loop); };
   const syncPlay = () => {
     const on = !video.paused && !video.ended; pl.classList.toggle("sn-playing", on); playBtn.querySelector(".sn-swap").classList.toggle("sn-on", on);
-    playBtn.setAttribute("aria-label", on ? tt("media.10") : tt("media.3")); playBtn.dataset.tip = on ? tt("media.10") : tt("media.3"); if (on) run(); wake();
+    playBtn.setAttribute("aria-label", on ? tt("media.10") : tt("media.3")); playBtn.dataset.tip = on ? tt("media.10") : tt("media.3"); retip(playBtn); if (on) run(); wake();
   };
   const play = () => video.play().catch((e) => { if (e?.name !== "AbortError") onError?.(e); });
   const pause = () => video.pause();
@@ -78,7 +78,7 @@ export function mountPlayer(pl, { onError } = {}) {
   function setVolume(v, mute) {
     level = Math.max(0, Math.min(1, v)); muted = mute || level === 0;
     const s = muted ? 0 : level; setV(vol, "--sn-v", s); vol.dataset.lv = s === 0 ? 0 : s < .5 ? 1 : 2;
-    vs.setAttribute("aria-valuenow", String(Math.round(s * 100))); muteBtn.setAttribute("aria-label", muted ? tt("media.11") : tt("media.6")); muteBtn.dataset.tip = muted ? tt("media.11") : tt("media.6");
+    vs.setAttribute("aria-valuenow", String(Math.round(s * 100))); muteBtn.setAttribute("aria-label", muted ? tt("media.11") : tt("media.6")); muteBtn.dataset.tip = muted ? tt("media.11") : tt("media.6"); retip(muteBtn);
     video.volume = level; video.muted = muted;
   }
   const volText = () => (muted ? tt("media.6") : tt("media.12", { p0: Math.round(level * 100) }));
@@ -90,7 +90,7 @@ export function mountPlayer(pl, { onError } = {}) {
   // 全屏：整个播放器（控制条跟着进去）；Esc 退出时同步按钮
   const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   const toggleFs = () => { if (fsEl() === pl) (document.exitFullscreen || document.webkitExitFullscreen)?.call(document); else (pl.requestFullscreen || pl.webkitRequestFullscreen)?.call(pl)?.catch?.(() => {}); };
-  const syncFs = () => { const on = fsEl() === pl; pl.classList.toggle("sn-fs", on); fsBtn.querySelector(".sn-swap").classList.toggle("sn-on", on); fsBtn.setAttribute("aria-label", on ? tt("media.13") : tt("media.9")); fsBtn.dataset.tip = on ? tt("media.13") : tt("media.9"); wake(); };
+  const syncFs = () => { const on = fsEl() === pl; pl.classList.toggle("sn-fs", on); fsBtn.querySelector(".sn-swap").classList.toggle("sn-on", on); fsBtn.setAttribute("aria-label", on ? tt("media.13") : tt("media.9")); fsBtn.dataset.tip = on ? tt("media.13") : tt("media.9"); retip(fsBtn); wake(); };
   fsBtn.addEventListener("click", toggleFs);
   for (const ev of ["fullscreenchange", "webkitfullscreenchange"]) document.addEventListener(ev, syncFs);
   // 点画面：播放 / 暂停来回切（全屏用按钮或 F 键）；控制条、大播放键、画中画提示自己处理
@@ -99,8 +99,8 @@ export function mountPlayer(pl, { onError } = {}) {
   if (!(document.pictureInPictureEnabled && video.requestPictureInPicture)) pipBtn.hidden = true;
   const togglePip = async () => { try { if (document.pictureInPictureElement === video) await document.exitPictureInPicture(); else { await video.play(); await video.requestPictureInPicture(); } } catch (e) { onError?.(e); } };
   pipBtn.addEventListener("click", togglePip); $("[data-pip-back]").addEventListener("click", togglePip);
-  video.addEventListener("enterpictureinpicture", () => { pl.classList.add("sn-in-pip"); pipBtn.dataset.tip = tt("media.14"); });
-  video.addEventListener("leavepictureinpicture", () => { pl.classList.remove("sn-in-pip"); pipBtn.dataset.tip = tt("media.8"); });
+  video.addEventListener("enterpictureinpicture", () => { pl.classList.add("sn-in-pip"); pipBtn.dataset.tip = tt("media.14"); retip(pipBtn); });
+  video.addEventListener("leavepictureinpicture", () => { pl.classList.remove("sn-in-pip"); pipBtn.dataset.tip = tt("media.8"); retip(pipBtn); });
   pl.addEventListener("keydown", (e) => {
     if (e.target === vs) { const d = { ArrowRight: .05, ArrowUp: .05, ArrowLeft: -.05, ArrowDown: -.05 }[e.key]; if (d) { e.preventDefault(); setVolume((muted ? 0 : level) + d, false); } return; }
     if (e.target.closest("button") && (e.key === " " || e.key === "Enter")) return;

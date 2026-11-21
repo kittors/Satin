@@ -7,6 +7,9 @@ const FRAME = 17.5;
 // attrs：这个属性的任何变化；attrValues：属性变成（或原来是）这个值的变化（比如提示层的 role="tooltip"）
 const EXPECT = (() => { try { return JSON.parse(fs.readFileSync(new URL("./expected.json", import.meta.url), "utf8")); } catch { return []; } })();
 const TRACE_EX = EXPECT.flatMap((e) => (e.trace ? [e.trace] : []));
+// 按区块登记的 DOM 变化（trace.muts：{ block, path }，path 是对着变化元素路径的正则）：这些元素上的文字、增删子节点、属性变化不算
+// （比如对话顶栏的状态那一行：改造前生成时写"正在思考…"、平时写"已载入 N 条"，改造后不写——differences 28）
+const MUT_EX = TRACE_EX.flatMap((t) => t.muts || []).map((m) => ({ block: m.block, re: new RegExp(m.path) }));
 export const expectedAttr = (attr, ...values) => TRACE_EX.some((t) => (t.attrs || []).includes(attr) || (t.attrValues || []).some((v) => v.attr === attr && values.includes(v.value)));
 
 const num = (s) => (String(s).match(/-?\d+(\.\d+)?(e-?\d+)?/g) || []).map(Number);
@@ -98,11 +101,13 @@ function cmpAnims(a, b, out, label, ta, tb) {
   b.forEach((y, k) => { if (!used.has(k)) out.push(`${label} 动画只在 B：${y.kind} ${y.target}${y.pseudo} ${y.name} ${y.dur}ms ${y.easing} ${JSON.stringify(y.kf).slice(0, 160)}`); });
 }
 const styleProps = (v) => (v || "").split(";").map((x) => x.split(":")[0].trim()).filter(Boolean).sort().join(",");
-function cmpMuts(a, b, out, label) {
+function cmpMuts(a, b, out, label, block) {
+  const ex = MUT_EX.filter((e) => e.block === block);
   const norm = (list) => {
     const keys = [], lastStyle = new Map();
     for (const m of list) {
       if (m[1] === "a" && expectedAttr(m[3], m[4])) continue; // 登记过的预期差异
+      if (ex.length && ex.some((e) => e.re.test(m[2]))) continue; // 按区块登记的那几处元素
       if (m[1] === "a" && m[3] === "style") { keys.push(`s|${m[2]}|${styleProps(m[4])}`); lastStyle.set(m[2], m[4]); }
       else keys.push(m.slice(1).join("|"));
     }
@@ -127,13 +132,13 @@ function cmpMuts(a, b, out, label) {
 }
 
 
-export function compareAction(x, y, label) {
+export function compareAction(x, y, label, block) {
   const out = [];
     if (x.name !== y.name || x.path !== y.path) { out.push(`${label}: 动作对不上（${y.name} ${y.path}）`); return out; }
     if (x.name === "skip") return out;
     if ((x.err || "") !== (y.err || "")) out.push(`${label} 动作出错：${x.err} → ${y.err}`);
     cmpAnims(x.anims, y.anims, out, label, anchorOf(x), anchorOf(y));
-    cmpMuts(x.muts, y.muts, out, label);
+    cmpMuts(x.muts, y.muts, out, label, block);
     const animated = new Set([...x.anims, ...y.anims].map((q) => q.target));
     // 只被 CSS / WAAPI 动画驱动、这个动作里没有被 JS 改过内联样式的元素
     for (const m of [...x.muts, ...y.muts]) if (m[1] === "a" && m[3] === "style") animated.delete(m[2]);

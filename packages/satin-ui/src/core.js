@@ -118,22 +118,28 @@ export function initSeg(seg, onChange, start = 0) {
 }
 // ———— 3. Tooltip：首次悬停 500ms 后出现，刚关掉 300ms 内移到相邻元素立即出现；键盘聚焦也出现（09 号 §5.2） ————
 // 页面里没有提示气泡的容器就自己建一个（官网、库的使用者不用在 HTML 里写）
-let tip = null, tipTimer = 0, lastHide = 0, tipFor = null, described = null;
+let tip = null, tipTimer = 0, lastHide = 0, tipFor = null, described = null, tipWait = null, shown = "";
 const tipEl = () => (tip ??= document.getElementById("sn-tip") || document.body.appendChild(Object.assign(document.createElement("div"), { className: "sn-tip", id: "sn-tip", popover: "manual" })));
 // 读屏：提示层 role="tooltip"，显示时元素 aria-describedby 指向它（提示和 aria-label 一样时不再重复读）
 const undescribe = () => { described?.removeAttribute("aria-describedby"); described = null; };
 export function showTip(el, text) {
   tipEl(); if (!tip.matches(":popover-open")) tip.showPopover();
-  tip.setAttribute("role", "tooltip"); if (described !== el) undescribe();
+  tip.setAttribute("role", "tooltip"); if (described !== el || el.getAttribute("aria-label") === text) undescribe();
   if (!described && !el.hasAttribute("aria-describedby") && el.getAttribute("aria-label") !== text) { el.setAttribute("aria-describedby", tip.id); described = el; }
-  tip.textContent = text; if (el.dataset.kbd) { const k = document.createElement("kbd"); k.textContent = el.dataset.kbd; tip.append(k); }
+  tip.textContent = shown = text; if (el.dataset.kbd) { const k = document.createElement("kbd"); k.textContent = el.dataset.kbd; tip.append(k); }
   tip.classList.toggle("sn-wrap", text.length > 20); tip.classList.add("sn-on"); tipFor = el;
   const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
   const top = r.top - h - 8 < 64 ? r.bottom + 8 : r.top - h - 8;
   tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px"; tip.style.top = top + "px";
 }
-export const hideTip = () => { clearTimeout(tipTimer); undescribe(); if (tipFor) { tip.classList.remove("sn-on"); tipFor = null; lastHide = performance.now(); } };
+export const hideTip = () => { clearTimeout(tipTimer); tipWait = null; undescribe(); if (tipFor) { tip.classList.remove("sn-on"); tipFor = null; lastHide = performance.now(); } };
 export const tipTarget = () => tipFor;
+// 元素换了状态、改了 data-tip（发送按钮变成停止、又变回来）：正显示着它的提示当场换字，还在等 500ms 的也换成新字；新字为空就收起
+export const retip = (el) => {
+  const t = tipText(el);
+  if (tipWait?.el === el) { if (t) tipWait.text = t; else hideTip(); }
+  if (tipFor === el && t !== shown) { if (t) showTip(el, t); else hideTip(); }
+};
 // 弹窗进入顶层后，Tooltip 要重新放进顶层才能盖在弹窗上面
 export const resetTipLayer = () => { hideTip(); if (tip?.matches(":popover-open")) tip.hidePopover(); };
 const tipText = (el) => el.dataset.tip || (el.hasAttribute("data-tip-full") && el.scrollWidth > el.clientWidth ? el.textContent : "");
@@ -143,7 +149,7 @@ tipEl();
 document.addEventListener("pointerover", (e) => {
   const el = e.target.closest("[data-tip],[data-tip-full]"); if (!el || el === tipFor) return;
   const text = tipText(el); if (!text) return;
-  clearTimeout(tipTimer); tipTimer = setTimeout(() => showTip(el, text), performance.now() - lastHide < 300 ? 0 : 500);
+  clearTimeout(tipTimer); const w = tipWait = { el, text }; tipTimer = setTimeout(() => { tipWait = null; showTip(w.el, w.text); }, performance.now() - lastHide < 300 ? 0 : 500);
 });
 document.addEventListener("pointerout", (e) => { const el = e.target.closest("[data-tip],[data-tip-full]"); if (el && !el.contains(e.relatedTarget)) hideTip(); });
 document.addEventListener("focusin", (e) => { const el = e.target.closest?.("[data-tip]"); if (el?.matches(":focus-visible")) showTip(el, el.dataset.tip); });

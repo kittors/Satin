@@ -54,7 +54,7 @@ export default {
     { name: "loadingText", type: "string", default: "\"正在加载…\"", required: false, desc: "加载中那一层的话。", names: { js: "loadingText", react: "loadingText", vue: "loadingText", svelte: "loadingText", preact: "loadingText" } },
     { name: "lines", type: "\"row\" | \"grid\"", default: "\"grid\"", required: false, desc: "只画行线，还是画网格线（合并单元格只在网格线下显示）。", names: { js: "lines", react: "lines", vue: "lines", svelte: "lines", preact: "lines" } },
     { name: "height", type: "number | string", default: "480", required: false, desc: "表格框的高度（表头 + 行，不含工具条）：数字是 px，也可以写 `\"60vh\"`。行少时调小，别留一大片空白。", names: { js: "height", react: "height", vue: "height", svelte: "height", preact: "height" } },
-    { name: "label", type: "string", default: "\"数据表格（画布绘制）\"", required: false, desc: "表格的读屏名称（`role=\"grid\"` 的 `aria-label`）：写这张表是什么，\"镜头清单\"。", names: { js: "label", react: "label", vue: "label", svelte: "label", preact: "label" } },
+    { name: "label", type: "string", default: "\"数据表格\"", required: false, desc: "表格的读屏名称（`role=\"grid\"` 的 `aria-label`）：写这张表是什么，\"镜头清单\"。", names: { js: "label", react: "label", vue: "label", svelte: "label", preact: "label" } },
     { name: "toolbar", type: "boolean", default: "true", required: false, desc: "带不带工具条（搜索框、筛选条件、行数）。搜索搜的是主列；服务端不支持搜索时关掉。", names: { js: "toolbar", react: "toolbar", vue: "toolbar", svelte: "toolbar", preact: "toolbar" } },
     { name: "controls", type: "boolean", default: "false", required: false, desc: "工具条上再加几个切换：平铺 / 树形、按需加载 / 滚到底再加载、滚动条常驻 / 自动隐藏、行线 / 网格（设计稿的演示就开着它）。", names: { js: "controls", react: "controls", vue: "controls", svelte: "controls", preact: "controls" } },
   ],

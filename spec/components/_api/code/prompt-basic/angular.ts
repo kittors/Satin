@@ -2,7 +2,7 @@ import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild }
 import { createComposer, toast } from "satin-ui";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 @Component({
   selector: "demo-prompt-basic",

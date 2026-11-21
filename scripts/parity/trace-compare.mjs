@@ -24,7 +24,7 @@ for (const sub of fs.readdirSync(A).filter((d) => fs.statSync(path.join(A, d)).i
     const n = Math.min(a.actions.length, b.actions.length); if (a.actions.length !== b.actions.length) out.push(`动作数 ${a.actions.length} → ${b.actions.length}`);
     for (let i = 0; i < n; i++) {
       const x = a.actions[i], y = b.actions[i], label = `#${i} ${x.name} ${x.path.split(">").slice(-3).join(">")}`;
-      const d = compareAction(x, y, label); out.push(...d);
+      const d = compareAction(x, y, label, a.id ?? f.replace(".json.gz", "")); out.push(...d);
       if (d.some((s) => s.includes("动作对不上"))) break;
     }
     out.push(...compareFinal(a, b));

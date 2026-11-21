@@ -16,7 +16,7 @@ export class PromptStopComponent {
     const destroyRef = inject(DestroyRef);
     // 生成中点停止，onStop 里取消；渲染完再建（只在浏览器里跑），组件销毁时 destroy()
     afterNextRender(() => {
-      const it = createComposer(this.host().nativeElement, { placeholder: "描述画面，发送后可以随时停止", send: "生成", onSend: generate, onStop: stop });
+      const it = createComposer(this.host().nativeElement, { placeholder: "描述你想要的画面", send: "生成", onSend: generate, onStop: stop });
       destroyRef.onDestroy(() => it.destroy());
     });
   }

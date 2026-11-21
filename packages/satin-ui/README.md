@@ -53,7 +53,7 @@ createApp(App).use(Satin).mount("#app"); // <SnSegmented v-model="view" :items="
 
 ```js
 import { createChat } from "satin-ui/chat";
-const chat = createChat(document.querySelector("#chat"), { title: "分镜助手", async *respond(q) { yield "收到：" + q; } });
+const chat = createChat(document.querySelector("#chat"), { title: "分镜助手", async *respond(question) { yield "第三集可以拆成三段："; yield "车站外、候车厅、站台。"; } }); // respond：把 question 发给模型，回来一段 yield 一段
 chat.destroy(); // 卸载时：停掉生成中的回答、撤掉监听、清空容器
 // React：const Chat = wrapSatin(createChat, { events: [] })（satin-ui/react），然后 <Chat title="…" respond={…} />
 ```

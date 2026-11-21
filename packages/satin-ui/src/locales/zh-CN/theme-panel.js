@@ -9,6 +9,5 @@ export default {
   "theme-panel.6": "危险",
   "theme-panel.7": "字体",
   "theme-panel.8": "字号",
-  "theme-panel.9": "所有组件即时跟着变",
   "theme-panel.10": "恢复默认"
 };

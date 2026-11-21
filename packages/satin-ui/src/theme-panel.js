@@ -15,7 +15,7 @@ export function themePanelHTML() {
     + `</div></div>`
     + `<div class="sn-th-sec"><span class="sn-th-h">${tt("theme-panel.7")}</span><div class="sn-seg sn-sm" data-th="font"><span class="sn-thumb"></span>${T.FONTS.map((f) => `<button data-v="${f.id}">${f.name}</button>`).join("")}</div></div>`
     + `<div class="sn-th-sec"><span class="sn-th-h">${tt("theme-panel.8")}</span><div class="sn-seg sn-sm" data-th="scale"><span class="sn-thumb"></span>${T.SCALES.map((s) => `<button data-v="${s.id}">${s.name}</button>`).join("")}</div></div>`
-    + `<div class="sn-th-foot"><span class="sn-t-caption sn-c-tertiary">${tt("theme-panel.9")}</span><button class="sn-textbtn" data-th-reset>${tt("theme-panel.10")}</button></div>`;
+    + `<div class="sn-th-foot"><button class="sn-textbtn" data-th-reset>${tt("theme-panel.10")}</button></div>`;
 }
 // 挂到一个容器上：生成面板内容、接上交互；返回 { sync()（外面改了主题时刷新选中状态）, destroy() }。
 // 第二个参数不用给（分段控件、图标都从库里取）；以前要手动传进来的 { initSeg, injectIcons } 仍然接受

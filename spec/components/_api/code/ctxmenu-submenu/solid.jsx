@@ -1,5 +1,7 @@
 import { toast } from "satin-ui";
 
+const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+
 // 名字不是驼峰的事件用 ref 挂
 const on = (type, fn) => (el) => el.addEventListener(type, fn);
 
@@ -8,7 +10,7 @@ export default function OrganizeMenu() {
   return (
     <sn-enhance>
       <button type="button" class="sn-btn sn-secondary" data-fmenu="mn-move" aria-haspopup="menu" aria-expanded="false" data-i="chevron-down:caret">整理</button>
-      <div class="sn-menu sn-float" id="mn-move" ref={on("menuselect", (e) => toast({ text: "选了：" + e.detail.item.textContent }))} role="menu" tabindex="-1" aria-label="整理">
+      <div class="sn-menu sn-float" id="mn-move" ref={on("menuselect", (e) => toast({ text: DONE[e.detail.item.dataset.key] }))} role="menu" tabindex="-1" aria-label="整理">
         <div class="sn-item" role="menuitem" data-key="移动到" data-sub="mn-move-1" aria-haspopup="menu" data-i="folder:before">移动到<span data-i="chevron-right:more"></span></div>
         <div class="sn-sep"></div>
         <div class="sn-item sn-danger-item" role="menuitem" data-key="trash" data-i="trash-2:before">移到回收站</div>

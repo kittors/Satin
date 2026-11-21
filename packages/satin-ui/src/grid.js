@@ -233,7 +233,7 @@ export function mountToolbar(root, src, model, { $, initSeg, seg, treeSeg, selCo
     }
     if (chips) chips.innerHTML = parts.map(([k, t]) => `<span class="sn-chip sn-sm sn-on sn-g-chip" data-k="${esc(k)}">${t}<span class="sn-g-x" aria-label="${tt("grid.9")}">×</span></span>`).join("") + (parts.length ? tt("grid.10") : "");
     const sel = selCount(), tr = src.tree;
-    if (info) info.innerHTML = src.busy ? tt("grid.11") : tt("grid.12", { p0: src.total.toLocaleString("zh-CN"), p1: tr && rootsText(src.roots) ? tt("grid.49", { p0: esc(rootsText(src.roots)) }) : "", p2: (hasFilter(qq) || qq.sort) && src.ms != null ? tt("grid.50", { p0: src.ms }) : "", p3: sel ? tt("grid.51", { p0: `<b>${sel.toLocaleString("zh-CN")}</b>`, p1: tr ? tt("grid.52") : tt("grid.53") }) : "" });
+    if (info) info.innerHTML = src.busy ? tt("grid.11") : tt("grid.12", { p0: src.total.toLocaleString("zh-CN"), p1: tr && rootsText(src.roots) ? tt("grid.49", { p0: esc(rootsText(src.roots)) }) : "", p2: sel ? tt("grid.51", { p0: `<b>${sel.toLocaleString("zh-CN")}</b>`, p1: tr ? tt("grid.52") : tt("grid.53") }) : "" });
     if (xb) { xb.hidden = !tr; if (tr && !src.busy) xb.lastChild.textContent = src.allOpen() ? tt("grid.13") : tt("grid.14"); } // 树形模式：所有级一起展开 / 收起
   }
   chips?.addEventListener("click", (e) => {

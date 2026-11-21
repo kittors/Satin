@@ -19,7 +19,8 @@ for (const side of ["base", "cur"]) {
   const pre = side === "base" ? "" : "sn-", S = (sel) => sel.replace(/\.(?=[a-z])/g, "." + pre);
   for (const id of only) {
     const c = CASES[id]; if (!c) continue;
-    const Q = c.raw ? (x) => x : S;
+    // 选择器限定在这个区块里：嵌入页（?embed=）别的区块只是藏起来，还在文档里——不限定的话 .seg 第一个命中的是别的区块里看不见的那个
+    const Q = (x) => `#${c.sec} ${c.raw ? x : S(x)}`;
     const ctx = await newContext(browser, { side, theme: "light", size: "desktop" }), page = await ctx.newPage();
     await page.goto(embedURL(side, c.sec), { waitUntil: "load" }); await sleep(1200);
     const lat = [];

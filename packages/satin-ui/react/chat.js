@@ -1,7 +1,7 @@
 "use client"; // Next.js 等 React 服务端组件环境：用到状态和副作用，是客户端组件
 // satin-ui/react/chat：对话（satin-ui/chat 的 createChat）包成的 React 组件。重组件单独一个子路径，不拉进 satin-ui/react 主入口。
 //   import { Chat } from "satin-ui/react/chat";
-//   <Chat title="写作助手" status="在线" placeholder="说点什么…" respond={async function* (text) { yield "好的，"; yield "马上改。"; }} />
+//   <Chat title="写作助手" placeholder="说点什么…" respond={async function* (text) { yield "第三集可以拆成三段："; yield "车站外、候车厅、站台。"; }} />
 // respond 接模型：异步生成器一段段 yield（或返回一整段文字）；每次都用最新的 respond（换了不用重新挂）。
 // status 变了更新顶栏；history、title、placeholder、max、maxLines、attach、empty 只在创建时用（要换一段对话就换 key）。ref 拿到实例：send(text)、receive(item)、fill(text)……
 // 新对话：empty={{ icon, title, subtitle, suggestions }}；要自己画就给 renderEmpty={() => <… />}（画进空状态那一块，第一条消息进来时一起淡出）。

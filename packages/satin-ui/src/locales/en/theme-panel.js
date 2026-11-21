@@ -9,6 +9,5 @@ export default {
   "theme-panel.6": "Danger",
   "theme-panel.7": "Font",
   "theme-panel.8": "Text size",
-  "theme-panel.9": "Every component updates instantly",
   "theme-panel.10": "Reset"
 };

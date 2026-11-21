@@ -14,7 +14,7 @@ export class PromptUploadComponent {
     const destroyRef = inject(DestroyRef);
     // 拖进来、粘贴截图、点 + 都能加附件；渲染完再建（只在浏览器里跑），组件销毁时 destroy()
     afterNextRender(() => {
-      const it = createComposer(this.host().nativeElement, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
+      const it = createComposer(this.host().nativeElement, { placeholder: "描述画面，可以附上参考图", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
       destroyRef.onDestroy(() => it.destroy());
     });
   }

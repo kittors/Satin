@@ -28,6 +28,6 @@ export default {
   "canvas-grid.27": "Name",
   "canvas-grid.28": "sorting, filtering or expanding",
   "canvas-grid.29": "sorting or filtering",
-  "canvas-grid.30": "Data grid (drawn on canvas)",
+  "canvas-grid.30": "Data grid",
   "canvas-grid.31": "Search {p0}"
 };

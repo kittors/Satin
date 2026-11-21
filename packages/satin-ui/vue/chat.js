@@ -1,6 +1,6 @@
 // satin-ui/vue/chat：对话（satin-ui/chat 的 createChat）包成的 Vue 组件。重组件单独一个子路径，不拉进 satin-ui/vue 主入口。
-//   <script setup> import { Chat } from "satin-ui/vue/chat"; async function* respond(text) { yield "好的，"; yield "马上改。"; } </script>
-//   <Chat title="写作助手" status="在线" placeholder="说点什么…" :respond="respond" />
+//   <script setup> import { Chat } from "satin-ui/vue/chat"; async function* respond(text) { yield "第三集可以拆成三段："; yield "车站外、候车厅、站台。"; } </script>
+//   <Chat title="写作助手" placeholder="说点什么…" :respond="respond" />
 // respond 接模型：异步生成器一段段 yield（或返回一整段文字）；每次都用最新的 respond。
 // status 变了更新顶栏；history、title、placeholder、max、max-lines、attach 只在创建时用（要换一段对话就换 :key）。模板 ref 的 instance：send(text)、receive(item)……
 // 新对话：:empty="{ icon, title, subtitle, suggestions }"；要自己画就写 #empty 插槽（画进空状态那一块，第一条消息进来时一起淡出）。

@@ -387,7 +387,7 @@
       </div>
       <div class="sn-field"><label class="sn-lbl" for="c-desc">画面描述</label>
         <div class="sn-box-in" data-ta data-max="120" data-max-lines="7">
-          <textarea id="c-desc" rows="3" placeholder="写清楚人物、动作和光线，生成会更准。可以一直往下写，框会跟着长高。"></textarea>
+          <textarea id="c-desc" rows="3" placeholder="写清楚人物、动作和光线，生成会更准。"></textarea>
           <div class="sn-ta-foot"><span class="sn-hint">⇧↵ 换行 · ⌘↵ 保存</span><span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg><span class="sn-txt"><span class="sn-roll"><span>0</span></span> / 120</span></span></div>
         </div>
         <div class="sn-help">中文、英文、标点都按一个字算；表情按一个字算。</div></div>
@@ -769,7 +769,7 @@
           <span class="sn-g-filters" data-g-filters></span>
           <span class="sn-g-info" data-g-info></span>
         </div>
-        <div class="sn-g-frame"><div class="sn-g-vp" tabindex="0" role="grid" aria-label="数据表格，一百万行，画布绘制"><div class="sn-g-head" role="row"></div><canvas class="sn-cg-cv" aria-hidden="true"></canvas><div class="sn-cg-sizer"></div></div><i class="sn-g-shade sn-l" aria-hidden="true"></i><i class="sn-g-shade sn-r" aria-hidden="true"></i><div class="sn-cg-sr" aria-live="polite"></div></div>
+        <div class="sn-g-frame"><div class="sn-g-vp" tabindex="0" role="grid" aria-label="数据表格"><div class="sn-g-head" role="row"></div><canvas class="sn-cg-cv" aria-hidden="true"></canvas><div class="sn-cg-sizer"></div></div><i class="sn-g-shade sn-l" aria-hidden="true"></i><i class="sn-g-shade sn-r" aria-hidden="true"></i><div class="sn-cg-sr" aria-live="polite"></div></div>
       </div>
     </div>
     <ul class="rules"><li>滚动用原生滚动条：滚动容器里放一块和全部行一样高的垫片，画布 sticky 贴在视口里不动，滚到哪画哪；一百万行 × 32 = 3200 万 px，在浏览器元素高度的上限（约 3355 万）以内。</li><li>一帧只画看得见的十几行：中间列裁在两边固定列之间，固定列最后画、盖在上面；横着滚开时固定列边上画一道渐变阴影。字体切换尽量少，量过的字宽缓存起来，放不下就截断加省略号。</li><li>悬停、勾选、拖行让位、编辑后闪一下、数据到了淡入、换列位置时列从旧位置滑过去，都在画布上画；动画只在进行中的那几帧重画。</li><li>编辑：在格子的位置盖一个输入框（选项列弹出选项），滚动时能提交就提交、不合法就取消；当前格子的内容写进一个看不见的 aria-live 区域，读屏能读到。</li><li>什么时候用哪个：几千行以内、格子里要放复杂的交互组件用 DOM 版；几十万行以上、只读或简单编辑、要求快速滚动不掉帧用 Canvas 版。</li></ul>
@@ -879,7 +879,7 @@
     <div class="sn-chat-cfg"><span class="sn-cap">演示</span><button class="sn-btn sn-ghost sn-sm" data-chat-sim="top" data-i="arrow-up:before">快速滚到最早</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="incoming">模拟收到消息</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="fail">模拟发送失败</button></div>
     <div class="demo">
       <div class="sn-chat" id="chatBox">
-        <div class="sn-chat-hd"><div class="sn-tx"><b>分镜助手</b><span class="sn-sub"><span data-chat-status>在线</span>·<span data-chat-count class="sn-num"></span></span></div></div>
+        <div class="sn-chat-hd"><div class="sn-tx"><b>分镜助手</b><span class="sn-sub"><span data-chat-status></span></span></div></div>
         <div class="sn-chat-body"><div class="sn-chat-vp" id="chatVp"><div class="sn-chat-canvas"><div class="sn-chat-ph sn-top"></div><div class="sn-chat-ph sn-bot"></div></div></div><button class="sn-chat-jump" data-chat-jump aria-label="跳到最新"><span data-i="arrow-down"></span><span class="sn-badge" hidden>0</span></button></div>
         <div class="sn-chat-foot">
           <div class="sn-box-in sn-composer" data-composer data-external data-max="500" data-max-lines="5">
@@ -900,13 +900,13 @@
     </ul>
     <!-- 新加的演示（2026-11-21，differences 26）：data-parity-appended 让对比工具先把它拿掉，页面其余部分和改造前逐像素比 -->
     <h3 data-parity-appended>新对话</h3>
-    <p data-parity-appended>还没有消息时，消息区正中是一个单色图标、一句标题、一句说明和几个建议，点建议把它填进输入框（不直接发）。输入框顶上贴着一条浅灰的上下文栏（项目、环境、分支），底部一行左边是附件和权限标签，右边是模型选择和发送。发出第一条以后空状态淡出，输入框原地不动。</p>
+    <p data-parity-appended>还没有消息时，消息区正中是一个单色图标、一句标题、一行上下文（上次停在哪，没有就不写）和几个建议，点建议把它填进输入框（不直接发）。输入框顶上贴着一条浅灰的上下文栏（项目、环境、分支），底部一行左边是附件和权限标签，右边是模型选择和发送。发出第一条以后空状态淡出，输入框原地不动。</p>
     <div class="sn-chat-cfg" data-parity-appended><span class="sn-cap">演示</span><button class="sn-btn sn-ghost sn-sm" data-chat-new-reset data-i="rotate-ccw:before">重新开始</button></div>
     <div class="demo" data-parity-appended>
       <div class="sn-chat sn-chat-new" id="chatNew"></div>
     </div>
     <ul class="rules" data-parity-appended>
-      <li>空状态：图标 44px、只用三档灰；标题一句话说清楚能做什么；建议 2～4 个，写成用户会说的话。</li>
+      <li>空状态：图标 44px、只用三档灰；标题一句话说清楚能做什么；说明那行只写用户不知道的上下文，不写操作说明；建议 2～4 个，写成用户会说的话。</li>
       <li>第一条消息（发出或收到）进来时空状态淡出：220ms，只动透明度和位移；输入框不跳，消息照常飞进列表。</li>
       <li>权限、模式用标签的小圆点表示状态（绿 只读、橙 完全访问、红 有风险）；模型按钮写"名称 · 档位"，点开往上长菜单；没写内容时发送按钮是灰的。</li>
     </ul>

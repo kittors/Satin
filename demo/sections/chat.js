@@ -13,7 +13,7 @@ const HI = (g) => g.replace("w=720&h=450", "w=1920&h=1200");
 const CLIP = { src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg" };
 const SCENES = ["1516900557549-41557d405adf", "1541702467897-41915a07d3a7", "1554103577-c0d26e9b90e0", "1576514864427-f0809d2b66eb", "1589803196988-17b417281773", "1774979300738-5c8c05e1db6b"].map(PHOTO);
 const AI_LINES = ["第三集我拆成了 12 个镜头，节奏比上一版快一点。", "开头建议用远景：雨刚停，广场积水里倒映着路灯，镜头慢慢推近站门。", "林夏进候车厅那一段可以用全景，暖黄的灯光和外面的冷色形成对比。",
-  "最后一班车进站时，车灯穿过雨幕照亮她的侧脸，这里用特写。", "要不要把结尾改成她没有上车？留白会更有余味。", "好的，我按电影感的风格重新生成了画面描述。", "已经把第 7 到第 9 个镜头的时长各缩短了 1 秒。", "配音换成了温柔一点的女声，语速放慢了 10%。"];
+  "最后一班车进站时，车灯穿过雨幕照亮她的侧脸，这里用特写。", "要不要把结尾改成她没有上车？留白会更有余味。", "按电影感的风格重新生成了画面描述。", "已经把第 7 到第 9 个镜头的时长各缩短了 1 秒。", "配音换成了温柔一点的女声，语速放慢了 10%。"];
 const AI_LONG = ["这一集的情绪主线是等待。前半段用冷色和远景拉开距离，让观众先看见空旷；进候车厅以后，暖光和中近景把人拉近；最后车灯打在脸上的那一下，是整集唯一的高光，之后立刻收回到她的背影。",
   "我对比了原文和现在的分镜：原文里有两处心理描写没有画面对应，一处是她想起父亲送她上车，一处是她数站台的灯。建议给前一处加一个 2 秒的闪回空镜，后一处用一个慢慢摇过灯的长镜头。"];
 const DOCS = [["第三集分镜脚本（终版）.docx", "DOCX"], ["雨夜车站 · 人物小传.pdf", "PDF"], ["镜头时长统计表.xlsx", "XLSX"], ["配乐参考.zip", "ZIP"]];
@@ -60,7 +60,7 @@ async function* network(text, ctx) {
 const CARDS = [["03", "远景 · 4 秒", "雨刚停，积水里的路灯", SCENES[0]], ["04", "全景 · 6 秒", "她收起伞走进候车厅", SCENES[2]], ["05", "特写 · 3 秒", "车灯照亮她的侧脸", SCENES[3]]];
 // 剧本：思考 → 两个步骤 → 正文 → 三张镜头卡片 → 生成一张画面
 async function* script(prompt, ctx) {
-  for await (const t of network(prompt.includes("图") ? "先看参考图的色调：冷蓝、低饱和、有雾。再对一下第三集开头的三个镜头，它们现在偏暖，和参考不一致。打算把色温降下来，景别保持不变。" : `用户的意思是：${prompt.slice(0, 18)}。先找到第三集里对应的镜头，再看哪些参数要改：色调、景别还是时长。改完要重新生成画面，顺便检查前后镜头的衔接。`, ctx)) yield { think: t };
+  for await (const t of network(prompt.includes("图") ? "先看参考图的色调：冷蓝、低饱和、有雾。再对一下第三集开头的三个镜头，它们现在偏暖，和参考不一致。打算把色温降下来，景别保持不变。" : "先找到第三集里对应的镜头，再看哪些参数要改：色调、景别还是时长。改完要重新生成画面，顺便检查前后镜头的衔接。", ctx)) yield { think: t };
   if (ctx.stopped) return;
   yield { step: { t: "读取第三集的 48 个镜头", s: "run" } }; await wait(650); if (ctx.stopped) return;
   yield { stepUpdate: { index: 0, s: "done" } };
@@ -93,8 +93,8 @@ export function initChat() {
 function initNewChat() {
   const box = document.getElementById("chatNew"); if (!box) return;
   const opts = {
-    title: "新对话", status: "在线", placeholder: "随心输入",
-    empty: { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] },
+    title: "新对话", placeholder: "随心输入",
+    empty: { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] },
     // 上下文栏：项目（点了只发事件）、在哪跑、哪一集（点开是菜单）；权限：点开选只读 / 自动 / 完全访问（小圆点的颜色表示风险）
     context: [
       { icon: "folder", text: "雨夜车站" },

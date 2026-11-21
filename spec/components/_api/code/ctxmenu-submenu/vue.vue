@@ -6,11 +6,12 @@ const ITEMS = [
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
+const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 </script>
 
 <template>
   <!-- @select(key, 那一项)：子菜单里的项也走这里；斜着移向子菜单时，途经的行不抢高亮 -->
-  <Menu :items="ITEMS" @select="(key, it) => toast({ text: '选了：' + it.label })">
+  <Menu :items="ITEMS" @select="(key) => toast({ text: DONE[key] })">
     <Button caret>整理</Button>
   </Menu>
 </template>
