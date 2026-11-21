@@ -26,6 +26,7 @@ main { padding: 24px; display: grid; gap: 24px; }
 .clip { position: relative; overflow: hidden; height: 48px; width: 280px; }
 .clip .menu { position: absolute; left: 0; top: 36px; width: 200px; padding: 8px; background: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, .12); display: none; }
 .clip.open .menu { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -44,10 +45,18 @@ main { padding: 24px; display: grid; gap: 24px; }
   <div class="badges"><span style="background:#e11d48">紧急</span><span style="background:#2563eb">进行中</span><span style="background:#16a34a">新</span><span style="background:#9333ea">热门</span></div>
   <div class="overlap"><button>被挡住的按钮</button><div class="cover"></div></div>
   <button class="narrow">很长的按钮文字会换行</button>
+  <button class="sn-btn sn-ghost sn-sm">分镜模型 · 精细 精细</button>
   <div class="wide"></div>
   <p class="low">浅灰色的正文，几乎看不清</p>
   <div class="tiny"><a href="#">1</a><a href="#">2</a><a href="#">3</a><a href="#">4</a></div>
   <div class="clip" id="clip"><button aria-haspopup="menu" onclick="this.parentElement.classList.toggle('open')">打开菜单</button><div class="menu">重命名<br>复制一份<br>移到别的项目<br>删除</div></div>
+  <!-- 界面、换行（AI 味清单）：头像放字、默认按钮、网格孤儿（3 + 1）、处处加粗开头、行内代码折行、手机上的圆角卡片 -->
+  <div><span class="sn-av">林</span> <button>导出</button></div>
+  <button aria-label="停止" style="position: relative; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #e5484d"><svg viewBox="0 0 40 40" style="position: absolute; left: -4px; top: -4px; width: 40px; height: 40px; animation: spin .9s linear infinite"><circle cx="20" cy="20" r="19" fill="none" stroke="#e5484d" stroke-dasharray="30 96"/></svg></button>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px"><div class="cell">远景</div><div class="cell">中景</div><div class="cell">特写</div><div class="cell">空镜</div></div>
+  <ul><li><b>节奏</b>：比上一版快一点</li><li><b>色调</b>：开头再冷一点</li><li><b>景别</b>：第 8 个镜头换成侧面</li><li><b>配音</b>：换成温柔一点的女声</li><li><b>字幕</b>：字号小一点</li><li><b>结尾</b>：不上车，留白</li></ul>
+  <p style="width: 120px">颜色用 <code>--sn-label2-secondary-text</code> 这一档</p>
+  <div style="margin: 0 16px; height: 60vh; border-radius: 16px; background: #f5f5f7">手机上原样放进来的桌面卡片</div>
 </main>
   <!-- 编出来的 sn- 类名（class-exists） -->
   <span class="sn-eyebrow">工作区设置</span>

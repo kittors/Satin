@@ -104,9 +104,10 @@ w("motion/inventory.json", JSON.stringify({ easingUsage: easingCount, ...inv }, 
 w("motion/README.md", `# 动效规格\n\n只动 transform、opacity、filter；曲线和时长只用下面这几档（令牌：spec/tokens/base.tokens.json 的 motion.easing）。\n\n## 曲线\n\n| 名字 | CSS | 用在哪 |\n| --- | --- | --- |\n${curves.map((c) => `| \`${c.name}\` | \`${c.css}\` | ${c.use} |`).join("\n")}\n\n## 时长\n\n| 档位 | 例子 | 时长 |\n| --- | --- | --- |\n${durations.map((d) => `| ${d.tier} | ${d.examples} | ${d.ms} |`).join("\n")}\n\n## 实际用量\n\n样式表里的过渡 / 动画 ${inv.css.length} 处，脚本里的 WAAPI ${inv.js.length} 处（清单见 inventory.json）。曲线用量：\n\n${Object.entries(easingCount).sort((a, b) => b[1] - a[1]).map(([k, n]) => `- \`${k}\`：${n}`).join("\n")}\n\n## 验收\n\n逐帧记录（rAF 每帧取关键元素的位置和透明度）：帧间隔 p95 ≤ 17ms、最长 ≤ 34ms、没有 > 50ms 的帧。录屏只用来看画面。\n`);
 
 // ———— 4. 去 AI 味规则（spec/rules/anti-ai.json 手写）→ Markdown ————
-const rules = JSON.parse(fs.readFileSync(path.join(SPEC, "rules/anti-ai.json"), "utf8")).rules;
-w("rules/anti-ai.md", `# 去 AI 味规则\n\n${rules.length} 条。每条都能自动检查（检查器 skills/satin/scripts/check.mjs，规则 id 一一对应）；static = 扫源码，dom = 在浏览器里量，visual = 截图看。\n\n`
-  + rules.map((r) => `## ${r.title}（\`${r.id}\`，${r.severity === "error" ? "必须" : "建议"}）\n\n${r.why}\n\n- 这样做：${r.do}\n- 不要：${r.dont}\n- 判据（${r.check.kind}）：${r.check.how}\n- 修法：${r.fix}\n`).join("\n"));
+const RULES_JSON = JSON.parse(fs.readFileSync(path.join(SPEC, "rules/anti-ai.json"), "utf8")), rules = RULES_JSON.rules, ROOTS = RULES_JSON.roots || [];
+w("rules/anti-ai.md", `# 去 AI 味规则\n\n${rules.length} 条，按七个根源分组。static、dom 的检查器能自动查（\`skills/satin/scripts/check.mjs\`，规则 id 一一对应：static = 扫源码，dom = 在浏览器里量）；visual 的要人工看截图、录屏。\n\n`
+  + "## AI 味七问\n\n" + ROOTS.map((x, i) => `${i + 1}. **${x.name}**（\`${x.id}\`）：${x.ask}`).join("\n") + "\n\n"
+  + rules.map((r, i) => { const ro = ROOTS.find((x) => x.id === r.root); return `${ro && r.root !== rules[i - 1]?.root ? `## ${ROOTS.indexOf(ro) + 1}. ${ro.name}\n\n${ro.def}自检：${ro.ask}\n\n例子：${ro.eg}\n\n` : ""}${ro ? "###" : "##"} ${r.title}（\`${r.id}\`，${r.severity === "error" ? "必须" : "建议"}）\n\n${r.why}\n\n- 这样做：${r.do}\n- 不要：${r.dont}\n- 判据（${r.check.kind}）：${r.check.how}\n- 修法：${r.fix}\n`; }).join("\n"));
 
 console.log(`规范：设计规范 ${GUIDES.length} 章、组件 ${index.length} 个、曲线 ${curves.length} 条、时长 ${durations.length} 档、过渡清单 ${inv.css.length}+${inv.js.length} 处`);
 } else console.log(`组件契约：${index.length} 个，填了手写 API 契约的 ${index.filter((x) => x.contract).length} 个（${index.filter((x) => x.contract).map((x) => x.id).join("、")}）`);

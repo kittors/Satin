@@ -14,3 +14,9 @@ button:focus { outline: none; }
 
 /* 写错的令牌名（token-exists） */
 .meta { color: var(--sn-text-secondary); font-size: var(--sn-t-callout-size); }
+
+/* 界面、换行（AI 味清单）：写死的大高度、正文 break-all、贴底不管安全区、标签被设成能折行 */
+.chat { height: 680px; }
+.para { word-break: break-all; }
+.bar { position: fixed; bottom: 0; left: 0; right: 0; }
+.sn-tag { white-space: normal; }

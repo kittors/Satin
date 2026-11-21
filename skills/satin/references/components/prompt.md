@@ -60,7 +60,7 @@ onSend 返回 Promise：发送后按钮变成停止、外圈转动，结束回�
 <script type="module">
   import { createComposer, toast } from "satin-ui";
   // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
   // 有内容时发送按钮才亮；⌘↵ 也能发送
   createComposer(document.getElementById("prompt-basic"), {
     placeholder: "描述你想要的画面，比如：雨夜，林夏站在空荡的站台上",
@@ -77,7 +77,7 @@ React 的写法：
 import { Composer, toast } from "satin-ui/react";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function ScenePrompt() {
   return <Composer placeholder="描述你想要的画面，比如：雨夜，林夏站在空荡的站台上" max={300} send="生成" onSend={generate} />;
@@ -91,7 +91,7 @@ Vue 的写法：
 import { Composer, toast } from "satin-ui/vue";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 </script>
 
 <template>
@@ -107,7 +107,7 @@ Svelte 的写法：
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createComposer, toast } from "satin-ui";
   // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
   // 有内容时发送按钮才亮；⌘↵ 也能发送
   const options = {
@@ -129,7 +129,7 @@ import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild }
 import { createComposer, toast } from "satin-ui";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 @Component({
   selector: "demo-prompt-basic",
@@ -160,7 +160,7 @@ import { onSettled } from "solid-js";
 import { createComposer, toast } from "satin-ui";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function ScenePrompt() {
   let host;
@@ -184,7 +184,7 @@ Preact 的写法：
 import { Composer, toast } from "satin-ui/react";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function ScenePrompt() {
   return <Composer placeholder="描述你想要的画面，比如：雨夜，林夏站在空荡的站台上" max={300} send="生成" onSend={generate} />;
@@ -211,7 +211,7 @@ export default function ScenePrompt() {
   const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error("已停止")); }; });
   const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
   // 生成中点停止，onStop 里取消
-  createComposer(document.getElementById("prompt-stop"), { placeholder: "描述画面，发送后可以随时停止", send: "生成", onSend: generate, onStop: stop });
+  createComposer(document.getElementById("prompt-stop"), { placeholder: "描述你想要的画面", send: "生成", onSend: generate, onStop: stop });
 </script>
 ```
 
@@ -226,7 +226,7 @@ const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 
 const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
 export default function StoppablePrompt() {
-  return <Composer placeholder="描述画面，发送后可以随时停止" send="生成" onSend={generate} onStop={stop} />;
+  return <Composer placeholder="描述你想要的画面" send="生成" onSend={generate} onStop={stop} />;
 }
 ```
 
@@ -243,7 +243,7 @@ const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 </script>
 
 <template>
-  <Composer placeholder="描述画面，发送后可以随时停止" send="生成" @send="generate" @stop="stop" />
+  <Composer placeholder="描述你想要的画面" send="生成" @send="generate" @stop="stop" />
 </template>
 ```
 
@@ -259,7 +259,7 @@ Svelte 的写法：
   const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
   // 生成中点停止，onStop 里取消
-  const options = { placeholder: "描述画面，发送后可以随时停止", send: "生成", onSend: generate, onStop: stop };
+  const options = { placeholder: "描述你想要的画面", send: "生成", onSend: generate, onStop: stop };
 </script>
 
 <!-- 这个组件没有单独的 Svelte 封装：用 Satin 包 createComposer，选项写在 options 里 -->
@@ -287,7 +287,7 @@ export class PromptStopComponent {
     const destroyRef = inject(DestroyRef);
     // 生成中点停止，onStop 里取消；渲染完再建（只在浏览器里跑），组件销毁时 destroy()
     afterNextRender(() => {
-      const it = createComposer(this.host().nativeElement, { placeholder: "描述画面，发送后可以随时停止", send: "生成", onSend: generate, onStop: stop });
+      const it = createComposer(this.host().nativeElement, { placeholder: "描述你想要的画面", send: "生成", onSend: generate, onStop: stop });
       destroyRef.onDestroy(() => it.destroy());
     });
   }
@@ -309,7 +309,7 @@ export default function StoppablePrompt() {
   let host;
   // 生成中点停止，onStop 里取消；挂上以后建，卸载时 destroy()
   onSettled(() => {
-    const it = createComposer(host, { placeholder: "描述画面，发送后可以随时停止", send: "生成", onSend: generate, onStop: stop });
+    const it = createComposer(host, { placeholder: "描述你想要的画面", send: "生成", onSend: generate, onStop: stop });
     return () => it.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;
@@ -327,7 +327,7 @@ const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 
 const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
 export default function StoppablePrompt() {
-  return <Composer placeholder="描述画面，发送后可以随时停止" send="生成" onSend={generate} onStop={stop} />;
+  return <Composer placeholder="描述你想要的画面" send="生成" onSend={generate} onStop={stop} />;
 }
 ```
 
@@ -349,7 +349,7 @@ upload(file, progress)：在这里上传，progress 更新附件上的进度环�
   // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise
   const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
   // 拖进来、粘贴截图、点 + 都能加附件
-  createComposer(document.getElementById("prompt-upload"), { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
+  createComposer(document.getElementById("prompt-upload"), { placeholder: "描述画面，可以附上参考图", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
 </script>
 ```
 
@@ -362,7 +362,7 @@ import { Composer, toast } from "satin-ui/react";
 const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function PromptWithFiles() {
-  return <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;
+  return <Composer placeholder="描述画面，可以附上参考图" send="生成" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;
 }
 ```
 
@@ -377,7 +377,7 @@ const upload = (file, progress) => new Promise((done) => { let p = 0; const t = 
 </script>
 
 <template>
-  <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" :upload="upload" @send="({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }" />
+  <Composer placeholder="描述画面，可以附上参考图" send="生成" :upload="upload" @send="({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }" />
 </template>
 ```
 
@@ -391,7 +391,7 @@ Svelte 的写法：
   const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
   // 拖进来、粘贴截图、点 + 都能加附件
-  const options = { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } };
+  const options = { placeholder: "描述画面，可以附上参考图", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } };
 </script>
 
 <!-- 这个组件没有单独的 Svelte 封装：用 Satin 包 createComposer，选项写在 options 里 -->
@@ -417,7 +417,7 @@ export class PromptUploadComponent {
     const destroyRef = inject(DestroyRef);
     // 拖进来、粘贴截图、点 + 都能加附件；渲染完再建（只在浏览器里跑），组件销毁时 destroy()
     afterNextRender(() => {
-      const it = createComposer(this.host().nativeElement, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
+      const it = createComposer(this.host().nativeElement, { placeholder: "描述画面，可以附上参考图", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
       destroyRef.onDestroy(() => it.destroy());
     });
   }
@@ -437,7 +437,7 @@ export default function PromptWithFiles() {
   let host;
   // 拖进来、粘贴截图、点 + 都能加附件；挂上以后建，卸载时 destroy()
   onSettled(() => {
-    const it = createComposer(host, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
+    const it = createComposer(host, { placeholder: "描述画面，可以附上参考图", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
     return () => it.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;
@@ -453,7 +453,7 @@ import { Composer, toast } from "satin-ui/react";
 const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function PromptWithFiles() {
-  return <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;
+  return <Composer placeholder="描述画面，可以附上参考图" send="生成" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;
 }
 ```
 
@@ -481,7 +481,7 @@ context 是顶上的上下文栏，mode 是权限标签，models / model 是模�
   const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
   const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
   // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
   // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件
   createComposer(document.getElementById("prompt-parts"), { placeholder: "随心输入", send: "生成", context: CONTEXT, mode: MODE, models: MODELS, model: "fine",
     onSend: generate, onModelChange: (v) => console.log("换了模型", v) });
@@ -503,7 +503,7 @@ const CONTEXT = [
 const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function PromptParts() {
   const [model, setModel] = useState("fine");
@@ -528,7 +528,7 @@ const CONTEXT = [
 const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 const model = ref("fine");
 </script>
 
@@ -552,7 +552,7 @@ Svelte 的写法：
   const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
   const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
   // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
   // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件；挂上以后建，卸载时 destroy()
   let host;
@@ -582,7 +582,7 @@ const CONTEXT: ComposerContextItem[] = [
 const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS: ComposerOption[] = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 @Component({
   selector: "demo-prompt-parts",
@@ -617,7 +617,7 @@ const CONTEXT = [
 const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function PromptParts() {
   let host;
@@ -646,7 +646,7 @@ const CONTEXT = [
 const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成：" + text.slice(0, 12) }); done(); }, 2000));
+const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function PromptParts() {
   const [model, setModel] = useState("fine");

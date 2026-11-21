@@ -8,8 +8,8 @@ import { rules } from "./lib/rules.mjs";
 const HERE = path.dirname(new URL(import.meta.url).pathname), ROOT = path.resolve(HERE, "../../..");
 const arg = (k, d) => { const i = process.argv.indexOf("--" + k); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://127.0.0.1:5192"), rel = path.relative(ROOT, HERE);
-const STATIC = ["color-token", "token-exists", "class-exists", "spacing-scale", "no-gradient", "no-colored-shadow", "motion-props", "easing-token", "no-ai-icons", "marketing-copy", "font-weight", "real-content", "focus-visible"];
-const DOM = ["no-gradient", "no-colored-shadow", "glass-only-floating", "card-nesting", "kpi-wall", "status-color", "nav-selected", "no-decorative-divider", "no-overlap", "button-wrap", "both-themes", "touch-target", "float-clipped"];
+const STATIC = ["color-token", "token-exists", "class-exists", "spacing-scale", "no-gradient", "no-colored-shadow", "motion-props", "easing-token", "no-ai-icons", "marketing-copy", "font-weight", "real-content", "focus-visible", "copy-obvious", "copy-debug", "copy-echo", "copy-status", "text-avatar", "browser-default", "link-style", "button-wrap", "unit-break", "fixed-height", "phone-card"];
+const DOM = ["no-gradient", "no-colored-shadow", "glass-only-floating", "card-nesting", "kpi-wall", "status-color", "nav-selected", "no-decorative-divider", "no-overlap", "button-wrap", "both-themes", "touch-target", "float-clipped", "copy-duplicate", "text-avatar", "browser-default", "grid-orphan", "phone-card", "heavy-emphasis", "code-break", "button-spinner"];
 let bad = 0;
 const ok = (cond, msg) => { console.log(`${cond ? "✓" : "✗"} ${msg}`); if (!cond) bad++; };
 const run = (...a) => { const r = spawnSync(process.execPath, [path.join(HERE, "check.mjs"), ...a, "--json"], { encoding: "utf8", maxBuffer: 64e6 }); return { code: r.status, json: JSON.parse(r.stdout || "{}"), err: r.stderr }; };
@@ -41,7 +41,7 @@ if (!process.argv.includes("--static-only")) {
   }
 }
 // 规则全覆盖：坏样例上 22 条规则每条都报过
-const ids = Object.keys(rules()).filter((k) => !k.startsWith("__"));
+const ids = Object.keys(rules()).filter((k) => !k.startsWith("__") && rules()[k].check?.kind !== "visual"); // 人工看的（visual）不算
 if (domRan) ok(ids.every((id) => all.has(id)), `规则全覆盖：${ids.length} 条里报出 ${ids.filter((id) => all.has(id)).length} 条${ids.filter((id) => !all.has(id)).length ? "，缺 " + ids.filter((id) => !all.has(id)).join("、") : ""}`);
 console.log(bad ? `\n检查器自测：${bad} 项没过` : "\n检查器自测：全部通过");
 process.exitCode = bad ? 1 : 0;

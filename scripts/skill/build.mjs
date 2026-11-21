@@ -141,9 +141,12 @@ tok += "\n## 圆角档（根元素 `data-radius`，默认胶囊）\n\n" + manife
 w("tokens.md", tok);
 
 // ———— 规则 ————
-const rules = JSON.parse(fs.readFileSync(path.join(ROOT, "spec/rules/anti-ai.json"), "utf8")).rules;
-let rl = "# 去 AI 味规则\n\n每条都写了为什么、怎么写、不要怎么写、检查器怎么判、怎么改。`severity: error` 的必须改到 0。\n\n";
-for (const r of rules) rl += `## ${r.title}（\`${r.id}\`，${r.severity}）\n\n**为什么**：${r.why}\n\n**这样写**：\n\`\`\`\n${r.do}\n\`\`\`\n\n**不要这样**：\n\`\`\`\n${r.dont}\n\`\`\`\n\n**检查器怎么判**（${r.check?.kind}）：${r.check?.how}\n\n**怎么改**：${r.fix}\n\n`;
+const RULES_JSON = JSON.parse(fs.readFileSync(path.join(ROOT, "spec/rules/anti-ai.json"), "utf8")), rules = RULES_JSON.rules, ROOTS = RULES_JSON.roots || [];
+let rl = "# 去 AI 味规则\n\n按七个根源分组：先用每组的那一句自检问题过一遍界面，再看具体规则。每条都写了为什么、怎么写、不要怎么写、检查器怎么判、怎么改。`severity: error` 的必须改到 0。\n\n"
+  + ROOTS.map((x, i) => `${i + 1}. **${x.name}**：${x.ask}`).join("\n") + "\n\n";
+// 按根源分组：根源一个二级标题（定义、自检问题、例子），组里每条三级标题
+let lastRoot = null;
+for (const r of rules) { const ro = ROOTS.find((x) => x.id === r.root); if (ro && r.root !== lastRoot) rl += `## ${ROOTS.indexOf(ro) + 1}. ${ro.name}\n\n${ro.def}\n\n**自检**：${ro.ask}\n\n**例子**：${ro.eg}\n\n`; lastRoot = r.root; rl += `${ro ? "###" : "##"} ${r.title}（\`${r.id}\`，${r.severity}）\n\n**为什么**：${r.why}\n\n**这样写**：\n\`\`\`\n${r.do}\n\`\`\`\n\n**不要这样**：\n\`\`\`\n${r.dont}\n\`\`\`\n\n**检查器怎么判**（${r.check?.kind}）：${r.check?.how}\n\n**怎么改**：${r.fix}\n\n`; }
 w("rules.md", rl);
 
 // ———— 图标 ————

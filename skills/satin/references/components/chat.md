@@ -61,7 +61,7 @@ respond 是异步生成器，一段段 yield 文字；点"停止"时 ctx.stopped
   import { createChat } from "satin-ui/chat";
   // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
   async function* respond(question, ctx) {
-    const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+    const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
     for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
       await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
       yield answer.slice(i, i + 2);
@@ -79,7 +79,7 @@ import { Chat } from "satin-ui/react/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
 async function* respond(question, ctx) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
     yield answer.slice(i, i + 2);
@@ -100,7 +100,7 @@ import { Chat } from "satin-ui/vue/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
 async function* respond(question, ctx) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
     yield answer.slice(i, i + 2);
@@ -121,7 +121,7 @@ Svelte 的写法：
   import { createChat } from "satin-ui/chat";
   // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
   async function* respond(question, ctx) {
-    const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+    const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
     for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
       await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
       yield answer.slice(i, i + 2);
@@ -147,7 +147,7 @@ import { createChat } from "satin-ui/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
 async function* respond(question: string, ctx: { readonly stopped: boolean }) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
     yield answer.slice(i, i + 2);
@@ -179,7 +179,7 @@ import { createChat } from "satin-ui/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
 async function* respond(question, ctx) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
     yield answer.slice(i, i + 2);
@@ -204,7 +204,7 @@ import { Chat } from "satin-ui/react/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
 async function* respond(question, ctx) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
     yield answer.slice(i, i + 2);
@@ -234,14 +234,14 @@ empty 给图标、标题、说明和建议（点了填进输入框）；输入�
   import { createChat } from "satin-ui/chat";
   // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
   async function* respond(question, ctx) {
-    const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+    const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
     for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
       await new Promise((r) => setTimeout(r, 40));
       yield answer.slice(i, i + 2);
     }
   }
   // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）
-  const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
+  const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
   // 输入框顶上的上下文栏：带 options 的那项点开是菜单
   const CONTEXT = [
     { icon: "folder", text: "雨夜车站" },
@@ -265,7 +265,7 @@ import { Chat } from "satin-ui/react/chat";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
 async function* respond(question, ctx) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
     yield answer.slice(i, i + 2);
@@ -273,7 +273,7 @@ async function* respond(question, ctx) {
 }
 
 // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）
-const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
+const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
 // 输入框顶上的上下文栏：带 options 的那项点开是菜单
 const CONTEXT = [
   { icon: "folder", text: "雨夜车站" },
@@ -303,7 +303,7 @@ import { Chat } from "satin-ui/vue/chat";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
 async function* respond(question, ctx) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
     yield answer.slice(i, i + 2);
@@ -311,7 +311,7 @@ async function* respond(question, ctx) {
 }
 
 // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）
-const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
+const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
 // 输入框顶上的上下文栏：带 options 的那项点开是菜单
 const CONTEXT = [
   { icon: "folder", text: "雨夜车站" },
@@ -338,14 +338,14 @@ Svelte 的写法：
   import { createChat } from "satin-ui/chat";
   // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
   async function* respond(question, ctx) {
-    const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+    const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
     for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
       await new Promise((r) => setTimeout(r, 40));
       yield answer.slice(i, i + 2);
     }
   }
   // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）
-  const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
+  const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
   // 输入框顶上的上下文栏：带 options 的那项点开是菜单
   const CONTEXT = [
     { icon: "folder", text: "雨夜车站" },
@@ -377,14 +377,14 @@ import type { ComposerContextItem, ComposerMode, ComposerOption } from "satin-ui
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
 async function* respond(question: string, ctx: { readonly stopped: boolean }) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
     yield answer.slice(i, i + 2);
   }
 }
 // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）
-const EMPTY: ChatEmpty = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
+const EMPTY: ChatEmpty = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
 // 输入框顶上的上下文栏：带 options 的那项点开是菜单
 const CONTEXT: ComposerContextItem[] = [
   { icon: "folder", text: "雨夜车站" },
@@ -421,14 +421,14 @@ import { createChat } from "satin-ui/chat";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
 async function* respond(question, ctx) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
     yield answer.slice(i, i + 2);
   }
 }
 // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）
-const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
+const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
 // 输入框顶上的上下文栏：带 options 的那项点开是菜单
 const CONTEXT = [
   { icon: "folder", text: "雨夜车站" },
@@ -459,7 +459,7 @@ import { Chat } from "satin-ui/react/chat";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
 async function* respond(question, ctx) {
-  const answer = `收到：“${question}”。第三集可以先拆成车站外、候车厅、站台三段，要我再细分成镜头吗？`;
+  const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
     yield answer.slice(i, i + 2);
@@ -467,7 +467,7 @@ async function* respond(question, ctx) {
 }
 
 // 新对话：还没有消息时正中的图标、标题、说明、建议（点了填进输入框，不直接发）
-const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "说说这一集的想法，或者从下面挑一个开始。", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
+const EMPTY = { icon: "clapperboard", title: "今天拍哪一段？", subtitle: "上次停在候车厅", suggestions: ["把第三集拆成镜头", "开头的雨夜再冷一点", "给结尾配一段钢琴"] };
 // 输入框顶上的上下文栏：带 options 的那项点开是菜单
 const CONTEXT = [
   { icon: "folder", text: "雨夜车站" },
@@ -503,22 +503,38 @@ history 给一开始的消息和"更早的一页"：往上翻到顶自动加载�
 
 <script type="module">
   import { createChat } from "satin-ui/chat";
-  // 历史：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-  const page = (day, n) => [{ kind: "day", text: day }, ...Array.from({ length: n }, (_, i) => ({ kind: "msg", me: i % 2 === 1, text: i % 2 ? `好，按这个改（${day}第 ${i + 1} 条）` : `第三集的分镜又改了一版（${day}第 ${i + 1} 条）` }))];
-  let left = 3;
+  // 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
+  const CONVO = [
+    [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
+    [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
+    [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
+    [false, "好，我晚上对一遍口型。"], [true, "雨声素材放在共享盘的「第三集」里了。"],
+    [false, "拿到了，比上次那版干净。"], [true, "车站广播那句要不要留？"],
+    [false, "留着吧，有年代感。音量压低一点。"], [true, "行，让混音那边压 6 分贝。"],
+    [false, "明天几点对片？"], [true, "下午两点，会议室 B。"],
+    [false, "我带上耳机，顺便把第四集的稿子也过一下。"], [true, "第四集的分镜还在拆，周五前给你。"],
+    [false, "不急，先把第三集定下来。"], [true, "定稿后导一份镜头时长表给你。"],
+    [false, "好，记得标上原文段落。"], [true, "会的，景别也一起写上。"],
+    [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
+    [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
+  ];
+  const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+  const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+  let left = OLDER.length;
+  // initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
   const history = {
     initial: () => [
-      ...page("昨天", 30),
+      { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
       { kind: "day", text: "今天" },
-      { kind: "msg", me: false, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
+      { kind: "msg", me: true, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
       { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
       { kind: "msg", me: false, text: "收到，下午配音。" },
     ],
-    older: () => new Promise((ok) => setTimeout(() => ok(page(`${left--} 天前`, 20)), 600)),
+    older: () => new Promise((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
     hasMore: () => left > 0,
   };
   // 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳
-  createChat(document.getElementById("chat-history"), { title: "林夏", status: "在线", history });
+  createChat(document.getElementById("chat-history"), { title: "林夏", status: "在线", placeholder: "发给林夏", history });
 </script>
 ```
 
@@ -527,24 +543,40 @@ React 的写法：
 ```jsx
 import { Chat } from "satin-ui/react/chat";
 
-// 历史：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-const page = (day, n) => [{ kind: "day", text: day }, ...Array.from({ length: n }, (_, i) => ({ kind: "msg", me: i % 2 === 1, text: i % 2 ? `好，按这个改（${day}第 ${i + 1} 条）` : `第三集的分镜又改了一版（${day}第 ${i + 1} 条）` }))];
-let left = 3;
+// 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
+const CONVO = [
+  [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
+  [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
+  [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
+  [false, "好，我晚上对一遍口型。"], [true, "雨声素材放在共享盘的「第三集」里了。"],
+  [false, "拿到了，比上次那版干净。"], [true, "车站广播那句要不要留？"],
+  [false, "留着吧，有年代感。音量压低一点。"], [true, "行，让混音那边压 6 分贝。"],
+  [false, "明天几点对片？"], [true, "下午两点，会议室 B。"],
+  [false, "我带上耳机，顺便把第四集的稿子也过一下。"], [true, "第四集的分镜还在拆，周五前给你。"],
+  [false, "不急，先把第三集定下来。"], [true, "定稿后导一份镜头时长表给你。"],
+  [false, "好，记得标上原文段落。"], [true, "会的，景别也一起写上。"],
+  [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
+  [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
+];
+const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+let left = OLDER.length;
+// initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
 const history = {
   initial: () => [
-    ...page("昨天", 30),
+    { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
     { kind: "day", text: "今天" },
-    { kind: "msg", me: false, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
+    { kind: "msg", me: true, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
     { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
     { kind: "msg", me: false, text: "收到，下午配音。" },
   ],
-  older: () => new Promise((ok) => setTimeout(() => ok(page(`${left--} 天前`, 20)), 600)),
+  older: () => new Promise((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
   hasMore: () => left > 0,
 };
 
 export default function Conversation() {
   // 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳；history 只在创建时用（换一段对话就换 key）
-  return <Chat title="林夏" status="在线" history={history} />;
+  return <Chat title="林夏" status="在线" placeholder="发给林夏" history={history} />;
 }
 ```
 
@@ -554,25 +586,41 @@ Vue 的写法：
 <script setup>
 import { Chat } from "satin-ui/vue/chat";
 
-// 历史：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-const page = (day, n) => [{ kind: "day", text: day }, ...Array.from({ length: n }, (_, i) => ({ kind: "msg", me: i % 2 === 1, text: i % 2 ? `好，按这个改（${day}第 ${i + 1} 条）` : `第三集的分镜又改了一版（${day}第 ${i + 1} 条）` }))];
-let left = 3;
+// 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
+const CONVO = [
+  [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
+  [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
+  [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
+  [false, "好，我晚上对一遍口型。"], [true, "雨声素材放在共享盘的「第三集」里了。"],
+  [false, "拿到了，比上次那版干净。"], [true, "车站广播那句要不要留？"],
+  [false, "留着吧，有年代感。音量压低一点。"], [true, "行，让混音那边压 6 分贝。"],
+  [false, "明天几点对片？"], [true, "下午两点，会议室 B。"],
+  [false, "我带上耳机，顺便把第四集的稿子也过一下。"], [true, "第四集的分镜还在拆，周五前给你。"],
+  [false, "不急，先把第三集定下来。"], [true, "定稿后导一份镜头时长表给你。"],
+  [false, "好，记得标上原文段落。"], [true, "会的，景别也一起写上。"],
+  [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
+  [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
+];
+const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+let left = OLDER.length;
+// initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
 const history = {
   initial: () => [
-    ...page("昨天", 30),
+    { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
     { kind: "day", text: "今天" },
-    { kind: "msg", me: false, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
+    { kind: "msg", me: true, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
     { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
     { kind: "msg", me: false, text: "收到，下午配音。" },
   ],
-  older: () => new Promise((ok) => setTimeout(() => ok(page(`${left--} 天前`, 20)), 600)),
+  older: () => new Promise((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
   hasMore: () => left > 0,
 };
 </script>
 
 <template>
   <!-- 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳；history 只在创建时用（换一段对话就换 :key） -->
-  <Chat title="林夏" status="在线" :history="history" />
+  <Chat title="林夏" status="在线" placeholder="发给林夏" :history="history" />
 </template>
 ```
 
@@ -581,25 +629,41 @@ Svelte 的写法：
 ```jsx
 <script>
   import { createChat } from "satin-ui/chat";
-  // 历史：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-  const page = (day, n) => [{ kind: "day", text: day }, ...Array.from({ length: n }, (_, i) => ({ kind: "msg", me: i % 2 === 1, text: i % 2 ? `好，按这个改（${day}第 ${i + 1} 条）` : `第三集的分镜又改了一版（${day}第 ${i + 1} 条）` }))];
-  let left = 3;
+  // 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
+  const CONVO = [
+    [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
+    [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
+    [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
+    [false, "好，我晚上对一遍口型。"], [true, "雨声素材放在共享盘的「第三集」里了。"],
+    [false, "拿到了，比上次那版干净。"], [true, "车站广播那句要不要留？"],
+    [false, "留着吧，有年代感。音量压低一点。"], [true, "行，让混音那边压 6 分贝。"],
+    [false, "明天几点对片？"], [true, "下午两点，会议室 B。"],
+    [false, "我带上耳机，顺便把第四集的稿子也过一下。"], [true, "第四集的分镜还在拆，周五前给你。"],
+    [false, "不急，先把第三集定下来。"], [true, "定稿后导一份镜头时长表给你。"],
+    [false, "好，记得标上原文段落。"], [true, "会的，景别也一起写上。"],
+    [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
+    [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
+  ];
+  const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+  const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+  let left = OLDER.length;
+  // initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
   const history = {
     initial: () => [
-      ...page("昨天", 30),
+      { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
       { kind: "day", text: "今天" },
-      { kind: "msg", me: false, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
+      { kind: "msg", me: true, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
       { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
       { kind: "msg", me: false, text: "收到，下午配音。" },
     ],
-    older: () => new Promise((ok) => setTimeout(() => ok(page(`${left--} 天前`, 20)), 600)),
+    older: () => new Promise((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
     hasMore: () => left > 0,
   };
 
   // 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳；挂上以后建，卸载时 destroy()
   let host;
   $effect(() => {
-    const it = createChat(host, { title: "林夏", status: "在线", history });
+    const it = createChat(host, { title: "林夏", status: "在线", placeholder: "发给林夏", history });
     return () => it.destroy();
   });
 </script>
@@ -613,18 +677,34 @@ Angular 的写法：
 import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from "@angular/core";
 import { createChat, type ChatHistory, type ChatItem } from "satin-ui/chat";
 
-// 历史：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-const page = (day: string, n: number): ChatItem[] => [{ kind: "day", text: day }, ...Array.from({ length: n }, (_, i) => ({ kind: "msg" as const, me: i % 2 === 1, text: i % 2 ? `好，按这个改（${day}第 ${i + 1} 条）` : `第三集的分镜又改了一版（${day}第 ${i + 1} 条）` }))];
-let left = 3;
+// 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
+const CONVO: [boolean, string][] = [
+  [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
+  [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
+  [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
+  [false, "好，我晚上对一遍口型。"], [true, "雨声素材放在共享盘的「第三集」里了。"],
+  [false, "拿到了，比上次那版干净。"], [true, "车站广播那句要不要留？"],
+  [false, "留着吧，有年代感。音量压低一点。"], [true, "行，让混音那边压 6 分贝。"],
+  [false, "明天几点对片？"], [true, "下午两点，会议室 B。"],
+  [false, "我带上耳机，顺便把第四集的稿子也过一下。"], [true, "第四集的分镜还在拆，周五前给你。"],
+  [false, "不急，先把第三集定下来。"], [true, "定稿后导一份镜头时长表给你。"],
+  [false, "好，记得标上原文段落。"], [true, "会的，景别也一起写上。"],
+  [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
+  [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
+];
+const msgs = (list: [boolean, string][]): ChatItem[] => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const OLDER: [string, [boolean, string][]][] = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+let left = OLDER.length;
+// initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
 const history: ChatHistory = {
   initial: () => [
-    ...page("昨天", 30),
+    { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
     { kind: "day", text: "今天" },
-    { kind: "msg", me: false, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
+    { kind: "msg", me: true, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
     { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
     { kind: "msg", me: false, text: "收到，下午配音。" },
   ],
-  older: () => new Promise((ok) => setTimeout(() => ok(page(`${left--} 天前`, 20)), 600)),
+  older: () => new Promise<ChatItem[]>((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
   hasMore: () => left > 0,
 };
 
@@ -638,7 +718,7 @@ export class ChatHistoryComponent {
     const destroyRef = inject(DestroyRef);
     // 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳；渲染完再建（只在浏览器里跑），组件销毁时 destroy()
     afterNextRender(() => {
-      const it = createChat(this.host().nativeElement, { title: "林夏", status: "在线", history });
+      const it = createChat(this.host().nativeElement, { title: "林夏", status: "在线", placeholder: "发给林夏", history });
       destroyRef.onDestroy(() => it.destroy());
     });
   }
@@ -651,18 +731,34 @@ Solid 的写法：
 import { onSettled } from "solid-js";
 import { createChat } from "satin-ui/chat";
 
-// 历史：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-const page = (day, n) => [{ kind: "day", text: day }, ...Array.from({ length: n }, (_, i) => ({ kind: "msg", me: i % 2 === 1, text: i % 2 ? `好，按这个改（${day}第 ${i + 1} 条）` : `第三集的分镜又改了一版（${day}第 ${i + 1} 条）` }))];
-let left = 3;
+// 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
+const CONVO = [
+  [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
+  [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
+  [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
+  [false, "好，我晚上对一遍口型。"], [true, "雨声素材放在共享盘的「第三集」里了。"],
+  [false, "拿到了，比上次那版干净。"], [true, "车站广播那句要不要留？"],
+  [false, "留着吧，有年代感。音量压低一点。"], [true, "行，让混音那边压 6 分贝。"],
+  [false, "明天几点对片？"], [true, "下午两点，会议室 B。"],
+  [false, "我带上耳机，顺便把第四集的稿子也过一下。"], [true, "第四集的分镜还在拆，周五前给你。"],
+  [false, "不急，先把第三集定下来。"], [true, "定稿后导一份镜头时长表给你。"],
+  [false, "好，记得标上原文段落。"], [true, "会的，景别也一起写上。"],
+  [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
+  [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
+];
+const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+let left = OLDER.length;
+// initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
 const history = {
   initial: () => [
-    ...page("昨天", 30),
+    { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
     { kind: "day", text: "今天" },
-    { kind: "msg", me: false, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
+    { kind: "msg", me: true, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
     { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
     { kind: "msg", me: false, text: "收到，下午配音。" },
   ],
-  older: () => new Promise((ok) => setTimeout(() => ok(page(`${left--} 天前`, 20)), 600)),
+  older: () => new Promise((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
   hasMore: () => left > 0,
 };
 
@@ -670,7 +766,7 @@ export default function Conversation() {
   let host;
   // 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳；挂上以后建，卸载时 destroy()
   onSettled(() => {
-    const it = createChat(host, { title: "林夏", status: "在线", history });
+    const it = createChat(host, { title: "林夏", status: "在线", placeholder: "发给林夏", history });
     return () => it.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;
@@ -682,24 +778,40 @@ Preact 的写法：
 ```jsx
 import { Chat } from "satin-ui/react/chat";
 
-// 历史：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-const page = (day, n) => [{ kind: "day", text: day }, ...Array.from({ length: n }, (_, i) => ({ kind: "msg", me: i % 2 === 1, text: i % 2 ? `好，按这个改（${day}第 ${i + 1} 条）` : `第三集的分镜又改了一版（${day}第 ${i + 1} 条）` }))];
-let left = 3;
+// 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
+const CONVO = [
+  [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
+  [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
+  [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
+  [false, "好，我晚上对一遍口型。"], [true, "雨声素材放在共享盘的「第三集」里了。"],
+  [false, "拿到了，比上次那版干净。"], [true, "车站广播那句要不要留？"],
+  [false, "留着吧，有年代感。音量压低一点。"], [true, "行，让混音那边压 6 分贝。"],
+  [false, "明天几点对片？"], [true, "下午两点，会议室 B。"],
+  [false, "我带上耳机，顺便把第四集的稿子也过一下。"], [true, "第四集的分镜还在拆，周五前给你。"],
+  [false, "不急，先把第三集定下来。"], [true, "定稿后导一份镜头时长表给你。"],
+  [false, "好，记得标上原文段落。"], [true, "会的，景别也一起写上。"],
+  [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
+  [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
+];
+const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+let left = OLDER.length;
+// initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
 const history = {
   initial: () => [
-    ...page("昨天", 30),
+    { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
     { kind: "day", text: "今天" },
-    { kind: "msg", me: false, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
+    { kind: "msg", me: true, type: "image", g: "url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=640&q=72) center / cover", cap: "雨夜车站 · 定稿" },
     { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
     { kind: "msg", me: false, text: "收到，下午配音。" },
   ],
-  older: () => new Promise((ok) => setTimeout(() => ok(page(`${left--} 天前`, 20)), 600)),
+  older: () => new Promise((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
   hasMore: () => left > 0,
 };
 
 export default function Conversation() {
   // 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳；history 只在创建时用（换一段对话就换 key）
-  return <Chat title="林夏" status="在线" history={history} />;
+  return <Chat title="林夏" status="在线" placeholder="发给林夏" history={history} />;
 }
 ```
 
@@ -946,7 +1058,7 @@ export default function Storyboard() {
 | `respond` | `(text: string, ctx: { readonly stopped: boolean }) => AsyncIterable<unknown> \| Promise<string> \| string` | — | 否 | 接模型：异步生成器一段段 yield——字符串是正文；`{ think }` 思考；`{ step: { t, s, n } }` / `{ stepUpdate: { index, s, n } }` 步骤；`{ card: [编号, 副信息, 说明, 背景] }` 镜头卡片；`{ image: { g } }`、`{ imageProgress }`、`{ imageDone }` 生成的画面。也能直接返回 Promise<字符串>。用户点"停止"后 `ctx.stopped` 变成 true（每次读都是现在的值），要尽快结束。不给就只发不回。 | createXxx 选项：`respond`；React：`respond`；Preact：`respond`；Vue：`respond` |
 | `history` | `ChatHistory` | — | 否 | 历史：`initial()` 一开始的条目（从旧到新），往上翻到顶时 `older()` 要更早的一页（可以是 Promise），`hasMore()` 还有没有。只在创建时用。 | createXxx 选项：`history`；React：`history`；Preact：`history`；Vue：`history` |
 | `title` | `string` | "" | 否 | 顶栏的名字（空容器时用）。 | createXxx 选项：`title`；React：`title`；Preact：`title`；Vue：`title` |
-| `status` | `string` | "在线" | 否 | 顶栏的状态；变了就更新。 | createXxx 选项：`status`；React：`status`；Preact：`status`；Vue：`status` |
+| `status` | `string` | 不写 | 否 | 顶栏标题下面那行字，默认不写（AI 助手的生成状态只在消息里显示一次，顶栏只留标题）；人和人聊天写"在线""正在输入…"，变了就更新。 | createXxx 选项：`status`；React：`status`；Preact：`status`；Vue：`status` |
 | `placeholder` | `string` | "" | 否 | 底部输入框的占位提示。 | createXxx 选项：`placeholder`；React：`placeholder`；Preact：`placeholder`；Vue：`placeholder` |
 | `max` | `number` | 500 | 否 | 输入框最多几个字。 | createXxx 选项：`max`；React：`max`；Preact：`max`；Vue：`max` |
 | `maxLines` | `number` | 5 | 否 | 输入框最多长到几行，再多在框里滚。 | createXxx 选项：`maxLines`；React：`maxLines`；Preact：`maxLines`；Vue：`maxLines（模板里写 max-lines）` |
@@ -1040,7 +1152,7 @@ export default function Storyboard() {
 - 已经载入的消息永远直接画真内容：拖滚动条时在同一个任务里画好新位置，并重算是否贴底；往上翻到离顶部还有两屏时就提前加载下一页。
 - 流式输出：网络来的字先进缓冲，再按匀速放出来（每秒 45～160 个，积压越多越快），新字淡入；贴底时视口平滑跟着往下走，不一行一行跳；用户往上翻了就不再跟，右下角显示新消息数。
 - 发送：临界阻尼弹簧曲线，竖直 300ms、水平 360ms，120ms 走完 60%；影子每帧追真实落点，落地和真气泡完全重合；字从发出那一帧起就是气泡的配色。AI 等消息落地再回复。减少动态效果时直接出现。
-- 空状态：图标 44px、只用三档灰；标题一句话说清楚能做什么；建议 2～4 个，写成用户会说的话。
+- 空状态：图标 44px、只用三档灰；标题一句话说清楚能做什么；说明那行只写用户不知道的上下文，不写操作说明；建议 2～4 个，写成用户会说的话。
 - 第一条消息（发出或收到）进来时空状态淡出：220ms，只动透明度和位移；输入框不跳，消息照常飞进列表。
 - 权限、模式用标签的小圆点表示状态（绿 只读、橙 完全访问、红 有风险）；模型按钮写"名称 · 档位"，点开往上长菜单；没写内容时发送按钮是灰的。
 
@@ -1050,7 +1162,7 @@ export default function Storyboard() {
 - 已经载入的消息永远直接画真内容：拖滚动条时在同一个任务里画好新位置，并重算是否贴底；往上翻到离顶部还有两屏时就提前加载下一页。
 - 流式输出：网络来的字先进缓冲，再按匀速放出来（每秒 45～160 个，积压越多越快），新字淡入；贴底时视口平滑跟着往下走，不一行一行跳；用户往上翻了就不再跟，右下角显示新消息数。
 - 发送：临界阻尼弹簧曲线，竖直 300ms、水平 360ms，120ms 走完 60%；影子每帧追真实落点，落地和真气泡完全重合；字从发出那一帧起就是气泡的配色。AI 等消息落地再回复。减少动态效果时直接出现。
-- 空状态：图标 44px、只用三档灰；标题一句话说清楚能做什么；建议 2～4 个，写成用户会说的话。
+- 空状态：图标 44px、只用三档灰；标题一句话说清楚能做什么；说明那行只写用户不知道的上下文，不写操作说明；建议 2～4 个，写成用户会说的话。
 - 第一条消息（发出或收到）进来时空状态淡出：220ms，只动透明度和位移；输入框不跳，消息照常飞进列表。
 - 权限、模式用标签的小圆点表示状态（绿 只读、橙 完全访问、红 有风险）；模型按钮写"名称 · 档位"，点开往上长菜单；没写内容时发送按钮是灰的。
 

@@ -106,12 +106,62 @@ function pageChecks({ theme, width, want }) {
   }
   if (want.includes("wrap")) {
     const wrapped = (el) => { const b = el.getBoundingClientRect(), tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); for (let n = tw.nextNode(); n; n = tw.nextNode()) { if (!n.textContent.trim()) continue; const rg = document.createRange(); rg.selectNodeContents(n); const rs = [...rg.getClientRects()].filter((q) => q.width > 1 && q.top + q.height / 2 > b.top && q.top + q.height / 2 < b.bottom); if (rs.length > 1 && Math.max(...rs.map((q) => q.top)) - Math.min(...rs.map((q) => q.top)) > 4) return true; } return false; };
-    for (const el of vis.filter((x) => x.matches("button, .sn-btn, [role=button], a.btn, a.button"))) if (wrapped(el)) add("button-wrap", el, `${width} 宽下按钮文字折成两行`);
+    for (const el of vis.filter((x) => x.matches("button, .sn-btn, [role=button], a.btn, a.button, .sn-tag, .sn-chip, .sn-badge, .sn-seg button, [role=tab], th, .sn-g-hc"))) if (wrapped(el)) add("button-wrap", el, `${width} 宽下${el.matches("th, .sn-g-hc") ? "表头" : el.matches(".sn-tag, .sn-chip, .sn-badge") ? "标签" : el.matches("[role=tab], .sn-seg button") ? "页签" : "按钮"}的字折成两行`);
+    // 代码标识（行内 code）折成两行：令牌名、类名、路径在连字符处断开
+    for (const el of vis.filter((x) => x.matches("code, .sn-mono") && !x.closest("pre"))) if (el.getClientRects().length > 1) add("code-break", el, `${width} 宽下行内代码"${el.textContent.trim().slice(0, 24)}"折成两行`);
+    // 数字和单位拆到两行；中文标点跑到行首（看每个字的位置）
+    { let n = 0; const UNIT = /\d[\d,.]*\s?(?:px|ms|秒|分钟|分|%|元|GB|MB|KB|条|行|个|张|天|小时|月|日|帧|倍)/g, PUNCT = /[，。、；：！？）」』】》]/g;
+      const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let t = tw.nextNode(); t && n < 12; t = tw.nextNode()) {
+        const s = t.textContent; if (!s || s.trim().length < 2 || !t.parentElement || !visible(t.parentElement) || t.parentElement.closest("pre, code, script, style, svg")) continue;
+        for (const m of s.matchAll(UNIT)) { const rg = document.createRange(); rg.setStart(t, m.index); rg.setEnd(t, m.index + m[0].length); const rs = [...rg.getClientRects()].filter((r) => r.width > 0); if (rs.length > 1 && Math.abs(rs[0].top - rs.at(-1).top) > 4) { add("unit-break", t.parentElement, `${width} 宽下"${m[0]}"被拆到两行`); n++; } }
+        for (const m of s.matchAll(PUNCT)) { if (!m.index) continue; const a = document.createRange(), b = document.createRange(); a.setStart(t, m.index - 1); a.setEnd(t, m.index); b.setStart(t, m.index); b.setEnd(t, m.index + 1); const ra = a.getClientRects()[0], rb = b.getClientRects()[0]; if (ra && rb && rb.top > ra.top + 4) { add("unit-break", t.parentElement, `${width} 宽下中文标点"${m[0]}"跑到了行首`); n++; } }
+      }
+    }
+    // 网格留孤儿：网格、换行的弹性容器里 3 个以上同类子元素，最后一行只剩 1 个、前面每行 ≥ 3 个
+    for (const el of vis) {
+      const s = cs(el); if (!(s.display.includes("grid") || (s.display.includes("flex") && s.flexWrap === "wrap"))) continue;
+      const kids = [...el.children].filter(visible); if (kids.length < 3) continue;
+      const sig = (k) => k.tagName + "." + [...k.classList].sort().join("."); if (new Set(kids.map(sig)).size > 1) continue;
+      const rows = []; for (const k of kids) { const top = Math.round(k.getBoundingClientRect().top); const r = rows.find((x) => Math.abs(x.top - top) < 4); if (r) r.n++; else rows.push({ top, n: 1 }); }
+      if (rows.length >= 2 && rows.at(-1).n === 1 && rows.slice(0, -1).every((r) => r.n >= 3)) add("grid-orphan", el, `${width} 宽下排成 ${rows.map((r) => r.n).join(" + ")}，最后一行只剩一个`);
+    }
+    // 手机上（窄于 600）：占了大半屏、四周留白的圆角卡片；最后一块内容下面空出一大块
+    if (width < 600) {
+      for (const el of vis) { const r = el.getBoundingClientRect(), s = cs(el); if (parseFloat(s.borderTopLeftRadius) < 8 || r.width < innerWidth * .7 || r.height < innerHeight * .5) continue; if (r.left >= 12 && innerWidth - r.right >= 12 && (s.backgroundColor !== "rgba(0, 0, 0, 0)" || s.boxShadow !== "none" || parseFloat(s.borderTopWidth) > 0)) { add("phone-card", el, `${width} 宽下是一张四周留白 ${Math.round(r.left)}px 的圆角卡片，不是铺满屏幕`); break; } }
+      const de = document.documentElement; if (de.scrollHeight <= innerHeight + 1) { let bottom = 0; for (const el of vis) { if (el === document.body || cs(el).position === "fixed") continue; const r = el.getBoundingClientRect(); if (r.height > 0 && r.height < innerHeight * .95) bottom = Math.max(bottom, r.bottom); } if (innerHeight - bottom >= 120 && !vis.some((el) => cs(el).position === "fixed" && el.getBoundingClientRect().bottom >= innerHeight - 2)) add("phone-card", document.body, `${width} 宽下最后一块内容下面空了 ${Math.round(innerHeight - bottom)}px，主按钮不在底部`); }
+    }
+    // 意外溢出：整页只多出不到 80px 的竖向滚动
+    { const extra = document.documentElement.scrollHeight - innerHeight; if (extra > 1 && extra < 80) add("fixed-height", document.body, `${width} 宽下整页多出 ${Math.round(extra)}px 的滚动（像是意外溢出，查有没有写死高度的容器）`); }
+    // 同一个词在按钮、标签、页签里露出来两次（"分镜模型 · 精细 精细"：长短两种写法同时显示了）。每个宽度都查，纯数字不算
+    for (const el of vis.filter((x) => x.matches("button, .sn-btn, [role=button], [role=tab], .sn-tag, .sn-chip, a.btn, a.button"))) {
+      const text = (el.innerText || "").replace(/\s+/g, " ").trim(), words = text.split(/[\s·|/]+/).filter((w) => w.length >= 2 && !/^[\d.,:]+$/.test(w));
+      const dup = words.find((w, i) => words.indexOf(w) !== i);
+      if (dup) add("copy-duplicate", el, `${width} 宽下"${text.slice(0, 30)}"里"${dup}"出现了两次`);
+    }
     // 撑宽页面的那个元素：伸得最远的里面，文档顺序最靠后的（父元素被它撑宽时也一样远，取更里面的那个）
     // 只算真正把页面撑宽的：没有子元素（或者里面的文字本身就伸出去了）的元素——被它撑宽的父元素、兄弟元素不算
     const de = document.documentElement; if (de.scrollWidth > innerWidth + 1) { let who = null, mx = 0; const textRight = (el) => { const rg = document.createRange(); rg.selectNodeContents(el); return rg.getBoundingClientRect().right; };
       for (const el of vis) { const r = el.getBoundingClientRect(); if (r.right <= innerWidth + 1 || cs(el).position === "fixed") continue; const leaf = !el.firstElementChild; if (leaf && (!el.textContent.trim() || textRight(el) > innerWidth + 1) && r.right > mx) { mx = r.right; who = el; } }
       if (!who) for (const el of vis) { const r = el.getBoundingClientRect(); if (r.right >= mx - 1 && cs(el).position !== "fixed") { mx = Math.max(mx, r.right); who = el; } } add("button-wrap", who, `${width} 宽下页面横向溢出（内容宽 ${de.scrollWidth}px）`, "缩短文案；宽内容（表格、长链接、代码）放进 sn-scroll 滚动区域；不要给元素写死超过视口的宽度"); }
+  }
+  // 头像放字、浏览器默认样式、处处加粗 / 徽标（只在第一种宽度量一次）
+  if (want.includes("layout")) {
+    for (const el of vis.filter((x) => x.matches(".sn-av"))) { const txt = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join(""); if (txt) add("text-avatar", el, `头像里放了字"${txt.slice(0, 4)}"`); }
+    for (const el of vis.filter((x) => x.matches("a[href]"))) { const s = cs(el); if (/^rgb\((0, 0, 238|85, 26, 139)\)$/.test(s.color)) { add("browser-default", el, `链接还是浏览器默认的颜色 ${s.color}`); break; } }
+    for (const el of vis.filter((x) => x.matches("button, select, input[type=checkbox], input[type=radio], input[type=text], input:not([type])"))) { const s = cs(el); if (s.appearance === "auto" && !el.closest("[class*='sn-']") && !/(^|\s)sn-/.test(el.className)) { add("browser-default", el, `${el.tagName.toLowerCase()} 还是浏览器默认的样子`); break; } }
+    const blocks = vis.filter((x) => x.matches("p, li, td, dd, .sn-msg") && x.textContent.trim().length > 8 && !x.closest("nav, .sn-side, header"));
+    const bold = blocks.filter((x) => +cs(x).fontWeight >= 600 || x.firstElementChild?.matches("b, strong"));
+    if (blocks.length >= 6 && bold.length / blocks.length >= .5) add("heavy-emphasis", bold[0], `正文段落、列表项里 ${bold.length}/${blocks.length} 是加粗的或者加粗开头`);
+    // 按钮外面套一圈一直在转的环；"停止"用饱和色（红）做底
+    for (const b of vis.filter((x) => x.matches("button, [role=button]"))) {
+      const br = b.getBoundingClientRect();
+      const ring = [...b.querySelectorAll("*")].find((x) => x.getAnimations?.().some((a) => a.effect?.getTiming?.().iterations === Infinity && a.playState === "running") && (() => { const r = x.getBoundingClientRect(); return r.width > br.width + 2 || r.height > br.height + 2; })());
+      if (ring) { add("button-spinner", b, "按钮外面套着一圈一直在转的环"); break; }
+    }
+    for (const b of vis.filter((x) => x.matches("button, [role=button]") && /停止|stop/i.test((x.getAttribute("aria-label") || x.textContent || "").trim()))) { const c = parse(cs(b).backgroundColor); if (c && c[3] > .5 && sat(c).s > .4) { add("button-spinner", b, `"停止"按钮用了饱和色做底（${cs(b).backgroundColor}），像出错`); break; } }
+    const badges = vis.filter((x) => x.matches(".sn-badge, .sn-tag, .sn-chip.sn-tag") && x.getBoundingClientRect().top < innerHeight);
+    if (badges.length > 8) add("heavy-emphasis", badges[0], `第一屏里有 ${badges.length} 个徽标、标签`);
   }
   if (want.includes("contrast")) {
     const dark = theme === "dark", page = parse(cs(document.documentElement).backgroundColor), body = parse(cs(document.body).backgroundColor);

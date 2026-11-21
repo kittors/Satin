@@ -1,5 +1,6 @@
 // 静态检查：扫源码（CSS / SCSS / LESS / HTML / Vue / Svelte / JSX / TSX / JS / TS），查能在源码里判断的规则：
-// color-token、spacing-scale、no-gradient、no-colored-shadow、motion-props、easing-token、no-ai-icons、marketing-copy、font-weight、real-content、focus-visible。
+// color-token、spacing-scale、no-gradient、no-colored-shadow、motion-props、easing-token、no-ai-icons、marketing-copy、font-weight、real-content、focus-visible，
+// 文案一组：copy-obvious、copy-debug、copy-echo、copy-status（copy-duplicate 要看渲染出来的字，在页面检查里）。
 // 也认 Tailwind 的工具类（低级模型常用）：bg-gradient-to-*、text-gray-500、p-[13px]、font-bold、transition-all……
 import fs from "node:fs";
 import path from "node:path";
@@ -81,7 +82,14 @@ function extractTags(src, units, baseLine = 1) {
   while ((m = TAG.exec(src))) {
     const tag = m[1], attrs = m[2] || "", line = baseLine + lineOf(src, m.index) - 1;
     units.tags.push({ tag, line });
-    if (tag === "a" && /(^|\s)(:?href|to)\s*=/.test(attrs) && !/(^|\s)(class|className|:class)\s*=/.test(attrs)) (units.bareLinks ||= []).push({ line });
+    const clsAttr = (/(?:^|\s)(?:class|className|:class)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{\s*["'`]([^"'`]*)["'`]\s*\})/.exec(attrs) || []).slice(1).find((x) => x != null);
+    const hasCls = /(^|\s)(class|className|:class)\s*=/.test(attrs);
+    if (tag === "a" && /(^|\s)(:?href|to)\s*=/.test(attrs)) {
+      if (!hasCls) (units.bareLinks ||= []).push({ line });
+      // 只套了排版类（sn-t-callout 之类）不管链接颜色：还是浏览器默认的蓝色下划线
+      else if (clsAttr != null && !/\{|\$/.test(clsAttr) && !LINKY.test(clsAttr)) (units.bareLinks ||= []).push({ line, cls: clsAttr });
+    }
+
     let a; ATTR_RE.lastIndex = 0;
     while ((a = ATTR_RE.exec(attrs))) {
       const name = a[1].replace(/^[:@]|^v-bind:/, ""), val = a[2] ?? a[3] ?? a[4] ?? a[5] ?? a[6] ?? "";
@@ -122,6 +130,7 @@ function extractJS(src, file, units, baseLine = 1, inHTML = false) {
     // CSS-in-JS：css`…`、styled.div`…`、keyframes`…`、createGlobalStyle`…`
     if (s.template && /(^|\.)(css|keyframes|createGlobalStyle|injectGlobal|global|styled(\.\w+)?)$|\)$/.test(s.tag) && /[:;{]/.test(s.text)) { units.css.push({ text: s.text.replace(/\u0000/g, "0"), line, cssInJs: true }); continue; }
     // 字符串里拼的 HTML（innerHTML = `<div style="…">`）
+    if (s.template && ECHO_TPL.test(s.text)) units.echo.push({ text: s.text.replace(/\u0000/g, "${…}"), line });
     if (/<[a-z][\w-]*[\s>]/i.test(s.text)) extractTags(s.text.replace(/\u0000/g, " "), units, line);
     else if (isUIText(s.text)) units.text.push({ text: s.text.replace(/\u0000/g, " "), line, kind: "string" });
     if (!s.template && CLASSY.test(s.text.trim()) && UTILITY.test(s.text)) units.classes.push({ text: s.text, line });
@@ -156,6 +165,11 @@ function checkDecl(d, where, out, srcLine = "") {
   const { prop, value } = d, sel = d.selector || "", v = value.trim();
   if (KNOWN) for (const m of v.matchAll(/var\(\s*(--sn-[\w-]+)/g)) if (!KNOWN.has(m[1]) && !DEFINED.has(m[1])) out.push(finding("token-exists", where, `${m[1]} 不是 Satin 的令牌（写错了名字，这条样式不会生效）`));
   if (!v || /^(inherit|initial|unset|revert|none)$/i.test(v)) return;
+  // 换行：按钮、标签、徽标、分段、页签、表头被设成可以折行；正文用了 break-all / anywhere（数字和单位、中文标点会被拆开）
+  if (prop === "white-space" && /^(normal|pre-wrap|break-spaces)$/i.test(v) && CONTROL_SEL.test(sel)) out.push(finding("button-wrap", where, `${sel} { white-space: ${v} }：控件里的字会折行`, "去掉这条（Satin 的控件默认不折行）；放不下用省略号或者让布局让位"));
+  if ((prop === "word-break" && /break-all/i.test(v)) || (prop === "line-break" && /anywhere/i.test(v))) out.push(finding("unit-break", where, `${prop}: ${v}：数字和单位、中文标点会被拆开`, "去掉；长链接、长代码用 overflow-wrap: anywhere 只在需要的元素上"));
+  // 写死的大高度（不是图片、视频、画布这类媒体）：放进矮的框多滚动条、放进手机填不满
+  if (prop === "height" && /^(\d{3,4})px$/.test(v) && +v.slice(0, -2) >= 360 && !/\b(img|video|canvas|iframe|svg|picture)\b|sn-(media|player|lb|chart|flow-mini)/.test(sel)) out.push(finding("fixed-height", where, `${sel || "这里"} { height: ${v} }：写死的高度`, "改成 height: 100% 跟着容器，高度由页面布局给（整页 100dvh、面板 flex: 1）；演示要固定尺寸就写在演示外面的那一层"));
   const isMask = /^(-webkit-)?mask/.test(prop);
   const gradient = /\b(repeating-)?(linear|radial|conic)-gradient\(/i.test(v);
   // no-eyebrow：全大写英文小标签（眉题）
@@ -225,6 +239,9 @@ function checkRule(r, where, out) {
   const get = (p) => r.decls.filter((d) => d.prop === p).pop()?.value;
   const tt = get("text-transform"), ls = get("letter-spacing");
   void tt; void ls; // 全大写 + 宽字距的小标签改由 checkDecl 里的 no-eyebrow 报（原来记在 font-weight 名下）
+  // 手机上贴底的东西（position: fixed + bottom: 0）不管底部安全区：iPhone 上会压在横条下面
+  const pos = get("position"), bottom = get("bottom") ?? get("inset") ?? get("inset-block-end");
+  if (pos && /^fixed$/i.test(pos.trim()) && bottom != null && /^0(px)?$|\s0(px)?$/.test(bottom.trim()) && !r.decls.some((d) => /safe-area-inset-bottom/.test(d.value))) out.push(finding("phone-card", where, `${r.selector} 贴底（position: fixed; bottom: 0）却没让出底部安全区`, "加 padding-bottom: env(safe-area-inset-bottom)（或者用 .sn-bottom-bar）"));
 }
 
 // ———— Tailwind 工具类 ————
@@ -261,10 +278,46 @@ function checkClasses(cls, where, out) {
 
 // ———— 文字 ————
 const MARKETING = /智能|一键|赋能|极致|革命性|颠覆|黑科技/;
+// 不该折行的控件（选择器里出现这些就算）
+const CONTROL_SEL = /\bbutton\b|\.sn-(btn|tag|chip|badge|seg|textbtn)\b|\[role=["']?tab|\bth\b|\.(btn|tag|chip|badge|tab)\b/;
+// 浏览器默认的控件：button、select、文字框不在任何 Satin 组件里（祖先都没有 sn- 类），自己也一个 Satin 类都没有。
+// 复选、单选一般包在 sn-check / sn-radio 的 label 里，算在组件里；大写开头的是框架组件（<Button>），不查
+const VOID = /^(input|img|br|hr|meta|link|source|area|col|embed|wbr|track|param|base)$/i;
+function bareControls(src) {
+  const out = [], stack = [];
+  for (const m of src.matchAll(/<(\/?)([a-z][\w-]*)((?:[^>"'{]|"[^"]*"|'[^']*'|\{(?:[^{}]|\{[^{}]*\})*\})*)>/g)) {
+    const [, close, tag, attrs] = m;
+    if (close) { const i = stack.map((e) => e.tag).lastIndexOf(tag); if (i >= 0) stack.length = i; continue; }
+    const cls = (/(?:^|\s)(?:class|className|:class)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{\s*["'`]([^"'`]*)["'`]\s*\})/.exec(attrs) || []).slice(1).find((x) => x != null);
+    const dyn = /(?:^|\s)(?:class|className|:class)\s*=\s*\{(?!\s*["'`])/.test(attrs) || /\$\{/.test(cls || "");
+    const sn = tag.startsWith("sn-") || /(^|\s)sn-/.test(cls || "") || dyn;
+    const kind = tag === "button" || tag === "select" || (tag === "input" && !/\btype\s*=\s*["']?(hidden|file|color|range|submit|image|checkbox|radio)\b/.test(attrs));
+    if (kind && !sn && !stack.some((e) => e.sn)) out.push({ tag, line: lineOf(src, m.index) });
+    if (!VOID.test(tag) && !/\/\s*$/.test(attrs)) stack.push({ tag, sn });
+  }
+  return out;
+}
+// 管链接样子的 Satin 类：文字链接、按钮、文字按钮，侧栏 / 页签 / 面包屑 / 菜单这些组件的标记里的链接
+const LINKY = /(^|\s)sn-(link|btn|textbtn|tab|crumb|side|item|nav|card|pc|lb|menu|opt|logo|brand|av)\b/;
+// 头像里直接放字：<span class="sn-av">林</span>、<Avatar>周</Avatar>（.sn-av-group、.sn-ai-av 这种不算）
+const AVATAR_TEXT = /<[A-Za-z][\w-]*\b[^>]*\bclass(?:Name)?\s*=\s*["'{`][^"'`}]*\bsn-av(?![\w-])[^"'`}]*["'`}][^>]*>\s*([^<\s{][^<{]*?)\s*<|<Avatar\b[^>]*>\s*([^<\s{][^<{]*?)\s*<\/Avatar>/g;
+// 按钮、标签里写了 <br>
+const BR_IN_CONTROL = /<(button|[A-Za-z][\w-]*\b[^>]*\bclass(?:Name)?\s*=\s*["'{`][^"'`}]*\bsn-(?:btn|tag|chip|badge)\b)[^>]*>[^<]*<br\s*\/?>/g;
 const FAKE = /\b(lorem|ipsum|todo|fixme|xxx)\b|示例文本|测试数据|占位文字|用户\s*[A-D]\b|test\s*data/i;
 const EMOJI = /\p{Emoji_Presentation}|\p{Extended_Pictographic}️/u;
+// 文案（spec/rules/anti-ai.json 的"文案"一组）：明摆着的事、调试信息、复读和客套开头、没意义的状态词
+const OBVIOUS = /这是对话的开始|往上(翻|滑|滚)(会|就会)?(继续)?加载|从下面(挑|选)一个|点击(下方|这里|按钮)(即可|就可以|来)/;
+const DEBUG = /已载入\s*[\d,，.万]+\s*条|已渲染\s*[\d,]+|耗时\s*\d+(\.\d+)?\s*ms\b|\b\d+\s*fps\b/i;
+const OPENER = /^(收到[：:]|好的[！!]|当然可以|作为(一个)?\s*(AI|人工智能))/i;
+const ECHO_TPL = /^\s*(收到|好的|明白|了解|当然)[^\u0000\n]{0,3}\u0000/;
+const IDLE = /^(就绪|空闲|系统正常|运行正常|状态[：:]\s*(正常|就绪))$/;
 function checkText(t, where, out) {
   const s = t.text.trim(); if (!s) return;
+  let m;
+  if ((m = OBVIOUS.exec(s))) out.push(finding("copy-obvious", where, `明摆着的事：${s.slice(0, 40)}（"${m[0]}"）`));
+  if ((m = DEBUG.exec(s))) out.push(finding("copy-debug", where, `调试信息：${s.slice(0, 40)}（"${m[0]}"）`));
+  if ((m = OPENER.exec(s)) && !out.some((f) => f.rule === "copy-echo" && f.where === where)) out.push(finding("copy-echo", where, `客套开头：${s.slice(0, 40)}（"${m[0]}"）`));
+  if (IDLE.test(s)) out.push(finding("copy-status", where, `没意义的状态词："${s}"`));
   if (EMOJI.test(s)) out.push(finding("no-ai-icons", where, `界面文案里有 emoji：${s.slice(0, 40)}`, "删掉 emoji；需要图标就用字面意思的线性图标（Satin 的 icon()），按钮以文字为主"));
   const mk = MARKETING.exec(s);
   if (mk || /！/.test(s) || (/[\p{L}\p{N}][!]$/u.test(s) && t.kind !== "string") || (/[\p{L}][!]$/u.test(s) && /\s/.test(s))) out.push(finding("marketing-copy", where, `营销腔：${s.slice(0, 40)}${mk ? `（"${mk[0]}"）` : "（感叹号）"}`));
@@ -289,7 +342,7 @@ export function runStatic(inputs, { root = process.cwd() } = {}) {
   DEFINED = new Set(); for (const file of files) for (const m of fs.readFileSync(file, "utf8").matchAll(/(--sn-[\w-]+)\s*:/g)) DEFINED.add(m[1]);
   for (const file of files) {
     const src = fs.readFileSync(file, "utf8"), rel = path.relative(root, file) || file, lines = src.split("\n");
-    const units = { css: [], inline: [], classes: [], text: [], icons: [], tags: [], attrColors: [], animate: [] };
+    const units = { css: [], inline: [], classes: [], text: [], icons: [], tags: [], attrColors: [], animate: [], echo: [] };
     if (/\.(css|scss|sass|less)$/i.test(file)) units.css.push({ text: src, line: 1, scss: /\.(scss|sass|less)$/i.test(file) });
     else if (/\.(html?|vue|svelte|astro)$/i.test(file)) extractMarkup(src, file, units);
     else extractJS(src, file, units);
@@ -302,8 +355,18 @@ export function runStatic(inputs, { root = process.cwd() } = {}) {
     for (const u of units.inline) for (const d of parseInline(u.text, u.line)) checkDecl(d, at(u.line), out, lines[u.line - 1] || "");
     for (const c of units.attrColors) checkDecl({ prop: c.prop === "color" ? "color" : "fill", value: c.value, selector: c.tag }, at(c.line), out);
     for (const c of units.classes) checkClasses(c.text, at(c.line), out);
-    for (const l of units.bareLinks || []) out.push(finding("link-style", at(l.line), "<a href> 没有 class：浏览器默认的蓝色、下划线", "文字链接用 class=\"sn-link\"；导航里的用侧栏 / 面包屑的标记；像按钮的用 class=\"sn-btn sn-ghost\""));
+    for (const c of bareControls(src)) out.push(finding("browser-default", at(c.line), `<${c.tag}> 没有 Satin 的类：浏览器默认的样子`, c.tag === "button" ? "加 class=\"sn-btn sn-secondary\"（或 sn-ghost、sn-primary）" : c.tag === "select" ? "用 Satin 的下拉（<sn-select> 或 createSelect），或者加 class=\"sn-input\"" : "文字框加 class=\"sn-input\"；复选、单选用 Satin 的 sn-check / sn-radio 标记"));
+    for (const m of src.matchAll(AVATAR_TEXT)) out.push(finding("text-avatar", at(lineOf(src, m.index)), `头像里放了字："${(m[1] || m[2] || "").trim().slice(0, 6)}"`));
+    for (const m of src.matchAll(BR_IN_CONTROL)) out.push(finding("button-wrap", at(lineOf(src, m.index)), "按钮、标签里写了 <br>：硬折行", "删掉 <br>，缩短文字；放不下就省略号或者让布局让位"));
+    for (const l of (units.bareLinks || []).filter((x) => x.cls)) out.push(finding("link-style", at(l.line), `<a> 只套了 "${l.cls.slice(0, 30)}"，没有管链接样子的类：还是浏览器默认的蓝色下划线`, "文字链接加 sn-link（像按钮的用 sn-btn sn-ghost）"));
+    for (const l of (units.bareLinks || []).filter((x) => !x.cls)) out.push(finding("link-style", at(l.line), "<a href> 没有 class：浏览器默认的蓝色、下划线", "文字链接用 class=\"sn-link\"；导航里的用侧栏 / 面包屑的标记；像按钮的用 class=\"sn-btn sn-ghost\""));
+    for (const e of units.echo) out.push(finding("copy-echo", at(e.line), `回复复读用户的话：${e.text.slice(0, 40)}`));
     for (const t of units.text) checkText(t, at(t.line), out);
+    // AI 助手（标题里有 助手 / AI / 模型……）的对话又写了 status: "在线"：前后 300 个字以内算同一处
+    for (const tm of src.matchAll(/\btitle\s*[:=]\s*\{?\s*["'`][^"'`\n]*(助手|AI|模型|Assistant|Copilot|Bot)[^"'`\n]*["'`]/g)) {
+      const from = Math.max(0, tm.index - 300), win = src.slice(from, tm.index + tm[0].length + 300), sm = /\bstatus\s*[:=]\s*\{?\s*["'`](在线|Online)["'`]/.exec(win);
+      if (sm) out.push(finding("copy-status", at(lineOf(src, from + sm.index)), `AI 助手的对话写了状态"${sm[1]}"（${tm[0].slice(0, 30)}）`));
+    }
     for (const i of units.icons) if (AI_ICON_NAME.test(i.name) || AI_ICON_COMPONENT.test(i.name)) out.push(finding("no-ai-icons", at(i.line), `AI 套路图标：${i.how}`, "换成字面意思的图标（生成用 play 或 plus，或者直接写\"生成\"两个字）；AI 功能不需要专门的图标"));
     for (const a of units.animate) for (const m of a.text.matchAll(/\b(width|height|top|left|right|bottom|margin\w*|padding\w*|inset\w*|fontSize|lineHeight)\s*:/g)) { out.push(finding("motion-props", at(a.line), `element.animate() 的关键帧动了布局属性 ${m[1]}`, "关键帧只写 transform、opacity、filter")); break; }
   }

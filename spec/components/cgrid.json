@@ -53,7 +53,7 @@
   "demos": [
     {
       "caption": "",
-      "html": "<div class=\"sn-grid cgrid\" id=\"gridCanvas\">\n  <div class=\"sn-g-bar\">\n    <span class=\"sn-ib sn-has-pre\" style=\"width:220px\"><span class=\"sn-pre\" data-i=\"search\"></span><input class=\"sn-input sn-sm\" data-g-q placeholder=\"搜索名称，比如 书店 9\" aria-label=\"搜索名称\"></span>\n    <div class=\"sn-seg sn-sm\" data-seg=\"cgtree\"><span class=\"sn-thumb\"></span><button data-v=\"flat\">平铺</button><button data-v=\"tree\">树形</button></div>\n    <button class=\"sn-btn sn-ghost sn-sm\" data-g-expand hidden data-i=\"chevrons-up-down:before\">全部展开</button>\n    <div class=\"sn-seg sn-sm\" data-seg=\"cgmode\"><span class=\"sn-thumb\"></span><button data-v=\"known\">按需加载</button><button data-v=\"append\">滚到底再加载</button></div>\n    <div class=\"sn-seg sn-sm\" data-seg=\"cgsb\"><span class=\"sn-thumb\"></span><button data-v=\"gutter\">常驻滚动条</button><button data-v=\"auto\">自动隐藏</button></div>\n    <div class=\"sn-seg sn-sm\" data-seg=\"cglines\"><span class=\"sn-thumb\"></span><button data-v=\"row\">行线</button><button data-v=\"grid\">网格</button></div>\n    <span class=\"sn-g-filters\" data-g-filters></span>\n    <span class=\"sn-g-info\" data-g-info></span>\n  </div>\n  <div class=\"sn-g-frame\"><div class=\"sn-g-vp\" tabindex=\"0\" role=\"grid\" aria-label=\"数据表格，一百万行，画布绘制\"><div class=\"sn-g-head\" role=\"row\"></div><canvas class=\"sn-cg-cv\" aria-hidden=\"true\"></canvas><div class=\"sn-cg-sizer\"></div></div><i class=\"sn-g-shade sn-l\" aria-hidden=\"true\"></i><i class=\"sn-g-shade sn-r\" aria-hidden=\"true\"></i><div class=\"sn-cg-sr\" aria-live=\"polite\"></div></div>\n</div>"
+      "html": "<div class=\"sn-grid cgrid\" id=\"gridCanvas\">\n  <div class=\"sn-g-bar\">\n    <span class=\"sn-ib sn-has-pre\" style=\"width:220px\"><span class=\"sn-pre\" data-i=\"search\"></span><input class=\"sn-input sn-sm\" data-g-q placeholder=\"搜索名称，比如 书店 9\" aria-label=\"搜索名称\"></span>\n    <div class=\"sn-seg sn-sm\" data-seg=\"cgtree\"><span class=\"sn-thumb\"></span><button data-v=\"flat\">平铺</button><button data-v=\"tree\">树形</button></div>\n    <button class=\"sn-btn sn-ghost sn-sm\" data-g-expand hidden data-i=\"chevrons-up-down:before\">全部展开</button>\n    <div class=\"sn-seg sn-sm\" data-seg=\"cgmode\"><span class=\"sn-thumb\"></span><button data-v=\"known\">按需加载</button><button data-v=\"append\">滚到底再加载</button></div>\n    <div class=\"sn-seg sn-sm\" data-seg=\"cgsb\"><span class=\"sn-thumb\"></span><button data-v=\"gutter\">常驻滚动条</button><button data-v=\"auto\">自动隐藏</button></div>\n    <div class=\"sn-seg sn-sm\" data-seg=\"cglines\"><span class=\"sn-thumb\"></span><button data-v=\"row\">行线</button><button data-v=\"grid\">网格</button></div>\n    <span class=\"sn-g-filters\" data-g-filters></span>\n    <span class=\"sn-g-info\" data-g-info></span>\n  </div>\n  <div class=\"sn-g-frame\"><div class=\"sn-g-vp\" tabindex=\"0\" role=\"grid\" aria-label=\"数据表格\"><div class=\"sn-g-head\" role=\"row\"></div><canvas class=\"sn-cg-cv\" aria-hidden=\"true\"></canvas><div class=\"sn-cg-sizer\"></div></div><i class=\"sn-g-shade sn-l\" aria-hidden=\"true\"></i><i class=\"sn-g-shade sn-r\" aria-hidden=\"true\"></i><div class=\"sn-cg-sr\" aria-live=\"polite\"></div></div>\n</div>"
     }
   ],
   "states": [],
@@ -438,7 +438,7 @@
     {
       "name": "label",
       "type": "string",
-      "default": "\"数据表格（画布绘制）\"",
+      "default": "\"数据表格\"",
       "required": false,
       "desc": "表格的读屏名称（`role=\"grid\"` 的 `aria-label`）：写这张表是什么，\"镜头清单\"。",
       "names": {

@@ -17,15 +17,14 @@
     "css": [
       "data.css"
     ],
-    "js": "排序、勾选批量、多级展开这些交互目前只在展示页里接上，组件库里还没有公开的表格组件；静态的几种只要标记和样式"
+    "js": "createTable（satin-ui）：列定义 + 数据；排序、勾选、多级展开、合并、拖行拖列、改列宽都是选项，写法见上面的示例；静态的几种只要标记和样式",
+    "skipDemos": [
+      8
+    ]
   },
   "example": {
     "5": {
       "js": "import { createScrollArea } from \"satin-ui/components\";\nimport \"satin-ui/css/data.css\";\nimport \"satin-ui/css/scroll.css\";\n\n// .sn-tbl-sc 限高（--sn-tbl-max）以后在框里滚；表头 position: sticky 吸在顶上\n// 不加边缘渐隐（fade: \"none\"），免得表头被淡掉；表格不回弹：滚到头就停住，再滚一次交给页面\ncreateScrollArea(document.querySelector(\".sn-tbl-sc\"), { fade: \"none\" });"
-    },
-    "8": {
-      "html": "<div id=\"projects\"></div>",
-      "js": "// 真数据的表格：createTable（React <Table>、Vue <SnTable>）——点表头排序（行移到新位置，相邻行错开 15ms）、勾选（全选、半选）、\n// 空状态、加载中（骨架行）、数字列右对齐等宽；斑马纹 / 紧凑 / 无外框 / 网格线 / 限高时表头固定都是选项。\n// 上面那张完整示例里的多级展开（行带 children）、合并、拖行拖列、改列宽行高也是选项，见下面的参数表。\nimport { setup, createTable, toast } from \"satin-ui\";\nimport \"satin-ui/css/data.css\";\n\nsetup();\nconst data = [\n  { id: 1, name: \"雨夜车站\", owner: \"林夏\", status: [\"sn-ok\", \"已完成\"], shots: 48 },\n  { id: 2, name: \"海边的第七天\", owner: \"周屿\", status: [\"sn-run\", \"生成中\"], shots: 32 },\n  { id: 3, name: \"长夜\", owner: \"许诺\", status: [\"sn-bad\", \"失败\"], shots: 20 },\n];\nconst table = createTable(document.querySelector(\"#projects\"), {\n  columns: [\n    { key: \"name\", title: \"项目\", sortable: true },\n    { key: \"owner\", title: \"负责人\" },\n    { key: \"status\", title: \"状态\", html: ([tone, text]) => `<span class=\"sn-tag ${tone}\"><i></i>${text}</span>` },\n    { key: \"shots\", title: \"镜头\", align: \"right\", sortable: true },\n  ],\n  data, rowKey: \"id\", selectable: true, label: \"项目列表\", empty: \"还没有项目\",\n  onSelect: (keys) => console.log(\"选中\", keys),\n  onRowClick: (row) => toast({ text: \"打开「\" + row.name + \"」\" }),\n});\n// 换数据：update({ data })；加载中显示骨架行：update({ loading: true })\ntable.update({ data: [...data, { id: 4, name: \"城南旧事\", owner: \"陈默\", status: [\"\", \"草稿\"], shots: 12 }] });"
     }
   },
   "demos": [

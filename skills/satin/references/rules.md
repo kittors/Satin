@@ -1,170 +1,24 @@
 # 去 AI 味规则
 
-每条都写了为什么、怎么写、不要怎么写、检查器怎么判、怎么改。`severity: error` 的必须改到 0。
+按七个根源分组：先用每组的那一句自检问题过一遍界面，再看具体规则。每条都写了为什么、怎么写、不要怎么写、检查器怎么判、怎么改。`severity: error` 的必须改到 0。
 
-## 颜色只用令牌（`color-token`，error）
+1. **自说自话**：用户此刻需要这句话吗？他已经知道、已经看得见的，就删。
+2. **假**：换成真实产品的数据，会是这样吗？换一个输入，结果还对吗？
+3. **照搬**：对面是人还是 AI？在手机上还是电脑上？用手指还是鼠标？
+4. **堆信号**：这个状态别处已经表达过了吗？去掉它，用户会少知道什么？
+5. **语义错位**：颜色是不是只在表达状态？同一种颜色、同一档字重在整页里是不是同一个意思？
+6. **只在理想条件下成立**：最窄 320、最宽 1440、文字最长时、空 / 加载 / 出错、深色、触屏、键盘，都看过了吗？
+7. **生硬**：每一次变化（出现、消失、切换、按下）都有过渡吗？时长和曲线一致吗？只动了 transform / opacity 吗？
 
-**为什么**：写死的颜色在深色主题下不会变，换主色也不跟着变；颜色多了就像拼凑的。
+## 1. 自说自话
 
-**这样写**：
-```
-color: var(--sn-label2); background: var(--sn-raised); border-color: var(--sn-line-control)
-```
+站在做的人的角度说话：把做的人知道、关心的事写到界面上。
 
-**不要这样**：
-```
-color: #666; background: #f0f4ff; border: 1px solid rgb(229, 231, 235)
-```
+**自检**：用户此刻需要这句话吗？他已经知道、已经看得见的，就删。
 
-**检查器怎么判**（static）：CSS、内联 style、JSX/Vue 模板的 style 里出现 #hex、rgb()/rgba()、hsl()/hsla()、颜色关键字（red、blue、gray、white、black……；transparent、currentColor、inherit 除外）就报。令牌定义文件本身不查。
+**例子**：这是对话的开始；往上翻会继续加载；从下面挑一个开始；先写点什么再发送；框会跟着长高；所有组件即时跟着变；已载入 N 条；服务端算了 12ms；画布绘制；"精细 精细"；营销腔。
 
-**怎么改**：换成最接近的语义令牌：文字 --sn-label / --sn-label2 / --sn-label3，底色 --sn-canvas / --sn-raised / --sn-sunken，线 --sn-line / --sn-line-control，状态 --sn-danger / --sn-success / --sn-warning，强调 --sn-accent。检查器会算出色差最小的那个令牌。
-
-## 只用存在的令牌（`token-exists`，error）
-
-**为什么**：写错名字的变量不会报错，样式悄悄失效：颜色变成默认的黑、间距变成 0、字号回到浏览器默认。
-
-**这样写**：
-```
-color: var(--sn-label2); padding: var(--sn-sp-16); class="sn-t-callout"
-```
-
-**不要这样**：
-```
-color: var(--sn-text-secondary); font-size: var(--sn-t-callout-size); gap: var(--sn-space-4)
-```
-
-**检查器怎么判**（static）：var(--sn-…) 引用的名字既不是 Satin 的令牌，也不是组件样式里用到的变量，就报（自己定义的 --sn-xxx 变量也算存在）。
-
-**怎么改**：查 references/tokens.md 换成真实的名字：文字 --sn-label / --sn-label2 / --sn-label3，间距 --sn-sp-4…80，圆角 --sn-r-sm/md/lg/xl；字号别用变量，用排版类 sn-t-*。
-
-## sn- 类名只用 Satin 有的（`class-exists`，warn）
-
-**为什么**：自己编的 sn- 类名（sn-eyebrow、sn-card-title……）没有样式，看着像用了 Satin，其实什么都没发生；以后升级也可能撞上真正的类名。
-
-**这样写**：
-```
-class="sn-t-caption sn-c-tertiary"（Satin 的排版类）；自己的类不带 sn- 前缀：class="page-eyebrow"
-```
-
-**不要这样**：
-```
-class="sn-eyebrow"、class="sn-card-title"
-```
-
-**检查器怎么判**（static）：标记、className 里 sn- 开头的类名不在 Satin 的样式和脚本里就报（建议改）。
-
-**怎么改**：查 references/components.md、SKILL.md 第 4 节找现成的类；没有就自己起名字，别用 sn- 前缀。
-
-## 间距只用刻度（`spacing-scale`，error）
-
-**为什么**：随手写的 13px、18px、22px 让对齐和节奏乱掉；刻度保证组内近、组间远。
-
-**这样写**：
-```
-padding: var(--sn-pad-card); gap: var(--sn-gap-stack); margin-top: 24px
-```
-
-**不要这样**：
-```
-padding: 13px 18px; gap: 7px; margin-top: 22px
-```
-
-**检查器怎么判**（static）：padding、margin、gap（含各方向）里的 px 必须在 0 2 4 6 8 10 12 14 16 20 24 28 32 40 48 64 80 上；1px 例外（细线对齐）。
-
-**怎么改**：改成最近的刻度值，或者用语义间距：组内 --sn-gap-inline（8）/ --sn-gap-stack（12），组间 --sn-gap-group（16），区块之间 --sn-gap-section（32），卡片内边距 --sn-pad-card（16），面板 --sn-pad-panel（24）。
-
-## 不用渐变做装饰（`no-gradient`，error）
-
-**为什么**：紫蓝渐变背景、渐变文字、渐变按钮是 AI 拼出来的界面最明显的标志。
-
-**这样写**：
-```
-背景用纯色令牌（--sn-canvas、--sn-raised）；分区靠留白和底色深浅
-```
-
-**不要这样**：
-```
-background: linear-gradient(135deg, #667eea, #764ba2); background-clip: text; 渐变色图标
-```
-
-**检查器怎么判**（static+dom）：background / background-image 里出现 linear-gradient、radial-gradient、conic-gradient 就报（mask-image 做边缘渐隐、骨架屏扫光除外）；background-clip: text 一律报。页面上量：看得见的元素计算样式 background-image 含 gradient 的。
-
-**怎么改**：删掉渐变，用一个纯色令牌；想要层次就用 --sn-raised 卡片放在 --sn-canvas 底上。
-
-## 不加彩色投影和光晕（`no-colored-shadow`，error）
-
-**为什么**：发光描边、彩色投影、霓虹光晕显得廉价；成熟产品的阴影是中性的、很淡的。
-
-**这样写**：
-```
-box-shadow: var(--sn-e1)（浮层）、var(--sn-card-shadow)（卡片）、var(--sn-e2)（对话框）
-```
-
-**不要这样**：
-```
-box-shadow: 0 0 20px rgba(99, 102, 241, .5); filter: drop-shadow(0 0 8px #a855f7); text-shadow: 0 0 10px cyan
-```
-
-**检查器怎么判**（static+dom）：box-shadow / text-shadow / drop-shadow 里的颜色不是黑或白（R=G=B 且只有透明度变化）就报；不是令牌、模糊半径大于 40px 的也报。
-
-**怎么改**：换成阴影令牌 --sn-e1 / --sn-e2 / --sn-card-shadow；焦点用 outline: 2px solid var(--sn-focus)。
-
-## 动效只动 transform、opacity、filter（`motion-props`，error）
-
-**为什么**：动宽高、位置、边距会每帧重排，掉帧、发抖。
-
-**这样写**：
-```
-transition: transform .2s var(--sn-ease-out), opacity .2s var(--sn-ease-out)；展开用 grid-template-rows 0fr→1fr 或者 scale
-```
-
-**不要这样**：
-```
-transition: all .3s; transition: height .3s, left .3s; @keyframes { from { width: 0 } }
-```
-
-**检查器怎么判**（static）：transition 里出现 all、width、height、top、left、right、bottom、margin*、padding*、inset 就报；@keyframes 和 element.animate() 的关键帧里出现这些属性也报。颜色、背景、阴影、边框色的状态过渡（≤ 200ms）允许。
-
-**怎么改**：位移改 transform: translate()；大小改 transform: scale()；淡入淡出用 opacity。不要写 all，列出具体属性。
-
-## 曲线和时长只用规定的几档（`easing-token`，warn）
-
-**为什么**：线性动画显得机械；每处一个自编的 cubic-bezier 就没有统一的手感。
-
-**这样写**：
-```
-进入 var(--sn-ease-out) 150–250ms；离开 var(--sn-ease-in) 120–200ms；换位 var(--sn-ease-in-out)；勾选、开关 var(--sn-ease-overshoot)
-```
-
-**不要这样**：
-```
-transition: opacity .5s linear; transition: transform 1s ease; cubic-bezier(.68, -.55, .27, 1.55)
-```
-
-**检查器怎么判**（static）：transition / animation 的曲线不是 var(--sn-ease-*) 就报（转圈、进度条用 linear 除外）；时长超过 500ms 的报（转圈、骨架屏、进度条除外）。
-
-**怎么改**：按动作选：出现用 --sn-ease-out，消失用 --sn-ease-in，留在屏上移动用 --sn-ease-in-out；时长按 spec/motion 的档位。
-
-## 不用 AI 套路图标和 emoji（`no-ai-icons`，error）
-
-**为什么**：星星闪光、仙女棒、机器人头、大脑、emoji 一出现，界面就像 AI 模板。
-
-**这样写**：
-```
-图标照字面意思选：生成用"播放"或"加号"，或者直接写"生成"两个字
-```
-
-**不要这样**：
-```
-✨ 智能生成；sparkles / wand / bot / brain 图标；每个标题前一个彩色圆角方块图标
-```
-
-**检查器怎么判**（static）：代码里出现图标名 sparkles、sparkle、wand、wand-2、magic、bot、brain、stars 就报；界面文案里出现 emoji（\p{Extended_Pictographic}）就报。
-
-**怎么改**：删掉图标，或者换成字面意思的图标（play、plus、check）；按钮以文字为主。
-
-## 文案说清楚做了什么，不用营销词（`marketing-copy`，warn）
+### 文案说清楚做了什么，不用营销词（`marketing-copy`，warn）
 
 **为什么**："智能""一键""赋能""极致"、感叹号，读起来像广告，不像工具。
 
@@ -182,169 +36,69 @@ transition: opacity .5s linear; transition: transform 1s ease; cubic-bezier(.68,
 
 **怎么改**：写具体的名词和数字：做了什么、结果在哪、下一步能做什么。
 
-## 不加英文眉题（`no-eyebrow`，warn）
+### 不写明摆着的事（`copy-obvious`，warn）
 
-**为什么**：标题上面一行全大写、加字距的英文小字（PROJECTS · 2026、DASHBOARD）是模板和 AI 生成页面的标志；中文产品界面的层级靠标题字号、字重和一句说明。
+**为什么**："这是对话的开始""往上翻会继续加载""或者从下面挑一个开始"——用户一眼就看得出来的事写出来，界面像在自言自语，也把真正要看的东西挤小了。
 
 **这样写**：
 ```
-<h1>全部项目</h1><p>共 128 个项目，本周新增 6 个</p>
+历史翻到最上面什么都不写；正在加载只转圈（"正在加载更早的消息"给读屏）；空状态的说明写用户不知道的上下文："上次停在候车厅"
 ```
 
 **不要这样**：
 ```
-<span style="text-transform: uppercase; letter-spacing: .2em">Projects · 2026</span><h1>全部项目</h1>
+这是对话的开始 / 往上翻会继续加载更早的消息 / 说说你的想法，或者从下面挑一个开始。 / 点击下方按钮即可提交
 ```
 
-**检查器怎么判**（static）：样式里出现 text-transform: uppercase。
+**检查器怎么判**（static）：界面文案里出现 这是对话的开始、往上翻（会继续）加载、从下面挑 / 选一个、点击下方 / 这里 / 按钮即可 就报。
 
-**怎么改**：删掉眉题；要补充信息就放进标题下面那句说明（--sn-label2 的正文小一号）。
+**怎么改**：删掉。真要写，就写用户不知道、能用上的：结果在哪、上次停在哪、还差什么。
 
-## 链接用 Satin 的样式（`link-style`，warn）
+### 界面上不放调试信息（`copy-debug`，warn）
 
-**为什么**：没写 class 的 <a href> 是浏览器默认的亮蓝色加下划线，和界面其他部分不是一套；低档模型做的登录页、页脚最常见。
+**为什么**："已载入 1,208 条""已渲染 36 行""耗时 12ms""60 fps"是开发时看的数字：用户不关心，看见了还会以为出了什么事。
 
 **这样写**：
 ```
-<a class="sn-link" href="/terms">服务条款</a>
+顶栏只写名字和对用户有意义的状态；数量对用户有用时写成结论放在列表外（"共 128 个项目"），不跟着加载实时跳
 ```
 
 **不要这样**：
 ```
-<a href="/terms">服务条款</a>
+分镜助手 · 已载入 1,208 条 / 已渲染 36 / 1,000,000 行 / 耗时 12ms / 60 fps
 ```
 
-**检查器怎么判**（static）：标记里有 href（或 to）却没有 class 的 <a>。
+**检查器怎么判**（static）：界面文案里出现 已载入 N 条、已渲染 N、耗时 Nms、N fps 就报。
 
-**怎么改**：文字链接加 class="sn-link"；侧栏、面包屑按组件的标记写；看起来像按钮的用 sn-btn。
+**怎么改**：删掉；要给开发者看就打到控制台，或者写进演示的说明文字里。
 
-## 字重只用 400、500、600；字号只用排版档（`font-weight`，warn）
+### 同一条信息不说两遍（`copy-duplicate`，warn）
 
-**为什么**：800 的粗标题、随手的 15.5px 字号让层级乱掉。
+**为什么**："分镜模型 · 精细 精细"、标签旁边再写一遍同样的字、副标题把标题换个说法再说一遍——重复让人怀疑出了错，也占地方。
 
 **这样写**：
 ```
-标题 class="sn-t-title1"（22/30/600）；正文 sn-t-body（14/22/400）；强调 sn-t-body-strong（14/22/500）
+模型按钮放得下全名就只显示全名，放不下只显示档位；副标题只补标题没说的
 ```
 
 **不要这样**：
 ```
-font-weight: 800; font-size: 15.5px; letter-spacing: .2em; text-transform: uppercase（中文界面）
+分镜模型 · 精细 精细 / 新对话 · 新对话 / 标题"通知"+ 副标题"这里是你的通知"
 ```
 
-**检查器怎么判**（static+dom）：font-weight 不在 400/500/600 就报；font-size 的 px 不在 11 12 13 14 15 17 22 28 上就报；text-transform: uppercase 同时 letter-spacing > .05em 的报。
+**检查器怎么判**（dom）：按钮、标签、页签里看得见的字，按空格和 · 切开以后同一个词出现两次就报（每个宽度都查）。
 
-**怎么改**：用排版类：sn-t-display / sn-t-title1 / sn-t-title2 / sn-t-title3 / sn-t-body / sn-t-body-strong / sn-t-callout / sn-t-caption / sn-t-micro / sn-t-code。
+**怎么改**：找到多出来的那一份删掉；同一处在不同宽度有长短两种写法时，确认短的那份只在放不下时出现、长的那份同时藏起来。
 
-## 不乱画分隔线（`no-decorative-divider`，warn）
+## 2. 假
 
-**为什么**：到处都是 1px 线，界面就碎了；区域之间靠留白和底色深浅区分。
+演示数据和占位一眼假。
 
-**这样写**：
-```
-侧栏和内容用底色深浅区分；卡片头和卡片身之间留白
-```
+**自检**：换成真实产品的数据，会是这样吗？换一个输入，结果还对吗？
 
-**不要这样**：
-```
-标题栏下、工具栏下、侧栏右边、卡片头身之间、弹层底栏上、页脚上都有一条线
-```
+**例子**：文字头像；渐变色块当图片；不管问什么都回同一句；历史里同一句话出现两次；"好的。""收到：…""用户的意思是"；Lorem ipsum、用户 A。
 
-**检查器怎么判**（dom）：header、nav、aside、footer、[role=toolbar]、卡片头尾这些元素带 1px 的 border-top / border-bottom / border-left / border-right（表格行线、可拖动的列边界除外）就报。
-
-**怎么改**：删掉线，用间距（--sn-gap-group 以上）或者把一边换成 --sn-sunken / --sn-canvas 底色。
-
-## 卡片不套卡片；只有能单独操作的对象才用卡片（`card-nesting`，warn）
-
-**为什么**：卡片里再套卡片、每块内容都装卡片，是线框图和模板的味道。
-
-**这样写**：
-```
-内容直接放在底色上，用标题和间距分组；项目、素材、生成结果这类能单独操作的对象才是卡片
-```
-
-**不要这样**：
-```
-统计数字、说明文字、表单都各装一张卡片；卡片里再放带阴影的卡片
-```
-
-**检查器怎么判**（dom）：有圆角 + 底色 + 阴影或描边的块（.sn-card、.sn-demo 或计算样式判断）里面还有同样的块就报。
-
-**怎么改**：去掉里层卡片的底色、阴影和描边，改成标题 + 间距分组。
-
-## 毛玻璃只给浮在内容上的东西（`glass-only-floating`，warn）
-
-**为什么**：面板、卡片全是毛玻璃，既看不清又像模板。
-
-**这样写**：
-```
-吸顶的顶栏、视频控制条、浮层用 backdrop-filter
-```
-
-**不要这样**：
-```
-侧栏、卡片、表单区都 backdrop-filter: blur(20px)
-```
-
-**检查器怎么判**（dom）：backdrop-filter 不为 none、而 position 不是 fixed / sticky / absolute 的元素就报。
-
-**怎么改**：去掉 backdrop-filter，用 --sn-raised 实底。
-
-## 数字写进文字，不堆 KPI 大字卡（`kpi-wall`，warn）
-
-**为什么**：一排等宽卡片、每张大号数字 + 小标签，是仪表盘模板的标志。
-
-**这样写**：
-```
-3 集 · 12 个段落 · 13 个素材（13px、副信息色、等宽数字）；真要看趋势就上图表或表格
-```
-
-**不要这样**：
-```
-四张卡片：大号 "10K+" 配小字 "用户"，再加一个绿色上箭头
-```
-
-**检查器怎么判**（dom）：同一行 3 张以上兄弟卡片，每张里有一个字号 ≥ 28px 的数字就报。
-
-**怎么改**：把数字并进一行说明文字，或者换成表格 / 图表；仪表盘配方见 spec/recipes/dashboard.md。
-
-## 颜色只表达状态（`status-color`，warn）
-
-**为什么**：每行堆三四个彩色徽章，类型也做成带底色的胶囊，眼睛不知道看哪。
-
-**这样写**：
-```
-正常不上色；需要处理的加一个主色小圆点；失败只给关键词上 --sn-danger
-```
-
-**不要这样**：
-```
-类型、标签、状态全是彩色胶囊；正常状态也是绿色徽章
-```
-
-**检查器怎么判**（dom）：同一屏里饱和色（HSL 饱和度 > 40%）做底色的小块超过 6 个，或者一行里超过 2 个，就报。
-
-**怎么改**：类型、标签改成普通文字或中性底色的 sn-chip；只给需要处理、失败的状态上色。
-
-## 导航选中用中性底色，字重不变（`nav-selected`，warn）
-
-**为什么**：左边一根彩色竖条、品牌色底，是后台模板的味道；字重变了文字会挤动。
-
-**这样写**：
-```
-选中项 background: var(--sn-fill-active); color: var(--sn-label)；字重始终 400 / 500 不变
-```
-
-**不要这样**：
-```
-选中项左边 3px 品牌色竖条；选中后变粗
-```
-
-**检查器怎么判**（dom）：导航里 [aria-current]、.on、.active 的项带彩色 border-left / 彩色背景，或者和未选中项 font-weight 不同就报。
-
-**怎么改**：用 sn-side 侧边栏组件，选中样式已经是对的。
-
-## 素材和数据要像真的（`real-content`，warn）
+### 素材和数据要像真的（`real-content`，warn）
 
 **为什么**：Lorem ipsum、渐变色块冒充图片、AI 抽象插画一眼假。
 
@@ -362,7 +116,471 @@ Lorem ipsum、测试数据 1、渐变方块当缩略图、用户 A / 用户 B
 
 **怎么改**：换成和页面业务一致的真实感数据；图片没有就用占位底色 + 文件名，不要画渐变。
 
-## 不遮挡（`no-overlap`，error）
+### 头像不放字（严禁）（`text-avatar`，error）
+
+**为什么**：拿名字的一个字、配一个随机底色当头像，是模板和 AI 生成页面最典型的标志：一屏彩色圆片，像占位，也认不出是谁。
+
+**这样写**：
+```
+<span class="sn-av"><img src="/avatars/lin.jpg" alt="林夏"></span>；没有照片用 Satin 的预设头像：createAvatar(el, { name: "林夏" })（按名字固定分到同一张）
+```
+
+**不要这样**：
+```
+<span class="sn-av" style="--sn-h: 210">林</span>；<Avatar>周</Avatar>
+```
+
+**检查器怎么判**（static+dom）：标记里 `.sn-av` 的元素直接写了文字（不是 `<img>`、预设头像）就报；页面上量：`.sn-av` 里有看得见的文字节点就报。
+
+**怎么改**：有照片放 `<img>`；没有照片用预设头像（`createAvatar`、`<Avatar name>` 不写 `src`），同一个人每次是同一张。列表里不需要分清是谁时干脆不放头像。
+
+### 回复不复读、不用客套开头（`copy-echo`，warn）
+
+**为什么**：回答先把用户的话念一遍（"收到：'把第三集拆成镜头'"），或者开头"好的！""当然可以！""作为 AI……"，一看就是模板；用户要的是结果。演示和示例里的假回答会被照抄进真产品，更要写对。
+
+**这样写**：
+```
+第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。
+```
+
+**不要这样**：
+```
+`收到：“${question}”。` / 好的！马上为您处理。 / 当然可以！ / 作为 AI 助手，我……
+```
+
+**检查器怎么判**（static）：模板字符串以 收到 / 好的 / 明白 / 了解 / 当然 开头、紧跟着插值（`收到：“${question}”`）；文案以 收到：、好的！、当然可以、作为（一个）AI、作为人工智能 开头。
+
+**怎么改**：直接给结果或下一步。演示用的假回答写一段固定的、和场景有关的话，不拼用户的输入。
+
+## 3. 照搬
+
+不看场合套用现成的模式。
+
+**自检**：对面是人还是 AI？在手机上还是电脑上？用手指还是鼠标？
+
+**例子**：AI 显示"在线""正在输入"；用户消息带发送转圈；桌面卡片塞进手机、页面边距露出一圈灰；触屏上显示 ⌘↵；浏览器默认的蓝色下划线链接；英文眉题；一墙 KPI 卡片。
+
+### 移动端可点区域够大（`touch-target`，warn）
+
+**为什么**：手机上 28px 的图标按钮很难点中。
+
+**这样写**：
+```
+390 宽下可点元素至少 40×40（用 sn-btn 的 lg 尺寸，或者给图标按钮加 sn-tap 扩大点击区）
+```
+
+**不要这样**：
+```
+手机页面上 24px 的关闭按钮、挤在一起的链接
+```
+
+**检查器怎么判**（dom）：390 宽、触摸模式下，可点元素（button、a、[role=button]、input）的点击框小于 40×40 且和别的可点元素间距小于 8px 就报。
+
+**怎么改**：移动端用 lg 尺寸；图标按钮加 `sn-tap`；列表行整行可点。
+
+### 浏览器默认样式不能漏出来（`browser-default`，error）
+
+**为什么**：亮蓝色带下划线的链接、灰底凸边的默认按钮、系统自带的复选框和下拉框、浏览器默认的焦点框，一眼就是没做完的页面。
+
+**这样写**：
+```
+文字链接 <a class="sn-link">；按钮 <button class="sn-btn sn-secondary">；表单控件用 Satin 的标记（sn-check、sn-select、sn-input）
+```
+
+**不要这样**：
+```
+<a href="/all" class="sn-t-callout">全部项目</a>（排版类不管链接颜色，还是蓝色下划线）；<button>导出</button>；<select> 不加任何类
+```
+
+**检查器怎么判**（static+dom）：标记里 `<button>`、`<select>`、`<input>`（checkbox / radio / text）一个 Satin 类都没有就报；页面上量：链接的计算颜色还是浏览器默认的 rgb(0, 0, 238) 或带下划线、按钮还是默认的灰底凸边，就报。链接本身见 `link-style`。
+
+**怎么改**：套上 Satin 的类（`sn-link`、`sn-btn`、`sn-input`……）；组件库里有的控件直接用组件。
+
+### 链接用 Satin 的样式（`link-style`，warn）
+
+**为什么**：没有链接类的 <a> 是浏览器默认的亮蓝色加下划线，和界面其他部分不是一套；只套了排版类（`sn-t-callout` 之类）也一样漏出来。低档模型做的登录页、页脚、仪表盘"查看全部"最常见。
+
+**这样写**：
+```
+<a class="sn-link" href="/terms">服务条款</a>
+```
+
+**不要这样**：
+```
+<a href="/terms">服务条款</a>
+```
+
+**检查器怎么判**（static）：标记里有 href（或 to）的 `<a>`，class 里没有 Satin 管链接样子的类（`sn-link`、`sn-btn`、`sn-textbtn`，或者侧栏、页签、面包屑、菜单这些组件自己的标记）就报。
+
+**怎么改**：文字链接加 class="`sn-link`"；侧栏、面包屑按组件的标记写；看起来像按钮的用 `sn-btn`。
+
+### 手机上不是桌面卡片缩小版（`phone-card`，warn）
+
+**为什么**：桌面上的居中卡片原样放进手机：四周一圈留白、圆角卡片、底下空一大块、主按钮在半中间，用户一看就说"太 AI 了"。手机应用是铺满屏幕的。
+
+**这样写**：
+```
+窄于 640 时内容铺满（去掉外圈留白和卡片圆角）；顶上一条导航栏；主操作用 .sn-bottom-bar 贴底并留出 env(safe-area-inset-bottom)；对话、表单这种整页的东西高度跟着屏幕（100dvh）
+```
+
+**不要这样**：
+```
+手机上 margin: 16px 的圆角卡片里放登录表单，卡片下面空 200px；底部按钮 position: fixed; bottom: 0 却不管安全区
+```
+
+**检查器怎么判**（static+dom）：390 宽下：占了大半屏的圆角卡片左右各留 ≥ 12px 白边，或者最后一块内容下面空出 ≥ 120px 而主按钮不在底部，就报；样式里 `position: fixed` 贴底的元素没有用 `env(safe-area-inset-bottom)` 就报。
+
+**怎么改**：手机上去掉外圈卡片和圆角；主按钮放 `.sn-bottom-bar`；整页的高度用 `100dvh`；贴底的东西加 `padding-bottom: env(safe-area-inset-bottom)`。
+
+### 数字写进文字，不堆 KPI 大字卡（`kpi-wall`，warn）
+
+**为什么**：一排等宽卡片、每张大号数字 + 小标签，是仪表盘模板的标志。
+
+**这样写**：
+```
+3 集 · 12 个段落 · 13 个素材（13px、副信息色、等宽数字）；真要看趋势就上图表或表格
+```
+
+**不要这样**：
+```
+四张卡片：大号 "10K+" 配小字 "用户"，再加一个绿色上箭头
+```
+
+**检查器怎么判**（dom）：同一行 3 张以上兄弟卡片，每张里有一个字号 ≥ 28px 的数字就报。
+
+**怎么改**：把数字并进一行说明文字，或者换成表格 / 图表；仪表盘配方见 `spec/recipes/04-dashboard.md`。
+
+### 不加英文眉题（`no-eyebrow`，warn）
+
+**为什么**：标题上面一行全大写、加字距的英文小字（PROJECTS · 2026、DASHBOARD）是模板和 AI 生成页面的标志；中文产品界面的层级靠标题字号、字重和一句说明。
+
+**这样写**：
+```
+<h1>全部项目</h1><p>共 128 个项目，本周新增 6 个</p>
+```
+
+**不要这样**：
+```
+<span style="text-transform: uppercase; letter-spacing: .2em">Projects · 2026</span><h1>全部项目</h1>
+```
+
+**检查器怎么判**（static）：样式里出现 text-transform: uppercase。
+
+**怎么改**：删掉眉题；要补充信息就放进标题下面那句说明（`--sn-label2` 的正文小一号）。
+
+### 状态词要对用户有意义（`copy-status`，warn）
+
+**为什么**：AI 助手顶栏写"在线"、角落写"就绪""空闲""系统运行正常"——这些词不会变，也没告诉用户能用的事。状态只在它会变、变了用户要知道时才写。
+
+**这样写**：
+```
+AI 助手的顶栏只写名字（思考、步骤、正文在消息里自己会显示）；人和人聊天写"在线""3 分钟前在线""正在输入…"
+```
+
+**不要这样**：
+```
+分镜助手 · 在线 / 状态：就绪 / 系统运行正常
+```
+
+**检查器怎么判**（static）：界面文案整句就是 就绪、空闲、系统正常、运行正常、状态：正常 / 就绪 时报；标题里有 助手 / AI / 模型 / Assistant 的对话又写了 status 在线 / Online 时报。
+
+**怎么改**：删掉；要表达状态就写会变的、用户能据此行动的：正在生成、排队第 3 位、离线（消息暂时发不出去）。
+
+## 4. 堆信号
+
+一个状态用好几样东西来表达，或者拿装饰当信号。
+
+**自检**：这个状态别处已经表达过了吗？去掉它，用户会少知道什么？
+
+**例子**：停止按钮外圈转圈 + 红底 + 用户消息转圈 + 思考点；处处加粗、处处徽标；渐变、光晕、emoji、魔法棒图标；卡片套卡片；乱画的分隔线。
+
+### 不加彩色投影和光晕（`no-colored-shadow`，error）
+
+**为什么**：发光描边、彩色投影、霓虹光晕显得廉价；成熟产品的阴影是中性的、很淡的。
+
+**这样写**：
+```
+box-shadow: var(--sn-e1)（浮层）、var(--sn-card-shadow)（卡片）、var(--sn-e2)（对话框）
+```
+
+**不要这样**：
+```
+box-shadow: 0 0 20px rgba(99, 102, 241, .5); filter: drop-shadow(0 0 8px #a855f7); text-shadow: 0 0 10px cyan
+```
+
+**检查器怎么判**（static+dom）：box-shadow / text-shadow / drop-shadow 里的颜色不是黑或白（R=G=B 且只有透明度变化）就报；不是令牌、模糊半径大于 40px 的也报。
+
+**怎么改**：换成阴影令牌 `--sn-e1` / `--sn-e2` / `--sn-card-shadow`；焦点用 outline: 2px solid `var(--sn-focus)`。
+
+### 不用渐变做装饰（`no-gradient`，error）
+
+**为什么**：紫蓝渐变背景、渐变文字、渐变按钮是 AI 拼出来的界面最明显的标志。
+
+**这样写**：
+```
+背景用纯色令牌（--sn-canvas、--sn-raised）；分区靠留白和底色深浅
+```
+
+**不要这样**：
+```
+background: linear-gradient(135deg, #667eea, #764ba2); background-clip: text; 渐变色图标
+```
+
+**检查器怎么判**（static+dom）：background / background-image 里出现 linear-gradient、radial-gradient、conic-gradient 就报（mask-image 做边缘渐隐、骨架屏扫光除外）；background-clip: text 一律报。页面上量：看得见的元素计算样式 background-image 含 gradient 的。
+
+**怎么改**：删掉渐变，用一个纯色令牌；想要层次就用 `--sn-raised` 卡片放在 `--sn-canvas` 底上。
+
+### 不用 AI 套路图标和 emoji（`no-ai-icons`，error）
+
+**为什么**：星星闪光、仙女棒、机器人头、大脑、emoji 一出现，界面就像 AI 模板。
+
+**这样写**：
+```
+图标照字面意思选：生成用"播放"或"加号"，或者直接写"生成"两个字
+```
+
+**不要这样**：
+```
+✨ 智能生成；sparkles / wand / bot / brain 图标；每个标题前一个彩色圆角方块图标
+```
+
+**检查器怎么判**（static）：代码里出现图标名 sparkles、sparkle、wand、wand-2、magic、bot、brain、stars 就报；界面文案里出现 emoji（\p{Extended_Pictographic}）就报。
+
+**怎么改**：删掉图标，或者换成字面意思的图标（play、plus、check）；按钮以文字为主。
+
+### 卡片不套卡片；只有能单独操作的对象才用卡片（`card-nesting`，warn）
+
+**为什么**：卡片里再套卡片、每块内容都装卡片，是线框图和模板的味道。
+
+**这样写**：
+```
+内容直接放在底色上，用标题和间距分组；项目、素材、生成结果这类能单独操作的对象才是卡片
+```
+
+**不要这样**：
+```
+统计数字、说明文字、表单都各装一张卡片；卡片里再放带阴影的卡片
+```
+
+**检查器怎么判**（dom）：有圆角 + 底色 + 阴影或描边的块（`.sn-card`、`.sn-demo` 或计算样式判断）里面还有同样的块就报。
+
+**怎么改**：去掉里层卡片的底色、阴影和描边，改成标题 + 间距分组。
+
+### 不处处加粗、处处徽标（`heavy-emphasis`，warn）
+
+**为什么**：每行开头都加粗、每个名词后面跟一个彩色徽标，强调多了就等于没有强调，是 AI 生成内容最常见的样子。
+
+**这样写**：
+```
+正文 400；一屏只有标题和真正要先看的那一个数是 600；状态用文字，需要处理的才加一个小圆点
+```
+
+**不要这样**：
+```
+列表每行 **加粗开头**：说明；每个名字后面一个"新""热""推荐"徽标
+```
+
+**检查器怎么判**（dom）：同一屏里正文段落、列表项有一半以上是 600 以上的字重，或者看得见的徽标、标签超过 8 个，就报。
+
+**怎么改**：去掉多余的加粗和徽标；分层靠字号、颜色深浅（`--sn-label` / `--sn-label2`）和间距。
+
+### 不乱画分隔线（`no-decorative-divider`，warn）
+
+**为什么**：到处都是 1px 线，界面就碎了；区域之间靠留白和底色深浅区分。
+
+**这样写**：
+```
+侧栏和内容用底色深浅区分；卡片头和卡片身之间留白
+```
+
+**不要这样**：
+```
+标题栏下、工具栏下、侧栏右边、卡片头身之间、弹层底栏上、页脚上都有一条线
+```
+
+**检查器怎么判**（dom）：header、nav、aside、footer、[role=toolbar]、卡片头尾这些元素带 1px 的 border-top / border-bottom / border-left / border-right（表格行线、可拖动的列边界除外）就报。
+
+**怎么改**：删掉线，用间距（`--sn-gap-group` 以上）或者把一边换成 `--sn-sunken` / `--sn-canvas` 底色。
+
+### 按钮外面不套转圈环；停止不用强调色或红色（`button-spinner`，warn）
+
+**为什么**：发送按钮生成中外面再套一圈转圈、底色变成主题色或红色：进度消息区里已经在表达，按钮上再转一圈是重复；停止也不是危险操作，红底像出错。
+
+**这样写**：
+```
+生成中按钮原地换成"停止"的方块（交叉淡入淡出加缩放），底色和能发送时一样是中性的墨色；进度在消息区里用"正在思考"或逐字出来的正文表达
+```
+
+**不要这样**：
+```
+<button class="send busy"><svg class="orbit spin">…</svg></button>；生成中 background: var(--sn-danger)
+```
+
+**检查器怎么判**（dom）：按钮里有一直在转的环（无限旋转的动画、比按钮还大一圈）就报；名字是"停止"的按钮底色是饱和色（HSL 饱和度 > 40%）就报。
+
+**怎么改**：去掉转圈环；停止按钮用中性色（`--sn-label` 底）；生成状态放进消息区。
+
+## 5. 语义错位
+
+颜色、字重、字号、位置和它要表达的意思对不上。
+
+**自检**：颜色是不是只在表达状态？同一种颜色、同一档字重在整页里是不是同一个意思？
+
+**例子**："已完成"是红的；四种状态一个颜色；停止用危险色；导航选中靠加粗；毛玻璃用在不浮动的东西上；不在刻度上的字号、间距。
+
+### 间距只用刻度（`spacing-scale`，error）
+
+**为什么**：随手写的 13px、18px、22px 让对齐和节奏乱掉；刻度保证组内近、组间远。
+
+**这样写**：
+```
+padding: var(--sn-pad-card); gap: var(--sn-gap-stack); margin-top: 24px
+```
+
+**不要这样**：
+```
+padding: 13px 18px; gap: 7px; margin-top: 22px
+```
+
+**检查器怎么判**（static）：padding、margin、gap（含各方向）里的 px 必须在 0 2 4 6 8 10 12 14 16 20 24 28 32 40 48 64 80 上；1px 例外（细线对齐）。
+
+**怎么改**：改成最近的刻度值，或者用语义间距：组内 `--sn-gap-inline`（8）/ `--sn-gap-stack`（12），组间 `--sn-gap-group`（16），区块之间 `--sn-gap-section`（32），卡片内边距 `--sn-pad-card`（16），面板 `--sn-pad-panel`（24）。
+
+### 字重只用 400、500、600；字号只用排版档（`font-weight`，warn）
+
+**为什么**：800 的粗标题、随手的 15.5px 字号让层级乱掉。
+
+**这样写**：
+```
+标题 class="sn-t-title1"（22/30/600）；正文 sn-t-body（14/22/400）；强调 sn-t-body-strong（14/22/500）
+```
+
+**不要这样**：
+```
+font-weight: 800; font-size: 15.5px; letter-spacing: .2em; text-transform: uppercase（中文界面）
+```
+
+**检查器怎么判**（static+dom）：font-weight 不在 400/500/600 就报；font-size 的 px 不在 11 12 13 14 15 17 22 28 上就报；text-transform: uppercase 同时 letter-spacing > .05em 的报。
+
+**怎么改**：用排版类：`sn-t-display` / `sn-t-title1` / `sn-t-title2` / `sn-t-title3` / `sn-t-body` / `sn-t-body-strong` / `sn-t-callout` / `sn-t-caption` / `sn-t-micro` / `sn-t-code`。
+
+### 颜色只表达状态（`status-color`，warn）
+
+**为什么**：每行堆三四个彩色徽章，类型也做成带底色的胶囊，眼睛不知道看哪。
+
+**这样写**：
+```
+正常不上色；需要处理的加一个主色小圆点；失败只给关键词上 --sn-danger
+```
+
+**不要这样**：
+```
+类型、标签、状态全是彩色胶囊；正常状态也是绿色徽章
+```
+
+**检查器怎么判**（dom）：同一屏里饱和色（HSL 饱和度 > 40%）做底色的小块超过 6 个，或者一行里超过 2 个，就报。
+
+**怎么改**：类型、标签改成普通文字或中性底色的 `sn-chip`；只给需要处理、失败的状态上色。
+
+### 毛玻璃只给浮在内容上的东西（`glass-only-floating`，warn）
+
+**为什么**：面板、卡片全是毛玻璃，既看不清又像模板。
+
+**这样写**：
+```
+吸顶的顶栏、视频控制条、浮层用 backdrop-filter
+```
+
+**不要这样**：
+```
+侧栏、卡片、表单区都 backdrop-filter: blur(20px)
+```
+
+**检查器怎么判**（dom）：backdrop-filter 不为 none、而 position 不是 fixed / sticky / absolute 的元素就报。
+
+**怎么改**：去掉 backdrop-filter，用 `--sn-raised` 实底。
+
+### 导航选中用中性底色，字重不变（`nav-selected`，warn）
+
+**为什么**：左边一根彩色竖条、品牌色底，是后台模板的味道；字重变了文字会挤动。
+
+**这样写**：
+```
+选中项 background: var(--sn-fill-active); color: var(--sn-label)；字重始终 400 / 500 不变
+```
+
+**不要这样**：
+```
+选中项左边 3px 品牌色竖条；选中后变粗
+```
+
+**检查器怎么判**（dom）：导航里 [aria-current]、.on、.active 的项带彩色 border-left / 彩色背景，或者和未选中项 font-weight 不同就报。
+
+**怎么改**：用 `sn-side` 侧边栏组件，选中样式已经是对的。
+
+## 6. 只在理想条件下成立
+
+没在真实宽度、真实内容、各种状态下看过。
+
+**自检**：最窄 320、最宽 1440、文字最长时、空 / 加载 / 出错、深色、触屏、键盘，都看过了吗？
+
+**例子**：写死 680px 导致滚动条；手机上填不满；"源码"拆成两行；令牌名在连字符处断开；指标排成 3 + 1；提示框被裁；浮层被挡；写死的颜色在深色下看不清；焦点框没了。
+
+### 颜色只用令牌（`color-token`，error）
+
+**为什么**：写死的颜色在深色主题下不会变，换主色也不跟着变；颜色多了就像拼凑的。
+
+**这样写**：
+```
+color: var(--sn-label2); background: var(--sn-raised); border-color: var(--sn-line-control)
+```
+
+**不要这样**：
+```
+color: #666; background: #f0f4ff; border: 1px solid rgb(229, 231, 235)
+```
+
+**检查器怎么判**（static）：CSS、内联 style、JSX/Vue 模板的 style 里出现 #hex、rgb()/rgba()、hsl()/hsla()、颜色关键字（red、blue、gray、white、black……；transparent、currentColor、inherit 除外）就报。令牌定义文件本身不查。
+
+**怎么改**：换成最接近的语义令牌：文字 `--sn-label` / `--sn-label2` / `--sn-label3`，底色 `--sn-canvas` / `--sn-raised` / `--sn-sunken`，线 `--sn-line` / `--sn-line-control`，状态 `--sn-danger` / `--sn-success` / `--sn-warning`，强调 `--sn-accent`。检查器会算出色差最小的那个令牌。
+
+### 只用存在的令牌（`token-exists`，error）
+
+**为什么**：写错名字的变量不会报错，样式悄悄失效：颜色变成默认的黑、间距变成 0、字号回到浏览器默认。
+
+**这样写**：
+```
+color: var(--sn-label2); padding: var(--sn-sp-16); class="sn-t-callout"
+```
+
+**不要这样**：
+```
+color: var(--sn-text-secondary); font-size: var(--sn-t-callout-size); gap: var(--sn-space-4)
+```
+
+**检查器怎么判**（static）：var(--sn-…) 引用的名字既不是 Satin 的令牌，也不是组件样式里用到的变量，就报（自己定义的 `--sn-xxx` 变量也算存在）。
+
+**怎么改**：查 references/tokens.md 换成真实的名字：文字 `--sn-label` / `--sn-label2` / `--sn-label3`，间距 `--sn-sp-4`…80，圆角 `--sn-r-sm`/md/lg/xl；字号别用变量，用排版类 `sn-t-`*。
+
+### sn- 类名只用 Satin 有的（`class-exists`，warn）
+
+**为什么**：自己编的 sn- 类名（`sn-eyebrow`、`sn-card-title`……）没有样式，看着像用了 Satin，其实什么都没发生；以后升级也可能撞上真正的类名。
+
+**这样写**：
+```
+class="sn-t-caption sn-c-tertiary"（Satin 的排版类）；自己的类不带 sn- 前缀：class="page-eyebrow"
+```
+
+**不要这样**：
+```
+class="sn-eyebrow"、class="sn-card-title"
+```
+
+**检查器怎么判**（static）：标记、className 里 sn- 开头的类名不在 Satin 的样式和脚本里就报（建议改）。
+
+**怎么改**：查 references/components.md、SKILL.md 第 4 节找现成的类；没有就自己起名字，别用 sn- 前缀。
+
+### 不遮挡（`no-overlap`，error）
 
 **为什么**：绝对定位的按钮压住内容角落的东西，看起来没做完。
 
@@ -380,7 +598,7 @@ Lorem ipsum、测试数据 1、渐变方块当缩略图、用户 A / 用户 B
 
 **怎么改**：给容器留出位置（padding），或者把按钮挪进工具行。
 
-## 浮层不被裁（`float-clipped`，error）
+### 浮层不被裁（`float-clipped`，error）
 
 **为什么**：下拉、菜单、提示被父元素的 overflow:hidden 裁掉一半。
 
@@ -398,25 +616,7 @@ Lorem ipsum、测试数据 1、渐变方块当缩略图、用户 A / 用户 B
 
 **怎么改**：用组件自带的浮层（会放到顶层）；自己写的浮层改用 popover 属性。
 
-## 按钮文字不换行，页面不横向溢出（`button-wrap`，error）
-
-**为什么**：按钮里的字折成两行、页面左右能滚，是没在窄屏上看过的标志。
-
-**这样写**：
-```
-按钮 white-space: nowrap（sn-btn 已经是）；窄屏下按钮组换成竖排或者收进更多菜单
-```
-
-**不要这样**：
-```
-固定宽度的按钮塞长文字；表格、长链接把页面撑宽
-```
-
-**检查器怎么判**（dom）：1440、768、390 三种宽度下：按钮里的文字节点有两行就报；document.documentElement.scrollWidth > innerWidth 就报。
-
-**怎么改**：缩短文案；按钮不设固定宽度；宽内容放进 sn-scroll 滚动区域或者表格自己的横向滚动。
-
-## 键盘焦点看得见（`focus-visible`，error）
+### 键盘焦点看得见（`focus-visible`，error）
 
 **为什么**：去掉焦点框以后键盘用户不知道自己在哪。
 
@@ -432,9 +632,9 @@ Lorem ipsum、测试数据 1、渐变方块当缩略图、用户 A / 用户 B
 
 **检查器怎么判**（static）：outline: none / 0 出现在 :focus 上，而同一个选择器没有对应的 :focus-visible 样式（outline 或 box-shadow）就报。
 
-**怎么改**：改成只在 :focus:not(:focus-visible) 上去掉 outline，并给 :focus-visible 加 outline: 2px solid var(--sn-focus)。
+**怎么改**：改成只在 :focus:not(:focus-visible) 上去掉 outline，并给 :focus-visible 加 outline: 2px solid `var(--sn-focus)`。
 
-## 深浅两套都精致（`both-themes`，error）
+### 深浅两套都精致（`both-themes`，error）
 
 **为什么**：只在浅色下调过，深色下文字发灰看不清、白底卡片刺眼。
 
@@ -452,21 +652,155 @@ Lorem ipsum、测试数据 1、渐变方块当缩略图、用户 A / 用户 B
 
 **怎么改**：换成令牌；深色下的特殊处理写在 [data-theme="dark"] 下面。
 
-## 移动端可点区域够大（`touch-target`，warn）
+### 网格不留孤儿（`grid-orphan`，warn）
 
-**为什么**：手机上 28px 的图标按钮很难点中。
+**为什么**：4 个指标在中等宽度排成 3 + 1、最后一行孤零零一个，是只在一种宽度下看过的标志。
 
 **这样写**：
 ```
-390 宽下可点元素至少 40×40（用 sn-btn 的 lg 尺寸，或者给图标按钮加 sn-tap 扩大点击区）
+指标桌面一行 4 个、平板和手机 2 × 2；卡片网格用 repeat(auto-fill, minmax(…)) 时数量和列数配好，或者直接按断点写列数
 ```
 
 **不要这样**：
 ```
-手机页面上 24px 的关闭按钮、挤在一起的链接
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 放 4 个指标，720 宽下变成 3 + 1
 ```
 
-**检查器怎么判**（dom）：390 宽、触摸模式下，可点元素（button、a、[role=button]、input）的点击框小于 40×40 且和别的可点元素间距小于 8px 就报。
+**检查器怎么判**（dom）：1440、768、390 三种宽度下：网格或换行的弹性容器里有 3 个以上同类子元素，最后一行只剩 1 个而前面每行 ≥ 3 个，就报。
 
-**怎么改**：移动端用 lg 尺寸；图标按钮加 sn-tap；列表行整行可点。
+**怎么改**：按断点写死列数（4 → 2 → 1 或 4 → 2 × 2），让每行个数能整除；实在不能整除就让最后一行撑满。
+
+### 容器不写死高度（`fixed-height`，warn）
+
+**为什么**：写死 680px 的对话框放进 640 高的预览里就多出滚动条，放进手机又填不满。意外的滚动条和底下一块空白都是 AI 味。
+
+**这样写**：
+```
+组件填满容器（height: 100%），高度由页面布局给：整页用 100dvh，侧栏里的面板用 flex: 1
+```
+
+**不要这样**：
+```
+.chat { height: 680px }；.panel { height: 600px; overflow: auto }
+```
+
+**检查器怎么判**（static+dom）：样式里非媒体元素写了 ≥ 360px 的固定 `height` 就报；页面上量：整页或者某个容器只多出不到 80px 的滚动（像是意外溢出）就报。
+
+**怎么改**：去掉固定高度，改成 `height: 100%` 跟着容器；页面层用 `100dvh` 和弹性布局分配高度。演示要固定尺寸就写在演示外面的那一层。
+
+### 按钮、标签、页签、表头不折行；页面不横向溢出（`button-wrap`，error）
+
+**为什么**：按钮、标签、徽标、分段控件、页签、表头、短的状态文字折成两行，页面左右能滚，是没在窄屏上看过的标志。
+
+**这样写**：
+```
+这些控件 white-space: nowrap（Satin 的 sn-btn、sn-tag、sn-chip、sn-badge、sn-seg、页签、表头已经是）；放不下时截断加省略号，或者让布局让位（按钮组竖排、收进更多菜单、表格横向滚动）
+```
+
+**不要这样**：
+```
+固定宽度的按钮塞长文字；<button>保存<br>草稿</button>；.sn-tag { white-space: normal }；表格、长链接把页面撑宽
+```
+
+**检查器怎么判**（static+dom）：标记里按钮、标签里写了 `<br>`，或者样式把它们设成 `white-space: normal` 就报；1440、768、390 三种宽度下：按钮、标签、徽标、分段、页签、表头、状态文字的字折成两行就报；`document.documentElement.scrollWidth > innerWidth` 就报。
+
+**怎么改**：缩短文案；不设固定宽度；放不下就截断加省略号（`overflow: hidden; text-overflow: ellipsis`）或者让布局让位；宽内容放进 `.sn-scroll` 滚动区域或者表格自己的横向滚动。
+
+### 代码标识不在连字符处断开（`code-break`，warn）
+
+**为什么**：令牌名、类名、路径在连字符处折行（"`--sn-label2` / --"接下一行"`sn-label3`"），读的人会以为是两个东西，也没法照抄。
+
+**这样写**：
+```
+正文里的令牌名、类名、路径包成行内代码（Markdown 里用反引号），行内代码 white-space: nowrap；太长的放进代码块
+```
+
+**不要这样**：
+```
+说明文字里直接写 --sn-label2 / --sn-label3，让它在连字符处断开
+```
+
+**检查器怎么判**（dom）：行内 `<code>` 或者 `.sn-mono` 文字占了两行（折行了）就报。
+
+**怎么改**：包成行内代码（`<code>`，Satin 的行内代码不折行）；一行放不下就换成代码块或者缩短说明。
+
+### 数字和单位、日期不拆开；中文标点不到行首（`unit-break`，warn）
+
+**为什么**："12"在行末、"秒"跑到下一行，"11 月"和"21 日"分在两行，句号、逗号跑到行首——排版没看过的标志。
+
+**这样写**：
+```
+数字和单位之间用不断行空格（&nbsp;）或者整体 white-space: nowrap；中文正文用默认的 line-break（不要 word-break: break-all、line-break: anywhere）
+```
+
+**不要这样**：
+```
+word-break: break-all 的段落；"12 秒"中间是普通空格又落在行尾
+```
+
+**检查器怎么判**（static+dom）：样式里正文用了 `word-break: break-all` 或 `line-break: anywhere` 就报；页面上量：数字和紧跟的单位（px、ms、秒、分、%、元、GB、条、行、个……）被折到两行，或者中文的逗号、句号、顿号这类标点出现在行首，就报。
+
+**怎么改**：数字和单位之间换成 `&nbsp;` 或者包一层 `white-space: nowrap`；去掉 `break-all` / `anywhere`。
+
+## 7. 生硬
+
+状态之间直接跳变，没有过渡和反馈；或者动的方式不对。
+
+**自检**：每一次变化（出现、消失、切换、按下）都有过渡吗？时长和曲线一致吗？只动了 transform / opacity 吗？
+
+**例子**：发送和停止直接切换；按下没有反馈；展开收起直接跳；动画改宽高导致卡顿；弹跳、无限脉冲。
+
+### 动效只动 transform、opacity、filter（`motion-props`，error）
+
+**为什么**：动宽高、位置、边距会每帧重排，掉帧、发抖。
+
+**这样写**：
+```
+transition: transform .2s var(--sn-ease-out), opacity .2s var(--sn-ease-out)；展开用 grid-template-rows 0fr→1fr 或者 scale
+```
+
+**不要这样**：
+```
+transition: all .3s; transition: height .3s, left .3s; @keyframes { from { width: 0 } }
+```
+
+**检查器怎么判**（static）：transition 里出现 all、width、height、top、left、right、bottom、margin*、padding*、inset 就报；@keyframes 和 element.animate() 的关键帧里出现这些属性也报。颜色、背景、阴影、边框色的状态过渡（≤ 200ms）允许。
+
+**怎么改**：位移改 transform: translate()；大小改 transform: scale()；淡入淡出用 opacity。不要写 all，列出具体属性。
+
+### 曲线和时长只用规定的几档（`easing-token`，warn）
+
+**为什么**：线性动画显得机械；每处一个自编的 cubic-bezier 就没有统一的手感。
+
+**这样写**：
+```
+进入 var(--sn-ease-out) 150–250ms；离开 var(--sn-ease-in) 120–200ms；换位 var(--sn-ease-in-out)；勾选、开关 var(--sn-ease-overshoot)
+```
+
+**不要这样**：
+```
+transition: opacity .5s linear; transition: transform 1s ease; cubic-bezier(.68, -.55, .27, 1.55)
+```
+
+**检查器怎么判**（static）：transition / animation 的曲线不是 var(`--sn-ease-`*) 就报（转圈、进度条用 linear 除外）；时长超过 500ms 的报（转圈、骨架屏、进度条除外）。
+
+**怎么改**：按动作选：出现用 `--sn-ease-out`，消失用 `--sn-ease-in`，留在屏上移动用 `--sn-ease-in-out`；时长按 spec/motion 的档位。
+
+### 状态切换要有过渡和反馈（`no-transition`，warn）
+
+**为什么**：发送 / 停止、展开 / 收起、出现 / 消失直接跳变，按下也没有反馈，界面像没做完。
+
+**这样写**：
+```
+图标切换交叉淡入淡出加缩放（160～200ms，缓出）；底色过渡 160ms；按下缩到 .96；展开收起只动 transform / opacity；减少动态效果时直接切换
+```
+
+**不要这样**：
+```
+生成中把箭头 display: none、方块 display: block；按钮按下没有任何变化
+```
+
+**检查器怎么判**（visual）：人工看录屏或逐帧记录：每一次状态变化都有过渡，按下有反馈；时长、曲线和 `spec/motion/README.md` 的档位一致。
+
+**怎么改**：照 Satin 组件自带的写法（`.sn-swap` 的交叉淡入淡出、`--sn-ease-out` 曲线）补上过渡；逐帧验收：帧间隔 p95 ≤ 17ms、最长 ≤ 34ms。
 

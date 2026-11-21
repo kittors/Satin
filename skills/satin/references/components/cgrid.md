@@ -1130,7 +1130,7 @@ export default function CanvasEvents() {
 | `loadingText` | `string` | "正在加载…" | 否 | 加载中那一层的话。 | createXxx 选项：`loadingText`；React：`loadingText`；Vue：`loadingText`；Svelte：`loadingText`；Preact：`loadingText` |
 | `lines` | `"row" \| "grid"` | "grid" | 否 | 只画行线，还是画网格线（合并单元格只在网格线下显示）。 | createXxx 选项：`lines`；React：`lines`；Vue：`lines`；Svelte：`lines`；Preact：`lines` |
 | `height` | `number \| string` | 480 | 否 | 表格框的高度（表头 + 行，不含工具条）：数字是 px，也可以写 `"60vh"`。行少时调小，别留一大片空白。 | createXxx 选项：`height`；React：`height`；Vue：`height`；Svelte：`height`；Preact：`height` |
-| `label` | `string` | "数据表格（画布绘制）" | 否 | 表格的读屏名称（`role="grid"` 的 `aria-label`）：写这张表是什么，"镜头清单"。 | createXxx 选项：`label`；React：`label`；Vue：`label`；Svelte：`label`；Preact：`label` |
+| `label` | `string` | "数据表格" | 否 | 表格的读屏名称（`role="grid"` 的 `aria-label`）：写这张表是什么，"镜头清单"。 | createXxx 选项：`label`；React：`label`；Vue：`label`；Svelte：`label`；Preact：`label` |
 | `toolbar` | `boolean` | true | 否 | 带不带工具条（搜索框、筛选条件、行数）。搜索搜的是主列；服务端不支持搜索时关掉。 | createXxx 选项：`toolbar`；React：`toolbar`；Vue：`toolbar`；Svelte：`toolbar`；Preact：`toolbar` |
 | `controls` | `boolean` | false | 否 | 工具条上再加几个切换：平铺 / 树形、按需加载 / 滚到底再加载、滚动条常驻 / 自动隐藏、行线 / 网格（设计稿的演示就开着它）。 | createXxx 选项：`controls`；React：`controls`；Vue：`controls`；Svelte：`controls`；Preact：`controls` |
 
