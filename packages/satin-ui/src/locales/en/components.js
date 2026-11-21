@@ -21,5 +21,7 @@ export default {
   "components.remove": "Remove",
   "components.17": "Show password",
   "components.18": "Caps Lock is on",
-  "components.19": "Clear"
+  "components.19": "Clear",
+  "components.dropTitle": "Drop files here, or",
+  "components.dropPick": "choose files",
 };

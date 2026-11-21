@@ -393,6 +393,9 @@ importers:
       react:
         specifier: '>=18'
         version: 19.3.1
+      react-dom:
+        specifier: '>=18'
+        version: 19.3.1(react@19.3.1)
       svelte:
         specifier: '>=5.20'
         version: 5.58.0

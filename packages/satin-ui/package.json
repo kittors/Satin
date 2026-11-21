@@ -122,7 +122,8 @@
   "peerDependencies": {
     "react": ">=18",
     "vue": ">=3.3",
-    "svelte": ">=5.20"
+    "svelte": ">=5.20",
+    "react-dom": ">=18"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -132,6 +133,9 @@
       "optional": true
     },
     "svelte": {
+      "optional": true
+    },
+    "react-dom": {
       "optional": true
     }
   }

@@ -21,5 +21,7 @@ export default {
   "components.remove": "移除",
   "components.17": "显示密码",
   "components.18": "大写锁定已打开",
-  "components.19": "清除"
+  "components.19": "清除",
+  "components.dropTitle": "把文件拖到这里，或者",
+  "components.dropPick": "选择文件",
 };

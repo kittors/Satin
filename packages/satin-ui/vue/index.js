@@ -13,6 +13,7 @@ import { CHECK } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
 import { wrap, cx } from "./wrap.js";
+import * as X from "./extra.js";
 const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
 
 // 自己包：重组件（对话、Markdown、流程图、数据表格……，各自单独引入）或别的 createXxx 也能变成 Vue 组件。props 列出要传给组件的选项名
@@ -157,8 +158,10 @@ export const notify = (o) => (setup(), S.notify(o));
 // 数据表格这类重组件不在这里注册：import { DataGrid } from "satin-ui/vue/grid"
 export default {
   install(app) {
-    for (const [k, c] of Object.entries({ Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
+    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
     app.directive("enhance", vEnhance);
     const off = setup(); app.onUnmount?.(off); // setup() 在服务端直接返回，什么都不做
   },
 };
+// 菜单、右键菜单、Popover、命令面板、看图、上传、侧栏、无限列表、滚动区域、视频、音频（vue/extra.js）
+export * from "./extra.js";
