@@ -1,6 +1,6 @@
 // satin-ui/react 的第二部分（react/extra.js，主入口一起转出）
 import type * as React from "react";
-import type { SatinInstance, ScrollAreaOptions } from "./components";
+import type { SatinInstance, ScrollAreaOptions, PlayerOptions, AudioOptions } from "./components";
 type Base = { className?: string; style?: React.CSSProperties; id?: string };
 // ———— 菜单、右键菜单、Popover、命令面板、看图、上传、侧栏、无限列表、滚动区域、视频、音频（satin-ui/react 主入口） ————
 /** 菜单的一条：key 不给就用 label；children 是子菜单。分隔线 { type: "divider" }，分组标题 { type: "group", label } */
@@ -21,7 +21,8 @@ export interface CommandPaletteHandle { open(): void; close(): void; toggle(): v
 /** 命令面板：⌘K 打开（hotkey={false} 关掉快捷键）；选中一条 onRun(item)；open 受控 */
 export interface CommandPaletteProps<T extends import("./components").CommandItem = import("./components").CommandItem> { groups: { name: string; items: T[] }[]; onRun?(item: T): void; placeholder?: string; /** 没有结果时显示的 HTML；里面带 data-empty-act 的按钮点了（或直接回车）调 onEmpty */ empty?(q: string): string; onEmpty?(q: string): void; hotkey?: boolean; enterLabel?: string; open?: boolean; onOpenChange?(open: boolean): void }
 export const CommandPalette: React.ForwardRefExoticComponent<CommandPaletteProps & React.RefAttributes<CommandPaletteHandle>>;
-export interface LightboxItem { src?: string; bg?: string; ratio?: number; video?: string; caption?: string }
+/** 看图的一张（和 satin-ui 的 LightboxItem 一样）：src / bg、ratio / size、alt；视频 type: "video" + poster */
+export type LightboxItem = import("./components").LightboxItem;
 /** 看图：index 是数字就打开到那一张，null 关上（onClose 里设回 null）；thumbOf(i) 返回第 i 张缩略图元素 */
 export function Lightbox(p: { items: LightboxItem[]; index?: number | null; onClose?(): void; thumbOf?(i: number): HTMLElement | null | undefined; enabled?(i: number): boolean }): null;
 /** 上传：拖放区 + 文件列表。accept：".txt,.docx" 或正则；maxSize：字节；upload(file, progress) 返回 Promise */
@@ -37,5 +38,5 @@ export const InfiniteList: React.ForwardRefExoticComponent<InfiniteListProps & R
 /** 滚动区域：写法和 div 一样（限高写在 style 上），as 换标签 */
 export type ScrollAreaProps = React.HTMLAttributes<HTMLElement> & Omit<ScrollAreaOptions, "inner"> & { as?: keyof React.JSX.IntrinsicElements };
 export const ScrollArea: React.ForwardRefExoticComponent<ScrollAreaProps & React.RefAttributes<SatinInstance & { refresh(): void; set(o: Partial<ScrollAreaOptions>): void }>>;
-export const Player: React.ForwardRefExoticComponent<Base & { src?: string; poster?: string; label?: string; onError?(e: unknown): void } & React.RefAttributes<SatinInstance & { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; readonly video: HTMLVideoElement }>>;
-export const AudioPlayer: React.ForwardRefExoticComponent<Base & { src?: string; title?: string; sub?: string; wave?: string; onError?(e: unknown): void } & React.RefAttributes<SatinInstance & { toggle(): void; readonly audio: HTMLAudioElement }>>;
+export const Player: React.ForwardRefExoticComponent<Base & PlayerOptions & React.RefAttributes<SatinInstance & { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; readonly video: HTMLVideoElement }>>;
+export const AudioPlayer: React.ForwardRefExoticComponent<Base & AudioOptions & React.RefAttributes<SatinInstance & { toggle(): void; readonly audio: HTMLAudioElement }>>;

@@ -1,5 +1,6 @@
 // 重组件：satin-ui/markdown、/chat、/flow、/grid、/canvas-grid、/lightbox、/media（各自单独引入，不拉进主入口）
-import type { SatinFactory } from "./components";
+import type { SatinFactory, LightboxItem, LightboxOptions, LightboxHandle } from "./components";
+export type { LightboxItem, LightboxOptions, LightboxHandle } from "./components";
 
 export interface MarkdownOptions { source?: string; codeMax?: number; imgH?: number | "auto"; tableMax?: number; reduced?(): boolean }
 export function renderMarkdown(el: HTMLElement, md: string, opt?: Omit<MarkdownOptions, "source">): { el: HTMLElement; set(next: Omit<MarkdownOptions, "source">): void; update(md: string): void; destroy(): void; readonly options: Omit<MarkdownOptions, "source"> };
@@ -107,11 +108,11 @@ export function canvasGridHTML(o?: { label?: string; toolbar?: boolean; controls
 /** 数据表格（统一写法）：destroy 撤掉监听、观察器、后台线程，拿掉放进 <head> 的样式，清空容器 */
 export const createDataGrid: SatinFactory<GridOptions, GridApi>;
 export const createCanvasGrid: SatinFactory<GridOptions, GridApi>;
-export function openLightbox(items: unknown[], index: number, o?: Record<string, unknown>): { close(): void };
+export function openLightbox(items: LightboxItem[], index: number, o?: LightboxOptions): LightboxHandle;
 export function closeLightbox(): void;
 /** 页面上真正露出来的区域（视口坐标，比如固定顶栏下面那块）：缩略图被挡住的部分不算，图从露出来的那截飞出去；null 恢复整个窗口 */
 export function setLightboxBounds(b: { left: number; top: number; right: number; bottom: number } | null): void;
 export function playerHTML(o?: { src?: string; poster?: string; label?: string }): string;
-export function mountPlayer(el: HTMLElement, o?: { onError?(e: unknown): void }): { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; video: HTMLVideoElement; destroy(): void };
+export function mountPlayer(el: HTMLElement, o?: { onError?(e: MediaError | null): void }): { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; video: HTMLVideoElement; destroy(): void };
 export function audioHTML(o?: { src?: string; title?: string; sub?: string; wave?: string }): string;
-export function mountAudio(el: HTMLElement, o?: { onError?(e: unknown): void }): { toggle(): void; audio: HTMLAudioElement; destroy(): void };
+export function mountAudio(el: HTMLElement, o?: { onError?(e: MediaError | null): void }): { toggle(): void; audio: HTMLAudioElement; destroy(): void };

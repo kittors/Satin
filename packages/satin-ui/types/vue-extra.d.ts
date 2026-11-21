@@ -12,7 +12,8 @@ export const ContextMenu: DefineComponent<{ items: MenuItem[]; label?: string; b
 export const Popover: DefineComponent<{ title?: string; align?: "start" | "center" | "end"; open?: boolean; defaultOpen?: boolean; label?: string }>;
 /** 命令面板：⌘K 打开；@run(item)、v-model:open；模板 ref 能调 open() / close() / toggle() */
 export const CommandPalette: DefineComponent<{ groups: { name: string; items: import("./components").CommandItem[] }[]; placeholder?: string; hotkey?: boolean; enterLabel?: string; empty?(q: string): string; open?: boolean }>;
-export interface LightboxItem { src?: string; bg?: string; ratio?: number; video?: string; caption?: string }
+/** 看图的一张（和 satin-ui 的 LightboxItem 一样）：src / bg、ratio / size、alt；视频 type: "video" + poster */
+export type LightboxItem = import("./components").LightboxItem;
 /** 气泡确认：默认插槽是触发按钮；@confirm / @cancel；打开时焦点先落在"取消"上 */
 export const Popconfirm: DefineComponent<{ title: string; description?: string; confirmText?: string; cancelText?: string; danger?: boolean; align?: "start" | "center" | "end" }>;
 /** 看图：v-model:index（数字打开到那一张，关上时回写 null）；@close */

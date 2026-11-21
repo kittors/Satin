@@ -89,8 +89,12 @@ export const createReorder: SatinFactory<{ row?: string; onReorder?(e: { from: n
 /** 侧栏布局（.sn-app）：选中切换、收起 / 展开（⌘\\）。collapseBelow：布局窄于这个宽度时自动收成图标栏（手机上用，比如 720） */
 export const createSidebar: SatinFactory<{ onNavigate?(link: HTMLElement): void; collapseBelow?: number }, { toggle(): void; select(link: HTMLElement): void; setFx(fx: "slide" | "bar" | "fade" | "text"): void }>;
 export const createInfiniteList: SatinFactory<{ loadPage(offset: number, size: number): Promise<unknown[]>; /** 把一行画出来：row 是行元素（会复用，子元素可以缓存在 row._d 上），item 是这一行的数据 */ renderRow(row: HTMLElement, item: any, index: number): void; rowHeight?: number; total?: number; pageSize?: number; /** 数量变了调：loaded 已加载的条数；total 总数（mountInfiniteList 会给；createInfiniteList 现在只转第一个参数，total 是 undefined） */ onCount?(loaded: number, total?: number): void }, { reload(): void; scrollTop(): void; readonly count: number }>;
-export const createPlayer: SatinFactory<{ src?: string; poster?: string; label?: string; onError?(e: unknown): void }, { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; readonly video: HTMLVideoElement }>;
-export const createAudio: SatinFactory<{ src?: string; title?: string; sub?: string; wave?: string; onError?(e: unknown): void }, { toggle(): void; readonly audio: HTMLAudioElement }>;
+/** 视频播放器：src 视频地址、poster 封面、label 读屏读的名字；onError 地址打不开、格式不支持时调（播放器画面上不显示错误，要自己告诉用户） */
+export interface PlayerOptions { src?: string; poster?: string; label?: string; onError?(e: MediaError | null): void }
+/** 音频条：title / sub 两行字；wave 波形数据的地址（不给就从音频本身算）；onError 同视频 */
+export interface AudioOptions { src?: string; title?: string; sub?: string; wave?: string; onError?(e: MediaError | null): void }
+export const createPlayer: SatinFactory<PlayerOptions, { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; readonly video: HTMLVideoElement }>;
+export const createAudio: SatinFactory<AudioOptions, { toggle(): void; readonly audio: HTMLAudioElement }>;
 
 // 纯样式组件的标记
 export interface ButtonHTMLOptions { text?: string; variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; round?: boolean; selected?: boolean; disabled?: boolean; busy?: boolean; type?: "button" | "submit" | "reset"; tip?: string; attrs?: Record<string, string> }
@@ -143,7 +147,13 @@ export function closeMenu(refocus?: boolean): void;
 export interface CommandItem { name: string; icon?: string; sub?: string; key?: string; keys?: string; [k: string]: unknown }
 /** 命令面板（整页一个）：empty(q) 是没有结果时显示的 HTML，里面带 data-empty-act 的按钮点了（或直接回车）调 onEmpty；destroy() 撤掉这次加的行和 ⌘K 监听（组件卸载时调） */
 export function createCommandPalette<T extends CommandItem = CommandItem>(groups: { name: string; items: T[] }[], o?: { onRun?(item: T): void; placeholder?: string; empty?(q: string): string; onEmpty?(q: string): void; hotkey?: boolean; enterLabel?: string }): { open(): void; close(): void; toggle(): void; destroy(): void; readonly input: HTMLInputElement; readonly list: HTMLElement };
-export function openLightbox(items: { src?: string; bg?: string; ratio?: number; video?: string; caption?: string }[], index: number, o?: { thumbOf?(i: number): HTMLElement | null; enabled?(i: number): boolean; onClose?(): void }): { close(): void };
+/** 看图的一张：src 图片地址，或 bg 直接给 CSS 背景（"url(…) center / cover"、渐变、颜色）；size 原图 [宽, 高]（适应窗口时不放大超过原图），只知道比例时给 ratio（宽 ÷ 高，都不给按 16:9）；alt 读屏读的说明。视频：type: "video"，src 是视频地址、poster 是封面 */
+export interface LightboxItem { src?: string; bg?: string; ratio?: number; size?: [number, number]; alt?: string; type?: "video"; poster?: string }
+/** thumbOf(i) 第 i 张的缩略图：从它那里放大、关上时沿原路缩回去（不给就在中间淡入淡出）；enabled(i) 左右翻页能不能停在这一张（加载失败的跳过）；onClose 关上以后 */
+export interface LightboxOptions { thumbOf?(i: number): HTMLElement | null | undefined; enabled?(i: number): boolean; onClose?(): void }
+/** 打开着的看图层：step(±1) 翻页、zoom(±1) 缩放、rotate(±1) 旋转 90°、reset() 还原、close() 关上 */
+export interface LightboxHandle { close(): void; step(d: number): void; zoom(d: number): void; rotate(d: number): void; reset(): void }
+export function openLightbox(items: LightboxItem[], index: number, o?: LightboxOptions): LightboxHandle;
 export function closeLightbox(): void;
 
 // ———— 其余公开函数 ————
