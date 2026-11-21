@@ -1,0 +1,26 @@
+<div class="sn-stack sn-gap-12" id="pick-cards">
+  <div class="sn-pcards">
+    <div class="sn-pc sn-sel" tabindex="0" aria-label="雨夜车站">
+      <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72" alt=""><label class="sn-check sn-pick" aria-label="选择雨夜车站"><input type="checkbox" value="雨夜车站" checked><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span></label><span class="sn-len">12:36</span></div>
+      <div class="sn-meta"><b>雨夜车站</b></div>
+    </div>
+    <div class="sn-pc" tabindex="0" aria-label="候车厅">
+      <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=480&q=72" alt=""><label class="sn-check sn-pick" aria-label="选择候车厅"><input type="checkbox" value="候车厅"><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span></label><span class="sn-len">04:12</span></div>
+      <div class="sn-meta"><b>候车厅</b></div>
+    </div>
+    <div class="sn-pc" tabindex="0" aria-label="积水里的城市">
+      <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=480&q=72" alt=""><label class="sn-check sn-pick" aria-label="选择积水里的城市"><input type="checkbox" value="积水里的城市"><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span></label><span class="sn-len">08:50</span></div>
+      <div class="sn-meta"><b>积水里的城市</b></div>
+    </div>
+  </div>
+  <span class="sn-help">已选 1 个</span>
+</div>
+
+<script type="module">
+  // 勾上：卡片加 sn-sel（外圈一道 2px 的线）
+  const box = document.getElementById("pick-cards");
+  box.addEventListener("change", (e) => {
+    e.target.closest(".sn-pc").classList.toggle("sn-sel", e.target.checked);
+    box.querySelector(".sn-help").textContent = `已选 ${box.querySelectorAll(".sn-pick input:checked").length} 个`;
+  });
+</script>
