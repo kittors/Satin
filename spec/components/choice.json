@@ -133,6 +133,9 @@
     {
       "name": "label",
       "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
       "default": "—",
       "required": false,
       "desc": "旁边的文字（也可以写在子元素、默认插槽里）。",

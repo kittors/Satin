@@ -187,6 +187,9 @@
     {
       "name": "title",
       "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
       "default": "—",
       "required": false,
       "desc": "面板的标题（13/600）。",

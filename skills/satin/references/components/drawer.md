@@ -532,7 +532,7 @@ export default function ShotSettings() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `open` | `boolean` | false | 是 | 开着没有（受控）。React 里在 `onClose` 里改成 false；Vue `v-model:open`。 | React：`open`；Preact：`open`；Vue：`v-model:open`；纯 HTML：`按钮 data-drawer="id" / openDrawer(抽屉)` |
-| `title` | `ReactNode \| string` | — | 否 | 标题（抽屉的 aria-labelledby 指向它）。 | React：`title`；Preact：`title`；Vue：`title`；纯 HTML：`.sn-hd h3` |
+| `title` | `ReactNode \| string`（Vue：string） | — | 否 | 标题（抽屉的 aria-labelledby 指向它）。 | React：`title`；Preact：`title`；Vue：`title`；纯 HTML：`.sn-hd h3` |
 | `className` | `string` | — | 否 | 加在抽屉上的类名（改宽度等）。 | React：`className`；Preact：`class` |
 
 ## 事件

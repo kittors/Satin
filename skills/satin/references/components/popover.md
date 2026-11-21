@@ -514,7 +514,7 @@ export default function InfoPopover() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `title` | `ReactNode \| string` | — | 否 | 面板的标题（13/600）。 | React：`title`；Preact：`title`；Vue：`title`；纯 HTML：`.sn-popover h4` |
+| `title` | `ReactNode \| string`（Vue：string） | — | 否 | 面板的标题（13/600）。 | React：`title`；Preact：`title`；Vue：`title`；纯 HTML：`.sn-popover h4` |
 | `align` | `"start" \| "center" \| "end"` | "start" | 否 | 和按钮的哪一边对齐：按钮靠右时用 end，面板不会伸出窗口。 | React：`align`；Preact：`align`；Vue：`align`；纯 HTML：`面板的 data-align` |
 | `open` | `boolean` | — | 否 | 开着没有。React 里受控（在 `onOpenChange` 里更新）；Vue `v-model:open`。 | React：`open`；Preact：`open`；Vue：`v-model:open` |
 | `defaultOpen` | `boolean` | false | 否 | 非受控：一开始开着没有。 | React：`defaultOpen`；Preact：`defaultOpen`；Vue：`defaultOpen` |

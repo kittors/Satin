@@ -161,6 +161,9 @@
     {
       "name": "label",
       "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
       "default": "—",
       "required": false,
       "desc": "标签，写在控件上面；能不填的在后面加 `<span class=\"sn-opt\">可选</span>`，必填的不标。",
@@ -174,6 +177,9 @@
     {
       "name": "help",
       "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
       "default": "—",
       "required": false,
       "desc": "控件下面的说明：规则、会用在哪里。",
@@ -187,6 +193,9 @@
     {
       "name": "error",
       "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
       "default": "不给就没有错误区",
       "required": false,
       "desc": "错误：给了字就在下面展开、字段标红、输入框抖两下；空字符串收起（先占好位置）。",

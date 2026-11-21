@@ -40,7 +40,7 @@ export default {
     { name: "checked", type: "boolean", default: "false", required: false, native: ["react"],
       desc: "勾上没有。React 里和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控；Vue `v-model`；Svelte `bind:checked`。",
       names: { react: "checked / defaultChecked", preact: "checked / defaultChecked", vue: "v-model", svelte: "bind:checked", angular: "[checked]", solid: "checked", html: "checked" } },
-    { name: "label", type: "ReactNode | string", default: "—", required: false,
+    { name: "label", type: "ReactNode | string", typeBy: { vue: "string" }, default: "—", required: false,
       desc: "旁边的文字（也可以写在子元素、默认插槽里）。", names: { react: "label", preact: "label", vue: "label", html: "<label> 里 input 后面的文字" } },
     { name: "indeterminate", type: "boolean", default: "false", required: false,
       desc: "半选（全选框下面只选了一部分）：方框里是一道横线。它没有对应的 HTML 属性，只能用 DOM 属性设。",

@@ -75,6 +75,340 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "面板 `role=\"alertdialog\"`，`aria-labelledby` 指向问题、`aria-describedby` 指向后果。"
+    ],
+    "focus": [
+      "打开时焦点在\"取消\"上（误按回车也不会删）；点取消、按 Esc 关上后回到按钮。"
+    ],
+    "notes": [
+      "问题写成问句，后果写清楚能不能恢复。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "气泡确认",
+  "lead": "能撤销的操作不确认：直接做，再用轻提示给\"撤销\"。只有单条、属于自己、不能撤销的操作才确认：锚在按钮上，从按钮那里展开，默认焦点在\"取消\"上。",
+  "whenToUse": [
+    "永久删除、提交以后不能再改这类单条、不能撤销的操作。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "能撤销的操作（移到回收站、归档）：直接做，用轻提示给\"撤销\"。",
+      "use": "toast"
+    },
+    {
+      "text": "影响很多条、要多写几句说明的：用对话框。",
+      "use": "dialog"
+    }
+  ],
+  "related": [
+    {
+      "id": "toast",
+      "diff": "能撤销的用轻提示给\"撤销\"；不能撤销的才用气泡确认。"
+    },
+    {
+      "id": "dialog",
+      "diff": "对话框盖住页面、能写更多说明；气泡确认锚在按钮上、只问一句。"
+    },
+    {
+      "id": "popover",
+      "diff": "气泡确认是专门问\"确定吗\"的弹出面板。"
+    }
+  ],
+  "import": {
+    "html": "import { openPopover, popoverOf } from \"satin-ui\"; // 标记照设计稿写，外面包 <sn-enhance>",
+    "react": "import { Popconfirm } from \"satin-ui/react\";",
+    "vue": "import { Popconfirm } from \"satin-ui/vue\";",
+    "svelte": "import { openPopover, popoverOf } from \"satin-ui\";",
+    "angular": "import { openPopover, popoverOf } from \"satin-ui\";",
+    "solid": "import { openPopover, popoverOf } from \"satin-ui\";",
+    "preact": "import { Popconfirm } from \"satin-ui/react\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`<Popconfirm title description confirmText onConfirm>` 包住触发按钮：确认按钮的字写清楚做什么（\"永久删除\"）；不是删除时 `danger={false}`。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Popconfirm`。",
+    "vue": "`<Popconfirm title description confirm-text @confirm>`，默认插槽是触发按钮。",
+    "svelte": "没有专门的组件：照设计稿写 `.sn-pop.sn-popconfirm` 标记，按钮点了 `openPopover(面板, 按钮, { align: \"end\" })`，`popoverOf(面板)?.close()` 关上。",
+    "angular": "没有专门的组件：照设计稿写标记，方法里 `openPopover` / `popoverOf(面板)?.close()`。",
+    "solid": "没有专门的组件：照设计稿写标记，`openPopover` / `popoverOf(面板)?.close()`。",
+    "html": "`.sn-pop.sn-popconfirm[role=alertdialog]` 里 `.sn-q`（图标、问题、`.sn-d` 后果）和 `.sn-acts`（`[data-no]` 取消、`[data-yes]` 确认）；`openPopover(面板, 按钮, { align: \"end\" })` 打开，焦点自动落在 `[data-no]` 上。"
+  },
+  "dts": {
+    "react": "Popconfirm",
+    "vue": "Popconfirm",
+    "functions": [
+      "openPopover",
+      "popoverOf"
+    ]
+  },
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
+      "default": "—",
+      "required": true,
+      "desc": "问的是什么：\"永久删除这个镜头？\"",
+      "names": {
+        "react": "title",
+        "preact": "title",
+        "vue": "title",
+        "html": ".sn-q 里的问题"
+      }
+    },
+    {
+      "name": "description",
+      "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
+      "default": "—",
+      "required": false,
+      "desc": "后果：\"删除后无法恢复。\"",
+      "names": {
+        "react": "description",
+        "preact": "description",
+        "vue": "description",
+        "html": ".sn-d"
+      }
+    },
+    {
+      "name": "confirmText",
+      "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
+      "default": "\"确定\"",
+      "required": false,
+      "desc": "确认按钮的字：写清楚做什么（\"永久删除\"），不写\"确定\"。",
+      "names": {
+        "react": "confirmText",
+        "preact": "confirmText",
+        "vue": "confirmText（模板里写 confirm-text）",
+        "html": "[data-yes]"
+      }
+    },
+    {
+      "name": "cancelText",
+      "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
+      "default": "\"取消\"",
+      "required": false,
+      "desc": "取消按钮的字。",
+      "names": {
+        "react": "cancelText",
+        "preact": "cancelText",
+        "vue": "cancelText（模板里写 cancel-text）",
+        "html": "[data-no]"
+      }
+    },
+    {
+      "name": "danger",
+      "type": "boolean",
+      "default": "true",
+      "required": false,
+      "desc": "确认按钮用危险样式；不是删除的操作关掉（用主按钮）。",
+      "names": {
+        "react": "danger",
+        "preact": "danger",
+        "vue": "danger",
+        "html": "确认按钮 sn-danger / sn-primary"
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"start\" | \"center\" | \"end\"",
+      "default": "\"end\"",
+      "required": false,
+      "desc": "和按钮的哪一边对齐。",
+      "names": {
+        "react": "align",
+        "preact": "align",
+        "vue": "align",
+        "html": "openPopover 的 align"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "confirm",
+      "payload": "—",
+      "when": "点了确认（面板先收起）。",
+      "names": {
+        "react": "onConfirm",
+        "preact": "onConfirm",
+        "vue": "@confirm",
+        "html": "[data-yes] 的 click"
+      }
+    },
+    {
+      "name": "cancel",
+      "payload": "—",
+      "when": "点了取消（面板收起，焦点回到按钮）；Esc、点外面关上时不调。",
+      "names": {
+        "react": "onCancel",
+        "preact": "onCancel",
+        "vue": "@cancel",
+        "html": "[data-no] 的 click"
+      }
+    }
+  ],
+  "slots": [
+    {
+      "name": "trigger",
+      "desc": "触发按钮（只能一个元素）。",
+      "names": {
+        "react": "children",
+        "vue": "默认插槽",
+        "html": "触发按钮"
+      }
+    }
+  ],
+  "methods": [],
+  "functions": [
+    {
+      "name": "openPopover",
+      "signature": "openPopover(pop: HTMLElement, trigger: HTMLElement, options?: { align?: \"start\" | \"center\" | \"end\"; onClose?(): void }): PopoverHandle",
+      "returns": "PopoverHandle",
+      "from": "satin-ui",
+      "desc": "在按钮旁边打开（气泡确认的面板打开时焦点落在 `[data-no]` 上）。"
+    },
+    {
+      "name": "popoverOf",
+      "signature": "popoverOf(pop: HTMLElement): PopoverHandle | undefined",
+      "returns": "PopoverHandle | undefined",
+      "from": "satin-ui",
+      "desc": "开着时拿到句柄：`close(refocus)` 关上。"
+    }
+  ],
+  "cssVars": [
+    {
+      "name": "--sn-danger",
+      "desc": "问题前面的图标",
+      "default": "红",
+      "token": true
+    },
+    {
+      "name": "--sn-overlay",
+      "desc": "面板底色",
+      "default": "白（深色主题 #2c2c2e）",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-pop.sn-popconfirm",
+      "desc": "气泡确认（role=\"alertdialog\"，宽 248）"
+    },
+    {
+      "name": ".sn-q / .sn-d / .sn-acts",
+      "desc": "问题（带图标）/ 后果 / 按钮"
+    },
+    {
+      "name": "[data-no] / [data-yes]",
+      "desc": "取消 / 确认"
+    }
+  ],
+  "types": [
+    "PopconfirmProps",
+    "PopoverHandle"
+  ],
+  "keyboard": [
+    {
+      "keys": "Enter / 空格（按钮上）",
+      "does": "打开，焦点落在\"取消\"上。"
+    },
+    {
+      "keys": "Esc",
+      "does": "关上，焦点回到按钮。"
+    },
+    {
+      "keys": "Tab / Shift+Tab",
+      "does": "在取消、确认之间移动。"
+    }
+  ],
+  "design": {
+    "do": [
+      "只给单条、属于自己、不能撤销的操作。",
+      "确认按钮写动作：\"永久删除\"\"提交\"。"
+    ],
+    "dont": [
+      {
+        "text": "能撤销的操作也弹确认。",
+        "rule": "real-content"
+      },
+      {
+        "text": "确认按钮写\"确定\"\"是\"。",
+        "rule": "marketing-copy"
+      }
+    ],
+    "copy": [
+      "\"永久删除这个镜头？删除后无法恢复。\""
+    ],
+    "motion": [
+      {
+        "what": "从按钮那里展开（缩放 0.97 → 1、位移 4px 回位）",
+        "easing": "ease.outStrong",
+        "duration": "140ms"
+      },
+      {
+        "what": "收起（淡出）",
+        "easing": "ease.in",
+        "duration": "100ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "popconfirm-basic",
+      "title": "最简单的用法：永久删除",
+      "why": "锚在按钮上、从按钮那里展开；焦点先落在\"取消\"上。",
+      "html": "<button type=\"button\" class=\"sn-btn sn-danger-soft\" data-pc=\"popconfirm-basic\" aria-haspopup=\"dialog\" aria-expanded=\"false\">永久删除</button><div class=\"sn-pop sn-popconfirm\" id=\"popconfirm-basic\" role=\"alertdialog\" aria-labelledby=\"popconfirm-basic-q\" aria-describedby=\"popconfirm-basic-d\"><div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-basic-q\">永久删除这个镜头？</div><div class=\"sn-d\" id=\"popconfirm-basic-d\">删除后无法恢复。</div></div></div><div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no>取消</button><button type=\"button\" class=\"sn-btn sn-danger sn-sm\" data-yes>永久删除</button></div></div>",
+      "code": {
+        "html": "<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-danger-soft\" data-pc=\"popconfirm-basic\" aria-haspopup=\"dialog\" aria-expanded=\"false\">永久删除</button>\n  <div class=\"sn-pop sn-popconfirm\" id=\"popconfirm-basic\" role=\"alertdialog\" aria-labelledby=\"popconfirm-basic-q\" aria-describedby=\"popconfirm-basic-d\">\n    <div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-basic-q\">永久删除这个镜头？</div><div class=\"sn-d\" id=\"popconfirm-basic-d\">删除后无法恢复。</div></div></div>\n    <div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no>取消</button><button type=\"button\" class=\"sn-btn sn-danger sn-sm\" data-yes>永久删除</button></div>\n  </div>\n</sn-enhance>\n\n<script type=\"module\">\n  import { openPopover, popoverOf, toast } from \"satin-ui\";\n  // 打开：锚在按钮上，焦点先落在\"取消\"（data-no）上；Esc、点外面关上\n  const btn = document.querySelector('[data-pc=\"popconfirm-basic\"]'), panel = document.getElementById(\"popconfirm-basic\");\n  btn.addEventListener(\"click\", () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: \"end\" }); });\n  panel.querySelector(\"[data-no]\").addEventListener(\"click\", () => popoverOf(panel)?.close(true));\n  panel.querySelector(\"[data-yes]\").addEventListener(\"click\", () => { popoverOf(panel)?.close(false); toast({ text: \"已永久删除镜头\" }); });\n</script>\n",
+        "react": "import { Button, Popconfirm, toast } from \"satin-ui/react\";\n\nexport default function PurgeShot() {\n  // 只给单条、属于自己、不能撤销的操作；确认按钮写清楚做什么\n  return (\n    <Popconfirm title=\"永久删除这个镜头？\" description=\"删除后无法恢复。\" confirmText=\"永久删除\" onConfirm={() => toast({ text: \"已永久删除镜头\" })}>\n      <Button variant=\"danger-soft\">永久删除</Button>\n    </Popconfirm>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Button, Popconfirm, toast } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <!-- 只给单条、属于自己、不能撤销的操作；确认按钮写清楚做什么 -->\n  <Popconfirm title=\"永久删除这个镜头？\" description=\"删除后无法恢复。\" confirm-text=\"永久删除\" @confirm=\"toast({ text: '已永久删除镜头' })\">\n    <Button variant=\"danger-soft\">永久删除</Button>\n  </Popconfirm>\n</template>\n",
+        "svelte": "<script>\n  import { openPopover, popoverOf, toast } from \"satin-ui\";\n\n  let btn, panel;\n  // 打开：锚在按钮上，焦点先落在\"取消\"（data-no）上；Esc、点外面关上\n  const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: \"end\" }); };\n  const yes = () => { popoverOf(panel)?.close(false); toast({ text: \"已永久删除镜头\" }); };\n</script>\n\n<!-- 只给单条、属于自己、不能撤销的操作；确认按钮写清楚做什么；<sn-enhance> 把 data-i 换成图标 -->\n<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-danger-soft\" bind:this={btn} onclick={ask} aria-haspopup=\"dialog\" aria-expanded=\"false\">永久删除</button>\n  <div class=\"sn-pop sn-popconfirm\" bind:this={panel} role=\"alertdialog\" aria-labelledby=\"popconfirm-basic-q\" aria-describedby=\"popconfirm-basic-d\">\n    <div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-basic-q\">永久删除这个镜头？</div><div class=\"sn-d\" id=\"popconfirm-basic-d\">删除后无法恢复。</div></div></div>\n    <div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no onclick={() => popoverOf(panel)?.close(true)}>取消</button><button type=\"button\" class=\"sn-btn sn-danger sn-sm\" data-yes onclick={yes}>永久删除</button></div>\n  </div>\n</sn-enhance>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, viewChild } from \"@angular/core\";\nimport { openPopover, popoverOf, toast } from \"satin-ui\";\n\n@Component({\n  selector: \"demo-popconfirm-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 把 data-i 换成图标\n  template: `\n    <!-- 只给单条、属于自己、不能撤销的操作；确认按钮写清楚做什么 -->\n    <sn-enhance>\n      <button #btn type=\"button\" class=\"sn-btn sn-danger-soft\" (click)=\"ask()\" aria-haspopup=\"dialog\" aria-expanded=\"false\">永久删除</button>\n      <div #panel class=\"sn-pop sn-popconfirm\" role=\"alertdialog\" aria-labelledby=\"popconfirm-basic-q\" aria-describedby=\"popconfirm-basic-d\">\n        <div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-basic-q\">永久删除这个镜头？</div><div class=\"sn-d\" id=\"popconfirm-basic-d\">删除后无法恢复。</div></div></div>\n        <div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no (click)=\"no()\">取消</button><button type=\"button\" class=\"sn-btn sn-danger sn-sm\" data-yes (click)=\"yes()\">永久删除</button></div>\n      </div>\n    </sn-enhance>\n  `,\n})\nexport class PopconfirmBasicComponent {\n  private btn = viewChild.required<ElementRef<HTMLElement>>(\"btn\");\n  private panel = viewChild.required<ElementRef<HTMLElement>>(\"panel\");\n  // 打开：锚在按钮上，焦点先落在\"取消\"（data-no）上；Esc、点外面关上\n  ask() { const p = this.panel().nativeElement, l = popoverOf(p); l ? l.close(false) : openPopover(p, this.btn().nativeElement, { align: \"end\" }); }\n  no() { popoverOf(this.panel().nativeElement)?.close(true); }\n  yes() { popoverOf(this.panel().nativeElement)?.close(false); toast({ text: \"已永久删除镜头\" }); }\n}\n",
+        "solid": "import { openPopover, popoverOf, toast } from \"satin-ui\";\n\n// 只给单条、属于自己、不能撤销的操作；确认按钮写清楚做什么；<sn-enhance> 把 data-i 换成图标\nexport default function PurgeShot() {\n  let btn, panel;\n  // 打开：锚在按钮上，焦点先落在\"取消\"（data-no）上；Esc、点外面关上\n  const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: \"end\" }); };\n  const yes = () => { popoverOf(panel)?.close(false); toast({ text: \"已永久删除镜头\" }); };\n  return (\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-danger-soft\" ref={(el) => (btn = el)} onClick={ask} aria-haspopup=\"dialog\" aria-expanded=\"false\">永久删除</button>\n      <div class=\"sn-pop sn-popconfirm\" ref={(el) => (panel = el)} role=\"alertdialog\" aria-labelledby=\"popconfirm-basic-q\" aria-describedby=\"popconfirm-basic-d\">\n        <div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-basic-q\">永久删除这个镜头？</div><div class=\"sn-d\" id=\"popconfirm-basic-d\">删除后无法恢复。</div></div></div>\n        <div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no onClick={() => popoverOf(panel)?.close(true)}>取消</button><button type=\"button\" class=\"sn-btn sn-danger sn-sm\" data-yes onClick={yes}>永久删除</button></div>\n      </div>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { Button, Popconfirm, toast } from \"satin-ui/react\";\n\nexport default function PurgeShot() {\n  // 只给单条、属于自己、不能撤销的操作；确认按钮写清楚做什么\n  return (\n    <Popconfirm title=\"永久删除这个镜头？\" description=\"删除后无法恢复。\" confirmText=\"永久删除\" onConfirm={() => toast({ text: \"已永久删除镜头\" })}>\n      <Button variant=\"danger-soft\">永久删除</Button>\n    </Popconfirm>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "popconfirm-undo",
+      "title": "能撤销的不确认",
+      "why": "移到回收站能撤销：直接做，再用轻提示给\"撤销\"，不弹确认。",
+      "html": "<button type=\"button\" class=\"sn-btn sn-secondary\" id=\"trash-btn\">移到回收站</button>",
+      "code": {
+        "html": "<button type=\"button\" class=\"sn-btn sn-secondary\" id=\"trash-btn\">移到回收站</button>\n\n<script type=\"module\">\n  import { toast } from \"satin-ui\";\n  // 能撤销的操作不确认：直接做，再用轻提示给\"撤销\"\n  document.getElementById(\"trash-btn\").addEventListener(\"click\", () => toast({\n    kind: \"action\",\n    text: \"已把镜头 12 移到回收站\",\n    action: { label: \"撤销\", run: (t) => t.update({ kind: \"status\", text: \"已恢复镜头 12\", done: true, duration: 2000 }) },\n  }));\n</script>\n",
+        "react": "import { Button, toast } from \"satin-ui/react\";\n\n// 能撤销的操作不确认：直接做，再用轻提示给\"撤销\"\nconst trash = () => toast({\n  kind: \"action\",\n  text: \"已把镜头 12 移到回收站\",\n  action: { label: \"撤销\", run: (t) => t.update({ kind: \"status\", text: \"已恢复镜头 12\", done: true, duration: 2000 }) },\n});\n\nexport default function TrashShot() {\n  return <Button onClick={trash}>移到回收站</Button>;\n}\n",
+        "vue": "<script setup>\nimport { Button, toast } from \"satin-ui/vue\";\n\n// 能撤销的操作不确认：直接做，再用轻提示给\"撤销\"\nconst trash = () => toast({\n  kind: \"action\",\n  text: \"已把镜头 12 移到回收站\",\n  action: { label: \"撤销\", run: (t) => t.update({ kind: \"status\", text: \"已恢复镜头 12\", done: true, duration: 2000 }) },\n});\n</script>\n\n<template>\n  <Button @click=\"trash\">移到回收站</Button>\n</template>\n",
+        "svelte": "<script>\n  import { toast } from \"satin-ui\";\n\n  // 能撤销的操作不确认：直接做，再用轻提示给\"撤销\"\n  const trash = () => toast({\n    kind: \"action\",\n    text: \"已把镜头 12 移到回收站\",\n    action: { label: \"撤销\", run: (t) => t.update({ kind: \"status\", text: \"已恢复镜头 12\", done: true, duration: 2000 }) },\n  });\n</script>\n\n<button type=\"button\" class=\"sn-btn sn-secondary\" onclick={trash}>移到回收站</button>\n",
+        "angular": "import { Component } from \"@angular/core\";\nimport { toast } from \"satin-ui\";\n\n@Component({\n  selector: \"demo-popconfirm-undo\",\n  template: `<button type=\"button\" class=\"sn-btn sn-secondary\" (click)=\"trash()\">移到回收站</button>`,\n})\nexport class PopconfirmUndoComponent {\n  // 能撤销的操作不确认：直接做，再用轻提示给\"撤销\"\n  trash() {\n    toast({\n      kind: \"action\",\n      text: \"已把镜头 12 移到回收站\",\n      action: { label: \"撤销\", run: (t) => t.update({ kind: \"status\", text: \"已恢复镜头 12\", done: true, duration: 2000 }) },\n    });\n  }\n}\n",
+        "solid": "import { toast } from \"satin-ui\";\n\n// 能撤销的操作不确认：直接做，再用轻提示给\"撤销\"\nconst trash = () => toast({\n  kind: \"action\",\n  text: \"已把镜头 12 移到回收站\",\n  action: { label: \"撤销\", run: (t) => t.update({ kind: \"status\", text: \"已恢复镜头 12\", done: true, duration: 2000 }) },\n});\n\nexport default function TrashShot() {\n  return <button type=\"button\" class=\"sn-btn sn-secondary\" onClick={trash}>移到回收站</button>;\n}\n",
+        "preact": "import { Button, toast } from \"satin-ui/react\";\n\n// 能撤销的操作不确认：直接做，再用轻提示给\"撤销\"\nconst trash = () => toast({\n  kind: \"action\",\n  text: \"已把镜头 12 移到回收站\",\n  action: { label: \"撤销\", run: (t) => t.update({ kind: \"status\", text: \"已恢复镜头 12\", done: true, duration: 2000 }) },\n});\n\nexport default function TrashShot() {\n  return <Button onClick={trash}>移到回收站</Button>;\n}\n"
+      }
+    },
+    {
+      "slug": "popconfirm-submit",
+      "title": "不是删除，但同样不能撤销",
+      "why": "danger 关掉，确认按钮用主按钮。",
+      "html": "<button type=\"button\" class=\"sn-btn sn-primary\" data-pc=\"popconfirm-submit\" aria-haspopup=\"dialog\" aria-expanded=\"false\">提交审核</button><div class=\"sn-pop sn-popconfirm\" id=\"popconfirm-submit\" role=\"alertdialog\" aria-labelledby=\"popconfirm-submit-q\" aria-describedby=\"popconfirm-submit-d\"><div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-submit-q\">提交审核？</div><div class=\"sn-d\" id=\"popconfirm-submit-d\">提交以后这一集就不能再改了。</div></div></div><div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no>取消</button><button type=\"button\" class=\"sn-btn sn-primary sn-sm\" data-yes>提交</button></div></div>",
+      "code": {
+        "html": "<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-primary\" data-pc=\"popconfirm-submit\" aria-haspopup=\"dialog\" aria-expanded=\"false\">提交审核</button>\n  <div class=\"sn-pop sn-popconfirm\" id=\"popconfirm-submit\" role=\"alertdialog\" aria-labelledby=\"popconfirm-submit-q\" aria-describedby=\"popconfirm-submit-d\">\n    <div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-submit-q\">提交审核？</div><div class=\"sn-d\" id=\"popconfirm-submit-d\">提交以后这一集就不能再改了。</div></div></div>\n    <div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no>取消</button><button type=\"button\" class=\"sn-btn sn-primary sn-sm\" data-yes>提交</button></div>\n  </div>\n</sn-enhance>\n\n<script type=\"module\">\n  import { openPopover, popoverOf, toast } from \"satin-ui\";\n  // 打开：锚在按钮上，焦点先落在\"取消\"（data-no）上；Esc、点外面关上\n  const btn = document.querySelector('[data-pc=\"popconfirm-submit\"]'), panel = document.getElementById(\"popconfirm-submit\");\n  btn.addEventListener(\"click\", () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: \"end\" }); });\n  panel.querySelector(\"[data-no]\").addEventListener(\"click\", () => popoverOf(panel)?.close(true));\n  panel.querySelector(\"[data-yes]\").addEventListener(\"click\", () => { popoverOf(panel)?.close(false); toast({ text: \"已提交审核\" }); });\n</script>\n",
+        "react": "import { Button, Popconfirm, toast } from \"satin-ui/react\";\n\nexport default function SubmitReview() {\n  // 不是删除、但同样不能撤销：danger 关掉，确认按钮用主按钮\n  return (\n    <Popconfirm title=\"提交审核？\" description=\"提交以后这一集就不能再改了。\" confirmText=\"提交\" danger={false} onConfirm={() => toast({ text: \"已提交审核\" })}>\n      <Button variant=\"primary\">提交审核</Button>\n    </Popconfirm>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Button, Popconfirm, toast } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <!-- 不是删除、但同样不能撤销：danger 关掉，确认按钮用主按钮 -->\n  <Popconfirm title=\"提交审核？\" description=\"提交以后这一集就不能再改了。\" confirm-text=\"提交\" :danger=\"false\" @confirm=\"toast({ text: '已提交审核' })\">\n    <Button variant=\"primary\">提交审核</Button>\n  </Popconfirm>\n</template>\n",
+        "svelte": "<script>\n  import { openPopover, popoverOf, toast } from \"satin-ui\";\n\n  let btn, panel;\n  // 打开：锚在按钮上，焦点先落在\"取消\"（data-no）上；Esc、点外面关上\n  const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: \"end\" }); };\n  const yes = () => { popoverOf(panel)?.close(false); toast({ text: \"已提交审核\" }); };\n</script>\n\n<!-- 不是删除、但同样不能撤销：danger 关掉，确认按钮用主按钮；<sn-enhance> 把 data-i 换成图标 -->\n<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-primary\" bind:this={btn} onclick={ask} aria-haspopup=\"dialog\" aria-expanded=\"false\">提交审核</button>\n  <div class=\"sn-pop sn-popconfirm\" bind:this={panel} role=\"alertdialog\" aria-labelledby=\"popconfirm-submit-q\" aria-describedby=\"popconfirm-submit-d\">\n    <div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-submit-q\">提交审核？</div><div class=\"sn-d\" id=\"popconfirm-submit-d\">提交以后这一集就不能再改了。</div></div></div>\n    <div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no onclick={() => popoverOf(panel)?.close(true)}>取消</button><button type=\"button\" class=\"sn-btn sn-primary sn-sm\" data-yes onclick={yes}>提交</button></div>\n  </div>\n</sn-enhance>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, viewChild } from \"@angular/core\";\nimport { openPopover, popoverOf, toast } from \"satin-ui\";\n\n@Component({\n  selector: \"demo-popconfirm-submit\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 把 data-i 换成图标\n  template: `\n    <!-- 不是删除、但同样不能撤销：danger 关掉，确认按钮用主按钮 -->\n    <sn-enhance>\n      <button #btn type=\"button\" class=\"sn-btn sn-primary\" (click)=\"ask()\" aria-haspopup=\"dialog\" aria-expanded=\"false\">提交审核</button>\n      <div #panel class=\"sn-pop sn-popconfirm\" role=\"alertdialog\" aria-labelledby=\"popconfirm-submit-q\" aria-describedby=\"popconfirm-submit-d\">\n        <div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-submit-q\">提交审核？</div><div class=\"sn-d\" id=\"popconfirm-submit-d\">提交以后这一集就不能再改了。</div></div></div>\n        <div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no (click)=\"no()\">取消</button><button type=\"button\" class=\"sn-btn sn-primary sn-sm\" data-yes (click)=\"yes()\">提交</button></div>\n      </div>\n    </sn-enhance>\n  `,\n})\nexport class PopconfirmSubmitComponent {\n  private btn = viewChild.required<ElementRef<HTMLElement>>(\"btn\");\n  private panel = viewChild.required<ElementRef<HTMLElement>>(\"panel\");\n  // 打开：锚在按钮上，焦点先落在\"取消\"（data-no）上；Esc、点外面关上\n  ask() { const p = this.panel().nativeElement, l = popoverOf(p); l ? l.close(false) : openPopover(p, this.btn().nativeElement, { align: \"end\" }); }\n  no() { popoverOf(this.panel().nativeElement)?.close(true); }\n  yes() { popoverOf(this.panel().nativeElement)?.close(false); toast({ text: \"已提交审核\" }); }\n}\n",
+        "solid": "import { openPopover, popoverOf, toast } from \"satin-ui\";\n\n// 不是删除、但同样不能撤销：danger 关掉，确认按钮用主按钮；<sn-enhance> 把 data-i 换成图标\nexport default function SubmitReview() {\n  let btn, panel;\n  // 打开：锚在按钮上，焦点先落在\"取消\"（data-no）上；Esc、点外面关上\n  const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: \"end\" }); };\n  const yes = () => { popoverOf(panel)?.close(false); toast({ text: \"已提交审核\" }); };\n  return (\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-primary\" ref={(el) => (btn = el)} onClick={ask} aria-haspopup=\"dialog\" aria-expanded=\"false\">提交审核</button>\n      <div class=\"sn-pop sn-popconfirm\" ref={(el) => (panel = el)} role=\"alertdialog\" aria-labelledby=\"popconfirm-submit-q\" aria-describedby=\"popconfirm-submit-d\">\n        <div class=\"sn-q\"><span data-i=\"triangle-alert\"></span><div><div id=\"popconfirm-submit-q\">提交审核？</div><div class=\"sn-d\" id=\"popconfirm-submit-d\">提交以后这一集就不能再改了。</div></div></div>\n        <div class=\"sn-acts\"><button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-no onClick={() => popoverOf(panel)?.close(true)}>取消</button><button type=\"button\" class=\"sn-btn sn-primary sn-sm\" data-yes onClick={yes}>提交</button></div>\n      </div>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { Button, Popconfirm, toast } from \"satin-ui/react\";\n\nexport default function SubmitReview() {\n  // 不是删除、但同样不能撤销：danger 关掉，确认按钮用主按钮\n  return (\n    <Popconfirm title=\"提交审核？\" description=\"提交以后这一集就不能再改了。\" confirmText=\"提交\" danger={false} onConfirm={() => toast({ text: \"已提交审核\" })}>\n      <Button variant=\"primary\">提交审核</Button>\n    </Popconfirm>\n  );\n}\n"
+      }
+    }
+  ]
 }

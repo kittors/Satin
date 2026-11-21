@@ -188,6 +188,9 @@
     {
       "name": "title",
       "type": "ReactNode | string",
+      "typeBy": {
+        "vue": "string"
+      },
       "default": "—",
       "required": false,
       "desc": "标题（抽屉的 aria-labelledby 指向它）。",

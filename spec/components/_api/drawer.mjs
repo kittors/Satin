@@ -37,7 +37,7 @@ export default {
   props: [
     { name: "open", type: "boolean", default: "false", required: true, desc: "开着没有（受控）。React 里在 `onClose` 里改成 false；Vue `v-model:open`。",
       names: { react: "open", preact: "open", vue: "v-model:open", html: "按钮 data-drawer=\"id\" / openDrawer(抽屉)" } },
-    { name: "title", type: "ReactNode | string", default: "—", required: false, desc: "标题（抽屉的 aria-labelledby 指向它）。", names: { react: "title", preact: "title", vue: "title", html: ".sn-hd h3" } },
+    { name: "title", type: "ReactNode | string", typeBy: { vue: "string" }, default: "—", required: false, desc: "标题（抽屉的 aria-labelledby 指向它）。", names: { react: "title", preact: "title", vue: "title", html: ".sn-hd h3" } },
     { name: "className", type: "string", default: "—", required: false, desc: "加在抽屉上的类名（改宽度等）。", names: { react: "className", preact: "class" } },
   ],
   events: [

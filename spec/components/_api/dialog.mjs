@@ -54,7 +54,7 @@ export default {
       desc: "标题左边的图标，放在红色圆底里（危险确认用 trash-2）。",
       example: 'icon="trash-2"',
       names: { react: "icon", vue: "icon", svelte: "icon", preact: "icon", html: '.sn-hd 里先放 <span class="sn-dlg-icon" data-i="trash-2">' } },
-    { name: "footer", type: "React.ReactNode", default: "—", required: false,
+    { name: "footer", type: "React.ReactNode", typeBy: { vue: "插槽 #footer", svelte: "片段 footer" }, default: "—", required: false,
       desc: "底部的按钮（主按钮放最右）。Vue 写在 #footer 插槽里，Svelte 写在 footer 片段里。",
       names: { react: "footer", preact: "footer", markup: ".sn-ft", html: ".sn-ft" } },
     { name: "footerClass", type: "string", default: "—", required: false,
