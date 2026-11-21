@@ -1,0 +1,91 @@
+// 字段与错误的 API 契约（手写）。格式见 spec/components/_api/README.md
+import { code } from "./_code.mjs";
+
+export default {
+  title: "字段与错误",
+  lead: "每个表单项 = 标签 + 控件 + 说明 + 错误。标签在上；只标\"可选\"，不标必填。错误放在字段下方展开，边框变红、左右抖两下；一开始输入就收起。",
+  whenToUse: ["表单里的每一项：输入框、下拉、验证码、标签输入都放进字段。", "要在控件下面说明规则、提示出错的地方。"],
+  whenNotToUse: [
+    { text: "整个表单提交失败（网络错误、没有权限）：用横幅说在表单上面。", use: "banner" },
+    { text: "工具条里的搜索框、筛选：不用标签，直接写 aria-label。", use: "input" },
+  ],
+  related: [
+    { id: "input", diff: "输入框是字段中间的控件；字段负责标签、说明和错误。" },
+    { id: "banner", diff: "横幅说整个表单的问题；字段的错误说某一项。" },
+  ],
+  import: {
+    html: '// 只有样式：<div class="sn-field"> 里放标签、控件、说明、错误；校验用 import { validateForm } from "satin-ui"',
+    react: 'import { Field, Input } from "satin-ui/react";',
+    vue: 'import { Field, Input } from "satin-ui/vue";',
+    svelte: '// 只有样式：<div class="sn-field" class:sn-bad={error}>',
+    angular: '// 只有样式：<div class="sn-field" [class.sn-bad]="error()">',
+    solid: '// 只有样式：<div class="sn-field" classList={{ "sn-bad": !!error() }}>',
+    preact: 'import { Field, Input } from "satin-ui/react"; // 经 preact/compat',
+  },
+  importNote: {
+    react: "`Field`：`label`、`help`、`error`（给了就有错误区：有字时展开、输入框抖两下，空字符串收起）、`htmlFor`；控件写在子元素里，出错时给 `Input` 加 `invalid`。",
+    preact: "经 preact/compat 用 `satin-ui/react` 的 `Field`：`label`、`help`、`error`、`htmlFor`。",
+    vue: "`Field`：`label`、`help`、`error`、`for`；控件放在默认插槽里，出错时给 `Input` 加 `:invalid`。",
+    svelte: "没有专门的组件：`<div class=\"sn-field\" class:sn-bad={error}>` 里放 `.sn-lbl`、控件、`.sn-help`、`.sn-err > span`。",
+    angular: "没有专门的组件：`<div class=\"sn-field\" [class.sn-bad]=\"error()\">`，错误写在 `.sn-err > span` 里。",
+    solid: "没有专门的组件：`<div class=\"sn-field\" classList={{ \"sn-bad\": !!error() }}>`。",
+    html: "`<div class=\"sn-field\" data-f=\"名字\">` 里放 `<label class=\"sn-lbl\">`、控件、`<div class=\"sn-help\">`、`<div class=\"sn-err\"><span></span></div>`；提交时 `validateForm(表单, 规则)` 把错误写上去。",
+  },
+  dts: { react: "Field", vue: "Field", functions: ["validateForm", "setFieldError", "clearFieldError", "fieldHTML"] },
+  props: [
+    { name: "label", type: "ReactNode | string", default: "—", required: false,
+      desc: "标签，写在控件上面；能不填的在后面加 `<span class=\"sn-opt\">可选</span>`，必填的不标。", names: { react: "label", preact: "label", vue: "label", html: "label.sn-lbl" } },
+    { name: "help", type: "ReactNode | string", default: "—", required: false, desc: "控件下面的说明：规则、会用在哪里。", names: { react: "help", preact: "help", vue: "help", html: ".sn-help" } },
+    { name: "error", type: "ReactNode | string", default: "不给就没有错误区", required: false,
+      desc: "错误：给了字就在下面展开、字段标红、输入框抖两下；空字符串收起（先占好位置）。", names: { react: "error", preact: "error", vue: "error", html: ".sn-err > span（字段加 .sn-bad）" } },
+    { name: "htmlFor", type: "string", default: "—", required: false, desc: "标签对应的控件 id：点标签聚焦到控件。", names: { react: "htmlFor", preact: "htmlFor", vue: "for", html: "label 的 for" } },
+    { name: "className", type: "string", default: "—", required: false, desc: "加在字段最外层的类名（排版用）。", names: { react: "className", preact: "class" } },
+  ],
+  events: [],
+  slots: [{ name: "default", desc: "控件：输入框、下拉、验证码……", names: { react: "children", vue: "默认插槽" } }],
+  methods: [],
+  functions: [
+    { name: "validateForm", signature: "validateForm(form: HTMLElement, rules: Record<string, (value: string, input: HTMLInputElement) => string | null | undefined | false>): boolean", returns: "boolean", from: "satin-ui",
+      desc: "按字段的 `data-f` 找规则：返回错误文字就标出来（焦点到第一个出错的），返回假值就清掉；全都通过返回 true。" },
+    { name: "setFieldError", signature: "setFieldError(field: HTMLElement, message: string): void", returns: "void", from: "satin-ui", desc: "给一个字段写上错误：展开、标红、输入框抖两下。" },
+    { name: "clearFieldError", signature: "clearFieldError(field: HTMLElement): void", returns: "void", from: "satin-ui", desc: "收起错误（一开始输入也会自动收起）。" },
+    { name: "fieldHTML", signature: "fieldHTML(o?: { label?: string; control?: string; help?: string; error?: string; id?: string; name?: string }): string", returns: "string", from: "satin-ui",
+      desc: "拼出字段的标记（服务端渲染、模板里用）：`name` 写成 `data-f`，给 `validateForm` 找规则。" },
+  ],
+  cssVars: [
+    { name: "--sn-danger", desc: "错误文字、出错的边框", default: "红", token: true },
+    { name: "--sn-label3", desc: "说明文字、\"可选\"", default: "#6e6e73", token: true },
+  ],
+  classes: [
+    { name: ".sn-field / .sn-field.sn-bad", desc: "字段 / 出错的字段" },
+    { name: ".sn-lbl / .sn-opt", desc: "标签 / 标签后面的\"可选\"" },
+    { name: ".sn-help", desc: "说明" },
+    { name: ".sn-err > span", desc: "错误（高度过渡展开、收起）" },
+    { name: "[data-f]", desc: "字段的名字：validateForm 按它找规则" },
+  ],
+  types: ["FieldProps"],
+  keyboard: [{ keys: "Enter（输入框里）", does: "提交表单：有错的都标出来，焦点到第一个出错的。" }],
+  a11y: {
+    roles: ["标签是 `<label for>`，点标签聚焦控件；出错时控件 `aria-invalid=\"true\"`。"],
+    focus: ["提交时有错，焦点到第一个出错的控件。"],
+    notes: ["错误文字写在控件下面，读屏顺着读到；不只靠红色表达。"],
+  },
+  design: {
+    do: ["标签在上，说明在下；只标\"可选\"。", "错误写怎么改：\"请填写项目名称\"\"最多 12 个字\"。", "一开始输入就把错误收起，别一直红着。"],
+    dont: [
+      { text: "必填的都打红色星号。", rule: "status-color" },
+      { text: "错误用弹窗、轻提示说。", rule: "no-overlap" },
+    ],
+    copy: ["标签用名词：\"项目名称\"；错误用一句话说清楚。"],
+    motion: [{ what: "错误展开、收起（高度过渡）", easing: "ease.inOut", duration: "200ms" }, { what: "输入框左右抖两下", easing: "ease.out", duration: "360ms" }],
+  },
+  examples: [
+    { slug: "field-basic", title: "最简单的用法", why: "标签、控件、说明三样；htmlFor 对上控件的 id，点标签就能聚焦。",
+      html: `<div class="sn-field"><label class="sn-lbl" for="project-name">项目名称</label><input class="sn-input" id="project-name" placeholder="比如：雨夜车站"><div class="sn-help">会显示在项目列表和导出的文件名里</div></div>`, code: code("field-basic") },
+    { slug: "field-error", title: "提交时校验", why: "错误在字段下面展开、输入框抖两下；一开始输入就收起。",
+      html: `<form class="sn-stack sn-gap-12" novalidate><div class="sn-field"><label class="sn-lbl" for="new-name">项目名称</label><input class="sn-input" id="new-name" placeholder="比如：雨夜车站"><div class="sn-err"><span></span></div></div><div><button type="submit" class="sn-btn sn-primary">创建</button></div></form>`,
+      code: code("field-error") },
+    { slug: "field-optional", title: "只标\"可选\"", why: "大多数字段都要填，少数能不填的才在标签后面标\"可选\"，必填的不标。",
+      html: `<div class="sn-field"><label class="sn-lbl" for="notify-mail">通知邮箱 <span class="sn-opt">可选</span></label><input class="sn-input" id="notify-mail" type="email" placeholder="name@example.com"><div class="sn-help">生成完成后发一封邮件</div></div>`, code: code("field-optional") },
+  ],
+};

@@ -1,0 +1,3 @@
+export default function ProjectName() {
+  return <input class="sn-input" placeholder="比如：雨夜车站" aria-label="项目名称" />;
+}

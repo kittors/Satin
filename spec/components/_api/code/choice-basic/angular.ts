@@ -1,0 +1,12 @@
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "demo-choice-basic",
+  template: `
+    <div class="sn-stack sn-gap-8">
+      <label class="sn-check"><input type="checkbox" checked><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>自动保存草稿</label>
+      <label class="sn-switch"><input type="checkbox" role="switch"><span class="sn-track"><span class="sn-knob"></span></span>生成完成后提醒我</label>
+    </div>
+  `,
+})
+export class ChoiceBasicComponent {}

@@ -1,0 +1,13 @@
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "demo-field-basic",
+  template: `
+    <div class="sn-field">
+      <label class="sn-lbl" for="project-name">项目名称</label>
+      <input class="sn-input" id="project-name" placeholder="比如：雨夜车站">
+      <div class="sn-help">会显示在项目列表和导出的文件名里</div>
+    </div>
+  `,
+})
+export class FieldBasicComponent {}

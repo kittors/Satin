@@ -1,0 +1,20 @@
+<div class="sn-stack sn-gap-8" id="shot-picks">
+  <label class="sn-check"><input type="checkbox" data-all><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>全选</label>
+  <label class="sn-check"><input type="checkbox" checked><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>开场</label>
+  <label class="sn-check"><input type="checkbox"><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>车站</label>
+  <label class="sn-check"><input type="checkbox"><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>雨夜</label>
+</div>
+
+<script type="module">
+  // 全选跟着下面几项变：全选上了就勾上，选了一部分就是半选
+  const box = document.getElementById("shot-picks"), all = box.querySelector("[data-all]");
+  const items = [...box.querySelectorAll("input:not([data-all])")];
+  const sync = () => {
+    const n = items.filter((i) => i.checked).length;
+    all.checked = n === items.length;
+    all.indeterminate = n > 0 && n < items.length;
+  };
+  all.addEventListener("change", () => { for (const i of items) i.checked = all.checked; sync(); });
+  for (const i of items) i.addEventListener("change", sync);
+  sync();
+</script>

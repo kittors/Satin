@@ -1,0 +1,14 @@
+<div class="sn-stack sn-gap-8" id="name-box">
+  <input class="sn-input" value="雨夜车站" aria-label="项目名称">
+  <span class="sn-help">4 / 12 个字</span>
+</div>
+
+<script type="module">
+  // 超过 12 个字就标红（aria-invalid），下面的字数跟着变
+  const box = document.getElementById("name-box"), input = box.querySelector("input"), help = box.querySelector(".sn-help");
+  input.addEventListener("input", () => {
+    const n = input.value.length;
+    help.textContent = `${n} / 12 个字`;
+    n > 12 ? input.setAttribute("aria-invalid", "true") : input.removeAttribute("aria-invalid");
+  });
+</script>

@@ -33,6 +33,291 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "原生 `<input>`；出错时 `aria-invalid=\"true\"`。"
+    ],
+    "focus": [
+      "聚焦时边框加深、外面一圈；放进字段里时点标签也能聚焦。"
+    ],
+    "notes": [
+      "没有可见的标签时写 `aria-label`；`placeholder` 不能代替标签。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "输入框",
+  "lead": "一行文字的输入：四档高度，聚焦时边框加深、外面一圈；出错时边框变红。就是原生的 <input>，加一个类名。",
+  "whenToUse": [
+    "名称、标题、链接这类一行写得下的文字。",
+    "放进字段（Field）里，上面写标签、下面写说明和错误。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "密码、邮箱、搜索：用对应的特殊输入框（显示密码、校验格式、清除按钮）。",
+      "use": "special"
+    },
+    {
+      "text": "好几行的文字：用 Textarea（同样的样式）或提示词输入框。",
+      "use": "prompt"
+    },
+    {
+      "text": "从固定选项里挑：用下拉选择。",
+      "use": "select"
+    }
+  ],
+  "related": [
+    {
+      "id": "field",
+      "diff": "字段 = 标签 + 输入框 + 说明 + 错误；输入框只是中间那一个。"
+    },
+    {
+      "id": "special",
+      "diff": "密码、邮箱、搜索在输入框上加了按钮和校验。"
+    },
+    {
+      "id": "count",
+      "diff": "要限制字数时用字数统计，右边显示还能写几个字。"
+    }
+  ],
+  "import": {
+    "html": "// 只有样式：<input class=\"sn-input\">（多行写 <textarea class=\"sn-input\">）",
+    "react": "import { Input, Textarea } from \"satin-ui/react\";",
+    "vue": "import { Input } from \"satin-ui/vue\";",
+    "svelte": "// 只有样式：<input class=\"sn-input\" bind:value>",
+    "angular": "// 只有样式：<input class=\"sn-input\">",
+    "solid": "// 只有样式：<input class=\"sn-input\">",
+    "preact": "import { Input, Textarea } from \"satin-ui/react\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`Input` 就是带了 `sn-input` 类名的原生 `<input>`：`value` + `onChange` 受控、`defaultValue` 非受控，别的属性照原生写；`size` 四档，`invalid` 标红。多行用 `Textarea`。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Input`，写法和原生 `<input>` 一样。",
+    "vue": "`Input` 组件：`v-model` 绑文字，`size`、`invalid`；别的属性（`placeholder`、`id`、`@input`）照原生写。",
+    "svelte": "没有专门的组件：`<input class=\"sn-input\" bind:value>`；出错时写 `aria-invalid=\"true\"`。",
+    "angular": "没有专门的组件：`<input class=\"sn-input\">`，`[value]`、`(input)` 照常写；出错时 `[attr.aria-invalid]`。",
+    "solid": "没有专门的组件：`<input class=\"sn-input\">`；出错时写 `aria-invalid`。",
+    "html": "`<input class=\"sn-input\">`，大小加 `sn-sm` / `sn-lg` / `sn-xl`，出错时写 `aria-invalid=\"true\"`。"
+  },
+  "dts": {
+    "react": "Input",
+    "vue": "Input"
+  },
+  "props": [
+    {
+      "name": "value",
+      "type": "string",
+      "default": "\"\"",
+      "required": false,
+      "native": [
+        "react"
+      ],
+      "desc": "输入的文字。React 里和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控；Vue `v-model`；Svelte `bind:value`。",
+      "names": {
+        "react": "value / defaultValue",
+        "preact": "value / defaultValue",
+        "vue": "v-model",
+        "svelte": "bind:value",
+        "angular": "[value]",
+        "solid": "value",
+        "html": "value"
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\" | \"lg\" | \"xl\"",
+      "default": "\"md\"",
+      "required": false,
+      "desc": "高度：sm 28（工具条、表格里）、md 32、lg 40（表单）、xl 48（大搜索框）。",
+      "names": {
+        "react": "size",
+        "preact": "size",
+        "vue": "size",
+        "html": "类名 sn-sm / sn-lg / sn-xl"
+      }
+    },
+    {
+      "name": "invalid",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "出错：边框变红，写上 `aria-invalid=\"true\"`（放进字段里时字段会管）。",
+      "names": {
+        "react": "invalid",
+        "preact": "invalid",
+        "vue": "invalid",
+        "svelte": "aria-invalid",
+        "angular": "[attr.aria-invalid]",
+        "solid": "aria-invalid",
+        "html": "aria-invalid=\"true\""
+      }
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "native": [
+        "react",
+        "vue"
+      ],
+      "desc": "空着时的提示：写个例子（\"比如：雨夜车站\"），不要拿它代替标签。",
+      "names": {
+        "react": "placeholder",
+        "preact": "placeholder",
+        "vue": "placeholder",
+        "html": "placeholder"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "input",
+      "payload": "ChangeEvent（React 的 onChange）/ string（Vue 的 v-model）",
+      "when": "每输入一个字（原生的 input 事件）。",
+      "native": true,
+      "names": {
+        "react": "onChange",
+        "preact": "onChange / onInput",
+        "vue": "@update:modelValue / @input",
+        "svelte": "bind:value / oninput",
+        "angular": "(input)",
+        "solid": "onInput",
+        "html": "input"
+      }
+    }
+  ],
+  "slots": [],
+  "methods": [],
+  "functions": [],
+  "cssVars": [
+    {
+      "name": "--sn-field",
+      "desc": "底色",
+      "default": "白（深色主题深灰）",
+      "token": true
+    },
+    {
+      "name": "--sn-line-control / --sn-line-control-hover",
+      "desc": "边框 / 悬停时的边框",
+      "default": "黑 14% / 黑 22%",
+      "token": true
+    },
+    {
+      "name": "--sn-focus / --sn-ring",
+      "desc": "聚焦时的边框 / 外面一圈",
+      "default": "黑 40% / 黑 7%",
+      "token": true
+    },
+    {
+      "name": "--sn-danger",
+      "desc": "出错时的边框",
+      "default": "红",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-input",
+      "desc": "输入框（input 或 textarea）"
+    },
+    {
+      "name": ".sn-input.sn-sm / .sn-lg / .sn-xl",
+      "desc": "大小"
+    },
+    {
+      "name": ".sn-input[aria-invalid=\"true\"]",
+      "desc": "出错"
+    },
+    {
+      "name": ".sn-ib.sn-has-pre / .sn-has-post",
+      "desc": "前后带图标、按钮的输入框（里面 .sn-pre / .sn-post）"
+    }
+  ],
+  "types": [
+    "InputProps"
+  ],
+  "keyboard": [
+    {
+      "keys": "—",
+      "does": "原生输入框的按键（选字、撤销、输入法）都照常。"
+    }
+  ],
+  "design": {
+    "do": [
+      "宽度按要填的内容定：名称 240 左右，链接、标题可以占满。",
+      "一个表单里的输入框用同一档高度。"
+    ],
+    "dont": [
+      {
+        "text": "用 placeholder 当标签，输入以后就看不到在填什么了。",
+        "rule": "real-content"
+      },
+      {
+        "text": "聚焦时加彩色光晕。",
+        "rule": "no-colored-shadow"
+      }
+    ],
+    "copy": [
+      "placeholder 写例子：\"比如：雨夜车站\"。"
+    ],
+    "motion": [
+      {
+        "what": "聚焦时边框、外圈过渡",
+        "easing": "ease.out",
+        "duration": "150ms"
+      },
+      {
+        "what": "出错时左右抖两下",
+        "easing": "ease.out",
+        "duration": "360ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "input-basic",
+      "title": "最简单的用法",
+      "why": "就是原生的输入框加一个类名；没有可见的标签时写 aria-label。",
+      "html": "<input class=\"sn-input\" placeholder=\"比如：雨夜车站\" aria-label=\"项目名称\">",
+      "code": {
+        "html": "<input class=\"sn-input\" placeholder=\"比如：雨夜车站\" aria-label=\"项目名称\">\n",
+        "react": "import { Input } from \"satin-ui/react\";\n\nexport default function ProjectName() {\n  return <Input placeholder=\"比如：雨夜车站\" aria-label=\"项目名称\" />;\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Input } from \"satin-ui/vue\";\n\nconst name = ref(\"\");\n</script>\n\n<template>\n  <Input v-model=\"name\" placeholder=\"比如：雨夜车站\" aria-label=\"项目名称\" />\n</template>\n",
+        "svelte": "<script>\n  let name = $state(\"\");\n</script>\n\n<input class=\"sn-input\" placeholder=\"比如：雨夜车站\" aria-label=\"项目名称\" bind:value={name} />\n",
+        "angular": "import { Component } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-input-basic\",\n  template: `<input class=\"sn-input\" placeholder=\"比如：雨夜车站\" aria-label=\"项目名称\">`,\n})\nexport class InputBasicComponent {}\n",
+        "solid": "export default function ProjectName() {\n  return <input class=\"sn-input\" placeholder=\"比如：雨夜车站\" aria-label=\"项目名称\" />;\n}\n",
+        "preact": "import { Input } from \"satin-ui/react\";\n\nexport default function ProjectName() {\n  return <Input placeholder=\"比如：雨夜车站\" aria-label=\"项目名称\" />;\n}\n"
+      }
+    },
+    {
+      "slug": "input-sizes",
+      "title": "四档高度",
+      "why": "工具条、表格里用 sm，表单用 lg，大搜索框用 xl。",
+      "html": "<div class=\"sn-stack sn-gap-8\"><input class=\"sn-input sn-sm\" placeholder=\"小号 sm\" aria-label=\"小号\"><input class=\"sn-input\" placeholder=\"默认 md\" aria-label=\"默认\"><input class=\"sn-input sn-lg\" placeholder=\"大号 lg\" aria-label=\"大号\"><input class=\"sn-input sn-xl\" placeholder=\"特大 xl\" aria-label=\"特大\"></div>",
+      "code": {
+        "html": "<div class=\"sn-stack sn-gap-8\">\n  <input class=\"sn-input sn-sm\" placeholder=\"小号 sm\" aria-label=\"小号\">\n  <input class=\"sn-input\" placeholder=\"默认 md\" aria-label=\"默认\">\n  <input class=\"sn-input sn-lg\" placeholder=\"大号 lg\" aria-label=\"大号\">\n  <input class=\"sn-input sn-xl\" placeholder=\"特大 xl\" aria-label=\"特大\">\n</div>\n",
+        "react": "import { Input } from \"satin-ui/react\";\n\nexport default function InputSizes() {\n  return (\n    <div className=\"sn-stack sn-gap-8\">\n      <Input size=\"sm\" placeholder=\"小号 sm\" aria-label=\"小号\" />\n      <Input placeholder=\"默认 md\" aria-label=\"默认\" />\n      <Input size=\"lg\" placeholder=\"大号 lg\" aria-label=\"大号\" />\n      <Input size=\"xl\" placeholder=\"特大 xl\" aria-label=\"特大\" />\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Input } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <div class=\"sn-stack sn-gap-8\">\n    <Input size=\"sm\" placeholder=\"小号 sm\" aria-label=\"小号\" />\n    <Input placeholder=\"默认 md\" aria-label=\"默认\" />\n    <Input size=\"lg\" placeholder=\"大号 lg\" aria-label=\"大号\" />\n    <Input size=\"xl\" placeholder=\"特大 xl\" aria-label=\"特大\" />\n  </div>\n</template>\n",
+        "svelte": "<div class=\"sn-stack sn-gap-8\">\n  <input class=\"sn-input sn-sm\" placeholder=\"小号 sm\" aria-label=\"小号\" />\n  <input class=\"sn-input\" placeholder=\"默认 md\" aria-label=\"默认\" />\n  <input class=\"sn-input sn-lg\" placeholder=\"大号 lg\" aria-label=\"大号\" />\n  <input class=\"sn-input sn-xl\" placeholder=\"特大 xl\" aria-label=\"特大\" />\n</div>\n",
+        "angular": "import { Component } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-input-sizes\",\n  template: `\n    <div class=\"sn-stack sn-gap-8\">\n      <input class=\"sn-input sn-sm\" placeholder=\"小号 sm\" aria-label=\"小号\">\n      <input class=\"sn-input\" placeholder=\"默认 md\" aria-label=\"默认\">\n      <input class=\"sn-input sn-lg\" placeholder=\"大号 lg\" aria-label=\"大号\">\n      <input class=\"sn-input sn-xl\" placeholder=\"特大 xl\" aria-label=\"特大\">\n    </div>\n  `,\n})\nexport class InputSizesComponent {}\n",
+        "solid": "export default function InputSizes() {\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <input class=\"sn-input sn-sm\" placeholder=\"小号 sm\" aria-label=\"小号\" />\n      <input class=\"sn-input\" placeholder=\"默认 md\" aria-label=\"默认\" />\n      <input class=\"sn-input sn-lg\" placeholder=\"大号 lg\" aria-label=\"大号\" />\n      <input class=\"sn-input sn-xl\" placeholder=\"特大 xl\" aria-label=\"特大\" />\n    </div>\n  );\n}\n",
+        "preact": "import { Input } from \"satin-ui/react\";\n\nexport default function InputSizes() {\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <Input size=\"sm\" placeholder=\"小号 sm\" aria-label=\"小号\" />\n      <Input placeholder=\"默认 md\" aria-label=\"默认\" />\n      <Input size=\"lg\" placeholder=\"大号 lg\" aria-label=\"大号\" />\n      <Input size=\"xl\" placeholder=\"特大 xl\" aria-label=\"特大\" />\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "input-controlled",
+      "title": "受控：边输边算字数",
+      "why": "文字放在父组件里，下面的字数跟着变；超过 12 个字标红。",
+      "html": "<div class=\"sn-stack sn-gap-8\"><input class=\"sn-input\" value=\"雨夜车站\" aria-label=\"项目名称\"><span class=\"sn-help\">4 / 12 个字</span></div>",
+      "code": {
+        "html": "<div class=\"sn-stack sn-gap-8\" id=\"name-box\">\n  <input class=\"sn-input\" value=\"雨夜车站\" aria-label=\"项目名称\">\n  <span class=\"sn-help\">4 / 12 个字</span>\n</div>\n\n<script type=\"module\">\n  // 超过 12 个字就标红（aria-invalid），下面的字数跟着变\n  const box = document.getElementById(\"name-box\"), input = box.querySelector(\"input\"), help = box.querySelector(\".sn-help\");\n  input.addEventListener(\"input\", () => {\n    const n = input.value.length;\n    help.textContent = `${n} / 12 个字`;\n    n > 12 ? input.setAttribute(\"aria-invalid\", \"true\") : input.removeAttribute(\"aria-invalid\");\n  });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Input } from \"satin-ui/react\";\n\nexport default function ProjectNameCount() {\n  const [name, setName] = useState(\"雨夜车站\");\n  return (\n    <div className=\"sn-stack sn-gap-8\">\n      <Input value={name} onChange={(e) => setName(e.target.value)} invalid={name.length > 12} aria-label=\"项目名称\" />\n      <span className=\"sn-help\">{name.length} / 12 个字</span>\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Input } from \"satin-ui/vue\";\n\nconst name = ref(\"雨夜车站\");\n</script>\n\n<template>\n  <div class=\"sn-stack sn-gap-8\">\n    <Input v-model=\"name\" :invalid=\"name.length > 12\" aria-label=\"项目名称\" />\n    <span class=\"sn-help\">{{ name.length }} / 12 个字</span>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  let name = $state(\"雨夜车站\");\n</script>\n\n<div class=\"sn-stack sn-gap-8\">\n  <input class=\"sn-input\" bind:value={name} aria-invalid={name.length > 12 ? \"true\" : undefined} aria-label=\"项目名称\" />\n  <span class=\"sn-help\">{name.length} / 12 个字</span>\n</div>\n",
+        "angular": "import { Component, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-input-controlled\",\n  template: `\n    <div class=\"sn-stack sn-gap-8\">\n      <input class=\"sn-input\" [value]=\"name()\" (input)=\"name.set($any($event.target).value)\" [attr.aria-invalid]=\"name().length > 12 ? 'true' : null\" aria-label=\"项目名称\">\n      <span class=\"sn-help\">{{ name().length }} / 12 个字</span>\n    </div>\n  `,\n})\nexport class InputControlledComponent {\n  protected name = signal(\"雨夜车站\");\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\nexport default function ProjectNameCount() {\n  const [name, setName] = createSignal(\"雨夜车站\");\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <input class=\"sn-input\" value={name()} onInput={(e) => setName(e.currentTarget.value)} aria-invalid={name().length > 12 ? \"true\" : undefined} aria-label=\"项目名称\" />\n      <span class=\"sn-help\">{name().length} / 12 个字</span>\n    </div>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Input } from \"satin-ui/react\";\n\nexport default function ProjectNameCount() {\n  const [name, setName] = useState(\"雨夜车站\");\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <Input value={name} onChange={(e) => setName(e.target.value)} invalid={name.length > 12} aria-label=\"项目名称\" />\n      <span class=\"sn-help\">{name.length} / 12 个字</span>\n    </div>\n  );\n}\n"
+      }
+    }
+  ]
 }

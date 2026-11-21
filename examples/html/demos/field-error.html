@@ -1,0 +1,18 @@
+<form class="sn-stack sn-gap-12" id="new-project" novalidate>
+  <div class="sn-field" data-f="name">
+    <label class="sn-lbl" for="new-name">项目名称</label>
+    <input class="sn-input" id="new-name" placeholder="比如：雨夜车站">
+    <div class="sn-err"><span></span></div>
+  </div>
+  <div><button type="submit" class="sn-btn sn-primary">创建</button></div>
+</form>
+
+<script type="module">
+  import { validateForm } from "satin-ui";
+  // 规则按字段的 data-f 找：返回错误文字就标出来（下面展开、输入框抖两下），一开始输入就收起
+  const form = document.getElementById("new-project");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (validateForm(form, { name: (v) => (v.trim() ? "" : "请填写项目名称") })) form.reset();
+  });
+</script>
