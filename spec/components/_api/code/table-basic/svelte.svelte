@@ -16,7 +16,7 @@
   // 点表头排序，行按新顺序移到位；数字列右对齐、用等宽数字；挂上以后建，卸载时 destroy()
   let host;
   $effect(() => {
-    const it = createTable(host, { columns: COLUMNS, rows: ROWS, label: "镜头清单" });
+    const it = createTable(host, { columns: COLUMNS, data: ROWS, label: "镜头清单" });
     return () => it.destroy();
   });
 </script>

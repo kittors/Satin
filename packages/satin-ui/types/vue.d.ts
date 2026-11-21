@@ -9,7 +9,8 @@ export const LongText: C<{ value?: string; max?: number; maxLines?: number; rows
 /** 提示词输入框：@send 返回 Promise 时发送后进入"生成中"，结束回到可发送；send 是发送按钮的名字 */
 export const Composer: DefineComponent<{ placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; upload?(file: File, progress: (p: number) => void): Promise<unknown> }>;
 export const Email: C<{ value?: string; label?: string; help?: string; name?: string; id?: string; placeholder?: string; size?: "sm" | "lg" | "xl"; autocomplete?: string }>;
-export const Table: C<Omit<TableOptions, "onSort" | "onSelect" | "onRowClick">>;
+/** 表格：v-model 绑勾上的行（selected），v-model:expanded 绑展开着的行（expandedKeys），v-model:sort 绑排序；事件写 @sort、@select、@row-click、@expand-change、@row-reorder……；插槽 #cell-<key>="{ value, row, index }" */
+export const Table: C<Omit<TableOptions, "onSort" | "onSelect" | "onRowClick" | "onExpandChange" | "onRowReorder" | "onColumnReorder" | "onColumnResize" | "onRowResize" | "onCellEdit" | "onRetry" | "onLayout"> & { /** v-model:expanded：展开着的行 */ expanded?: (string | number)[] }>;
 export const Segmented: C<{ items: Item[]; value?: string; size?: "sm" | "md"; label?: string }>;
 export const Slider: C<{ value?: number; max?: number; label?: string }>;
 export const Select: C<{ items: Item[]; value?: string; placeholder?: string; label?: string }>;

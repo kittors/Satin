@@ -15,5 +15,5 @@
     { id: 4, name: "末班列车", type: "全景", dur: 8, owner: "陈默" },
   ];
   // selectable：最左边一列勾选框；勾选后底部浮出批量操作条
-  createTable(document.getElementById("table-controlled"), { columns: COLUMNS, rows: ROWS, selectable: true, selected: [1], label: "镜头清单", onSelect: (keys) => console.log("勾上了：", keys) });
+  createTable(document.getElementById("table-controlled"), { columns: COLUMNS, data: ROWS, selectable: true, selected: [1], label: "镜头清单", onSelect: (keys) => console.log("勾上了：", keys) });
 </script>

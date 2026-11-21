@@ -1,6 +1,6 @@
 // satin-ui/react
 import type * as React from "react";
-import type { SatinInstance, Item, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions } from "./components";
+import type { SatinInstance, Item, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions, TableColumn, TableCellContext, TableApi } from "./components";
 type Base = { className?: string; style?: React.CSSProperties; id?: string };
 type Controlled<T, K extends string = "value"> = { [P in K]?: T } & { [P in `default${Capitalize<K>}`]?: T };
 type Ref = React.Ref<SatinInstance | null>;
@@ -15,7 +15,11 @@ export const Pager: React.ForwardRefExoticComponent<Base & Controlled<number, "p
 export const Collapse: React.ForwardRefExoticComponent<Base & Controlled<number[], "open"> & { items: { title: string; content?: string; html?: string }[]; single?: boolean; onToggle?(e: { index: number; open: boolean }): void; onChange?(open: number[]): void } & React.RefAttributes<SatinInstance>>;
 export const TagInput: React.ForwardRefExoticComponent<Base & Controlled<string[], "tags"> & { max?: number; placeholder?: string; hint?: string; onChange?(tags: string[]): void } & React.RefAttributes<SatinInstance>>;
 export const Stepper: React.ForwardRefExoticComponent<Base & Controlled<number> & { min?: number; max?: number; unit?: string; label?: string; onChange?(value: number): void } & React.RefAttributes<SatinInstance>>;
-export const Table: React.ForwardRefExoticComponent<Base & TableOptions & { selected?: (string | number)[]; defaultSelected?: (string | number)[] } & React.RefAttributes<SatinInstance>>;
+/** 表格的列（React 版：render 可以返回 React 节点，画进这一格里的一个小 React 根，拿不到外面的 Context） */
+export type TableColumnReact<R = any> = Omit<TableColumn<R>, "render"> & { render?(value: any, row: R, ctx: TableCellContext): React.ReactNode | string | number | Node | void };
+/** 表格的属性：columns + data（树形用 children）；selected / expandedKeys / sort 受控（defaultXxx 非受控，"传进来的值换了"才跟着变）；事件 onXxx；ref 拿到实例 */
+export type TableProps<R = any> = Base & Omit<TableOptions<R>, "columns"> & { columns: TableColumnReact<R>[] };
+export const Table: React.ForwardRefExoticComponent<TableProps & React.RefAttributes<SatinInstance & TableApi>>;
 export const Password: React.ForwardRefExoticComponent<Base & Controlled<string> & { label?: string; help?: string; name?: string; placeholder?: string; meter?: boolean; size?: "sm" | "lg" | "xl"; autocomplete?: string; onChange?(value: string): void } & React.RefAttributes<SatinInstance>>;
 /** 搜索框：search(q) 返回结果数（或数组、Promise），超过 300ms 放大镜换成转圈；onSearch(q)；id 写在输入框上 */
 export type SearchProps = Base & { search?(q: string): number | unknown[] | Promise<number | unknown[]>; debounce?: number; placeholder?: string; label?: string; kbd?: string | false; name?: string; size?: "sm" | "lg" | "xl"; onSearch?(q: string): void };

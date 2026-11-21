@@ -16,7 +16,7 @@
   // selectable：最左边一列勾选框；勾选后底部浮出批量操作条；挂上以后建，卸载时 destroy()
   let host;
   $effect(() => {
-    const it = createTable(host, { columns: COLUMNS, rows: ROWS, selectable: true, selected: [1], label: "镜头清单", onSelect: (keys) => console.log("勾上了：", keys) });
+    const it = createTable(host, { columns: COLUMNS, data: ROWS, selectable: true, selected: [1], label: "镜头清单", onSelect: (keys) => console.log("勾上了：", keys) });
     return () => it.destroy();
   });
 </script>

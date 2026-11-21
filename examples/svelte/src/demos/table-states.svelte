@@ -7,10 +7,10 @@
     { key: "owner", title: "负责人" },
   ];
 
-  // rows 是空数组时显示 empty；加载中给 loading（骨架行）；compact 紧凑密度；挂上以后建，卸载时 destroy()
+  // data 是空数组时显示 empty；加载中给 loading（骨架行）；compact 紧凑密度；挂上以后建，卸载时 destroy()
   let host;
   $effect(() => {
-    const it = createTable(host, { columns: COLUMNS, rows: [], empty: "还没有镜头，先导入原文", label: "镜头清单", compact: true });
+    const it = createTable(host, { columns: COLUMNS, data: [], empty: "还没有镜头，先导入原文", label: "镜头清单", compact: true });
     return () => it.destroy();
   });
 </script>

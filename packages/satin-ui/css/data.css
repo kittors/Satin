@@ -486,12 +486,15 @@
 
 /* ———— 列：宽度用 colgroup（固定布局，"项目"列占剩下的宽度）；改宽手柄、拖列的影子、改宽参考线和数据表格共用（.g-rz / .g-ghost / .g-rzline） ———— */
 .sn-tbl:has(> colgroup) { table-layout: fixed; } /* 只有带列宽（colgroup）的交互表格用固定布局；静态表格按内容排 */
-.sn-tbl col.sn-c-ck { width: 60px; } .sn-tbl col.sn-c-acts { width: 84px; }
+.sn-tbl col.sn-c-ck { width: 60px; } .sn-tbl col.sn-c-pick { width: 44px; } .sn-tbl col.sn-c-acts { width: 84px; }
+.sn-tbl td.sn-ck > .sn-check:first-child { margin-left: 20px; } /* 能改行高、不能拖行（没有把手）：勾选框照样和全选框对齐 */
+.sn-tbl .sn-tbl-cell { display: contents; } /* render 画进树形那一列时的容器（React / Vue 的节点画在它里面），排版上不多一层 */
 .sn-tbl td:not(.sn-ck) { overflow-x: clip; } /* 列窄了内容横向裁掉，竖向不裁（合并格的内容过渡时会伸出自己那一格）；表头不裁（改宽手柄有一半伸在格子外面），勾选那一格不裁（里面放着横跨整行的行高手柄） */
 .sn-tbl .sn-name b { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.sn-tbl th[data-c] { position: relative; cursor: grab; user-select: none; }
+.sn-tbl th[data-c] { position: relative; }
+.sn-tbl th[data-c]:not([data-fixed]) { cursor: grab; user-select: none; } /* 能拖的表头（draggableColumns；列上 fixed 的、没开拖列的表格写 data-fixed） */
 .sn-tbl-wrap.sn-coldrag thead { cursor: grabbing; } /* 拖列时指针被表头整行捕获，光标跟着表头走；不给整张表的每个元素切光标（起手那一下要重算几百个元素的样式） */
-.sn-tbl th[data-c]:nth-last-child(2) .sn-g-rz { display: none; } /* 最后一列右边是操作列，不改宽 */
+.sn-tbl th[data-c]:not(:has(~ th[data-c])) .sn-g-rz { display: none; } /* 最后一个数据列右边没有能一起调的列（改宽是挪两列之间的边线），不改宽；拖列以后跟着新的最后一列走 */
 .sn-tbl-wrap.sn-resizing .sn-g-rz::after { background: transparent; }
 
 /* ———— 线：默认只有行线；切到"网格"时每一格右边也有一条（最后的操作列除外） ———— */
@@ -507,10 +510,11 @@
 
 /* ———— 多级树（项目 → 分集 → 场）：每一级缩进 24px；左边竖向的层级线，每一级一条、正好穿过上级展开箭头的中心，连起来就是一棵树；
    没有下级的用一个小圆点占住展开箭头的位置，同一级的名字对齐 ———— */
-.sn-tbl td[data-c="n"] { position: relative; }
-.sn-tbl td[data-c="n"] > .sn-name { padding-left: calc(var(--sn-lv, 0) * 24px); }
-.sn-tbl tr.sn-kid td[data-c="n"]::before { content: ""; position: absolute; top: 0; bottom: 0; left: 12px; width: calc(var(--sn-lv) * 24px); background: repeating-linear-gradient(90deg, transparent 0 3.5px, var(--sn-tree-line) 3.5px 4.5px, transparent 4.5px 24px); pointer-events: none; }
-.sn-tbl tr.sn-open > td[data-c="n"]::after { content: ""; position: absolute; left: calc(15.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); pointer-events: none; } /* 展开着的那一行：从展开箭头下面接到行底，和下级的层级线连上 */
+/* 树形的那一列（格子里 .sn-name 打头是展开箭头或小圆点，哪一列都行，不认列名） */
+.sn-tbl td:has(> .sn-name > :is(.sn-exp, .sn-leaf)) { position: relative; }
+.sn-tbl td > .sn-name:has(> :is(.sn-exp, .sn-leaf)) { padding-left: calc(var(--sn-lv, 0) * 24px); }
+.sn-tbl tr.sn-kid td:has(> .sn-name > :is(.sn-exp, .sn-leaf))::before { content: ""; position: absolute; top: 0; bottom: 0; left: 12px; width: calc(var(--sn-lv) * 24px); background: repeating-linear-gradient(90deg, transparent 0 3.5px, var(--sn-tree-line) 3.5px 4.5px, transparent 4.5px 24px); pointer-events: none; }
+.sn-tbl tr.sn-open > td:has(> .sn-name > .sn-exp)::after { content: ""; position: absolute; left: calc(15.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); pointer-events: none; } /* 展开着的那一行：从展开箭头下面接到行底，和下级的层级线连上 */
 .sn-tbl .sn-leaf { flex: none; display: grid; place-items: center; width: 20px; height: 20px; margin: 0 -4px 0 -6px; }
 .sn-tbl .sn-leaf::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--sn-line-control); }
 
@@ -541,6 +545,7 @@
 .sn-tbl-none > span:not(.sn-art) { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-tbl-none .sn-btn { margin-top: 10px; }
 .sn-tbl-empty:has(.sn-tbl-none) td { height: auto; }
+.sn-tbl-err .sn-art { color: var(--sn-danger); } /* 出错：图标用状态色，其余和空状态一样 */
 /* 加载中：每格一条骨架，行高和真数据一样，加载完不跳 */
 .sn-tbl-sk .sn-sk { height: 10px; display: inline-block; vertical-align: middle; }
 .sn-tbl-sk td.sn-r .sn-sk { margin-left: auto; }

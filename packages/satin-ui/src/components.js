@@ -310,15 +310,13 @@ export { bindCollapses } from "./data.js";
 export { bindInputs } from "./input.js";
 export { bindPickers } from "./picker.js";
 
-// ———— 表格（真数据）：列定义 + 行数据 → 设计稿里的 .sn-tbl；排序（行移到位）、勾选、空状态、加载中 ————
+// ———— 表格（真数据）：列定义 + 数据 → 设计稿里的 .sn-tbl；排序（行移到位）、勾选、多级展开、合并、拖行拖列、改列宽行高、空 / 加载 / 出错 ————
+// 事件：sort、select、rowClick、expandChange、rowReorder、columnReorder、columnResize、rowResize、cellEdit、retry、layout（看得见的行定了）
 export const createTable = /* @__PURE__ */ defineComponent({
   name: "table",
-  defaults: { columns: [], rows: [], rowKey: "id" },
+  defaults: { columns: [], rowKey: "id" },
   html: (o) => tableHTML(o),
-  mount(el, o, api) {
-    const tb = mountTable(el, { ...o, onSort: (s) => api.emit("sort", s), onSelect: (k) => api.emit("select", k), onRowClick: (r) => api.emit("rowClick", r) });
-    return { update: (next) => tb.update(next), get selected() { return tb.selected; }, get sort() { return tb.sort; }, destroy: tb.destroy };
-  },
+  mount: (el, o, api) => mountTable(el, o, api.emit),
 });
 export { tableHTML, sortRows };
 export { bindForms } from "./form.js";

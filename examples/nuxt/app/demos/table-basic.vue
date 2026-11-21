@@ -17,5 +17,5 @@ const ROWS = [
 
 <template>
   <!-- 点表头排序，行按新顺序移到位；数字列（align: "right"）右对齐、用等宽数字 -->
-  <Table :columns="COLUMNS" :rows="ROWS" label="镜头清单" />
+  <Table :columns="COLUMNS" :data="ROWS" label="镜头清单" />
 </template>

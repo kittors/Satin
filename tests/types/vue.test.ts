@@ -24,3 +24,11 @@ export const Demo2 = defineComponent({
   },
 });
 export const dir: Directive<HTMLElement> = vEnhance;
+// 表格：v-model（勾选）、v-model:expanded、v-model:sort；树形数据、合并、拖动、出错
+import { Table } from "satin-ui/vue";
+export const TreeTableVue = defineComponent({
+  setup() {
+    const keys = ref<(string | number)[]>([]), open = ref<(string | number)[]>(["p1"]);
+    return () => h(Table, { columns: [{ key: "name", title: "项目", merge: true }, { key: "act", type: "actions" }], data: [{ id: "p1", name: "雨夜车站", children: [{ id: "p1.e1", name: "第 1 集" }] }], modelValue: keys.value, expanded: open.value, "onUpdate:expanded": (k: string[]) => (open.value = k), lines: "grid", draggableRows: true, draggableColumns: true, error: false, spans: () => [{ row: 0, key: "name", rowSpan: 2 }] });
+  },
+});

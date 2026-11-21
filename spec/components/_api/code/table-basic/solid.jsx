@@ -18,7 +18,7 @@ export default function ShotTable() {
   let host;
   // 点表头排序，行按新顺序移到位；数字列右对齐、用等宽数字；挂上以后建，卸载时 destroy()
   onSettled(() => {
-    const it = createTable(host, { columns: COLUMNS, rows: ROWS, label: "镜头清单" });
+    const it = createTable(host, { columns: COLUMNS, data: ROWS, label: "镜头清单" });
     return () => it.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;

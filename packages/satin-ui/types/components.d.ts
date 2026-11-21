@@ -202,32 +202,80 @@ export function bindPickers(root?: ParentNode, options?: Pick<PickerOptions, "to
 
 // ———— 表格（真数据） ————
 export interface TableColumn<R = any> {
-  key: string; title: string;
-  /** 数字列 "right"：右对齐 + 等宽数字 */
-  align?: "left" | "right"; width?: number | string; sortable?: boolean;
+  /** 取行里的哪个字段；拖列、改宽、合并、事件都按它认列 */ key: string;
+  /** 表头文字 */ title?: string;
+  /** "actions"：行末的操作列（固定在最右边，不排序、不拖、不改宽；悬停这一行时按钮才变实） */ type?: "actions";
+  /** 数字列 "right"：右对齐 + 等宽数字 */ align?: "left" | "right";
+  /** 列宽；开了改宽 / 拖列时写数字（px），不写是弹性列（分剩下的宽度） */ width?: number | string;
+  /** 拖边线改宽时最窄多少（px），默认 64 */ minWidth?: number;
+  sortable?: boolean;
+  /** 第一次点按哪个方向排（时间列常用 "desc"：先看最新的） */ sortFirst?: "asc" | "desc";
+  /** 自定义排序（升序时 a 在 b 前面返回负数） */ sort?(a: R, b: R): number;
+  /** 拖表头右边缘改宽（双击按内容定宽）：左边这列宽多少，右边那列就窄多少 */ resizable?: boolean;
+  /** 开了 draggableColumns 时这一列不能拖 */ fixed?: boolean;
+  /** 树形时展开箭头放在这一列（默认第一列） */ primary?: boolean;
+  /** 双击（或选中后回车）改这一格，改完发 onCellEdit */ editable?: boolean;
+  /** 连续相同的值合成一格：true 按这一列的值比，或者给"算不算相同"的函数；只在网格线下合并 */ merge?: boolean | ((a: R, b: R) => boolean);
   /** 显示的文字（会转义） */ format?(value: any, row: R): string | number;
   /** 显示的 HTML（标签、头像这类标记；自己保证安全） */ html?(value: any, row: R): string;
-  /** 自定义排序（升序时 a 在 b 前面返回负数） */ sort?(a: R, b: R): number;
+  /** 自己画格子：返回 HTML 字符串、节点，或者自己改好 ctx.cell 返回 undefined */ render?(value: any, row: R, ctx: TableCellContext): string | number | Node | void;
   num?: boolean; className?: string;
 }
 export interface TableOptions<R = any> {
-  columns: TableColumn<R>[]; rows: R[];
+  columns: TableColumn<R>[];
+  /** 数据：一行一个对象；行里带 children 就是多级树 */ data?: R[];
+  /** data 的旧名 */ rows?: R[];
   /** 行的唯一键：字段名或函数，默认 "id" */ rowKey?: string | ((row: R, index: number) => string | number);
-  sort?: { key: string; dir: "asc" | "desc" } | null;
-  /** 默认在表格里排；false：只发 onSort，由外面排好再 update({ rows }) */ sortLocal?: boolean;
-  selectable?: boolean; selected?: (string | number)[];
-  /** 没有数据时那一行的文字 */ empty?: string;
-  loading?: boolean; skeleton?: number; label?: string;
-  striped?: boolean; compact?: boolean; plain?: boolean; lines?: "row" | "grid"; maxHeight?: number | string;
-  onSort?(sort: { key: string; dir: "asc" | "desc" }): void; onSelect?(keys: string[]): void; onRowClick?(row: R): void;
+  /** 展开着的行（受控：传进来的值换了才跟着变） */ expandedKeys?: (string | number)[];
+  /** 一开始展开的行（非受控） */ defaultExpandedKeys?: (string | number)[];
+  sort?: TableSort | null; defaultSort?: TableSort | null;
+  /** 默认在表格里排；false：只发 onSort，由外面排好再 update({ data }) */ sortLocal?: boolean;
+  selectable?: boolean; selected?: (string | number)[]; defaultSelected?: (string | number)[];
+  /** 筛选：显示匹配的行和它的所有上级（上级自动展开）；null 不筛 */ filter?: ((row: R) => boolean) | null;
+  /** 合并规则：拿看得见的行，返回要合并的块（排序、展开、筛选、拖行以后都重算）；只在网格线下合并 */ spans?(rows: R[]): TableSpan[];
+  /** 拖左边的把手换行的位置（同一个上级里，整棵子树一起走） */ draggableRows?: boolean;
+  /** 按住表头拖列 */ draggableColumns?: boolean;
+  /** 拖一行的下边线改行高（双击恢复） */ resizableRows?: boolean;
+  /** 单击格子选中、方向键走格子（树形那一列左右键收起 / 展开 / 回到上级） */ cellSelect?: boolean;
+  /** 给每一行加的属性（data-*、aria-*……；class、style、hidden 和表格自己用的 data-id / data-lv / data-parent 不认） */ rowAttrs?(row: R, ctx: { key: string; level: number; parent: R | null }): Record<string, string | number | boolean | null | undefined>;
+  /** 没有数据时那一行：字符串按文字放；函数返回 HTML（filtered：是筛选以后没有结果） */ empty?: string | ((ctx: { filtered: boolean }) => string);
+  loading?: boolean; skeleton?: number;
+  /** 出错：true 或说明文字；那一行带"重试"（发 onRetry） */ error?: boolean | string;
+  label?: string; striped?: boolean; compact?: boolean; plain?: boolean; lines?: "row" | "grid"; maxHeight?: number | string;
+  onSort?(sort: TableSort | null): void;
+  onSelect?(keys: string[]): void;
+  onRowClick?(row: R): void;
+  onExpandChange?(e: TableExpandEvent): void;
+  onRowReorder?(e: TableRowReorderEvent): void;
+  onColumnReorder?(e: { keys: string[] }): void;
+  onColumnResize?(e: { key: string; width: number; widths: Record<string, number> }): void;
+  onRowResize?(e: { key: string; height: number | null }): void;
+  onCellEdit?(e: TableCellEditEvent<R>): void;
+  onRetry?(): void;
+  onLayout?(e: { rows: R[] }): void;
 }
-export const createTable: SatinFactory<TableOptions, { readonly selected: string[]; readonly sort: { key: string; dir: "asc" | "desc" } | null }>;
+/** createTable 的实例（React / Vue 的 ref 拿到的也是它） */
+export interface TableApi {
+  readonly selected: string[];
+  readonly sort: TableSort | null;
+  readonly expanded: string[];
+  readonly columnOrder: string[];
+  isExpanded(key: string | number): boolean;
+  expand(keys: string | number | (string | number)[], open?: boolean): void;
+  expandAll(open?: boolean): void;
+  select(keys: (string | number)[]): void;
+  refresh(): void;
+  edit(key: string | number, colKey?: string): void;
+}
+export const createTable: SatinFactory<TableOptions, TableApi>;
 export function tableHTML(o: TableOptions): string;
-export function sortRows<R>(rows: R[], columns: TableColumn<R>[], sort: { key: string; dir: "asc" | "desc" } | null): R[];
+export function sortRows<R>(rows: R[], columns: TableColumn<R>[], sort: TableSort | null): R[];
 
 /** 照设计稿写好的标记，在 root 里一次接上交互（下拉、复制、芯片、清除、显示密码、自动长高、滑块、验证码、输入框、折叠面板、日期选择器、浮层触发器、横幅），并把 data-i 换成图标。
  *  返回撤销函数（撤掉监听、观察器、包上去的滚动区域和"已接过"标记，同一段标记可以再接一次）。wire：同一个作用域里跑的自己的接线，撤销时一起撤 */
 export function enhance(root?: ParentNode | null, wire?: (root: ParentNode) => void): () => void;
+/** render 的第三个参数：cell 是这一格（字符串阶段——服务端渲染、第一帧——是 null，返回 HTML 字符串或先空着）；index 是现在的顺序里第几行（树形按整棵树数）；level 是第几级（0 起） */
+export interface TableCellContext { cell: HTMLElement | null; key: string; index: number; level: number }
 /** 表单类的标记一次接上（enhance 里已经包含） */
 export function bindForms(root?: ParentNode): void;
 export function bindBanners(root?: ParentNode): void;
@@ -237,3 +285,12 @@ export function closeBanner(wrap: HTMLElement): void;
 export function autoGrow(box: HTMLElement): void;
 /** 长文本的用量环（传包着 textarea 和 .sn-ta-count 的容器，data-max 是上限） */
 export function longCount(box: HTMLElement, o?: { showFrom?: number }): void;
+/** spans 返回的一块合并：row 是看得见的行里第几行，key 是从哪一列开始，往下 rowSpan 行、往右 colSpan 列（按现在的列顺序） */
+export interface TableSpan { row: number; key: string; rowSpan?: number; colSpan?: number }
+export interface TableSort { key: string; dir: "asc" | "desc" }
+/** 展开 / 收起：keys 是现在展开着的所有行（有筛选时是筛选前的展开状态），key 是点的那一行 */
+export interface TableExpandEvent { keys: string[]; key: string; expanded: boolean }
+/** 拖行松手：key 是拖的那一行，parentKey 它的上级（第一级是 null），from / to 在兄弟里的位置，keys 是这一组兄弟的新顺序 */
+export interface TableRowReorderEvent { key: string; parentKey: string | null; from: number; to: number; keys: string[] }
+/** 改完一格：表格已经把新值写进行里（row[key]），再发这个 */
+export interface TableCellEditEvent<R = any> { row: R; key: string; value: unknown; oldValue: unknown }

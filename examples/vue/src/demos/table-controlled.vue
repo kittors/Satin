@@ -20,7 +20,7 @@ const picked = ref([1]);
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <Table v-model="picked" :columns="COLUMNS" :rows="ROWS" selectable label="镜头清单" />
+    <Table v-model="picked" :columns="COLUMNS" :data="ROWS" selectable label="镜头清单" />
     <span class="sn-help">已选 {{ picked.length }} 行</span>
   </div>
 </template>

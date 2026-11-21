@@ -14,5 +14,5 @@ onMounted(() => setTimeout(() => (rows.value = []), 1200));
 </script>
 
 <template>
-  <Table :columns="COLUMNS" :rows="rows ?? []" :loading="rows === null" empty="还没有镜头，先导入原文" label="镜头清单" compact />
+  <Table :columns="COLUMNS" :data="rows ?? []" :loading="rows === null" empty="还没有镜头，先导入原文" label="镜头清单" compact />
 </template>

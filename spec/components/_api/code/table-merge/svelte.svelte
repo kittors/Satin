@@ -1,0 +1,29 @@
+<script>
+  import { createTable } from "satin-ui";
+  // 负责人一样的相邻几行合成一格：列上写 merge
+  const COLUMNS = [
+    { key: "owner", title: "负责人", merge: true },
+    { key: "name", title: "镜头" },
+    { key: "type", title: "景别", format: (v, row) => row.note ?? v },
+    { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => (v ? `${v} 秒` : "—") },
+  ];
+  const DATA = [
+    { id: 1, owner: "林夏", name: "站台远景", type: "远景", dur: 6 },
+    { id: 2, owner: "林夏", name: "推门进候车厅", type: "中景", dur: 5 },
+    { id: 3, owner: "周屿", name: "雨里的车灯", type: "近景", dur: 3 },
+    { id: 4, owner: "周屿", name: "车窗上的雨", type: "特写", dur: 4 },
+    { id: 5, owner: "周屿", name: "转场", note: "黑场 2 秒，接下一场" },
+    { id: 6, owner: "陈默", name: "末班列车", type: "全景", dur: 8 },
+  ];
+  // 转场那一行：景别、时长两列合成一格写说明（rows 是现在看得见的行，排序以后表格会重新问一遍）
+  const spans = (rows) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
+
+  // 合并只在网格线下显示（lines: "grid"）；挂上以后建，卸载时 destroy()
+  let host;
+  $effect(() => {
+    const it = createTable(host, { columns: COLUMNS, data: DATA, spans, lines: "grid", label: "分镜" });
+    return () => it.destroy();
+  });
+</script>
+
+<div bind:this={host}></div>

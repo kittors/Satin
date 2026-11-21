@@ -5,7 +5,8 @@
 // · SSR 安全：服务端输出和浏览器第一帧一样的标记（createXxx.html），水合以后再接交互；导入时不碰 document
 // · StrictMode 下挂两次、卸载一次也不漏：每次挂载都配对一次 destroy
 // · 第一次挂载任何组件时自动调 setup()（Tooltip、浮层栈这些页面级行为），最后一个组件卸载时撤掉
-import { createElement as h, forwardRef, useEffect, useRef, useState, useId, useCallback, cloneElement, isValidElement, Children } from "react";
+import { createElement as h, forwardRef, useEffect, useRef, useState, useId, useCallback, useMemo, cloneElement, isValidElement, Children } from "react";
+import { createRoot } from "react-dom/client";
 import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
@@ -44,8 +45,32 @@ export const CountInput = /* @__PURE__ */ wrap(S.createCount, { passId: true, di
 export const LongText = /* @__PURE__ */ wrap(S.createLongText, { events: ["change", "submit"], passId: true, displayName: "LongText" });
 // 提示词输入框：onSend({ text, files }) 返回 Promise——发送后进入"生成中"（发送键变停止），Promise 结束回到可发送；onStop
 export const Composer = /* @__PURE__ */ wrap(S.createComposer, { events: ["send", "stop"], displayName: "Composer" });
-// 表格：columns + rows；selected 受控（onSelect 里更新）；onSort、onRowClick
-export const Table = /* @__PURE__ */ wrap(S.createTable, { valueKey: "selected", events: ["sort", "select", "rowClick"], displayName: "Table" });
+// 表格：columns + data（树形用 children）。勾选 selected + onSelect 受控（defaultSelected 非受控）；展开 expandedKeys + onExpandChange 受控（defaultExpandedKeys 非受控）；
+// sort + onSort（defaultSort）；拖行、拖列、改宽、改行高、改格子、重试：onRowReorder、onColumnReorder、onColumnResize、onRowResize、onCellEdit、onRetry。
+// 受控的值"传进来的值换了（按值比）"才跟过去；ref 拿到实例（expand、expandAll、select、refresh、edit……）。
+// 列的 render 可以返回 React 节点：每个格子一个小的 React 根（拿不到外面的 Context，要用就把值放进行数据里）；服务端和第一帧先空着，挂上以后画
+const TABLE_EVENTS = ["sort", "select", "rowClick", "expandChange", "rowReorder", "columnReorder", "columnResize", "rowResize", "cellEdit", "retry", "layout"];
+const TableInstance = /* @__PURE__ */ wrap(S.createTable, { valueKey: "selected", events: TABLE_EVENTS, displayName: "TableInstance" });
+// 格子 → React 根记在这里（不挂在格子元素上：StrictMode 里表格销毁再挂时会清掉元素上的 _xxx）；模拟卸载后马上又挂上时不卸，
+// 真卸载了才在微任务里统一卸；整表重画换下来的格子，在微任务里卸掉它们的根
+function useTableCells(columns) {
+  const box = useRef(null); if (box.current === null) box.current = { roots: new Map(), alive: true, sweep: false };
+  useEffect(() => { const b = box.current; b.alive = true; return () => { b.alive = false; queueMicrotask(() => { if (b.alive) return; for (const r of b.roots.values()) r.unmount(); b.roots.clear(); }); }; }, []);
+  return useMemo(() => (columns || []).map((c) => (typeof c.render !== "function" ? c : { ...c, render: (v, row, ctx) => {
+    const out = c.render(v, row, ctx);
+    if (!isValidElement(out)) return out;
+    if (!ctx.cell) return ""; // 字符串阶段（服务端、第一帧）：先空着
+    const b = box.current; let root = b.roots.get(ctx.cell);
+    if (!root) {
+      ctx.cell.replaceChildren(); root = createRoot(ctx.cell); b.roots.set(ctx.cell, root);
+      if (!b.sweep) { b.sweep = true; queueMicrotask(() => { b.sweep = false; for (const [el, r] of b.roots) if (!el.isConnected) { r.unmount(); b.roots.delete(el); } }); }
+    }
+    root.render(out); return undefined;
+  } })), [columns]);
+}
+export const Table = /* @__PURE__ */ forwardRef(function Table({ columns, ...rest }, ref) {
+  return h(TableInstance, { ...rest, columns: useTableCells(columns), ref });
+});
 // 日期、时间、地址选择器：kind（date | range | time | datetime | region）、placeholder、label；onChange({ text }) 拿到触发框里显示的文字。
 // today / now 固定"今天""现在"（测试、截图用）。kind、placeholder、label 只在创建时用：要换种类就换 key 重新挂
 export const DatePicker = /* @__PURE__ */ wrap(S.createPicker, { displayName: "DatePicker" });

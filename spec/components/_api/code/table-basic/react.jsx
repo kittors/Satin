@@ -15,5 +15,5 @@ const ROWS = [
 
 export default function ShotTable() {
   // 点表头排序，行按新顺序移到位；数字列（align: "right"）右对齐、用等宽数字
-  return <Table columns={COLUMNS} rows={ROWS} label="镜头清单" />;
+  return <Table columns={COLUMNS} data={ROWS} label="镜头清单" />;
 }

@@ -12,5 +12,5 @@ export default function EmptyTable() {
   // 加载中给 loading（骨架行，300ms 内回来不出）；加载完是空数组就显示 empty
   const [rows, setRows] = useState(null);
   useEffect(() => { const t = setTimeout(() => setRows([]), 1200); return () => clearTimeout(t); }, []);
-  return <Table columns={COLUMNS} rows={rows ?? []} loading={rows === null} empty="还没有镜头，先导入原文" label="镜头清单" compact />;
+  return <Table columns={COLUMNS} data={rows ?? []} loading={rows === null} empty="还没有镜头，先导入原文" label="镜头清单" compact />;
 }

@@ -23,9 +23,34 @@ export function Demo() {
 // 表格
 import { Table } from "satin-ui/react";
 const rows = [{ id: 1, name: "雨夜车站", shots: 48 }];
-export const T1 = <Table columns={[{ key: "name", title: "项目", sortable: true }, { key: "shots", title: "镜头", align: "right", format: (v) => v + " 个" }]} rows={rows} selectable selected={[1]} onSelect={(k) => k.length} onSort={(s) => s.dir} />;
+export const T1 = <Table columns={[{ key: "name", title: "项目", sortable: true }, { key: "shots", title: "镜头", align: "right", format: (v) => v + " 个" }]} rows={rows} selectable selected={[1]} onSelect={(k) => k.length} onSort={(s) => s?.dir} />;
 // @ts-expect-error columns 必须给
 export const T2 = <Table rows={rows} />;
+// 数据驱动：树形（children）、受控展开、合并、拖行拖列、改宽、出错重试；render 返回 JSX；ref 拿实例
+import { useRef } from "react";
+import type { TableProps, TableColumnReact } from "satin-ui/react";
+import type { SatinInstance, TableApi, TableSpan } from "satin-ui";
+type Shot = { id: string; name: string; owner: string; shots: number; children?: Shot[] };
+const tree: Shot[] = [{ id: "p1", name: "雨夜车站", owner: "林夏", shots: 48, children: [{ id: "p1.e1", name: "第 1 集", owner: "林夏", shots: 20 }] }];
+const tcols: TableColumnReact<Shot>[] = [
+  { key: "name", title: "项目", sortable: true, resizable: true, minWidth: 200, editable: true },
+  { key: "owner", title: "负责人", width: 120, merge: true, render: (v) => <b>{v}</b> },
+  { key: "shots", title: "镜头", align: "right", width: 80, sortFirst: "desc", merge: (a, b) => a.shots === b.shots },
+  { key: "act", type: "actions", render: () => <button type="button">更多</button> },
+];
+const spans = (rs: Shot[]): TableSpan[] => rs.map((r, i) => ({ row: i, key: "name", colSpan: r.children ? 1 : 2 }));
+export function TreeTable() {
+  const ref = useRef<(SatinInstance & TableApi) | null>(null);
+  const props: TableProps<Shot> = { columns: tcols, data: tree, expandedKeys: ["p1"], lines: "grid", spans, filter: (r) => r.shots > 0 };
+  return (
+    <Table {...props} ref={ref} draggableRows draggableColumns resizableRows cellSelect error="网络断了" onRetry={() => ref.current?.refresh()}
+      onExpandChange={(e) => e.keys.length + Number(e.expanded)} onRowReorder={(e) => e.keys.join() + e.parentKey} onColumnReorder={(e) => e.keys.length}
+      onColumnResize={(e) => e.width + e.widths[e.key]} onRowResize={(e) => e.height ?? 0} onCellEdit={(e) => String(e.value)} onLayout={(e) => e.rows.length}
+      empty={({ filtered }) => (filtered ? "没有匹配的" : "还没有")} rowAttrs={(r, c) => ({ "data-lv": c.level, "data-name": r.name })} />
+  );
+}
+// @ts-expect-error sortFirst 只能是 asc / desc
+export const T3 = <Table columns={[{ key: "name", sortFirst: "up" }]} data={tree} />;
 
 // 自己包重组件
 import { wrapSatin } from "satin-ui/react";

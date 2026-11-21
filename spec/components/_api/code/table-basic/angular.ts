@@ -4,7 +4,7 @@ import { createTable } from "satin-ui";
 const COLUMNS = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right" as const, sortable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 const ROWS = [
@@ -24,7 +24,7 @@ export class TableBasicComponent {
     const destroyRef = inject(DestroyRef);
     // 点表头排序，行按新顺序移到位；数字列右对齐、用等宽数字；渲染完再建（只在浏览器里跑），组件销毁时 destroy()
     afterNextRender(() => {
-      const it = createTable(this.host().nativeElement, { columns: COLUMNS, rows: ROWS, label: "镜头清单" });
+      const it = createTable(this.host().nativeElement, { columns: COLUMNS, data: ROWS, label: "镜头清单" });
       destroyRef.onDestroy(() => it.destroy());
     });
   }

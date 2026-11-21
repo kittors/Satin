@@ -32,8 +32,55 @@ export const TagInput = /* @__PURE__ */ wrap(S.createTagInput, { name: "SnTagInp
 // 密码框、邮箱框：v-model 绑值；label、help、name、placeholder（密码框 meter 出强度条）
 export const Password = /* @__PURE__ */ wrap(S.createPassword, { name: "SnPassword", props: ["value", "label", "help", "name", "id", "placeholder", "meter", "size", "autocomplete"] });
 export const Email = /* @__PURE__ */ wrap(S.createEmail, { name: "SnEmail", props: ["value", "label", "help", "name", "id", "placeholder", "size", "autocomplete"] });
-// 表格：v-model 绑勾选的行键（selected）；@sort、@rowclick
-export const Table = /* @__PURE__ */ wrap(S.createTable, { name: "SnTable", props: ["columns", "rows", "rowKey", "sort", "sortLocal", "selectable", "selected", "empty", "loading", "skeleton", "label", "striped", "compact", "plain", "lines", "maxHeight"], valueKey: "selected", events: ["select", "sort", "rowClick"], modelEvent: "select" });
+// 表格：:columns + :data（树形用 children）。v-model 绑勾上的行（selected），v-model:expanded 绑展开着的行（expandedKeys），v-model:sort 绑排序；
+// 事件 @sort、@select、@row-click、@expand-change、@row-reorder、@column-reorder、@column-resize、@row-resize、@cell-edit、@retry、@layout；
+// 自己画格子：插槽 #cell-<列的 key>="{ value, row, index }"，或者列的 render 返回 VNode（用 h() 写）；模板 ref 的 instance 是实例。
+// data 改了（换数组、就地 push / 改行里的字段）都跟着变：只换内容变了的行，行移到新位置
+// （属性、事件都写成字面量：defineComponent 的参数里有函数调用，打包时摇不掉，只用别的组件也会把表格带进来）
+const TABLE_PROPS = ["columns", "data", "rows", "rowKey", "sort", "defaultSort", "sortLocal", "selectable", "selected", "defaultSelected", "expanded", "expandedKeys", "defaultExpandedKeys", "filter", "spans", "draggableRows", "draggableColumns", "resizableRows", "cellSelect", "rowAttrs", "empty", "loading", "skeleton", "error", "label", "striped", "compact", "plain", "lines", "maxHeight"];
+const TABLE_EVENTS = ["sort", "select", "rowClick", "expandChange", "rowReorder", "columnReorder", "columnResize", "rowResize", "cellEdit", "retry", "layout"];
+const anyP = { type: null, default: undefined }, boolP = { type: Boolean, default: undefined };
+// 插槽在这个小组件的 render 里调（依赖跟着它收集：插槽里用到的响应式数据变了，这一格自己重画）
+const TableSlotCell = { name: "SnTableCell", props: { s: anyP, a: anyP }, render() { return this.s(this.a); } }; /* 布尔的写 Boolean：模板里 <Table selectable draggable-rows> 就是 true（不传还是 undefined） */
+export const Table = /* @__PURE__ */ defineComponent({
+  name: "SnTable", inheritAttrs: false,
+  props: { columns: anyP, data: anyP, rows: anyP, rowKey: anyP, sort: anyP, defaultSort: anyP, sortLocal: boolP, selectable: boolP, selected: anyP, defaultSelected: anyP, expanded: anyP, expandedKeys: anyP, defaultExpandedKeys: anyP, filter: anyP, spans: anyP,
+    draggableRows: boolP, draggableColumns: boolP, resizableRows: boolP, cellSelect: boolP, rowAttrs: anyP, empty: anyP, loading: boolP, skeleton: anyP, error: { type: [Boolean, String], default: undefined },
+    label: anyP, striped: boolP, compact: boolP, plain: boolP, lines: anyP, maxHeight: anyP, modelValue: anyP },
+  emits: ["sort", "select", "rowClick", "expandChange", "rowReorder", "columnReorder", "columnResize", "rowResize", "cellEdit", "retry", "layout", "update:modelValue", "update:expanded", "update:sort"],
+  setup(p, { emit, expose, attrs, slots }) {
+    const host = ref(null), inst = Vue.shallowRef(null), app = Vue.getCurrentInstance()?.appContext, cells = new Set();
+    // 插槽格子攒到微任务里一起画（同一帧、绘制之前）：表格是在 onMounted 里建的，钩子执行期间调插槽 Vue 会警告"在 render 外调插槽"
+    const pending = new Map(); let queued = false;
+    const later = (cell, vnode) => { pending.set(cell, vnode); if (queued) return; queued = true; queueMicrotask(() => { queued = false; for (const [c, v] of pending) if (c.isConnected) { Vue.render(v, c); cells.add(c); } pending.clear(); }); };
+    // 插槽 #cell-<key>、render 返回 VNode：用 Vue 的 render 画进格子（带上应用的上下文：全局组件、provide 都能用）；服务端和第一帧先空着
+    const cols = () => (p.columns || []).map((c) => {
+      const slot = slots["cell-" + c.key], fn = typeof c.render === "function" ? c.render : slot ? (v, row, ctx) => h(TableSlotCell, { s: slot, a: { value: v, row, index: ctx.index } }) : null;
+      return !fn ? c : { ...c, render: (v, row, ctx) => { if (!ctx.cell && fn !== c.render) return ""; /* 插槽只在挂上以后画（setup 里拼字符串时不调） */ const out = fn(v, row, ctx); if (!Vue.isVNode(out)) return out; if (!ctx.cell) return ""; out.appContext = app; if (fn !== c.render) later(ctx.cell, out); else { Vue.render(out, ctx.cell); cells.add(ctx.cell); } return undefined; } };
+    });
+    const dataKey = () => (p.data !== undefined ? "data" : "rows");
+    const opts = (fresh) => {
+      const o = {}; for (const k of TABLE_PROPS) if (p[k] !== undefined && k !== "expanded") o[k] = p[k];
+      if (p.modelValue !== undefined) o.selected = p.modelValue; if (p.expanded !== undefined) o.expandedKeys = p.expanded;
+      const d = p[dataKey()]; if (fresh && Array.isArray(d)) o[dataKey()] = [...d]; // 就地改的数组：交一个新数组过去，表格才知道要重新看
+      o.columns = cols(); return o;
+    };
+    const html = S.createTable.html(opts());
+    let unsetup = null;
+    onMounted(() => {
+      unsetup = setup();
+      const handlers = Object.fromEntries(TABLE_EVENTS.map((ev) => ["on" + ev[0].toUpperCase() + ev.slice(1), (d) => { emit(ev, d); if (ev === "select") emit("update:modelValue", d); if (ev === "expandChange") emit("update:expanded", d.keys); if (ev === "sort") emit("update:sort", d); }]));
+      inst.value = S.createTable(host.value.firstElementChild, { ...opts(), ...handlers });
+    });
+    // 数据深看（就地改也算）；别的选项浅看（数组类的受控值看到每一项）
+    const list = (v) => (Array.isArray(v) ? [...v] : v);
+    watch(() => p[dataKey()], () => inst.value?.update(opts(true)), { deep: true });
+    watch(() => [...TABLE_PROPS.filter((k) => k !== "data" && k !== "rows").map((k) => (k === "columns" ? p[k] : list(p[k]))), list(p.modelValue)], () => inst.value?.update(opts()));
+    onBeforeUnmount(() => { inst.value?.destroy(); inst.value = null; pending.clear(); for (const c of cells) Vue.render(null, c); cells.clear(); unsetup?.(); });
+    expose({ instance: inst });
+    return () => h("div", { ...attrs, ref: host, class: cx("sn-host", attrs.class), style: ["display: contents", attrs.style], innerHTML: html });
+  },
+});
 export const Search = /* @__PURE__ */ wrap(S.createSearch, { name: "SnSearch", props: ["search", "debounce", "placeholder", "label", "kbd", "id", "name", "size"], events: ["search"], modelEvent: null });
 export const CountInput = /* @__PURE__ */ wrap(S.createCount, { name: "SnCountInput", props: ["value", "max", "placeholder", "size", "id", "name"] });
 export const LongText = /* @__PURE__ */ wrap(S.createLongText, { name: "SnLongText", props: ["value", "max", "maxLines", "rows", "placeholder", "hint", "label", "id", "name"], events: ["change", "submit"] });
