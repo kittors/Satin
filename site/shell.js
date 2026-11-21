@@ -8,7 +8,9 @@ import { loadCatalog } from "./catalog.js";
 import { START, GUIDES } from "./pages.js";
 import { docPages, groupsOf } from "./nav-pages.js";
 import { ICONS } from "../packages/satin-ui/src/icons.js";
-import { fwButtonHTML, mountFwButtons, setFw } from "./fwpref.js";
+import { mountFwButtons, setFw } from "./fwpref.js";
+import { bindOverlays } from "../packages/satin-ui/src/overlay.js";
+import { icon } from "../packages/satin-ui/src/icons.js";
 import { setup } from "../packages/satin-ui/src/setup.js";
 // 官网自己用、组件库里没有的几个图标（Lucide 的 menu、smartphone、terminal、globe、languages）：窄屏顶栏的菜单按钮、文档目录里几页的图标
 ICONS.menu ??= '<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>';
@@ -31,10 +33,10 @@ export const onMode = (f) => modeSubs.add(f);
 // 换主题：先拍下旧画面，换完再整页交叉淡化（不给每个元素加颜色过渡，几千个元素一起过渡会卡）
 function applyMode(animate) {
   const t = resolve(pref()); if (root.dataset.theme === t) return;
-  const swap = () => { root.dataset.theme = t; for (const f of modeSubs) f(t); paintModeBtn(); };
+  const swap = () => { root.dataset.theme = t; for (const f of modeSubs) f(t); paintModeBtn(); paintAppearance(); };
   if (animate && document.startViewTransition && !reduced()) document.startViewTransition(swap).ready.catch(() => {}); else swap(); // 过渡被浏览器中途放弃时主题照样换好
 }
-export function setMode(p) { localStorage.setItem("satin-theme", p); applyMode(true); syncModeSegs(); }
+export function setMode(p) { localStorage.setItem("satin-theme", p); applyMode(true); syncModeSegs(); paintAppearance(); }
 mq.addEventListener("change", () => applyMode(true));
 addEventListener("storage", (e) => { if (e.key === "satin-theme") { applyMode(false); syncModeSegs(); } });
 
@@ -58,8 +60,9 @@ function paintModeBtn() {
 modeBtn?.addEventListener("click", () => setMode(root.dataset.theme === "dark" ? "light" : "dark"));
 
 // ———— 主题定制：外观 + 组件库现成的主题面板 ————
+let openThemePanel = () => {};
 {
-  const btn = $("[data-custom-btn]"), panel = $("[data-theme-panel]"); let mounted = false;
+  const btn = $("[data-appearance]") || $("[data-custom-btn]"), panel = $("[data-theme-panel]"); let mounted = false;
   const mount = () => {
     panel.innerHTML = '<div class="sn-th-sec"><span class="sn-th-h">外观</span><div class="sn-seg sn-sm" data-th="mode"><span class="sn-thumb"></span><button data-v="auto">跟随系统</button><button data-v="light">浅色</button><button data-v="dark">深色</button></div></div><div class="th-rest"></div>';
     mountThemePanel($(".th-rest", panel), { initSeg, injectIcons });
@@ -72,11 +75,27 @@ modeBtn?.addEventListener("click", () => setMode(root.dataset.theme === "dark" ?
     if (on) place();
     panel.classList.toggle("sn-open", on); btn.setAttribute("aria-expanded", String(on)); btn.classList.toggle("sn-is-open", on);
   };
-  btn?.addEventListener("click", () => open(!panel.classList.contains("sn-open")));
-  document.addEventListener("pointerdown", (e) => { if (panel?.classList.contains("sn-open") && !panel.contains(e.target) && !btn.contains(e.target)) open(false); });
+  if (btn?.matches("[data-custom-btn]")) btn.addEventListener("click", () => open(!panel.classList.contains("sn-open")));
+  if (panel && btn) openThemePanel = () => open(true);
+  document.addEventListener("pointerdown", (e) => { if (panel?.classList.contains("sn-open") && !panel.contains(e.target) && !btn.contains(e.target) && !e.target.closest?.(".s-appear-menu")) open(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel?.classList.contains("sn-open")) { open(false); btn.focus(); } });
   addEventListener("resize", () => panel?.classList.contains("sn-open") && place());
 }
+
+// ———— 外观：顶栏右边的太阳 / 月亮按钮，点开是组件库的按钮菜单（浅色、深色、跟随系统；主题调整…） ————
+const appearBtn = $("[data-appearance]"), appearMenu = $("#s-appear");
+function paintAppearance() {
+  const ic = $("[data-appearance-ic]"); if (!ic) return;
+  const dark = root.dataset.theme === "dark", p = pref();
+  ic.innerHTML = icon(dark ? "moon" : "sun", 18);
+  const label = "外观：" + (p === "auto" ? "跟随系统" : p === "dark" ? "深色" : "浅色");
+  appearBtn.dataset.tip = label; appearBtn.setAttribute("aria-label", label);
+  for (const it of $$("[data-mode]", appearMenu)) { const on = it.dataset.mode === p; it.classList.toggle("sn-sel", on); it.setAttribute("aria-checked", String(on)); }
+}
+appearMenu?.addEventListener("click", (e) => {
+  const it = e.target.closest("[data-mode]"); if (it) { setMode(it.dataset.mode); return; }
+  if (e.target.closest("[data-theme-adjust]")) setTimeout(() => openThemePanel(), 0); // 等菜单收起来再开面板
+});
 
 // ———— 搜索：组件库的命令面板，内容是全部文档页 ————
 let cmdk = null;
@@ -121,10 +140,10 @@ export function reveal(scope = document) {
   for (const el of $$(".rv:not(.sn-in)", scope)) io.observe(el);
 }
 
-// 新版官网：顶栏的"框架：React ▾"（全站的框架偏好，见 fwpref.js）——先换上按钮再统一换图标
-if (NEXT) for (const s of $$("[data-fw-slot]")) s.outerHTML = fwButtonHTML();
+// 框架偏好不在顶栏上（只在文档侧栏顶上、代码块头部，见 fwpref.js）；页面里写了 data-set-fw 的按钮点了就换
 document.addEventListener("click", (e) => { const b = e.target.closest("[data-set-fw]"); if (b) setFw(b.dataset.setFw); });
-injectIcons(); paintModeBtn();
+injectIcons(); paintModeBtn(); paintAppearance();
+bindOverlays(document); // 顶栏的外观菜单（data-fmenu）
 if (NEXT) mountFwButtons(document);
 // 新版官网：顶栏、首页主题区、页脚里的外观分段控件（跟随系统 / 浅色 / 深色）都在这里接（要等图标换好再量宽度）
 if (NEXT) for (const s of $$("[data-mode-seg]")) bindModeSeg(s);

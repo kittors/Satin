@@ -1,4 +1,3 @@
-"use client";
 import { Button, Icon } from "satin-ui/react";
 
 const SORTS = ["最近更新", "名称", "创建时间"];

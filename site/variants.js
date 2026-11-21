@@ -209,7 +209,7 @@ export function variants({ node, js = "", css = "", name, slug, htmlCode, inline
   // React：挂载时 setup()（引用计数）+ enhance(根元素, 自己的接线)，卸载时撤掉；<sn-xxx> 换成 satin-ui/react 的组件
   const rUsed = new Set(), jsx = toJSX(node, { ...opt, indent: "      ", used: rUsed });
   const rImp = mergeImports(['import { useEffect, useRef } from "react";', 'import { setup, enhance } from "satin-ui";', ...(rUsed.size ? [`import { ${[...rUsed].join(", ")} } from "satin-ui/react";`] : []), ...imports, ...cssImport]);
-  const react = `"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响\n${rImp.join("\n")}\n\nexport default function ${comp}() {\n  const ref = useRef(null);\n  useEffect(() => {\n    const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数\n    const off = ${wire("    ", "ref.current")}; // 接上标记里的交互，返回撤销函数\n    return () => { off(); unsetup(); };\n  }, []);\n  return (\n    <div ref={ref}>\n${jsx}\n    </div>\n  );\n}\n`;
+  const react = `${rImp.join("\n")}\n\nexport default function ${comp}() {\n  const ref = useRef(null);\n  useEffect(() => {\n    const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数\n    const off = ${wire("    ", "ref.current")}; // 接上标记里的交互，返回撤销函数\n    return () => { off(); unsetup(); };\n  }, []);\n  return (\n    <div ref={ref}>\n${jsx}\n    </div>\n  );\n}\n`;
 
   // Vue：同样的生命周期；<sn-xxx> 换成 satin-ui/vue 的组件
   const vUsed = new Set(), tpl = toHTML(node, { ...opt, indent: "    ", vue: true, used: vUsed });

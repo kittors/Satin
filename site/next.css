@@ -635,24 +635,117 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .dx-vars::-webkit-scrollbar { display: none; }
 .dx-vars .sn-seg button { padding: 0 12px; }
 
-/* ———— 10. 全站框架偏好（fwpref.js）：顶栏按钮、菜单、代码块头上的框架按钮、抽屉里那一行 ———— */
-.s-fw-btn { gap: 4px; }
-.s-fw-btn .s-fw-pre { color: var(--sn-label3); }
-.s-fw-btn .sn-ic { width: 14px; height: 14px; color: var(--sn-label3); }
-.s-fw-menu { min-width: 200px; }
-.s-fw-menu .s-fw-env { padding-left: 28px; color: var(--sn-label2); }
-.s-fw-menu .s-fw-note { white-space: normal; max-width: 220px; }
+/* ———— 10. 框架选择器（fwpref.js）：文档侧栏顶上、代码块头部、手机目录条；抽屉里是两列标志网格 ————
+   触发按钮：16px 标志 + 名字（14px / 500）+ 12px 箭头，高 32；菜单宽 220、内边距 6，一行 36：18px 标志、名字、版本（12px 三级灰）、选中的勾。
+   标志是各框架的官方标志（Simple Icons，CC0），用品牌色；不加"框架："字样，说明放在 Tooltip（"切换框架：React"） */
+.s-fw-btn { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 8px; border-radius: var(--sn-r-md);
+  font: 500 calc(14px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label); white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color .12s var(--sn-ease-out); }
+.s-fw-btn:hover, .s-fw-btn.sn-is-open { background: var(--sn-fill-hover); }
+.s-fw-btn:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
+.s-fw-btn .s-fw-logo { display: inline-flex; width: 16px; height: 16px; flex: none; }
+.s-fw-btn .s-fwlogo { width: 16px; height: 16px; }
+.s-fw-btn .s-fw-caret { width: 12px; height: 12px; flex: none; color: var(--sn-label3); transition: rotate .2s var(--sn-ease-out-strong); }
+.s-fw-btn.sn-is-open .s-fw-caret { rotate: 180deg; }
+.s-fw-side { width: 100%; padding: 0 10px; box-shadow: inset 0 0 0 1px var(--sn-line); }
+.s-fw-side .s-fw-caret { margin-left: auto; }
+.s-fw-icon { width: 32px; padding: 0; justify-content: center; border-radius: var(--sn-r-full); }
+.s-fw-code { height: 28px; padding: 0 8px 0 6px; gap: 6px; font-size: calc(13px * var(--fsx)); } /* 代码块头一行的高度（文件页签、复制按钮都是 28） */
+.sn-menu.s-fw-menu { width: 220px; min-width: 220px; max-width: 220px; padding: 6px; }
+.s-fw-menu .sn-item.s-fw-item { height: 36px; padding: 0 10px; gap: 10px; font: 500 calc(14px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label); }
+.s-fw-item .s-fwlogo { width: 18px; height: 18px; flex: none; }
+.s-fw-item .s-fw-n { flex: 1; min-width: 0; }
+.s-fw-item .s-fw-v { font: 400 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); font-variant-numeric: tabular-nums; }
+.s-fw-item .s-fw-ck { display: inline-flex; width: 16px; height: 16px; flex: none; opacity: 0; }
+.s-fw-item .s-fw-ck .sn-ic { width: 16px; height: 16px; color: var(--sn-label); }
+.s-fw-item.sn-sel .s-fw-ck { opacity: 1; }
+/* 侧栏：框架选择器钉在最上面，下面的目录自己滚（侧栏定高，目录占剩下的高度） */
+@media (min-width: 861px) { .n-docs .d-side { display: flex; flex-direction: column; height: calc(100vh - var(--nav-h)); max-height: none; padding: 16px 8px 0 0; } } /* 窄屏侧栏收进抽屉（上面 860 以下的 display: none） */
+.d-side-fw { flex: none; padding: 0 0 12px; }
+.d-side-list { flex: 1 1 0; min-height: 0; max-height: 100%; padding: 8px 0 40px; }
 .cx-fw { display: inline-flex; align-items: center; margin-right: 4px; }
-.sn-btn.cx-fwbtn { --sn-h: 26px; --sn-px: 8px; font-weight: 600; }
 .cx-note { margin-right: 8px; font: 400 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
 .d-fw-miss { padding: 10px 14px; border-radius: 10px; background: var(--sn-fill-subtle); color: var(--sn-label2); }
-.s-md-fw { flex: none; padding: 10px max(12px, env(safe-area-inset-right, 0px)) 0 16px; box-shadow: inset 0 1px 0 var(--sn-line); }
+/* 抽屉里：和侧栏一样的一行选择器，点开在下面展开列表（一行 44 高，手指好点） */
+.s-md-fw { flex: none; padding: 12px max(12px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px)); box-shadow: inset 0 1px 0 var(--sn-line); }
 .s-md-fw + .s-md-ft { box-shadow: none; padding-top: 10px; }
-.sn-btn.s-md-fwbtn { width: 100%; justify-content: flex-start; --sn-h: 40px; --sn-r: var(--sn-r-full); --sn-fs: 14px; }
-.sn-btn.s-md-fwbtn .sn-ic { margin-left: auto; }
+.s-md-fw .s-fw-side { height: 44px; padding: 0 12px; font-size: calc(15px * var(--fsx)); }
+.s-fw-list { display: grid; gap: 2px; margin-top: 6px; }
+.s-fw-list[hidden] { display: none; }
+.s-fw-row { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: var(--sn-r-md);
+  font: 500 calc(15px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color .12s var(--sn-ease-out); }
+.s-fw-row:active, .s-fw-row:hover { background: var(--sn-fill-hover); }
+.s-fw-row:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: -2px; }
+.s-fw-row .s-fwlogo { width: 18px; height: 18px; flex: none; }
+.s-fw-row .s-fw-n { flex: 1; min-width: 0; }
+.s-fw-row .s-fw-v { font: 400 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); }
+.s-fw-row .s-fw-ck { display: inline-flex; width: 16px; height: 16px; flex: none; opacity: 0; }
+.s-fw-row .s-fw-ck .sn-ic { width: 16px; height: 16px; color: var(--sn-label); }
+.s-fw-row.sn-sel .s-fw-ck { opacity: 1; }
+/* 快速上手、框架接入页：React / Vue 写法上面的"Vite | Next.js""Vite | Nuxt"页签 */
+.d-envtabs { display: inline-flex; gap: 2px; padding: 2px; margin: 4px 0 12px; border-radius: var(--sn-r-md); background: var(--sn-fill-subtle); }
+.d-envtabs button { all: unset; box-sizing: border-box; height: 28px; padding: 0 12px; border-radius: calc(var(--sn-r-md) - 2px); font: 500 calc(13px * var(--fsx))/28px var(--sn-sans); color: var(--sn-label2); cursor: pointer; transition: color .12s var(--sn-ease-out); }
+.d-envtabs button:hover { color: var(--sn-label); }
+.d-envtabs button[aria-selected="true"] { background: var(--sn-raised); color: var(--sn-label); box-shadow: 0 0 0 1px var(--sn-line); }
+.d-envtabs button:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
 .d-mtoc { gap: 8px; }
 @media (max-width: 1080px) { .d-mtoc { display: flex; flex-wrap: wrap; align-items: center; } }
 @media (min-width: 861px) { .d-mtoc-fw { display: none; } .d-mtoc:not(:has(> .d-mtoc-btn)) { display: none; } }
-@media (max-width: 860px) { .s-nav [data-fw-slot], .s-nav .s-fw-btn, .n-end .s-fw-btn { display: none; } }
+/* 框架标志的颜色：品牌色，深色主题下太深的换一档（黑色标志用正文色） */
+.s-fwlogo[data-fw-logo="html"] { color: #E34F26; }
+.s-fwlogo[data-fw-logo="react"] { color: #149ECA; }
+.s-fwlogo[data-fw-logo="vue"] { color: #42B883; }
+.s-fwlogo[data-fw-logo="svelte"] { color: #FF3E00; }
+.s-fwlogo[data-fw-logo="angular"] { color: #0F0F11; }
+.s-fwlogo[data-fw-logo="solid"] { color: #2C4F7C; }
+.s-fwlogo[data-fw-logo="preact"] { color: #673AB8; }
+.s-fwlogo[data-fw-logo="next"] { color: #000000; }
+.s-fwlogo[data-fw-logo="nuxt"] { color: #00DC82; }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="html"] { color: #F06A3A; }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="react"] { color: #61DAFB; }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="vue"] { color: #42D392; }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="svelte"] { color: #FF5A26; }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="angular"] { color: var(--sn-label); }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="solid"] { color: #6C9BD2; }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="preact"] { color: #9C7BE0; }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="next"] { color: var(--sn-label); }
+[data-theme="dark"] .s-fwlogo[data-fw-logo="nuxt"] { color: #00DC82; }
+
+/* ———— 11. 顶栏（2026-11-21 按 apple.com 的思路重做：只负责导航，内容优先，靠字和留白、不靠装饰） ————
+   高 56；左 20px 标志 + "Satin"（16px / 600）；中间 5 个导航（14px / 400，二级字色，悬停一级，当前页一级 + 500，不加底、不加下划线）；
+   右边两个 18px 细线图标按钮（搜索、外观）。在页面顶部完全透明；滚动以后底色半透明 + 虚化，底下 1px 细线——只有这一层淡入淡出（opacity，200ms） */
+html { --nav-h: 56px; }
+.s-nav { position: sticky; top: 0; z-index: 30; height: var(--nav-h); background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; transition: none; }
+.s-nav.s-nav-home { position: fixed; left: 0; right: 0; }
+.s-nav::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; pointer-events: none;
+  background: color-mix(in srgb, var(--sn-canvas) 72%, transparent); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px);
+  box-shadow: inset 0 -1px 0 var(--sn-line); transition: opacity .2s var(--sn-ease-out); }
+.s-nav.scrolled::before { opacity: 1; }
+.s-nav-in { position: relative; height: 100%; width: min(100%, var(--hdr-w, 1360px)); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; }
+.s-nav-home .s-nav-in { --hdr-w: calc(var(--nwrap, 1152px) + 48px); }
+.s-nav .s-logo { display: inline-flex; align-items: center; gap: 8px; height: 32px; font: 600 calc(16px * var(--fsx))/1 var(--sn-sans); letter-spacing: -.01em; color: var(--sn-label); text-decoration: none; }
+.s-nav .s-logo svg { width: 20px; height: 20px; flex: none; color: var(--sn-label); }
+.s-nav .s-links { position: absolute; left: 50%; translate: -50% 0; display: flex; align-items: center; gap: 32px; }
+.s-nav .s-links a { padding: 0; border-radius: 0; background: none; font: 400 calc(14px * var(--fsx))/calc(20px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); text-decoration: none; white-space: nowrap; transition: color .15s var(--sn-ease-out); }
+.s-nav .s-links a:hover { color: var(--sn-label); background: none; }
+.s-nav .s-links a[aria-current] { color: var(--sn-label); font-weight: 500; }
+.s-nav .s-links a:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 4px; border-radius: 4px; }
+.s-nav .s-nav-end { margin-left: auto; margin-right: -7px; display: flex; align-items: center; gap: 4px; } /* 按钮 32、图标 18：往右挪 7，图标和内容的右边缘对齐 */
+.s-hbtn { all: unset; box-sizing: border-box; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: var(--sn-r-full); color: var(--sn-label2); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color .15s var(--sn-ease-out); }
+.s-hbtn:hover, .s-hbtn.sn-is-open { color: var(--sn-label); }
+.s-hbtn:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 0; }
+.s-hbtn .sn-ic { width: 18px; height: 18px; }
+.s-appear-ic { display: inline-grid; place-items: center; width: 18px; height: 18px; }
+.sn-menu.s-appear-menu { min-width: 200px; }
+@media (max-width: 860px) {
+  /* 窄屏顶栏的搜索、菜单：和桌面一样只有线条图标，不加圆底（点击区仍是 44） */
+  .s-nav .sn-btn.s-mbtn { --sn-bg: transparent; --sn-fg: var(--sn-label); }
+  .s-nav .sn-btn.s-mbtn:active, .s-nav .sn-btn.s-mbtn[aria-expanded="true"] { --sn-bg: var(--sn-fill-hover); }
+  .s-nav .s-links, .s-nav .s-hbtn { display: none; }
+  .s-nav .s-nav-end { margin-right: 0; }
+  .s-nav-in { padding: 0 max(12px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
+  .s-nav { height: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); }
+}
+
 /* 组件页"设计规范"里的这样做 / 不要：一条一行 */
 .d-dodont ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; font: 400 calc(14px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); }

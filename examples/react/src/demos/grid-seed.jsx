@@ -1,4 +1,3 @@
-"use client";
 import { DataGrid } from "satin-ui/react/grid";
 
 export default function ShotListFixture() {

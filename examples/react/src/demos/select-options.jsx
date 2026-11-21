@@ -1,4 +1,3 @@
-"use client";
 import { Select } from "satin-ui/react";
 
 const STATUSES = [

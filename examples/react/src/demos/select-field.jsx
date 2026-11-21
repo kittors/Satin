@@ -1,4 +1,3 @@
-"use client";
 import { Select } from "satin-ui/react";
 
 const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];

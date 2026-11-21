@@ -90,8 +90,8 @@ if (CONTRACT.length) {
         // 契约里给了某个框架的手写写法（React 的受控 value / onChange、Vue 的 v-model 这类惯用法）：用手写的
         for (const [fw, code0] of Object.entries(e.code || {})) {
           if (!files[fw]) continue;
-          // React 的手写写法用到 useState 这类钩子：标上 "use client"（Next.js 里是客户端组件；Vite 里这一行没有影响）
-          const code = fw === "react" && !/^["']use client["']/.test(code0.trim()) ? `"use client";\n${code0}` : code0;
+          // "use client" 只加在拷进 Next.js 示例的那一份（见下面写文件的地方）；Vite 的 React 示例、官网上显示的代码不放这一行
+          const code = code0.replace(/^\s*["']use client["'];?\n/, "");
           files[fw][0] = { ...files[fw][0], code: code.endsWith("\n") ? code : code + "\n" };
         }
         host.remove();
@@ -131,7 +131,7 @@ for (const fw of FRAMEWORKS) {
   for (const env of fw.envs || []) for (const d of demos) {
     const files = d.files[fw.id]; if (!files) continue;
     const sub = env.id === "next" ? "app/demos" : "app/demos", dir = path.join(ROOT, env.dir, sub);
-    for (const f of files) { write(path.join(dir, f.name), f.code); nFiles++; }
+    for (const f of files) { write(path.join(dir, f.name), env.id === "next" && f === files[0] && /\b(useState|useEffect|useRef|useLayoutEffect|useReducer)\b/.test(f.code) && !/^["']use client["']/.test(f.code.trim()) ? `"use client";\n${f.code}` : f.code); nFiles++; }
   }
 }
 // 配方：每个框架 fw.recipe(id) 一份（+ 样式）；CLI 的 satin add 也读这一份（packages/satin-cli/templates/recipes/<id>/<写法>/）

@@ -1,4 +1,3 @@
-"use client";
 import { Button } from "satin-ui/react";
 
 export default function SaveActions() {

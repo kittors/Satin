@@ -29,22 +29,7 @@ function photos(scope = document) {
   }
 }
 
-// ———— 顶栏：往下滚，背后长出浮岛，两头往里收（位移量按浮岛宽度算好，只动 transform） ————
-{
-  const nav = $("[data-nav]"), inner = $(".n-nav-in", nav), logo = $(".n-logo", nav), end = $(".n-end", nav), links = $(".n-links", nav);
-  const measure = () => {
-    const small = innerWidth < 860, base = inner.getBoundingClientRect().left;
-    const want = small ? innerWidth - 16 : Math.max(680, logo.offsetWidth + links.offsetWidth + end.offsetWidth + 112);
-    const iw = Math.min(innerWidth - 16, want), il = (innerWidth - iw) / 2;
-    nav.style.setProperty("--iw", iw + "px");
-    nav.style.setProperty("--dl", Math.max(0, il + 16 - (base + logo.offsetLeft)) + "px");
-    nav.style.setProperty("--dr", Math.min(0, il + iw - 10 - (base + end.offsetLeft + end.offsetWidth)) + "px");
-  };
-  const onScroll = () => nav.classList.toggle("island", scrollY > 24);
-  addEventListener("resize", measure); addEventListener("scroll", onScroll, { passive: true });
-  measure(); onScroll();
-  document.fonts?.ready.then(measure);
-}
+// 顶栏：和文档页同一个（shell.js 管滚动后的底色和细线），不再有浮动胶囊
 
 // ———— 首屏的命令：点了复制（组件库的"已复制"反馈） ————
 for (const b of $$("[data-copy-cmd]")) b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(b.dataset.copyCmd); copied(b); } catch { toast({ icon: "circle-x", tone: "danger", text: "没能复制，手动选中命令复制吧", alert: true }); } });

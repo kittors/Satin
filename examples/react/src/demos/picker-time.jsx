@@ -1,4 +1,3 @@
-"use client";
 import { DatePicker } from "satin-ui/react";
 
 export default function ReminderTime() {

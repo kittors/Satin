@@ -13,7 +13,7 @@ import { USAGE, TALL, EX, WIN } from "./usage.js";
 import { EXAMPLES, API } from "./examples.js";
 import { img } from "./media.js";
 import { variants, demoCSS, guessInline, guessFlex } from "./variants.js";
-import { getFw, getEnv, onFw, setFw, fwButtonHTML, mountFwButtons } from "./fwpref.js";
+import { getFw, getEnv, onFw, setFw, fwButtonHTML, mountFwButtons, parseHash, hashOf, syncURL, followURL, envTab, setEnvTab } from "./fwpref.js";
 import { FRAMEWORKS } from "./frameworks.js";
 
 const side = $("[data-side]"), main = $("[data-main]"), toc = $("[data-toc]"), cat = await loadCatalog();
@@ -28,6 +28,7 @@ const byHash = new Map(pages.map((x) => [x.hash, x]));
 
 // ———— 左边目录（除了组件、配方各页，都带图标） ————
 {
+  // 最上面是框架选择器（全站的代码跟着换，钉在侧栏顶上不跟着滚）；下面是目录（自己的滚动区域）
   let html = "", g = null, sec = null;
   for (const pg of pages) {
     if (pg.section !== sec) { sec = pg.section; g = null; html += `<p>${sec}</p>`; }
@@ -35,8 +36,9 @@ const byHash = new Map(pages.map((x) => [x.hash, x]));
     const ic = pg.icon;
     html += `<a href="${pg.hash}"${ic ? ` data-i="${ic}:before"` : ""}>${pg.title}</a>`;
   }
-  side.innerHTML = html; injectIcons(side);
-  scrollArea(side, { inner: true, size: 32 });
+  side.innerHTML = `<div class="d-side-fw">${fwButtonHTML({ variant: "side" })}</div><div class="d-side-list">${html}</div>`; injectIcons(side);
+  scrollArea($(".d-side-list", side), { inner: true, size: 32 });
+  mountFwButtons(side);
 }
 const tocVp = scrollArea(toc, { inner: true, size: 24 }).vp; // 右边目录长了在自己的滚动区域里滚
 const sideLinks = new Map($$("a", side).map((a) => [a.getAttribute("href"), a]));
@@ -52,7 +54,7 @@ const BLOCK = {
   h2: (t) => anchor("s" + ++h2n, t),
   p: (h) => `<p>${h}</p>`,
   ul: (items) => `<ul class="d-list">${items.map((i) => `<li>${i}</li>`).join("")}</ul>`,
-  code: (lang, src, cap) => snippet(lang, src, cap),
+  code: (lang, src, cap) => (fwCtx ? codePanel([{ name: cap || "", lang, code: src }], { solo: true, nums: src.split("\n").length > 4, lead: fwLead() }) : snippet(lang, src, cap)),
   files: (files) => codePanel(files, { solo: true, nums: true }),
   rules: () => '<div data-async="rules"></div>',
   fw: (map) => `<div class="d-fw" data-fwb="${FWB.push(map) - 1}">${renderFwb(map)}</div>`,
@@ -200,7 +202,7 @@ async function codeFiles(kind, key) {
   return { note: fw.fallback || `${fw.name} 暂用自定义元素写法`, files: hc ? [{ name: hrel.split("/").pop(), lang: "html", code: hc }] : [] };
 }
 // 代码块头一行：框架按钮（点开换全站的框架）+ 文件名；没有专门写法时一行说明
-const fwLead = (note) => `<span class="cx-fw">${fwButtonHTML({ cls: "sn-btn sn-ghost sn-sm cx-fwbtn", prefix: "" })}</span>${note ? `<span class="cx-note">${esc(note)}</span>` : ""}`;
+const fwLead = (note) => `<span class="cx-fw">${fwButtonHTML({ variant: "code" })}</span>${note ? `<span class="cx-note">${esc(note)}</span>` : ""}`;
 async function fillCode(slot) {
   const kind = slot.dataset.recipe ? "recipe" : "demo", key = slot.dataset.recipe || slot.dataset.slug, want = getFw().id + (getEnv()?.id || "");
   const r = await codeFiles(kind, key); if (!slot.isConnected) return;
@@ -212,13 +214,20 @@ async function fillCode(slot) {
 const fillAll = (scope = main) => Promise.all($$(".dx-code[data-slug], .dx-code[data-recipe]", scope).map(fillCode));
 // 正文里跟着框架变的块（快速上手、框架接入、CLI 页）
 const FWB = [];
-const fwPick = (map) => { const fw = getFw(), env = getEnv(); return map[env?.id] || map[fw.id] || null; };
-const renderFwb = (map) => { const b = fwPick(map), fw = getFw(); return b ? blocks(b) : `<p class="d-fw-miss">${esc(fw.name)} 这一段还没有专门的写法，下面是纯 HTML（自定义元素）的写法，在 ${esc(fw.name)} 里同样能用。</p>` + blocks(map.html || []); };
+const fwPick = (map) => { const fw = getFw(), env = envTab(fw.id); return (env && map[env]) || map[fw.id] || null; };
+const envTabs = (map) => {
+  const fw = getFw(), envs = (fw.envs || []).filter((e) => map[e.id]); if (!envs.length || !map[fw.id]) return "";
+  const on = envTab(fw.id);
+  return `<div class="d-envtabs" role="tablist" aria-label="运行环境">${[{ id: "", name: "Vite" }, ...envs].map((e) => `<button type="button" role="tab" aria-selected="${e.id === on}" data-envtab="${e.id}">${esc(e.name)}</button>`).join("")}</div>`;
+};
+let fwCtx = false; // 正在画跟着框架变的块：里面的代码块头部带框架按钮
+const renderFwb = (map) => { fwCtx = true; try { return renderFwb0(map); } finally { fwCtx = false; } };
+const renderFwb0 = (map) => { const b = fwPick(map), fw = getFw(); return b ? envTabs(map) + blocks(b) : `<p class="d-fw-miss">${esc(fw.name)} 这一段还没有专门的写法，下面是纯 HTML（自定义元素）的写法，在 ${esc(fw.name)} 里同样能用。</p>` + blocks(map.html || []); };
 onFw(() => {
   fillAll();
-  for (const el of $$(".d-fw[data-fwb]", main)) { el.innerHTML = renderFwb(FWB[+el.dataset.fwb]); injectIcons(el); mountCode(el); }
+  for (const el of $$(".d-fw[data-fwb]", main)) { el.innerHTML = renderFwb(FWB[+el.dataset.fwb]); injectIcons(el); mountCode(el); mountFwButtons(el); }
   for (const el of $$("[data-fw-name]", main)) el.textContent = getFw().name + (getEnv() ? " · " + getEnv().name : "");
-  for (const el of $$(".d-fwr[data-fwr]", main)) { el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); for (const w of $$(".d-tablewrap", el)) scrollArea(w, { fade: "x", size: 20 }); }
+  for (const el of $$(".d-fwr[data-fwr]", main)) { el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); mountFwButtons(el); for (const w of $$(".d-tablewrap", el)) scrollArea(w, { fade: "x", size: 20 }); }
 });
 // 计算样式拿来判断空白要不要留：在演示文档里找同样标签、同样类名的元素
 const liveOf = (doc, el) => { if (!doc || !el.classList?.length) return null; try { return doc.querySelector(el.localName + "." + [...el.classList].map((c) => CSS.escape(c)).join(".")); } catch { return null; } };
@@ -630,7 +639,7 @@ function contractHTML(c, k) {
   if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">什么时候别用</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${x.use && cat.byId[x.use] ? ` → <a href="#/c/${x.use}">${esc(cat.byId[x.use].name)}</a>` : ""}</li>`).join("")}</ul>`);
   if (k.related?.length) out.push(`<h3 class="d-h3">和相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [cat.byId[r.id] ? `<a href="#/c/${r.id}">${esc(cat.byId[r.id].name)}</a>` : esc(r.id), md(r.diff)])));
   // 2. 引入（当前框架）
-  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return snippet("js", line, `${getFw().name}${getEnv() ? " · " + getEnv().name : ""}`); }), k.importNote ? fwr(() => { const t = fwText(k.importNote); return t ? `<p>${md(t)}</p>` : ""; }) : "");
+  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return codePanel([{ name: "", lang: "js", code: line }], { solo: true, lead: fwLead() }); }), k.importNote ? fwr(() => { const t = fwText(k.importNote); return t ? `<p>${md(t)}</p>` : ""; }) : "");
   // 3. 示例：由浅入深，每个都是现场演示 + 当前框架的代码
   out.push(anchor("examples", "示例"));
   for (const ex of k.examples || []) out.push(`<h3 class="d-h3" id="ex-${ex.slug}">${esc(ex.title)}</h3>`, ex.why ? `<p>${md(ex.why)}</p>` : "", playBox(c, ex));
@@ -708,7 +717,7 @@ async function fillAsync(scope, base) {
     try { el.outerHTML = await ASYNC[k](arg); } catch (e) { el.outerHTML = `<p class="d-err">这一块没能载入：${esc(e.message)}</p>`; }
   }));
   if (curPage?.hash !== base) return; // 载入期间已经换页了
-  injectIcons(main); mountCode(main);
+  injectIcons(main); mountCode(main); mountFwButtons(main);
   for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
   for (const box of $$(".dx:not([data-wired])", main)) { box.dataset.wired = ""; wireDemo(box, cat.byId[box.dataset.demo]); }
   pump();
@@ -725,10 +734,12 @@ function pager(pg) {
   const i = pages.indexOf(pg), a = pages[i - 1], b = pages[i + 1];
   return `<nav class="d-pager" aria-label="上一页和下一页">${a ? `<a href="${a.hash}"><span data-i="arrow-left"></span><span class="t">${a.title}</span></a>` : "<i></i>"}${b ? `<a class="next" href="${b.hash}"><span class="t">${b.title}</span><span data-i="arrow-right"></span></a>` : ""}</nav>`;
 }
+main.addEventListener("click", (e) => { const t = e.target.closest("[data-envtab]"); if (t) setEnvTab(getFw().id, t.dataset.envtab); });
 // 小节标题前的链接：点了复制这一节的地址
 main.addEventListener("click", (e) => {
   const a = e.target.closest("[data-anchor]"); if (!a) return; e.preventDefault();
-  const url = location.href.split("#")[0] + decodeURIComponent(location.hash).split(":")[0] + ":" + a.dataset.anchor;
+  const h = parseHash(); h.part = a.dataset.anchor; h.params.set("fw", getFw().id);
+  const url = location.href.split("#")[0] + hashOf(h);
   history.replaceState(null, "", url); navigator.clipboard?.writeText(url).catch(() => {});
   document.getElementById(a.dataset.anchor)?.scrollIntoView({ behavior: reduced() ? "instant" : "smooth", block: "start" });
 });
@@ -756,7 +767,7 @@ function buildToc(base) {
     const bar = document.createElement("div"); bar.className = "d-mtoc";
     bar.innerHTML = (tocHs.length >= 2 ? `<button class="d-mtoc-btn" type="button" data-fmenu="d-mtoc-menu" data-i="list:before">本页目录<span data-i="chevron-down"></span></button>`
       + `<div class="sn-menu d-mtoc-menu" id="d-mtoc-menu">${tocHs.map((h) => `<a class="sn-item" href="${base}:${h.id}" data-to="${h.id}">${esc(tt(h))}</a>`).join("")}</div>` : "")
-      + `<span class="d-mtoc-fw">${fwButtonHTML({ cls: "d-mtoc-btn", prefix: "框架：" })}</span>`;
+      + `<span class="d-mtoc-fw">${fwButtonHTML({ variant: "code" })}</span>`;
     hd.after(bar); injectIcons(bar); bindOverlays(bar); mountFwButtons(bar);
   }
 }
@@ -764,8 +775,10 @@ function buildToc(base) {
 // ———— 路由 ————
 let curPage = null, first = true;
 function route() {
-  const raw = decodeURIComponent(location.hash || "#/intro"), [base, part] = raw.split(":");
+  followURL(); // 网址里的 fw 变了（手改地址、带参数的链接）：先换框架
+  const { base: b0, part } = parseHash(location.hash || "#/intro"), base = b0 || "#/intro";
   const pg = byHash.get(base === "#/" || base === "#" ? "#/intro" : base);
+  queueMicrotask(syncURL); // 用户选过框架：换页以后把 ?fw= 写回网址（复制地址栏分享出去对方看到同一种写法）
   if (pg !== curPage) {
     if (!first && document.startViewTransition && !reduced()) {
       root.classList.add("vt-page");
@@ -788,7 +801,7 @@ function swapPage(pg, part) {
   } else {
     const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
     main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}">${body}${pager(pg)}</article>`;
-    injectIcons(main); mountCode(main);
+    injectIcons(main); mountCode(main); mountFwButtons(main);
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     for (const w of $$(".dx-wall", main)) { const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); }
     for (const box of $$(".dx", main)) { box.dataset.wired = ""; wireDemo(box, pg.c || cat.byId[box.dataset.demo]); }
@@ -808,15 +821,15 @@ function swapPage(pg, part) {
   pump(); // 滚到位以后再开始载演示：看得见的先载
 }
 addEventListener("hashchange", route);
-toc.addEventListener("click", (e) => { const a = e.target.closest("a[data-to]"); if (a && a.getAttribute("href") === location.hash) { e.preventDefault(); document.getElementById(a.dataset.to)?.scrollIntoView({ behavior: reduced() ? "instant" : "smooth", block: "start" }); } });
+toc.addEventListener("click", (e) => { const a = e.target.closest("a[data-to]"); if (a && a.getAttribute("href") === hashOf({ ...parseHash(), params: null })) { e.preventDefault(); document.getElementById(a.dataset.to)?.scrollIntoView({ behavior: reduced() ? "instant" : "smooth", block: "start" }); } });
 
 // ———— 窄屏：顶栏右边的菜单按钮打开导航抽屉（和首页同一套，见 mnav.js） ————
 const toItem = (pg) => ({ href: pg.hash, title: pg.title, icon: pg.icon });
 const mnav = mountMobileNav({
   sections: sectionsOf(pages).map((sc) => ({ name: sc.name, items: sc.items.map(toItem), cats: sc.cats.map((c) => ({ name: c.name, items: c.items.map(toItem) })) })),
   top: [{ href: "next.html", title: "首页", icon: "house" }],
-  current: (href) => href === (decodeURIComponent(location.hash || "#/intro").split(":")[0] || "#/intro"),
+  current: (href) => href === (parseHash().base || "#/intro"),
 });
 
 route();
-anchorTo = decodeURIComponent(location.hash).split(":")[1] || null; setTimeout(() => (anchorTo = null), 4000);
+anchorTo = parseHash().part; setTimeout(() => (anchorTo = null), 4000);

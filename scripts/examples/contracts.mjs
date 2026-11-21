@@ -22,12 +22,12 @@ for (const f of fs.readdirSync(SPEC).filter((x) => x.endsWith(".json"))) {
     for (const fw of FRAMEWORKS) {
       const code0 = e.code?.[fw.id];
       if (!code0) { console.log(`  ✗ ${e.slug} 没有 ${fw.name} 的写法`); continue; }
-      // React 的写法用到 useState 这类钩子：标上 "use client"（Next.js 里是客户端组件；Vite 里这一行没有影响）
-      const code = (fw.id === "react" && !/^["']use client["']/.test(code0.trim()) ? `"use client";\n${code0}` : code0).replace(/\s*$/, "\n");
+      const code = code0.replace(/^\s*["']use client["'];?\n/, "").replace(/\s*$/, "\n");
       const main = path.join(ROOT, fw.dir, fw.demo(e.slug));
       write(main, code); nFiles++;
-      // Next.js、Nuxt：和 React、Vue 同一份组件文件，拷进各自的示例
-      for (const env of fw.envs || []) { write(path.join(ROOT, env.dir, "app/demos", path.basename(main)), code); nFiles++; }
+      // Next.js、Nuxt：和 React、Vue 同一份组件文件，拷进各自的示例；Next.js 那份标上 "use client"（用到 useState 这类钩子的是客户端组件）。
+      // Vite 的 React 示例里不写这一行（官网上显示的是这一份，不放和 Vite 无关的样板）
+      for (const env of fw.envs || []) { write(path.join(ROOT, env.dir, "app/demos", path.basename(main)), env.id === "next" ? `"use client";\n${code}` : code); nFiles++; }
     }
   }
   console.log(`${c.id.padEnd(10)} 契约示例 ${c.examples.length} 个`);
