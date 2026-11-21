@@ -1,0 +1,12 @@
+<div class="sn-stack sn-gap-8" id="tabs-pager-box">
+  <sn-pager total="13" count="128" page="1"></sn-pager>
+  <span class="sn-help">第 1 页</span>
+</div>
+
+<script type="module">
+  const box = document.getElementById("tabs-pager-box");
+  box.addEventListener("sn-change", (e) => {
+    const v = e.detail;
+    box.querySelector(".sn-help").textContent = `第 ${v} 页`;
+  });
+</script>

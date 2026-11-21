@@ -69,6 +69,317 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "标签条 `role=\"tablist\"`、每个标签 `role=\"tab\"` + `aria-selected`、内容 `role=\"tabpanel\"`；只有选中的标签在 Tab 顺序里。",
+      "面包屑是 `<nav aria-label=\"位置\">`；分页按钮写了\"上一页\"\"下一页\"。"
+    ],
+    "focus": [
+      "方向键换标签时焦点跟着走；键盘聚焦时 2px 焦点环。"
+    ],
+    "notes": [
+      "步骤条只显示进度，不能点；要能跳回去时把做完的步骤写成按钮。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "标签页、面包屑、分页、步骤",
+  "lead": "标签页的下划线和分页的当前页，都是前缘先走、后缘跟上（和分段控件同一套）；新内容从所选标签那一侧滑进来。面包屑说在哪，步骤条说做到第几步。",
+  "whenToUse": [
+    "标签页：同一个对象的几块内容（概览、镜头、设置），一次看一块。",
+    "分页：一页放不下、要跳着看的列表。",
+    "步骤：分几步完成的流程（导入 → 拆分 → 生成）。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "切换同一份内容的看法（网格 / 列表）：用分段控件。",
+      "use": "segmented"
+    },
+    {
+      "text": "滚着看的长列表：用无限列表，不分页。",
+      "use": "vlist"
+    }
+  ],
+  "related": [
+    {
+      "id": "segmented",
+      "diff": "分段控件切换看法；标签页切换内容区。"
+    },
+    {
+      "id": "sidebar",
+      "diff": "侧栏在页面之间导航；标签页在一个页面里分块。"
+    }
+  ],
+  "import": {
+    "html": "// 入口里调过 defineElements()：标签页写 <sn-tabs>、分页写 <sn-pager>；步骤条照设计稿写，用 setStep() 换步",
+    "react": "import { Tabs, Pager, Steps } from \"satin-ui/react\";",
+    "vue": "import { Tabs, Pager, Steps } from \"satin-ui/vue\";",
+    "svelte": "import Tabs from \"satin-ui/svelte/Tabs.svelte\"; // 分页：satin-ui/svelte/Pager.svelte",
+    "angular": "// 入口里调过 defineElements()：模板里写 <sn-tabs>、<sn-pager>（组件加 CUSTOM_ELEMENTS_SCHEMA）",
+    "solid": "// 入口里调过 defineElements()：直接写 <sn-tabs>、<sn-pager>",
+    "preact": "import { Tabs, Pager, Steps } from \"satin-ui/react\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`<Tabs tabs value onChange>`：`tabs` 是 `{ label, badge?, content }`，`value` 是第几个（从 0 数）、受控，`defaultValue` 非受控。分页 `<Pager total page onChange>`，步骤 `<Steps steps current>`。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Tabs`、`Pager`、`Steps`。",
+    "vue": "`<Tabs v-model :tabs>`（v-model 是第几个）；分页 `<Pager v-model :total>`；步骤 `<Steps :steps :current>`。",
+    "svelte": "`Tabs`、`Pager` 组件（`bind:value`、`bind:page`）；步骤条照设计稿的标记写。",
+    "angular": "写 `<sn-tabs [attr.tabs]=\"JSON\" [attr.value]>`，换标签发冒泡的 `(sn-change)`；分页 `<sn-pager>` 同理；步骤条用 `@for` 写标记。",
+    "solid": "写 `<sn-tabs tabs={JSON} value={tab()}>`，`sn-change` 用 `ref` 挂监听；步骤条用 `<For>` 写标记。",
+    "html": "`<sn-tabs tabs='[…]' value=\"0\">`、`<sn-pager total=\"13\" page=\"1\">`，换了发冒泡的 `sn-change`；步骤条 `.sn-steps` 照设计稿写，`setStep(步骤条, 第几步)` 换步；面包屑 `nav.sn-crumbs`。"
+  },
+  "dts": {
+    "factory": "createTabs",
+    "react": "Tabs",
+    "vue": "Tabs",
+    "svelte": "Tabs",
+    "functions": [
+      "setStep",
+      "stepsHTML"
+    ]
+  },
+  "props": [
+    {
+      "name": "tabs",
+      "type": "{ label: string; badge?: string | number; content?: string; html?: string }[]",
+      "default": "[]",
+      "required": true,
+      "desc": "标签：`label` 名字，`badge` 后面的数量，`content` 这一块的内容（纯文字；带格式给 `html`）。",
+      "names": {
+        "js": "tabs",
+        "react": "tabs",
+        "vue": "tabs",
+        "svelte": "tabs",
+        "preact": "tabs",
+        "element": "tabs（JSON）",
+        "html": "tabs（JSON）"
+      }
+    },
+    {
+      "name": "value",
+      "type": "number",
+      "default": "0",
+      "required": false,
+      "desc": "选中第几个（从 0 数）。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`；传进来的值换了就滑过去。",
+      "names": {
+        "js": "value",
+        "react": "value",
+        "vue": "v-model",
+        "svelte": "bind:value",
+        "preact": "value",
+        "element": "value",
+        "html": "value"
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "number",
+      "default": "0",
+      "required": false,
+      "desc": "非受控的初始值（Vue 里不绑 v-model、只写 :value 也是这个意思）。",
+      "names": {
+        "react": "defaultValue",
+        "preact": "defaultValue",
+        "vue": "value"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "change",
+      "payload": "number",
+      "when": "点了另一个标签、或者用方向键换了以后（程序里改 value 不触发）。",
+      "names": {
+        "js": "onChange",
+        "react": "onChange",
+        "vue": "@update:modelValue / @change",
+        "svelte": "onchange",
+        "preact": "onChange",
+        "angular": "(sn-change)",
+        "solid": "sn-change（ref 挂监听）",
+        "element": "sn-change",
+        "html": "sn-change（e.detail）"
+      }
+    }
+  ],
+  "slots": [],
+  "methods": [
+    {
+      "name": "value",
+      "kind": "property",
+      "signature": "readonly value: number",
+      "returns": "number",
+      "desc": "现在是第几个。"
+    },
+    {
+      "name": "select",
+      "kind": "method",
+      "signature": "select(index: number): void",
+      "returns": "void",
+      "desc": "换到第几个（下划线滑过去，发 change）。"
+    }
+  ],
+  "functions": [
+    {
+      "name": "setStep",
+      "signature": "setStep(steps: HTMLElement, index: number): number",
+      "returns": "number",
+      "from": "satin-ui",
+      "desc": "步骤条换到第几步（超出范围按边界算），连线和圆圈跟着动；返回现在是第几步。"
+    },
+    {
+      "name": "stepsHTML",
+      "signature": "stepsHTML(o?: { steps?: string[]; current?: number }): string",
+      "returns": "string",
+      "from": "satin-ui",
+      "desc": "拼出步骤条的标记（服务端渲染、模板里用）。"
+    }
+  ],
+  "cssVars": [
+    {
+      "name": "--sn-accent",
+      "desc": "下划线、当前页、当前步骤的颜色（就是正文色）",
+      "default": "#1d1d1f",
+      "token": true
+    },
+    {
+      "name": "--sn-label3",
+      "desc": "没选中的标签、没到的步骤",
+      "default": "#6e6e73",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-tabs > .sn-tab-list[role=tablist] / .sn-ink",
+      "desc": "标签页 / 下划线"
+    },
+    {
+      "name": ".sn-tab-panels > .sn-tab-panel",
+      "desc": "每一块内容"
+    },
+    {
+      "name": ".sn-pager / .sn-pages / .sn-total",
+      "desc": "分页 / 页码 / \"共 128 条\""
+    },
+    {
+      "name": ".sn-steps > .sn-st(.sn-done | .sn-cur) / .sn-ln",
+      "desc": "步骤条：步骤（做完 / 当前）/ 连线"
+    },
+    {
+      "name": "nav.sn-crumbs",
+      "desc": "面包屑：a 是能点的层级，最后一级写 b"
+    }
+  ],
+  "types": [
+    "TabsOptions"
+  ],
+  "keyboard": [
+    {
+      "keys": "← / →",
+      "does": "标签页、分页里换到上一个 / 下一个。"
+    },
+    {
+      "keys": "Home / End",
+      "does": "第一个 / 最后一个标签。"
+    },
+    {
+      "keys": "Tab",
+      "does": "从标签条进到下面的内容。"
+    }
+  ],
+  "design": {
+    "do": [
+      "标签两到六个、一两个词；数量写在 badge 里。",
+      "分页写总数：\"共 128 条\"。",
+      "步骤三到五步，名字用动词短语。"
+    ],
+    "dont": [
+      {
+        "text": "选中的标签用彩色底、加粗。",
+        "rule": "nav-selected"
+      },
+      {
+        "text": "标签挤得换行、横向溢出。",
+        "rule": "button-wrap"
+      }
+    ],
+    "copy": [
+      "标签用名词：\"概览\"\"镜头\"\"配音\"。"
+    ],
+    "motion": [
+      {
+        "what": "下划线、当前页：前缘先走、后缘跟上",
+        "easing": "ease.outStrong / ease.inOut",
+        "duration": "300ms 左右"
+      },
+      {
+        "what": "新内容从所选标签那一侧滑进来",
+        "easing": "ease.out",
+        "duration": "240ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "tabs-basic",
+      "title": "最简单的用法",
+      "why": "给标签和内容就能用：组件自己管选中，下划线滑过去。",
+      "html": "<sn-tabs tabs='[{\"label\":\"概览\",\"content\":\"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\"},{\"label\":\"镜头\",\"badge\":48,\"content\":\"镜头列表：按集分组，可以拖动排序。\"},{\"label\":\"配音\",\"content\":\"配音：林夏、周屿两个角色，6 段。\"}]'></sn-tabs>",
+      "code": {
+        "html": "<sn-tabs tabs='[\n  {\"label\":\"概览\",\"content\":\"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\"},\n  {\"label\":\"镜头\",\"badge\":48,\"content\":\"镜头列表：按集分组，可以拖动排序。\"},\n  {\"label\":\"配音\",\"content\":\"配音：林夏、周屿两个角色，6 段。\"}\n]'></sn-tabs>\n",
+        "react": "import { Tabs } from \"satin-ui/react\";\n\nconst TABS = [\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n];\n\nexport default function ProjectTabs() {\n  return <Tabs tabs={TABS} />;\n}\n",
+        "vue": "<script setup>\nimport { Tabs } from \"satin-ui/vue\";\n\nconst TABS = [\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n];\n</script>\n\n<template>\n  <Tabs :tabs=\"TABS\" />\n</template>\n",
+        "svelte": "<script>\n  import Tabs from \"satin-ui/svelte/Tabs.svelte\";\n\n  const TABS = [\n    { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n    { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n    { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n  ];\n</script>\n\n<Tabs tabs={TABS} />\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n// 自定义元素的属性只认字符串：数组写成 JSON\nconst TABS = JSON.stringify([\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n]);\n\n@Component({\n  selector: \"demo-tabs-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-tabs>\n  template: `<sn-tabs [attr.tabs]=\"tabs\"></sn-tabs>`,\n})\nexport class TabsBasicComponent {\n  protected tabs = TABS;\n}\n",
+        "solid": "// 自定义元素的属性只认字符串：数组写成 JSON\nconst TABS = JSON.stringify([\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n]);\n\nexport default function ProjectTabs() {\n  return <sn-tabs tabs={TABS}></sn-tabs>;\n}\n",
+        "preact": "import { Tabs } from \"satin-ui/react\";\n\nconst TABS = [\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n];\n\nexport default function ProjectTabs() {\n  return <Tabs tabs={TABS} />;\n}\n"
+      }
+    },
+    {
+      "slug": "tabs-controlled",
+      "title": "受控：从外面换标签",
+      "why": "选中的放在父组件里：显示在别处，也能从外面换。",
+      "html": "<div class=\"sn-stack sn-gap-8\"><sn-tabs value=\"1\" tabs='[{\"label\":\"概览\",\"content\":\"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\"},{\"label\":\"镜头\",\"badge\":48,\"content\":\"镜头列表：按集分组，可以拖动排序。\"},{\"label\":\"配音\",\"content\":\"配音：林夏、周屿两个角色，6 段。\"}]'></sn-tabs><div class=\"sn-row\"><span class=\"sn-help\">现在看的是：镜头</span><button type=\"button\" class=\"sn-btn sn-secondary sn-sm\">去配音</button></div></div>",
+      "code": {
+        "html": "<div class=\"sn-stack sn-gap-8\" id=\"tabs-box\">\n  <sn-tabs value=\"1\" tabs='[\n    {\"label\":\"概览\",\"content\":\"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\"},\n    {\"label\":\"镜头\",\"badge\":48,\"content\":\"镜头列表：按集分组，可以拖动排序。\"},\n    {\"label\":\"配音\",\"content\":\"配音：林夏、周屿两个角色，6 段。\"}\n  ]'></sn-tabs>\n  <div class=\"sn-row\"><span class=\"sn-help\">现在看的是：镜头</span><button type=\"button\" class=\"sn-btn sn-secondary sn-sm\">去配音</button></div>\n</div>\n\n<script type=\"module\">\n  // 换标签时发冒泡的 sn-change，e.detail 是第几个；从外面换：改 value 属性\n  const box = document.getElementById(\"tabs-box\"), tabs = box.querySelector(\"sn-tabs\"), help = box.querySelector(\".sn-help\");\n  const NAMES = [\"概览\", \"镜头\", \"配音\"];\n  box.addEventListener(\"sn-change\", (e) => { help.textContent = \"现在看的是：\" + NAMES[e.detail]; });\n  box.querySelector(\"button\").addEventListener(\"click\", () => { tabs.setAttribute(\"value\", \"2\"); help.textContent = \"现在看的是：配音\"; });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, Tabs } from \"satin-ui/react\";\n\nconst TABS = [\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n];\n\nexport default function ProjectTabsControlled() {\n  const [tab, setTab] = useState(1);\n  return (\n    <div className=\"sn-stack sn-gap-8\">\n      <Tabs tabs={TABS} value={tab} onChange={setTab} />\n      <div className=\"sn-row\">\n        <span className=\"sn-help\">现在看的是：{TABS[tab].label}</span>\n        <Button size=\"sm\" onClick={() => setTab(2)}>去配音</Button>\n      </div>\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, Tabs } from \"satin-ui/vue\";\n\nconst TABS = [\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n];\nconst tab = ref(1);\n</script>\n\n<template>\n  <div class=\"sn-stack sn-gap-8\">\n    <Tabs v-model=\"tab\" :tabs=\"TABS\" />\n    <div class=\"sn-row\">\n      <span class=\"sn-help\">现在看的是：{{ TABS[tab].label }}</span>\n      <Button size=\"sm\" @click=\"tab = 2\">去配音</Button>\n    </div>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Tabs from \"satin-ui/svelte/Tabs.svelte\";\n\n  const TABS = [\n    { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n    { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n    { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n  ];\n  let tab = $state(1);\n</script>\n\n<div class=\"sn-stack sn-gap-8\">\n  <Tabs tabs={TABS} bind:value={tab} />\n  <div class=\"sn-row\">\n    <span class=\"sn-help\">现在看的是：{TABS[tab].label}</span>\n    <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" onclick={() => (tab = 2)}>去配音</button>\n  </div>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\n\nconst LIST = [\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n];\n\n@Component({\n  selector: \"demo-tabs-controlled\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-tabs>\n  template: `\n    <div class=\"sn-stack sn-gap-8\">\n      <sn-tabs [attr.tabs]=\"tabs\" [attr.value]=\"tab()\" (sn-change)=\"tab.set($any($event).detail)\"></sn-tabs>\n      <div class=\"sn-row\">\n        <span class=\"sn-help\">现在看的是：{{ list[tab()].label }}</span>\n        <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" (click)=\"tab.set(2)\">去配音</button>\n      </div>\n    </div>\n  `,\n})\nexport class TabsControlledComponent {\n  protected list = LIST;\n  // 自定义元素的属性只认字符串：数组写成 JSON\n  protected tabs = JSON.stringify(LIST);\n  protected tab = signal(1);\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\nconst LIST = [\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n];\n// 自定义元素的属性只认字符串：数组写成 JSON\nconst TABS = JSON.stringify(LIST);\n// 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）\nconst on = (type, fn) => (el) => el.addEventListener(type, fn);\n\nexport default function ProjectTabsControlled() {\n  const [tab, setTab] = createSignal(1);\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <sn-tabs tabs={TABS} value={tab()} ref={on(\"sn-change\", (e) => setTab(e.detail))}></sn-tabs>\n      <div class=\"sn-row\">\n        <span class=\"sn-help\">现在看的是：{LIST[tab()].label}</span>\n        <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" onClick={() => setTab(2)}>去配音</button>\n      </div>\n    </div>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Button, Tabs } from \"satin-ui/react\";\n\nconst TABS = [\n  { label: \"概览\", content: \"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。\" },\n  { label: \"镜头\", badge: 48, content: \"镜头列表：按集分组，可以拖动排序。\" },\n  { label: \"配音\", content: \"配音：林夏、周屿两个角色，6 段。\" },\n];\n\nexport default function ProjectTabsControlled() {\n  const [tab, setTab] = useState(1);\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <Tabs tabs={TABS} value={tab} onChange={setTab} />\n      <div class=\"sn-row\">\n        <span class=\"sn-help\">现在看的是：{TABS[tab].label}</span>\n        <Button size=\"sm\" onClick={() => setTab(2)}>去配音</Button>\n      </div>\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "tabs-pager",
+      "title": "分页",
+      "why": "`total` 是一共几页，`count` 写总条数；当前页受控。",
+      "html": "<div class=\"sn-stack sn-gap-8\"><sn-pager total=\"13\" count=\"128\" page=\"1\"></sn-pager><span class=\"sn-help\">第 1 页</span></div>",
+      "code": {
+        "html": "<div class=\"sn-stack sn-gap-8\" id=\"tabs-pager-box\">\n  <sn-pager total=\"13\" count=\"128\" page=\"1\"></sn-pager>\n  <span class=\"sn-help\">第 1 页</span>\n</div>\n\n<script type=\"module\">\n  const box = document.getElementById(\"tabs-pager-box\");\n  box.addEventListener(\"sn-change\", (e) => {\n    const v = e.detail;\n    box.querySelector(\".sn-help\").textContent = `第 ${v} 页`;\n  });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Pager } from \"satin-ui/react\";\n\nexport default function ShotPager() {\n  const [page, setPage] = useState(1);\n  return (\n    <div className=\"sn-stack sn-gap-8\">\n      <Pager total={13} count={128} page={page} onChange={setPage} />\n      <span className=\"sn-help\">第 {page} 页</span>\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Pager } from \"satin-ui/vue\";\n\nconst page = ref(1);\n</script>\n\n<template>\n  <div class=\"sn-stack sn-gap-8\">\n    <Pager v-model=\"page\" :total=\"13\" :count=\"128\" />\n    <span class=\"sn-help\">第 {{ page }} 页</span>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Pager from \"satin-ui/svelte/Pager.svelte\";\n\n  let page = $state(1);\n</script>\n\n<div class=\"sn-stack sn-gap-8\">\n  <Pager total={13} count={128} bind:page={page} />\n  <span class=\"sn-help\">第 {page} 页</span>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-tabs-pager\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-pager>\n  template: `\n    <div class=\"sn-stack sn-gap-8\">\n      <sn-pager total=\"13\" count=\"128\" [attr.page]=\"page()\" (sn-change)=\"page.set($any($event).detail)\"></sn-pager>\n      <span class=\"sn-help\">第 {{ page() }} 页</span>\n    </div>\n  `,\n})\nexport class TabsPagerComponent {\n  protected page = signal(1);\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\n// 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）\nconst on = (type, fn) => (el) => el.addEventListener(type, fn);\n\nexport default function ShotPager() {\n  const [page, setPage] = createSignal(1);\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <sn-pager total=\"13\" count=\"128\" page={page()} ref={on(\"sn-change\", (e) => setPage(e.detail))}></sn-pager>\n      <span class=\"sn-help\">第 {page()} 页</span>\n    </div>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Pager } from \"satin-ui/react\";\n\nexport default function ShotPager() {\n  const [page, setPage] = useState(1);\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <Pager total={13} count={128} page={page} onChange={setPage} />\n      <span class=\"sn-help\">第 {page} 页</span>\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "tabs-steps",
+      "title": "步骤条",
+      "why": "分几步完成的流程：做完的打勾，当前的高亮，连线跟着走。",
+      "html": "<div class=\"sn-stack sn-gap-12\"><div class=\"sn-steps\"><span class=\"sn-st sn-done\"><span class=\"sn-n\">1</span>导入原文</span><span class=\"sn-ln sn-done\"><i></i></span><span class=\"sn-st sn-cur\"><span class=\"sn-n\">2</span>拆分章节</span><span class=\"sn-ln\"><i></i></span><span class=\"sn-st\"><span class=\"sn-n\">3</span>生成分镜</span><span class=\"sn-ln\"><i></i></span><span class=\"sn-st\"><span class=\"sn-n\">4</span>配音</span></div><div class=\"sn-row\"><button type=\"button\" class=\"sn-btn sn-secondary sn-sm\">上一步</button><button type=\"button\" class=\"sn-btn sn-primary sn-sm\">下一步</button></div></div>",
+      "code": {
+        "html": "<div class=\"sn-stack sn-gap-12\" id=\"steps-box\">\n  <div class=\"sn-steps\"><span class=\"sn-st sn-done\"><span class=\"sn-n\">1</span>导入原文</span><span class=\"sn-ln sn-done\"><i></i></span><span class=\"sn-st sn-cur\"><span class=\"sn-n\">2</span>拆分章节</span><span class=\"sn-ln\"><i></i></span><span class=\"sn-st\"><span class=\"sn-n\">3</span>生成分镜</span><span class=\"sn-ln\"><i></i></span><span class=\"sn-st\"><span class=\"sn-n\">4</span>配音</span></div>\n  <div class=\"sn-row\"><button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-step=\"-1\">上一步</button><button type=\"button\" class=\"sn-btn sn-primary sn-sm\" data-step=\"1\">下一步</button></div>\n</div>\n\n<script type=\"module\">\n  import { setStep } from \"satin-ui\";\n  // setStep(步骤条, 第几步)：连线和圆圈跟着动，返回现在是第几步\n  const box = document.getElementById(\"steps-box\"), steps = box.querySelector(\".sn-steps\");\n  let cur = 1;\n  box.addEventListener(\"click\", (e) => { const b = e.target.closest(\"[data-step]\"); if (b) cur = setStep(steps, cur + Number(b.dataset.step)); });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, Steps } from \"satin-ui/react\";\n\nconst STEPS = [\"导入原文\", \"拆分章节\", \"生成分镜\", \"配音\"];\n\nexport default function MakeSteps() {\n  const [cur, setCur] = useState(1);\n  return (\n    <div className=\"sn-stack sn-gap-12\">\n      <Steps steps={STEPS} current={cur} />\n      <div className=\"sn-row\">\n        <Button size=\"sm\" disabled={cur === 0} onClick={() => setCur(cur - 1)}>上一步</Button>\n        <Button size=\"sm\" variant=\"primary\" disabled={cur === STEPS.length - 1} onClick={() => setCur(cur + 1)}>下一步</Button>\n      </div>\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, Steps } from \"satin-ui/vue\";\n\nconst STEPS = [\"导入原文\", \"拆分章节\", \"生成分镜\", \"配音\"];\nconst cur = ref(1);\n</script>\n\n<template>\n  <div class=\"sn-stack sn-gap-12\">\n    <Steps :steps=\"STEPS\" :current=\"cur\" />\n    <div class=\"sn-row\">\n      <Button size=\"sm\" :disabled=\"cur === 0\" @click=\"cur--\">上一步</Button>\n      <Button size=\"sm\" variant=\"primary\" :disabled=\"cur === STEPS.length - 1\" @click=\"cur++\">下一步</Button>\n    </div>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  const STEPS = [\"导入原文\", \"拆分章节\", \"生成分镜\", \"配音\"];\n  let cur = $state(1);\n</script>\n\n<div class=\"sn-stack sn-gap-12\">\n  <div class=\"sn-steps\">\n    {#each STEPS as s, i (s)}\n      {#if i}<span class=\"sn-ln\" class:sn-done={i <= cur}><i></i></span>{/if}\n      <span class=\"sn-st\" class:sn-done={i < cur} class:sn-cur={i === cur}><span class=\"sn-n\">{i + 1}</span>{s}</span>\n    {/each}\n  </div>\n  <div class=\"sn-row\">\n    <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" disabled={cur === 0} onclick={() => cur--}>上一步</button>\n    <button type=\"button\" class=\"sn-btn sn-primary sn-sm\" disabled={cur === STEPS.length - 1} onclick={() => cur++}>下一步</button>\n  </div>\n</div>\n",
+        "angular": "import { Component, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-tabs-steps\",\n  template: `\n    <div class=\"sn-stack sn-gap-12\">\n      <div class=\"sn-steps\">\n        @for (s of steps; track s; let i = $index) {\n          @if (i) { <span class=\"sn-ln\" [class.sn-done]=\"i <= cur()\"><i></i></span> }\n          <span class=\"sn-st\" [class.sn-done]=\"i < cur()\" [class.sn-cur]=\"i === cur()\"><span class=\"sn-n\">{{ i + 1 }}</span>{{ s }}</span>\n        }\n      </div>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" [disabled]=\"cur() === 0\" (click)=\"cur.set(cur() - 1)\">上一步</button>\n        <button type=\"button\" class=\"sn-btn sn-primary sn-sm\" [disabled]=\"cur() === steps.length - 1\" (click)=\"cur.set(cur() + 1)\">下一步</button>\n      </div>\n    </div>\n  `,\n})\nexport class TabsStepsComponent {\n  protected steps = [\"导入原文\", \"拆分章节\", \"生成分镜\", \"配音\"];\n  protected cur = signal(1);\n}\n",
+        "solid": "import { createSignal, For, Show } from \"solid-js\";\n\nconst STEPS = [\"导入原文\", \"拆分章节\", \"生成分镜\", \"配音\"];\n\nexport default function MakeSteps() {\n  const [cur, setCur] = createSignal(1);\n  return (\n    <div class=\"sn-stack sn-gap-12\">\n      <div class=\"sn-steps\">\n        <For each={STEPS}>\n          {(s, i) => (\n            <>\n              <Show when={i()}><span class=\"sn-ln\" classList={{ \"sn-done\": i() <= cur() }}><i></i></span></Show>\n              <span class=\"sn-st\" classList={{ \"sn-done\": i() < cur(), \"sn-cur\": i() === cur() }}><span class=\"sn-n\">{i() + 1}</span>{s}</span>\n            </>\n          )}\n        </For>\n      </div>\n      <div class=\"sn-row\">\n        <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" disabled={cur() === 0} onClick={() => setCur(cur() - 1)}>上一步</button>\n        <button type=\"button\" class=\"sn-btn sn-primary sn-sm\" disabled={cur() === STEPS.length - 1} onClick={() => setCur(cur() + 1)}>下一步</button>\n      </div>\n    </div>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Button, Steps } from \"satin-ui/react\";\n\nconst STEPS = [\"导入原文\", \"拆分章节\", \"生成分镜\", \"配音\"];\n\nexport default function MakeSteps() {\n  const [cur, setCur] = useState(1);\n  return (\n    <div class=\"sn-stack sn-gap-12\">\n      <Steps steps={STEPS} current={cur} />\n      <div class=\"sn-row\">\n        <Button size=\"sm\" disabled={cur === 0} onClick={() => setCur(cur - 1)}>上一步</Button>\n        <Button size=\"sm\" variant=\"primary\" disabled={cur === STEPS.length - 1} onClick={() => setCur(cur + 1)}>下一步</Button>\n      </div>\n    </div>\n  );\n}\n"
+      }
+    }
+  ]
 }

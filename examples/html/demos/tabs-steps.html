@@ -1,0 +1,12 @@
+<div class="sn-stack sn-gap-12" id="steps-box">
+  <div class="sn-steps"><span class="sn-st sn-done"><span class="sn-n">1</span>导入原文</span><span class="sn-ln sn-done"><i></i></span><span class="sn-st sn-cur"><span class="sn-n">2</span>拆分章节</span><span class="sn-ln"><i></i></span><span class="sn-st"><span class="sn-n">3</span>生成分镜</span><span class="sn-ln"><i></i></span><span class="sn-st"><span class="sn-n">4</span>配音</span></div>
+  <div class="sn-row"><button type="button" class="sn-btn sn-secondary sn-sm" data-step="-1">上一步</button><button type="button" class="sn-btn sn-primary sn-sm" data-step="1">下一步</button></div>
+</div>
+
+<script type="module">
+  import { setStep } from "satin-ui";
+  // setStep(步骤条, 第几步)：连线和圆圈跟着动，返回现在是第几步
+  const box = document.getElementById("steps-box"), steps = box.querySelector(".sn-steps");
+  let cur = 1;
+  box.addEventListener("click", (e) => { const b = e.target.closest("[data-step]"); if (b) cur = setStep(steps, cur + Number(b.dataset.step)); });
+</script>

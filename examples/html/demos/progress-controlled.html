@@ -1,0 +1,17 @@
+<div class="sn-stack sn-gap-8" style="max-width:420px" id="exp-box">
+  <div class="sn-pbar" style="--sn-p:0" role="progressbar" aria-label="导出进度" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><i></i></div>
+  <div class="sn-row"><span class="sn-help sn-num">还没开始</span><button type="button" class="sn-btn sn-secondary sn-sm">开始导出</button></div>
+</div>
+
+<script type="module">
+  // 进度放在自己的变量里，改 --sn-p（0～1）和 aria-valuenow 就行
+  const box = document.getElementById("exp-box"), bar = box.querySelector(".sn-pbar"), help = box.querySelector(".sn-help"), btn = box.querySelector("button");
+  let p = 0, t = 0;
+  const show = () => { bar.style.setProperty("--sn-p", p); bar.setAttribute("aria-valuenow", Math.round(p * 100)); help.textContent = p >= 1 ? "已导出" : t ? `已导出 ${Math.round(p * 100)}%` : "还没开始"; };
+  btn.addEventListener("click", () => {
+    if (t) { clearInterval(t); t = 0; p = 0; btn.textContent = "开始导出"; return show(); }
+    p = 0; btn.textContent = "取消";
+    t = setInterval(() => { p = Math.min(1, p + 0.1); if (p >= 1) { clearInterval(t); t = 0; btn.textContent = "再导一次"; } show(); }, 300);
+    show();
+  });
+</script>

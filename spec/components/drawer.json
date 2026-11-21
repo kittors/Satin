@@ -107,6 +107,275 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "`role=\"dialog\"`、`aria-modal=\"true\"`，`aria-labelledby` 指向标题。"
+    ],
+    "focus": [
+      "打开后焦点移进抽屉；关上后回到打开它的按钮。"
+    ],
+    "notes": [
+      "关闭按钮写 `aria-label=\"关闭\"`，提示里带 Esc。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "抽屉",
+  "lead": "从右边滑进来，背后的页面保持可见、只压暗一点：长表单、要对照页面编辑时用。改动即时反映到背后的页面、随改随存；抽屉不用来做确认。",
+  "whenToUse": [
+    "编辑列表里的一项：一边看着列表、一边改它的设置。",
+    "比对话框长的表单、详情。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "要用户确认、做决定（删除、离开）：用对话框或气泡确认。",
+      "use": "dialog"
+    },
+    {
+      "text": "两三个马上生效的选项：用弹出面板。",
+      "use": "popover"
+    }
+  ],
+  "related": [
+    {
+      "id": "dialog",
+      "diff": "对话框盖住页面、要一个决定；抽屉让页面露着、边改边看。"
+    },
+    {
+      "id": "popover",
+      "diff": "弹出面板长在按钮旁边、内容少；抽屉占一整条。"
+    }
+  ],
+  "import": {
+    "html": "// 入口里调过 setup()：标记照设计稿写，外面包 <sn-enhance>（接上 data-drawer 触发按钮、Esc、点外面关）",
+    "react": "import { Drawer } from \"satin-ui/react\";",
+    "vue": "import { Drawer } from \"satin-ui/vue\";",
+    "svelte": "// 标记照设计稿写，外面包 <sn-enhance>（接上 data-drawer 触发按钮、Esc、点外面关）",
+    "angular": "// 标记照设计稿写，外面包 <sn-enhance>（组件加 CUSTOM_ELEMENTS_SCHEMA）",
+    "solid": "// 标记照设计稿写，外面包 <sn-enhance>",
+    "preact": "import { Drawer } from \"satin-ui/react\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`<Drawer open onClose title footer>`：`open` 受控，Esc、点外面、右上角关闭都会调 `onClose`（在里面把 `open` 改成 false）；焦点自动回到打开它的按钮。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Drawer`：`open`、`onClose`、`title`、`footer`。",
+    "vue": "`<Drawer v-model:open title>`：关上时把 `open` 改回 false、再发 `close`；底栏写在 `#footer` 插槽里。",
+    "svelte": "没有专门的组件：照设计稿写 `<aside class=\"sn-drawer\">`，触发按钮写 `data-drawer=\"抽屉 id\"`，外面包 `<sn-enhance>`。",
+    "angular": "没有专门的组件：照设计稿写 `<aside class=\"sn-drawer\">` 和 `data-drawer` 触发按钮，外面包 `<sn-enhance>`。",
+    "solid": "没有专门的组件：照设计稿写 `<aside class=\"sn-drawer\">` 和 `data-drawer` 触发按钮，外面包 `<sn-enhance>`。",
+    "html": "`<aside class=\"sn-drawer\" id role=\"dialog\" aria-modal=\"true\" aria-labelledby>` 里放 `.sn-hd`（标题 + `data-x` 关闭按钮）、`.sn-bd`、可选 `.sn-ft`；按钮写 `data-drawer=\"id\"`。也可以 `openDrawer(抽屉)`。"
+  },
+  "dts": {
+    "react": "Drawer",
+    "vue": "Drawer",
+    "functions": [
+      "openDrawer"
+    ]
+  },
+  "props": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "default": "false",
+      "required": true,
+      "desc": "开着没有（受控）。React 里在 `onClose` 里改成 false；Vue `v-model:open`。",
+      "names": {
+        "react": "open",
+        "preact": "open",
+        "vue": "v-model:open",
+        "html": "按钮 data-drawer=\"id\" / openDrawer(抽屉)"
+      }
+    },
+    {
+      "name": "title",
+      "type": "ReactNode | string",
+      "default": "—",
+      "required": false,
+      "desc": "标题（抽屉的 aria-labelledby 指向它）。",
+      "names": {
+        "react": "title",
+        "preact": "title",
+        "vue": "title",
+        "html": ".sn-hd h3"
+      }
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "desc": "加在抽屉上的类名（改宽度等）。",
+      "names": {
+        "react": "className",
+        "preact": "class"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "close",
+      "payload": "—",
+      "when": "Esc、点外面、点关闭按钮（data-x）以后，抽屉已经开始收起。",
+      "names": {
+        "react": "onClose",
+        "preact": "onClose",
+        "vue": "@close / @update:open",
+        "html": "openDrawer(抽屉, { onClose })"
+      }
+    }
+  ],
+  "slots": [
+    {
+      "name": "default",
+      "desc": "抽屉的内容（.sn-bd 里）。",
+      "names": {
+        "react": "children",
+        "vue": "默认插槽",
+        "html": ".sn-bd"
+      }
+    },
+    {
+      "name": "footer",
+      "desc": "底栏：这一项的其他操作（不放\"保存\"）。",
+      "names": {
+        "react": "footer",
+        "vue": "#footer",
+        "html": ".sn-ft"
+      }
+    }
+  ],
+  "methods": [],
+  "functions": [
+    {
+      "name": "openDrawer",
+      "signature": "openDrawer(drawer: HTMLElement, o?: { trigger?: HTMLElement | null; scrim?: HTMLElement; focus?: HTMLElement; onClose?(): void }): { close(refocus?: boolean): void }",
+      "returns": "{ close(refocus?: boolean): void }",
+      "from": "satin-ui",
+      "desc": "打开抽屉：`trigger` 是关上后焦点回去的元素，`focus` 是打开后先聚焦的；返回能 `close()` 的句柄。"
+    }
+  ],
+  "cssVars": [
+    {
+      "name": "--sn-raised",
+      "desc": "抽屉的底色",
+      "default": "白（深色主题深灰）",
+      "token": true
+    },
+    {
+      "name": "--sn-scrim",
+      "desc": "背后页面压暗的那一层（抽屉只压 12%，深色 40%）",
+      "default": "黑 12%",
+      "token": true
+    },
+    {
+      "name": "--sn-r-xl",
+      "desc": "圆角",
+      "default": "16px",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": "aside.sn-drawer",
+      "desc": "抽屉（role=\"dialog\"、aria-modal、tabindex=\"-1\"）"
+    },
+    {
+      "name": ".sn-hd / .sn-bd / .sn-ft",
+      "desc": "标题栏 / 内容 / 底栏"
+    },
+    {
+      "name": "[data-drawer] / [data-x]",
+      "desc": "打开它的按钮（值是抽屉 id）/ 关闭按钮"
+    }
+  ],
+  "types": [
+    "DrawerProps"
+  ],
+  "keyboard": [
+    {
+      "keys": "Esc",
+      "does": "关上抽屉，焦点回到打开它的按钮。"
+    },
+    {
+      "keys": "Tab",
+      "does": "焦点留在抽屉里循环（打开时盖住页面的焦点）。"
+    }
+  ],
+  "design": {
+    "do": [
+      "悬浮在窗口里，四周留 8px，圆角 16。",
+      "改动即时生效、随改随存，背后的页面跟着变。"
+    ],
+    "dont": [
+      {
+        "text": "在抽屉里放\"确定 / 取消\"做确认。",
+        "rule": "real-content"
+      },
+      {
+        "text": "背后的页面压得太暗、看不见。",
+        "rule": "no-overlap"
+      }
+    ],
+    "copy": [
+      "标题写在改什么：\"编辑镜头\"\"镜头设置\"。"
+    ],
+    "motion": [
+      {
+        "what": "滑进来",
+        "easing": "ease.open",
+        "duration": "320ms"
+      },
+      {
+        "what": "滑出去",
+        "easing": "ease.in",
+        "duration": "220ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "drawer-basic",
+      "title": "最简单的用法",
+      "why": "按钮打开，Esc、点外面、右上角都能关；焦点回到按钮。",
+      "html": "<button type=\"button\" class=\"sn-btn sn-secondary\">编辑镜头</button><aside class=\"sn-drawer\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-shot-t\" tabindex=\"-1\"><div class=\"sn-hd\"><h3 id=\"drw-shot-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\"></button></div><div class=\"sn-bd\"><div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-shot-name\">镜头名称</label><input class=\"sn-input\" id=\"drw-shot-name\" value=\"站台 · 远景\"></div></div></aside>",
+      "code": {
+        "html": "<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-drawer=\"drw-shot\">编辑镜头</button>\n  <aside class=\"sn-drawer\" id=\"drw-shot\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-shot-t\" tabindex=\"-1\">\n    <div class=\"sn-hd\"><h3 id=\"drw-shot-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-shot-name\">镜头名称</label><input class=\"sn-input\" id=\"drw-shot-name\" value=\"站台 · 远景\"></div>\n    </div>\n  </aside>\n</sn-enhance>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, Drawer, Field, Input } from \"satin-ui/react\";\n\nexport default function EditShot() {\n  const [open, setOpen] = useState(false);\n  return (\n    <>\n      <Button onClick={() => setOpen(true)}>编辑镜头</Button>\n      {/* Esc、点外面、右上角的关闭都会调 onClose；焦点回到\"编辑镜头\" */}\n      <Drawer open={open} onClose={() => setOpen(false)} title=\"编辑镜头\">\n        <Field label=\"镜头名称\" htmlFor=\"drw-shot-name\">\n          <Input id=\"drw-shot-name\" defaultValue=\"站台 · 远景\" />\n        </Field>\n      </Drawer>\n    </>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, Drawer, Field, Input } from \"satin-ui/vue\";\n\nconst open = ref(false);\nconst name = ref(\"站台 · 远景\");\n</script>\n\n<template>\n  <Button @click=\"open = true\">编辑镜头</Button>\n  <!-- Esc、点外面、右上角的关闭都会把 open 改回 false；焦点回到\"编辑镜头\" -->\n  <Drawer v-model:open=\"open\" title=\"编辑镜头\">\n    <Field label=\"镜头名称\" for=\"drw-shot-name\">\n      <Input id=\"drw-shot-name\" v-model=\"name\" />\n    </Field>\n  </Drawer>\n</template>\n",
+        "svelte": "<!-- <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关、关闭按钮（data-x） -->\n<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-drawer=\"drw-shot\">编辑镜头</button>\n  <aside class=\"sn-drawer\" id=\"drw-shot\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-shot-t\" tabindex=\"-1\">\n    <div class=\"sn-hd\"><h3 id=\"drw-shot-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\" /><label class=\"sn-lbl\" for=\"drw-shot-name\" />镜头名称</label><input class=\"sn-input\" id=\"drw-shot-name\" value=\"站台 · 远景\" /></div>\n    </div>\n  </aside>\n</sn-enhance>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-drawer-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关、关闭按钮（data-x）\n  template: `\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-secondary\" data-drawer=\"drw-shot\">编辑镜头</button>\n      <aside class=\"sn-drawer\" id=\"drw-shot\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-shot-t\" tabindex=\"-1\">\n        <div class=\"sn-hd\"><h3 id=\"drw-shot-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n        <div class=\"sn-bd\">\n          <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-shot-name\">镜头名称</label><input class=\"sn-input\" id=\"drw-shot-name\" value=\"站台 · 远景\"></div>\n        </div>\n      </aside>\n    </sn-enhance>\n  `,\n})\nexport class DrawerBasicComponent {}\n",
+        "solid": "// 标记照设计稿写，<sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关、关闭按钮（data-x）\nexport default function EditShot() {\n  return (\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-secondary\" data-drawer=\"drw-shot\">编辑镜头</button>\n      <aside class=\"sn-drawer\" id=\"drw-shot\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-shot-t\" tabindex=\"-1\">\n        <div class=\"sn-hd\"><h3 id=\"drw-shot-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n        <div class=\"sn-bd\">\n          <div class=\"sn-field\" /><label class=\"sn-lbl\" for=\"drw-shot-name\" />镜头名称</label><input class=\"sn-input\" id=\"drw-shot-name\" value=\"站台 · 远景\" /></div>\n        </div>\n      </aside>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Button, Drawer, Field, Input } from \"satin-ui/react\";\n\nexport default function EditShot() {\n  const [open, setOpen] = useState(false);\n  return (\n    <>\n      <Button onClick={() => setOpen(true)}>编辑镜头</Button>\n      {/* Esc、点外面、右上角的关闭都会调 onClose；焦点回到\"编辑镜头\" */}\n      <Drawer open={open} onClose={() => setOpen(false)} title=\"编辑镜头\">\n        <Field label=\"镜头名称\" for=\"drw-shot-name\">\n          <Input id=\"drw-shot-name\" defaultValue=\"站台 · 远景\" />\n        </Field>\n      </Drawer>\n    </>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "drawer-controlled",
+      "title": "受控：边改边反映到背后",
+      "why": "抽屉不做确认：改的值放在父组件里，背后的页面跟着变。",
+      "html": "<div class=\"sn-row\"><b>站台 · 远景</b><button type=\"button\" class=\"sn-btn sn-secondary sn-sm\">编辑</button></div><aside class=\"sn-drawer\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-live-t\" tabindex=\"-1\"><div class=\"sn-hd\"><h3 id=\"drw-live-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\"></button></div><div class=\"sn-bd\"><div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-live-name\">镜头名称</label><input class=\"sn-input\" id=\"drw-live-name\" value=\"站台 · 远景\"></div></div></aside>",
+      "code": {
+        "html": "<sn-enhance>\n  <div class=\"sn-row\">\n    <b id=\"drw-live-title\">站台 · 远景</b>\n    <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-drawer=\"drw-live\">编辑</button>\n  </div>\n  <aside class=\"sn-drawer\" id=\"drw-live\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-live-t\" tabindex=\"-1\">\n    <div class=\"sn-hd\"><h3 id=\"drw-live-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-live-name\">镜头名称</label><input class=\"sn-input\" id=\"drw-live-name\" value=\"站台 · 远景\"></div>\n    </div>\n  </aside>\n</sn-enhance>\n\n<script type=\"module\">\n  // 抽屉不做确认：边改边反映到背后的页面\n  const input = document.getElementById(\"drw-live-name\"), title = document.getElementById(\"drw-live-title\");\n  input.addEventListener(\"input\", () => { title.textContent = input.value || \"未命名镜头\"; });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, Drawer, Field, Input } from \"satin-ui/react\";\n\nexport default function LiveEdit() {\n  const [open, setOpen] = useState(false);\n  const [name, setName] = useState(\"站台 · 远景\");\n  return (\n    <>\n      <div className=\"sn-row\">\n        <b>{name || \"未命名镜头\"}</b>\n        <Button size=\"sm\" onClick={() => setOpen(true)}>编辑</Button>\n      </div>\n      {/* 抽屉不做确认：边改边反映到背后的页面 */}\n      <Drawer open={open} onClose={() => setOpen(false)} title=\"编辑镜头\">\n        <Field label=\"镜头名称\" htmlFor=\"drw-live-name\">\n          <Input id=\"drw-live-name\" value={name} onChange={(e) => setName(e.target.value)} />\n        </Field>\n      </Drawer>\n    </>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, Drawer, Field, Input } from \"satin-ui/vue\";\n\nconst open = ref(false);\nconst name = ref(\"站台 · 远景\");\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <b>{{ name || \"未命名镜头\" }}</b>\n    <Button size=\"sm\" @click=\"open = true\">编辑</Button>\n  </div>\n  <!-- 抽屉不做确认：边改边反映到背后的页面 -->\n  <Drawer v-model:open=\"open\" title=\"编辑镜头\">\n    <Field label=\"镜头名称\" for=\"drw-live-name\">\n      <Input id=\"drw-live-name\" v-model=\"name\" />\n    </Field>\n  </Drawer>\n</template>\n",
+        "svelte": "<script>\n  let name = $state(\"站台 · 远景\");\n</script>\n\n<!-- <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关；抽屉不做确认：边改边反映到背后的页面 -->\n<sn-enhance>\n  <div class=\"sn-row\">\n    <b>{name || \"未命名镜头\"}</b>\n    <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-drawer=\"drw-live\">编辑</button>\n  </div>\n  <aside class=\"sn-drawer\" id=\"drw-live\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-live-t\" tabindex=\"-1\">\n    <div class=\"sn-hd\"><h3 id=\"drw-live-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-live-name\">镜头名称</label><input class=\"sn-input\" id=\"drw-live-name\" bind:value={name} /></div>\n    </div>\n  </aside>\n</sn-enhance>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-drawer-controlled\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关\n  template: `\n    <!-- 抽屉不做确认：边改边反映到背后的页面 -->\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <b>{{ name() || \"未命名镜头\" }}</b>\n        <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-drawer=\"drw-live\">编辑</button>\n      </div>\n      <aside class=\"sn-drawer\" id=\"drw-live\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-live-t\" tabindex=\"-1\">\n        <div class=\"sn-hd\"><h3 id=\"drw-live-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n        <div class=\"sn-bd\">\n          <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-live-name\">镜头名称</label><input class=\"sn-input\" id=\"drw-live-name\" [value]=\"name()\" (input)=\"name.set($any($event.target).value)\"></div>\n        </div>\n      </aside>\n    </sn-enhance>\n  `,\n})\nexport class DrawerControlledComponent {\n  protected name = signal(\"站台 · 远景\");\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\n// <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关；抽屉不做确认：边改边反映到背后的页面\nexport default function LiveEdit() {\n  const [name, setName] = createSignal(\"站台 · 远景\");\n  return (\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <b>{name() || \"未命名镜头\"}</b>\n        <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-drawer=\"drw-live\">编辑</button>\n      </div>\n      <aside class=\"sn-drawer\" id=\"drw-live\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-live-t\" tabindex=\"-1\">\n        <div class=\"sn-hd\"><h3 id=\"drw-live-t\">编辑镜头</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n        <div class=\"sn-bd\">\n          <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-live-name\">镜头名称</label><input class=\"sn-input\" id=\"drw-live-name\" value={name()} onInput={(e) => setName(e.currentTarget.value)} /></div>\n        </div>\n      </aside>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Button, Drawer, Field, Input } from \"satin-ui/react\";\n\nexport default function LiveEdit() {\n  const [open, setOpen] = useState(false);\n  const [name, setName] = useState(\"站台 · 远景\");\n  return (\n    <>\n      <div class=\"sn-row\">\n        <b>{name || \"未命名镜头\"}</b>\n        <Button size=\"sm\" onClick={() => setOpen(true)}>编辑</Button>\n      </div>\n      {/* 抽屉不做确认：边改边反映到背后的页面 */}\n      <Drawer open={open} onClose={() => setOpen(false)} title=\"编辑镜头\">\n        <Field label=\"镜头名称\" for=\"drw-live-name\">\n          <Input id=\"drw-live-name\" value={name} onChange={(e) => setName(e.target.value)} />\n        </Field>\n      </Drawer>\n    </>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "drawer-footer",
+      "title": "带底栏",
+      "why": "底栏放这一项的其他操作，比如删除；不放\"保存\"。",
+      "html": "<button type=\"button\" class=\"sn-btn sn-secondary\">镜头设置</button><aside class=\"sn-drawer\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-more-t\" tabindex=\"-1\"><div class=\"sn-hd\"><h3 id=\"drw-more-t\">镜头设置</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\"></button></div><div class=\"sn-bd\"><div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-more-note\">备注</label><textarea class=\"sn-input\" id=\"drw-more-note\" rows=\"3\">雨要下得再大一点</textarea></div></div><div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-danger-soft\">删除镜头</button></div></aside>",
+      "code": {
+        "html": "<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-drawer=\"drw-more\">镜头设置</button>\n  <aside class=\"sn-drawer\" id=\"drw-more\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-more-t\" tabindex=\"-1\">\n    <div class=\"sn-hd\"><h3 id=\"drw-more-t\">镜头设置</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-more-note\">备注</label><textarea class=\"sn-input\" id=\"drw-more-note\" rows=\"3\">雨要下得再大一点</textarea></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-danger-soft\" data-x>删除镜头</button></div>\n  </aside>\n</sn-enhance>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, Drawer, Field, Textarea, toast } from \"satin-ui/react\";\n\nexport default function ShotSettings() {\n  const [open, setOpen] = useState(false);\n  const remove = () => { setOpen(false); toast({ text: \"已删除镜头\" }); };\n  return (\n    <>\n      <Button onClick={() => setOpen(true)}>镜头设置</Button>\n      {/* footer：底栏放这一项的其他操作（不放\"保存\"：抽屉里的改动随改随存） */}\n      <Drawer open={open} onClose={() => setOpen(false)} title=\"镜头设置\" footer={<Button variant=\"danger-soft\" onClick={remove}>删除镜头</Button>}>\n        <Field label=\"备注\" htmlFor=\"drw-more-note\">\n          <Textarea id=\"drw-more-note\" rows={3} defaultValue=\"雨要下得再大一点\" />\n        </Field>\n      </Drawer>\n    </>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, Drawer, Field, toast } from \"satin-ui/vue\";\n\nconst open = ref(false);\nconst note = ref(\"雨要下得再大一点\");\nconst remove = () => { open.value = false; toast({ text: \"已删除镜头\" }); };\n</script>\n\n<template>\n  <Button @click=\"open = true\">镜头设置</Button>\n  <Drawer v-model:open=\"open\" title=\"镜头设置\">\n    <Field label=\"备注\" for=\"drw-more-note\">\n      <textarea id=\"drw-more-note\" v-model=\"note\" class=\"sn-input\" rows=\"3\"></textarea>\n    </Field>\n    <!-- #footer：底栏放这一项的其他操作（不放\"保存\"：抽屉里的改动随改随存） -->\n    <template #footer>\n      <Button variant=\"danger-soft\" @click=\"remove\">删除镜头</Button>\n    </template>\n  </Drawer>\n</template>\n",
+        "svelte": "<!-- <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关；底栏的 data-x 点了也关上 -->\n<sn-enhance>\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-drawer=\"drw-more\">镜头设置</button>\n  <aside class=\"sn-drawer\" id=\"drw-more\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-more-t\" tabindex=\"-1\">\n    <div class=\"sn-hd\"><h3 id=\"drw-more-t\">镜头设置</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\" /><label class=\"sn-lbl\" for=\"drw-more-note\" />备注</label><textarea class=\"sn-input\" id=\"drw-more-note\" rows=\"3\" />雨要下得再大一点</textarea></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-danger-soft\" data-x>删除镜头</button></div>\n  </aside>\n</sn-enhance>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-drawer-footer\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关；底栏的 data-x 点了也关上\n  template: `\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-secondary\" data-drawer=\"drw-more\">镜头设置</button>\n      <aside class=\"sn-drawer\" id=\"drw-more\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-more-t\" tabindex=\"-1\">\n        <div class=\"sn-hd\"><h3 id=\"drw-more-t\">镜头设置</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n        <div class=\"sn-bd\">\n          <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"drw-more-note\">备注</label><textarea class=\"sn-input\" id=\"drw-more-note\" rows=\"3\">雨要下得再大一点</textarea></div>\n        </div>\n        <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-danger-soft\" data-x>删除镜头</button></div>\n      </aside>\n    </sn-enhance>\n  `,\n})\nexport class DrawerFooterComponent {}\n",
+        "solid": "// 标记照设计稿写，<sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关；底栏的 data-x 点了也关上\nexport default function ShotSettings() {\n  return (\n    <sn-enhance>\n      <button type=\"button\" class=\"sn-btn sn-secondary\" data-drawer=\"drw-more\">镜头设置</button>\n      <aside class=\"sn-drawer\" id=\"drw-more\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"drw-more-t\" tabindex=\"-1\">\n        <div class=\"sn-hd\"><h3 id=\"drw-more-t\">镜头设置</h3><button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-ibtn\" data-x aria-label=\"关闭\" data-tip=\"关闭\" data-kbd=\"Esc\" data-i=\"x\"></button></div>\n        <div class=\"sn-bd\">\n          <div class=\"sn-field\" /><label class=\"sn-lbl\" for=\"drw-more-note\" />备注</label><textarea class=\"sn-input\" id=\"drw-more-note\" rows=\"3\" />雨要下得再大一点</textarea></div>\n        </div>\n        <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-danger-soft\" data-x>删除镜头</button></div>\n      </aside>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Button, Drawer, Field, Textarea, toast } from \"satin-ui/react\";\n\nexport default function ShotSettings() {\n  const [open, setOpen] = useState(false);\n  const remove = () => { setOpen(false); toast({ text: \"已删除镜头\" }); };\n  return (\n    <>\n      <Button onClick={() => setOpen(true)}>镜头设置</Button>\n      {/* footer：底栏放这一项的其他操作（不放\"保存\"：抽屉里的改动随改随存） */}\n      <Drawer open={open} onClose={() => setOpen(false)} title=\"镜头设置\" footer={<Button variant=\"danger-soft\" onClick={remove}>删除镜头</Button>}>\n        <Field label=\"备注\" for=\"drw-more-note\">\n          <Textarea id=\"drw-more-note\" rows={3} defaultValue=\"雨要下得再大一点\" />\n        </Field>\n      </Drawer>\n    </>\n  );\n}\n"
+      }
+    }
+  ]
 }

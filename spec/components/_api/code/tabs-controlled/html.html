@@ -1,0 +1,16 @@
+<div class="sn-stack sn-gap-8" id="tabs-box">
+  <sn-tabs value="1" tabs='[
+    {"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},
+    {"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},
+    {"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}
+  ]'></sn-tabs>
+  <div class="sn-row"><span class="sn-help">现在看的是：镜头</span><button type="button" class="sn-btn sn-secondary sn-sm">去配音</button></div>
+</div>
+
+<script type="module">
+  // 换标签时发冒泡的 sn-change，e.detail 是第几个；从外面换：改 value 属性
+  const box = document.getElementById("tabs-box"), tabs = box.querySelector("sn-tabs"), help = box.querySelector(".sn-help");
+  const NAMES = ["概览", "镜头", "配音"];
+  box.addEventListener("sn-change", (e) => { help.textContent = "现在看的是：" + NAMES[e.detail]; });
+  box.querySelector("button").addEventListener("click", () => { tabs.setAttribute("value", "2"); help.textContent = "现在看的是：配音"; });
+</script>
