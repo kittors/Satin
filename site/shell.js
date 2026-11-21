@@ -6,12 +6,21 @@ import { mountCmdk } from "../packages/satin-ui/src/overlay.js";
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { loadCatalog } from "./catalog.js";
 import { START, GUIDES } from "./pages.js";
+import { docPages, groupsOf } from "./nav-pages.js";
+import { ICONS } from "../packages/satin-ui/src/icons.js";
 import { setup } from "../packages/satin-ui/src/setup.js";
+// 官网自己用、组件库里没有的几个图标（Lucide 的 menu、smartphone、terminal、globe、languages）：窄屏顶栏的菜单按钮、文档目录里几页的图标
+ICONS.menu ??= '<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>';
+ICONS.smartphone ??= '<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>';
+ICONS.terminal ??= '<polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>';
+ICONS.globe ??= '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>';
+ICONS.languages ??= '<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>';
 setup(); // 页面级的全局行为（Tooltip、浮层栈、主题……），原来导入时就装上
 
 // 文档页地址：页面可以在 <html data-docs="…"> 里指定（新版设计稿用 next-docs.html），默认 docs.html
 export const DOCS = new URL(document.documentElement.dataset.docs || "./docs.html", document.documentElement.dataset.docs ? location.href : import.meta.url).pathname;
 const onDocs = () => location.pathname === DOCS;
+const NEXT = DOCS.endsWith("next-docs.html");
 
 // ———— 深浅：和组件展示页共用 satin-theme（auto / light / dark） ————
 const mq = matchMedia("(prefers-color-scheme: dark)"), modeSubs = new Set();
@@ -22,7 +31,7 @@ export const onMode = (f) => modeSubs.add(f);
 function applyMode(animate) {
   const t = resolve(pref()); if (root.dataset.theme === t) return;
   const swap = () => { root.dataset.theme = t; for (const f of modeSubs) f(t); paintModeBtn(); };
-  if (animate && document.startViewTransition && !reduced()) document.startViewTransition(swap); else swap();
+  if (animate && document.startViewTransition && !reduced()) document.startViewTransition(swap).ready.catch(() => {}); else swap(); // 过渡被浏览器中途放弃时主题照样换好
 }
 export function setMode(p) { localStorage.setItem("satin-theme", p); applyMode(true); syncModeSegs(); }
 mq.addEventListener("change", () => applyMode(true));
@@ -74,7 +83,11 @@ const go = (hash) => { if (onDocs()) location.hash = hash; else location.href = 
 async function ensureSearch() {
   if (cmdk) return cmdk;
   const cat = await loadCatalog();
-  const groups = [
+  // 新版文档页：和目录同一份清单（nav-pages.js：开始、定制、给 AI 用、规范、组件、配方、其他）；旧版文档页照旧
+  const groups = NEXT ? groupsOf(docPages(cat)).map((g) => ({ name: g.name, items: g.items.map((pg) => {
+    const en = pg.p?.en || pg.c?.en.split(" · ")[0] || "", keys = [en, pg.c?.en, pg.c?.title, pg.group === "给 AI 用" ? "AI skill agents" : ""].filter(Boolean).join(" ");
+    return { icon: pg.icon || "layout-grid", name: pg.title, sub: en, keys, hash: pg.hash };
+  }) })) : [
     { name: "开始", items: START.map((p) => ({ icon: "book-open", name: p.title, sub: p.en, keys: p.en, hash: "#/" + p.id })) },
     { name: "规范", items: GUIDES.map((p) => ({ icon: "layers", name: p.title, sub: p.en, keys: p.en, hash: "#/guide/" + p.id })) },
     ...cat.groups.filter((g) => g.name !== "基础").map((g) => ({ name: g.name, items: g.items.map((c) => ({ icon: "layout-grid", name: c.name, sub: c.en.split(" · ")[0], keys: c.en + " " + c.title, hash: "#/c/" + c.id })) })),
@@ -108,3 +121,5 @@ export function reveal(scope = document) {
 }
 
 injectIcons(); paintModeBtn();
+// 新版官网：顶栏、首页主题区、页脚里的外观分段控件（跟随系统 / 浅色 / 深色）都在这里接（要等图标换好再量宽度）
+if (NEXT) for (const s of $$("[data-mode-seg]")) bindModeSeg(s);

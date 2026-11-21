@@ -109,5 +109,5 @@ function applyMode(anim) {
   if (root.dataset.theme === next) return;
   const swap = () => { root.dataset.theme = next; };
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches || root.classList.contains("sn-reduce-motion");
-  if (anim && root.dataset.theme && document.startViewTransition && !still) document.startViewTransition(swap); else swap();
+  if (anim && root.dataset.theme && document.startViewTransition && !still) document.startViewTransition(swap).ready.catch(() => {}); else swap(); // 浏览器中途放弃过渡（窗口大小变了）时 ready 会 reject：接住，主题照样换好
 }

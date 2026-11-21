@@ -209,7 +209,8 @@ function route() {
     // 换页：旧内容很快淡出、新内容淡入并轻轻上来，中间没有空白帧（只动主区，目录和顶栏直接换）
     if (!first && document.startViewTransition && !reduced()) {
       root.classList.add("vt-page");
-      document.startViewTransition(() => swapPage(pg, part)).finished.finally(() => root.classList.remove("vt-page"));
+      const vt = document.startViewTransition(() => swapPage(pg, part)); vt.ready.catch(() => {});
+      vt.finished.finally(() => root.classList.remove("vt-page"));
       return;
     }
     swapPage(pg, part);

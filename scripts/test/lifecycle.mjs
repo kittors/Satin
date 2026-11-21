@@ -43,6 +43,24 @@ const CASES = [
   ["<sn-segmented>", { items: ["网格", "列表"], value: "网格" }, { value: "列表" }, { element: "sn-segmented" }],
   ["<sn-select>", { items: ["16:9", "9:16"], value: "16:9" }, { value: "9:16" }, { element: "sn-select" }],
   ["<sn-tabs>", { tabs: [{ label: "概览", content: "a" }, { label: "镜头", content: "b" }], value: 0 }, { value: 1 }, { element: "sn-tabs" }],
+  // enhance()：设计稿整块标记接上 → 撤销 → 再接一遍（React StrictMode 开发时就是这样）→ 撤销：第二遍接完的结构要和第一遍一样，
+  // 撤销后不留"已接过"标记，监听、观察器、节点回到起点
+  ["enhance #field", {}, {}, { markup: "#field", enhance: true }],
+  ["enhance #input", {}, {}, { markup: "#input", enhance: true }],
+  ["enhance #special", {}, {}, { markup: "#special", enhance: true }],
+  ["enhance #count", {}, {}, { markup: "#count", enhance: true }],
+  ["enhance #taginput", {}, {}, { markup: "#taginput", enhance: true }],
+  ["enhance #select", {}, {}, { markup: "#select", enhance: true }],
+  ["enhance #picker", {}, {}, { markup: "#picker", enhance: true }],
+  ["enhance #choice", {}, {}, { markup: "#choice", enhance: true }],
+  ["enhance #popover", {}, {}, { markup: "#popover", enhance: true }],
+  ["enhance #popconfirm", {}, {}, { markup: "#popconfirm", enhance: true }],
+  ["enhance #ctxmenu", {}, {}, { markup: "#ctxmenu", enhance: true }],
+  ["enhance #dialog", {}, {}, { markup: "#dialog", enhance: true }],
+  ["enhance #drawer", {}, {}, { markup: "#drawer", enhance: true }],
+  ["enhance #banner", {}, {}, { markup: "#banner", enhance: true }],
+  ["enhance #collapse", {}, {}, { markup: "#collapse", enhance: true }],
+  ["enhance #sidebar", {}, {}, { markup: "#sidebar", enhance: true }],
 ];
 const browser = await launch();
 const ctx = await newContext(browser, { side: "cur" }), page = await ctx.newPage();
@@ -79,6 +97,15 @@ for (const [name, init, next, how = {}] of CASES) {
         await new Promise((r) => requestAnimationFrame(r)); box.remove(); await Promise.resolve();
         if (tag.instance) left.push("移出页面后没有销毁");
         continue;
+      }
+      if (how.enhance) {
+        box.innerHTML = window.markup(how.markup); const el = box.firstElementChild;
+        const off1 = window.C.enhance(el); const s1 = el.innerHTML; off1();
+        const off2 = window.C.enhance(el); const s2 = el.innerHTML; await new Promise((r) => requestAnimationFrame(r)); off2();
+        if (s1 !== s2) left.push(`再接一遍结构变了（${s1.length} → ${s2.length}）`);
+        const ks = [el, ...el.querySelectorAll("*")].flatMap((x) => Object.keys(x).filter((k) => k.startsWith("_") && x[k]));
+        if (ks.length) left.push("撤销后还留着 " + [...new Set(ks)].join(","));
+        box.remove(); continue;
       }
       if (how.markup) box.innerHTML = window.markup(how.markup); else if (how.el) box.innerHTML = how.el;
       const el = how.markup || how.el ? box.firstElementChild : box;

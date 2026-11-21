@@ -4,9 +4,11 @@
 import { onMode } from "./shell.js";
 import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
+import { bindOverlays } from "../packages/satin-ui/src/overlay.js";
 import { loadCatalog } from "./catalog.js";
 import { codePanel, mountCode, fmtHTML } from "./code.js";
-import { START, GUIDES } from "./pages.js";
+import { docPages, sectionsOf, NAV_OF, RECIPES } from "./nav-pages.js";
+import { mountMobileNav } from "./mnav.js";
 import { USAGE, TALL, EX, WIN } from "./usage.js";
 import { EXAMPLES, API } from "./examples.js";
 import { img } from "./media.js";
@@ -16,20 +18,16 @@ const OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
 // ———— 所有页按顺序排好（目录、上一页 / 下一页都用它） ————
-const pages = [
-  ...START.map((p) => ({ hash: "#/" + p.id, title: p.title, group: "开始", kind: "start", p })),
-  ...GUIDES.map((p) => ({ hash: "#/guide/" + p.id, title: p.title, group: "规范", kind: "guide", p })),
-  ...cat.components.map((c) => ({ hash: "#/c/" + c.id, title: c.name, group: c.group, kind: "comp", c })),
-];
+const pages = docPages(cat);
 const byHash = new Map(pages.map((x) => [x.hash, x]));
 
-// ———— 左边目录（开始、规范两组带图标） ————
-const SIDE_IC = { intro: "book-open", start: "zap", theming: "palette", principles: "compass", color: "swatch-book", type: "type", spacing: "ruler", layout: "layout-dashboard", shape: "box", elevation: "layers", motion: "activity", icons: "component", feel: "mouse-pointer-2", "no-ai": "scan-eye", a11y: "accessibility", writing: "pen-line" };
+// ———— 左边目录（除了组件、配方各页，都带图标） ————
 {
-  let html = "", g = null;
+  let html = "", g = null, sec = null;
   for (const pg of pages) {
-    if (pg.group !== g) { g = pg.group; html += `<p>${g}</p>`; }
-    const ic = pg.kind !== "comp" ? SIDE_IC[pg.p.id] || "file-text" : "";
+    if (pg.section !== sec) { sec = pg.section; g = null; html += `<p>${sec}</p>`; }
+    if (pg.kind === "comp" && pg.group !== g) { g = pg.group; html += `<p class="d-cat">${g}</p>`; }
+    const ic = pg.icon;
     html += `<a href="${pg.hash}"${ic ? ` data-i="${ic}:before"` : ""}>${pg.title}</a>`;
   }
   side.innerHTML = html; injectIcons(side);
@@ -49,7 +47,11 @@ const BLOCK = {
   h2: (t) => anchor("s" + ++h2n, t),
   p: (h) => `<p>${h}</p>`,
   ul: (items) => `<ul class="d-list">${items.map((i) => `<li>${i}</li>`).join("")}</ul>`,
-  code: (lang, src) => snippet(lang, src),
+  code: (lang, src, cap) => snippet(lang, src, cap),
+  files: (files) => codePanel(files, { solo: true, nums: true }),
+  rules: () => '<div data-async="rules"></div>',
+  tokens: () => '<div data-async="tokens"></div>',
+  img: (src, w, h, cap) => `<figure class="d-fig"><img src="${src}" width="${w}" height="${h}" alt="${esc(cap)}" loading="lazy" decoding="async"><figcaption>${cap}</figcaption></figure>`,
   do: (yes, no) => `<div class="d-dodont"><div class="do"><b><span data-i="check"></span>这样做</b><p>${yes}</p></div><div class="dont"><b><span data-i="x"></span>不要</b><p>${no}</p></div></div>`,
   table: (head, rows) => `<div class="d-tablewrap"><table class="d-table"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`,
 };
@@ -96,9 +98,8 @@ const winAt = (c, w) => (w?.demo ?? Math.max(0, (c?.demos.length || 1) - 1));
 function demoBox(id, { code = true, n } = {}) {
   const c = cat.byId[id], w0 = WIN[id], w = w0 && (n == null || n === winAt(c, w0)) ? w0 : null, min = TALL[id] || 0; // 不给保底高度：内容比预览框矮时由预览框上下居中，不把空白都堆在下面
   const frame = `<div class="d-frame" style="--sn-h:${Math.max(min, w ? 320 : 120)}px" data-min="${min}"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="${esc(c?.name || "")}演示" data-src="../index.html?embed=${id}${n != null ? "&demo=" + n : ""}${w ? "&win=1" : ""}${w?.flush ? "&flush=1" : ""}${TALL[id] ? "&center=1" : ""}"></iframe></div>`;
-  const open = `<a class="sn-btn sn-ghost sn-sm sn-ibtn dx-open" href="../index.html#${id}" target="_blank" rel="noopener" data-tip="在展示页里打开" aria-label="在展示页里打开" data-i="arrow-up-right"></a>`;
   return `<div class="dx${w ? " is-win" : ""}" data-demo="${id}"${n != null ? ` data-n="${n}"` : ""}>
-    <div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span>${open}</div>
+    <div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div>
     <div class="dx-stage">${w ? `<img class="dx-wall" src="${img("mist", 1800, 70)}" alt="" decoding="async">` : ""}${w ? MAC(w.title, frame) : frame}</div>
     ${code && c ? ((fs) => `<div class="dx-code" data-sig="${sigOf(fs)}">${codePanel(fs, { fold: 8 })}</div>`)(filesOf(c, null, n)) : ""}
   </div>`;
@@ -151,7 +152,7 @@ function codeOf(demo, doc) {
         const k = x.tagName + "." + x.className; if (seen.has(k)) continue;
         seen.add(k); keep.push(x); if (keep.length >= 8) break;
       }
-      kids.replaceChildren(...keep, document.createComment(` 展示页里一共 ${all.length} 个，这里同一种只留一个 `));
+      kids.replaceChildren(...keep, document.createComment(` 演示里一共 ${all.length} 个，这里同一种只留一个 `));
     }
     el.replaceChildren(...kids.childNodes);
   }
@@ -492,6 +493,71 @@ function compPage(pg) {
   return head(pg, c.name, `${c.group}${c.en ? ` <span>${esc(c.en)}</span>` : ""}`, c.desc)
     + demosHTML(c) + usage(c.id) + apiHTML(c.id) + rulesHTML(c.rules);
 }
+// 组件总览：按类别分组的卡片（名字、英文名、一句话说明），点进去是组件页
+const plain = (h) => String(h).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+function overviewPage(pg) {
+  const groups = cat.groups.filter((g) => g.name !== "基础");
+  return head(pg, "组件总览", `组件 <span>Components</span>`, `${cat.components.length} 个组件，按类别分组。点一张卡片进到组件页：现场演示、HTML / React / Vue / 自定义元素四种写法的代码、参数和要点。颜色、排版这些基础在<a href="#/guide/color">规范</a>里。`)
+    + groups.map((g, i) => anchor("g" + i, `${esc(g.name)}<span class="d-h2-sub">${g.items.length}</span>`) + `<div class="d-cards">${g.items.map((c) => `<a class="d-card" href="#/c/${c.id}"><b>${esc(c.name)}</b><small>${esc(c.en.split(" · ")[0])}</small><span>${esc(plain(c.desc))}</span></a>`).join("")}</div>`).join("");
+}
+// 配方总览：8 种页面，每张卡片上是这一页缩小的实时预览（滚到附近才载入）
+const RSUB = { "admin-table": "侧栏 + 搜索筛选 + 表格 + 分页", settings: "单栏窄页面，左边标题、右边字段", auth: "整屏居中一个面板：字段 + 撑满的主按钮", dashboard: "指标面板 + 两栏：主要内容和最近动态",
+  chat: "对话框占满主区：消息区 + 提示词输入框", landing: "首屏 + 3 个功能点 + 真实场景 + 页脚", "mobile-order": "单栏 + 底部贴边的操作栏", wizard: "步骤条 + 当前一步的字段 + 上一步 / 下一步" };
+function recipesPage(pg) {
+  return head(pg, "配方总览", `配方 <span>Recipes</span>`, "8 种常见页面的骨架：先照着搭结构，再换成自己的内容。只用 Satin 的骨架类和组件，不用自己写布局和颜色。每一种都有实时预览和代码，代码可以切换 HTML、React、Vue。")
+    + `<div class="d-cards d-rcards">${RECIPES.map((r) => `<a class="d-card d-rcard" href="#/recipe/${r.id}"><span class="d-rprev" aria-hidden="true"><iframe src="../tests/recipes/${r.id}.html" loading="lazy" tabindex="-1" title=""></iframe></span><b>${esc(r.title)}</b><span>${esc(RSUB[r.id] || "")}</span></a>`).join("")}</div>`;
+}
+// 单个配方：原文（spec/recipes/*.md）载好后填进来——说明、实时预览、代码、补充说明
+function recipePage(pg) {
+  return head(pg, pg.r.title, `配方 <span>Recipe</span>`, `<span data-async-lead></span>`) + `<div data-async="recipe:${pg.r.id}"></div>`;
+}
+const md2html = (t) => esc(t).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+const RMD = new Map();
+const loadRecipe = (r) => RMD.get(r.id) || (RMD.set(r.id, fetch(new URL(`../spec/recipes/${r.file}`, location.href)).then((x) => x.text()).then((md) => {
+  const title = (md.match(/^# (.+)$/m) || [, r.title])[1], i = md.indexOf("```html"), j = md.indexOf("```", i + 7);
+  const before = md.slice(md.indexOf("\n", md.indexOf("# ")) + 1, i).trim().split(/\n+/), after = md.slice(j + 3).trim().split(/\n+/).filter(Boolean);
+  return { title, lead: before, code: md.slice(md.indexOf("\n", i) + 1, j).trimEnd(), notes: after };
+})), RMD.get(r.id));
+const ASYNC = {
+  async recipe(id) {
+    const r = RECIPES.find((x) => x.id === id), d = await loadRecipe(r);
+    const lead = $("[data-async-lead]", main); if (lead) lead.outerHTML = md2html(d.lead.join(" "));
+    return anchor("preview", "预览") + `<div class="d-rframe"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>`
+      + anchor("code", "代码") + `<div class="dx-code d-rcode">${codePanel([{ name: "HTML", lang: "html", code: d.code }], { fold: 24, solo: true })}</div>`
+      + (d.notes.length ? anchor("notes", "补充说明") + `<ul class="d-list">${d.notes.map((n) => `<li>${md2html(n)}</li>`).join("")}</ul>` : "");
+  },
+  async rules() {
+    const { rules } = await fetch(new URL("../spec/rules/anti-ai.json", location.href)).then((x) => x.json());
+    return BLOCK.table(["规则", "查法", "怎么改"], rules.map((r) => [`<b>${esc(r.title)}</b><br><code>${esc(r.id)}</code>`, r.check?.kind === "dom" ? "页面" : r.check?.kind === "both" ? "源码 + 页面" : "源码", esc(r.fix || "")]));
+  },
+  async tokens() {
+    const get = (f) => fetch(new URL(`../packages/satin-ui/tokens/${f}.tokens.json`, location.href)).then((x) => x.json());
+    const [base, light, dark] = await Promise.all([get("base"), get("theme.light"), get("theme.dark")]);
+    // 拍平成 { var: { value, desc, path } }
+    const flat = (tree, out = {}, path = []) => { for (const [k, v] of Object.entries(tree)) { if (k[0] === "$") continue; if (v && typeof v === "object" && "$value" in v) { const x = v.$extensions?.["com.satin"]; if (x?.var) out[x.var] = { value: v.$value, desc: v.$description || "", path: [...path, k].join(".") }; } else if (v && typeof v === "object") flat(v, out, [...path, k]); } return out; };
+    const B = flat(base), L = flat(light), D = flat(dark), all = { ...B, ...L };
+    const val = (x) => (typeof x === "object" ? JSON.stringify(x) : String(x)).replace(/\{([\w.]+)\}/g, "$1");
+    const NAMES = { color: "颜色", font: "字体与字号", space: "间距", radius: "圆角", shadow: "阴影", motion: "动效", duration: "时长", easing: "曲线", size: "尺寸", z: "层级" };
+    const byCat = new Map();
+    for (const [v, t] of Object.entries(all)) { const c = t.path.split(".")[0]; if (!byCat.has(c)) byCat.set(c, []); byCat.get(c).push([v, t]); }
+    return [...byCat].map(([c, list], i) => anchor("t" + i, `${esc(NAMES[c] || c)}<span class="d-h2-sub">${list.length}</span>`) + BLOCK.table(["变量", "浅色", "深色", "说明"], list.map(([v, t]) => [`<code>${esc(v)}</code>`, `<code>${esc(val(L[v]?.value ?? t.value))}</code>`, `<code>${esc(val(D[v]?.value ?? t.value))}</code>`, esc(t.desc)]))).join("");
+  },
+};
+// 配方卡片上的缩小预览：iframe 按 1280 宽排版，再按卡片宽度缩小
+const fitPrev = () => { for (const pv of $$(".d-rprev", main)) pv.style.setProperty("--k", pv.clientWidth / 1280); };
+addEventListener("resize", fitPrev);
+// 页面里异步的几块（[data-async]）：载好以后填进去，重新排本页目录
+async function fillAsync(scope, base) {
+  const list = $$("[data-async]", scope); if (!list.length) return;
+  await Promise.all(list.map(async (el) => {
+    const [k, arg] = el.dataset.async.split(":");
+    try { el.outerHTML = await ASYNC[k](arg); } catch (e) { el.outerHTML = `<p class="d-err">这一块没能载入：${esc(e.message)}</p>`; }
+  }));
+  if (curPage?.hash !== base) return; // 载入期间已经换页了
+  injectIcons(main); mountCode(main);
+  for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
+  buildToc(base);
+}
 function textPage(pg) {
   const p = pg.p, sec = p.rulesOf ? cat.byId[p.rulesOf] : null;
   return head(pg, p.title, `${pg.group} <span>${esc(p.en)}</span>`, p.lead)
@@ -500,7 +566,7 @@ function textPage(pg) {
 }
 function pager(pg) {
   const i = pages.indexOf(pg), a = pages[i - 1], b = pages[i + 1];
-  return `<nav class="d-pager" aria-label="上一页和下一页">${a ? `<a href="${a.hash}"><span data-i="arrow-left"></span>${a.title}</a>` : "<i></i>"}${b ? `<a class="next" href="${b.hash}">${b.title}<span data-i="arrow-right"></span></a>` : ""}</nav>`;
+  return `<nav class="d-pager" aria-label="上一页和下一页">${a ? `<a href="${a.hash}"><span data-i="arrow-left"></span><span class="t">${a.title}</span></a>` : "<i></i>"}${b ? `<a class="next" href="${b.hash}"><span class="t">${b.title}</span><span data-i="arrow-right"></span></a>` : ""}</nav>`;
 }
 // 小节标题前的链接：点了复制这一节的地址
 main.addEventListener("click", (e) => {
@@ -526,6 +592,14 @@ function buildToc(base) {
   tocVp.innerHTML = tocHs.length ? `<p>本页</p>` + tocHs.map((h) => `<a href="${base}:${h.id}" data-to="${h.id}">${esc(tt(h))}</a>`).join("") : "";
   tocLinks = new Map($$("a", tocVp).map((a) => [a.dataset.to, a]));
   spyToc();
+  // 窄屏（右边的本页目录藏起来了）：标题和说明下面一条"本页目录"，点开是一张菜单（组件库的按钮菜单），点一项滚到那一节
+  const hd = $(".d-head", main);
+  if (hd && tocHs.length >= 2) {
+    const bar = document.createElement("div"); bar.className = "d-mtoc";
+    bar.innerHTML = `<button class="d-mtoc-btn" type="button" data-fmenu="d-mtoc-menu" data-i="list:before">本页目录<span data-i="chevron-down"></span></button>`
+      + `<div class="sn-menu d-mtoc-menu" id="d-mtoc-menu">${tocHs.map((h) => `<a class="sn-item" href="${base}:${h.id}" data-to="${h.id}">${esc(tt(h))}</a>`).join("")}</div>`;
+    hd.after(bar); injectIcons(bar); bindOverlays(bar);
+  }
 }
 
 // ———— 路由 ————
@@ -536,7 +610,9 @@ function route() {
   if (pg !== curPage) {
     if (!first && document.startViewTransition && !reduced()) {
       root.classList.add("vt-page");
-      document.startViewTransition(() => { swapPage(pg, part); return shownSoon(180); }).finished.finally(() => root.classList.remove("vt-page"));
+      const vt = document.startViewTransition(() => { swapPage(pg, part); return shownSoon(180); });
+      vt.ready.catch(() => {}); // 浏览器中途放弃过渡（手机上地址栏伸缩、窗口大小变了）时 ready 会 reject，内容照样换好
+      vt.finished.finally(() => root.classList.remove("vt-page"));
       return;
     }
     if (first) { swapPage(pg, part); shownSoon(700).then(() => root.classList.remove("booting")); return; } // 刷新 / 首次打开：第一屏演示好了再整页露出来（见 next-docs.html 的 .booting）
@@ -551,20 +627,21 @@ function swapPage(pg, part) {
     main.innerHTML = `<div class="d-404"><h1 class="d-h1">没有这一页</h1><p class="d-lead">地址可能写错了，或者这一页改了名字。</p><a class="sn-btn sn-secondary" href="#/intro">回到介绍</a></div>`;
     tocVp.innerHTML = ""; document.title = "没有这一页 · Satin";
   } else {
-    main.innerHTML = `<article class="d-page">${pg.kind === "comp" ? compPage(pg) : textPage(pg)}${pager(pg)}</article>`;
+    const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
+    main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}">${body}${pager(pg)}</article>`;
     injectIcons(main); mountCode(main);
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     for (const w of $$(".dx-wall", main)) { const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); }
     for (const box of $$(".dx", main)) wireDemo(box, pg.c || cat.byId[box.dataset.demo]);
-    buildToc(pg.hash);
+    buildToc(pg.hash); fillAsync(main, pg.hash); fitPrev();
     document.title = `${pg.title} · Satin`;
     if (!first && !document.startViewTransition && !reduced()) main.firstElementChild.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: OUT_STRONG });
   }
   sideLinks.forEach((a, h) => a.toggleAttribute("aria-current", h === pg?.hash));
   if (pg) { const a = sideLinks.get(pg.hash), vp = a.closest(".sn-sa-vp") || side, r = a.getBoundingClientRect(), vr = vp.getBoundingClientRect(); if (r.top < vr.top + 40 || r.bottom > vr.bottom - 40) vp.scrollTop += r.top - vr.top - vr.height / 3; }
-  for (const n of $$("[data-nav]")) n.toggleAttribute("aria-current", !!pg && (n.dataset.nav === "c" ? pg.kind === "comp" : n.dataset.nav === "guide" ? pg.kind === "guide" : pg.kind === "start"));
+  for (const n of $$("[data-nav]")) n.toggleAttribute("aria-current", !!pg && n.dataset.nav === NAV_OF(pg));
   scrollTo({ top: 0, behavior: "instant" });
-  closeSide();
+  mnav?.sync();
   if (!first) main.focus({ preventScroll: true });
   first = false;
   if (part) { const el = document.getElementById(part); if (el) el.scrollIntoView({ behavior: "instant", block: "start" }); }
@@ -573,12 +650,13 @@ function swapPage(pg, part) {
 addEventListener("hashchange", route);
 toc.addEventListener("click", (e) => { const a = e.target.closest("a[data-to]"); if (a && a.getAttribute("href") === location.hash) { e.preventDefault(); document.getElementById(a.dataset.to)?.scrollIntoView({ behavior: reduced() ? "instant" : "smooth", block: "start" }); } });
 
-// ———— 窄屏：目录收进左边的抽屉 ————
-const burger = $("[data-burger]"), scrim = $("[data-scrim]");
-function closeSide() { side.classList.remove("sn-open"); scrim.classList.remove("sn-open"); burger?.setAttribute("aria-expanded", "false"); }
-burger?.addEventListener("click", () => { const on = !side.classList.contains("sn-open"); side.classList.toggle("sn-open", on); scrim.classList.toggle("sn-open", on); burger.setAttribute("aria-expanded", String(on)); });
-scrim.addEventListener("click", closeSide);
-addEventListener("keydown", (e) => { if (e.key === "Escape" && side.classList.contains("sn-open")) closeSide(); });
+// ———— 窄屏：顶栏右边的菜单按钮打开导航抽屉（和首页同一套，见 mnav.js） ————
+const toItem = (pg) => ({ href: pg.hash, title: pg.title, icon: pg.icon });
+const mnav = mountMobileNav({
+  sections: sectionsOf(pages).map((sc) => ({ name: sc.name, items: sc.items.map(toItem), cats: sc.cats.map((c) => ({ name: c.name, items: c.items.map(toItem) })) })),
+  top: [{ href: "next.html", title: "首页", icon: "house" }],
+  current: (href) => href === (decodeURIComponent(location.hash || "#/intro").split(":")[0] || "#/intro"),
+});
 
 route();
 anchorTo = decodeURIComponent(location.hash).split(":")[1] || null; setTimeout(() => (anchorTo = null), 4000);

@@ -369,11 +369,12 @@ function wireDrawer(drawer) {
   for (const x of drawer.querySelectorAll("[data-x]")) x.addEventListener("click", () => { if (drLayer?.drawer === drawer) drLayer.close(true); });
   drawer.addEventListener("keydown", (e) => trap(drawer, e));
   // 触屏：手指往右拖可以关——抽屉跟着手走，松手时拖过三成宽或甩得快就关，不然弹回原位（只动 translate）。
-  // 在输入框、滑块、分段控件、能横着滑的区域里按下的不接管；先往竖直方向动的交给页面滚动
+  // 在输入框、滑块、分段控件、能横着滑的区域里按下的不接管（只能竖着滚的滚动区域照样接）；先往竖直方向动的交给页面滚动
   let sw = null;
   drawer.addEventListener("pointerdown", (e) => {
     if (e.pointerType !== "touch" || !drawer.classList.contains("sn-open")) return;
-    if (e.target.closest("input, textarea, select, [contenteditable], .sn-slider, .sn-seg, .sn-tab-list, .sn-sa-vp")) return;
+    if (e.target.closest("input, textarea, select, [contenteditable], .sn-slider, .sn-seg, .sn-tab-list")) return;
+    const sv = e.target.closest(".sn-sa-vp"); if (sv && sv.scrollWidth > sv.clientWidth + 1) return; // 能横着滑的滚动区域交给它自己；只能竖着滚的（抽屉里的长列表）照样能拖着关
     sw = { x: e.clientX, y: e.clientY, t: e.timeStamp, dx: 0, on: false, id: e.pointerId };
   });
   drawer.addEventListener("pointermove", (e) => {

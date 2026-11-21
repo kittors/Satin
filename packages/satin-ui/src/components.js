@@ -4,7 +4,7 @@
 // · destroy() 撤掉挂载时加的监听、观察器、定时器；el 是空的时候渲染的标记也一并清掉
 // · createXxx.html(options) 是纯字符串函数：Node / SSR 里也能调，生成和展示页一模一样的标记
 // 导入本身没有副作用。
-import { defineComponent } from "./lifecycle.js";
+import { defineComponent, track } from "./lifecycle.js";
 import { initSeg, injectIcons } from "./core.js";
 import { icon } from "./icons.js";
 import { svg } from "./svg.js";
@@ -286,14 +286,38 @@ export { autoGrow, longCount } from "./input.js";
 // 一行接上整段标记：照设计稿写好的标记（下拉、复制按钮、筛选芯片、清除按钮、显示密码、自动长高、滑块、验证码、
 // 搜索 / 密码 / 邮箱 / 计数输入框、折叠面板、日期选择器、浮层触发器、横幅的关闭），在 root 里一次全部接上交互，并把 data-i 换成图标。
 // 纯 HTML 页面：setup(); enhance();   之后再插进来的标记：enhance(那一段)
+// 返回撤销函数：撤掉接线时加的监听、观察器、定时器，拆掉包上去的滚动区域，去掉"已接过"的标记——同一段标记再接一次照样能用
+// （React 的 useEffect 直接 return 它；StrictMode 开发时会接、撤、再接一遍）。
+// wire(root)：可选，自己的接线（createXxx、addEventListener……）放在同一个作用域里跑，撤销时一起撤：
+//   useEffect(() => enhance(ref.current, (root) => { createSegmented(root.querySelector(".sn-seg")); }), []);
 import { bindForms as _bindForms } from "./form.js";
 import { bindInputs as _bindInputs } from "./input.js";
 import { bindCollapses as _bindCollapses } from "./data.js";
 import { bindOverlays as _bindOverlays } from "./overlay.js";
 import { bindBanners as _bindBanners } from "./feedback.js";
-export function enhance(root = typeof document !== "undefined" ? document : null) {
-  if (!root) return;
-  injectIcons(root); _bindForms(root); _bindInputs(root); _bindCollapses(root); bindPickers(root); _bindOverlays(root); _bindBanners(root);
-  // 侧栏布局：接上选中滑块、收起按钮、⌘\；窄于 720（手机、竖着的平板）自动收成图标栏（data-collapse-below 可改，0 不收）
-  for (const app of [...(root.matches?.(".sn-app") ? [root] : []), ...root.querySelectorAll(".sn-app")]) if (app.querySelector(".sn-side-nav")) mountSidebar(app, { collapseBelow: +(app.dataset.collapseBelow ?? 720) });
+export function enhance(root = typeof document !== "undefined" ? document : null, wire) {
+  if (!root) return () => {};
+  const scope = root.nodeType === 9 ? root.documentElement : root;
+  // 接线前每个元素上已有的 _xxx（实例、"已接过"标记）；浮层触发器指向的面板可能在 root 外面，一起记
+  const els = () => {
+    const out = new Set([scope, ...scope.querySelectorAll("*")]), doc = scope.ownerDocument || document;
+    for (const t of scope.querySelectorAll("[data-pop], [data-fmenu], [data-ctx], [data-dlg], [data-drawer]")) {
+      const target = doc.getElementById(t.dataset.pop || t.dataset.fmenu || t.dataset.ctx || t.dataset.dlg || t.dataset.drawer);
+      if (target) for (const n of [target, ...target.querySelectorAll("*")]) out.add(n);
+    }
+    return out;
+  };
+  const keys = (n) => Object.keys(n).filter((k) => k[0] === "_");
+  const before = new Map([...els()].map((n) => [n, new Set(keys(n))]));
+  const [, dispose] = track(() => {
+    injectIcons(root); _bindForms(root); _bindInputs(root); _bindCollapses(root); bindPickers(root); _bindOverlays(root); _bindBanners(root);
+    // 侧栏布局：接上选中滑块、收起按钮、⌘\；窄于 720（手机、竖着的平板）自动收成图标栏（data-collapse-below 可改，0 不收）
+    for (const app of [...(root.matches?.(".sn-app") ? [root] : []), ...root.querySelectorAll(".sn-app")]) if (app.querySelector(".sn-side-nav")) mountSidebar(app, { collapseBelow: +(app.dataset.collapseBelow ?? 720) });
+    wire?.(root);
+  });
+  let done = false;
+  return () => {
+    if (done) return; done = true; dispose();
+    for (const n of els()) { const had = before.get(n); for (const k of keys(n)) if (!had?.has(k)) delete n[k]; }
+  };
 }

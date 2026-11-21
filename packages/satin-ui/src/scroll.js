@@ -1,6 +1,7 @@
 // 滚动区域（ScrollArea）：把一个会溢出的元素变成"原生滚动 + 悬浮细滚动条 + 可配置的边缘渐隐"。
 // 滚动条位置和渐隐由滚动时间线驱动（合成线程），JS 只做几件事：量滑块长度、滚动时显示滚动条、拖动滑块，以及按配置开的回弹和滚轮转横向。
 
+import { onCleanup } from "./lifecycle.js";
 const SD = typeof CSS !== "undefined" && /* @__PURE__ */ CSS.supports("animation-timeline: scroll()");
 /**
  * scrollArea(el, opts)
@@ -130,7 +131,9 @@ export function scrollArea(el, options = {}) {
   apply(); measure();
   // 销毁：拆掉包的那一层和两根滚动条、还原类名和内联样式，元素回到接之前的样子（同一个元素可以再接一次）。
   // 挂载时加的监听、观察器由 createScrollArea（或外面的组件）的 destroy 一起撤
+  let dead = false;
   const destroy = () => {
+    if (dead) return; dead = true;
     cancelAnimationFrame(raf); raf = 0; ela.release?.();
     by.remove(); bx.remove();
     if (o.inner) { while (vp.firstChild) el.insertBefore(vp.firstChild, vp); vp.remove(); el.style.padding = elPad0; el.style.overflow = elOv0; }
@@ -140,6 +143,7 @@ export function scrollArea(el, options = {}) {
   };
   const api = { box, vp, refresh: measure, set(next) { Object.assign(o, next); apply(); later(); }, destroy, get options() { return { ...o }; } };
   el._sa = api; vp._sa = api;
+  onCleanup(destroy); // 在组件挂载或 enhance() 里建的：撤销时拆掉（直接调 scrollArea 的不受影响）
   return api;
 }
 // ———— 滚到头：一次滚动开始时决定滚到头谁来管 ————

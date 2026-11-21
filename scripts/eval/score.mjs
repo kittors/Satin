@@ -86,7 +86,9 @@ for (const r of runs) {
       const ctx = await browser.newContext({ viewport: { width: w, height: h }, colorScheme: theme, locale: "zh-CN", isMobile: size === "phone", hasTouch: size === "phone", deviceScaleFactor: 1 });
       const page = await ctx.newPage(), errs = [];
       page.on("pageerror", (e) => errs.push("pageerror: " + e.message.slice(0, 200)));
-      page.on("console", (m) => { if (m.type() === "error") errs.push("console: " + m.text().slice(0, 200)); });
+      // 控制台那条"Failed to load resource"不带地址：改成按响应记（带地址）；浏览器自己要的 /favicon.ico 不算页面的错
+      page.on("console", (m) => { if (m.type() === "error" && !/Failed to load resource/.test(m.text())) errs.push("console: " + m.text().slice(0, 200)); });
+      page.on("response", (q) => { if (q.status() >= 400 && !/\/favicon\.ico$/.test(q.url())) errs.push(`${q.status()}: ${q.url().replace(url, "/").slice(0, 120)}`); });
       page.on("requestfailed", (q) => errs.push("requestfailed: " + q.url().replace(url, "/").slice(0, 120)));
       try { await page.goto(url, { waitUntil: "load", timeout: 20000 }); await page.waitForTimeout(1200); } catch (e) { errs.push("load: " + e.message.slice(0, 120)); }
       const f = path.join(shotDir, `${theme}-${size}.png`);

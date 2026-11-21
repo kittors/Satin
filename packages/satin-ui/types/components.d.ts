@@ -177,7 +177,8 @@ export function tableHTML(o: TableOptions): string;
 export function sortRows<R>(rows: R[], columns: TableColumn<R>[], sort: { key: string; dir: "asc" | "desc" } | null): R[];
 
 /** 照设计稿写好的标记，在 root 里一次接上交互（下拉、复制、芯片、清除、显示密码、自动长高、滑块、验证码、输入框、折叠面板、日期选择器、浮层触发器、横幅），并把 data-i 换成图标 */
-export function enhance(root?: ParentNode): void;
+/** 把 root 里写在标记上的交互一次接上；返回撤销函数（撤掉监听、观察器、包上去的滚动区域和"已接过"标记，同一段标记可以再接一次）。wire：同一个作用域里跑的自己的接线，撤销时一起撤 */
+export function enhance(root?: ParentNode | null, wire?: (root: ParentNode) => void): () => void;
 /** 表单类的标记一次接上（enhance 里已经包含） */
 export function bindForms(root?: ParentNode): void;
 export function bindBanners(root?: ParentNode): void;

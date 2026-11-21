@@ -2,13 +2,16 @@
 import { reveal, bindModeSeg, onMode, openSearch } from "./shell.js";
 import { $, $$, root, reduced, injectIcons, initSeg, fitScroll } from "../packages/satin-ui/src/core.js";
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
-import { initSlider, busy, succeed, prepBusy, BOX } from "../packages/satin-ui/src/form.js";
+import { initSlider, busy, succeed, prepBusy, BOX, copied } from "../packages/satin-ui/src/form.js";
 import { toast } from "../packages/satin-ui/src/feedback.js";
 import { numberFlow } from "../packages/satin-ui/src/number.js";
 import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
 import * as T from "../packages/satin-ui/src/theme.js";
 import { PHOTO, img, MUSIC, musicSrc, waveSrc, VIDEO, videoSrc, creditsHTML } from "./media.js";
 import { GUIDES } from "./pages.js";
+import { docPages, sectionsOf } from "./nav-pages.js";
+import { loadCatalog } from "./catalog.js";
+import { mountMobileNav } from "./mnav.js";
 
 const SPRING = "linear(0, .32, .78, 1.04, 1.09, 1.06, 1.02, 1, .99, .99, 1)", EASE_IN = "cubic-bezier(.42,0,1,1)", OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -41,6 +44,23 @@ function photos(scope = document) {
   addEventListener("resize", measure); addEventListener("scroll", onScroll, { passive: true });
   measure(); onScroll();
   document.fonts?.ready.then(measure);
+}
+
+// ———— 首屏的命令：点了复制（组件库的"已复制"反馈） ————
+for (const b of $$("[data-copy-cmd]")) b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(b.dataset.copyCmd); copied(b); } catch { toast({ icon: "circle-x", tone: "danger", text: "没能复制，手动选中命令复制吧", alert: true }); } });
+
+// ———— 窄屏：顶栏右边的菜单按钮打开导航抽屉（和文档页同一套，见 mnav.js）。组件目录要读展示页，读好了补进抽屉 ————
+{
+  const toItem = (pg) => ({ href: "next-docs.html" + pg.hash, title: pg.title, icon: pg.icon });
+  const toGroups = (cat) => sectionsOf(docPages(cat)).map((sc) => ({ name: sc.name, items: sc.items.map(toItem), cats: sc.cats.map((c) => ({ name: c.name, items: c.items.map(toItem) })) }));
+  const mnav = mountMobileNav({
+    sections: toGroups(null), top: [{ href: "next.html", title: "首页", icon: "house" }],
+    current: (href) => href === "next.html",
+  });
+  let asked = false;
+  const more = () => { if (asked || !mnav) return; asked = true; loadCatalog().then((cat) => mnav.update(toGroups(cat)), () => (asked = false)); };
+  // 手指按下菜单按钮（或键盘按下）才去读：首页平时不多解析一份展示页，免得在滚动、播动效的时候插进一段长任务
+  for (const ev of ["pointerdown", "keydown"]) $("[data-menu]")?.addEventListener(ev, more, { once: true });
 }
 
 // ———— 标题里的小组件：每格 3 秒，进来后自己动一下（开关拨过去、对勾弹出来……），离开往上淡出 ————
@@ -330,7 +350,7 @@ for (const c of $$("[data-chips] .sn-chip")) c.addEventListener("click", () => c
 for (const l of $$("label.sn-check[data-box]")) $("input", l).insertAdjacentHTML("afterend", BOX);
 
 // ———— 主题：外观 + 组件库的主题面板（横着排成一条）+ 复制当前这套 CSS 变量 ————
-for (const s of $$("[data-mode-seg]")) bindModeSeg(s);
+// 外观分段控件（顶栏、主题区、页脚）由 shell.js 统一接
 mountThemePanel($("[data-inline-theme]"), { initSeg, injectIcons });
 for (const p of document.querySelectorAll("[data-tbar] .sn-th-pick")) { p.dataset.tip = p.textContent.trim() + "色"; p.setAttribute("aria-label", p.dataset.tip); }
 initSeg($("[data-pv-seg]"), null, 0);
