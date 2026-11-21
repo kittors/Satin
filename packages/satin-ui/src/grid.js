@@ -470,7 +470,9 @@ export function mountMergeBar(root, injectIcons) {
   const info = root.querySelector("[data-g-info]"), bar = document.createElement("span"); bar.className = "sn-g-mbar";
   bar.innerHTML = tt("grid.15");
   // 合并按钮、提示、行数放在单独一行（固定高度、不换行）：提示出现、行数变长时只在这一行里伸缩（提示超长打省略号），不把下面的表格往下推
-  injectIcons(bar); const meta = document.createElement("div"); meta.className = "sn-g-meta"; info.before(meta); meta.append(bar, info);
+  injectIcons(bar);
+  // 没有信息栏（工具条关掉了、或者照自己的标记挂的）：合并按钮不放进页面，返回不在页面里的元素，调用的地方不用判断
+  if (info) { const meta = document.createElement("div"); meta.className = "sn-g-meta"; info.before(meta); meta.append(bar, info); }
   return { merge: bar.querySelector("[data-g-merge]"), split: bar.querySelector("[data-g-split]"), hint: bar.querySelector(".sn-g-mhint") };
 }
 // 空、加载、出错三种状态（两种表格共用）：表身上面一层，表头照常（列还在、能看出是哪张表）。第一次要显示时才建这一层；

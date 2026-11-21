@@ -219,6 +219,8 @@ const KW = {
 };
 const LIT = { js: words("true false null undefined NaN Infinity"), py: words("True False None"), go: words("true false nil iota"), sh: words(""), sql: words("null true false") };
 const TYPES = { go: words("string int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 float32 float64 bool byte rune error any"), js: words("string number boolean bigint symbol object unknown never void any Promise Array Record Map Set") };
+// i 前面到行首（或开头）都是空白：往回走，不切整段字符串
+const lineStart = (code, i) => { let k = i - 1; while (k >= 0 && code[k] !== "\n" && /\s/.test(code[k])) k--; return k < 0 || code[k] === "\n"; };
 function lex(code, lang) {
   const f = FAMILY[lang] || lang, toks = []; let i = 0; const n = code.length;
   const push = (t, s) => toks.push([t, s]);
@@ -241,9 +243,13 @@ function lex(code, lang) {
     if (done) continue;
     const c = code[i];
     if (/[A-Za-z_$\u00c0-\uffff]/.test(c) && f !== "html" && f !== "json") {
-      const m = /[\w$\u00c0-\uffff]+/y; m.lastIndex = i; const w = m.exec(code)[0], after = code.slice(i + w.length).match(/^\s*(.)/)?.[1], before = code.slice(0, i).match(/(\S)\s*$/)?.[1];
+      // 前后第一个不是空白的字：往两边走着找（原来每个词都切一次整段代码再匹配，几百 KB 的代码要好几秒）
+      const m = /[\w$\u00c0-\uffff]+/y; m.lastIndex = i; const w = m.exec(code)[0];
+      let a = i + w.length; while (a < n && /\s/.test(code[a])) a++;
+      let b = i - 1; while (b >= 0 && /\s/.test(code[b])) b--;
+      const after = a < n ? code[a] : undefined, before = b >= 0 ? code[b] : undefined;
       const lw = f === "sql" ? w.toLowerCase() : w;
-      const t = KW[f]?.has(lw) ? "kw" : LIT[f]?.has(lw) ? "lit" : TYPES[f]?.has(w) ? "typ" : before === "." ? "prop" : after === "(" ? "fn" : (f === "js" || f === "go") && /^[A-Z]/.test(w) ? "typ" : f === "sh" && (/(^|\n)\s*$/.test(code.slice(0, i)) || before === "|") ? "fn" : "";
+      const t = KW[f]?.has(lw) ? "kw" : LIT[f]?.has(lw) ? "lit" : TYPES[f]?.has(w) ? "typ" : before === "." ? "prop" : after === "(" ? "fn" : (f === "js" || f === "go") && /^[A-Z]/.test(w) ? "typ" : f === "sh" && (lineStart(code, i) || before === "|") ? "fn" : "";
       push(t, w); i += w.length; continue;
     }
     if (/[+\-*/%=<>!&|^~?:]/.test(c)) { const m = /[+\-*/%=<>!&|^~?:]+/y; m.lastIndex = i; const o = m.exec(code)[0]; push("op", o); i += o.length; continue; }

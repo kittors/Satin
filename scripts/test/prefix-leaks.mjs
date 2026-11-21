@@ -33,6 +33,24 @@ for (const f of files) {
     for (const m of line.matchAll(/className\s*=\s*[^;]*["'`]\s["'`]\s*\+\s*([a-zA-Z_$][\w$.]*)/g)) report(f, i, "变量拼的类名", m[1], m[0]);
   });
 }
+// 6. 库代码里写的 CSS 变量 var(--x)：样式里只定义了 --sn-x（漏了前缀），或者哪里都没定义（拼错、写的是早就没有的令牌）
+//   （2026-11-21 官网查出主题面板的状态色 var(--success) 显示成空心；看图占位的 var(--fill) 从来没定义过）
+{
+  const libCss = read(path.join(ROOT, "packages/satin-ui/css"), ".css").map((f) => fs.readFileSync(f, "utf8")).join("\n");
+  const defined = new Set([...libCss.matchAll(/(--[a-zA-Z0-9-]+)\s*:/g)].map((m) => m[1]));
+  for (const f of files) fs.readFileSync(f, "utf8").split("\n").forEach((line, n) => {
+    if (line.trimStart().startsWith("//")) return;
+    // var(--${…})：整个名字拼出来的，没带 sn- 前缀（库的令牌都是 --sn-…）
+    if (line.includes("var(--${")) { bad++; console.log(`  ✗ ${path.relative(ROOT, f)}:${n + 1} 拼出来的 CSS 变量名没带 sn- 前缀 var(--\${…})   …${line.trim().slice(0, 90)}`); }
+    // var(--x) 里 --x 是脚本自己临时设的（style.setProperty("--x")、style="--x:…"）也算定义过
+    for (const m of line.matchAll(/var\((--[a-zA-Z][a-zA-Z0-9-]*)/g)) {
+      const v = m[1]; if (line[m.index + m[0].length] === "$" || defined.has(v)) continue; // 后面接着 ${…}：拼出来的名字，查不了
+      const set = new RegExp(`["'\`]${v}["'\`:]|${v}\\s*:`).test(fs.readFileSync(f, "utf8"));
+      if (set) continue;
+      bad++; console.log(`  ✗ ${path.relative(ROOT, f)}:${n + 1} ${defined.has("--sn-" + v.slice(2)) ? "CSS 变量少了前缀（样式里是 --sn-" + v.slice(2) + "）" : "CSS 变量哪里都没定义"} ${v}   …${line.trim().slice(0, 90)}`);
+    }
+  });
+}
 // media.js 的 down（拖动进度条时的状态钩子）：样式里的 .sn-down 是统计卡片的"下降"，和它无关、两边都对——白名单
 console.log(bad ? `前缀漏改：${bad} 处` : `前缀漏改：${files.length} 个文件 0 处`);
 process.exitCode = bad ? 1 : 0;

@@ -129,7 +129,7 @@ export function openLightbox(items, n, { thumbOf = () => null, enabled = () => t
     let size = raw.size;
     if (!size && th?.tagName === "IMG" && th.naturalWidth) size = [th.naturalWidth, th.naturalHeight];
     const ratio = raw.ratio || (size ? size[0] / size[1] : 16 / 9);
-    const bg = raw.bg || (raw.src ? `url("${String(raw.src).replace(/["\\]/g, "\\$&")}") center / cover no-repeat` : "var(--fill)");
+    const bg = raw.bg || (raw.src ? `url("${String(raw.src).replace(/["\\]/g, "\\$&")}") center / cover no-repeat` : "var(--sn-fill-subtle)"); // 没有图也没有背景：浅灰占位（原来写的 --fill 从来没定义过）
     return { video: raw.type === "video", ratio, size, bg, url: raw.type === "video" ? "" : raw.src || urlOf(bg), src: raw.src || "", poster: raw.poster || "", alt: raw.alt || "" };
   }
   // 可用的地方：四边留白（窄屏 16px，宽屏到 48px），底下给工具条留 88px
