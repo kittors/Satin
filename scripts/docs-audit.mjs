@@ -189,19 +189,27 @@ try {
   if (arg("selftest", false)) {
     where = "自检";
     await page.evaluate(() => { location.hash = "#/c/popover"; }); await page.waitForTimeout(1500);
-    await page.evaluate(() => __audit.pick(0)); await page.evaluate(() => __audit.reload());
-    const tr = await page.evaluate((m) => __audit.triggers(m), MAXT), i = tr.findIndex((t) => /筛选/.test(t.d));
+    await page.evaluate(() => __audit.loadAll());
+    // 弹出面板页现在是契约页：前面是示例框，"筛选"所在的设计稿演示在后面的"完整演示"里——挨个演示找有"筛选"按钮的那个
+    let i = -1;
+    for (let k = 0, nf = await page.evaluate(() => document.querySelectorAll(".dx .d-frame iframe").length); k < nf && i < 0; k++) {
+      await page.evaluate((k) => __audit.pick(k), k); await page.evaluate(() => __audit.reload());
+      i = (await page.evaluate((m) => __audit.triggers(m), MAXT)).findIndex((t) => /筛选/.test(t.d));
+    }
+    if (i < 0) { console.log("自检失败：弹出面板页的演示里没找到“筛选”按钮"); process.exitCode = 1; }
     const run = async (pin) => {
       await page.evaluate((pin) => { document.getElementById("audit-pin")?.remove(); if (pin) document.head.insertAdjacentHTML("beforeend", '<style id="audit-pin">.dx .d-frame iframe { height: var(--sn-h) !important; top: 0 !important; }</style>'); }, pin);
       await page.evaluate(() => __audit.reload()); const aim = await page.evaluate(([m, i]) => __audit.aim(m, i), [MAXT, i]);
       await page.evaluate(() => { window.__monP = __audit.mon(__audit.cur, 800); }); await page.mouse.click(aim.x, aim.y);
       const r = await page.evaluate(() => window.__monP); await page.keyboard.press("Escape"); await page.waitForTimeout(400); return r;
     };
-    const bad = await run(true), good = await run(false);
-    await page.evaluate(() => document.getElementById("audit-pin")?.remove());
-    const pass = i >= 0 && bad.bad > 0 && good.bad === 0 && good.saw > 0;
-    console.log(pass ? `自检通过：画布钉死时筛选面板 ${bad.bad}/${bad.frames} 帧报出被裁；放开后 ${good.saw} 帧伸出预览框、0 帧被裁` : `自检失败：${JSON.stringify({ i, bad, good })}`);
-    if (!pass) process.exitCode = 1;
+    if (i >= 0) {
+      const bad = await run(true), good = await run(false);
+      await page.evaluate(() => document.getElementById("audit-pin")?.remove());
+      const pass = bad.bad > 0 && good.bad === 0 && good.saw > 0;
+      console.log(pass ? `自检通过：画布钉死时筛选面板 ${bad.bad}/${bad.frames} 帧报出被裁；放开后 ${good.saw} 帧伸出预览框、0 帧被裁` : `自检失败：${JSON.stringify({ i, bad, good })}`);
+      if (!pass) process.exitCode = 1;
+    }
   }
   const t0all = Date.now(); let nTrig = 0, nDemo = 0; const loadMs = [], showMs = [];
   for (const [pi, pg] of pages.entries()) {
