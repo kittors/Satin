@@ -3,6 +3,11 @@ import fs from "node:fs";
 import zlib from "node:zlib";
 export const load = (f) => JSON.parse(zlib.gunzipSync(fs.readFileSync(f)));
 const FRAME = 17.5;
+// 预期差异（scripts/parity/expected.json 里带 trace 的那几条，docs/differences.md 写了原因）：这些属性的变化不算——
+// attrs：这个属性的任何变化；attrValues：属性变成（或原来是）这个值的变化（比如提示层的 role="tooltip"）
+const EXPECT = (() => { try { return JSON.parse(fs.readFileSync(new URL("./expected.json", import.meta.url), "utf8")); } catch { return []; } })();
+const TRACE_EX = EXPECT.flatMap((e) => (e.trace ? [e.trace] : []));
+export const expectedAttr = (attr, ...values) => TRACE_EX.some((t) => (t.attrs || []).includes(attr) || (t.attrValues || []).some((v) => v.attr === attr && values.includes(v.value)));
 
 const num = (s) => (String(s).match(/-?\d+(\.\d+)?(e-?\d+)?/g) || []).map(Number);
 const near = (a, b, tol) => a.length === b.length && a.every((v, i) => Math.abs(v - b[i]) <= tol);
@@ -97,6 +102,7 @@ function cmpMuts(a, b, out, label) {
   const norm = (list) => {
     const keys = [], lastStyle = new Map();
     for (const m of list) {
+      if (m[1] === "a" && expectedAttr(m[3], m[4])) continue; // 登记过的预期差异
       if (m[1] === "a" && m[3] === "style") { keys.push(`s|${m[2]}|${styleProps(m[4])}`); lastStyle.set(m[2], m[4]); }
       else keys.push(m.slice(1).join("|"));
     }
@@ -136,14 +142,22 @@ export function compareAction(x, y, label) {
   return out;
 }
 
+// 按区块登记的预期差异（expected.json 里 trace.final：{ block, classes?, attrs? }）：这些类名的元素（连同里面的）、这些属性的差异不算
+const FINAL_EX = TRACE_EX.flatMap((t) => t.final || []);
+const classOf = (snap, p) => String(snap[p]?.attrs?.class || "").split(/\s+/);
+const underClass = (snap, p, classes) => { const seg = p.split(">"); for (let i = seg.length; i > 0; i--) if (classOf(snap, seg.slice(0, i).join(">")).some((c) => classes.includes(c))) return true; return false; };
+// 一直在转的元素（转圈、加载环）：正方形转过一个角度，外框跟着变大变小，中心不动——结束快照那一刻转到哪儿看运气，只差这个不算
+const spinning = (r1, r2) => [r1, r2].every((r) => Math.abs(r[2] - r[3]) <= 0.05) && Math.abs(r1[0] + r1[2] / 2 - (r2[0] + r2[2] / 2)) <= 0.6 && Math.abs(r1[1] + r1[3] / 2 - (r2[1] + r2[3] / 2)) <= 0.6;
 export function compareFinal(a, b) {
-  const out = [];
+  const out = [], ex = FINAL_EX.filter((f) => f.block === (a.id ?? b.id));
+  const exClasses = ex.flatMap((f) => f.classes || []), exAttrs = ex.flatMap((f) => f.attrs || []);
   for (const p of new Set([...Object.keys(a.final), ...Object.keys(b.final)])) {
+    if (exClasses.length && (underClass(a.final, p, exClasses) || underClass(b.final, p, exClasses))) continue;
     const x = a.final[p], y = b.final[p];
     if (!x || !y) { out.push(`结束快照 ${p}: 只在${x ? "A" : "B"}`); continue; }
     if (x.text !== y.text) out.push(`结束快照 ${p}: 文字 ${JSON.stringify(x.text).slice(0, 80)} → ${JSON.stringify(y.text).slice(0, 80)}`);
-    if (JSON.stringify(x.attrs) !== JSON.stringify(y.attrs)) { const ks = new Set([...Object.keys(x.attrs), ...Object.keys(y.attrs)]); for (const k of ks) if (x.attrs[k] !== y.attrs[k] && !(k === "style" && near(num(x.attrs[k]), num(y.attrs[k]), 0.5) && styleProps(x.attrs[k]) === styleProps(y.attrs[k]))) out.push(`结束快照 ${p} @${k}: ${String(x.attrs[k]).slice(0, 100)} → ${String(y.attrs[k]).slice(0, 100)}`); }
-    if (typeof x.rect[0] === "number" && typeof y.rect[0] === "number" && !near(x.rect, y.rect, 0.5)) out.push(`结束快照 ${p}: 位置 ${x.rect} → ${y.rect}`);
+    if (JSON.stringify(x.attrs) !== JSON.stringify(y.attrs)) { const ks = new Set([...Object.keys(x.attrs), ...Object.keys(y.attrs)]); for (const k of ks) if (x.attrs[k] !== y.attrs[k] && !expectedAttr(k, x.attrs[k], y.attrs[k]) && !exAttrs.includes(k) && !(k === "style" && near(num(x.attrs[k]), num(y.attrs[k]), 0.5) && styleProps(x.attrs[k]) === styleProps(y.attrs[k]))) out.push(`结束快照 ${p} @${k}: ${String(x.attrs[k]).slice(0, 100)} → ${String(y.attrs[k]).slice(0, 100)}`); }
+    if (typeof x.rect[0] === "number" && typeof y.rect[0] === "number" && !near(x.rect, y.rect, 0.5) && !spinning(x.rect, y.rect)) out.push(`结束快照 ${p}: 位置 ${x.rect} → ${y.rect}`);
     if (String(x.scroll) !== String(y.scroll)) out.push(`结束快照 ${p}: 滚动 ${x.scroll} → ${y.scroll}`);
   }
   return out;

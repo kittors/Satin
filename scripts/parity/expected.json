@@ -1,5 +1,20 @@
 [
  {
+  "id": "differences-20",
+  "reason": "提示层带 role=\"tooltip\"，提示出现时被指着的元素带 aria-describedby（读屏能读到提示），画面不变：docs/differences.md 第 20 条",
+  "trace": {
+   "attrs": [
+    "aria-describedby"
+   ],
+   "attrValues": [
+    {
+     "attr": "role",
+     "value": "tooltip"
+    }
+   ]
+  }
+ },
+ {
   "id": "differences-8",
   "reason": "通知在 480 宽以下占满宽度、两边留 12（原来固定 360 宽、右边 24，390 宽的手机上左边只剩 6px）：docs/differences.md 第 8 条",
   "dom": [
@@ -56,6 +71,64 @@
      "msg"
     ]
    }
-  ]
+  ],
+  "trace": {
+   "final": [
+    {
+     "block": "banner",
+     "classes": [
+      "msg"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "differences-3",
+  "reason": "Markdown \"能动的 HTML\"预览的 iframe 在外面问的时候再报一次高度（改造前的高度竞态修掉了）：docs/differences.md 第 3 条",
+  "trace": {
+   "final": [
+    {
+     "block": "md",
+     "attrs": [
+      "srcdoc"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "differences-27",
+  "reason": "数据表格、画布表格的空 / 加载 / 出错状态层（搜索、筛选没有结果时写\"没有符合条件的结果\"、给\"清除筛选\"）：docs/differences.md 第 27 条",
+  "trace": {
+   "final": [
+    {
+     "block": "grid",
+     "classes": [
+      "g-state"
+     ]
+    },
+    {
+     "block": "cgrid",
+     "classes": [
+      "g-state"
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": "differences-1",
+  "reason": "Markdown\"能动的 HTML\"那段示例代码里的 var(--label) 变成 var(--sn-label)，代码高亮分词跟着变：docs/differences.md 第 1 条",
+  "trace": {
+   "final": [
+    {
+     "block": "md",
+     "classes": [
+      "md-live-code"
+     ]
+    }
+   ]
+  }
  }
 ]

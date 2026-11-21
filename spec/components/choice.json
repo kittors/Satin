@@ -188,7 +188,19 @@
     {
       "name": "change",
       "payload": "ChangeEvent（React）/ boolean（Vue 的 v-model）",
+      "payloadBy": {
+        "react": "ChangeEvent",
+        "preact": "Event",
+        "vue": "boolean",
+        "svelte": "Event",
+        "angular": "Event",
+        "solid": "Event",
+        "html": "Event"
+      },
       "when": "勾上、取消以后（原生的 change 事件）。",
+      "whenBy": {
+        "vue": "勾上、取消以后：`v-model` 跟着变（`@update:modelValue` 拿到新的 true / false）。"
+      },
       "native": true,
       "names": {
         "react": "onChange",

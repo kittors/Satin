@@ -179,7 +179,19 @@
     {
       "name": "input",
       "payload": "ChangeEvent（React 的 onChange）/ string（Vue 的 v-model）",
+      "payloadBy": {
+        "react": "ChangeEvent",
+        "preact": "Event",
+        "vue": "string",
+        "svelte": "Event",
+        "angular": "Event",
+        "solid": "Event",
+        "html": "Event"
+      },
       "when": "每输入一个字（原生的 input 事件）。",
+      "whenBy": {
+        "vue": "每输入一个字：`v-model` 跟着变（`@update:modelValue` 拿到新的文字）。"
+      },
       "native": true,
       "names": {
         "react": "onChange",

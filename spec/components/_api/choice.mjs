@@ -49,7 +49,7 @@ export default {
       desc: "不可用：变灰、点不动，Tab 也跳过。", names: { react: "disabled", preact: "disabled", vue: "disabled", html: "disabled" } },
   ],
   events: [
-    { name: "change", payload: "ChangeEvent（React）/ boolean（Vue 的 v-model）", when: "勾上、取消以后（原生的 change 事件）。", native: true,
+    { name: "change", payload: "ChangeEvent（React）/ boolean（Vue 的 v-model）", payloadBy: { react: "ChangeEvent", preact: "Event", vue: "boolean", svelte: "Event", angular: "Event", solid: "Event", html: "Event" }, when: "勾上、取消以后（原生的 change 事件）。", whenBy: { vue: "勾上、取消以后：`v-model` 跟着变（`@update:modelValue` 拿到新的 true / false）。" }, native: true,
       names: { react: "onChange", preact: "onChange", vue: "@update:modelValue", svelte: "bind:checked / onchange", angular: "(change)", solid: "onChange", html: "change" } },
   ],
   slots: [{ name: "default", desc: "旁边的文字（和 label 二选一）。", names: { react: "children", vue: "默认插槽" }, native: ["react"] }],
