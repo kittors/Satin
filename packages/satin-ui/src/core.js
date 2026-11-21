@@ -126,7 +126,7 @@ export function showTip(el, text) {
   tipEl(); if (!tip.matches(":popover-open")) tip.showPopover();
   tip.setAttribute("role", "tooltip"); if (described !== el || el.getAttribute("aria-label") === text) undescribe();
   if (!described && !el.hasAttribute("aria-describedby") && el.getAttribute("aria-label") !== text) { el.setAttribute("aria-describedby", tip.id); described = el; }
-  tip.textContent = shown = text; if (el.dataset.kbd) { const k = document.createElement("kbd"); k.textContent = el.dataset.kbd; tip.append(k); }
+  tip.textContent = shown = text; if (el.dataset.kbd && !matchMedia("(hover: none)").matches) { const k = document.createElement("kbd"); k.textContent = el.dataset.kbd; tip.append(k); } // 触屏上不写快捷键
   tip.classList.toggle("sn-wrap", text.length > 20); tip.classList.add("sn-on"); tipFor = el;
   const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
   const top = r.top - h - 8 < 64 ? r.bottom + 8 : r.top - h - 8;
@@ -146,7 +146,10 @@ const tipText = (el) => el.dataset.tip || (el.hasAttribute("data-tip-full") && e
 // 页面级：悬停 / 聚焦带 data-tip 的元素出提示。setup() 里装一次（展示页在 main.js 开头按原来的顺序装）
 export function installTooltips() {
 tipEl();
+// 触屏、没有悬停的设备（手机、平板）不出悬停提示：手指点一下也会先来一个 pointerover，提示会盖在手指刚点的地方，上面的快捷键在手机上也没用
+const noHover = matchMedia("(hover: none)");
 document.addEventListener("pointerover", (e) => {
+  if (e.pointerType === "touch" || e.pointerType === "pen" || noHover.matches) return;
   const el = e.target.closest("[data-tip],[data-tip-full]"); if (!el || el === tipFor) return;
   const text = tipText(el); if (!text) return;
   clearTimeout(tipTimer); const w = tipWait = { el, text }; tipTimer = setTimeout(() => { tipWait = null; showTip(w.el, w.text); }, performance.now() - lastHide < 300 ? 0 : 500);

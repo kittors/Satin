@@ -220,5 +220,6 @@ document.addEventListener("change", (e) => { const i = e.target; if (i instanceo
 document.addEventListener("pointerdown", (e) => { for (const s of selects) if (!s.el.contains(e.target)) s.close(); });
 document.addEventListener("input", (e) => { const f = e.target.closest?.(".sn-field.sn-bad"); if (f) clearFieldError(f); });
 document.addEventListener("animationend", (e) => e.target.classList?.remove("sn-shake"));
-document.addEventListener("click", (e) => { const b = e.target.closest?.('[aria-disabled="true"]'); if (b) { e.preventDefault(); e.stopPropagation(); if (b.dataset.tip) showTip(b, b.dataset.tip); } }, true);
+// 点了不可用的按钮：提示写的是原因（"等附件传完再发"）才弹出来；和按钮名字一样（"发送"）就不弹——说了等于没说（触屏上点一下灰着的发送按钮也不出"发送 ⌘↵"）
+document.addEventListener("click", (e) => { const b = e.target.closest?.('[aria-disabled="true"]'); if (b) { e.preventDefault(); e.stopPropagation(); if (b.dataset.tip && b.dataset.tip !== b.getAttribute("aria-label")) showTip(b, b.dataset.tip); } }, true);
 }

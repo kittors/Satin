@@ -17,30 +17,82 @@ const AI_LINES = ["第三集我拆成了 12 个镜头，节奏比上一版快一
 const AI_LONG = ["这一集的情绪主线是等待。前半段用冷色和远景拉开距离，让观众先看见空旷；进候车厅以后，暖光和中近景把人拉近；最后车灯打在脸上的那一下，是整集唯一的高光，之后立刻收回到她的背影。",
   "我对比了原文和现在的分镜：原文里有两处心理描写没有画面对应，一处是她想起父亲送她上车，一处是她数站台的灯。建议给前一处加一个 2 秒的闪回空镜，后一处用一个慢慢摇过灯的长镜头。"];
 const DOCS = [["第三集分镜脚本（终版）.docx", "DOCX"], ["雨夜车站 · 人物小传.pdf", "PDF"], ["镜头时长统计表.xlsx", "XLSX"], ["配乐参考.zip", "ZIP"]];
-const ME_LINES = ["先按小说的原文拆一下第三集", "开头的雨夜要冷一点", "她进候车厅那一段再慢一点", "结尾就按你说的，不上车", "配音用温柔一点的女声", "镜头 8 的构图换成侧面", "可以，先生成看看", "这一版比上一版好多了"];
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // 点开看大图用高清的那一张（同样的裁切）
 const hiRes = (g) => HI(g);
 
-// 演示历史：和改造前一模一样的生成器（固定种子，翻多少遍都一样）
+// 演示历史（固定种子，翻多少遍都一样）：一问一答像真的对话——用户提要求，助手说改了什么；同一天里一句话不出现第二次，
+// 每天的顺序都打乱；偶尔用户发参考图、试音、文件，助手发生成的画面、成片，回答跟着说到它。每天 36 条（18 轮），往上翻能翻到一万条左右
+// （2026-11-21 用户要求去掉 AI 腔：原来的生成器从 8 句里随机抽，同一句挨着出现两次，不像真的对话——differences 28）
+const TURNS = [
+  ["先按小说的原文拆一下第三集", "第三集拆成了 12 个镜头：车站外 3 个、候车厅 5 个、站台 4 个，节奏比上一版快一点。"],
+  ["开头的雨夜要冷一点", "开头三个镜头的色温降到 5200K，路灯改成冷白，积水里的倒影也跟着偏蓝了。"],
+  ["她进候车厅那一段再慢一点", "候车厅那段从 18 秒放到 24 秒，第 6 个镜头加了一个她收伞的停顿。"],
+  ["结尾就按你说的，不上车", "结尾改成车门关上、她站在原地，最后一个镜头停在空站台，留 3 秒黑场。"],
+  ["配音用温柔一点的女声", "换成了温柔一点的女声，语速放慢了 10%，第 9 个镜头的旁白提前半秒进。"],
+  ["镜头 8 的构图换成侧面", "镜头 8 改成侧面中景，她在画面左边三分之一，右边留给进站的车灯。"],
+  ["可以，先生成看看", "第 3 到第 5 个镜头的画面生成好了，候车厅那张的灯光偏暖，要不要再压一点？"],
+  ["这一版比上一版好多了", "这一版存成了第三集的定稿，旧版本放进历史记录，随时能找回来。"],
+  ["第 2 个镜头太长了", "第 2 个镜头从 6 秒剪到 4 秒，雨刚停的那一下留着，后面推镜头的部分去掉了。"],
+  ["车灯那一下能再亮一点吗", "车灯那一帧的曝光提高了一档，打在她脸上的高光更明显，背景没有跟着变亮。"],
+  ["把她想起父亲那段加进来", "第 7 个镜头后面加了一个 2 秒的闪回空镜：月台上一只旧行李箱，不出人脸。"],
+  ["站台的灯一共几盏", "站台上 9 盏灯。原文里她数到第 7 盏时车进站，我把数灯做成了一个慢慢摇过去的长镜头。"],
+  ["雨声和音乐别打架", "下雨的段落音乐压低了 6 分贝，雨声留着，车进站前 2 秒音乐再起来。"],
+  ["整集现在多长", "现在 2 分 48 秒，比要求的 3 分钟短 12 秒，可以给结尾的空站台再留几秒。"],
+  ["候车厅的长椅换成木头的", "长椅换成了旧木条的，扶手上有磨损，和候车厅的暖光更搭。"],
+  ["她的伞换个颜色", "伞改成深红色。冷色的雨夜里只有这一点颜色，观众一眼就能找到她。"],
+  ["第 4 集也先拆一下", "第 4 集初拆成 10 个镜头，第一场接着第三集的空站台，从第二天早上开始。"],
+  ["字幕小一点", "字幕从 28 号改成 24 号，离画面底边留 8%，手机上也不会挡到脸。"],
+  ["开头加一个片名", "片名放在第 1 个镜头的远景上：白色细体，2 秒淡入、停 2 秒、淡出。"],
+  ["这个转场太硬了", "第 5、第 6 个镜头之间改成 12 帧的叠化，雨声先过去，画面再接上。"],
+  ["她的表情再克制一点", "第 9 个镜头的描述去掉了\"流泪\"，改成\"看着车门，嘴角收紧\"，重新生成了两版。"],
+  ["背景里的广告牌去掉", "广告牌换成了褪色的站名牌，只留\"雨花站\"三个字，不抢视线。"],
+  ["今天先到这，明天弄第 4 集", "第三集的改动都存好了，明天从第 4 集的第一场接着来。"],
+  ["整理一下这一集的情绪线", AI_LONG[0]],
+  ["对照原文看看有没有漏的", AI_LONG[1]],
+  ["镜头时长导一份给我", "导出了镜头时长表，按镜头号排好，每个镜头写了景别和对应的原文段落。"],
+];
+// 用户发的不是字（参考图、试音、文件）时，助手接着说到它
+const AFTER = {
+  image: ["参考图的色调记下了：冷蓝、低饱和、有雾，后面三个镜头都按它调。", "这张参考图的机位比现在的低，第 2 个镜头的机位也跟着放低了一点。", "参考图里站台的灯是暖黄的，和现在的冷白不一样，两种各出了一版。"],
+  audio: ["试音听过了，语速刚好，第 3 句后面的停顿可以再长半拍。", "这一版旁白的情绪对了，只是\"末班车\"三个字读得太快，标出来了。"],
+  file: ["这份文件里的镜头号和时长和现在的分镜对了一遍，有两处不一致，已经标出来了。", "人物小传里她的年龄是 26 岁，第 4 个镜头的描述写成了学生，已经改过来。"],
+};
 function demoHistory() {
-  let rnd = 11, oldestDay = 0, left = 30;
+  let rnd = 11, oldestDay = 0, left = 30, lastTurn = -1;
   const rand = () => (rnd = (rnd * 16807) % 2147483647) / 2147483647;
   const TODAY = new Date(2026, 10, 19), WEEK = "日一二三四五六";
   const dayLabel = (k) => { if (k === 0) return "今天"; if (k === 1) return "昨天"; const d = new Date(TODAY - k * 864e5); return k < 7 ? `星期${WEEK[d.getDay()]}` : `${d.getMonth() + 1} 月 ${d.getDate()} 日`; };
-  // 一页历史：segs 天，每天 36 条，按时间从旧到新
+  const shot = () => 1 + ((rand() * 48) | 0);
+  // 一页历史：segs 天，每天 18 轮一问一答，按时间从旧到新
   function page(segs) {
     const out = [];
     for (let s = segs - 1; s >= 0; s--) {
       out.push({ kind: "day", text: dayLabel(oldestDay + s) });
-      for (let i = 0; i < 36; i++) {
-        const me = rand() < .4, r = rand();
-        if (r < .05) out.push({ kind: "msg", me, type: "image", g: SCENES[(rand() * SCENES.length) | 0], cap: me ? "参考：雨夜的站台" : "第 " + (1 + ((rand() * 48) | 0)) + " 个镜头的画面" });
-        else if (r < .065) out.push({ kind: "msg", me: false, type: "video", g: `url("${CLIP.poster}") center / cover`, src: CLIP.src, poster: CLIP.poster, dur: `0:0${3 + ((rand() * 6) | 0)}`, cap: "第 " + (1 + ((rand() * 48) | 0)) + " 个镜头 · 成片" });
-        else if (r < .075 && me) out.push({ kind: "msg", me, type: "audio", dur: `0:${20 + ((rand() * 39) | 0)}`, seed: 1 + ((rand() * 50) | 0), name: "旁白试音.mp3" });
-        else if (r < .085 && me) { const d = DOCS[(rand() * DOCS.length) | 0]; out.push({ kind: "msg", me, type: "file", name: d[0], ext: d[1], size: 2e5 + rand() * 4e6 }); }
-        else out.push({ kind: "msg", me, type: "text", text: me ? ME_LINES[(rand() * ME_LINES.length) | 0] : r > .82 ? AI_LONG[(rand() * AI_LONG.length) | 0] : AI_LINES[(rand() * AI_LINES.length) | 0] });
+      // 这一天的顺序：把全部问答打乱取前 18 轮（同一天里不重复）；和前一天最后一轮不一样
+      const order = TURNS.map((_, i) => i);
+      for (let i = order.length - 1; i > 0; i--) { const j = (rand() * (i + 1)) | 0; [order[i], order[j]] = [order[j], order[i]]; }
+      if (order[0] === lastTurn) [order[0], order[1]] = [order[1], order[0]];
+      const used = new Set(); // 这一天已经说过的"接着附件说的话"：同一天不说第二遍，说完了就不再发这种附件
+      const after = (kind) => { const left = AFTER[kind].filter((x) => !used.has(x)); if (!left.length) return null; const x = left[(rand() * left.length) | 0]; used.add(x); return x; };
+      for (let t = 0; t < 18; t++) {
+        const [ask, answer] = TURNS[order[t]], r = rand();
+        // 用户这一轮：多半是一句话，偶尔是参考图、试音、文件（助手的回答跟着说到它）
+        const kind = r < .06 ? "image" : r < .075 ? "audio" : r < .09 ? "file" : null, reply = kind && after(kind);
+        if (reply) {
+          if (kind === "image") out.push({ kind: "msg", me: true, type: "image", g: SCENES[(rand() * SCENES.length) | 0], cap: "参考：雨夜的站台" });
+          else if (kind === "audio") out.push({ kind: "msg", me: true, type: "audio", dur: `0:${20 + ((rand() * 39) | 0)}`, seed: 1 + ((rand() * 50) | 0), name: "旁白试音.mp3" });
+          else { const d = DOCS[(rand() * DOCS.length) | 0]; out.push({ kind: "msg", me: true, type: "file", name: d[0], ext: d[1], size: 2e5 + rand() * 4e6 }); }
+          out.push({ kind: "msg", me: false, type: "text", text: reply }); continue;
+        }
+        out.push({ kind: "msg", me: true, type: "text", text: ask });
+        // 助手这一轮：多半是一段话；偶尔先发生成的画面或成片，再说明
+        const q = rand();
+        if (q < .1) out.push({ kind: "msg", me: false, type: "image", g: SCENES[(rand() * SCENES.length) | 0], cap: `第 ${shot()} 个镜头的画面` });
+        else if (q < .14) out.push({ kind: "msg", me: false, type: "video", g: `url("${CLIP.poster}") center / cover`, src: CLIP.src, poster: CLIP.poster, dur: `0:0${3 + ((rand() * 6) | 0)}`, cap: `第 ${shot()} 个镜头 · 成片` });
+        out.push({ kind: "msg", me: false, type: "text", text: answer });
       }
+      lastTurn = order[17];
     }
     oldestDay += segs; return out;
   }

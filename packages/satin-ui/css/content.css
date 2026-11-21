@@ -37,7 +37,9 @@
 @keyframes sn-vl-in { from { opacity: 0; } }
 
 /* ———— 聊天与 AI 对话 ———— */
-.sn-chat { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 680px; max-width: 840px; border-radius: var(--sn-r-xl); border: 1px solid var(--sn-line); background: var(--sn-canvas); overflow: hidden; }
+/* 填满容器（高度由页面布局给：整页用 100dvh，面板里用 flex: 1），不写死 680 高——写死的放进矮一点的框会多出滚动条、放进手机又填不满。
+   容器自己没有高度时（只写了一个空 div）至少 360 高，不至于塌成一条 */
+.sn-chat { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; min-height: 360px; border-radius: var(--sn-r-xl); border: 1px solid var(--sn-line); background: var(--sn-canvas); overflow: hidden; }
 .sn-chat-hd { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px 0 16px; background: var(--sn-raised); }
 .sn-chat-hd .sn-tx { display: grid; } .sn-chat-hd b { font: 600 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); }
 .sn-chat-hd .sn-sub { display: flex; gap: 6px; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
@@ -171,8 +173,14 @@
 .sn-ai-text .sn-tk, .sn-think-txt .sn-tk { animation: sn-tk-in .36s var(--sn-ease-out) both; }
 @keyframes sn-tk-in { from { opacity: 0; } }
 /* 光标：正文末尾一个柔和的圆点 */
-.sn-ai-text .sn-caret { display: inline-block; width: 7px; height: 7px; margin-left: 4px; border-radius: 50%; background: var(--sn-accent); vertical-align: 1px; animation: sn-caret-pulse 1.1s var(--sn-ease-in-out) infinite; }
+.sn-ai-text .sn-caret { display: inline-block; width: 7px; height: 7px; margin-left: 4px; border-radius: 50%; background: var(--sn-label3); /* 中性色：跟着主题色变红时像出错 */ vertical-align: 1px; animation: sn-caret-pulse 1.1s var(--sn-ease-in-out) infinite; }
 @keyframes sn-caret-pulse { 50% { opacity: .25; scale: .7; } }
+/* 回答的第一段还没来：三个中性色的点轮流淡入淡出（只动透明度），读屏读"正在思考"；减少动态效果时三个点静止 */
+.sn-ai-wait { display: inline-flex; align-items: center; gap: 5px; height: 26px; }
+.sn-ai-wait i { width: 6px; height: 6px; border-radius: 50%; background: var(--sn-label3); opacity: .3; animation: sn-ai-wait 1.2s var(--sn-ease-in-out) infinite; }
+.sn-ai-wait i:nth-child(2) { animation-delay: .16s; } .sn-ai-wait i:nth-child(3) { animation-delay: .32s; }
+@keyframes sn-ai-wait { 30% { opacity: 1; } 60% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .sn-ai-wait i { animation: none; opacity: .6; } }
 .sn-ai-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 8px; }
 .sn-ai-card { border-radius: 12px; overflow: hidden; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); }
 .sn-ai-card i { display: block; aspect-ratio: 16 / 9; background: var(--sn-g); }
@@ -358,6 +366,14 @@
 .sn-chat-foot > * { pointer-events: auto; }
 .sn-chat-foot { will-change: transform; } /* 自己一个合成层：列表在下面滚时不用重画这一段淡出 */
 .sn-chat-jump { bottom: calc(var(--sn-foot-h, 120px) + 4px); }
+/* 手机上（窄于 640）对话铺满，不是一张卡片：去掉圆角和外圈的线；顶栏像手机应用的导航栏（标题居中、让出刘海）；输入框贴底、让出底部安全区。
+   参照 ChatGPT、Codex 的手机端。设计稿的演示在 demo/doc.css 里照旧画成卡片 */
+@media (max-width: 640px) {
+  .sn-chat { min-height: 0; border-radius: 0; box-shadow: none; }
+  .sn-chat-hd { justify-content: center; padding-top: env(safe-area-inset-top); box-sizing: content-box; }
+  .sn-chat-hd .sn-tx { justify-items: center; text-align: center; }
+  .sn-chat-foot { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+}
 
 /* 无限列表的表头一行：窄的时候计数单独占一行，从一开始就是两行——计数从“已加载 0 条”变成“已加载 40 条 · 共 10,000 条”变长了，
    原来会在加载以后才折成两行，框高跳一下（2026-11-20 巡检：768 宽时 28 → 60） */

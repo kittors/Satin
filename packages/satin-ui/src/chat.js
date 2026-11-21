@@ -121,7 +121,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     else if (it.type === "audio") bub = `<div class="sn-bubble sn-aud"><button class="sn-ap" type="button" aria-label="${tt("chat.4")}"><span class="sn-swap"><span class="sn-a">${PLAY}</span><span class="sn-b">${PAUSE}</span></span></button><span class="sn-wf">${waveBars(28, it.seed || 1)}<span class="sn-wf-on">${waveBars(28, it.seed || 1)}</span></span><span class="sn-dur">${esc(it.dur ?? "")}</span></div>`;
     else if (it.type === "file") bub = `<div class="sn-bubble sn-fcard"><span class="sn-ext-card">${esc(it.ext ?? "")}</span><span class="sn-meta"><b class="sn-fname">${esc(midEllipsis(it.name, 20))}</b><span>${esc(it.ext ?? "")} · ${fmtSize(it.size)}</span></span></div>`;
     else bub = `<div class="sn-bubble">${esc(it.text)}</div>`;
-    const st = it.me && it.status ? `<span class="sn-msg-state${it.status === "fail" ? " sn-bad" : ""}"${it.status === "fail" ? ` role="button" tabindex="0" title="${tt("chat.27")}"` : ""}>${STATE[it.status]}</span>` : "";
+    // 用户的消息立刻出现，不放"发送中"的转圈、不闪对勾（AI 对话里多余）；只有发送失败才显示重试
+    const st = it.me && it.status === "fail" ? `<span class="sn-msg-state${it.status === "fail" ? " sn-bad" : ""}"${it.status === "fail" ? ` role="button" tabindex="0" title="${tt("chat.27")}"` : ""}>${STATE[it.status]}</span>` : "";
     return `<div class="sn-msg ${it.me ? "sn-me" : "sn-ai"}${cont ? " sn-cont" : ""}${it.flying ? " sn-flying" : ""}">${bub}${st}</div>` + (it.status === "fail" ? tt("chat.5") : "");
   }
   // 历史最上面那一行：正在加载只转圈（字留给读屏）；平时、到头了都不写字（"这是对话的开始""往上翻会继续加载"是明摆着的事）
@@ -396,11 +397,12 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   // ———— AI 回复 ————
   function aiHTML(it) {
     const think = it.think == null ? "" : `<div class="sn-think${it.open ? " sn-open" : ""}${it.ph === "think" ? " sn-live" : ""}"><button class="sn-think-hd" type="button"><span class="sn-think-t">${it.ph === "think" ? tt("chat.26") : tt("chat.23", { p0: it.secs })}</span>${icon("chevron-down", 14)}</button><div class="sn-think-bd"><div><p class="sn-think-txt">${esc(it.think)}</p></div></div></div>`;
+    const wait = it.ph === "wait" ? `<div class="sn-ai-wait" role="status" aria-label="${tt("chat.26")}"><i></i><i></i><i></i></div>` : "";
     const steps = it.steps.length ? `<ol class="sn-ai-plan">${it.steps.map(stepHTML).join("")}</ol>` : "";
     const text = it.text || it.ph === "text" ? `<div class="sn-ai-text">${esc(it.text)}${it.ph === "text" ? '<span class="sn-caret"></span>' : ""}</div>` : "";
     const cards = it.cards ? `<div class="sn-ai-cards">${it.cardList.slice(0, it.cards).map(cardHTML).join("")}</div>` : "";
     const img = it.img ? imgHTML(it.img) : "";
-    return `<div class="sn-msg sn-ai sn-rich"><div class="sn-ai-body">${think}${steps}${text}${cards}${img}${it.stopped ? STOPPED : ""}${it.acts ? ACTS : ""}</div></div>`;
+    return `<div class="sn-msg sn-ai sn-rich"><div class="sn-ai-body">${wait}${think}${steps}${text}${cards}${img}${it.stopped ? STOPPED : ""}${it.acts ? ACTS : ""}</div></div>`;
   }
   const imgHTML = (m) => `<div class="sn-ai-image${m.done ? " sn-done" : ""}"><span class="sn-blur" style="--sn-g:${esc(m.g)}"></span><span class="sn-pic" style="--sn-g:${esc(m.g)}"></span><span class="sn-gen-l"><span class="sn-spinner"></span>${tt("chat.12")} <b class="sn-num">${Math.round(m.p * 100)}%</b></span></div>`;
   const STOPPED = tt("chat.13");
@@ -450,6 +452,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     composer._cm?.setBusy(true);
     await after; await wait(90); if (me.stop) return finish(it, me); // 用户的消息落地，停一拍再开始
     let inserted = false, th = null, tx = null, t0 = 0;
+    // 第一段到之前先放"正在思考"的三个点（不然只有一个闪的光标，看不出是在想还是坏了）；第一段来了就换成正文 / 思考 / 步骤
+    const unwait = (ph) => { if (it.ph !== "wait") return false; it.ph = ph; liveEl(it)?.querySelector(".sn-ai-wait")?.remove(); return true; };
     const show = (ph) => {
       if (inserted) return; inserted = true; it.ph = ph; if (ph === "think") it.think = "";
       insert([it], { dur: DY }); msgCount++;
@@ -466,28 +470,29 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
     const toText = async () => {
       if (tx) return tx;
       if (!inserted) show("text");
-      else { await closeThink("text"); it.ph = "text"; liveEl(it)?.querySelector(".sn-ai-body")?.insertAdjacentHTML("beforeend", '<div class="sn-ai-text"><span class="sn-caret"></span></div>'); }
+      else { unwait("text"); await closeThink("text"); it.ph = "text"; liveEl(it)?.querySelector(".sn-ai-body")?.insertAdjacentHTML("beforeend", '<div class="sn-ai-text"><span class="sn-caret"></span></div>'); }
       tx = revealer(it, "text", ".sn-ai-text"); return tx;
     };
     // 正文告一段落（后面是卡片、画面）：先放完缓冲里的字，再去掉光标
     const endText = async () => { if (tx && it.ph === "text") { await tx.drain(); if (me.stop) return; it.ph = "cards"; liveEl(it)?.querySelector(".sn-ai-text .sn-caret")?.remove(); } };
     const addStep = async (st) => {
-      if (!inserted) show("steps"); else await closeThink("steps");
+      if (!inserted) show("steps"); else { unwait("steps"); await closeThink("steps"); }
       if (me.stop) return;
       it.steps.push(st); const el = liveEl(it); if (!el) return; let ol = el.querySelector(".sn-ai-plan"); if (!ol) { ol = document.createElement("ol"); ol.className = "sn-ai-plan"; const t = el.querySelector(".sn-think"); if (t) t.after(ol); else el.querySelector(".sn-ai-body").prepend(ol); } ol.insertAdjacentHTML("beforeend", stepHTML(st));
     };
     // 只改图标和计数，不重建这一行（重建会让它再淡入一次）
     const setStep = ({ index: k, s: st, n }) => { const x = it.steps[k]; if (!x) return; if (st != null) x.s = st; if (n != null) x.n = n; const li = liveEl(it)?.querySelectorAll(".sn-ai-plan li")[k]; if (!li) return; li.className = x.s ? "sn-" + x.s : ""; li.querySelector(".sn-si").innerHTML = SI[x.s]; li.querySelector(".sn-sn").textContent = x.n || ""; };
     const addCard = async (c) => {
-      await endText(); if (me.stop) return; if (!inserted) show("cards");
+      await endText(); if (me.stop) return; if (!inserted) show("cards"); else unwait("cards");
       it.cardList.push(c); it.cards = it.cardList.length;
       const el = liveEl(it); if (el) { let row = el.querySelector(".sn-ai-cards"); if (!row) { row = document.createElement("div"); row.className = "sn-ai-cards"; el.querySelector(".sn-ai-body").append(row); } row.insertAdjacentHTML("beforeend", cardHTML(c)); }
     };
     const image = async (part) => {
-      if (part.image) { await endText(); if (me.stop) return; if (!inserted) show("cards"); it.img = { g: part.image.g, p: 0, done: false }; liveEl(it)?.querySelector(".sn-ai-body").insertAdjacentHTML("beforeend", imgHTML(it.img)); }
+      if (part.image) { await endText(); if (me.stop) return; if (!inserted) show("cards"); else unwait("cards"); it.img = { g: part.image.g, p: 0, done: false }; liveEl(it)?.querySelector(".sn-ai-body").insertAdjacentHTML("beforeend", imgHTML(it.img)); }
       else if (part.imageProgress != null && it.img) { it.img.p = part.imageProgress; const b = liveEl(it)?.querySelector(".sn-ai-image b"); if (b) b.textContent = Math.round(it.img.p * 100) + "%"; }
       else if (part.imageDone && it.img) { it.img.done = true; liveEl(it)?.querySelector(".sn-ai-image")?.classList.add("sn-done"); }
     };
+    show("wait");
     try {
       const out = respond(prompt, { get stopped() { return me.stop; } });
       if (out && typeof out[Symbol.asyncIterator] === "function") {
@@ -495,7 +500,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
           if (me.stop) break;
           if (part == null) continue;
           if (typeof part !== "object") (await toText()).push(String(part));
-          else if (part.think != null) { if (tx) continue; if (!inserted) show("think"); th ??= revealer(it, "think", ".sn-think-txt"); th.push(String(part.think)); }
+          else if (part.think != null) { if (tx) continue; if (!inserted) show("think"); else if (unwait("think")) { it.think = ""; t0 = performance.now(); const el = liveEl(it); if (el) { const tmp = document.createElement("div"); tmp.innerHTML = aiHTML(it); el.querySelector(".sn-ai-body")?.prepend(tmp.querySelector(".sn-think")); } } th ??= revealer(it, "think", ".sn-think-txt"); th.push(String(part.think)); }
           else if (part.text != null) (await toText()).push(String(part.text));
           else if (part.step) await addStep(part.step);
           else if (part.stepUpdate) setStep(part.stepUpdate);
@@ -506,6 +511,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
       } else { const text = await out; if (!me.stop && text) (await toText()).push(String(text)); }
     } catch (e) { if (!me.stop) { (await toText()).push(tt("chat.24")); } }
     if (!inserted && !me.stop) show("text");
+    unwait("text");
     await th?.drain(); await tx?.drain();
     liveEl(it)?.querySelector(".sn-ai-text .sn-caret")?.remove();
     finish(it, me);
@@ -513,6 +519,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   // 收尾：只在原地补上"已停止"和操作按钮，不整块重画（整块重画会让卡片、步骤再淡入一次）
   function finish(it, me) {
     if (job === me) job = null;
+    if (it.ph === "wait") { it.ph = "text"; liveEl(it)?.querySelector(".sn-ai-wait")?.remove(); } // 第一段没来就停了：三个点收掉
     if (index.has(it.id)) {
       if (me.stop) {
         it.stopped = true; it.steps.forEach((s) => { if (s.s === "run") s.s = "stop"; });

@@ -20,7 +20,7 @@ export function menuHTML(items, id, label) {
       if (sid) subs.push(menu(it.children, sid, true, it.label));
       return `<div class="${cx("sn-item", it.disabled && "sn-is-off", it.danger && "sn-danger-item", it.checked && "sn-sel")}" role="menuitem" data-key="${esc(it.key ?? it.label)}"`
         + (it.disabled ? ' aria-disabled="true"' : "") + (sid ? ` data-sub="${sid}" aria-haspopup="menu"` : "") + ">"
-        + (it.icon ? icon(it.icon) : "") + esc(it.label) + (it.kbd ? `<span class="sn-key">${esc(it.kbd)}</span>` : "")
+        + (it.icon ? icon(it.icon) : "") + esc(it.label) + (it.kbd ? `<span class="sn-key sn-sc">${esc(it.kbd)}</span>` : "") /* sn-sc：是快捷键（触屏上藏起来），区别于"JPG · PNG"这种说明 */
         + (it.checked ? `<span class="sn-chk">${icon("check")}</span>` : "") + (sid ? icon("chevron-right").replace('class="sn-ic"', 'class="sn-ic sn-more"') : "") + "</div>";
     }).join("");
     return `<div class="sn-menu sn-float${sub ? " sn-sub" : ""}" id="${mid}" role="menu" tabindex="-1"${aria ? ` aria-label="${esc(aria)}"` : ""}>`

@@ -45,6 +45,12 @@
 .sn-c-warning { color: var(--sn-warning); }
 .sn-num { font-variant-numeric: tabular-nums; }
 .sn-truncate { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* 触屏、没有悬停的设备（手机、平板）上不显示快捷键提示：没有 ⌘、也没有键盘，写了只会让人困惑（悬停提示在 core.js 里也不出） */
+@media (hover: none) { .sn-kbd, .sn-kbd-hint, .sn-key.sn-sc, .sn-cmdk .sn-opt .sn-key, .sn-ta-foot .sn-hint { display: none; } }
+/* 链接兜底：没套 Satin 链接类的 <a>（比如只套了排版类）也不露出浏览器默认的亮蓝色——颜色跟着文字、下划线是浅的线色，和 .sn-link 一个样子。
+   :where() 权重是 0，组件、页面自己写的链接样式都盖得过它；正经写法还是 class="sn-link"（检查器 link-style 会查） */
+:where(a[href]) { color: inherit; text-decoration-thickness: 1px; text-decoration-color: var(--sn-line-control); text-underline-offset: 3px; }
+@media (hover: hover) { :where(a[href]:hover) { text-decoration-color: currentColor; } }
 .sn-ic { flex: none; display: block; }
 /* 一行放不下就横着滑（fitScroll 包上滚动区域，加 .scroll）：滚动区域那一层在行内排版里不另起一行、能被挤窄 */
 .sn-sa:has(> .sn-seg.sn-scroll) { display: inline-block; max-width: 100%; vertical-align: middle; }

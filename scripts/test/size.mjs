@@ -7,7 +7,7 @@ const ROOT = path.resolve(import.meta.dirname, "../..");
 // [名字, 入口代码, 预算（gzip 后 KB）]。预算按 2026-11-21 量到的数留一成余量：轻组件 2.5～6KB；toast、按钮标记要带整张图标名字表（按名字取图标）；
 // React / Vue 封装第一次挂载会调 setup()（Tooltip、浮层栈等页面级行为都装上），所以基础就有 13KB
 const CASES = [
-  ["setup()", `import { setup } from "satin-ui"; setup();`, 14],
+  ["setup()", `import { setup } from "satin-ui"; setup();`, 14.5], // 2026-11-22 +0.5：提示跟着按钮状态当场换字、触屏不出悬停提示、输入框底部一行放不下时收起（用户要求去 AI 味），量到 14.0
   ["createSegmented", `import { createSegmented } from "satin-ui/components"; createSegmented(document.body, { items: ["a", "b"] });`, 7],
   ["createSlider", `import { createSlider } from "satin-ui/components"; createSlider(document.body, {});`, 4],
   ["createSelect", `import { createSelect } from "satin-ui/components"; createSelect(document.body, { items: ["a"] });`, 5],

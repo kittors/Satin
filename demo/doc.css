@@ -50,4 +50,12 @@
 .form-demo { display: grid; gap: 16px; max-width: 440px; }
 .sn-inline-menu { min-width: 0; }
 .state-cell { display: grid; gap: 8px; }
+/* 对话演示：库里的 .sn-chat 现在填满容器、手机上铺满屏幕；设计稿的两个演示照原来画成 680 高、最宽 840 的卡片（画面和改造前一样） */
+.doc .demo > .sn-chat { height: 680px; max-width: 840px; }
+@media (max-width: 640px) {
+  .doc .demo > .sn-chat { min-height: 360px; border-radius: var(--sn-r-xl); box-shadow: inset 0 0 0 1px var(--sn-card-line); }
+  .doc .demo > .sn-chat > .sn-chat-hd { justify-content: flex-start; padding-top: 0; box-sizing: border-box; }
+  .doc .demo > .sn-chat > .sn-chat-hd .sn-tx { justify-items: start; text-align: left; }
+  .doc .demo > .sn-chat .sn-chat-foot { padding-bottom: 16px; }
+}
 }

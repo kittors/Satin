@@ -19,7 +19,26 @@ for (const f of fs.readdirSync(SRC).filter((f) => /^\d+-.*\.md$/.test(f)).sort()
   // 图片：本地占位
   html = html.replace(/src="\/[^"]+\.(png|jpe?g|webp)"/g, (s) => `src="${ph(1280, 720)}"`);
   // 对话的接口：换成本地假回复（逐字流出来）
-  html = html.replace(/async \*respond\(text\) \{[\s\S]*?\n {4}\},/, `async *respond(text) {\n      const reply = "好的。第 3 场的雨夜可以拆成三个镜头：远景站台、林夏的中景、车灯穿过雨幕的特写。";\n      for (const ch of reply) { await new Promise((r) => setTimeout(r, 30)); yield ch; }\n    },`);
+  html = html.replace(/async \*respond\(text\) \{[\s\S]*?\n {4}\},/, () => `respond: (() => {
+      // 演示用的回答（真用时换成你的接口）：按说的事给不同的回答；说的和分镜无关就问要改哪一场；同一句不连着说两遍，不用客套开头
+      const TOPICS = [
+        [/雨|冷|暖|色|灯/, ["开头三个镜头的色温降到 5200K，路灯改成冷白，积水里的倒影也跟着偏蓝了。", "候车厅的暖光压了一档，和外面的冷色对比更明显。"]],
+        [/拆|镜头|分镜|场/, ["这一场拆成三个镜头：远景站台、林夏的中景、车灯穿过雨幕的特写。", "第三集一共 12 个镜头：车站外 3 个、候车厅 5 个、站台 4 个。"]],
+        [/慢|快|节奏|时长|秒/, ["候车厅那段从 18 秒放到 24 秒，第 6 个镜头加了一个收伞的停顿。", "第 2 个镜头从 6 秒剪到 4 秒，雨刚停的那一下留着。"]],
+        [/结尾|结局|最后/, ["结尾改成车门关上、她站在原地，最后停在空站台，留 3 秒黑场。", "结尾的空站台多留 2 秒，车灯远去以后再黑场。"]],
+        [/配音|声|音乐|旁白/, ["旁白换成温柔一点的女声，语速放慢 10%；下雨的段落音乐压低 6 分贝。", "车进站前 2 秒音乐再起来，雨声一直留着。"]],
+        [/字幕|片名|标题/, ["字幕改成 24 号，离画面底边留 8%；片名放在第一个远景上，2 秒淡入。"]],
+      ];
+      const ASK = ["要改哪一场？车站外、候车厅还是站台？", "想先动哪一段：开头的雨夜、候车厅，还是结尾？"];
+      let last = "";
+      return async function* (text) {
+        const pool = (TOPICS.find(([re]) => re.test(text)) || [, ASK])[1];
+        const reply = pool.find((r) => r !== last) || ASK.find((r) => r !== last);
+        last = reply;
+        await new Promise((r) => setTimeout(r, 600)); // 假装在等模型：这段时间消息区里是"正在思考"的三个点
+        for (const ch of reply) { await new Promise((r) => setTimeout(r, 30)); yield ch; }
+      };
+    })(),`);
   const viewport = /viewport-fit=cover/.test(html) ? "" : `<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">`;
   html = html.replace(/<meta name="viewport"[^>]*>\n?/, "");
   const page = `<!doctype html>

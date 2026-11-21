@@ -323,8 +323,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     const fs = kept(), waiting = fs.some((f) => !f.classList.contains("sn-done")), failed = fs.some((f) => f.classList.contains("sn-fail"));
     const ready = (!!ta.value.trim() || fs.length > 0) && !waiting && !box.classList.contains("sn-over");
     send.classList.toggle("sn-ready", ready && !busy); send.setAttribute("aria-disabled", String(!ready && !busy));
-    // 新对话那一套（.sn-cm-new）：什么都没写时，提示写明为什么发不了
-    if (!busy) send.dataset.tip = failed ? tt("input.15") : waiting ? tt("input.16") : !ready && !fs.length && !ta.value.trim() && box.classList.contains("sn-cm-new") ? tt("input.empty") : idleLabel;
+    if (!busy) send.dataset.tip = failed ? tt("input.15") : waiting ? tt("input.16") : idleLabel;
     retip(send); // 提示正开着（指针停在按钮上）就当场换成新状态的字
   };
   const setBusy = (on) => {
@@ -370,17 +369,23 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   };
   // 选择类的部件（模型、模式、上下文栏里能点开的那项）：用户在菜单里选了 → 打勾、按钮上的字平滑换掉、发事件；程序里设（受控的值换了）不发事件
   const picks = (kind) => [...box.querySelectorAll(`.sn-cm-pick[data-pick="${kind}"]`)];
-  // 模型按钮：底部一行放不下全名（全名被省略了）就只显示档位（"精细"），不从中间截断
-  // 再放不下（320 宽这种，档位也被省略了）：底部一行收紧一点（左右留白、用量环和权限标签的间距），一般就够了
+  // 底部一行不折行，发送按钮永远在最右：放不下全名（全名被省略了、或者一行撑出去了）就收起——模型只显示档位（"精细"），
+  // 风格这种文字按钮收成图标；再放不下（320 宽这种，档位也被省略了）：底部一行收紧一点（左右留白、用量环和权限标签的间距），一般就够了
   const cut = (el) => el && el.scrollWidth > el.clientWidth + 0.5;
+  const bar = $(".sn-cm-bar", box);
+  const over = () => cut(bar) || [...box.querySelectorAll(".sn-cm-bar .sn-cm-lbl:not(.sn-cm-lbl-s)")].some((l) => l.offsetParent && cut(l));
   const fitModel = () => {
-    const lbl = $(".sn-cm-model .sn-cm-lbl:not(.sn-cm-lbl-s)", box); if (!lbl) return;
+    if (!bar || !box.querySelector(".sn-cm-bar .sn-cm-lbl")) return;
     box.classList.remove("sn-cm-compact", "sn-cm-tight");
-    if (!cut(lbl)) return;
+    if (!over()) return;
     box.classList.add("sn-cm-compact");
-    if (cut($(".sn-cm-model .sn-cm-lbl-s", box))) box.classList.add("sn-cm-tight");
+    if (over() || cut($(".sn-cm-model .sn-cm-lbl-s", box))) box.classList.add("sn-cm-tight");
   };
-  if ($(".sn-cm-models", box)) { new ResizeObserver(fitModel).observe(box); fitModel(); }
+  // 老写法（设计稿里的标记）：风格按钮、模型按钮的字直接写在按钮里——包成能收起的两段（风格：图标 + 字；模型：全名 + 档位），一行放不下时收起
+  const styleBtn0 = $("[data-cm-style]", box), modelBtn0 = $("[data-cm-model]", box);
+  if (styleBtn0 && !styleBtn0.querySelector(".sn-cm-lbl")) { const t = styleBtn0.textContent; styleBtn0.innerHTML = `<span class="sn-cm-ic" data-i="palette" aria-hidden="true"></span><span class="sn-cm-lbl"></span>`; styleBtn0.lastChild.textContent = t; if (!styleBtn0.getAttribute("aria-label")) styleBtn0.setAttribute("aria-label", t); injectIcons(styleBtn0); }
+  if (modelBtn0 && !modelBtn0.querySelector(".sn-cm-lbl")) { const tn = modelBtn0.firstChild; if (tn?.nodeType === 3) { const full = tn.textContent.trim(), l = document.createElement("span"), s = document.createElement("span"); l.className = "sn-cm-lbl"; l.textContent = full; s.className = "sn-cm-lbl sn-cm-lbl-s"; s.setAttribute("aria-hidden", "true"); s.textContent = shortOf({ label: full }); tn.replaceWith(l, s); if (!modelBtn0.getAttribute("aria-label")) modelBtn0.setAttribute("aria-label", full); } }
+  if (bar && box.querySelector(".sn-cm-bar .sn-cm-lbl")) { new ResizeObserver(fitModel).observe(box); fitModel(); }
   const choose = (pick, v, quiet) => {
     const items = [...pick.querySelectorAll(".sn-menu .sn-item")], it = items.find((x) => x.dataset.v === String(v)); if (!it) return false;
     for (const x of items) { x.classList.toggle("sn-sel", x === it); x.setAttribute("aria-checked", String(x === it)); }
@@ -503,9 +508,9 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   box.addEventListener("drop", (e) => { if (!hasFiles(e)) return; e.preventDefault(); dragN = 0; box.classList.remove("sn-drop"); for (const file of e.dataTransfer.files) addReal(file); });
   ta.addEventListener("paste", (e) => { const fs = [...(e.clipboardData?.files || [])]; if (!fs.length) return; e.preventDefault(); fs.forEach(addReal); });
   const styles = [tt("input.25"), tt("input.26"), tt("input.27"), tt("input.28")]; let si = 0; const styleBtn = $("[data-cm-style]", box);
-  styleBtn?.addEventListener("click", () => { si = (si + 1) % styles.length; styleBtn.lastChild.textContent = tt("input.29", { p0: styles[si] }); if (!reduced()) styleBtn.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 200, easing: "cubic-bezier(0,0,.58,1)" }); });
+  styleBtn?.addEventListener("click", () => { si = (si + 1) % styles.length; const st = tt("input.29", { p0: styles[si] }); styleBtn.lastChild.textContent = st; styleBtn.setAttribute("aria-label", st); if (!reduced()) styleBtn.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 200, easing: "cubic-bezier(0,0,.58,1)" }); });
   const models = [tt("input.30"), tt("input.31")]; let mi = 0; const modelBtn = $("[data-cm-model]", box);
-  modelBtn?.addEventListener("click", () => { mi = (mi + 1) % models.length; modelBtn.firstChild.textContent = tt("input.32", { p0: models[mi] }); if (!reduced()) modelBtn.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 200, easing: "cubic-bezier(0,0,.58,1)" }); });
+  modelBtn?.addEventListener("click", () => { mi = (mi + 1) % models.length; const ml = modelBtn.querySelector(".sn-cm-lbl:not(.sn-cm-lbl-s)"), ms = modelBtn.querySelector(".sn-cm-lbl-s"); if (ml) { ml.textContent = tt("input.32", { p0: models[mi] }); if (ms) ms.textContent = models[mi]; modelBtn.setAttribute("aria-label", ml.textContent); } else modelBtn.firstChild.textContent = tt("input.32", { p0: models[mi] }); fitModel(); if (!reduced()) modelBtn.animate([{ opacity: .4 }, { opacity: 1 }], { duration: 200, easing: "cubic-bezier(0,0,.58,1)" }); });
   sync(); upd(false);
   return box._cm;
 }

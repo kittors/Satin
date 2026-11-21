@@ -35,5 +35,4 @@ export default {
   "input.32": "分镜模型 · {p0}",
   "input.ctx": "上下文",
   "input.model": "换模型",
-  "input.empty": "先写点什么再发送"
 };

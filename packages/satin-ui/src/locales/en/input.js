@@ -35,5 +35,4 @@ export default {
   "input.32": "Storyboard model · {p0}",
   "input.ctx": "Context",
   "input.model": "Switch model",
-  "input.empty": "Type something to send"
 };

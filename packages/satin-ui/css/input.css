@@ -176,7 +176,14 @@
 /* 输入框里的附件菜单往上弹（输入框在页面底部） */
 .sn-inline-menu.sn-up > .sn-menu { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: 0 4px; }
 .sn-inline-menu.sn-up.sn-open > .sn-menu { translate: 0; }
-.sn-cm-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 8px 8px; }
+/* 底部一行永远不折行：发送按钮永远在最右；中间放不下就收起（风格收成图标、模型只显示档位，见下面 sn-cm-compact） */
+.sn-cm-bar { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; padding: 4px 8px 8px; }
+.sn-cm-bar > .sn-cm-chip, .sn-cm-bar > .sn-cm-model { flex: 0 1 auto; min-width: 0; }
+.sn-cm-chip .sn-cm-lbl, .sn-cm-bar > .sn-cm-model .sn-cm-lbl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sn-cm-chip .sn-cm-ic { display: none; }
+.sn-cm-compact .sn-cm-chip .sn-cm-ic { display: inline-grid; }
+.sn-cm-compact .sn-cm-chip .sn-cm-lbl { display: none; }
+.sn-cm-compact .sn-cm-bar > .sn-cm-chip { flex: none; padding-left: 8px; padding-right: 8px; }
 .sn-cm-bar > .sn-inline-menu { flex: none; }
 .sn-cm-bar .sn-grow { flex: 1; }
 .sn-cm-bar .sn-ta-count { margin-right: 6px; font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
@@ -235,19 +242,25 @@
 .sn-cm-new .sn-cm-send .sn-swap { scale: .86; transition: scale .24s var(--sn-ease-out-strong); }
 .sn-cm-new .sn-cm-send:is(.sn-ready, .sn-busy) .sn-swap { scale: 1; }
 @media (prefers-reduced-motion: reduce) { .sn-cm-ctx-i:active, .sn-cm-pick > .sn-cm-mode:active { transform: none; } .sn-cm-caret .sn-ic, .sn-cm-new .sn-cm-send .sn-swap { transition: none; } }
-.sn-cm-send { all: unset; box-sizing: border-box; position: relative; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
-  background: var(--sn-fill-active); color: var(--sn-label-off); transition: background-color .18s var(--sn-ease-out), color .18s var(--sn-ease-out), transform .1s var(--sn-ease-out); }
-.sn-cm-send.sn-ready { background: var(--sn-accent); color: var(--sn-on-primary); }
+/* 发送 / 停止：能发和生成中都是中性的实心圆（墨色底、白字；深色主题反过来），不跟着主题色走——换成红色主题时停止看着像出错，停止不是危险操作。
+   箭头和方块交叉淡入淡出加缩放（出去的缩到 .6、进来的从 .6 放大到 1，160～200ms），底色过渡 160ms，按下缩到 .96；生成进度在消息区里表达，按钮外面不套转圈 */
+.sn-cm-send { --sn-send-bg: var(--sn-label); --sn-send-on: var(--sn-raised); all: unset; box-sizing: border-box; position: relative; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  background: var(--sn-fill-active); color: var(--sn-label-off); transition: background-color .16s var(--sn-ease-out), color .16s var(--sn-ease-out), transform .1s var(--sn-ease-out); }
+:where([data-theme="dark"]) .sn-cm-send { --sn-send-on: var(--sn-canvas); }
+@media (prefers-color-scheme: dark) { :where(:root:not([data-theme])) .sn-cm-send { --sn-send-on: var(--sn-canvas); } }
+.sn-cm-send.sn-ready { background: var(--sn-send-bg); color: var(--sn-send-on); }
+.sn-cm-send .sn-swap > * { transition: opacity .16s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong); }
+.sn-cm-send .sn-swap > .sn-b, .sn-cm-send .sn-swap.sn-on > .sn-a { transform: scale(.6); }
+.sn-cm-send .sn-swap.sn-on > .sn-b { transform: none; } /* 进来的方块放大到 1（上一条的权重和按钮库里那条一样、又写在后面，要再写一次） */
 .sn-cm-send:disabled, .sn-cm-send[aria-disabled="true"] { cursor: default; } /* 还没写内容、发不了：不是手型（悬停照样出提示） */
 @media (hover: hover) {
 .sn-cm-send.sn-ready:hover { transform: scale(1.06); } }
-.sn-cm-send:active { transform: scale(var(--sn-press-icon)); }
-.sn-cm-send.sn-busy { background: var(--sn-accent); color: var(--sn-on-primary); }
+.sn-cm-send:active { transform: scale(.96); }
+.sn-cm-send.sn-busy { background: var(--sn-send-bg); color: var(--sn-send-on); }
 .sn-cm-send:focus-visible { box-shadow: 0 0 0 3px var(--sn-ring); }
 .sn-cm-send .sn-swap .sn-ic { width: 16px; height: 16px; }
 .sn-cm-send .sn-stop { display: block; width: 10px; height: 10px; border-radius: 2px; background: currentColor; }
-.sn-cm-send .sn-orbit { position: absolute; inset: -4px; width: 40px; height: 40px; opacity: 0; transition: opacity .2s; pointer-events: none; }
-.sn-cm-send .sn-orbit circle { fill: none; stroke: var(--sn-label); stroke-width: 1.5; stroke-dasharray: 30 96; stroke-linecap: round; }
-.sn-cm-send.sn-busy .sn-orbit { opacity: 1; animation: sn-spin .9s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .sn-cm-send, .sn-cm-send .sn-swap > * { transition: none; } .sn-cm-send:active { transform: none; } }
+.sn-reduce-motion .sn-cm-send, .sn-reduce-motion .sn-cm-send .sn-swap > * { transition: none; }
 .sn-composer.sn-busy textarea { color: var(--sn-label3); }
 }
