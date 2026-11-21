@@ -37,6 +37,11 @@ const MAN = path.join(ROOT, "examples/shared/demos.json");
 let man = JSON.parse(fs.readFileSync(MAN, "utf8"));
 const before = man.length;
 man = man.filter((d, k) => man.findIndex((x) => x.slug === d.slug) === k);
+// 契约里已经没有的契约示例（改名、删掉的）从清单里拿掉；它们以前写出的文件留在原处，不再进入口页（报告里列为建议删除）
+const live = new Set(contracted.flatMap((c) => c.examples.map((e) => e.slug)));
+const dropped = man.filter((d) => d.contract && !live.has(d.slug)).map((d) => d.slug);
+man = man.filter((d) => !(d.contract && !live.has(d.slug)));
+if (dropped.length) console.log(`清单里拿掉契约里已经没有的示例：${dropped.join("、")}（文件没删）`);
 for (const c of contracted) for (const e of c.examples) {
   if (man.some((d) => d.slug === e.slug)) continue;
   const at = man.findIndex((d) => d.id === c.id), entry = { slug: e.slug, id: c.id, n: -1, name: c.name || c.id, group: c.group || "", cap: e.title, css: false, contract: true };

@@ -71,6 +71,8 @@ function contractMD(c) {
     }
   }
   if (c.props?.length) o += `## 属性\n\n` + tbl(["名称", "类型", "默认值", "必填", "说明", "各写法里的叫法"], c.props.map((x) => [`\`${x.name}\``, `\`${x.type}\``, x.default, x.required ? "是" : "否", pr(x.desc) + (x.example ? `（例：\`${x.example}\`）` : ""), namesOf(x.names)]));
+  // 列定义（表格的 columns 里每一列能写的字段）
+  if (c.columnProps?.length) o += `## 列定义（columns 的每一项）\n\n` + tbl(["字段", "类型", "默认值", "说明"], c.columnProps.map((x) => [`\`${x.name}\``, `\`${x.type}\``, x.default, pr(x.desc)]));
   if (c.events?.length) o += `## 事件\n\n` + tbl(["名称", "参数", "什么时候", "各写法"], c.events.map((x) => [`\`${x.name}\``, `\`${x.payload}\``, pr(x.when), namesOf(x.names)]));
   if (c.slots?.length) o += `## 插槽 / 子元素\n\n` + tbl(["名称", "说明", "各写法"], c.slots.map((x) => [`\`${x.name}\``, pr(x.desc), namesOf(x.names)]));
   if (c.methods?.length) o += `## 实例方法（createXxx 的返回值、React / Vue 的 ref）\n\n` + tbl(["名称", "签名", "说明"], c.methods.map((x) => [`\`${x.name}\``, `\`${x.signature}\``, pr(x.desc)])) + "所有组件都有：`el`、`update(选项)`、`destroy()`、`on(事件, 回调)`、`off(事件, 回调)`。\n\n";

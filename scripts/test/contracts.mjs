@@ -39,7 +39,7 @@ const fileOf = (d) => Object.keys(files).find((f) => files[f].sf === d.sf);
 const EXPORTED_TYPES = new Set(Object.values(files).flatMap(({ decls }) => [...decls].filter(([, d]) => d.kind === "type" && d.exported).map(([n]) => n)));
 const INFRA = new Set(["SatinFactory", "SatinInstance"]); // 所有组件共用的外壳，不算进某一个组件的类型
 const norm = (s) => String(s ?? "").replace(/\s+/g, "").replace(/;+$/, "").replace(/;}/g, "}");
-const lead = (s) => String(s ?? "").split(/[（(]/)[0].trim(); // "PickDetail（{ text: string }）" → "PickDetail"
+const lead = (s) => String(s ?? "").split("（")[0].trim(); // "PickDetail（{ text: string }）" → "PickDetail"（只认全角括号：半角的是函数类型里的）
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 // 一个类型展开成成员表：name → { optional, text, method, params }；顺手记下用到了哪些导出的类型
@@ -234,7 +234,7 @@ for (const id of ids) {
     if (!d?.node.type) errs.push(`vue.d.ts（和 vue-*.d.ts）里找不到组件 ${dts.vue}`);
     else {
       const m = membersOf(d.node.type, vf, refs);
-      const want = new Set(props.flatMap((p) => vueNames(p.names?.vue)));
+      const want = new Set(props.filter((p) => !(p.native || []).includes("vue")).flatMap((p) => vueNames(p.names?.vue))); // native: ["vue"]：从原生属性透传（类型里不单独声明）
       diffSets(want, new Set(m.keys()), `Vue ${dts.vue} 的属性`, errs);
     }
   }

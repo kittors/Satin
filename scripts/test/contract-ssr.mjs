@@ -26,13 +26,15 @@ function htmlOf(src) {
   const host = document.createElement("div");
   host.innerHTML = src.replace(/<!--[\s\S]*?-->/g, "").replace(/<script[\s\S]*?<\/script>/g, "");
   for (const e of [...host.querySelectorAll("sn-enhance")]) e.replaceWith(...e.childNodes);
+  // 浮在 <body> 上的面板（弹出面板）：React、Vue 挂载以后才用 portal / Teleport 放进 <body>，服务端标记里没有，不比
+  for (const e of [...host.querySelectorAll(".sn-pop.sn-popover")]) e.remove();
   injectIcons(host);
   return host.innerHTML;
 }
 // 统一：去掉标签之间的空白、注释（Vue 的 <!--[--> 片段标记）、按属性名排序、类名排序
 // 纯 HTML 写法接线用、框架写法里换成 onClick / ref 的属性：不比
 // （弹窗里"放弃填写的内容？"那一条的 data-keep / data-discard 也是：框架写法里是 Dialog 的 guard + onClick）
-const WIRING = new Set(["id", "data-dlg", "data-pop", "data-fmenu", "data-ctx", "data-drawer", "data-keep", "data-discard", "data-toggle", "data-chips"]);
+const WIRING = new Set(["id", "data-dlg", "data-pop", "data-fmenu", "data-ctx", "data-drawer", "data-keep", "data-discard", "data-toggle", "data-chips", "data-all", "data-f", "data-x", "data-step"]);
 function norm(html) {
   const host = document.createElement("div"); host.innerHTML = html.replace(/<!--[\s\S]*?-->/g, "");
   // 封装组件外面那层 <div class="sn-host" style="display: contents">（不占布局）拆掉

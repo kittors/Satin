@@ -43,7 +43,8 @@ function check(c, foundation) {
     if (ex.length < 3) add("3 示例", `至少 3 个（现在 ${ex.length} 个）`);
     if (ex[0] && ex[0].slug !== c.id + "-basic") add("3 示例", `第一个示例应该是 ${c.id}-basic（基础用法）`);
     const stateful = (c.props || []).some((p) => / \/ default|^default/.test(p.names?.react || "") || /v-model/.test(p.names?.vue || ""));
-    if (stateful && !ex.some((e) => /controlled/.test(e.slug))) add("3 示例", `有受控写法（value / v-model），缺 ${c.id}-controlled 示例`);
+    // 受控示例：slug 带 controlled，或者标题写明"受控"（表格这种有好几个受控项的，按受控项分开写）
+    if (stateful && !ex.some((e) => /controlled/.test(e.slug) || /受控/.test(e.title))) add("3 示例", `有受控写法（value / v-model），缺 ${c.id}-controlled 示例`);
     for (const e of ex) {
       if (!e.slug?.startsWith(c.id + "-")) add("3 示例", `slug "${e.slug}" 要以 ${c.id}- 开头`);
       for (const k of ["title", "why", "html"]) if (!has(e[k])) add("3 示例", `${e.slug} 缺 ${k}`);
