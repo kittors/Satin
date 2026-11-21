@@ -4,28 +4,35 @@
 
 Text 组件 = 层级 × 色调。页面不直接写字号字重，只选层级和色调。一页最多四级字号，字重只用 400、500、600。
 
+**Text 组件 = 层级 × 色调：页面不直接写字号、字重，只选层级和色调。一页最多四级字号，字重只用 400、500、600；数字一律等宽，变化时不左右跳。**
+
+## 相近的组件
+
+- `color`：文字的四级色调来自颜色令牌。
+- `spacing`：标题和内容之间的距离见间距。
+
+## 样式定制
+
+| 变量 | 作用 | 默认值 |
+|---|---|---|
+| `--sn-sans`（全局令牌） | 正文字体（系统字体：苹方、SF） | -apple-system, "PingFang SC"… |
+| `--sn-mono`（全局令牌） | 代码、等宽数字 | "SF Mono", ui-monospace… |
+| `--sn-serif`（全局令牌） | 长文阅读（可选） | "Songti SC"… |
+| `--sn-font-scale`（全局令牌） | 整体字号倍数（设置里的"字号"） | 1 |
+
+## 设计规范
+
+- 这样做：标题、正文、说明各选一级，色调用 label 四级灰。
+- 这样做：计数、价格、时间、表格里的数字用等宽数字。
+- 这样做：文字被截断时悬停显示全文；没被截断就不显示提示。
+- 不要：随手写 font-size、font-weight: 700。（规则 `font-weight`）
+- 不要：标题上方加英文小眉题。（规则 `no-eyebrow`）
+- 不要：写"极致""赋能"这类营销词。（规则 `marketing-copy`）
+
 ## 验收要点
 
 - 计数、价格、时间、表格里的数字一律等宽，变化时不会左右跳。
 - 文字被截断时，悬停显示全文；没被截断就不显示提示。
-
-## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）
-
-### 色调
-
-```html
-<div class="sn-row" id="tones"></div>
-```
-
-### 数字与截断
-
-```html
-<div class="sn-cols" style="--lc:120px">
-<span class="sn-cap">比例数字</span><span class="sn-t-title2">1,111 · 8,888 · 2,017</span>
-<span class="sn-cap">等宽数字</span><span class="sn-t-title2 sn-num">1,111 · 8,888 · 2,017</span>
-<span class="sn-cap">截断 · 悬停看全文</span><span class="sn-t-callout sn-truncate" style="max-width:280px" data-tip-full="">第三集 · 雨夜的车站：主角在末班车开走之后，才发现手里的信封是空的</span>
-</div>
-```
 
 ## 规则
 

@@ -1,0 +1,26 @@
+// 颜色（基础规范）的契约（手写）：说明、令牌、该这样做 / 不要这样做、相关。格式见 spec/components/_api/README.md
+
+export default {
+  title: "颜色",
+  lead: "只用中性色：层级靠背景明度差和四级文字灰度表达；彩色只用在危险、成功、警告这类状态上。强调色就是正文色（浅色主题黑、深色主题白），开关、复选框、进度、焦点都用它。",
+  related: [{ id: "type", diff: "排版里的四级文字色就是这里的 label 系列。" }, { id: "elevation", diff: "层级靠明度差，阴影见阴影与层级。" }],
+  dts: {}, // 基础规范：没有组件和函数，只有令牌
+  types: [],
+  cssVars: [
+    { name: "--sn-canvas / --sn-raised / --sn-sunken", desc: "页面底色 / 卡片、面板 / 凹下去的区域", default: "#f5f5f7 / #fff / #e8e8ed", token: true },
+    { name: "--sn-label / --sn-label2 / --sn-label3 / --sn-label-off", desc: "四级文字：正文 / 次要 / 说明 / 不可用", default: "#1d1d1f / #424245 / #6e6e73 / #aeaeb2", token: true },
+    { name: "--sn-fill-hover / --sn-fill-active", desc: "悬停、按下时叠的一层", default: "黑 4% / 黑 7%", token: true },
+    { name: "--sn-line / --sn-line-control", desc: "分隔、描边 / 输入框这类控件的边", default: "黑 8% / 黑 14%", token: true },
+    { name: "--sn-accent", desc: "强调色（就是正文色）", default: "#1d1d1f", token: true },
+    { name: "--sn-danger / --sn-success / --sn-warning", desc: "状态色：只表达危险、成功、警告", default: "#d92d20 / #248a3d / #b25000", token: true },
+    { name: "--sn-focus / --sn-ring", desc: "键盘焦点的边 / 外面一圈", default: "黑 40% / 黑 7%", token: true },
+  ],
+  design: {
+    do: ["页面只写令牌，不写色值：换深色主题时一起换。", "层级拉开靠明度：卡片比页面亮一点，凹下去的区域暗一点。", "彩色只在说状态的时候出现：删除、失败用危险色，完成用成功色。"],
+    dont: [
+      { text: "在样式里写死 #xxxxxx、rgb()。", rule: "color-token" },
+      { text: "用品牌色、彩色图标、彩色徽章装饰。", rule: "status-color" },
+      { text: "渐变底、渐变文字。", rule: "no-gradient" },
+    ],
+  },
+};

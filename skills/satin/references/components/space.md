@@ -4,19 +4,26 @@
 
 圆角 6 档。线只有 1px，焦点环 2px；默认不画分割线。间距见上一节。
 
-## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）
+**圆角 6 档，从小控件到大面板逐级变大；线只有 1px，焦点环 2px；默认不画分割线，靠留白和明度差分组。**
 
-```html
-<div class="sn-row" id="radii" style="gap:20px"></div>
-```
+## 相近的组件
 
-### 嵌套圆角：内层 = 外层 − 内边距
+- `elevation`：阴影与层级管浮层的投影；这里管圆角和描边。
+- `spacing`：分组先靠间距。
 
-```html
-<div class="sn-row" style="gap:32px">
-<div style="--R:16px;--sn-p:8px"><div></div><span class="sn-cap">外 16，内边距 8 → 内 8</span></div>
-<div style="--R:12px;--sn-p:4px"><div></div><span class="sn-cap">外 12，内边距 4 → 内 8（菜单与菜单项）</span></div>
-<div style="--R:16px;--sn-p:8px"><div></div><span class="sn-cap sn-c-danger">错误：内外同为 16，四周间距不均</span></div>
-</div>
-```
+## 样式定制
+
+| 变量 | 作用 | 默认值 |
+|---|---|---|
+| `--sn-r-xs / --sn-r-sm / --sn-r-md`（全局令牌） | 小标记 / 小控件 / 按钮、输入框 | 4 / 6 / 8 |
+| `--sn-r-lg / --sn-r-xl / --sn-r-full`（全局令牌） | 卡片、菜单 / 对话框、大面板 / 胶囊、圆 | 12 / 16 / 9999 |
+| `--sn-line`（全局令牌） | 1px 的线 | 黑 8% |
+| `--sn-focus`（全局令牌） | 2px 的焦点环 | 黑 40% |
+
+## 设计规范
+
+- 这样做：外面的圆角比里面的大：卡片 12、卡片里的按钮 8。
+- 这样做：要分组时先加留白，不够再用明度差，最后才画线。
+- 不要：到处画分割线、左侧竖条。（规则 `no-decorative-divider`）
+- 不要：卡片里再套带边框的卡片。（规则 `card-nesting`）
 

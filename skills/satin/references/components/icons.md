@@ -4,10 +4,24 @@
 
 统一的线性图标，线宽 1.5，颜色跟随文字。16 放在正文旁，20 用在工具栏，24 用在空状态。不用 emoji，不用彩色图标。
 
-## 设计稿里的标记（照抄即可；`data-i` 的图标要调 `injectIcons()`，交互组件还要接 JS，见上面的写法）
+**统一的线性图标，线宽 1.5，颜色跟随文字：16 放在正文旁，20 用在工具栏，24 用在空状态。不用 emoji，不用彩色图标。**
 
-```html
-<div class="sn-row" style="margin-bottom:16px"><div class="sn-seg sn-sm" data-seg="iconsize"><span class="sn-thumb"></span><button data-v="16">16</button><button data-v="20">20</button><button data-v="24">24</button></div></div>
-<div id="iconGrid"></div>
-```
+## 相近的组件
+
+- `iconbutton`：只有图标的按钮见图标按钮。
+- `button`：按钮里的图标放在字前或字后。
+
+## 样式定制
+
+| 变量 | 作用 | 默认值 |
+|---|---|---|
+| `currentColor` | 图标颜色跟着所在文字（次要图标放在 --sn-label3 的文字里） | 正文色 |
+| `--sn-label3`（全局令牌） | 次要图标、说明里的图标 | #6e6e73 |
+
+## 设计规范
+
+- 这样做：一个按钮最多一个图标；只有图标的按钮要写 aria-label 和文字提示。
+- 这样做：同一处的图标同一个尺寸：正文 16，工具栏 20，空状态 24。
+- 不要：用 emoji、星星火箭这类 AI 套路图标。（规则 `no-ai-icons`）
+- 不要：给图标上彩色、加底色圆圈。（规则 `status-color`）
 
