@@ -8,6 +8,7 @@ import { loadCatalog } from "./catalog.js";
 import { START, GUIDES } from "./pages.js";
 import { docPages, groupsOf } from "./nav-pages.js";
 import { ICONS } from "../packages/satin-ui/src/icons.js";
+import { fwButtonHTML, mountFwButtons, setFw } from "./fwpref.js";
 import { setup } from "../packages/satin-ui/src/setup.js";
 // 官网自己用、组件库里没有的几个图标（Lucide 的 menu、smartphone、terminal、globe、languages）：窄屏顶栏的菜单按钮、文档目录里几页的图标
 ICONS.menu ??= '<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>';
@@ -120,6 +121,10 @@ export function reveal(scope = document) {
   for (const el of $$(".rv:not(.sn-in)", scope)) io.observe(el);
 }
 
+// 新版官网：顶栏的"框架：React ▾"（全站的框架偏好，见 fwpref.js）——先换上按钮再统一换图标
+if (NEXT) for (const s of $$("[data-fw-slot]")) s.outerHTML = fwButtonHTML();
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-set-fw]"); if (b) setFw(b.dataset.setFw); });
 injectIcons(); paintModeBtn();
+if (NEXT) mountFwButtons(document);
 // 新版官网：顶栏、首页主题区、页脚里的外观分段控件（跟随系统 / 浅色 / 深色）都在这里接（要等图标换好再量宽度）
 if (NEXT) for (const s of $$("[data-mode-seg]")) bindModeSeg(s);

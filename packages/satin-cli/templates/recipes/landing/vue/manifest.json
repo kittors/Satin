@@ -1,0 +1,7 @@
+{
+ "title": "落地页",
+ "files": [
+  "landing.vue"
+ ],
+ "entry": "landing.vue"
+}

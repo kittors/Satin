@@ -10,6 +10,7 @@ import { openDrawer, bindOverlays } from "../packages/satin-ui/src/overlay.js";
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
 import { bindModeSeg } from "./shell.js";
+import { fwButtonHTML, mountFwButtons } from "./fwpref.js";
 
 export const NARROW = matchMedia("(max-width: 860px)");
 const LOGO = '<svg viewBox="0 0 24 24" aria-hidden="true"><defs><mask id="lg-m"><rect width="24" height="24" rx="6.5" fill="#fff"/><rect x="-4" y="10.75" width="32" height="2.5" fill="#000" transform="rotate(-34 12 12)"/></mask></defs><rect width="24" height="24" rx="6.5" fill="currentColor" mask="url(#lg-m)"/></svg>';
@@ -34,6 +35,7 @@ export function mountMobileNav({ sections, top = [], current = () => false }) {
     <div class="s-md-pane s-md-nav"><nav class="s-mn" aria-label="网站导航"></nav></div>
     <div class="s-md-pane s-md-theme" inert><div class="s-md-th"></div></div>
   </div>
+  <div class="s-md-fw">${fwButtonHTML({ cls: "sn-btn sn-secondary s-md-fwbtn", prefix: "框架：" })}</div>
   <div class="s-md-ft">
     <div class="sn-seg s-md-mode" role="tablist" aria-label="外观"><span class="sn-thumb"></span><button data-v="auto" aria-label="跟随系统" data-i="monitor"></button><button data-v="light" aria-label="浅色" data-i="sun"></button><button data-v="dark" aria-label="深色" data-i="moon"></button></div>
     <button class="sn-btn sn-ghost s-md-thbtn" type="button" data-md-theme aria-expanded="false" data-i="sliders-horizontal:before">主题调整</button>
@@ -46,6 +48,7 @@ export function mountMobileNav({ sections, top = [], current = () => false }) {
   bindOverlays(box); // [data-x] 关、Tab 圈在抽屉里、手指往右拖着关
   const sa = scrollArea(navPane, { inner: true, size: 24, overscroll: "contain" });
   bindModeSeg($(".s-md-mode", box));
+  mountFwButtons(box);
 
   // ———— 列表 ————
   const opened = new Set(); // 用户自己展开过的类别（换页、补上组件目录以后还开着）

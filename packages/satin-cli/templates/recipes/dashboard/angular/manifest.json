@@ -1,0 +1,7 @@
+{
+ "title": "仪表盘",
+ "files": [
+  "dashboard.ts"
+ ],
+ "entry": "dashboard.ts"
+}

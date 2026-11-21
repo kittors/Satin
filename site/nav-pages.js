@@ -1,10 +1,10 @@
 // 新版官网的页面清单：文档页左边的目录、上一页 / 下一页、窄屏的导航抽屉（文档页和首页）、⌘K 搜索都用这一份。
 // 站点地图和每一项为什么放在那里，见 docs/site-ia.md。旧版文档页（docs.html）还是只读 pages.js 的 START、GUIDES。
-import { START, GUIDES } from "./pages.js";
-import { START_MORE, AI_PAGES, INTRO, CLI_PAGE, BROWSERS, CUSTOM_PAGES, OTHER_PAGES, RECIPES } from "./pages-more.js";
+import { GUIDES } from "./pages.js";
+import { START_MORE, AI_PAGES, INTRO, QUICK, CLI_PAGE, BROWSERS, CUSTOM_PAGES, OTHER_PAGES, RECIPES } from "./pages-more.js";
 
 // "开始"一组：介绍 → 快速上手 → 用 CLI 创建项目 → 框架接入 → 移动端与 H5 → 浏览器支持
-export const STARTS = [INTRO, START.find((p) => p.id === "start"), CLI_PAGE, ...START_MORE, BROWSERS];
+export const STARTS = [INTRO, QUICK, CLI_PAGE, ...START_MORE, BROWSERS];
 export { AI_PAGES, GUIDES, CUSTOM_PAGES, OTHER_PAGES, RECIPES };
 
 // 目录里每页的图标（组件页不带图标）

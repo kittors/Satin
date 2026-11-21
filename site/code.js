@@ -51,18 +51,19 @@ export function fmtHTML(root, W = 80) {
 // files：[{ name: "HTML", lang: "html", code }]；fold：超过多少行折叠（0 不折叠）；solo：单独一块（自带底色和圆角），否则铺在演示框里
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const COPY = '<button class="sn-btn sn-ghost sn-sm sn-ibtn cx-copy" data-tip="复制" aria-label="复制"><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>';
-export function codePanel(files, { fold = 0, solo = false, nums = true } = {}) {
+// lead：放在头一行最前面的东西（比如框架选择按钮）；给了 lead 就总有头一行，单个文件也显示文件名
+export function codePanel(files, { fold = 0, solo = false, nums = true, lead = "" } = {}) {
   files = files.filter((f) => f.code?.trim());
   if (!files.length) return "";
   const many = files.length > 1;
   const head = many
-    ? `<div class="cx-hd"><div class="cx-tabs" role="tablist">${files.map((f, i) => `<button role="tab" aria-selected="${i === 0}" data-k="${i}">${esc(f.name)}</button>`).join("")}</div>${COPY}</div>`
-    : (files[0].name && solo ? `<div class="cx-hd"><span class="cx-name">${esc(files[0].name)}</span>${COPY}</div>` : COPY);
+    ? `<div class="cx-hd">${lead}<div class="cx-tabs" role="tablist">${files.map((f, i) => `<button role="tab" aria-selected="${i === 0}" data-k="${i}">${esc(f.name)}</button>`).join("")}</div>${COPY}</div>`
+    : ((files[0].name && solo) || lead ? `<div class="cx-hd">${lead}<span class="cx-name">${esc(files[0].name || "")}</span>${COPY}</div>` : COPY);
   const body = files.map((f, i) => {
     const lines = highlightLines(f.code, f.lang), n = lines.length;
     return `<div class="cx-file${nums && n > 1 ? "" : " sn-nonum"}" data-k="${i}" data-n="${n}" data-src="${esc(f.code)}"${i ? " hidden" : ""} style="--sn-gw:${String(n).length}ch"><pre tabindex="0"><code>${lines.map((l) => `<span class="sn-l">${l || " "}</span>`).join("")}</code></pre></div>`;
   }).join("");
-  return `<div class="cx${solo ? " solo" : ""}${many || (files[0].name && solo) ? " has-hd" : ""}" data-fold="${fold}">${head}<div class="cx-bd">${body}<i class="cx-fade"></i></div>`
+  return `<div class="cx${solo ? " solo" : ""}${many || (files[0].name && solo) || lead ? " has-hd" : ""}" data-fold="${fold}">${head}<div class="cx-bd">${body}<i class="cx-fade"></i></div>`
     + `<button class="cx-more" hidden><span class="cx-more-t">展开代码</span><span class="cx-more-i" data-i="chevron-down"></span></button></div>`;
 }
 // 放进页面以后调一次：补图标、按行数决定折不折叠（源码在 data-src 上，复制用）

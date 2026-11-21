@@ -64,6 +64,10 @@ const FW = [
 ];
 // 检查片段能不能直接跑的脚本（scripts/site/snippets.mjs）也读这一份
 export const FRAMEWORK_SNIPPETS = FW.map(([name, note, files]) => ({ name, note, files }));
+const FW_ID = { React: "react", Vue: "vue", Svelte: "svelte", Angular: "angular", Solid: "solid", Preact: "preact", "纯 HTML": "html", "Next.js": "next", Nuxt: "nuxt" };
+export const FW_SETUP = Object.fromEntries(FW.map(([name, note, files]) => [FW_ID[name], { name, note, files }]));
+// 跟着框架变的一段：每个框架（和环境）一组块
+const perFw = (make) => Object.fromEntries(Object.entries(FW_SETUP).map(([id, x]) => [id, make(id, x)]));
 
 export const START_MORE = [
   {
@@ -77,13 +81,15 @@ export const START_MORE = [
         ["Svelte、Angular、Solid、Preact、纯 HTML", "自定义元素 <code>&lt;sn-xxx&gt;</code> + 纯样式的类名", "任何能写 HTML 的地方"],
         ["任何写法", "<code>createXxx(元素, 选项)</code>：返回实例，有 <code>update</code>、<code>destroy</code>", "数据表格、流程图、对话这类重组件，或者想自己管生命周期"],
       ]],
-      ["p", "四种写法画出来一模一样：React、Vue 组件和自定义元素都是在同一个 <code>createXxx</code> 外面包一层。纯样式的组件（按钮、输入框、标签……）在哪种框架里都直接写 <code>sn-</code> 类名。"],
-      ...FW.flatMap(([name, note, files]) => [["h2", name], ["p", note], ["files", files]]),
+      ["p", "几种写法画出来一模一样：React、Vue 组件和自定义元素都是在同一个 <code>createXxx</code> 外面包一层。纯样式的组件（按钮、输入框、标签……）在哪种框架里都直接写 <code>sn-</code> 类名。<b>右上角选好框架以后，整个网站的代码都换成这个框架的写法</b>（组件页、配方、快速上手、CLI）。"],
+      ["h2", "接入步骤"],
+      ["fw", perFw((id, x) => [["p", `<b>${x.name}</b>：${x.note}`], ["files", x.files]])],
+      ["p", "换一个框架看：" + Object.entries(FW_ID).map(([n, id]) => `<button class="sn-btn sn-tertiary sn-sm" data-set-fw="${id}">${n}</button>`).join(" ")],
       ["h2", "重组件"],
-      ["p", "数据表格、Canvas 表格、流程图、对话、Markdown 在各自的子路径里（<code>satin-ui/grid</code>、<code>satin-ui/flow</code>……），用 <code>createXxx</code> 挂到一个空容器上；React、Vue 里用 <code>wrapSatin(createXxx)</code> 包成组件。每个组件页的代码区可以切换 HTML、React、Vue、自定义元素四种写法。"],
+      ["p", "数据表格、Canvas 表格、流程图、对话、Markdown 在各自的子路径里（<code>satin-ui/grid</code>、<code>satin-ui/flow</code>……），用 <code>createXxx</code> 挂到一个空容器上；React、Vue 里用 <code>wrapSatin(createXxx)</code> 包成组件。组件页上每个演示的代码都是当前框架的写法，取自仓库里构建、截图比对过的全量示例。"],
       ["code", "jsx", 'import { wrapSatin } from "satin-ui/react";\nimport { createDataGrid } from "satin-ui/grid";\n\nconst DataGrid = wrapSatin(createDataGrid); // 卸载时自动 destroy：后台线程、放进 <head> 的样式一起撤\n\nexport default function Projects() {\n  return <DataGrid rows={100000} />;\n}'],
       ["h2", "仓库里的完整示例"],
-      ["p", "<code>examples/</code> 下每种写法一个项目，渲染同一批组件，截图和纯 HTML 版逐像素对比；Next.js、Nuxt 的那份走服务端渲染再水合。"],
+      ["p", "<code>examples/</code> 下每种写法一个项目：<code>index.html</code> 是同一批组件的对照页，<code>gallery.html</code>（Next.js、Nuxt 是 <code>/gallery</code>）是设计稿 61 块的全部演示，逐块截图和设计稿比对。官网组件页、配方页的代码就是这些文件。"],
     ],
   },
   {
@@ -246,13 +252,30 @@ export const INTRO = {
   ],
 };
 
+// 快速上手（新版）：两种开始方式，代码跟着全站的框架偏好变；后面的"文件一览""公开的函数"沿用原来那页
+const ST = START.find((p) => p.id === "start");
+export const QUICK = {
+  ...ST,
+  lead: "两种开始方式：一条命令建好新项目，或者在已有项目里装上。下面的代码跟着右上角选的框架变，复制就能跑。",
+  body: [
+    ["h2", "用 CLI 建一个新项目"],
+    ["p", "样式、theme-boot、框架插件、给编码助手的技能和 AGENTS.md 都配好。还没发布到 npm，先在 Satin 仓库里用 node 跑（详见<a href=\"#/cli\">用 CLI 创建项目</a>）："],
+    ["fw", perFw((id) => [["code", "sh", `node <Satin 仓库>/packages/satin-cli/bin/satin.js init --framework ${id} --dir my-app\ncd my-app\nnpm run dev`]])],
+    ["h2", "在已有项目里装"],
+    ["fw", perFw((id, x) => [["p", x.note], ["files", x.files]])],
+    ["h2", "写组件"],
+    ["p", "纯样式的组件（按钮、输入框、开关、标签……）就是类名，变体、尺寸也是类名，图标写成 <code>data-i</code> 占位；有交互的组件用当前框架的写法。组件页上每个演示的代码都是当前框架的写法，取自构建、截图比对过的全量示例，复制就能跑。"],
+    ...ST.body.slice(ST.body.findIndex((b) => b[0] === "h2" && b[1] === "文件一览")),
+  ],
+};
+
 export const CLI_PAGE = {
   id: "cli", title: "用 CLI 创建项目", en: "CLI",
   lead: "一条命令起一个配好 Satin 的项目：样式、theme-boot、框架插件、技能和 AGENTS.md 都放好，打开就能让编码助手开始做页面。",
   body: [
     ["h2", "还没发布到 npm"],
-    ["p", "CLI 的包是 <code>satin-cli</code>（命令名 <code>satin</code>），还没有发布到 npm；发布要等维护者确认。现在在 Satin 仓库里直接用 node 跑："],
-    ["code", "sh", "node packages/satin-cli/bin/satin.js init --framework react --dir my-app\n# 发布以后：npx satin-ui init"],
+    ["p", "CLI 的包是 <code>satin-cli</code>（命令名 <code>satin</code>），还没有发布到 npm；发布要等维护者确认。现在在 Satin 仓库里直接用 node 跑（命令里的框架跟着右上角选的走）："],
+    ["fw", perFw((id) => [["code", "sh", `node <Satin 仓库>/packages/satin-cli/bin/satin.js init --framework ${id} --dir my-app\ncd my-app\nnpm run dev\n# 发布以后：npx satin-ui init --framework ${id}`]])],
     ["h2", "命令"],
     ["table", ["命令", "做什么"], [
       ["<code>init</code>", "选框架（9 种）生成能直接跑的项目：样式、theme-boot、Vite / Next / Nuxt 插件配好，写入 AGENTS.md 和项目级技能，package.json 里加 <code>check</code> 脚本"],

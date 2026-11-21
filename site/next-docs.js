@@ -13,6 +13,8 @@ import { USAGE, TALL, EX, WIN } from "./usage.js";
 import { EXAMPLES, API } from "./examples.js";
 import { img } from "./media.js";
 import { variants, demoCSS, guessInline, guessFlex } from "./variants.js";
+import { getFw, getEnv, onFw, setFw, fwButtonHTML, mountFwButtons } from "./fwpref.js";
+import { FRAMEWORKS } from "./frameworks.js";
 
 const side = $("[data-side]"), main = $("[data-main]"), toc = $("[data-toc]"), cat = await loadCatalog();
 // 展示页给演示排版用的样式（库里没有的类）：生成代码时挑出这个演示用到的规则，跟代码一起给
@@ -53,6 +55,8 @@ const BLOCK = {
   code: (lang, src, cap) => snippet(lang, src, cap),
   files: (files) => codePanel(files, { solo: true, nums: true }),
   rules: () => '<div data-async="rules"></div>',
+  fw: (map) => `<div class="d-fw" data-fwb="${FWB.push(map) - 1}">${renderFwb(map)}</div>`,
+  fwname: () => `<b data-fw-name>${esc(getFw().name + (getEnv() ? " · " + getEnv().name : ""))}</b>`,
   tokens: () => '<div data-async="tokens"></div>',
   img: (src, w, h, cap) => `<figure class="d-fig"><img src="${src}" width="${w}" height="${h}" alt="${esc(cap)}" loading="lazy" decoding="async"><figcaption>${cap}</figcaption></figure>`,
   do: (yes, no) => `<div class="d-dodont"><div class="do"><b><span data-i="check"></span>这样做</b><p>${yes}</p></div><div class="dont"><b><span data-i="x"></span>不要</b><p>${no}</p></div></div>`,
@@ -104,7 +108,7 @@ function demoBox(id, { code = true, n } = {}) {
   return `<div class="dx${w ? " is-win" : ""}" data-demo="${id}"${n != null ? ` data-n="${n}"` : ""}>
     <div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div>
     <div class="dx-stage">${w ? `<img class="dx-wall" src="${img("mist", 1800, 70)}" alt="" decoding="async">` : ""}${w ? MAC(w.title, frame) : frame}</div>
-    ${code && c ? codeSlot(variantFiles(c, null, n)) : ""}
+    ${code && c ? `<div class="dx-code" data-slug="${c.id}-${n ?? 0}"><div class="dx-cx"></div></div>` : ""}
   </div>`;
 }
 // iframe 里内容高度变了会发消息来：框跟着变。第一条消息 = 演示好了：换页等待里、不在视口里、或者记下的高度没变，直接出来；
@@ -171,14 +175,40 @@ function codeOf(demo, doc) {
   }
   return fmtHTML(t.content);
 }
-// ———— 写法切换：同一个演示的 HTML、React、Vue、自定义元素四种写法（variants.js 从标记和脚本生成）。选了哪种记住，整站都换 ————
-const VARS = [["html", "HTML"], ["react", "React"], ["vue", "Vue"], ["element", "自定义元素"]];
-let curVar = localStorage.getItem("satin-docs-variant"); if (!VARS.some(([k]) => k === curVar)) curVar = "html";
-// keys：这一块有哪几种写法（配方没有"自定义元素"）；当前选的那种这一块没有，就显示 HTML
-const varsOf = (keys) => VARS.filter(([k]) => keys.includes(k));
-const pick = (fs) => fs[curVar] || fs.html;
-const varRow = (keys = VARS.map(([k]) => k)) => `<div class="dx-vars" data-keys="${keys.join(",")}"><div class="sn-seg sn-sm" role="tablist" aria-label="写法"><span class="sn-thumb"></span>${varsOf(keys).map(([k, t]) => `<button data-v="${k}">${t}</button>`).join("")}</div></div>`;
-const codeSlot = (fs, fold = 8) => `<div class="dx-code" data-sig="${sigOf(fs)}" data-fold="${fold}">${varRow(Object.keys(fs))}<div class="dx-cx">${codePanel(pick(fs), { fold })}</div></div>`;
+// ———— 代码：跟着全站的框架偏好（fwpref.js），读 examples/<框架>/ 里这个演示的源码——全量示例生成、构建、逐块截图比对过的同一份文件 ————
+const DEMOS = new Map((await fetch(new URL("../examples/shared/demos.json", import.meta.url)).then((r) => r.json()).catch(() => [])).map((d) => [d.slug, d]));
+const texts = new Map();
+const getText = (u) => texts.get(u) || (texts.set(u, fetch(new URL(u, import.meta.url)).then((r) => (r.ok ? r.text() : null)).catch(() => null)), texts.get(u));
+const htmlFw = FRAMEWORKS.find((f) => f.id === "html");
+// 一个演示 / 配方在当前框架下的文件；这个框架还没有对应写法时明说，给自定义元素写法（纯 HTML 那份），不悄悄换成别的框架
+async function codeFiles(kind, key) {
+  const fw = getFw(), rel = kind === "demo" ? fw.demo(key) : fw.recipe(key), main = `../${fw.dir}/${rel}`, dir = main.slice(0, main.lastIndexOf("/") + 1);
+  const css = fw.id !== "angular" && fw.id !== "html" && kind === "demo" && DEMOS.get(key)?.css ? getText(dir + key + ".css") : null; // 配方只用库的类名，没有演示样式
+  const [code, cssCode] = await Promise.all([getText(main), css]);
+  if (code != null) return { files: [{ name: rel.split("/").pop(), lang: fw.lang, code }, ...(cssCode ? [{ name: key + ".css", lang: "css", code: cssCode }] : [])] };
+  const hrel = kind === "demo" ? htmlFw.demo(key) : htmlFw.recipe(key), hc = await getText(`../${htmlFw.dir}/${hrel}`);
+  return { note: fw.fallback || `${fw.name} 暂用自定义元素写法`, files: hc ? [{ name: hrel.split("/").pop(), lang: "html", code: hc }] : [] };
+}
+// 代码块头一行：框架按钮（点开换全站的框架）+ 文件名；没有专门写法时一行说明
+const fwLead = (note) => `<span class="cx-fw">${fwButtonHTML({ cls: "sn-btn sn-ghost sn-sm cx-fwbtn", prefix: "" })}</span>${note ? `<span class="cx-note">${esc(note)}</span>` : ""}`;
+async function fillCode(slot) {
+  const kind = slot.dataset.recipe ? "recipe" : "demo", key = slot.dataset.recipe || slot.dataset.slug, want = getFw().id + (getEnv()?.id || "");
+  const r = await codeFiles(kind, key); if (!slot.isConnected) return;
+  const cx = $(".dx-cx", slot), open = cx.querySelector(".cx")?.classList.contains("sn-open");
+  cx.innerHTML = r.files.length ? codePanel(r.files, { fold: +slot.dataset.fold || 8, lead: fwLead(r.note) }) : `<p class="d-err">这一块的代码还没生成（node scripts/examples/gallery.mjs）</p>`;
+  slot.dataset.fw = want; mountCode(cx); mountFwButtons(cx);
+  if (open) cx.querySelector(".cx-more")?.click();
+}
+const fillAll = (scope = main) => Promise.all($$(".dx-code[data-slug], .dx-code[data-recipe]", scope).map(fillCode));
+// 正文里跟着框架变的块（快速上手、框架接入、CLI 页）
+const FWB = [];
+const fwPick = (map) => { const fw = getFw(), env = getEnv(); return map[env?.id] || map[fw.id] || null; };
+const renderFwb = (map) => { const b = fwPick(map), fw = getFw(); return b ? blocks(b) : `<p class="d-fw-miss">${esc(fw.name)} 这一段还没有专门的写法，下面是纯 HTML（自定义元素）的写法，在 ${esc(fw.name)} 里同样能用。</p>` + blocks(map.html || []); };
+onFw(() => {
+  fillAll();
+  for (const el of $$(".d-fw[data-fwb]", main)) { el.innerHTML = renderFwb(FWB[+el.dataset.fwb]); injectIcons(el); mountCode(el); }
+  for (const el of $$("[data-fw-name]", main)) el.textContent = getFw().name + (getEnv() ? " · " + getEnv().name : "");
+});
 // 计算样式拿来判断空白要不要留：在演示文档里找同样标签、同样类名的元素
 const liveOf = (doc, el) => { if (!doc || !el.classList?.length) return null; try { return doc.querySelector(el.localName + "." + [...el.classList].map((c) => CSS.escape(c)).join(".")); } catch { return null; } };
 const inlineIn = (doc) => (el) => { const l = liveOf(doc, el); return l ? /^inline/.test(doc.defaultView.getComputedStyle(l).display) : guessInline(el); };
@@ -205,23 +235,6 @@ window.__satinDemoFiles = () => $$(".dx", main).filter((box) => box.querySelecto
   const ready = !!(doc && doc.__dx), fs = variantFiles(c, ready ? doc : null, n);
   return { id: c.id, n, slug: `${c.id}-${n}`, cap: c.demos[n]?.cap || "", ready, files: fs.all, extra: fs.extra, markup: fs.markup, js: fs.js, css: fs.css };
 });
-// 代码区放进页面以后：接上写法切换（组件库的分段控件）；切了一个，整页的演示一起换
-function mountVars(scope) {
-  for (const row of $$(".dx-vars:not([data-ready])", scope)) {
-    row.dataset.ready = "";
-    const keys = row.dataset.keys.split(",");
-    row._keys = keys; row._seg = initSeg($(".sn-seg", row), (v) => setVar(v, row), Math.max(0, keys.indexOf(curVar)));
-  }
-}
-function setVar(v, from) {
-  if (v === curVar) return; curVar = v; localStorage.setItem("satin-docs-variant", v);
-  for (const slot of $$(".dx-code", main)) {
-    const row = $(".dx-vars", slot); if (row && row !== from) row._seg?.go(Math.max(0, row._keys.indexOf(v)), false, true);
-    const fs = slot._fs; if (!fs) continue;
-    const cx = $(".dx-cx", slot), open = cx.querySelector(".cx")?.classList.contains("sn-open");
-    cx.innerHTML = codePanel(pick(fs), { fold: +slot.dataset.fold || 8 }); mountCode(cx); if (open) cx.querySelector(".cx-more")?.click();
-  }
-}
 // 一个演示的代码：手写的用法（examples.js）优先——整套替换（files），或者在标记后面补 JS、前面补别的文件；
 // 没写的就给这个演示的标记（脚本生成的从 iframe 里取），第一个演示再带上通用的 JS 调用（EX）
 function filesOf(c, doc, n) {
@@ -258,14 +271,7 @@ function wireDemo(box, c) {
   // 代码面板：演示宣布“好了”的那一刻（第一条高度消息，见上面的 message 处理）同步按生成出来的结构更新——赶在页面 / 演示露出来之前，
   // 不能露出来以后再换（原来等两帧，刷新时整页出来了代码区再重排一次、“展开代码”跳一下，2026-11-20 刷新录像抓到）。
   // 整页加载完（有的演示标记是脚本后来才生成的）再核对一次；内容没变不重画
-  const code = (doc) => {
-    const slot = box.querySelector(".dx-code"); if (!slot || !c || !doc) return;
-    const fs = variantFiles(c, doc, box.dataset.n != null ? +box.dataset.n : undefined), sig = sigOf(fs);
-    slot._fs = fs; if (slot.dataset.sig === sig) return;
-    const cx = $(".dx-cx", slot), open = cx.querySelector(".cx")?.classList.contains("sn-open");
-    slot.dataset.sig = sig; cx.innerHTML = codePanel(pick(fs), { fold: 8 }); mountCode(cx);
-    if (open) cx.querySelector(".cx-more")?.click();
-  };
+  const code = () => {}; // 代码块读示例文件（fillCode），演示载好以后不用再按页面重画
   f.__code = code;
   // 浮层处理：演示文档一解析完就接上（模块脚本在这之前已经跑完；等两帧，初始化里排的第一帧也走完）
   whenReady(f, (doc) => {
@@ -590,14 +596,19 @@ function recipeFiles(r, d, doc) {
   const js = [...tp.content.querySelectorAll("script")].map((x) => x.textContent.replace(/^\n|\s+$/g, "").split("\n").map((l) => l.replace(/^ {2}/, "")).join("\n")).join("\n");
   for (const x of tp.content.querySelectorAll("script, meta, link, title")) x.remove();
   const v = variants({ node: tp.content, js, slug: r.id, ...(doc ? { inline: inlineIn(doc), flex: flexIn(doc) } : {}) });
-  return (d.fs = { html: [{ name: "HTML", lang: "html", code: d.code }], react: v.react, vue: v.vue });
+  return (d.fs = { original: [{ name: "HTML", lang: "html", code: d.code }], ...v });
 }
+window.__satinRecipeFiles = async () => {
+  const pg = curPage; if (pg?.kind !== "recipe") return null;
+  const f = $(".d-rframe iframe", main); let doc = null; try { doc = f?.contentDocument; } catch {}
+  const d = await loadRecipe(pg.r); return { id: pg.r.id, ready: !!doc && doc.readyState === "complete", files: recipeFiles(pg.r, d, doc && doc.URL !== "about:blank" ? doc : null) };
+};
 const ASYNC = {
   async recipe(id) {
     const r = RECIPES.find((x) => x.id === id), d = await loadRecipe(r);
     const lead = $("[data-async-lead]", main); if (lead) lead.outerHTML = md2html(d.lead.join(" "));
     return anchor("preview", "预览") + `<div class="d-rframe"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>`
-      + anchor("code", "代码") + `<div class="d-rcode" data-recipe-code="${id}">${codeSlot(recipeFiles(r, d), 24)}</div>`
+      + anchor("code", "代码") + `<div class="dx-code d-rcode" data-recipe="${id}" data-fold="24"><div class="dx-cx"></div></div>`
       + (d.notes.length ? anchor("notes", "补充说明") + `<ul class="d-list">${d.notes.map((n) => `<li>${md2html(n)}</li>`).join("")}</ul>` : "");
   },
   async rules() {
@@ -630,16 +641,7 @@ async function fillAsync(scope, base) {
   if (curPage?.hash !== base) return; // 载入期间已经换页了
   injectIcons(main); mountCode(main);
   for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
-  for (const box of $$("[data-recipe-code]", main)) {
-    const r = RECIPES.find((x) => x.id === box.dataset.recipeCode), slot = $(".dx-code", box); if (!r || !slot) continue;
-    const d = await loadRecipe(r); slot._fs = recipeFiles(r, d);
-    // 预览载好以后按真实的排版重新生成一遍（行内元素之间的空格要不要留），变了才重画
-    const f = $(".d-rframe iframe", main), redo = () => { let doc = null; try { doc = f.contentDocument; } catch {} if (!doc || doc.URL === "about:blank") return;
-      const fs = recipeFiles(r, d, doc), sig = sigOf(fs); slot._fs = fs; if (slot.dataset.sig === sig) return; slot.dataset.sig = sig;
-      const cx = $(".dx-cx", slot); cx.innerHTML = codePanel(pick(fs), { fold: 24 }); mountCode(cx); };
-    if (f) { f.addEventListener("load", redo, { once: true }); if (f.contentDocument?.readyState === "complete") redo(); }
-  }
-  mountVars(main);
+  await fillAll();
   buildToc(base);
 }
 function textPage(pg) {
@@ -678,11 +680,13 @@ function buildToc(base) {
   spyToc();
   // 窄屏（右边的本页目录藏起来了）：标题和说明下面一条"本页目录"，点开是一张菜单（组件库的按钮菜单），点一项滚到那一节
   const hd = $(".d-head", main);
-  if (hd && tocHs.length >= 2) {
+  if (hd) {
+    $(".d-mtoc", main)?.remove();
     const bar = document.createElement("div"); bar.className = "d-mtoc";
-    bar.innerHTML = `<button class="d-mtoc-btn" type="button" data-fmenu="d-mtoc-menu" data-i="list:before">本页目录<span data-i="chevron-down"></span></button>`
-      + `<div class="sn-menu d-mtoc-menu" id="d-mtoc-menu">${tocHs.map((h) => `<a class="sn-item" href="${base}:${h.id}" data-to="${h.id}">${esc(tt(h))}</a>`).join("")}</div>`;
-    hd.after(bar); injectIcons(bar); bindOverlays(bar);
+    bar.innerHTML = (tocHs.length >= 2 ? `<button class="d-mtoc-btn" type="button" data-fmenu="d-mtoc-menu" data-i="list:before">本页目录<span data-i="chevron-down"></span></button>`
+      + `<div class="sn-menu d-mtoc-menu" id="d-mtoc-menu">${tocHs.map((h) => `<a class="sn-item" href="${base}:${h.id}" data-to="${h.id}">${esc(tt(h))}</a>`).join("")}</div>` : "")
+      + `<span class="d-mtoc-fw">${fwButtonHTML({ cls: "d-mtoc-btn", prefix: "框架：" })}</span>`;
+    hd.after(bar); injectIcons(bar); bindOverlays(bar); mountFwButtons(bar);
   }
 }
 
@@ -717,8 +721,7 @@ function swapPage(pg, part) {
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     for (const w of $$(".dx-wall", main)) { const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); }
     for (const box of $$(".dx", main)) wireDemo(box, pg.c || cat.byId[box.dataset.demo]);
-    mountVars(main);
-    for (const slot of $$(".dx-code", main)) if (!slot._fs) { const box = slot.closest(".dx"), c = pg.c || cat.byId[box?.dataset.demo]; if (c) slot._fs = variantFiles(c, null, box.dataset.n != null ? +box.dataset.n : undefined); }
+    fillAll();
     buildToc(pg.hash); fillAsync(main, pg.hash); fitPrev();
     document.title = `${pg.title} · Satin`;
     if (!first && !document.startViewTransition && !reduced()) main.firstElementChild.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: OUT_STRONG });

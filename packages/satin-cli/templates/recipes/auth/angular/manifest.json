@@ -1,0 +1,7 @@
+{
+ "title": "登录注册",
+ "files": [
+  "auth.ts"
+ ],
+ "entry": "auth.ts"
+}

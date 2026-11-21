@@ -634,3 +634,23 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .dx-vars { display: flex; align-items: center; gap: 8px; padding: 10px 10px 2px; overflow-x: auto; scrollbar-width: none; }
 .dx-vars::-webkit-scrollbar { display: none; }
 .dx-vars .sn-seg button { padding: 0 12px; }
+
+/* ———— 10. 全站框架偏好（fwpref.js）：顶栏按钮、菜单、代码块头上的框架按钮、抽屉里那一行 ———— */
+.s-fw-btn { gap: 4px; }
+.s-fw-btn .s-fw-pre { color: var(--sn-label3); }
+.s-fw-btn .sn-ic { width: 14px; height: 14px; color: var(--sn-label3); }
+.s-fw-menu { min-width: 200px; }
+.s-fw-menu .s-fw-env { padding-left: 28px; color: var(--sn-label2); }
+.s-fw-menu .s-fw-note { white-space: normal; max-width: 220px; }
+.cx-fw { display: inline-flex; align-items: center; margin-right: 4px; }
+.sn-btn.cx-fwbtn { --sn-h: 26px; --sn-px: 8px; font-weight: 600; }
+.cx-note { margin-right: 8px; font: 400 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
+.d-fw-miss { padding: 10px 14px; border-radius: 10px; background: var(--sn-fill-subtle); color: var(--sn-label2); }
+.s-md-fw { flex: none; padding: 10px max(12px, env(safe-area-inset-right, 0px)) 0 16px; box-shadow: inset 0 1px 0 var(--sn-line); }
+.s-md-fw + .s-md-ft { box-shadow: none; padding-top: 10px; }
+.sn-btn.s-md-fwbtn { width: 100%; justify-content: flex-start; --sn-h: 40px; --sn-r: var(--sn-r-full); --sn-fs: 14px; }
+.sn-btn.s-md-fwbtn .sn-ic { margin-left: auto; }
+.d-mtoc { gap: 8px; }
+@media (max-width: 1080px) { .d-mtoc { display: flex; flex-wrap: wrap; align-items: center; } }
+@media (min-width: 861px) { .d-mtoc-fw { display: none; } .d-mtoc:not(:has(> .d-mtoc-btn)) { display: none; } }
+@media (max-width: 860px) { .s-nav [data-fw-slot], .s-nav .s-fw-btn, .n-end .s-fw-btn { display: none; } }

@@ -1,0 +1,7 @@
+{
+ "title": "移动端下单",
+ "files": [
+  "mobile-order.vue"
+ ],
+ "entry": "mobile-order.vue"
+}

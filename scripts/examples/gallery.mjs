@@ -6,6 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { FRAMEWORKS } from "../../site/frameworks.js";
+import { RECIPES } from "../../site/pages-more.js";
 
 const require = createRequire(import.meta.url);
 const pw = require(process.env.PLAYWRIGHT || "/Users/kittors/Developer/freelance/TaleFrame/apps/admin/node_modules/playwright");
@@ -66,6 +67,19 @@ for (const sec of SECTIONS) {
   demos.push(...got.map((d) => ({ ...d, section: sec })));
   console.log(`${sec.id.padEnd(12)} ${got.length} 个演示${bad.length ? `（没等到载好：${bad.join(", ")}，按标签猜的空白）` : ""}`);
 }
+// ———— 页面配方：8 种整页（spec/recipes），预览载好以后按真实排版生成 7 种写法 ————
+const recipes = [];
+if (!ONLY || ONLY.split(",").includes("recipes")) {
+  const ids = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/recipes/index.json"), "utf8"));
+  for (const id of ids) {
+    await page.goto(`${BASE}/site/next-docs.html#/recipe/${id}`, { waitUntil: "load" });
+    // 等预览 iframe 载好（按真实排版判断空白）：最多 30 秒
+    let r = null;
+    for (let i = 0; i < 60; i++) { r = await page.evaluate(() => window.__satinRecipeFiles?.()).catch(() => null); if (r?.ready) break; await sleep(500); }
+    if (r) recipes.push(r);
+    console.log(`配方 ${id.padEnd(12)} ${r?.ready ? "" : "（预览没载好，按标签猜的空白）"}`);
+  }
+}
 await browser.close();
 
 // ———— 写文件：每个框架每个演示一份组件文件（+ 演示用样式） ————
@@ -82,6 +96,17 @@ for (const fw of FRAMEWORKS) {
     const sub = env.id === "next" ? "app/demos" : "app/demos", dir = path.join(ROOT, env.dir, sub);
     for (const f of files) { write(path.join(dir, f.name), f.code); nFiles++; }
   }
+}
+// 配方：每个框架 fw.recipe(id) 一份（+ 样式）；CLI 的 satin add 也读这一份（packages/satin-cli/templates/recipes/<id>/<写法>/）
+const CLI_VARIANT = { html: "html", react: "react", vue: "vue", svelte: "svelte", angular: "angular", solid: "solid", preact: "preact" };
+for (const r of recipes) for (const fw of FRAMEWORKS) {
+  const files = r.files[fw.id]; if (!files) continue;
+  const main = path.join(ROOT, fw.dir, fw.recipe(r.id)), dir = path.dirname(main);
+  for (const f of files) { write(f === files[0] ? main : path.join(dir, f.name), f.code); nFiles++; }
+  if (fw.id === "html") continue; // 纯 HTML 项目要的是一整张页面（CLI 自己从 tests/recipes 生成），不用这里的片段
+  const cdir = path.join(ROOT, "packages/satin-cli/templates/recipes", r.id, CLI_VARIANT[fw.id]), title = RECIPES.find((x) => x.id === r.id)?.title || r.id;
+  for (const f of files) write(path.join(cdir, f === files[0] ? path.basename(main) : f.name), f.code);
+  write(path.join(cdir, "manifest.json"), JSON.stringify({ title, files: files.map((f, i) => (i === 0 ? path.basename(main) : f.name)), entry: path.basename(main) }, null, 1) + "\n");
 }
 // 清单：官网、入口页、比对脚本都按它走
 const manifest = demos.map((d) => ({ slug: d.slug, id: d.id, n: d.n, name: d.section.name, group: d.section.group, cap: d.cap, css: !!d.files.react[1] }));

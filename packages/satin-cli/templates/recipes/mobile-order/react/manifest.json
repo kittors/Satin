@@ -1,0 +1,7 @@
+{
+ "title": "移动端下单",
+ "files": [
+  "mobile-order.jsx"
+ ],
+ "entry": "mobile-order.jsx"
+}

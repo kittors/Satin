@@ -1,0 +1,115 @@
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { setup, enhance } from "satin-ui";
+import { Segmented as SnSegmented } from "satin-ui/vue";
+
+const root = ref(null);
+let off = () => {};
+onMounted(() => {
+  const unsetup = setup();
+  const done = enhance(root.value);
+  off = () => { done(); unsetup(); };
+});
+onBeforeUnmount(() => off());
+</script>
+
+<template>
+  <div ref="root">
+    <div class="sn-page">
+      <header class="sn-page-hd">
+        <div>
+          <h1>本周概览</h1>
+          <p>11 月 14 日 – 11 月 20 日</p>
+        </div>
+        <div class="sn-acts">
+          <SnSegmented :items='["本周","本月","全年"]' value="本周" />
+        </div>
+      </header>
+      <div class="sn-panel" style="margin-bottom: var(--sn-sp-24)">
+        <div class="sn-cols" style="--sn-min: 160px">
+          <div class="sn-stat">
+            <span>生成的镜头</span>
+            <b>1,284</b>
+            <small class="sn-up">比上周 +12%</small>
+          </div>
+          <div class="sn-stat">
+            <span>完成的项目</span>
+            <b>36</b>
+            <small>比上周 +4</small>
+          </div>
+          <div class="sn-stat">
+            <span>平均生成时长</span>
+            <b>2 分 18 秒</b>
+            <small class="sn-down">比上周慢 9 秒</small>
+          </div>
+          <div class="sn-stat">
+            <span>本月用量</span>
+            <b>68%</b>
+            <small>还剩 3,200 次</small>
+          </div>
+        </div>
+      </div>
+      <div class="sn-with-aside" style="--sn-aside: 340px">
+        <section class="sn-panel">
+          <div class="sn-panel-hd">
+            <h2>各状态的项目</h2>
+            <a class="sn-t-callout" href="/projects">全部项目</a>
+          </div>
+          <div class="sn-stack sn-gap-16">
+            <div class="sn-stack sn-gap-8">
+              <div class="sn-row sn-between">
+                <span>已完成</span>
+                <span class="sn-num sn-c-secondary">58</span>
+              </div>
+              <div class="sn-pbar" style="--sn-p:.45">
+                <i></i>
+              </div>
+            </div>
+            <div class="sn-stack sn-gap-8">
+              <div class="sn-row sn-between">
+                <span>生成中</span>
+                <span class="sn-num sn-c-secondary">31</span>
+              </div>
+              <div class="sn-pbar" style="--sn-p:.24">
+                <i></i>
+              </div>
+            </div>
+            <div class="sn-stack sn-gap-8">
+              <div class="sn-row sn-between">
+                <span>待审核</span>
+                <span class="sn-num sn-c-secondary">27</span>
+              </div>
+              <div class="sn-pbar" style="--sn-p:.21">
+                <i></i>
+              </div>
+            </div>
+            <div class="sn-stack sn-gap-8">
+              <div class="sn-row sn-between">
+                <span>失败</span>
+                <span class="sn-num sn-c-secondary">12</span>
+              </div>
+              <div class="sn-pbar" style="--sn-p:.09">
+                <i></i>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="sn-panel">
+          <div class="sn-panel-hd">
+            <h2>最近动态</h2>
+          </div>
+          <div class="sn-stack sn-gap-12">
+            <div class="sn-row sn-gap-8">
+              <span class="sn-av sn-sm" style="--sn-h:210">林</span>
+              <div class="sn-grow"><b>林夏</b> 完成了「雨夜车站」<div class="sn-t-caption sn-c-tertiary">3 分钟前</div></div>
+            </div>
+            <div class="sn-row sn-gap-8">
+              <span class="sn-av sn-sm" style="--sn-h:30">周</span>
+              <div class="sn-grow"><b>周屿</b> 上传了 12 张素材<div class="sn-t-caption sn-c-tertiary">1 小时前</div></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</template>
