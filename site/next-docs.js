@@ -105,6 +105,7 @@ const MAC = (title, inner) => `<div class="mac"><div class="mac-bar"><span class
 // n：第几个演示（组件页每个演示一个框；不给 n 就嵌整块，规范页用）。像应用的那一块（WIN，默认最后一个演示）放进 macOS 窗口
 const winAt = (c, w) => (w?.demo ?? Math.max(0, (c?.demos.length || 1) - 1));
 function demoBox(id, { code = true, n } = {}) {
+  if (USAGE[id]?.demoOnly) code = false; // 展示页自己的演示：没有能抄的代码
   const c = cat.byId[id], w0 = WIN[id], w = w0 && (n == null || n === winAt(c, w0)) ? w0 : null, min = TALL[id] || 0; // 不给保底高度：内容比预览框矮时由预览框上下居中，不把空白都堆在下面
   const frame = `<div class="d-frame" style="--sn-h:${Math.max(min, w ? 320 : 120)}px" data-min="${min}"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="${esc(c?.name || "")}演示" data-src="../index.html?embed=${id}${n != null ? "&demo=" + n : ""}${w ? "&win=1" : ""}${w?.flush ? "&flush=1" : ""}${TALL[id] ? "&center=1" : ""}"></iframe></div>`;
   return `<div class="dx${w ? " is-win" : ""}" data-demo="${id}"${n != null ? ` data-n="${n}"` : ""}>
@@ -259,8 +260,9 @@ function variantFiles(c, doc, n) {
   return { html: [...html, ...cssFile], react: [...v.react, ...extra], vue: [...v.vue, ...extra], element: [...v.html, ...extra], all: v, extra, markup, js, css };
 }
 // 给 scripts/examples/gallery.mjs 用：这一页每个演示（等演示载好、按真实排版判断空白以后）7 种写法的文件
-// 设计稿里的演示（有契约的组件页上"完整演示"那几块不带代码面板，也要算；契约示例的框 data-play 另外按契约生成，不算在这里）
-window.__satinDemoFiles = () => $$(".dx[data-demo]", main).filter((box) => !box.dataset.play).map((box) => {
+// 设计稿里的演示（有契约的组件页上"完整演示"那几块不带代码面板，也要算；契约示例的框 data-play 另外按契约生成，不算在这里；
+// 展示页自己的演示（USAGE 里 demoOnly，比如万级节点压测）没有组件库的代码，生成出来是空的，也不算）
+window.__satinDemoFiles = () => $$(".dx[data-demo]", main).filter((box) => !box.dataset.play && !USAGE[box.dataset.demo]?.demoOnly).map((box) => {
   const c = cat.byId[box.dataset.demo], n = box.dataset.n != null ? +box.dataset.n : 0, f = box.querySelector("iframe");
   let doc = null; try { doc = f.contentDocument; } catch {}
   const ready = !!(doc && doc.__dx), fs = variantFiles(c, ready ? doc : null, n);

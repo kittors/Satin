@@ -200,8 +200,7 @@ ratio.value;                     // "9:16"
 bindSelects(document);
 document.addEventListener("select", (e) => console.log(e.detail.value));
 
-// 不写标记也行：给一个空容器，按选项渲染
-createSelect(document.querySelector("#ratio"), { items: ["16:9 · 横屏", "9:16 · 竖屏"], value: "16:9 · 横屏", label: "画面比例" });`,
+// 不写标记也行：createSelect(空容器, { items: ["16:9 · 横屏", "9:16 · 竖屏"], value: "16:9 · 横屏", label: "画面比例" }) 按选项渲染`,
     },
   },
   compound: {
@@ -407,9 +406,10 @@ editBtn.addEventListener("click", () => {
 import "satin-ui/css/buttons.css";
 
 const save = document.querySelector("#save");
+const request = () => new Promise((done) => setTimeout(done, 1200)); // 换成你的请求，比如 fetch("/api/projects/42", { method: "PUT" })
 save.addEventListener("click", async () => {
   // 300ms 内回来不转圈；转圈出现后至少留 500ms；等待期间点不了
-  await busy(save, fetch("/api/projects/42", { method: "PUT" }));
+  await busy(save, request());
   succeed(save); // 原地换成对勾，一会儿换回文字
 });`,
     },
@@ -521,8 +521,7 @@ const tags = createTagInput(document.querySelector("[data-tagin]"), {
 });
 tags.tags;    // ["雨夜", "车站"]
 
-// 不写标记也行：给一个空容器，按选项渲染（输入框 + 下面的计数行）
-createTagInput(document.querySelector("#tags"), { tags: ["雨夜"], max: 8 });`,
+// 不写标记也行：createTagInput(空容器, { tags: ["雨夜"], max: 8 }) 按选项渲染（输入框 + 下面的计数行）`,
     },
   },
   number: {
@@ -537,8 +536,7 @@ const dur = createStepper(document.querySelector("[data-stepper]"), {
 dur.set(10);
 dur.value; // 10
 
-// 不写标记也行：给一个空容器，按选项渲染
-createStepper(document.querySelector("#dur"), { value: 4, min: 1, max: 60, unit: "秒", label: "镜头时长" });`,
+// 不写标记也行：createStepper(空容器, { value: 4, min: 1, max: 60, unit: "秒", label: "镜头时长" }) 按选项渲染`,
     },
   },
   prompt: {
@@ -642,10 +640,18 @@ fix?.addEventListener("click", async () => {
       js: `import { loadWithSkeleton } from "satin-ui/components";
 
 // 300ms 内回来就不显示骨架（不闪）；显示了就至少留 500ms；数据到了逐行替换，每行淡入
-const { shown, waited } = await loadWithSkeleton(document.querySelector(".sn-sk-list"), {
-  load: () => fetch("/api/shots").then((r) => r.json()),
-  skeleton: '<div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px"></span>…</div>'.repeat(4),
-  render: (shots) => shots.map((s) => \`<div class="sn-sk-row"><b>\${s.title}</b></div>\`).join(""),
+const list = document.querySelector(".sn-sk-list"), note = document.querySelector("#loadNote");
+const SHOTS = [["07", "车站外，雨刚停", "远景 · 4 秒"], ["08", "林夏走进候车厅", "全景 · 6 秒"], ["09", "站台上的最后一班车", "中景 · 5 秒"], ["10", "车窗里的倒影", "特写 · 3 秒"]];
+const skRow = '<div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:46%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>';
+const row = ([n, title, meta]) => \`<div class="sn-sk-row"><span class="sn-thumb"></span><div class="sn-meta"><b>镜头 \${n} · \${title}</b><span>\${meta}</span></div></div>\`;
+for (const btn of document.querySelectorAll("[data-load]")) btn.addEventListener("click", async () => {
+  const ms = Number(btn.dataset.load);
+  const r = await loadWithSkeleton(list, {
+    load: () => new Promise((done) => setTimeout(() => done(SHOTS), ms)), // 换成你的请求，比如 fetch("/api/shots").then((res) => res.json())
+    skeleton: skRow.repeat(SHOTS.length),
+    render: (shots) => shots.map(row).join(""),
+  });
+  if (r) note.textContent = r.shown ? \`等了 \${r.waited}ms，骨架至少留了 500ms\` : \`\${ms}ms 就回来了，没有闪出骨架\`;
 });`,
     },
   },
@@ -709,11 +715,7 @@ faq.open(0);
 // 或者把页面上所有 .sn-acc 一次接上
 bindCollapses(document);
 
-// 不写标记也行：给一个空容器，按选项渲染
-createCollapse(document.querySelector("#faq"), {
-  items: [{ title: "导出的成片放在哪里？", content: "默认放在“下载”文件夹里。" }, { title: "能多人一起编辑吗？", content: "可以，在设置里邀请协作者。" }],
-  open: [0],
-});`,
+// 不写标记也行：createCollapse(空容器, { items: [{ title, content }], open: [0] }) 按选项渲染`,
     },
   },
   card: {
@@ -904,15 +906,22 @@ nameEl.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target ==
     0: {
       js: `import { createNumberFlow } from "satin-ui/components";
 
-// 只滚动变了的那几位；style："roll"（滚动）| "blur"（滚动带模糊）| "push"（推入）| "fade"（淡入）
-const views = createNumberFlow(document.querySelector("#views"), {
-  value: 12840,
-  style: "roll",
-  format: (v) => Number(v).toLocaleString("zh-CN"),
+// 只滚动变了的那几位；style："roll"（滚动，默认）| "blur"（滚动带模糊）| "push"（推入）| "fade"（淡入）；format 决定怎么显示
+const nf = (name, opts) => createNumberFlow(document.querySelector(\`[data-nf="\${name}"]\`), opts);
+const shots = nf("shots", { value: 1284, format: (v) => v.toLocaleString("zh-CN") });
+const price = nf("price", { value: 199, format: (v) => "¥ " + v.toLocaleString("zh-CN", { minimumFractionDigits: 2 }) });
+const live = nf("live", { value: 2875, format: (v) => \`\${Math.floor(v / 60)} 小时 \${String(v % 60).padStart(2, "0")} 分\` });
+const badge = nf("badge", { value: 3, style: "fade", format: (v) => (v > 99 ? "99+" : String(v)) });
+
+// set(新值) 滚到新值；value 是当前值
+for (const btn of document.querySelectorAll("[data-nf-add]")) btn.addEventListener("click", () => {
+  const k = btn.dataset.nfAdd;
+  shots.set(Math.max(0, k === "rand" ? Math.round(Math.random() * 120000) : shots.value + Number(k)));
 });
-views.set(12841);
-views.value;                     // 12841
-views.update({ style: "fade" }); // 换样式`,
+const PLANS = [199, 2399, 49.9, 12800, 999];
+document.querySelector("[data-nf-plan]").addEventListener("click", () => price.set(PLANS[(PLANS.indexOf(price.value) + 1) % PLANS.length]));
+document.querySelector("[data-nf-badge]").addEventListener("click", () => badge.set(badge.value >= 120 ? 3 : badge.value + 9));
+setInterval(() => live.set(live.value + 1), 1200); // 每 1.2 秒自动更新`,
     },
   },
   chat: {
@@ -937,9 +946,9 @@ createChat(document.querySelector("#chatBox"), {
 
 // 行高固定：只画看得见的几十行，一万条照样流畅；滚到离底部 400px 自动要下一页（勾上"模拟加载失败"看失败后的重试）
 const vl = document.querySelector("#vl"), countEl = document.querySelector("#vlCount"), topBtn = document.querySelector("[data-vl-top]"), failBox = document.querySelector("#vlFail");
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms)), TOTAL = 10000;
 const list = createInfiniteList(vl, {
-  total: 10000, pageSize: 400, rowHeight: 56,
+  total: TOTAL, pageSize: 400, rowHeight: 56,
   // 换成你的接口：返回这一页的数据数组
   loadPage: async (offset, size) => { await wait(offset === 0 ? 200 : 500 + Math.random() * 700); if (failBox.checked && offset > 0) throw new Error("加载失败"); return Array.from({ length: size }, (_, k) => offset + k); },
   // 行元素会复用：子元素缓存在 el._d 上，每次只改文字
@@ -947,7 +956,8 @@ const list = createInfiniteList(vl, {
     if (!el._d) { el.innerHTML = '<span class="sn-th"></span><span class="sn-tx"><b></b><span></span></span><span class="sn-no"></span>'; el._d = { b: el.querySelector("b"), m: el.querySelector(".sn-tx span"), no: el.children[2] }; }
     el._d.b.textContent = \`镜头 \${i + 1}\`; el._d.m.textContent = \`第 \${Math.floor(i / 40) + 1} 集 · \${3 + (i % 6)} 秒\`; el._d.no.textContent = String(i + 1);
   },
-  onCount: (n, total) => { countEl.textContent = n >= total ? \`已全部加载 · \${n.toLocaleString("zh-CN")} 条\` : \`已加载 \${n.toLocaleString("zh-CN")} 条 · 共 \${total.toLocaleString("zh-CN")} 条\`; },
+  // 已加载的条数变了调（参数只有这一个；总数就是上面给的 total）
+  onCount: (n) => { countEl.textContent = n >= TOTAL ? \`已全部加载 · \${n.toLocaleString("zh-CN")} 条\` : \`已加载 \${n.toLocaleString("zh-CN")} 条 · 共 \${TOTAL.toLocaleString("zh-CN")} 条\`; },
 });
 vl.addEventListener("vlscroll", (e) => topBtn.classList.toggle("sn-on", e.detail.top > vl.clientHeight));
 topBtn.addEventListener("click", () => list.scrollTop());`,
@@ -958,8 +968,8 @@ topBtn.addEventListener("click", () => list.scrollTop());`,
       js: `import { createFlow } from "satin-ui/flow";
 import "satin-ui/css/content.css";
 
-// 空容器：画布、工具条、小地图都由 createFlow 填好（设计稿里的 .sn-flow 标记也可以直接传）；卸载时调 flow.destroy()
-const flow = createFlow(document.querySelector("#flow"), {
+// 设计稿里的 .sn-flow 标记直接传（空容器也行：画布、工具条、小地图都由 createFlow 填好）；卸载时调 flow.destroy()
+const flow = createFlow(document.querySelector(".sn-flow"), {
   // 节点：位置、标题、图标、说明、类型（类型决定线和端口的色相：text | board | image | audio | video | out）
   nodes: [
     { id: "src",   x: 0,   y: 0, t: "导入原文", ic: "book-open",    d: "雨夜车站.docx", k: "text" },
@@ -1087,14 +1097,15 @@ document.addEventListener("pick", (e) => {
   },
   table: {
     8: {
+      html: `<div id="projects"></div>`,
       js: `// 真数据的表格：createTable（React <Table>、Vue <SnTable>）——点表头排序（行移到新位置，相邻行错开 15ms）、勾选（全选、半选）、
 // 空状态、加载中（骨架行）、数字列右对齐等宽；斑马纹 / 紧凑 / 无外框 / 网格线 / 限高时表头固定都是选项。
-// 多级展开、合并、拖动行列、改列宽行高这几样还只在展示页里接（这个完整示例），没有做成公开的选项。
+// 上面那张完整示例里的多级展开（行带 children）、合并、拖行拖列、改列宽行高也是选项，见下面的参数表。
 import { setup, createTable, toast } from "satin-ui";
 import "satin-ui/css/data.css";
 
 setup();
-const rows = [
+const data = [
   { id: 1, name: "雨夜车站", owner: "林夏", status: ["sn-ok", "已完成"], shots: 48 },
   { id: 2, name: "海边的第七天", owner: "周屿", status: ["sn-run", "生成中"], shots: 32 },
   { id: 3, name: "长夜", owner: "许诺", status: ["sn-bad", "失败"], shots: 20 },
@@ -1106,12 +1117,12 @@ const table = createTable(document.querySelector("#projects"), {
     { key: "status", title: "状态", html: ([tone, text]) => \`<span class="sn-tag \${tone}"><i></i>\${text}</span>\` },
     { key: "shots", title: "镜头", align: "right", sortable: true },
   ],
-  rows, rowKey: "id", selectable: true, label: "项目列表", empty: "还没有项目",
+  data, rowKey: "id", selectable: true, label: "项目列表", empty: "还没有项目",
   onSelect: (keys) => console.log("选中", keys),
   onRowClick: (row) => toast({ text: "打开「" + row.name + "」" }),
 });
-table.update({ rows: [...rows, { id: 4, name: "城南旧事", owner: "陈默", status: ["", "草稿"], shots: 12 }] }); // 换数据
-table.update({ loading: true });  // 加载中：骨架行`,
+// 换数据：update({ data })；加载中显示骨架行：update({ loading: true })
+table.update({ data: [...data, { id: 4, name: "城南旧事", owner: "陈默", status: ["", "草稿"], shots: 12 }] });`,
     },
     // 固定表头、限高滚动：表头吸附，内容在框里滚，滚动条换成组件库的
     5: {

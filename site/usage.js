@@ -47,7 +47,8 @@ export const USAGE = {
   chat: { css: ["content.css", "input.css", "data.css"], api: [["createChat(空容器或 .sn-chat, { title, respond, history })", "satin-ui/chat"]] },
   md: { css: ["md.css", "data.css"], api: [["createMarkdown(空容器, { source, codeMax, imgH, tableMax })", "satin-ui/markdown"], ["renderMarkdown(容器, 文本, 选项)", "satin-ui/markdown"]] },
   flow: { css: ["content.css"], api: [["createFlow(空容器或 .sn-flow, { nodes, edges })", "satin-ui/flow"]] },
-  flowstress: { js: "万级节点压测是展示页自己的演示（画布绘制、布局都写在展示页里），不在组件库里" },
+  // demoOnly：展示页自己的演示，没有组件库的代码——文档里不放代码面板，也不生成单独的示例（生成出来是空的）
+  flowstress: { js: "万级节点压测是展示页自己的演示（画布绘制、布局都写在展示页里），不在组件库里", demoOnly: true },
   image: { css: ["data.css"], api: [["openLightbox(items, 第几张, 选项)", "satin-ui/lightbox"], ["closeLightbox()", "satin-ui/lightbox"]] },
   media: { css: ["data.css"], api: [["createPlayer(容器, { src, poster, label, onError })", C], ["createAudio(容器, { src, title, sub, wave, onError })", C]] },
   upload: { css: ["data.css", "input.css"], api: [["createUpload(拖放区, { list, accept, maxSize, upload })", C]] },
@@ -65,12 +66,13 @@ export const TALL = {};
 export const EX = {
   button: `import { busy, succeed } from "satin-ui/components";
 
-const save = document.querySelector("#save");
-save.addEventListener("click", async () => {
-  // 300ms 内回来不转圈；转圈出现后至少留 500ms
-  await busy(save, fetch("/api/projects/42", { method: "PUT" }));
-  succeed(save);
-});`,
+// 点"保存修改"：300ms 内回来不转圈；转圈出现后至少留 500ms；完了打个勾
+for (const save of document.querySelectorAll(".sn-btn.sn-primary")) {
+  save.addEventListener("click", async () => {
+    await busy(save, 1200); // 第二个参数是毫秒或 Promise，比如 fetch("/api/projects/42", { method: "PUT" })
+    succeed(save);
+  });
+}`,
   compound: `import { copied } from "satin-ui/components";
 
 const btn = document.querySelector("[data-copy]");
@@ -94,10 +96,12 @@ slider.update({ value: 60 }); // 从外面改值`,
   tooltip: `import { setup, showTip, hideTip } from "satin-ui";
 
 setup(); // 整页调一次：写了 data-tip 的元素自动有提示
-// 要在别处触发时：
-const field = document.querySelector("#name");
-field.addEventListener("invalid", () => showTip(field, "名称不能为空"));
-field.addEventListener("input", hideTip);`,
+// 要在别处触发时：比如点了"放大预览"，在按钮上说一下结果，1.5 秒后收起
+const zoom = document.querySelector('[data-tip="放大预览"]');
+zoom.addEventListener("click", () => {
+  showTip(zoom, "已放大到 200%");
+  setTimeout(hideTip, 1500);
+});`,
   cmdk: `import { createCommandPalette, toast } from "satin-ui/components";
 
 // 命令面板：⌘K（Windows 上 Ctrl K）打开；输入就筛，↑↓ 选、回车执行、Esc 关；分组、图标、副标题、快捷键
