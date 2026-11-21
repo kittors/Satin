@@ -5,6 +5,7 @@
 // 3. 定时发布：日历和时间放在一个面板里；早于现在的不能确定，原因写在面板底部。
 // 4. 地址：省 → 市 → 区三级标签，选完一级自动滑到下一级；可以跨级搜索（命中的字加下划线）；常用城市一键到区县。
 // 面板开合和菜单一样：第一帧就不透明，只放大 140ms；收起 100ms 淡出。只动 transform 和 opacity。
+import { onCleanup } from "./lifecycle.js";
 import { scrollArea } from "./scroll.js";
 import { $, reduced, injectIcons } from "./core.js";
 import { scoped } from "./i18n.js";
@@ -274,7 +275,8 @@ export function bindPickers(root = document, { today, now } = {}) {
     host(h); const panel = $(".sn-pk-panel", h), q = $(".sn-rg-search input", panel), tabsEl = $(".sn-rg-tabs", panel), ink = $(".sn-ink", tabsEl), vp = $(".sn-rg-vp", panel), res = $(".sn-rg-res", panel);
     let path = [], level = 0, list = null, hl = -1;
     const boxOf = (el) => (el.parentElement?.classList.contains("sn-sa") ? el.parentElement : el); // 包了滚动区域的列表：显隐、滑动都作用在外面那一层
-    scrollArea(res, { fade: "y", size: 20, overscroll: "contain" }); boxOf(res).hidden = res.hidden; res.hidden = false;
+    const resHidden = res.hidden; scrollArea(res, { fade: "y", size: 20, overscroll: "contain" }); boxOf(res).hidden = res.hidden; res.hidden = false;
+    onCleanup(() => { res.hidden = resHidden; }); // 撤销时（组件销毁、enhance 的撤销函数）把搜索结果列表的 hidden 还回去：滚动区域拆掉以后，再接一次和第一次一模一样
     const optsAt = (lv) => (lv === 0 ? Object.keys(REG) : lv === 1 ? Object.keys(REG[path[0]]) : REG[path[0]][path[1]]);
     const moveInk = () => { const b = $(`button[data-lv="${level}"]`, tabsEl); if (b) ink.style.transform = `translateX(${b.offsetLeft + 8}px) scaleX(${Math.max(8, b.offsetWidth - 16)})`; };
     function tabs() {
