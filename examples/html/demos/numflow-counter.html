@@ -1,0 +1,14 @@
+<div class="sn-row" id="numflow-counter-box">
+  <sn-number-flow value="128"></sn-number-flow>
+  <button type="button" class="sn-btn sn-secondary sn-sm" data-add="1">+1</button>
+  <button type="button" class="sn-btn sn-secondary sn-sm" data-add="-12">-12</button>
+</div>
+
+<script type="module">
+  // 改 value 属性，数字就变过去（value 变了只动变了的那几位）
+  const box = document.getElementById("numflow-counter-box"), nf = box.querySelector("sn-number-flow");
+  box.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-add]");
+    if (b) nf.setAttribute("value", String(Number(nf.getAttribute("value")) + Number(b.dataset.add)));
+  });
+</script>

@@ -82,6 +82,330 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "每项标题是 `<button aria-expanded>`：展开时 `aria-expanded=\"true\"`。"
+    ],
+    "focus": [
+      "标题是按钮，Tab 依次经过，聚焦时标题里一圈焦点环；展开、收起以后焦点留在标题上。"
+    ],
+    "notes": [
+      "标题写成问题或名词短语：读屏先读标题，再读展开了没有。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "折叠面板",
+  "lead": "一组能展开、收起的条目：高度平滑地长出来，内容在展开过半时淡入，箭头跟着转 90°；可以同时展开几项，也可以一次只开一项（手风琴）。",
+  "whenToUse": [
+    "常见问题、帮助说明：标题一眼扫过去，想看哪条点开哪条。",
+    "设置页里不常用的高级选项，平时收起来，页面短一些。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "几块平级、要来回切换的内容：用标签页。",
+      "use": "tabs"
+    },
+    {
+      "text": "必须看到的内容（错误、必填说明）：直接写出来，不要收起来。"
+    }
+  ],
+  "related": [
+    {
+      "id": "tabs",
+      "diff": "标签页一次只看一块、来回切；折叠面板可以同时展开几项，顺着往下读。"
+    },
+    {
+      "id": "list",
+      "diff": "列表的行点开是进详情；折叠面板在原地展开内容。"
+    }
+  ],
+  "import": {
+    "html": "// 入口里调过 defineElements()：直接写 <sn-collapse>（也可以 import { createCollapse } from \"satin-ui\"）",
+    "react": "import { Collapse } from \"satin-ui/react\";",
+    "vue": "import { Collapse } from \"satin-ui/vue\";",
+    "svelte": "import Collapse from \"satin-ui/svelte/Collapse.svelte\";",
+    "angular": "// 入口里调过 defineElements()：模板里写 <sn-collapse>（组件加 CUSTOM_ELEMENTS_SCHEMA）",
+    "solid": "// 入口里调过 defineElements()：直接写 <sn-collapse>",
+    "preact": "import { Collapse } from \"satin-ui/react\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`Collapse` 组件：`items` 是条目（`{ title, content }`）；`open`（展开的序号）+ `onChange` 受控，只给 `defaultOpen` 是非受控；`single` 一次只开一项。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Collapse`：`open` + `onChange` 受控，`defaultOpen` 非受控。",
+    "vue": "`Collapse` 组件：`v-model` 绑展开的序号（数组），`items`、`single`；不绑 v-model、只写 `:open` 是初始值。",
+    "svelte": "`Collapse` 组件（`satin-ui/svelte/Collapse.svelte`）：`bind:open` 双向绑定展开的序号，`items`、`single`。",
+    "angular": "写 `<sn-collapse>`：`[attr.items]` 传 JSON，`[attr.open]` 绑展开的序号（JSON）；展开、收起以后发冒泡的 `(sn-change)`，`$event.detail` 是现在展开的序号。",
+    "solid": "写 `<sn-collapse>`：`items`、`open` 写成 JSON 字符串；`sn-change` 用 `ref` 挂监听。",
+    "html": "写 `<sn-collapse items='[…]' open=\"[0]\">`；展开、收起以后发冒泡的 `sn-change`（`e.detail` 是展开的序号）；也可以 `createCollapse(容器, 选项)`。"
+  },
+  "dts": {
+    "factory": "createCollapse",
+    "react": "Collapse",
+    "vue": "Collapse",
+    "svelte": "Collapse"
+  },
+  "props": [
+    {
+      "name": "items",
+      "type": "{ title: string; content?: string; html?: string }[]",
+      "default": "[]",
+      "required": true,
+      "desc": "条目：`title` 标题，`content` 内容（纯文字）；内容要带链接、列表时给 `html`（自己保证内容安全）。",
+      "names": {
+        "js": "items",
+        "react": "items",
+        "vue": "items",
+        "svelte": "items",
+        "preact": "items",
+        "element": "items（JSON）",
+        "markup": "每项一个 .sn-acc-item：标题 button.sn-acc-hd + 内容 .sn-acc-bd",
+        "html": "items（JSON）"
+      }
+    },
+    {
+      "name": "open",
+      "type": "number[]",
+      "default": "[]",
+      "required": false,
+      "desc": "展开的是第几项（从 0 数）。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:open`；传进来的值换了，面板就照它开合。",
+      "names": {
+        "js": "open",
+        "react": "open",
+        "vue": "v-model",
+        "svelte": "bind:open",
+        "preact": "open",
+        "element": "open（JSON）",
+        "markup": "展开的那项加 .sn-open，标题 aria-expanded=\"true\"",
+        "html": "open（JSON）"
+      }
+    },
+    {
+      "name": "defaultOpen",
+      "type": "number[]",
+      "default": "[]",
+      "required": false,
+      "desc": "非受控：一开始展开哪几项（Vue 里不绑 v-model、只写 `:open` 也是这个意思）。",
+      "names": {
+        "react": "defaultOpen",
+        "preact": "defaultOpen",
+        "vue": "open"
+      }
+    },
+    {
+      "name": "single",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "一次只开一项（手风琴）：点开一项，别的自动收起。",
+      "names": {
+        "js": "single",
+        "react": "single",
+        "vue": "single",
+        "svelte": "single",
+        "preact": "single",
+        "element": "single",
+        "html": "single"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "change",
+      "payload": "number[]",
+      "when": "点开、收起以后，参数是现在展开的序号（手风琴开一项、关一项也只发一次；程序里改 open 不触发）。",
+      "names": {
+        "js": "onChange",
+        "react": "onChange",
+        "vue": "@update:modelValue / @change",
+        "svelte": "onchange",
+        "preact": "onChange",
+        "angular": "(sn-change)",
+        "solid": "sn-change（ref 挂监听）",
+        "element": "sn-change",
+        "html": "sn-change（e.detail）"
+      }
+    },
+    {
+      "name": "toggle",
+      "payload": "{ index: number; open: boolean }",
+      "when": "某一项展开或收起的那一下（手风琴自动收起的那项也发）。",
+      "names": {
+        "js": "onToggle",
+        "react": "onToggle",
+        "vue": "@toggle",
+        "svelte": "ontoggle",
+        "preact": "onToggle",
+        "angular": "(sn-toggle)",
+        "solid": "sn-toggle（ref 挂监听）",
+        "element": "sn-toggle",
+        "html": "sn-toggle（e.detail）"
+      }
+    }
+  ],
+  "slots": [],
+  "methods": [
+    {
+      "name": "open",
+      "kind": "method",
+      "signature": "open(index: number): void",
+      "returns": "void",
+      "desc": "展开第 index 项（会发 toggle、change）。"
+    },
+    {
+      "name": "close",
+      "kind": "method",
+      "signature": "close(index: number): void",
+      "returns": "void",
+      "desc": "收起第 index 项。"
+    },
+    {
+      "name": "toggle",
+      "kind": "method",
+      "signature": "toggle(index: number): void",
+      "returns": "void",
+      "desc": "展开或收起第 index 项。"
+    },
+    {
+      "name": "expanded",
+      "kind": "property",
+      "signature": "readonly expanded: number[]",
+      "returns": "number[]",
+      "desc": "现在展开的是第几项。"
+    }
+  ],
+  "functions": [],
+  "cssVars": [
+    {
+      "name": "--sn-fill-hover",
+      "desc": "标题悬停时整条的底色",
+      "default": "浅灰",
+      "token": true
+    },
+    {
+      "name": "--sn-line",
+      "desc": "外框",
+      "default": "细灰线",
+      "token": true
+    },
+    {
+      "name": "--sn-focus",
+      "desc": "键盘聚焦时标题里的焦点环",
+      "default": "蓝",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-acc",
+      "desc": "折叠面板"
+    },
+    {
+      "name": ".sn-acc-item / .sn-acc-item.sn-open",
+      "desc": "一项 / 展开的那项"
+    },
+    {
+      "name": ".sn-acc-hd",
+      "desc": "标题（button，aria-expanded）"
+    },
+    {
+      "name": ".sn-acc-bd",
+      "desc": "内容（高度 0fr → 1fr 过渡，里面再包一层 div）"
+    }
+  ],
+  "types": [
+    "CollapseOptions"
+  ],
+  "keyboard": [
+    {
+      "keys": "Tab",
+      "does": "在各项标题之间移动。"
+    },
+    {
+      "keys": "Enter / 空格",
+      "does": "展开或收起这一项。"
+    }
+  ],
+  "design": {
+    "do": [
+      "标题一行写完，看一眼就知道里面是什么。",
+      "条目多时用 `single`，免得页面越拉越长。"
+    ],
+    "dont": [
+      {
+        "text": "条目之间画分隔线、加阴影。",
+        "rule": "no-decorative-divider"
+      },
+      {
+        "text": "把卡片放进面板，再在卡片里套面板。",
+        "rule": "card-nesting"
+      }
+    ],
+    "copy": [
+      "标题用问句或名词：\"导出的成片放在哪里？\"\"高级设置\"。"
+    ],
+    "motion": [
+      {
+        "what": "内容高度长出来、收回去（0fr → 1fr）",
+        "easing": "ease.inOut",
+        "duration": "260ms"
+      },
+      {
+        "what": "箭头转 90°",
+        "easing": "ease.outStrong",
+        "duration": "240ms"
+      },
+      {
+        "what": "内容晚 120ms 淡入、从上方 4px 落下",
+        "easing": "ease.out / ease.outStrong",
+        "duration": "200–260ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "collapse-basic",
+      "title": "最简单的用法",
+      "why": "给条目和一开始展开哪几项就能用：可以同时展开几项。",
+      "html": "<sn-collapse open=\"[0]\" items='[{\"title\":\"导出的成片放在哪里？\",\"content\":\"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\"},{\"title\":\"额度用完了会怎样？\",\"content\":\"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\"},{\"title\":\"可以多人一起编辑吗？\",\"content\":\"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\"}]'></sn-collapse>",
+      "code": {
+        "html": "<sn-collapse open=\"[0]\" items='[\n  {\"title\":\"导出的成片放在哪里？\",\"content\":\"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\"},\n  {\"title\":\"额度用完了会怎样？\",\"content\":\"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\"},\n  {\"title\":\"可以多人一起编辑吗？\",\"content\":\"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\"}\n]'></sn-collapse>\n",
+        "react": "import { Collapse } from \"satin-ui/react\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\n\nexport default function Faq() {\n  return <Collapse items={FAQ} defaultOpen={[0]} />;\n}\n",
+        "vue": "<script setup>\nimport { Collapse } from \"satin-ui/vue\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\n</script>\n\n<template>\n  <Collapse :items=\"FAQ\" :open=\"[0]\" />\n</template>\n",
+        "svelte": "<script>\n  import Collapse from \"satin-ui/svelte/Collapse.svelte\";\n\n  const FAQ = [\n    { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n    { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n    { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n  ];\n</script>\n\n<Collapse items={FAQ} open={[0]} />\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n// 自定义元素的属性只认字符串：数组写成 JSON\nconst FAQ = JSON.stringify([\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n]);\n\n@Component({\n  selector: \"demo-collapse-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-collapse>\n  template: `<sn-collapse [attr.items]=\"faq\" open=\"[0]\"></sn-collapse>`,\n})\nexport class CollapseBasicComponent {\n  protected faq = FAQ;\n}\n",
+        "solid": "// 自定义元素的属性只认字符串：数组写成 JSON\nconst FAQ = JSON.stringify([\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n]);\n\nexport default function Faq() {\n  return <sn-collapse items={FAQ} open=\"[0]\"></sn-collapse>;\n}\n",
+        "preact": "import { Collapse } from \"satin-ui/react\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\n\nexport default function Faq() {\n  return <Collapse items={FAQ} defaultOpen={[0]} />;\n}\n"
+      }
+    },
+    {
+      "slug": "collapse-single",
+      "title": "一次只开一项（手风琴）",
+      "why": "条目多、内容长时用：点开一项，别的自动收起。",
+      "html": "<sn-collapse single open=\"[0]\" items='[{\"title\":\"导出的成片放在哪里？\",\"content\":\"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\"},{\"title\":\"额度用完了会怎样？\",\"content\":\"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\"},{\"title\":\"可以多人一起编辑吗？\",\"content\":\"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\"}]'></sn-collapse>",
+      "code": {
+        "html": "<sn-collapse single open=\"[0]\" items='[\n  {\"title\":\"导出的成片放在哪里？\",\"content\":\"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\"},\n  {\"title\":\"额度用完了会怎样？\",\"content\":\"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\"},\n  {\"title\":\"可以多人一起编辑吗？\",\"content\":\"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\"}\n]'></sn-collapse>\n",
+        "react": "import { Collapse } from \"satin-ui/react\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\n\nexport default function FaqAccordion() {\n  return <Collapse items={FAQ} single defaultOpen={[0]} />;\n}\n",
+        "vue": "<script setup>\nimport { Collapse } from \"satin-ui/vue\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\n</script>\n\n<template>\n  <Collapse :items=\"FAQ\" single :open=\"[0]\" />\n</template>\n",
+        "svelte": "<script>\n  import Collapse from \"satin-ui/svelte/Collapse.svelte\";\n\n  const FAQ = [\n    { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n    { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n    { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n  ];\n</script>\n\n<Collapse items={FAQ} single open={[0]} />\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n// 自定义元素的属性只认字符串：数组写成 JSON\nconst FAQ = JSON.stringify([\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n]);\n\n@Component({\n  selector: \"demo-collapse-single\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-collapse>\n  template: `<sn-collapse [attr.items]=\"faq\" single open=\"[0]\"></sn-collapse>`,\n})\nexport class CollapseSingleComponent {\n  protected faq = FAQ;\n}\n",
+        "solid": "// 自定义元素的属性只认字符串：数组写成 JSON\nconst FAQ = JSON.stringify([\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n]);\n\nexport default function FaqAccordion() {\n  return <sn-collapse items={FAQ} single open=\"[0]\"></sn-collapse>;\n}\n",
+        "preact": "import { Collapse } from \"satin-ui/react\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\n\nexport default function FaqAccordion() {\n  return <Collapse items={FAQ} single defaultOpen={[0]} />;\n}\n"
+      }
+    },
+    {
+      "slug": "collapse-controlled",
+      "title": "受控：知道展开了哪几项",
+      "why": "展开的序号放在父组件里：可以从外面开合，也可以拿去存起来、下次恢复。",
+      "html": "<div class=\"sn-stack sn-gap-8\"><sn-collapse open=\"[0]\" items='[{\"title\":\"导出的成片放在哪里？\",\"content\":\"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\"},{\"title\":\"额度用完了会怎样？\",\"content\":\"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\"},{\"title\":\"可以多人一起编辑吗？\",\"content\":\"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\"}]'></sn-collapse><span class=\"sn-help\">展开了 1 项</span></div>",
+      "code": {
+        "html": "<div class=\"sn-stack sn-gap-8\" id=\"faq-box\">\n  <sn-collapse open=\"[0]\" items='[\n    {\"title\":\"导出的成片放在哪里？\",\"content\":\"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\"},\n    {\"title\":\"额度用完了会怎样？\",\"content\":\"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\"},\n    {\"title\":\"可以多人一起编辑吗？\",\"content\":\"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\"}\n  ]'></sn-collapse>\n  <span class=\"sn-help\">展开了 1 项</span>\n</div>\n\n<script type=\"module\">\n  // 每次展开、收起以后发冒泡的 sn-change，e.detail 是现在展开的序号\n  const box = document.getElementById(\"faq-box\");\n  box.addEventListener(\"sn-change\", (e) => {\n    box.querySelector(\".sn-help\").textContent = `展开了 ${e.detail.length} 项`;\n  });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Collapse } from \"satin-ui/react\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\n\nexport default function FaqControlled() {\n  const [open, setOpen] = useState([0]);\n  return (\n    <div className=\"sn-stack sn-gap-8\">\n      <Collapse items={FAQ} open={open} onChange={setOpen} />\n      <span className=\"sn-help\">展开了 {open.length} 项</span>\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Collapse } from \"satin-ui/vue\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\nconst open = ref([0]);\n</script>\n\n<template>\n  <div class=\"sn-stack sn-gap-8\">\n    <Collapse v-model=\"open\" :items=\"FAQ\" />\n    <span class=\"sn-help\">展开了 {{ open.length }} 项</span>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Collapse from \"satin-ui/svelte/Collapse.svelte\";\n\n  const FAQ = [\n    { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n    { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n    { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n  ];\n  let open = $state([0]);\n</script>\n\n<div class=\"sn-stack sn-gap-8\">\n  <Collapse items={FAQ} bind:open={open} />\n  <span class=\"sn-help\">展开了 {open.length} 项</span>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, computed } from \"@angular/core\";\n\n// 自定义元素的属性只认字符串：数组写成 JSON\nconst FAQ = JSON.stringify([\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n]);\n\n@Component({\n  selector: \"demo-collapse-controlled\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-collapse>\n  template: `\n    <div class=\"sn-stack sn-gap-8\">\n      <sn-collapse [attr.items]=\"faq\" [attr.open]=\"openJson()\" (sn-change)=\"open.set($any($event).detail)\"></sn-collapse>\n      <span class=\"sn-help\">展开了 {{ open().length }} 项</span>\n    </div>\n  `,\n})\nexport class CollapseControlledComponent {\n  protected faq = FAQ;\n  protected open = signal([0]);\n  protected openJson = computed(() => JSON.stringify(this.open()));\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\n// 自定义元素的属性只认字符串：数组写成 JSON\nconst FAQ = JSON.stringify([\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n]);\n// 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）\nconst on = (type, fn) => (el) => el.addEventListener(type, fn);\n\nexport default function FaqControlled() {\n  const [open, setOpen] = createSignal([0]);\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <sn-collapse items={FAQ} open={JSON.stringify(open())} ref={on(\"sn-change\", (e) => setOpen(e.detail))}></sn-collapse>\n      <span class=\"sn-help\">展开了 {open().length} 项</span>\n    </div>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Collapse } from \"satin-ui/react\";\n\nconst FAQ = [\n  { title: \"导出的成片放在哪里？\", content: \"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。\" },\n  { title: \"额度用完了会怎样？\", content: \"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。\" },\n  { title: \"可以多人一起编辑吗？\", content: \"可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。\" },\n];\n\nexport default function FaqControlled() {\n  const [open, setOpen] = useState([0]);\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      <Collapse items={FAQ} open={open} onChange={setOpen} />\n      <span class=\"sn-help\">展开了 {open.length} 项</span>\n    </div>\n  );\n}\n"
+      }
+    }
+  ]
 }

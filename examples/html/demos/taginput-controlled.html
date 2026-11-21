@@ -1,0 +1,12 @@
+<div class="sn-stack sn-gap-8" id="taginput-controlled-box">
+  <sn-tag-input max="5" placeholder="输入关键词，回车确认" tags='["悬疑","长镜头"]'></sn-tag-input>
+  <span class="sn-help">已添加 2 / 5 个</span>
+</div>
+
+<script type="module">
+  const box = document.getElementById("taginput-controlled-box");
+  box.addEventListener("sn-change", (e) => {
+    const v = e.detail;
+    box.querySelector(".sn-help").textContent = `已添加 ${v.length} / 5 个`;
+  });
+</script>

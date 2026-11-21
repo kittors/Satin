@@ -1,0 +1,12 @@
+<div class="sn-stack sn-gap-8" id="number-controlled-box">
+  <sn-stepper min="1" max="12" unit="集" label="集数" value="3"></sn-stepper>
+  <span class="sn-help">预计生成 72 个镜头</span>
+</div>
+
+<script type="module">
+  const box = document.getElementById("number-controlled-box");
+  box.addEventListener("sn-change", (e) => {
+    const v = e.detail;
+    box.querySelector(".sn-help").textContent = `预计生成 ${v * 24} 个镜头`;
+  });
+</script>

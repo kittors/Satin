@@ -71,6 +71,274 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "每一位 `aria-hidden`，另有一个看不见的 `.sn-nf-sr` 写着完整的值：读屏只读最终的值，不读滚动的过程。"
+    ],
+    "focus": [
+      "不进 Tab 顺序。"
+    ],
+    "notes": [
+      "减少动态效果打开时直接换数字。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "数字变化",
+  "lead": "数字变了只动变了的那几位：变大往上走、变小往下走，从个位开始依次动；位数变了，新的一位从 0 宽长出来，逗号、小数点、货币符号不跟着滚。四种样子按场合选。",
+  "whenToUse": [
+    "计数、统计、价格这类会变的数字：让人看见\"变了\"，又不打断阅读。",
+    "点赞、收藏这类乐观更新的数字。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "要让人改的数字：用数字步进。",
+      "use": "number"
+    },
+    {
+      "text": "一页里堆一排大数字卡片：把数字写进句子里。"
+    }
+  ],
+  "related": [
+    {
+      "id": "number",
+      "diff": "数字步进能加减；数字变化只负责显示、把变化滚过去。"
+    },
+    {
+      "id": "optimistic",
+      "diff": "乐观更新先改数字再等服务器，数字用它来滚。"
+    }
+  ],
+  "import": {
+    "html": "// 入口里调过 defineElements()：直接写 <sn-number-flow>（也可以 import { createNumberFlow } from \"satin-ui\"）",
+    "react": "import { NumberFlow } from \"satin-ui/react\";",
+    "vue": "import { NumberFlow } from \"satin-ui/vue\";",
+    "svelte": "import NumberFlow from \"satin-ui/svelte/NumberFlow.svelte\";",
+    "angular": "// 入口里调过 defineElements()：模板里写 <sn-number-flow>（组件加 CUSTOM_ELEMENTS_SCHEMA）",
+    "solid": "// 入口里调过 defineElements()：直接写 <sn-number-flow>",
+    "preact": "import { NumberFlow } from \"satin-ui/react\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`NumberFlow` 组件：`value` 变了数字就变过去；`effect` 换变化的样子，`format` 自己格式化（默认千分位）。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `NumberFlow`：`value`、`effect`、`format`。",
+    "vue": "`NumberFlow` 组件：`:value` 变了数字就变过去；`effect` 换变化的样子，`:format` 自己格式化。",
+    "svelte": "`NumberFlow` 组件（`satin-ui/svelte/NumberFlow.svelte`）：`value` 变了数字就变过去，`effect`、`format`。",
+    "angular": "写 `<sn-number-flow [attr.value]=\"n()\">`：值变了数字就变过去；`effect` 换样子（要自己格式化时用 `createNumberFlow`）。",
+    "solid": "写 `<sn-number-flow value={n()}>`：信号变了数字就变过去；`effect` 换样子。",
+    "html": "写 `<sn-number-flow value=\"128\">`，改 `value` 属性数字就变过去；要自己格式化时用 `createNumberFlow(元素, { value, format })`，之后 `set(值)`。"
+  },
+  "dts": {
+    "factory": "createNumberFlow",
+    "react": "NumberFlow",
+    "vue": "NumberFlow",
+    "svelte": "NumberFlow"
+  },
+  "props": [
+    {
+      "name": "value",
+      "type": "number",
+      "default": "0",
+      "required": true,
+      "desc": "显示的数字；变了就从现在看到的位置滚过去（中途又变，接着滚）。",
+      "names": {
+        "js": "value",
+        "react": "value",
+        "vue": "value",
+        "svelte": "value",
+        "preact": "value",
+        "element": "value"
+      }
+    },
+    {
+      "name": "effect",
+      "type": "\"roll\" | \"blur\" | \"push\" | \"fade\"",
+      "default": "\"roll\"",
+      "required": false,
+      "desc": "变化的样子：roll 像里程表一样滚（计数、统计）；blur 滚的时候带运动模糊（大号数字、跳得多）；push 旧的滑走、新的滑进来（价格、档位）；fade 原地淡出淡入（徽标、按钮里的小数字）。",
+      "names": {
+        "js": "effect",
+        "react": "effect",
+        "vue": "effect",
+        "svelte": "effect",
+        "preact": "effect",
+        "element": "effect"
+      }
+    },
+    {
+      "name": "style",
+      "type": "\"roll\" | \"blur\" | \"push\" | \"fade\"",
+      "default": "\"roll\"",
+      "required": false,
+      "desc": "`effect` 的旧名，只在 `createNumberFlow` 的选项里认（框架里 style 是写 CSS 的）。",
+      "names": {
+        "js": "style"
+      }
+    },
+    {
+      "name": "format",
+      "type": "(v: number) => string",
+      "default": "千分位（1,280）",
+      "required": false,
+      "desc": "把数字变成要显示的字：金额、百分比、\"99+\"。逗号、货币符号这些不是数字的字不滚。",
+      "names": {
+        "js": "format",
+        "react": "format",
+        "vue": "format",
+        "svelte": "format",
+        "preact": "format"
+      }
+    },
+    {
+      "name": "reduced",
+      "type": "() => boolean",
+      "default": "跟系统的\"减少动态效果\"",
+      "required": false,
+      "desc": "返回 true 时不做动画、直接换数字。一般不用给。",
+      "names": {
+        "js": "reduced"
+      }
+    }
+  ],
+  "events": [],
+  "slots": [],
+  "methods": [
+    {
+      "name": "value",
+      "kind": "property",
+      "signature": "readonly value: number",
+      "returns": "number",
+      "desc": "现在的值。"
+    },
+    {
+      "name": "set",
+      "kind": "method",
+      "signature": "set(value: number): void",
+      "returns": "void",
+      "desc": "换成这个值（滚过去）。"
+    },
+    {
+      "name": "get",
+      "kind": "method",
+      "signature": "get(): number",
+      "returns": "number",
+      "desc": "现在的值（同 value）。"
+    },
+    {
+      "name": "setStyle",
+      "kind": "method",
+      "signature": "setStyle(style: \"roll\" | \"blur\" | \"push\" | \"fade\"): void",
+      "returns": "void",
+      "desc": "换变化的样子（框架里直接改 effect）。"
+    }
+  ],
+  "functions": [],
+  "cssVars": [
+    {
+      "name": "--sn-label",
+      "desc": "数字的颜色（跟着外面的文字色）",
+      "default": "正文色",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-nf",
+      "desc": "数字变化（脚本往里放每一位）"
+    },
+    {
+      "name": ".sn-nf[data-nf-style]",
+      "desc": "现在的样子：roll / blur / push / fade"
+    },
+    {
+      "name": ".sn-nf-sr",
+      "desc": "给读屏的最终值（看不见）"
+    }
+  ],
+  "types": [
+    "NumberFlowOptions"
+  ],
+  "keyboard": [
+    {
+      "keys": "—",
+      "does": "只显示，不能操作。"
+    }
+  ],
+  "design": {
+    "do": [
+      "数字写进句子里：\"已生成 1,280 个镜头\"。",
+      "按场合选样子：计数用滚动，价格用推入，小徽标用淡入。"
+    ],
+    "dont": [
+      {
+        "text": "一页堆一排大号 KPI 数字卡片。",
+        "rule": "kpi-wall"
+      },
+      {
+        "text": "数字变了还配彩色闪烁、发光。",
+        "rule": "no-colored-shadow"
+      }
+    ],
+    "copy": [
+      "单位跟着数字写：\"1,280 个\"\"¥199\"。"
+    ],
+    "motion": [
+      {
+        "what": "每一位滚到新数字，从个位开始每位晚 30ms",
+        "easing": "ease.outStrong",
+        "duration": "约 600ms"
+      },
+      {
+        "what": "新的一位从 0 宽长出来",
+        "easing": "ease.out",
+        "duration": "300ms 左右"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "numflow-basic",
+      "title": "最简单的用法",
+      "why": "给个数字就行：默认千分位，之后值变了自动滚过去。",
+      "html": "<sn-number-flow value=\"1280\"></sn-number-flow>",
+      "code": {
+        "html": "<sn-number-flow value=\"1280\"></sn-number-flow>\n",
+        "react": "import { NumberFlow } from \"satin-ui/react\";\n\nexport default function ShotTotal() {\n  return <NumberFlow value={1280} />;\n}\n",
+        "vue": "<script setup>\nimport { NumberFlow } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <NumberFlow :value=\"1280\" />\n</template>\n",
+        "svelte": "<script>\n  import NumberFlow from \"satin-ui/svelte/NumberFlow.svelte\";\n</script>\n\n<NumberFlow value={1280} />\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-numflow-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-number-flow>\n  template: `<sn-number-flow value=\"1280\"></sn-number-flow>`,\n})\nexport class NumflowBasicComponent {}\n",
+        "solid": "export default function ShotTotal() {\n  return <sn-number-flow value=\"1280\"></sn-number-flow>;\n}\n",
+        "preact": "import { NumberFlow } from \"satin-ui/react\";\n\nexport default function ShotTotal() {\n  return <NumberFlow value={1280} />;\n}\n"
+      }
+    },
+    {
+      "slug": "numflow-counter",
+      "title": "值变了：只动变了的那几位",
+      "why": "点加减看效果：变大往上走，变小往下走。",
+      "html": "<div class=\"sn-row\"><sn-number-flow value=\"128\"></sn-number-flow><button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-add=\"1\">+1</button><button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-add=\"-12\">-12</button></div>",
+      "code": {
+        "html": "<div class=\"sn-row\" id=\"numflow-counter-box\">\n  <sn-number-flow value=\"128\"></sn-number-flow>\n  <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-add=\"1\">+1</button>\n  <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-add=\"-12\">-12</button>\n</div>\n\n<script type=\"module\">\n  // 改 value 属性，数字就变过去（value 变了只动变了的那几位）\n  const box = document.getElementById(\"numflow-counter-box\"), nf = box.querySelector(\"sn-number-flow\");\n  box.addEventListener(\"click\", (e) => {\n    const b = e.target.closest(\"[data-add]\");\n    if (b) nf.setAttribute(\"value\", String(Number(nf.getAttribute(\"value\")) + Number(b.dataset.add)));\n  });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, NumberFlow } from \"satin-ui/react\";\n\nexport default function ShotCounter() {\n  const [n, setN] = useState(128);\n  return (\n    <div className=\"sn-row\">\n      {/* value 变了只动变了的那几位 */}\n      <NumberFlow value={n} />\n      <Button size=\"sm\" onClick={() => setN(n + 1)}>+1</Button>\n      <Button size=\"sm\" onClick={() => setN(n - 12)}>-12</Button>\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, NumberFlow } from \"satin-ui/vue\";\n\nconst n = ref(128);\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <!-- value 变了只动变了的那几位 -->\n    <NumberFlow :value=\"n\" />\n    <Button size=\"sm\" @click=\"n += 1\">+1</Button>\n    <Button size=\"sm\" @click=\"n -= 12\">-12</Button>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import NumberFlow from \"satin-ui/svelte/NumberFlow.svelte\";\n\n  let n = $state(128);\n</script>\n\n<div class=\"sn-row\">\n  <!-- value 变了只动变了的那几位 -->\n  <NumberFlow value={n} />\n  <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" onclick={() => (n += 1)}>+1</button>\n  <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" onclick={() => (n -= 12)}>-12</button>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-numflow-counter\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-number-flow>\n  template: `\n    <div class=\"sn-row\">\n      <!-- value 变了只动变了的那几位 -->\n      <sn-number-flow [attr.value]=\"n()\"></sn-number-flow>\n      <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" (click)=\"n.set(n() + 1)\">+1</button>\n      <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" (click)=\"n.set(n() - 12)\">-12</button>\n    </div>\n  `,\n})\nexport class NumflowCounterComponent {\n  protected n = signal(128);\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\nexport default function ShotCounter() {\n  const [n, setN] = createSignal(128);\n  return (\n    <div class=\"sn-row\">\n      {/* value 变了只动变了的那几位 */}\n      <sn-number-flow value={n()}></sn-number-flow>\n      <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" onClick={() => setN(n() + 1)}>+1</button>\n      <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" onClick={() => setN(n() - 12)}>-12</button>\n    </div>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Button, NumberFlow } from \"satin-ui/react\";\n\nexport default function ShotCounter() {\n  const [n, setN] = useState(128);\n  return (\n    <div class=\"sn-row\">\n      {/* value 变了只动变了的那几位 */}\n      <NumberFlow value={n} />\n      <Button size=\"sm\" onClick={() => setN(n + 1)}>+1</Button>\n      <Button size=\"sm\" onClick={() => setN(n - 12)}>-12</Button>\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "numflow-styles",
+      "title": "换个样子：模糊滚动",
+      "why": "effect 换变化的样子；跳得多的大号数字用 blur 更有速度感。",
+      "html": "<div class=\"sn-row\"><sn-number-flow value=\"2026\" effect=\"blur\"></sn-number-flow><button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-add=\"137\">+137</button></div>",
+      "code": {
+        "html": "<div class=\"sn-row\" id=\"numflow-styles-box\">\n  <sn-number-flow value=\"2026\" effect=\"blur\"></sn-number-flow>\n  <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-add=\"137\">+137</button>\n</div>\n\n<script type=\"module\">\n  // 改 value 属性，数字就变过去（value 变了只动变了的那几位；effect 换变化的样子：roll 滚动（默认）/ blur 模糊 / push 推入 / fade 淡入）\n  const box = document.getElementById(\"numflow-styles-box\"), nf = box.querySelector(\"sn-number-flow\");\n  box.addEventListener(\"click\", (e) => {\n    const b = e.target.closest(\"[data-add]\");\n    if (b) nf.setAttribute(\"value\", String(Number(nf.getAttribute(\"value\")) + Number(b.dataset.add)));\n  });\n</script>\n",
+        "react": "import { useState } from \"react\";\nimport { Button, NumberFlow } from \"satin-ui/react\";\n\nexport default function NumberEffect() {\n  const [n, setN] = useState(2026);\n  return (\n    <div className=\"sn-row\">\n      {/* value 变了只动变了的那几位；effect 换变化的样子：roll 滚动（默认）/ blur 模糊 / push 推入 / fade 淡入 */}\n      <NumberFlow value={n} effect=\"blur\" />\n      <Button size=\"sm\" onClick={() => setN(n + 137)}>+137</Button>\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Button, NumberFlow } from \"satin-ui/vue\";\n\nconst n = ref(2026);\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <!-- value 变了只动变了的那几位；effect 换变化的样子：roll 滚动（默认）/ blur 模糊 / push 推入 / fade 淡入 -->\n    <NumberFlow :value=\"n\" effect=\"blur\" />\n    <Button size=\"sm\" @click=\"n += 137\">+137</Button>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import NumberFlow from \"satin-ui/svelte/NumberFlow.svelte\";\n\n  let n = $state(2026);\n</script>\n\n<div class=\"sn-row\">\n  <!-- value 变了只动变了的那几位；effect 换变化的样子：roll 滚动（默认）/ blur 模糊 / push 推入 / fade 淡入 -->\n  <NumberFlow value={n} effect=\"blur\" />\n  <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" onclick={() => (n += 137)}>+137</button>\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-numflow-styles\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-number-flow>\n  template: `\n    <div class=\"sn-row\">\n      <!-- value 变了只动变了的那几位；effect 换变化的样子：roll 滚动（默认）/ blur 模糊 / push 推入 / fade 淡入 -->\n      <sn-number-flow [attr.value]=\"n()\" effect=\"blur\"></sn-number-flow>\n      <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" (click)=\"n.set(n() + 137)\">+137</button>\n    </div>\n  `,\n})\nexport class NumflowStylesComponent {\n  protected n = signal(2026);\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\nexport default function NumberEffect() {\n  const [n, setN] = createSignal(2026);\n  return (\n    <div class=\"sn-row\">\n      {/* value 变了只动变了的那几位；effect 换变化的样子：roll 滚动（默认）/ blur 模糊 / push 推入 / fade 淡入 */}\n      <sn-number-flow value={n()} effect=\"blur\"></sn-number-flow>\n      <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" onClick={() => setN(n() + 137)}>+137</button>\n    </div>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Button, NumberFlow } from \"satin-ui/react\";\n\nexport default function NumberEffect() {\n  const [n, setN] = useState(2026);\n  return (\n    <div class=\"sn-row\">\n      {/* value 变了只动变了的那几位；effect 换变化的样子：roll 滚动（默认）/ blur 模糊 / push 推入 / fade 淡入 */}\n      <NumberFlow value={n} effect=\"blur\" />\n      <Button size=\"sm\" onClick={() => setN(n + 137)}>+137</Button>\n    </div>\n  );\n}\n"
+      }
+    }
+  ]
 }

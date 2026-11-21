@@ -1,0 +1,13 @@
+<div class="sn-row" id="numflow-styles-box">
+  <sn-number-flow value="2026" effect="blur"></sn-number-flow>
+  <button type="button" class="sn-btn sn-secondary sn-sm" data-add="137">+137</button>
+</div>
+
+<script type="module">
+  // 改 value 属性，数字就变过去（value 变了只动变了的那几位；effect 换变化的样子：roll 滚动（默认）/ blur 模糊 / push 推入 / fade 淡入）
+  const box = document.getElementById("numflow-styles-box"), nf = box.querySelector("sn-number-flow");
+  box.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-add]");
+    if (b) nf.setAttribute("value", String(Number(nf.getAttribute("value")) + Number(b.dataset.add)));
+  });
+</script>
