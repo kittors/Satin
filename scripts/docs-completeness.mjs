@@ -72,7 +72,9 @@ function check(c, foundation) {
     const pureCss = !c.dts?.react && !c.dts?.vue && !c.dts?.svelte && !c.dts?.factory && !c.dts?.options && !has(c.functions);
     if (!has(c.props) && !has(c.functions) && !pureCss) add("4 API", "属性和函数都没有");
     if (!has(c.classes)) add("4 API", "纯 HTML 写法的类名、data 属性（classes）");
-    if (!has(c.types) && !pureCss) add("4 API", "导出的 TS 类型名（types）");
+    // 导出的类型：有组件、工厂、选项接口的才要（只有几个参数是元素、字符串的函数没有自己的类型）
+    const needTypes = !!(c.dts?.react || c.dts?.vue || c.dts?.svelte || c.dts?.factory || c.dts?.options);
+    if (!has(c.types) && needTypes) add("4 API", "导出的 TS 类型名（types）");
   }
   if (!has(c.cssVars)) add("4 API", "能改的 CSS 变量、令牌（cssVars）");
   for (const v of c.cssVars || []) { const lack = ["desc", "default"].filter((k) => !has(v[k])); if (lack.length) add("4 API", `CSS 变量 ${v.name} 缺 ${lack.join("、")}`); }

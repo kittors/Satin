@@ -34,9 +34,11 @@ function htmlOf(src) {
 // 统一：去掉标签之间的空白、注释（Vue 的 <!--[--> 片段标记）、按属性名排序、类名排序
 // 纯 HTML 写法接线用、框架写法里换成 onClick / ref 的属性：不比
 // （弹窗里"放弃填写的内容？"那一条的 data-keep / data-discard 也是：框架写法里是 Dialog 的 guard + onClick）
-const WIRING = new Set(["id", "data-dlg", "data-pop", "data-fmenu", "data-ctx", "data-drawer", "data-keep", "data-discard", "data-toggle", "data-chips", "data-all", "data-f", "data-x", "data-step"]);
+const WIRING = new Set(["id", "data-dlg", "data-pop", "data-fmenu", "data-ctx", "data-drawer", "data-keep", "data-discard", "data-toggle", "data-chips", "data-all", "data-f", "data-x", "data-step", "data-dismiss"]);
 function norm(html) {
   const host = document.createElement("div"); host.innerHTML = html.replace(/<!--[\s\S]*?-->/g, "");
+  // React 19 给 <img> 自动加的预加载提示（<link rel="preload" as="image">）：不是组件的标记，不比
+  for (const l of [...host.querySelectorAll('link[rel="preload"]')]) l.remove();
   // 封装组件外面那层 <div class="sn-host" style="display: contents">（不占布局）拆掉
   for (const w of [...host.querySelectorAll("div.sn-host")]) if (/display:\s*contents/.test(w.getAttribute("style") || "")) w.replaceWith(...w.childNodes);
   // <sn-enhance>（不占布局）拆掉；Vue 的 v-enhance 挂在最外面一个不带属性的 <div> 上：也拆掉（只拆最外面那一个）

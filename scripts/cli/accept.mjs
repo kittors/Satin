@@ -62,9 +62,15 @@ async function waitUp(url, ms = 60000) {
   while (Date.now() - t0 < ms) { try { const r = await fetch(url); if (r.ok) return true; } catch { /* 还没起来 */ } await sleep(500); }
   return false;
 }
-function checker(dir, argv) {
-  const r = spawnSync(process.execPath, [path.join(dir, ".claude/skills/satin/scripts/check.mjs"), ...argv, "--json"], { cwd: dir, env: { ...ENV, PLAYWRIGHT }, encoding: "utf8", timeout: 600000, maxBuffer: 64 * 1024 * 1024 });
-  try { const j = JSON.parse(r.stdout); return { error: j.counts.error, warn: j.counts.warn, rules: j.counts.byRule }; } catch { return { error: -1, note: tail(r.stdout + r.stderr, 4) }; }
+// 检查器用异步子进程跑：Angular 的成品由本进程里的静态服务提供，spawnSync 会把本进程卡住，检查器打开页面就一直等不到（30 秒超时）
+const spawnAsync = (cmd, args, opts) => new Promise((resolve) => {
+  const c = spawn(cmd, args, opts); let stdout = "", stderr = ""; const t = setTimeout(() => c.kill("SIGKILL"), opts.timeout ?? 600000);
+  c.stdout.on("data", (d) => (stdout += d)); c.stderr.on("data", (d) => (stderr += d)); c.on("close", (status) => { clearTimeout(t); resolve({ status, stdout, stderr }); });
+});
+async function checker(dir, argv) {
+  const r = await spawnAsync(process.execPath, [path.join(dir, ".claude/skills/satin/scripts/check.mjs"), ...argv, "--json"], { cwd: dir, env: { ...ENV, PLAYWRIGHT }, timeout: 600000 });
+  try { const j = JSON.parse(r.stdout); return { error: j.counts.error, warn: j.counts.warn, rules: j.counts.byRule }; }
+  catch { const log = path.join(OUT, "_check", `${path.basename(dir)}-${argv[0]}.log`); fs.mkdirSync(path.dirname(log), { recursive: true }); fs.writeFileSync(log, r.stdout + "\n" + r.stderr); return { error: -1, note: tail(r.stdout + r.stderr, 4), log }; } // 检查器没跑完：整段输出留在 log 里查
 }
 
 const report = [];
@@ -118,8 +124,8 @@ for (const [i, fw] of ONLY.entries()) {
       r.steps.noErrors = !r.light.errors.length && !r.dark.errors.length;
     } finally { await browser.close(); }
     // 5. 检查器：源码 + 页面
-    r.static = checker(dir, ["static", ...def.src]);
-    r.dom = checker(dir, ["dom", url, "--out", path.join(OUT, "_check", fw), "--widths", "1440,390", "--themes", "light,dark"]);
+    r.static = await checker(dir, ["static", ...def.src]);
+    r.dom = await checker(dir, ["dom", url, "--out", path.join(OUT, "_check", fw), "--widths", "1440,390", "--themes", "light,dark"]);
     r.steps.checker = r.static.error === 0 && r.dom.error === 0;
   } catch (e) { r.error = String(e?.message || e).split("\n")[0]; console.log(r.error); }
   finally { srv.kill(); cleanup(dir); }
