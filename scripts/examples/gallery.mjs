@@ -87,7 +87,12 @@ if (CONTRACT.length) {
         const host = document.createElement("div"); host.innerHTML = e.html; box.append(host);
         const files = V.variants({ node: host, js: e.js || "", css: e.css || "", slug: e.slug, inline, flex });
         // 契约里给了某个框架的手写写法（React 的受控 value / onChange、Vue 的 v-model 这类惯用法）：用手写的
-        for (const [fw, code] of Object.entries(e.code || {})) if (files[fw]) files[fw][0] = { ...files[fw][0], code: code.endsWith("\n") ? code : code + "\n" };
+        for (const [fw, code0] of Object.entries(e.code || {})) {
+          if (!files[fw]) continue;
+          // React 的手写写法用到 useState 这类钩子：标上 "use client"（Next.js 里是客户端组件；Vite 里这一行没有影响）
+          const code = fw === "react" && !/^["']use client["']/.test(code0.trim()) ? `"use client";\n${code0}` : code0;
+          files[fw][0] = { ...files[fw][0], code: code.endsWith("\n") ? code : code + "\n" };
+        }
         host.remove();
         return { id: c.id, n: -1, slug: e.slug, cap: e.title, ready: true, contract: true, files, extra: [] };
       });

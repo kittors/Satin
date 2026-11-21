@@ -195,6 +195,7 @@
 .sn-g-ghost > * { transition: opacity .2s var(--sn-ease-out); }
 /* 拖列：浮起的整列（表头那一格 + 表身看得见的那一段），压在表格上面 */
 .sn-g-colghost { overflow: hidden; display: flex; flex-direction: column; }
+.sn-g-flashbox { position: absolute; inset: 0; background: var(--sn-g-flash); pointer-events: none; } /* 改完值闪一下的那层底（grid.js flash），只动透明度 */
 .sn-g-colghost > .sn-g-gh-head { flex: none; height: 40px; background: var(--sn-raised); }
 .sn-g-colghost > .sn-g-gh-body { position: relative; flex: none; }
 .sn-g-colghost > .sn-g-gh-body > .sn-g-cell { background: var(--sn-raised); }

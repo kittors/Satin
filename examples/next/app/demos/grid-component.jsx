@@ -1,3 +1,4 @@
+"use client";
 import { wrapSatin } from "satin-ui/react";
 import { createDataGrid } from "satin-ui/grid";
 

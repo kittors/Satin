@@ -16,6 +16,14 @@ import ElevationDemo0 from "../demos/elevation-0.jsx";
 import MotionDemo0 from "../demos/motion-0.jsx";
 import IconsDemo0 from "../demos/icons-0.jsx";
 import ButtonDemo0 from "../demos/button-0.jsx";
+import ButtonDemo0 from "../demos/button-0.jsx";
+import ButtonDemo0 from "../demos/button-0.jsx";
+import ButtonDemo0 from "../demos/button-0.jsx";
+import ButtonDemo0 from "../demos/button-0.jsx";
+import ButtonDemo0 from "../demos/button-0.jsx";
+import ButtonDemo0 from "../demos/button-0.jsx";
+import ButtonDemo0 from "../demos/button-0.jsx";
+import ButtonDemo0 from "../demos/button-0.jsx";
 import ButtonDemo1 from "../demos/button-1.jsx";
 import ButtonDemo2 from "../demos/button-2.jsx";
 import ButtonDemo3 from "../demos/button-3.jsx";
@@ -33,6 +41,19 @@ import TaginputDemo0 from "../demos/taginput-0.jsx";
 import NumberDemo0 from "../demos/number-0.jsx";
 import PromptDemo0 from "../demos/prompt-0.jsx";
 import SelectDemo0 from "../demos/select-0.jsx";
+import SelectDemo0 from "../demos/select-0.jsx";
+import SelectDemo0 from "../demos/select-0.jsx";
+import SelectDemo0 from "../demos/select-0.jsx";
+import SelectDemo0 from "../demos/select-0.jsx";
+import SelectDemo0 from "../demos/select-0.jsx";
+import SelectDemo0 from "../demos/select-0.jsx";
+import SelectDemo0 from "../demos/select-0.jsx";
+import PickerDemo0 from "../demos/picker-0.jsx";
+import PickerDemo0 from "../demos/picker-0.jsx";
+import PickerDemo0 from "../demos/picker-0.jsx";
+import PickerDemo0 from "../demos/picker-0.jsx";
+import PickerDemo0 from "../demos/picker-0.jsx";
+import PickerDemo0 from "../demos/picker-0.jsx";
 import PickerDemo0 from "../demos/picker-0.jsx";
 import ChoiceDemo0 from "../demos/choice-0.jsx";
 import SegmentedDemo0 from "../demos/segmented-0.jsx";
@@ -42,6 +63,11 @@ import TooltipDemo0 from "../demos/tooltip-0.jsx";
 import PopoverDemo0 from "../demos/popover-0.jsx";
 import PopconfirmDemo0 from "../demos/popconfirm-0.jsx";
 import CtxmenuDemo0 from "../demos/ctxmenu-0.jsx";
+import DialogDemo0 from "../demos/dialog-0.jsx";
+import DialogDemo0 from "../demos/dialog-0.jsx";
+import DialogDemo0 from "../demos/dialog-0.jsx";
+import DialogDemo0 from "../demos/dialog-0.jsx";
+import DialogDemo0 from "../demos/dialog-0.jsx";
 import DialogDemo0 from "../demos/dialog-0.jsx";
 import DrawerDemo0 from "../demos/drawer-0.jsx";
 import CmdkDemo0 from "../demos/cmdk-0.jsx";
@@ -61,6 +87,9 @@ import TableDemo5 from "../demos/table-5.jsx";
 import TableDemo6 from "../demos/table-6.jsx";
 import TableDemo7 from "../demos/table-7.jsx";
 import TableDemo8 from "../demos/table-8.jsx";
+import GridDemo0 from "../demos/grid-0.jsx";
+import GridDemo0 from "../demos/grid-0.jsx";
+import GridDemo0 from "../demos/grid-0.jsx";
 import GridDemo0 from "../demos/grid-0.jsx";
 import CgridDemo0 from "../demos/cgrid-0.jsx";
 import ListDemo0 from "../demos/list-0.jsx";
@@ -162,6 +191,14 @@ export default function Gallery() {
       <section id="button">
         <h2>按钮</h2>
         <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
+        <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
+        <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
+        <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
+        <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
+        <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
+        <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
+        <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
+        <div className="demo" data-demo="button-0"><ButtonDemo0 /></div>
         <div className="demo" data-demo="button-1"><ButtonDemo1 /></div>
         <div className="demo" data-demo="button-2"><ButtonDemo2 /></div>
         <div className="demo" data-demo="button-3"><ButtonDemo3 /></div>
@@ -215,9 +252,22 @@ export default function Gallery() {
       <section id="select">
         <h2>下拉选择与菜单</h2>
         <div className="demo" data-demo="select-0"><SelectDemo0 /></div>
+        <div className="demo" data-demo="select-0"><SelectDemo0 /></div>
+        <div className="demo" data-demo="select-0"><SelectDemo0 /></div>
+        <div className="demo" data-demo="select-0"><SelectDemo0 /></div>
+        <div className="demo" data-demo="select-0"><SelectDemo0 /></div>
+        <div className="demo" data-demo="select-0"><SelectDemo0 /></div>
+        <div className="demo" data-demo="select-0"><SelectDemo0 /></div>
+        <div className="demo" data-demo="select-0"><SelectDemo0 /></div>
       </section>
       <section id="picker">
         <h2>日期、时间、地址</h2>
+        <div className="demo" data-demo="picker-0"><PickerDemo0 /></div>
+        <div className="demo" data-demo="picker-0"><PickerDemo0 /></div>
+        <div className="demo" data-demo="picker-0"><PickerDemo0 /></div>
+        <div className="demo" data-demo="picker-0"><PickerDemo0 /></div>
+        <div className="demo" data-demo="picker-0"><PickerDemo0 /></div>
+        <div className="demo" data-demo="picker-0"><PickerDemo0 /></div>
         <div className="demo" data-demo="picker-0"><PickerDemo0 /></div>
       </section>
       <section id="choice">
@@ -254,6 +304,11 @@ export default function Gallery() {
       </section>
       <section id="dialog">
         <h2>弹窗</h2>
+        <div className="demo" data-demo="dialog-0"><DialogDemo0 /></div>
+        <div className="demo" data-demo="dialog-0"><DialogDemo0 /></div>
+        <div className="demo" data-demo="dialog-0"><DialogDemo0 /></div>
+        <div className="demo" data-demo="dialog-0"><DialogDemo0 /></div>
+        <div className="demo" data-demo="dialog-0"><DialogDemo0 /></div>
         <div className="demo" data-demo="dialog-0"><DialogDemo0 /></div>
       </section>
       <section id="drawer">
@@ -306,6 +361,9 @@ export default function Gallery() {
       </section>
       <section id="grid">
         <h2>数据表格</h2>
+        <div className="demo" data-demo="grid-0"><GridDemo0 /></div>
+        <div className="demo" data-demo="grid-0"><GridDemo0 /></div>
+        <div className="demo" data-demo="grid-0"><GridDemo0 /></div>
         <div className="demo" data-demo="grid-0"><GridDemo0 /></div>
       </section>
       <section id="cgrid">

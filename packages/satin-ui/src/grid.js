@@ -180,7 +180,8 @@ export function mountHead(head, model, opt) {
     const vp = opt.vp, fr = vp.parentElement, r = hc.getBoundingClientRect();
     const ghost = document.createElement("div"), hcl = hc.cloneNode(true); ghost.className = "sn-g-ghost sn-g-colghost"; hcl.querySelector(".sn-g-rz")?.remove(); hcl.classList.add("sn-g-gh-head"); hcl.style.removeProperty("translate"); hcl.style.removeProperty("opacity"); hcl.style.order = "-1"; hcl.style.position = "relative"; /* 表格的样式表按 data-c 给每一列排了 order、固定列 sticky：克隆出来的表头格子也会命中，这里压住 */
     ghost.append(hcl); const part = opt.colGhost?.(key); if (part) { part.classList.add("sn-g-gh-body"); ghost.append(part); }
-    Object.assign(ghost.style, { left: r.left + "px", top: head.getBoundingClientRect().top + "px", width: r.width + "px" }); opt.root.append(ghost); liftIn(ghost);
+    const top0 = head.getBoundingClientRect().top;
+    Object.assign(ghost.style, { left: r.left + "px", top: top0 + "px", width: r.width + "px", translate: "0px 0px" }); opt.root.append(ghost); liftIn(ghost); // 起点定好以后只动 translate（跟手、落位都是），不改 left / top
     slotEl = document.createElement("i"); slotEl.className = "sn-g-gap sn-g-colgap"; fr.prepend(slotEl); slotKey = key; head.style.background = "transparent"; paintSlot(); /* 表头底色透明：被拖那一格淡掉时露出后面的空位（别的格子自己有底）。只改表头自己，不给整张表加类名，免得整表重算样式 */
     const dx0 = ev.clientX - r.left, home = [...model.mid], rest = home.filter((k) => k !== key); let px = ev.clientX, py = ev.clientY, raf = 0, out = false;
     dimCol(key, 0, 160); /* 这一列淡出、浮起的那份淡入（同样 160ms），中间不会先变空一下 */
@@ -188,7 +189,7 @@ export function mountHead(head, model, opt) {
     const target = () => { const gl = px - dx0 - vp.getBoundingClientRect().left + vp.scrollLeft; let x = model.leftW(), best = 0, bd = Infinity; for (let t = 0; t <= rest.length; t++) { const d = Math.abs(gl - x); if (d < bd) { bd = d; best = t; } if (t < rest.length) x += model.byKey[rest[t]].w; } return best; };
     const tick = () => {
       const b = fr.getBoundingClientRect(); out = px < b.left - 40 || px > b.right + 40 || py < b.top - 40 || py > b.bottom + 40;
-      ghost.style.top = head.getBoundingClientRect().top + "px"; ghost.style.left = px - dx0 + "px"; ghost.classList.toggle("sn-away", out);
+      ghost.style.translate = `${px - dx0 - r.left}px ${head.getBoundingClientRect().top - top0}px`; ghost.classList.toggle("sn-away", out);
       if (!out) { const vr = vp.getBoundingClientRect(), lo = vr.left + model.leftW() + 32, hi = vr.left + vp.clientWidth - model.rightW() - 32, sp = px < lo ? -(lo - px) / 3 : px > hi ? (px - hi) / 3 : 0; if (sp) vp.scrollLeft += Math.max(-24, Math.min(24, sp)); }
       const t = target(); moveCols(out ? home : [...rest.slice(0, t), key, ...rest.slice(t)]); paintSlot(); raf = requestAnimationFrame(tick);
     };
@@ -200,8 +201,8 @@ export function mountHead(head, model, opt) {
         const land = () => { landCol = null; slotEl?.remove(); slotEl = null; slotKey = null; head.style.removeProperty("background"); dimCol(key, 1, 1); opt.motion(); if (reduced()) { ghost.remove(); return; } ghost.animate([{ opacity: getComputedStyle(ghost).opacity }, { opacity: 0 }], { duration: 120, easing: EASE_CSS.out, fill: "forwards" }).onfinish = () => ghost.remove(); };
         if (reduced()) { land(); return; }
         // 浮起的列滑进空位（空位可能还在滑：按它最后的位置），落定了再现出这一列
-        const tx = vp.getBoundingClientRect().left + model.xOf(key) - vp.scrollLeft;
-        const anim = ghost.animate([{ left: ghost.style.left, opacity: getComputedStyle(ghost).opacity }, { left: tx + "px", opacity: 1 }], { duration: COL_DUR, easing: EASE_CSS.outStrong, fill: "forwards" });
+        const tx = vp.getBoundingClientRect().left + model.xOf(key) - vp.scrollLeft, ty = head.getBoundingClientRect().top - top0;
+        const anim = ghost.animate([{ translate: ghost.style.translate || "0px 0px", opacity: getComputedStyle(ghost).opacity }, { translate: `${tx - r.left}px ${ty}px`, opacity: 1 }], { duration: COL_DUR, easing: EASE_CSS.outStrong, fill: "forwards" });
         landCol = () => { anim.cancel(); land(); }; anim.onfinish = land;
       },
     };
@@ -785,7 +786,8 @@ export function mountDataGrid(root, { rows = 100000, seed = 11 } = {}) {
   let errEl = null;
   function showErr(cell, msg) { hideErr(); cell.classList.add("sn-bad"); errEl = document.createElement("div"); errEl.className = "sn-g-err"; errEl.textContent = msg; document.body.append(errEl); const r = cell.getBoundingClientRect(); errEl.style.left = r.left + "px"; errEl.style.top = r.bottom + 4 + "px"; errEl._cell = cell; }
   function hideErr() { if (errEl) { errEl._cell.classList.remove("sn-bad"); errEl.remove(); errEl = null; } }
-  function flash(r, key) { requestAnimationFrame(() => { const row = pool.find((x) => x._r === r && x.style.display !== "none"); const c = row?._cells[key]; if (c && !reduced()) c.animate([{ backgroundColor: "var(--sn-g-flash)" }, { backgroundColor: "transparent" }], { duration: 700, easing: "ease-out" }); }); }
+  // 改完值格子闪一下：格子里叠一层成功色的底，只动它的透明度，播完拿掉（不动格子自己的 background-color）
+  function flash(r, key) { requestAnimationFrame(() => { const row = pool.find((x) => x._r === r && x.style.display !== "none"); const c = row?._cells[key]; if (!c || reduced()) return; const f = document.createElement("i"); f.className = "sn-g-flashbox"; f.setAttribute("aria-hidden", "true"); c.append(f); f.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: EASE_CSS.out }).onfinish = () => f.remove(); }); }
 
   // ———— 拖行换位置（跟手） ————
   // 按住把手移动 4px 才算拿起：这一行浮起来（一层投影，160ms 淡入），一比一跟着指针上下走，不缓动；其他行逐帧缓动让开，

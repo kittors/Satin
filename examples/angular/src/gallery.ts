@@ -16,6 +16,14 @@ import { ElevationDemo0Component } from "./demos/elevation-0";
 import { MotionDemo0Component } from "./demos/motion-0";
 import { IconsDemo0Component } from "./demos/icons-0";
 import { ButtonDemo0Component } from "./demos/button-0";
+import { ButtonDemo0Component } from "./demos/button-0";
+import { ButtonDemo0Component } from "./demos/button-0";
+import { ButtonDemo0Component } from "./demos/button-0";
+import { ButtonDemo0Component } from "./demos/button-0";
+import { ButtonDemo0Component } from "./demos/button-0";
+import { ButtonDemo0Component } from "./demos/button-0";
+import { ButtonDemo0Component } from "./demos/button-0";
+import { ButtonDemo0Component } from "./demos/button-0";
 import { ButtonDemo1Component } from "./demos/button-1";
 import { ButtonDemo2Component } from "./demos/button-2";
 import { ButtonDemo3Component } from "./demos/button-3";
@@ -33,6 +41,19 @@ import { TaginputDemo0Component } from "./demos/taginput-0";
 import { NumberDemo0Component } from "./demos/number-0";
 import { PromptDemo0Component } from "./demos/prompt-0";
 import { SelectDemo0Component } from "./demos/select-0";
+import { SelectDemo0Component } from "./demos/select-0";
+import { SelectDemo0Component } from "./demos/select-0";
+import { SelectDemo0Component } from "./demos/select-0";
+import { SelectDemo0Component } from "./demos/select-0";
+import { SelectDemo0Component } from "./demos/select-0";
+import { SelectDemo0Component } from "./demos/select-0";
+import { SelectDemo0Component } from "./demos/select-0";
+import { PickerDemo0Component } from "./demos/picker-0";
+import { PickerDemo0Component } from "./demos/picker-0";
+import { PickerDemo0Component } from "./demos/picker-0";
+import { PickerDemo0Component } from "./demos/picker-0";
+import { PickerDemo0Component } from "./demos/picker-0";
+import { PickerDemo0Component } from "./demos/picker-0";
 import { PickerDemo0Component } from "./demos/picker-0";
 import { ChoiceDemo0Component } from "./demos/choice-0";
 import { SegmentedDemo0Component } from "./demos/segmented-0";
@@ -42,6 +63,11 @@ import { TooltipDemo0Component } from "./demos/tooltip-0";
 import { PopoverDemo0Component } from "./demos/popover-0";
 import { PopconfirmDemo0Component } from "./demos/popconfirm-0";
 import { CtxmenuDemo0Component } from "./demos/ctxmenu-0";
+import { DialogDemo0Component } from "./demos/dialog-0";
+import { DialogDemo0Component } from "./demos/dialog-0";
+import { DialogDemo0Component } from "./demos/dialog-0";
+import { DialogDemo0Component } from "./demos/dialog-0";
+import { DialogDemo0Component } from "./demos/dialog-0";
 import { DialogDemo0Component } from "./demos/dialog-0";
 import { DrawerDemo0Component } from "./demos/drawer-0";
 import { CmdkDemo0Component } from "./demos/cmdk-0";
@@ -61,6 +87,9 @@ import { TableDemo5Component } from "./demos/table-5";
 import { TableDemo6Component } from "./demos/table-6";
 import { TableDemo7Component } from "./demos/table-7";
 import { TableDemo8Component } from "./demos/table-8";
+import { GridDemo0Component } from "./demos/grid-0";
+import { GridDemo0Component } from "./demos/grid-0";
+import { GridDemo0Component } from "./demos/grid-0";
 import { GridDemo0Component } from "./demos/grid-0";
 import { CgridDemo0Component } from "./demos/cgrid-0";
 import { ListDemo0Component } from "./demos/list-0";
@@ -119,7 +148,7 @@ import { SelectMenuComponent } from "./demos/select-menu";
 
 @Component({
   selector: "app-root",
-  imports: [ColorDemo0Component, TypeDemo0Component, TypeDemo1Component, TypeDemo2Component, SpacingDemo0Component, SpacingDemo1Component, SpacingDemo2Component, SpacingDemo3Component, LayoutDemo0Component, LayoutDemo1Component, SpaceDemo0Component, SpaceDemo1Component, ElevationDemo0Component, MotionDemo0Component, IconsDemo0Component, ButtonDemo0Component, ButtonDemo1Component, ButtonDemo2Component, ButtonDemo3Component, IconbuttonDemo0Component, LinkDemo0Component, CompoundDemo0Component, ChipDemo0Component, FieldDemo0Component, InputDemo0Component, InputDemo1Component, InputDemo2Component, SpecialDemo0Component, CountDemo0Component, TaginputDemo0Component, NumberDemo0Component, PromptDemo0Component, SelectDemo0Component, PickerDemo0Component, ChoiceDemo0Component, SegmentedDemo0Component, SliderDemo0Component, OtpDemo0Component, TooltipDemo0Component, PopoverDemo0Component, PopconfirmDemo0Component, CtxmenuDemo0Component, DialogDemo0Component, DrawerDemo0Component, CmdkDemo0Component, ToastDemo0Component, NotifyDemo0Component, BannerDemo0Component, EmptyDemo0Component, LoadingDemo0Component, ProgressDemo0Component, NumflowDemo0Component, TableDemo0Component, TableDemo1Component, TableDemo2Component, TableDemo3Component, TableDemo4Component, TableDemo5Component, TableDemo6Component, TableDemo7Component, TableDemo8Component, GridDemo0Component, CgridDemo0Component, ListDemo0Component, CardDemo0Component, TagsDemo0Component, CollapseDemo0Component, ScrollareaDemo0Component, ScrollareaDemo1Component, ScrollareaDemo2Component, ScrollareaDemo3Component, ScrollareaDemo4Component, ScrollareaDemo5Component, ScrollareaDemo6Component, VlistDemo0Component, ChatDemo0Component, MdDemo0Component, FlowDemo0Component, FlowstressDemo0Component, ImageDemo0Component, MediaDemo0Component, UploadDemo0Component, SidebarDemo0Component, TabsDemo0Component, ReorderDemo0Component, AddremoveDemo0Component, OptimisticDemo0Component, ButtonBasicComponent, ButtonVariantsComponent, ButtonSizesComponent, ButtonIconsComponent, ButtonStatesComponent, ButtonBusyComponent, ButtonActionsComponent, ButtonMobileComponent, DialogBasicComponent, DialogDangerComponent, DialogGuardComponent, DialogEventsComponent, DialogControlledComponent, GridBasicComponent, GridSeedComponent, GridComponentComponent, PickerBasicComponent, PickerRangeComponent, PickerTimeComponent, PickerDatetimeComponent, PickerRegionComponent, PickerEventsComponent, SelectBasicComponent, SelectPlaceholderComponent, SelectOptionsComponent, SelectFieldComponent, SelectEventsComponent, SelectControlledComponent, SelectMenuComponent],
+  imports: [ColorDemo0Component, TypeDemo0Component, TypeDemo1Component, TypeDemo2Component, SpacingDemo0Component, SpacingDemo1Component, SpacingDemo2Component, SpacingDemo3Component, LayoutDemo0Component, LayoutDemo1Component, SpaceDemo0Component, SpaceDemo1Component, ElevationDemo0Component, MotionDemo0Component, IconsDemo0Component, ButtonDemo0Component, ButtonDemo0Component, ButtonDemo0Component, ButtonDemo0Component, ButtonDemo0Component, ButtonDemo0Component, ButtonDemo0Component, ButtonDemo0Component, ButtonDemo0Component, ButtonDemo1Component, ButtonDemo2Component, ButtonDemo3Component, IconbuttonDemo0Component, LinkDemo0Component, CompoundDemo0Component, ChipDemo0Component, FieldDemo0Component, InputDemo0Component, InputDemo1Component, InputDemo2Component, SpecialDemo0Component, CountDemo0Component, TaginputDemo0Component, NumberDemo0Component, PromptDemo0Component, SelectDemo0Component, SelectDemo0Component, SelectDemo0Component, SelectDemo0Component, SelectDemo0Component, SelectDemo0Component, SelectDemo0Component, SelectDemo0Component, PickerDemo0Component, PickerDemo0Component, PickerDemo0Component, PickerDemo0Component, PickerDemo0Component, PickerDemo0Component, PickerDemo0Component, ChoiceDemo0Component, SegmentedDemo0Component, SliderDemo0Component, OtpDemo0Component, TooltipDemo0Component, PopoverDemo0Component, PopconfirmDemo0Component, CtxmenuDemo0Component, DialogDemo0Component, DialogDemo0Component, DialogDemo0Component, DialogDemo0Component, DialogDemo0Component, DialogDemo0Component, DrawerDemo0Component, CmdkDemo0Component, ToastDemo0Component, NotifyDemo0Component, BannerDemo0Component, EmptyDemo0Component, LoadingDemo0Component, ProgressDemo0Component, NumflowDemo0Component, TableDemo0Component, TableDemo1Component, TableDemo2Component, TableDemo3Component, TableDemo4Component, TableDemo5Component, TableDemo6Component, TableDemo7Component, TableDemo8Component, GridDemo0Component, GridDemo0Component, GridDemo0Component, GridDemo0Component, CgridDemo0Component, ListDemo0Component, CardDemo0Component, TagsDemo0Component, CollapseDemo0Component, ScrollareaDemo0Component, ScrollareaDemo1Component, ScrollareaDemo2Component, ScrollareaDemo3Component, ScrollareaDemo4Component, ScrollareaDemo5Component, ScrollareaDemo6Component, VlistDemo0Component, ChatDemo0Component, MdDemo0Component, FlowDemo0Component, FlowstressDemo0Component, ImageDemo0Component, MediaDemo0Component, UploadDemo0Component, SidebarDemo0Component, TabsDemo0Component, ReorderDemo0Component, AddremoveDemo0Component, OptimisticDemo0Component, ButtonBasicComponent, ButtonVariantsComponent, ButtonSizesComponent, ButtonIconsComponent, ButtonStatesComponent, ButtonBusyComponent, ButtonActionsComponent, ButtonMobileComponent, DialogBasicComponent, DialogDangerComponent, DialogGuardComponent, DialogEventsComponent, DialogControlledComponent, GridBasicComponent, GridSeedComponent, GridComponentComponent, PickerBasicComponent, PickerRangeComponent, PickerTimeComponent, PickerDatetimeComponent, PickerRegionComponent, PickerEventsComponent, SelectBasicComponent, SelectPlaceholderComponent, SelectOptionsComponent, SelectFieldComponent, SelectEventsComponent, SelectControlledComponent, SelectMenuComponent],
   encapsulation: ViewEncapsulation.None,
   styleUrl: "../../shared/gallery.css",
   template: `
@@ -165,6 +194,14 @@ import { SelectMenuComponent } from "./demos/select-menu";
   </section>
   <section id="button">
     <h2>按钮</h2>
+    <div class="demo" data-demo="button-0"><demo-button-0 /></div>
+    <div class="demo" data-demo="button-0"><demo-button-0 /></div>
+    <div class="demo" data-demo="button-0"><demo-button-0 /></div>
+    <div class="demo" data-demo="button-0"><demo-button-0 /></div>
+    <div class="demo" data-demo="button-0"><demo-button-0 /></div>
+    <div class="demo" data-demo="button-0"><demo-button-0 /></div>
+    <div class="demo" data-demo="button-0"><demo-button-0 /></div>
+    <div class="demo" data-demo="button-0"><demo-button-0 /></div>
     <div class="demo" data-demo="button-0"><demo-button-0 /></div>
     <div class="demo" data-demo="button-1"><demo-button-1 /></div>
     <div class="demo" data-demo="button-2"><demo-button-2 /></div>
@@ -219,9 +256,22 @@ import { SelectMenuComponent } from "./demos/select-menu";
   <section id="select">
     <h2>下拉选择与菜单</h2>
     <div class="demo" data-demo="select-0"><demo-select-0 /></div>
+    <div class="demo" data-demo="select-0"><demo-select-0 /></div>
+    <div class="demo" data-demo="select-0"><demo-select-0 /></div>
+    <div class="demo" data-demo="select-0"><demo-select-0 /></div>
+    <div class="demo" data-demo="select-0"><demo-select-0 /></div>
+    <div class="demo" data-demo="select-0"><demo-select-0 /></div>
+    <div class="demo" data-demo="select-0"><demo-select-0 /></div>
+    <div class="demo" data-demo="select-0"><demo-select-0 /></div>
   </section>
   <section id="picker">
     <h2>日期、时间、地址</h2>
+    <div class="demo" data-demo="picker-0"><demo-picker-0 /></div>
+    <div class="demo" data-demo="picker-0"><demo-picker-0 /></div>
+    <div class="demo" data-demo="picker-0"><demo-picker-0 /></div>
+    <div class="demo" data-demo="picker-0"><demo-picker-0 /></div>
+    <div class="demo" data-demo="picker-0"><demo-picker-0 /></div>
+    <div class="demo" data-demo="picker-0"><demo-picker-0 /></div>
     <div class="demo" data-demo="picker-0"><demo-picker-0 /></div>
   </section>
   <section id="choice">
@@ -258,6 +308,11 @@ import { SelectMenuComponent } from "./demos/select-menu";
   </section>
   <section id="dialog">
     <h2>弹窗</h2>
+    <div class="demo" data-demo="dialog-0"><demo-dialog-0 /></div>
+    <div class="demo" data-demo="dialog-0"><demo-dialog-0 /></div>
+    <div class="demo" data-demo="dialog-0"><demo-dialog-0 /></div>
+    <div class="demo" data-demo="dialog-0"><demo-dialog-0 /></div>
+    <div class="demo" data-demo="dialog-0"><demo-dialog-0 /></div>
     <div class="demo" data-demo="dialog-0"><demo-dialog-0 /></div>
   </section>
   <section id="drawer">
@@ -310,6 +365,9 @@ import { SelectMenuComponent } from "./demos/select-menu";
   </section>
   <section id="grid">
     <h2>数据表格</h2>
+    <div class="demo" data-demo="grid-0"><demo-grid-0 /></div>
+    <div class="demo" data-demo="grid-0"><demo-grid-0 /></div>
+    <div class="demo" data-demo="grid-0"><demo-grid-0 /></div>
     <div class="demo" data-demo="grid-0"><demo-grid-0 /></div>
   </section>
   <section id="cgrid">
