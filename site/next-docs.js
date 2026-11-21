@@ -709,6 +709,8 @@ const ASYNC = {
 // 配方卡片上的缩小预览：iframe 按 1280 宽排版，再按卡片宽度缩小
 const fitPrev = () => { for (const pv of $$(".d-rprev", main)) pv.style.setProperty("--k", pv.clientWidth / 1280); };
 addEventListener("resize", fitPrev);
+// 窗口式演示背后的壁纸：载好了再淡入（.ld）。换页时接一遍；契约页的"完整演示"是后来异步填进来的，fillAsync 里再接一遍（不接就一直透明）
+const wireWalls = (scope) => { for (const w of $$(".dx-wall:not(.ld)", scope)) { if (w._wall) continue; w._wall = 1; const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); } };
 // 页面里异步的几块（[data-async]）：载好以后填进去，重新排本页目录
 async function fillAsync(scope, base) {
   const list = $$("[data-async]", scope); if (!list.length) return;
@@ -717,7 +719,7 @@ async function fillAsync(scope, base) {
     try { el.outerHTML = await ASYNC[k](arg); } catch (e) { el.outerHTML = `<p class="d-err">这一块没能载入：${esc(e.message)}</p>`; }
   }));
   if (curPage?.hash !== base) return; // 载入期间已经换页了
-  injectIcons(main); mountCode(main); mountFwButtons(main);
+  injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main);
   for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
   for (const box of $$(".dx:not([data-wired])", main)) { box.dataset.wired = ""; wireDemo(box, cat.byId[box.dataset.demo]); }
   pump();
@@ -803,7 +805,7 @@ function swapPage(pg, part) {
     main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}">${body}${pager(pg)}</article>`;
     injectIcons(main); mountCode(main); mountFwButtons(main);
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
-    for (const w of $$(".dx-wall", main)) { const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); }
+    wireWalls(main);
     for (const box of $$(".dx", main)) { box.dataset.wired = ""; wireDemo(box, pg.c || cat.byId[box.dataset.demo]); }
     fillAll();
     buildToc(pg.hash); fillAsync(main, pg.hash); fitPrev();

@@ -110,7 +110,7 @@
 .d-head-act .sn-btn { --sn-h: 36px; --sn-r: var(--sn-r-full); }
 .n-docs .d-lead { margin-top: 8px; font-size: calc(17px * var(--fsx)); line-height: calc(28px * var(--fsx)); color: var(--sn-label3); }
 .n-docs .d-main h2 { display: flex; align-items: center; gap: 8px; margin: 64px 0 4px; font: 600 calc(22px * var(--fsx))/calc(30px * var(--fsx)) var(--sn-sans); }
-.n-docs .d-main .d-head + h2 { margin-top: 40px; }
+.n-docs .d-main .d-head + h2, .n-docs .d-main .d-head + .d-mtoc + h2 { margin-top: 40px; } /* 标题区后面插着窄屏用的"本页目录"条（宽屏藏着），也算紧跟着 */
 .d-anchor { order: 2; display: inline-flex; color: var(--sn-label-off); opacity: 0; transition: opacity .15s var(--sn-ease-out), color .15s var(--sn-ease-out); }
 .d-anchor .sn-ic { width: 16px; height: 16px; }
 .n-docs .d-main h2:hover .d-anchor, .d-anchor:focus-visible { opacity: 1; }
@@ -131,6 +131,7 @@
 .n-docs .d-pager a:hover { background: var(--sn-fill-active); box-shadow: none; }
 .n-docs .d-pager a .sn-ic { width: 16px; height: 16px; }
 .n-docs .d-pager a.next { margin-left: auto; }
+.n-docs .d-pager a .t { font: inherit; color: inherit; } /* 标题包了一层（窄屏省略号用），别吃到旧版文档页 .d-pager span 的 12px 灰字 */
 @media (max-width: 1080px) { .n-docs .d-layout { grid-template-columns: 216px minmax(0, 1fr); gap: 40px; } }
 @media (max-width: 760px) {
   .n-docs .d-layout { grid-template-columns: 1fr; }
@@ -596,7 +597,7 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
   .d-mtoc { display: block; margin-top: 20px; }
   .d-mtoc-btn { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px 0 14px; border-radius: var(--sn-r-full); background: var(--sn-fill-subtle); font: 500 calc(14px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label2); cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .d-mtoc-btn .sn-ic { width: 16px; height: 16px; }
-  .d-mtoc-btn > span .sn-ic { color: var(--sn-label3); }
+  .d-mtoc-btn > .sn-ic:last-child { color: var(--sn-label3); } /* 右边的箭头（空 span 会被直接换成图标，没有包裹层） */
   .d-mtoc-btn[aria-expanded="true"] { background: var(--sn-fill-active); color: var(--sn-label); }
   .d-mtoc-btn:focus-visible { box-shadow: 0 0 0 2px var(--sn-focus); }
   .d-mtoc-menu { max-width: min(340px, calc(100vw - 32px)); }

@@ -145,7 +145,7 @@ const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="s
   grid.addEventListener("click", (e) => {
     const b = e.target.closest(".na-shot"); if (!b) return;
     const s = SHOTS.find((x) => x.n === Number(b.dataset.n)); if (!s || s === sel) return;
-    grid.querySelector(".na-shot.on")?.classList.remove("sn-on"); b.classList.add("sn-on"); sel = s; paintInsp(s);
+    grid.querySelector(".na-shot.sn-on")?.classList.remove("sn-on"); b.classList.add("sn-on"); sel = s; paintInsp(s);
   });
   grid.querySelector('[data-n="12"]').classList.add("sn-on");
   // 生成镜头：等待按钮 → 新镜头排到最后，百分比从 0 走起；网格滚到它那里
