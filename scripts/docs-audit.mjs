@@ -177,9 +177,9 @@ const PROBE = () => {
     r = el.getBoundingClientRect(); fr = f.getBoundingClientRect();
     return { x: fr.left + (r.left + r.right) / 2, y: fr.top + (r.top + r.bottom) / 2, sy: scrollY };
   };
-  // 关上以后的样子：浮层还有没有露在预览框（.d-frame，没伸出去时的大小）外面。容差 0.5px 和文档页伸画布的判断一致：
-  // 提示没关（库的提示 Esc 关不掉）、只露出 1px，文档页照样会把框伸着——那是浮层还开着，不是"没缩回"
-  A.state = () => { const f = A.cur, fl = A.floats(f), fr = f.getBoundingClientRect(), w = f.parentElement.getBoundingClientRect(); return { global: f.classList.contains("global"), lock: document.documentElement.classList.contains("dx-lock"), ext: f.parentElement.classList.contains("ext"), modal: fl.some((x) => x.modal && x.op > .3), loose: fl.some((x) => x.el.closest(".sn-toasts, .sn-notifs") && x.op > .05), out: fl.some((x) => x.op > .1 && (fr.top + x.r.top < w.top - .5 || fr.top + x.r.bottom > w.bottom + .5)), sy: scrollY, h: Math.round(w.height) }; };
+  // 关上以后的样子：浮层还有没有露在预览框（.d-frame，没伸出去时的大小）外面。和文档页伸画布的判断一样：露出一点点（哪怕 0.5px）就算露在外面。
+  // 键盘焦点不在演示里时（只悬停、没点进去），Esc 送不到演示，提示照样开着、露出 0.5px，文档页把框伸着——那是浮层还开着，不是"没缩回"
+  A.state = () => { const f = A.cur, fl = A.floats(f), fr = f.getBoundingClientRect(), w = f.parentElement.getBoundingClientRect(); return { global: f.classList.contains("global"), lock: document.documentElement.classList.contains("dx-lock"), ext: f.parentElement.classList.contains("ext"), modal: fl.some((x) => x.modal && x.op > .3), loose: fl.some((x) => x.el.closest(".sn-toasts, .sn-notifs") && x.op > .05), out: fl.some((x) => x.op > .1 && (fr.top + x.r.top < w.top - .01 || fr.top + x.r.bottom > w.bottom + .01)), sy: scrollY, h: Math.round(w.height), fh: f.style.height, why: fl.filter((x) => x.op > .02).map((x) => `${label(x.el)} 透明度 ${x.op.toFixed(2)} 上 ${Math.round(fr.top + x.r.top - w.top)} 下 ${Math.round(fr.top + x.r.bottom - w.bottom)}`).slice(0, 3) }; };
 };
 
 // 滚动条常显（占宽度）：和用户的 Chrome 一样。测试浏览器默认把滚动条藏了，锁滚动时整页左右跳这类问题一直测不出来（2026-11-20）
@@ -362,7 +362,7 @@ try {
           await page.keyboard.press("Escape"); await page.waitForTimeout(120); await page.keyboard.press("Escape"); await page.waitForTimeout(650);
           const s = await page.evaluate(() => __audit.state());
           if (!s.modal && !s.loose && (s.global || s.lock)) add("关上后演示还铺满窗口 / 页面还锁着", where, JSON.stringify(s));
-          if (s.ext && !s.out) add("关上后演示框没缩回", where, "");
+          if (s.ext && !s.out) add("关上后演示框没缩回", where, `框高 ${s.fh}；还看得见的浮层：${s.why.join(" | ") || "无"}`);
           // 演示自己的高度变了（删了几行、展开了内容），页面跟着滚是正常的
           if (before.global && Math.abs(s.sy - aim.sy) > 2 && s.h === before.h) add("开关浮层后页面滚动位置变了", where, `${aim.sy} → ${s.sy}`);
         }

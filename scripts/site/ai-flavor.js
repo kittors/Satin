@@ -204,7 +204,11 @@ export function AI_PROBE() {
       const st = stOf(label); if (!st || !shown(el)) continue;
       let color;
       if (bar) { const fill = [...el.querySelectorAll("*")].find((x) => alpha(css(x).backgroundColor) > .5 && x.getBoundingClientRect().width < el.getBoundingClientRect().width - .5) || el.firstElementChild || el; color = css(fill).backgroundColor; }
-      else { const c = css(el); color = alpha(c.backgroundColor) > .5 && sat(c.backgroundColor) > .25 ? c.backgroundColor : c.color; }
+      else {
+        // Satin 的 .sn-tag 文字保持中性，状态色只上在前面的圆点上（.sn-ok / .sn-warn / .sn-bad 改的是第一个 i 的颜色）：有圆点就按圆点比
+        const c = css(el), dot = el.matches(".sn-tag") ? el.querySelector("i") : null, dc = dot && css(dot).backgroundColor;
+        color = dc && alpha(dc) > .5 ? dc : alpha(c.backgroundColor) > .5 && sat(c.backgroundColor) > .25 ? c.backgroundColor : c.color;
+      }
       items.push({ el, bar, st, label: label.slice(0, 10), color });
     }
     const groups = new Map();
@@ -344,6 +348,8 @@ export function AI_PROBE() {
       ["text-avatar", "头像里放字", {}, '<span class="sn-av" style="display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#ddd">张</span> <span style="display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#ddd">AB</span>',
         '<span class="sn-av" style="display:inline-block;width:32px;height:32px;border-radius:50%;overflow:hidden"><img alt="" width="32" height="32" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E"></span> <span style="display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#e33;color:#fff">3</span>'],
       ["grid-orphan", "3 列 4 个", {}, `<div style="display:grid;grid-template-columns:repeat(3,100px);gap:8px">${'<div class="c" style="height:40px;background:#eee"></div>'.repeat(4)}</div>`, `<div style="display:grid;grid-template-columns:repeat(3,100px);gap:8px">${'<div class="c" style="height:40px;background:#eee"></div>'.repeat(6)}</div>`],
+      ["status-color", "状态标签的圆点同色（文字中性不算）", {}, '<div><span class="sn-tag"><i style="display:inline-block;width:6px;height:6px;border-radius:3px;background:rgb(120,120,120)"></i>已完成</span> <span class="sn-tag"><i style="display:inline-block;width:6px;height:6px;border-radius:3px;background:rgb(120,120,120)"></i>失败</span></div>',
+        '<div><span class="sn-tag" style="color:#444"><i style="display:inline-block;width:6px;height:6px;border-radius:3px;background:rgb(40,160,80)"></i>已完成</span> <span class="sn-tag" style="color:#444"><i style="display:inline-block;width:6px;height:6px;border-radius:3px;background:rgb(220,40,40)"></i>失败</span></div>'],
       ["status-color", "完成和失败的进度条同色", {}, `<div>${pbar("已完成", "rgb(220, 40, 40)")}${pbar("失败", "rgb(220, 40, 40)")}</div>`, `<div>${pbar("已完成", "rgb(40, 160, 80)")}${pbar("失败", "rgb(220, 40, 40)")}</div>`],
       ["wrap", "按钮折行", {}, '<div style="width:40px"><button style="all:unset;display:inline-block">保存草稿</button></div>', '<div style="width:200px"><button style="all:unset;display:inline-block">保存草稿</button></div>'],
       ["wrap", "短单元格 / 表头折行", {}, '<table style="width:40px;border-collapse:collapse"><tr><th>更新时间</th></tr><tr><td>源码</td></tr></table>', '<table style="width:200px"><tr><th>更新时间</th></tr><tr><td>源码</td></tr></table>'],
