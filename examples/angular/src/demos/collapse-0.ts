@@ -52,11 +52,7 @@ export class CollapseDemo0Component {
       // 或者把页面上所有 .sn-acc 一次接上
       bindCollapses(document);
 
-      // 不写标记也行：给一个空容器，按选项渲染
-      createCollapse(root.querySelector("#faq"), {
-        items: [{ title: "导出的成片放在哪里？", content: "默认放在“下载”文件夹里。" }, { title: "能多人一起编辑吗？", content: "可以，在设置里邀请协作者。" }],
-        open: [0],
-      });
+      // 不写标记也行：createCollapse(空容器, { items: [{ title, content }], open: [0] }) 按选项渲染
     });
     this.off = () => { done(); unsetup(); };
   }

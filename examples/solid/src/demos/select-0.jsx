@@ -21,8 +21,7 @@ export default function SelectDemo0() {
       bindSelects(document);
       document.addEventListener("select", (e) => console.log(e.detail.value));
 
-      // 不写标记也行：给一个空容器，按选项渲染
-      createSelect(root.querySelector("#ratio"), { items: ["16:9 · 横屏", "9:16 · 竖屏"], value: "16:9 · 横屏", label: "画面比例" });
+      // 不写标记也行：createSelect(空容器, { items: ["16:9 · 横屏", "9:16 · 竖屏"], value: "16:9 · 横屏", label: "画面比例" }) 按选项渲染
     });
     off = () => { done(); unsetup(); };
   });

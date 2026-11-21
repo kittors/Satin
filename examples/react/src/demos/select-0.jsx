@@ -1,4 +1,3 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
 import { useEffect, useRef } from "react";
 import { setup, enhance, injectIcons } from "satin-ui";
 import { createSelect, bindSelects } from "satin-ui/components";
@@ -22,8 +21,7 @@ export default function SelectDemo0() {
       bindSelects(document);
       document.addEventListener("select", (e) => console.log(e.detail.value));
 
-      // 不写标记也行：给一个空容器，按选项渲染
-      createSelect(root.querySelector("#ratio"), { items: ["16:9 · 横屏", "9:16 · 竖屏"], value: "16:9 · 横屏", label: "画面比例" });
+      // 不写标记也行：createSelect(空容器, { items: ["16:9 · 横屏", "9:16 · 竖屏"], value: "16:9 · 横屏", label: "画面比例" }) 按选项渲染
     }); // 接上标记里的交互，返回撤销函数
     return () => { off(); unsetup(); };
   }, []);

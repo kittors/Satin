@@ -16,8 +16,7 @@ export default function TaginputDemo0() {
       });
       tags.tags;    // ["雨夜", "车站"]
 
-      // 不写标记也行：给一个空容器，按选项渲染（输入框 + 下面的计数行）
-      createTagInput(root.querySelector("#tags"), { tags: ["雨夜"], max: 8 });
+      // 不写标记也行：createTagInput(空容器, { tags: ["雨夜"], max: 8 }) 按选项渲染（输入框 + 下面的计数行）
     });
     return () => { off(); unsetup(); };
   }, []);

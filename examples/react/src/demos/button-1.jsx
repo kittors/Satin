@@ -1,4 +1,3 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
 import "./button-1.css";

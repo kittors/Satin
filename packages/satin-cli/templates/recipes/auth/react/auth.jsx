@@ -1,4 +1,3 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
 
@@ -25,7 +24,6 @@ export default function Auth() {
             </div>
             <div className="sn-field" data-f="pwd">
               <label className="sn-lbl" htmlFor="l-pwd">密码 <a className="sn-aside sn-link" href="/forgot">忘记密码？</a></label>
-              {" "}
               <span className="sn-ib sn-has-post">
                 <input className="sn-input sn-lg" id="l-pwd" type="password" autoComplete="current-password" />
                 <span className="sn-post">
@@ -47,7 +45,6 @@ export default function Auth() {
   </svg>
   <span className="sn-bar"></span>
 </span>30 天内保持登录</label>
-            {" "}
             <button className="sn-btn sn-primary sn-lg" type="submit" style={{ width: "100%" }}>登录</button>
           </form>
           <p className="sn-t-callout sn-c-tertiary" style={{ marginTop: "var(--sn-sp-20)", textAlign: "center" }}>还没有账号？<a className="sn-link" href="/signup">注册</a></p>

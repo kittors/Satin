@@ -8,15 +8,22 @@ export default function NumflowDemo0() {
   useEffect(() => {
     const unsetup = setup();
     const off = enhance(ref.current, (root) => {
-      // 只滚动变了的那几位；style："roll"（滚动）| "blur"（滚动带模糊）| "push"（推入）| "fade"（淡入）
-      const views = createNumberFlow(root.querySelector("#views"), {
-        value: 12840,
-        style: "roll",
-        format: (v) => Number(v).toLocaleString("zh-CN"),
+      // 只滚动变了的那几位；style："roll"（滚动，默认）| "blur"（滚动带模糊）| "push"（推入）| "fade"（淡入）；format 决定怎么显示
+      const nf = (name, opts) => createNumberFlow(root.querySelector(`[data-nf="${name}"]`), opts);
+      const shots = nf("shots", { value: 1284, format: (v) => v.toLocaleString("zh-CN") });
+      const price = nf("price", { value: 199, format: (v) => "¥ " + v.toLocaleString("zh-CN", { minimumFractionDigits: 2 }) });
+      const live = nf("live", { value: 2875, format: (v) => `${Math.floor(v / 60)} 小时 ${String(v % 60).padStart(2, "0")} 分` });
+      const badge = nf("badge", { value: 3, style: "fade", format: (v) => (v > 99 ? "99+" : String(v)) });
+
+      // set(新值) 滚到新值；value 是当前值
+      for (const btn of root.querySelectorAll("[data-nf-add]")) btn.addEventListener("click", () => {
+        const k = btn.dataset.nfAdd;
+        shots.set(Math.max(0, k === "rand" ? Math.round(Math.random() * 120000) : shots.value + Number(k)));
       });
-      views.set(12841);
-      views.value;                     // 12841
-      views.update({ style: "fade" }); // 换样式
+      const PLANS = [199, 2399, 49.9, 12800, 999];
+      root.querySelector("[data-nf-plan]").addEventListener("click", () => price.set(PLANS[(PLANS.indexOf(price.value) + 1) % PLANS.length]));
+      root.querySelector("[data-nf-badge]").addEventListener("click", () => badge.set(badge.value >= 120 ? 3 : badge.value + 9));
+      setInterval(() => live.set(live.value + 1), 1200); // 每 1.2 秒自动更新
     });
     return () => { off(); unsetup(); };
   }, []);

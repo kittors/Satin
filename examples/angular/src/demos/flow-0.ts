@@ -39,8 +39,8 @@ export class FlowDemo0Component {
   ngAfterViewInit() {
     const unsetup = setup();
     const done = enhance(this.root.nativeElement, (root: any) => {
-      // 空容器：画布、工具条、小地图都由 createFlow 填好（设计稿里的 .sn-flow 标记也可以直接传）；卸载时调 flow.destroy()
-      const flow = createFlow(root.querySelector("#flow"), {
+      // 设计稿里的 .sn-flow 标记直接传（空容器也行：画布、工具条、小地图都由 createFlow 填好）；卸载时调 flow.destroy()
+      const flow = createFlow(root.querySelector(".sn-flow"), {
         // 节点：位置、标题、图标、说明、类型（类型决定线和端口的色相：text | board | image | audio | video | out）
         nodes: [
           { id: "src",   x: 0,   y: 0, t: "导入原文", ic: "book-open",    d: "雨夜车站.docx", k: "text" },

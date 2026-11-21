@@ -7,10 +7,12 @@ export default function TooltipDemo0() {
   onSettled(() => {
     const unsetup = setup();
     const done = enhance(root, (root) => {
-      // 要在别处触发时：
-      const field = root.querySelector("#name");
-      field.addEventListener("invalid", () => showTip(field, "名称不能为空"));
-      field.addEventListener("input", hideTip);
+      // 要在别处触发时：比如点了"放大预览"，在按钮上说一下结果，1.5 秒后收起
+      const zoom = root.querySelector('[data-tip="放大预览"]');
+      zoom.addEventListener("click", () => {
+        showTip(zoom, "已放大到 200%");
+        setTimeout(hideTip, 1500);
+      });
     });
     off = () => { done(); unsetup(); };
   });

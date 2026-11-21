@@ -1,4 +1,4 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
+"use client";
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
 import { createCanvasGrid } from "satin-ui/canvas-grid";
@@ -10,54 +10,43 @@ export default function CgridDemo0() {
   useEffect(() => {
     const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数
     const off = enhance(ref.current, (root) => {
-      // 整张表画在一块画布上：百万行照样流畅；交互和 DOM 版一致
-      const grid = createCanvasGrid(root.querySelector("#grid"), { rows: 1000000 }); // 卸载时 grid.destroy()
+      (async () => {
+        const STATUS = ["待开始", "生成中", "审核中", "已完成", "已暂停"];
+        const SCENES = ["雨夜车站", "候车厅", "站台", "列车上", "终点站", "海边", "旧城区", "天台"];
+        // 第 i 行：假的服务端按行号算出来（真的项目里换成 fetch，按 start、end 返回这一段）
+        const rowAt = (i) => {
+          const h = Math.imul(i + 1, 2654435761) >>> 0; // 按行号算出看起来随机的值
+          return { id: i + 1, name: `${SCENES[i % 8]} ${i + 1}`, status: STATUS[h % 5], shots: 4 + ((h >>> 12) % 120), dur: 15 + ((h >>> 16) % 1800), prog: (h >>> 20) % 101 };
+        };
+
+        const columns = [
+          { key: "name", title: "名称", width: 200, primary: true },
+          { key: "status", title: "状态", type: "status", width: 116, options: STATUS },
+          { key: "shots", title: "镜头", type: "int", width: 88 },
+          { key: "dur", title: "时长", type: "dur", width: 96 },
+          { key: "prog", title: "进度", type: "prog", width: 148 },
+        ];
+
+        // 整张表画在一块画布上：一百万行在服务端，按块要（一块 200 行），滚到哪要到哪，还没到的行画占位条。
+        // 这个假的服务端不会搜索、排序：不要工具条（toolbar: false），列也不写 sortable
+        const grid = createCanvasGrid(root.querySelector("#grid"), {
+          columns, rowKey: "id", toolbar: false, label: "一百万个镜头",
+          dataSource: {
+            total: 1000000,
+            async load({ start, end }) {
+              await new Promise((r) => setTimeout(r, 200)); // 模拟网络
+              return Array.from({ length: end - start }, (_, k) => rowAt(start + k));
+            },
+          },
+        });
+        // 卸载时调 grid.destroy()
+      })();
     }); // 接上标记里的交互，返回撤销函数
     return () => { off(); unsetup(); };
   }, []);
   return (
     <div ref={ref}>
-      <div className="sn-grid cgrid" id="gridCanvas">
-        <div className="sn-g-bar">
-          <span className="sn-ib sn-has-pre" style={{ width: "220px" }}>
-            <span className="sn-pre" data-i="search"></span>
-            <input className="sn-input sn-sm" data-g-q="" placeholder="搜索名称，比如 书店 9" aria-label="搜索名称" />
-          </span>
-          <div className="sn-seg sn-sm" data-seg="cgtree">
-            <span className="sn-thumb"></span>
-            <button data-v="flat">平铺</button>
-            <button data-v="tree">树形</button>
-          </div>
-          <button className="sn-btn sn-ghost sn-sm" data-g-expand="" hidden data-i="chevrons-up-down:before">全部展开</button>
-          <div className="sn-seg sn-sm" data-seg="cgmode">
-            <span className="sn-thumb"></span>
-            <button data-v="known">按需加载</button>
-            <button data-v="append">滚到底再加载</button>
-          </div>
-          <div className="sn-seg sn-sm" data-seg="cgsb">
-            <span className="sn-thumb"></span>
-            <button data-v="gutter">常驻滚动条</button>
-            <button data-v="auto">自动隐藏</button>
-          </div>
-          <div className="sn-seg sn-sm" data-seg="cglines">
-            <span className="sn-thumb"></span>
-            <button data-v="row">行线</button>
-            <button data-v="grid">网格</button>
-          </div>
-          <span className="sn-g-filters" data-g-filters=""></span>
-          <span className="sn-g-info" data-g-info=""></span>
-        </div>
-        <div className="sn-g-frame">
-          <div className="sn-g-vp" tabIndex="0" role="grid" aria-label="数据表格，一百万行，画布绘制">
-            <div className="sn-g-head" role="row"></div>
-            <canvas className="sn-cg-cv" aria-hidden="true"></canvas>
-            <div className="sn-cg-sizer"></div>
-          </div>
-          <i className="sn-g-shade sn-l" aria-hidden="true"></i>
-          <i className="sn-g-shade sn-r" aria-hidden="true"></i>
-          <div className="sn-cg-sr" aria-live="polite"></div>
-        </div>
-      </div>
+      <div id="grid"></div>
     </div>
   );
 }

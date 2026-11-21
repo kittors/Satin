@@ -1,4 +1,4 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
+"use client";
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
 import { createFlow } from "satin-ui/flow";
@@ -9,8 +9,8 @@ export default function FlowDemo0() {
   useEffect(() => {
     const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数
     const off = enhance(ref.current, (root) => {
-      // 空容器：画布、工具条、小地图都由 createFlow 填好（设计稿里的 .sn-flow 标记也可以直接传）；卸载时调 flow.destroy()
-      const flow = createFlow(root.querySelector("#flow"), {
+      // 设计稿里的 .sn-flow 标记直接传（空容器也行：画布、工具条、小地图都由 createFlow 填好）；卸载时调 flow.destroy()
+      const flow = createFlow(root.querySelector(".sn-flow"), {
         // 节点：位置、标题、图标、说明、类型（类型决定线和端口的色相：text | board | image | audio | video | out）
         nodes: [
           { id: "src",   x: 0,   y: 0, t: "导入原文", ic: "book-open",    d: "雨夜车站.docx", k: "text" },

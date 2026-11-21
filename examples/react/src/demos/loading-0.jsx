@@ -1,4 +1,3 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
 import { loadWithSkeleton } from "satin-ui/components";
@@ -9,14 +8,20 @@ export default function LoadingDemo0() {
   useEffect(() => {
     const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数
     const off = enhance(ref.current, (root) => {
-      (async () => {
-        // 300ms 内回来就不显示骨架（不闪）；显示了就至少留 500ms；数据到了逐行替换，每行淡入
-        const { shown, waited } = await loadWithSkeleton(root.querySelector(".sn-sk-list"), {
-          load: () => fetch("/api/shots").then((r) => r.json()),
-          skeleton: '<div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px"></span>…</div>'.repeat(4),
-          render: (shots) => shots.map((s) => `<div class="sn-sk-row"><b>${s.title}</b></div>`).join(""),
+      // 300ms 内回来就不显示骨架（不闪）；显示了就至少留 500ms；数据到了逐行替换，每行淡入
+      const list = root.querySelector(".sn-sk-list"), note = root.querySelector("#loadNote");
+      const SHOTS = [["07", "车站外，雨刚停", "远景 · 4 秒"], ["08", "林夏走进候车厅", "全景 · 6 秒"], ["09", "站台上的最后一班车", "中景 · 5 秒"], ["10", "车窗里的倒影", "特写 · 3 秒"]];
+      const skRow = '<div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:46%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>';
+      const row = ([n, title, meta]) => `<div class="sn-sk-row"><span class="sn-thumb"></span><div class="sn-meta"><b>镜头 ${n} · ${title}</b><span>${meta}</span></div></div>`;
+      for (const btn of root.querySelectorAll("[data-load]")) btn.addEventListener("click", async () => {
+        const ms = Number(btn.dataset.load);
+        const r = await loadWithSkeleton(list, {
+          load: () => new Promise((done) => setTimeout(() => done(SHOTS), ms)), // 换成你的请求，比如 fetch("/api/shots").then((res) => res.json())
+          skeleton: skRow.repeat(SHOTS.length),
+          render: (shots) => shots.map(row).join(""),
         });
-      })();
+        if (r) note.textContent = r.shown ? `等了 ${r.waited}ms，骨架至少留了 500ms` : `${ms}ms 就回来了，没有闪出骨架`;
+      });
     }); // 接上标记里的交互，返回撤销函数
     return () => { off(); unsetup(); };
   }, []);

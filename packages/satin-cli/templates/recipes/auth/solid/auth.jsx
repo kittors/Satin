@@ -25,7 +25,6 @@ export default function Auth() {
             </div>
             <div class="sn-field" data-f="pwd">
               <label class="sn-lbl" for="l-pwd">密码 <a class="sn-aside sn-link" href="/forgot">忘记密码？</a></label>
-              {" "}
               <span class="sn-ib sn-has-post">
                 <input class="sn-input sn-lg" id="l-pwd" type="password" autocomplete="current-password" />
                 <span class="sn-post">
@@ -47,7 +46,6 @@ export default function Auth() {
   </svg>
   <span class="sn-bar"></span>
 </span>30 天内保持登录</label>
-            {" "}
             <button class="sn-btn sn-primary sn-lg" type="submit" style="width: 100%">登录</button>
           </form>
           <p class="sn-t-callout sn-c-tertiary" style="margin-top: var(--sn-sp-20); text-align: center">还没有账号？<a class="sn-link" href="/signup">注册</a></p>

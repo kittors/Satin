@@ -8,12 +8,13 @@ export default function ButtonDemo0() {
   useEffect(() => {
     const unsetup = setup();
     const off = enhance(ref.current, (root) => {
-      const save = root.querySelector("#save");
-      save.addEventListener("click", async () => {
-        // 300ms 内回来不转圈；转圈出现后至少留 500ms
-        await busy(save, fetch("/api/projects/42", { method: "PUT" }));
-        succeed(save);
-      });
+      // 点"保存修改"：300ms 内回来不转圈；转圈出现后至少留 500ms；完了打个勾
+      for (const save of root.querySelectorAll(".sn-btn.sn-primary")) {
+        save.addEventListener("click", async () => {
+          await busy(save, 1200); // 第二个参数是毫秒或 Promise，比如 fetch("/api/projects/42", { method: "PUT" })
+          succeed(save);
+        });
+      }
     });
     return () => { off(); unsetup(); };
   }, []);

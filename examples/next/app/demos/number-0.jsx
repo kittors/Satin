@@ -1,4 +1,4 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
+"use client";
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
 import { createStepper } from "satin-ui/components";
@@ -17,8 +17,7 @@ export default function NumberDemo0() {
       dur.set(10);
       dur.value; // 10
 
-      // 不写标记也行：给一个空容器，按选项渲染
-      createStepper(root.querySelector("#dur"), { value: 4, min: 1, max: 60, unit: "秒", label: "镜头时长" });
+      // 不写标记也行：createStepper(空容器, { value: 4, min: 1, max: 60, unit: "秒", label: "镜头时长" }) 按选项渲染
     }); // 接上标记里的交互，返回撤销函数
     return () => { off(); unsetup(); };
   }, []);

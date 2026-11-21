@@ -39,12 +39,16 @@ try {
       const P = await page.evaluate(() => window.__parityPrefix || "");
       // 在这一块里找元素（两边类名前缀不同，选择器只用 data 属性；要用类名的拼上前缀）
       const box = async (sel) => { const el = page.locator(`#${id} ${sel}`).first(); await el.scrollIntoViewIfNeeded(); return el; };
+      const at = async (sel) => { const r = await (await box(sel)).boundingBox(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; };
+      // 每个动作做的时候停表（和 trace.mjs 一样）：鼠标点击要花的真实时间不一样，表要是一直走，上传进度、随机数用掉多少就对不上
+      const still = async (fn) => { await page.evaluate(() => window.__parity.clock?.(false)); try { await fn(); } finally { await page.evaluate(() => window.__parity.clock?.(true)); } };
       const s = {
         P,
         wait: (ms) => frames(ms),
-        click: async (sel) => (await box(sel)).click(),
-        pick: (sel) => page.locator(`#${id} ${sel}`).first().evaluate((el) => el.click()),
-        hover: async (sel) => (await box(sel)).hover(),
+        // 先量好位置（表走着，元素该滚进来就滚进来），再停表用鼠标点：Playwright 的 click 要等元素"稳定"（按帧判断），停着表会一直等
+        click: async (sel) => { const p = await at(sel); await still(() => page.mouse.click(p.x, p.y)); },
+        pick: (sel) => still(() => page.locator(`#${id} ${sel}`).first().evaluate((el) => el.click())),
+        hover: async (sel) => { const p = await at(sel); await still(() => page.mouse.move(p.x, p.y)); },
       };
       for (const [name, fn, wait] of STEPS) {
         try { await fn(s); } catch (e) { errs.push(`${name}：${String(e.message).split("\n")[0].slice(0, 160)}`); }

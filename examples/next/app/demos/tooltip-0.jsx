@@ -1,4 +1,4 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
+"use client";
 import { useEffect, useRef } from "react";
 import { setup, enhance, showTip, hideTip } from "satin-ui";
 import "./tooltip-0.css";
@@ -8,10 +8,12 @@ export default function TooltipDemo0() {
   useEffect(() => {
     const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数
     const off = enhance(ref.current, (root) => {
-      // 要在别处触发时：
-      const field = root.querySelector("#name");
-      field.addEventListener("invalid", () => showTip(field, "名称不能为空"));
-      field.addEventListener("input", hideTip);
+      // 要在别处触发时：比如点了"放大预览"，在按钮上说一下结果，1.5 秒后收起
+      const zoom = root.querySelector('[data-tip="放大预览"]');
+      zoom.addEventListener("click", () => {
+        showTip(zoom, "已放大到 200%");
+        setTimeout(hideTip, 1500);
+      });
     }); // 接上标记里的交互，返回撤销函数
     return () => { off(); unsetup(); };
   }, []);

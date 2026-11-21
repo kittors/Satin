@@ -57,8 +57,7 @@ export class NumberDemo0Component {
       dur.set(10);
       dur.value; // 10
 
-      // 不写标记也行：给一个空容器，按选项渲染
-      createStepper(root.querySelector("#dur"), { value: 4, min: 1, max: 60, unit: "秒", label: "镜头时长" });
+      // 不写标记也行：createStepper(空容器, { value: 4, min: 1, max: 60, unit: "秒", label: "镜头时长" }) 按选项渲染
     });
     this.off = () => { done(); unsetup(); };
   }

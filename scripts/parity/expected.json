@@ -8,6 +8,12 @@
     "ids": [
      "notifs"
     ]
+   },
+   {
+    "match": "*-phone/*",
+    "ids": [
+     "notifs"
+    ]
    }
   ]
  },
