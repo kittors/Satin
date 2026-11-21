@@ -18,6 +18,7 @@ export default {
   "components.15": "第 {p0} 位",
   "components.16": "共 {p0} 条",
   "components.close": "关闭",
+  "components.longHint": "⇧↵ 换行 · ⌘↵ 保存",
   "components.loading": "加载中",
   "components.remove": "移除",
   "components.17": "显示密码",

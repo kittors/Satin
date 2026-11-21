@@ -72,6 +72,22 @@ for (const fw of FWS) {
     await page.click("#acc .sn-acc-item:nth-child(2) .sn-acc-hd"); await logHas("open:0,1,2");
     eq(await opened(), [0, 1, 2], "点第二项以后"); eq(JSON.parse(await page.textContent("#state")).open, [0, 1, 2], "父组件的值");
   });
+  await step(`${fw} 受控字数统计：一开始 2 个字；父组件换值，计数跟着变（不触发回调）；输入一个字，回调带新值`, async () => {
+    const cnt = () => page.$eval("#count .sn-counter .sn-roll", (r) => r.textContent.trim());
+    eq(await cnt(), "2", "一开始");
+    await page.evaluate(() => { window.__log.length = 0; });
+    await page.click("#count-set"); await page.waitForTimeout(400);
+    eq(await page.$eval("#role-name", (i) => i.value), "林夏和周屿", "换值以后输入框"); eq(await cnt(), "5", "换值以后计数");
+    eq(await page.evaluate(() => window.__log.filter((x) => x.startsWith("role:"))), [], "程序改值发出的回调");
+    await page.click("#role-name"); await page.keyboard.press("End"); await page.keyboard.type("们"); await logHas("role:林夏和周屿们");
+  });
+  await step(`${fw} 提示词输入框：onSend 返回 Promise 时发送后进入"生成中"，结束回到可发送`, async () => {
+    await page.click("#cm textarea"); await page.keyboard.type("雨夜站台"); await page.keyboard.press("Meta+Enter"); await logHas("send:雨夜站台");
+    await page.waitForTimeout(120);
+    eq(await page.$eval("#cm .sn-cm-send", (b) => b.classList.contains("sn-busy")), true, "发送后");
+    await page.waitForTimeout(900);
+    eq(await page.$eval("#cm .sn-cm-send", (b) => b.classList.contains("sn-busy")), false, "Promise 结束以后");
+  });
   const fails = res.filter((r) => r[0] === "✗");
   console.log(`${fw}：${res.length - fails.length}/${res.length} 通过${errs.length ? `，报错 ${errs.length} 条` : ""}`);
   for (const r of res) console.log(`  ${r[0]} ${r[1]}${r[2] ? "：" + r[2] : ""}`);

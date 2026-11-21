@@ -34,6 +34,11 @@ export const Password = /* @__PURE__ */ wrap(S.createPassword, { name: "SnPasswo
 export const Email = /* @__PURE__ */ wrap(S.createEmail, { name: "SnEmail", props: ["value", "label", "help", "name", "id", "placeholder", "size", "autocomplete"] });
 // 表格：v-model 绑勾选的行键（selected）；@sort、@rowclick
 export const Table = /* @__PURE__ */ wrap(S.createTable, { name: "SnTable", props: ["columns", "rows", "rowKey", "sort", "sortLocal", "selectable", "selected", "empty", "loading", "skeleton", "label", "striped", "compact", "plain", "lines", "maxHeight"], valueKey: "selected", events: ["select", "sort", "rowClick"], modelEvent: "select" });
+export const Search = /* @__PURE__ */ wrap(S.createSearch, { name: "SnSearch", props: ["search", "debounce", "placeholder", "label", "kbd", "id", "name", "size"], events: ["search"], modelEvent: null });
+export const CountInput = /* @__PURE__ */ wrap(S.createCount, { name: "SnCountInput", props: ["value", "max", "placeholder", "size", "id", "name"] });
+export const LongText = /* @__PURE__ */ wrap(S.createLongText, { name: "SnLongText", props: ["value", "max", "maxLines", "rows", "placeholder", "hint", "label", "id", "name"], events: ["change", "submit"] });
+// 提示词输入框：@send 返回 Promise 时发送后进入"生成中"，Promise 结束回到可发送（所以 send 不走 emit，直接调 @send 拿返回值）
+export const Composer = /* @__PURE__ */ wrap(S.createComposer, { name: "SnComposer", props: ["placeholder", "max", "maxLines", "attach", "send", "upload"], events: ["send", "stop"], returns: ["send"], modelEvent: null });
 export const Stepper = /* @__PURE__ */ wrap(S.createStepper, { name: "SnStepper", props: ["value", "min", "max", "unit", "label"] });
 export const NumberFlow = /* @__PURE__ */ wrap(S.createNumberFlow, { name: "SnNumberFlow", props: ["value", "effect", "format"], events: [] });
 // 日期、时间、地址选择器：kind（date | range | time | datetime | region）、placeholder、label；@change 拿到 { text }（触发框里显示的文字）。
@@ -187,7 +192,7 @@ export const notify = (o) => (setup(), S.notify(o));
 // 数据表格这类重组件不在这里注册：import { DataGrid } from "satin-ui/vue/grid"
 export default {
   install(app) {
-    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
+    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, Search, CountInput, LongText, Composer, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
     app.directive("enhance", vEnhance);
     const off = setup(); app.onUnmount?.(off); // setup() 在服务端直接返回，什么都不做
   },

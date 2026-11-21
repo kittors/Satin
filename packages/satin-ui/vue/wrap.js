@@ -8,12 +8,13 @@ import { setup } from "../src/setup.js";
 
 export const cx = (...a) => a.filter(Boolean).join(" ");
 // 把 createXxx 包成 Vue 组件。props：组件的选项名；valueKey：v-model 绑定的那一项
-export function wrap(create, { name, props = [], valueKey = "value", events = ["change"], modelEvent = "change" }) {
+// returns：这些事件要拿到监听的返回值（提示词输入框 @send 返回 Promise）：不写进 emits，直接调组件上的 onXxx
+export function wrap(create, { name, props = [], valueKey = "value", events = ["change"], modelEvent = "change", returns = [] }) {
   return defineComponent({
     name,
     inheritAttrs: false,
     props: Object.fromEntries([...props, "modelValue"].map((p) => [p, { type: null, default: undefined }])),
-    emits: [...events, "update:modelValue"],
+    emits: [...events.filter((e) => !returns.includes(e)), "update:modelValue"],
     setup(p, { emit, expose, attrs }) {
       const host = ref(null), inst = shallowRef(null);
       const opts = () => { const o = {}; for (const k of props) if (p[k] !== undefined) o[k] = p[k]; if (p.modelValue !== undefined) o[valueKey] = p.modelValue; return o; };
@@ -22,13 +23,16 @@ export function wrap(create, { name, props = [], valueKey = "value", events = ["
       onMounted(() => {
         unsetup = setup();
         const handlers = {};
-        for (const ev of events) handlers["on" + ev[0].toUpperCase() + ev.slice(1)] = (v) => { emit(ev, v); if (ev === modelEvent) emit("update:modelValue", v); };
+        for (const ev of events) { const on = "on" + ev[0].toUpperCase() + ev.slice(1);
+          handlers[on] = returns.includes(ev) ? (v) => { const fn = attrs[on]; return Array.isArray(fn) ? fn.map((f) => f(v))[0] : fn?.(v); } : (v) => { emit(ev, v); if (ev === modelEvent) emit("update:modelValue", v); }; }
         inst.value = create(host.value.firstElementChild, { ...opts(), ...handlers });
       });
       watch(opts, (o) => inst.value?.update(o), { deep: true });
       onBeforeUnmount(() => { inst.value?.destroy(); inst.value = null; unsetup?.(); });
       expose({ instance: inst });
-      return () => h("div", { ...attrs, ref: host, class: cx("sn-host", attrs.class), style: ["display: contents", attrs.style], innerHTML: html });
+      // returns 里的事件监听不挂到外层 div 上
+      const own = () => { const a = { ...attrs }; for (const ev of returns) delete a["on" + ev[0].toUpperCase() + ev.slice(1)]; return a; };
+      return () => h("div", { ...own(), ref: host, class: cx("sn-host", attrs.class), style: ["display: contents", attrs.style], innerHTML: html });
     },
   });
 }

@@ -13,23 +13,25 @@ export const cx = (...a) => a.filter(Boolean).join(" ");
 export const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 // 把 createXxx 包成 React 组件。valueKey：受控的那个属性（value / page / tags……）；events：组件会发的事件名；
-// stateKey：实例上读当前值的那一项（默认和 valueKey 同名；折叠面板的 open 是方法，当前值在 expanded）
-export function wrap(create, { valueKey = "value", events = ["change"], stateKey = valueKey, displayName } = {}) {
+// stateKey：实例上读当前值的那一项（默认和 valueKey 同名；折叠面板的 open 是方法，当前值在 expanded）；
+// passId：id 交给组件写在里面的输入框上（<label htmlFor> 才对得上），外层不写 id
+export function wrap(create, { valueKey = "value", events = ["change"], stateKey = valueKey, passId = false, displayName } = {}) {
   const C = forwardRef(function SatinComponent(props, ref) {
     const { className, style, id } = props;
     const host = useRef(null), inst = useRef(null), latest = useRef(props);
     latest.current = props;
     const defKey = "default" + cap(valueKey);
     // 传给 Satin 的选项：去掉回调（回调走下面固定的转发函数，props 换了也不用重新挂）和 defaultValue
-    const optsOf = (p) => { const o = {}; for (const [k, v] of Object.entries(p)) if (!/^on[A-Z]/.test(k) && k !== defKey && k !== "className" && k !== "style" && k !== "id" && k !== "children") o[k] = v; if (p[valueKey] === undefined && p[defKey] !== undefined) o[valueKey] = p[defKey]; return o; };
+    const optsOf = (p) => { const o = {}; for (const [k, v] of Object.entries(p)) if (!/^on[A-Z]/.test(k) && k !== defKey && k !== "className" && k !== "style" && (passId || k !== "id") && k !== "children") o[k] = v; if (p[valueKey] === undefined && p[defKey] !== undefined) o[valueKey] = p[defKey]; return o; };
     const [html] = useState(() => create.html({ ...optsOf(props) }));
     useIso(() => {
       const unsetup = setup();
       const handlers = {};
       for (const ev of events) handlers["on" + cap(ev)] = (v) => {
-        latest.current["on" + cap(ev)]?.(v);
+        const out = latest.current["on" + cap(ev)]?.(v); // 返回值交回给组件（提示词输入框 onSend 返回 Promise）
         // 受控：父组件没把新值传回来，就退回到父组件给的值（组件只在"传进来的值换了"时跟过去，所以先清掉、再给一次）
         if (ev === "change" && latest.current[valueKey] !== undefined) setTimeout(() => { const want = latest.current[valueKey]; if (inst.current && want !== undefined && JSON.stringify(inst.current[stateKey]) !== JSON.stringify(want)) inst.current.update({ [valueKey]: undefined }).update({ [valueKey]: want }); });
+        return out;
       };
       inst.current = create(host.current.firstElementChild, { ...optsOf(latest.current), ...handlers });
       return () => { inst.current?.destroy(); inst.current = null; unsetup(); };
@@ -38,7 +40,7 @@ export function wrap(create, { valueKey = "value", events = ["change"], stateKey
     // 非受控（没给 value、只给 defaultValue）时不带值：defaultValue 只管第一次，不然父组件一重新渲染，用户刚改的值就被打回去
     useIso(() => { const o = optsOf(props); if (props[valueKey] === undefined) delete o[valueKey]; inst.current?.update(o); });
     useImperativeHandle(ref, () => inst.current, []);
-    return h("div", { ref: host, id, className: cx("sn-host", className), style: { display: "contents", ...style }, dangerouslySetInnerHTML: { __html: html }, suppressHydrationWarning: true });
+    return h("div", { ref: host, id: passId ? undefined : id, className: cx("sn-host", className), style: { display: "contents", ...style }, dangerouslySetInnerHTML: { __html: html }, suppressHydrationWarning: true });
   });
   C.displayName = displayName || create.componentName;
   return C;

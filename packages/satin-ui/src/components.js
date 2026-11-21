@@ -210,8 +210,23 @@ const inputOf = (el, sel) => (el.matches?.(sel) ? el : el.querySelector(sel));
 export const createPassword = /* @__PURE__ */ defineComponent({ name: "password", html: passwordHTML, mount(el, o, api) { injectIcons(el); const input = inputOf(el, "input[data-pw], input[type=password]"); if (o.value != null) input.value = o.value; mountPassword(input); _bindForms(input.closest(".sn-field") || el); input.addEventListener("input", () => api.emit("change", input.value)); return { get value() { return input.value; }, update(n) { if (n.value != null && n.value !== input.value) input.value = n.value; }, focus: () => input.focus() }; } });
 export const createEmail = /* @__PURE__ */ defineComponent({ name: "email", html: emailHTML, mount(el, o, api) { const input = inputOf(el, "input[data-email], input[type=email]"); if (o.value != null) input.value = o.value; mountEmail(input); input.addEventListener("input", () => api.emit("change", input.value)); return { get value() { return input.value; }, update(n) { if (n.value != null && n.value !== input.value) input.value = n.value; }, focus: () => input.focus() }; } });
 export const createSearch = /* @__PURE__ */ defineComponent({ name: "search", html: searchHTML, mount(el, o, api) { injectIcons(el); _bindForms(el); mountSearch(el.matches(".sn-ib") ? el : el.querySelector(".sn-ib") || el, { search: (q) => (api.emit("search", q), o.search?.(q) ?? 0), debounce: o.debounce ?? 150 }); return { destroy() { for (const x of [el, ...el.querySelectorAll("*")]) { delete x._fw; delete x._sr; } } }; } });
-export const createCount = /* @__PURE__ */ defineComponent({ name: "count", html: countHTML, mount(el) { const input = inputOf(el, "input[data-count], input"); mountCount(input); return { destroy() { delete input._cnt; } }; } });
-export const createLongText = /* @__PURE__ */ defineComponent({ name: "longtext", mount(el, o, api) { mountLongText(el, { onSubmit: (v) => api.emit("submit", v) }); return {}; } });
+// 受控同步（update 里写进新值）时也要让计数、长高跟着变：派一次 input，但不当成用户的输入发 change
+const quietInput = (field, v, flag) => { flag.on = true; field.value = v; field.dispatchEvent(new Event("input", { bubbles: true })); flag.on = false; };
+export const createCount = /* @__PURE__ */ defineComponent({ name: "count", html: countHTML, mount(el, o, api) {
+  const input = inputOf(el, "input[data-count], input"), quiet = { on: false }; mountCount(input);
+  input.addEventListener("input", () => { if (!quiet.on) api.emit("change", input.value); });
+  return { update(n, p) { if (n.value != null && n.value !== p.value && n.value !== input.value) quietInput(input, n.value, quiet); }, get value() { return input.value; }, focus: () => input.focus(), destroy() { delete input._cnt; } };
+} });
+// 长文本：输入框随内容长高、右下角用量环、⌘↵ 提交。给空容器就按选项渲染（和设计稿一样的标记）
+export const longTextHTML = (o = {}) => { const max = +(o.max ?? 120);
+  return `<div class="sn-box-in" data-ta data-max="${max}" data-max-lines="${+(o.maxLines ?? 7)}"><textarea${attrs({ id: o.id, name: o.name, rows: o.rows ?? 3, placeholder: o.placeholder, "aria-label": o.label })}>${esc(o.value ?? "")}</textarea>`
+    + `<div class="sn-ta-foot"><span class="sn-hint">${esc(o.hint ?? tt("components.longHint"))}</span><span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg><span class="sn-txt"><span class="sn-roll"><span>0</span></span> / ${max}</span></span></div></div>`; };
+export const createLongText = /* @__PURE__ */ defineComponent({ name: "longtext", html: longTextHTML, mount(el, o, api) {
+  const box = el.matches("[data-ta]") ? el : el.querySelector("[data-ta]") || el, ta = box.querySelector("textarea"), quiet = { on: false };
+  mountLongText(box, { onSubmit: (v) => api.emit("submit", v) });
+  ta.addEventListener("input", () => { if (!quiet.on) api.emit("change", ta.value); });
+  return { update(n, p) { if (n.value != null && n.value !== p.value && n.value !== ta.value) quietInput(ta, n.value, quiet); }, get value() { return ta.value; }, focus: () => ta.focus() };
+} });
 // 提示词输入框的标记（和设计稿一样）：附件菜单（图片、视频、音频、文档）、自动长高的输入框、用量环、发送 / 停止按钮。
 // external：发送由外面接管（对话框里用），不在这里清空。图标是 data-i，挂载时换成 SVG
 export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach = true, send = tt("components.12"), external } = {}) =>

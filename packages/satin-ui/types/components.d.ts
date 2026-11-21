@@ -63,14 +63,17 @@ export function countHTML(o?: { id?: string; name?: string; placeholder?: string
 /** 邮箱框：停止输入 400ms 后格式对了出现对勾 */
 export const createEmail: SatinFactory<InputBoxOptions & { value?: string; onChange?(value: string): void }, { readonly value: string; focus(): void }>;
 /** 搜索框：防抖、转圈（300ms 内回来不转）、结果数、清除按钮、按 / 聚焦。search(q) 返回结果数 */
-export const createSearch: SatinFactory<{ search?(q: string): number | unknown[] | Promise<number | unknown[]>; debounce?: number; onSearch?(q: string): void; placeholder?: string; label?: string; kbd?: string | false; id?: string; name?: string }>;
+export const createSearch: SatinFactory<{ search?(q: string): number | unknown[] | Promise<number | unknown[]>; debounce?: number; onSearch?(q: string): void; placeholder?: string; label?: string; kbd?: string | false; id?: string; name?: string; size?: "sm" | "lg" | "xl" }>;
 /** 带字数的输入框（max 默认 20） */
-export const createCount: SatinFactory<{ id?: string; name?: string; placeholder?: string; max?: number; value?: string; size?: "sm" | "lg" | "xl" }>;
-export const createLongText: SatinFactory<{ onSubmit?(value: string): void }>;
+export const createCount: SatinFactory<{ id?: string; name?: string; placeholder?: string; max?: number; value?: string; size?: "sm" | "lg" | "xl"; onChange?(value: string): void }, { readonly value: string; focus(): void }>;
+export interface LongTextOptions { value?: string; max?: number; maxLines?: number; rows?: number; placeholder?: string; hint?: string; label?: string; id?: string; name?: string; onChange?(value: string): void; onSubmit?(value: string): void }
+/** 长文本的标记（空容器交给 createLongText 时就用它渲染） */
+export function longTextHTML(o?: LongTextOptions): string;
+export const createLongText: SatinFactory<LongTextOptions, { readonly value: string; focus(): void }>;
 /** 提示词输入框的标记（空容器交给 createComposer 时就用它渲染） */
 export function composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean }): string;
 /** 提示词输入框：onSend 返回 Promise 时，Promise 结束才退出"生成中"；message.files 是附件行元素（元素上的 _file 是原始 File） */
-export const createComposer: SatinFactory<{ onSend?(message: { text: string; files: HTMLElement[] }): void | Promise<unknown>; onStop?(): void; upload?(file: File, progress: (p: number) => void): Promise<unknown> }, { setBusy(on: boolean): void; clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void; files(): HTMLElement[] }>;
+export const createComposer: SatinFactory<{ placeholder?: string; max?: number; maxLines?: number; attach?: boolean; /** 发送按钮的名字 */ send?: string; external?: boolean; onSend?(message: { text: string; files: HTMLElement[] }): void | Promise<unknown>; onStop?(): void; upload?(file: File, progress: (p: number) => void): Promise<unknown> }, { setBusy(on: boolean): void; clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void; files(): HTMLElement[] }>;
 export interface ProgressCardApi { start(title: string, sub?: string, enter?: boolean): void; set(progress: number, sub?: string): void; finish(title?: string, sub?: string): void; cancel(title?: string, sub?: string): void }
 export const createProgressCard: SatinFactory<{ onCancel?(): void; onOpen?(): void }, ProgressCardApi>;
 /** 选择器选好值时的数据：text 是触发框里显示的文字（清除时是空字符串） */

@@ -35,8 +35,15 @@ export const TagInput = /* @__PURE__ */ wrap(S.createTagInput, { valueKey: "tags
 export const Stepper = /* @__PURE__ */ wrap(S.createStepper, { displayName: "Stepper" });
 export const NumberFlow = /* @__PURE__ */ wrap(S.createNumberFlow, { events: [], displayName: "NumberFlow" });
 // 密码框（显示 / 隐藏、大写提示，meter 出强度条）、邮箱框（格式对了出对勾）：value + onChange(值) 当受控组件用；label、help、name、placeholder
-export const Password = /* @__PURE__ */ wrap(S.createPassword, { displayName: "Password" });
-export const Email = /* @__PURE__ */ wrap(S.createEmail, { displayName: "Email" });
+export const Password = /* @__PURE__ */ wrap(S.createPassword, { passId: true, displayName: "Password" });
+export const Email = /* @__PURE__ */ wrap(S.createEmail, { passId: true, displayName: "Email" });
+// 搜索框：空着时显示快捷键、一输入换成清除按钮；search(q) 返回结果数（或数组、Promise），超过 300ms 放大镜换成转圈；onSearch(q)
+export const Search = /* @__PURE__ */ wrap(S.createSearch, { events: ["search"], passId: true, displayName: "Search" });
+// 字数统计（单行）：value + onChange 受控，max 上限；长文本：value + onChange，onSubmit（⌘↵）
+export const CountInput = /* @__PURE__ */ wrap(S.createCount, { passId: true, displayName: "CountInput" });
+export const LongText = /* @__PURE__ */ wrap(S.createLongText, { events: ["change", "submit"], passId: true, displayName: "LongText" });
+// 提示词输入框：onSend({ text, files }) 返回 Promise——发送后进入"生成中"（发送键变停止），Promise 结束回到可发送；onStop
+export const Composer = /* @__PURE__ */ wrap(S.createComposer, { events: ["send", "stop"], displayName: "Composer" });
 // 表格：columns + rows；selected 受控（onSelect 里更新）；onSort、onRowClick
 export const Table = /* @__PURE__ */ wrap(S.createTable, { valueKey: "selected", events: ["sort", "select", "rowClick"], displayName: "Table" });
 // 日期、时间、地址选择器：kind（date | range | time | datetime | region）、placeholder、label；onChange({ text }) 拿到触发框里显示的文字。

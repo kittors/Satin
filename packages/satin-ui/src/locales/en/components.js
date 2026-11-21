@@ -18,6 +18,7 @@ export default {
   "components.15": "Digit {p0}",
   "components.16": "{p0} items",
   "components.close": "Close",
+  "components.longHint": "⇧↵ new line · ⌘↵ save",
   "components.loading": "Loading",
   "components.remove": "Remove",
   "components.17": "Show password",
