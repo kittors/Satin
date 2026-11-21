@@ -627,7 +627,7 @@ function contractHTML(c, k) {
   if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">什么时候别用</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${x.use && cat.byId[x.use] ? ` → <a href="#/c/${x.use}">${esc(cat.byId[x.use].name)}</a>` : ""}</li>`).join("")}</ul>`);
   if (k.related?.length) out.push(`<h3 class="d-h3">和相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [cat.byId[r.id] ? `<a href="#/c/${r.id}">${esc(cat.byId[r.id].name)}</a>` : esc(r.id), md(r.diff)])));
   // 2. 引入（当前框架）
-  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return snippet(getFw().lang === "vue" ? "js" : "js", line, `${getFw().name}${getEnv() ? " · " + getEnv().name : ""}`); }), k.importNote ? `<p>${md(k.importNote)}</p>` : "");
+  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return snippet("js", line, `${getFw().name}${getEnv() ? " · " + getEnv().name : ""}`); }), k.importNote ? `<p>${md(k.importNote)}</p>` : "");
   // 3. 示例：由浅入深，每个都是现场演示 + 当前框架的代码
   out.push(anchor("examples", "示例"));
   for (const ex of k.examples || []) out.push(`<h3 class="d-h3" id="ex-${ex.slug}">${esc(ex.title)}</h3>`, ex.why ? `<p>${md(ex.why)}</p>` : "", playBox(c, ex));
