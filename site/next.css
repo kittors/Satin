@@ -720,3 +720,11 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 
 /* 组件页"设计规范"里的这样做 / 不要：一条一行 */
 .d-dodont ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; font: 400 calc(14px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); }
+
+/* 组件页 API 表（契约）：表头只有两三个字（名称、类型、默认值、必填、说明），不许折行——"必填"那列常空着，会被挤成竖排两行 */
+.n-docs .d-table th { white-space: nowrap; }
+@media (max-width: 760px) {
+  /* 手机上 4 列以上的表（组件页的 API 表）：整张表在框里横着滑，最少 640 宽，"说明"一列至少 220——不然说明被挤得很窄、把每一行撑得老高，短的默认值也一个字一行 */
+  .n-docs .d-table:has(th:nth-child(4)) { min-width: 640px; }
+  .n-docs .d-table:has(th:nth-child(4)) td:last-child { min-width: 220px; }
+}

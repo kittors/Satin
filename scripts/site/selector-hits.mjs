@@ -83,7 +83,9 @@ function strip(sel) {
 // 只在没有脚本时才生效的（.no-js）、只有伪元素的（::view-transition-old(root)），不查
 const skipWhy = (sel) => (/^\.no-js\b/.test(sel) ? "只在没有脚本时生效（.no-js）" : /^::view-transition|^::-webkit-scrollbar|^::selection/.test(sel) ? "只有伪元素" : null);
 function variants(s) {
-  const out = []; const toks = [...s.matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)];
+  // :not(…) 里的类名不造变体：加了前缀反而更容易命中（.x:not(.ld) → .x:not(.sn-ld)），会误报
+  const inNot = (at) => { let d = 0; for (let k = at - 1; k >= 0; k--) { if (s[k] === ")") d++; else if (s[k] === "(") { if (d === 0) return s.slice(Math.max(0, k - 4), k) === ":not"; d--; } } return false; };
+  const out = []; const toks = [...s.matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)].filter((m) => !inNot(m.index));
   for (const m of toks) {
     const name = m[1], at = m.index;
     if (name.startsWith("sn-")) out.push({ kind: "去掉 sn-", tok: name, to: name.slice(3), sel: s.slice(0, at) + "." + name.slice(3) + s.slice(at + 1 + name.length) });
