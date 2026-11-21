@@ -202,14 +202,17 @@
   const ownText = (el) => { let s = ""; for (const n of el.childNodes) if (n.nodeType === 3) s += n.textContent; return s.replace(/\s+/g, " ").trim(); };
   // 整个范围的快照：{ 路径: { tag, attrs, text, rect, style, before, after, scroll } }
   // 正在无限循环的动画（转圈）：它自己和里面的元素外框随旋转角度变，快照里位置不比
-  const spinning = () => { const set = new Set(); for (const a of document.getAnimations()) { if (a.timeline !== document.timeline || a.playState !== "running") continue; const e = a.effect?.getComputedTiming().endTime, t = a.effect?.target; if (e === Infinity && t) set.add(t); } return set; };
-  P.snapshot = (id, { styles = true } = {}) => {
+  // 无限循环的动画（转圈、加载环、不确定进度条、扫光、闪的圆点）：帧时钟接管的动画两帧之间是暂停着的（playState 是 paused），也算在播
+  const spinning = () => { const set = new Set(); for (const a of document.getAnimations()) { if (a.timeline !== document.timeline || (a.playState !== "running" && !P.isControlled?.(a))) continue; const e = a.effect?.getComputedTiming().endTime, t = a.effect?.target; if (e === Infinity && t) set.add(t); } return set; };
+  // layoutForInf（逐帧轨迹的结束快照用）：无限动画里的元素不记外框（转到哪、走到哪看相位），改记不受 transform 影响的布局盒（offsetLeft / Top / Width / Height），
+  // 大小、位置真的变了照样比得出来；静态截图那一遍不带它，格式和改造前录的基线一样
+  P.snapshot = (id, { styles = true, layoutForInf = false } = {}) => {
     const out = {}, sd = scrollDriven(), spin = spinning(), inSpin = (el) => { for (const s of spin) if (s === el || s.contains(el)) return true; return false; };
     walk(P.scopeRoots(id), (el) => {
       const r = el.getBoundingClientRect(), o = { tag: el.tagName.toLowerCase(), attrs: attrsOf(el), text: P.normText(ownText(el)), rect: [r2(r.x), r2(r.y), r2(r.width), r2(r.height)] };
       // 没有盒子（自己或祖先 display:none）的元素不画出来：计算样式不比（滚动驱动动画在这种元素上的取值不确定），打开以后由动态那一遍比
       if (!el.getClientRects().length && el.tagName !== "BR") o.nobox = 1;
-      if (spin.size && inSpin(el)) o.rect = ["~无限动画"];
+      if (spin.size && inSpin(el)) o.rect = layoutForInf && el instanceof HTMLElement ? ["~无限动画", el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight] : ["~无限动画"];
       if (el.scrollTop || el.scrollLeft) o.scroll = [Math.round(el.scrollTop), Math.round(el.scrollLeft)];
       if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) o.value = el.value + (el.checked ? "|checked" : "");
       if (styles && !o.nobox) {

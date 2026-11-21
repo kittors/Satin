@@ -146,8 +146,9 @@ export function compareAction(x, y, label) {
 const FINAL_EX = TRACE_EX.flatMap((t) => t.final || []);
 const classOf = (snap, p) => String(snap[p]?.attrs?.class || "").split(/\s+/);
 const underClass = (snap, p, classes) => { const seg = p.split(">"); for (let i = seg.length; i > 0; i--) if (classOf(snap, seg.slice(0, i).join(">")).some((c) => classes.includes(c))) return true; return false; };
-// 一直在转的元素（转圈、加载环）：正方形转过一个角度，外框跟着变大变小，中心不动——结束快照那一刻转到哪儿看运气，只差这个不算
-const spinning = (r1, r2) => [r1, r2].every((r) => Math.abs(r[2] - r[3]) <= 0.05) && Math.abs(r1[0] + r1[2] / 2 - (r2[0] + r2[2] / 2)) <= 0.6 && Math.abs(r1[1] + r1[3] / 2 - (r2[1] + r2[3] / 2)) <= 0.6;
+// 无限动画里的元素：快照记的是 ["~无限动画", 布局盒 offsetLeft, offsetTop, offsetWidth, offsetHeight]（不受转角、相位影响）——两边都有布局盒就比布局盒；
+// 旧的录法只有 "~无限动画" 没有数字的，那一项不比
+const infBox = (r) => (String(r[0]).startsWith("~") ? r.slice(1).map(Number) : null);
 export function compareFinal(a, b) {
   const out = [], ex = FINAL_EX.filter((f) => f.block === (a.id ?? b.id));
   const exClasses = ex.flatMap((f) => f.classes || []), exAttrs = ex.flatMap((f) => f.attrs || []);
@@ -157,7 +158,8 @@ export function compareFinal(a, b) {
     if (!x || !y) { out.push(`结束快照 ${p}: 只在${x ? "A" : "B"}`); continue; }
     if (x.text !== y.text) out.push(`结束快照 ${p}: 文字 ${JSON.stringify(x.text).slice(0, 80)} → ${JSON.stringify(y.text).slice(0, 80)}`);
     if (JSON.stringify(x.attrs) !== JSON.stringify(y.attrs)) { const ks = new Set([...Object.keys(x.attrs), ...Object.keys(y.attrs)]); for (const k of ks) if (x.attrs[k] !== y.attrs[k] && !expectedAttr(k, x.attrs[k], y.attrs[k]) && !exAttrs.includes(k) && !(k === "style" && near(num(x.attrs[k]), num(y.attrs[k]), 0.5) && styleProps(x.attrs[k]) === styleProps(y.attrs[k]))) out.push(`结束快照 ${p} @${k}: ${String(x.attrs[k]).slice(0, 100)} → ${String(y.attrs[k]).slice(0, 100)}`); }
-    if (typeof x.rect[0] === "number" && typeof y.rect[0] === "number" && !near(x.rect, y.rect, 0.5) && !spinning(x.rect, y.rect)) out.push(`结束快照 ${p}: 位置 ${x.rect} → ${y.rect}`);
+    if (typeof x.rect[0] === "number" && typeof y.rect[0] === "number" && !near(x.rect, y.rect, 0.5)) out.push(`结束快照 ${p}: 位置 ${x.rect} → ${y.rect}`);
+    else if (infBox(x.rect)?.length === 4 && infBox(y.rect)?.length === 4 && !near(infBox(x.rect), infBox(y.rect), 0.5)) out.push(`结束快照 ${p}: 无限动画元素的布局盒 ${infBox(x.rect)} → ${infBox(y.rect)}`);
     if (String(x.scroll) !== String(y.scroll)) out.push(`结束快照 ${p}: 滚动 ${x.scroll} → ${y.scroll}`);
   }
   return out;

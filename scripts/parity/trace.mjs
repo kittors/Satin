@@ -103,7 +103,7 @@ try {
       }
       await rec("s:away", null, () => page.mouse.move(2, 2), 400);
     }
-    const final = await page.evaluate(({ id }) => window.__parity.snapshot(id, { styles: false }), { id });
+    const final = await page.evaluate(({ id }) => window.__parity.snapshot(id, { styles: false, layoutForInf: true }), { id });
     for (const a of await page.evaluate(() => window.__parity.auditLog || [])) errs.push(`前缀漏改 ${a.api} ${a.tok} @ ${a.at}`);
     fs.writeFileSync(path.join(dir, id + ".json.gz"), zlib.gzipSync(JSON.stringify({ id, triggers: trig, actions, final, errors: errs })));
     summary[id] = { triggers: trig.length, actions: actions.length, errors: errs.length };
