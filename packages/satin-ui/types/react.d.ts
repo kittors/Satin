@@ -33,7 +33,9 @@ export const Textarea: React.ForwardRefExoticComponent<React.TextareaHTMLAttribu
 export function Field(p: { label?: React.ReactNode; help?: React.ReactNode; error?: React.ReactNode; htmlFor?: string; className?: string; children?: React.ReactNode }): React.ReactElement;
 export const Checkbox: React.ForwardRefExoticComponent<Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> & { label?: React.ReactNode; indeterminate?: boolean } & React.RefAttributes<HTMLInputElement>>;
 export const Switch: React.ForwardRefExoticComponent<Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> & { label?: React.ReactNode } & React.RefAttributes<HTMLInputElement>>;
-export function Chip(p: React.HTMLAttributes<HTMLSpanElement> & { on?: boolean; removable?: boolean; onRemove?(): void }): React.ReactElement;
+/** 芯片：onChange（受控时再给 selected）或 defaultSelected 给了是能切换的筛选芯片（button）；removable 是能移除的标签（收起动画放完才调 onRemove）；都没给只显示（selected 决定选中的样子） */
+export type ChipProps = Omit<React.HTMLAttributes<HTMLElement>, "onChange"> & { selected?: boolean; defaultSelected?: boolean; onChange?(selected: boolean): void; removable?: boolean; onRemove?(): void; removeLabel?: string };
+export const Chip: React.ForwardRefExoticComponent<ChipProps & React.RefAttributes<HTMLElement>>;
 export function Progress(p: { value?: number; ring?: boolean; size?: "lg"; className?: string }): React.ReactElement;
 export function Spinner(p: { size?: "lg"; className?: string }): React.ReactElement;
 export function Steps(p: { steps: React.ReactNode[]; current?: number; className?: string }): React.ReactElement;

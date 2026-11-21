@@ -9,7 +9,7 @@ import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
 import { ICONS } from "../src/icons.js";
-import { CHECK } from "../src/form.js";
+import { CHECK, removeChip } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
 import { wrap, cx } from "./wrap.js";
@@ -92,9 +92,18 @@ export const Switch = /* @__PURE__ */ defineComponent({
   name: "SnSwitch", props: { modelValue: Boolean, label: String, disabled: Boolean }, emits: ["update:modelValue"],
   setup: (p, { slots, emit }) => () => h("label", { class: "sn-switch" }, [h("input", { type: "checkbox", role: "switch", checked: p.modelValue, disabled: p.disabled, onChange: (e) => emit("update:modelValue", e.target.checked) }), h("span", { class: "sn-track" }, [h("span", { class: "sn-knob" })]), p.label ?? slots.default?.()]),
 });
+// 芯片三种：v-model（或 selected）给了是能切换的筛选芯片（<button aria-pressed>）；removable 是能移除的标签（点 × 先收起，动画放完发 remove，父组件这时再删）；都没给只显示
 export const Chip = /* @__PURE__ */ defineComponent({
-  name: "SnChip", props: { on: Boolean, removable: Boolean }, emits: ["remove"],
-  setup: (p, { slots, emit }) => () => h("span", { class: cx("sn-chip", p.removable && "sn-tag", p.on && "sn-on") }, [slots.default?.(), p.removable ? h("button", { class: "sn-x", "aria-label": tt("components.remove"), onClick: () => emit("remove") }, [h(Icon, { name: "x", size: 10 })]) : null]),
+  name: "SnChip", props: { modelValue: { type: Boolean, default: undefined }, selected: { type: Boolean, default: undefined }, removable: Boolean, removeLabel: String }, emits: ["update:modelValue", "change", "remove"],
+  setup(p, { slots, emit }) {
+    const el = ref(null);
+    return () => {
+      const on = p.modelValue ?? p.selected ?? false;
+      if (p.removable) return h("span", { ref: el, class: cx("sn-chip", "sn-tag", on && "sn-on") }, [slots.default?.(), h("button", { type: "button", class: "sn-x", "aria-label": p.removeLabel ?? tt("components.remove"), onClick: () => removeChip(el.value, { keep: true, onRemoved: () => emit("remove") }) }, [h(Icon, { name: "x" })])]);
+      if (p.modelValue !== undefined) return h("button", { type: "button", class: cx("sn-chip", on && "sn-on"), "aria-pressed": String(on), onClick: () => { emit("update:modelValue", !on); emit("change", !on); } }, [h(Icon, { name: "check" }), slots.default?.()]);
+      return h("span", { class: cx("sn-chip", on && "sn-on") }, slots.default?.());
+    };
+  },
 });
 export const Progress = /* @__PURE__ */ defineComponent({
   name: "SnProgress", props: { value: Number, ring: Boolean, size: String },

@@ -101,7 +101,7 @@
     "en": "ToggleChip · Tag",
     "group": "按钮",
     "summary": "筛选条件、多选标签。选中时前面长出一个对勾；可以移除的标签，移除时先收起宽度再消失，旁边的芯片平滑补位。",
-    "contract": 0
+    "contract": 1
   },
   {
     "id": "field",

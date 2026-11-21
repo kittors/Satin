@@ -172,10 +172,11 @@ export function mountOtp(box, { onComplete } = {}) {
 // 筛选芯片：.chip[data-toggle]，点了切换 .on（aria-pressed 跟着变）；
 // 可移除的标签：容器写 data-chips="removable"，标签里的 .x 点了先脱离布局淡出，剩下的用弹簧补位；removeChip(芯片) 也能直接调
 const CHIP_SPRING = "linear(0, .32, .78, 1.04, 1.09, 1.06, 1.02, 1, .99, .99, 1)";
-export function removeChip(chip, { onRemoved } = {}) {
+// keep：节点由调用方自己删（React、Vue 里父组件从列表里拿掉这一项）——这里只播收起动画、让旁边的补位，播完调 onRemoved
+export function removeChip(chip, { onRemoved, keep } = {}) {
   const row = chip.parentElement, sibs = [...row.children].filter((c) => c !== chip);
   const before = new Map(sibs.map((x) => [x, x.getBoundingClientRect()])), r = chip.getBoundingClientRect(), rr = row.getBoundingClientRect();
-  const done = () => { chip.remove(); onRemoved?.(); row.dispatchEvent(new CustomEvent("chipremove", { bubbles: true, detail: { chip } })); };
+  const done = () => { if (!keep) chip.remove(); onRemoved?.(); row.dispatchEvent(new CustomEvent("chipremove", { bubbles: true, detail: { chip } })); };
   if (matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("sn-reduce-motion")) return done();
   row.style.position = "relative"; Object.assign(chip.style, { position: "absolute", left: r.left - rr.left + "px", top: r.top - rr.top + "px", pointerEvents: "none" });
   chip.animate([{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(.96)" }], { duration: 160, easing: "cubic-bezier(.42,0,1,1)", fill: "forwards" }).onfinish = done;

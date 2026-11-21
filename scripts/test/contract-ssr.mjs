@@ -32,7 +32,7 @@ function htmlOf(src) {
 // 统一：去掉标签之间的空白、注释（Vue 的 <!--[--> 片段标记）、按属性名排序、类名排序
 // 纯 HTML 写法接线用、框架写法里换成 onClick / ref 的属性：不比
 // （弹窗里"放弃填写的内容？"那一条的 data-keep / data-discard 也是：框架写法里是 Dialog 的 guard + onClick）
-const WIRING = new Set(["id", "data-dlg", "data-pop", "data-fmenu", "data-ctx", "data-drawer", "data-keep", "data-discard"]);
+const WIRING = new Set(["id", "data-dlg", "data-pop", "data-fmenu", "data-ctx", "data-drawer", "data-keep", "data-discard", "data-toggle", "data-chips"]);
 function norm(html) {
   const host = document.createElement("div"); host.innerHTML = html.replace(/<!--[\s\S]*?-->/g, "");
   // 封装组件外面那层 <div class="sn-host" style="display: contents">（不占布局）拆掉

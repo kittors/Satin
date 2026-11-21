@@ -23,6 +23,9 @@ import ButtonDemo3 from "../demos/button-3.vue";
 import IconbuttonDemo0 from "../demos/iconbutton-0.vue";
 import LinkDemo0 from "../demos/link-0.vue";
 import CompoundDemo0 from "../demos/compound-0.vue";
+import ChipRemovable from "../demos/chip-removable.vue";
+import ChipControlled from "../demos/chip-controlled.vue";
+import ChipBasic from "../demos/chip-basic.vue";
 import ChipDemo0 from "../demos/chip-0.vue";
 import FieldDemo0 from "../demos/field-0.vue";
 import InputDemo0 from "../demos/input-0.vue";
@@ -181,6 +184,9 @@ import SelectMenu from "../demos/select-menu.vue";
   </section>
   <section id="chip">
     <h2>切换芯片</h2>
+    <div class="demo" data-demo="chip-removable"><ChipRemovable /></div>
+    <div class="demo" data-demo="chip-controlled"><ChipControlled /></div>
+    <div class="demo" data-demo="chip-basic"><ChipBasic /></div>
     <div class="demo" data-demo="chip-0"><ChipDemo0 /></div>
   </section>
   <section id="field">

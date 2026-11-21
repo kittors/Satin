@@ -80,6 +80,352 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "筛选芯片是 `<button aria-pressed>`（开关按钮）；能移除的标签里的 × 是 `<button>`。"
+    ],
+    "focus": [
+      "键盘聚焦时 2px 焦点环（:focus-visible）；移除一个标签以后，焦点交给旁边的标签或输入框（组件里由父组件决定）。"
+    ],
+    "notes": [
+      "× 按钮要写清移除的是什么：`removeLabel`（组件默认\"移除 + 文字\"）。",
+      "芯片的文字就是它的名称，不要只放图标。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "切换芯片",
+  "lead": "筛选条件、多选标签：选中时前面长出一个对勾；能移除的标签先收起再消失，旁边的平滑补位。",
+  "whenToUse": [
+    "列表、表格上方的筛选条件：可以同时选几个，选了马上生效。",
+    "已经选好的几项（标签、收件人、关键词），每项都能单独移除。",
+    "只读地标出几个属性（状态、类型），和正文区分开。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "几个选项里只能选一个、而且一直有一个选中：用分段控件。",
+      "use": "segmented"
+    },
+    {
+      "text": "点了就执行一个动作（导出、删除）：用按钮，芯片是\"条件\"不是\"动作\"。",
+      "use": "button"
+    },
+    {
+      "text": "让用户自己输入、回车生成标签：用标签输入框，它会负责增删和校验。",
+      "use": "taginput"
+    }
+  ],
+  "related": [
+    {
+      "id": "segmented",
+      "diff": "分段控件是单选、总有一个选中；芯片可以多选、也可以都不选。"
+    },
+    {
+      "id": "taginput",
+      "diff": "标签输入框负责输入、去重、上限，里面的每一项就是能移除的芯片。"
+    },
+    {
+      "id": "button",
+      "diff": "按钮是在这里做一件事；芯片是可开关的筛选条件或一个已选项。"
+    },
+    {
+      "id": "tags",
+      "diff": "标签与徽标是只读的状态标记（颜色表达状态）；芯片能点、能移除。"
+    }
+  ],
+  "import": {
+    "html": "import { removeChip } from \"satin-ui\"; // 只有自己写移除逻辑时要用；标记写类名 sn-chip，包一层 <sn-enhance> 就接好了切换和移除",
+    "react": "import { Chip } from \"satin-ui/react\";",
+    "vue": "import { Chip } from \"satin-ui/vue\";",
+    "svelte": "import { removeChip } from \"satin-ui\"; // 芯片写类名 sn-chip；图标用 satin-ui/svelte/Icon.svelte",
+    "angular": "import { removeChip } from \"satin-ui\"; // 芯片写类名 sn-chip，图标写 data-i、外面包 <sn-enhance>",
+    "solid": "import { removeChip } from \"satin-ui\"; // 芯片写类名 sn-chip，图标写 data-i、外面包 <sn-enhance>",
+    "preact": "import { Chip } from \"satin-ui/react\"; // @preact/preset-vite 默认把 react 指到 preact/compat"
+  },
+  "importNote": {
+    "react": "`Chip` 组件：给 `selected` + `onChange` 是能切换的筛选芯片（`defaultSelected` 非受控）；`removable` 是能移除的标签，收起动画放完才调 `onRemove`，这时再从列表里删掉；都不给就是只显示的芯片。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Chip`，用法和 React 一样：`selected` + `onChange`、`removable` + `onRemove`。",
+    "vue": "`Chip` 组件：`v-model` 绑一个布尔值是能切换的筛选芯片；`removable` 是能移除的标签，收起动画放完才发 `remove`；只写 `selected` 是只显示选中的样子。",
+    "svelte": "写 `<button class=\"sn-chip\">`，用 `class:sn-on` 和 `aria-pressed` 跟着状态变，对勾用 `<Icon name=\"check\">`；移除时调 `removeChip(芯片, { keep: true, onRemoved })`，动画放完再从数组里删。",
+    "angular": "写 `<button class=\"sn-chip\">`，`[class.sn-on]`、`[attr.aria-pressed]` 跟着状态变，对勾写 `data-i=\"check\"`、外面包 `<sn-enhance>`；移除时调 `removeChip(芯片, { keep: true, onRemoved })`。",
+    "solid": "写 `<button class=\"sn-chip\">`，`classList`、`aria-pressed` 跟着信号变，对勾写 `data-i=\"check\"`、外面包 `<sn-enhance>`；移除时调 `removeChip(芯片, { keep: true, onRemoved })`。",
+    "html": "筛选芯片写 `<button class=\"sn-chip\" data-toggle aria-pressed>`，能移除的标签放进 `data-chips=\"removable\"` 的容器；外面包一层 `<sn-enhance>`，点了切换 `.sn-on`、点 × 播完动画移除（容器上冒泡 `chipremove`）。"
+  },
+  "dts": {
+    "functions": [
+      "chipHTML",
+      "removeChip"
+    ],
+    "react": "Chip",
+    "vue": "Chip"
+  },
+  "props": [
+    {
+      "name": "selected",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "选中的样子（底色加深；筛选芯片前面还有对勾）。React 里和 `onChange` 一起给就是受控的筛选芯片；只给它是只显示的芯片。",
+      "names": {
+        "js": "on",
+        "react": "selected",
+        "vue": "selected",
+        "preact": "selected",
+        "markup": "类名 sn-on（筛选芯片再写 aria-pressed=\"true\"）",
+        "html": "类名 sn-on（筛选芯片再写 aria-pressed=\"true\"）"
+      }
+    },
+    {
+      "name": "modelValue",
+      "type": "boolean",
+      "default": "—",
+      "required": false,
+      "desc": "Vue：`v-model` 绑一个布尔值，就是能切换的筛选芯片（点了回写）。",
+      "names": {
+        "vue": "v-model"
+      }
+    },
+    {
+      "name": "defaultSelected",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "非受控的初始选中状态：组件自己管开关，`onChange` 只负责通知。",
+      "names": {
+        "react": "defaultSelected",
+        "preact": "defaultSelected"
+      }
+    },
+    {
+      "name": "removable",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "能移除的标签：后面有 ×，点了先脱离布局淡出、旁边的用弹簧补位，动画放完才通知移除。",
+      "names": {
+        "js": "removable",
+        "react": "removable",
+        "vue": "removable",
+        "preact": "removable",
+        "markup": "类名 sn-tag + 里面的 <button class=\"sn-x\">",
+        "html": "放进 data-chips=\"removable\" 的容器"
+      }
+    },
+    {
+      "name": "removeLabel",
+      "type": "string",
+      "default": "\"移除 + 文字\"",
+      "required": false,
+      "desc": "× 按钮给读屏的名称，比如\"移除 雨夜\"。",
+      "names": {
+        "react": "removeLabel",
+        "vue": "removeLabel（模板里写 remove-label）",
+        "preact": "removeLabel",
+        "markup": "<button class=\"sn-x\" aria-label>",
+        "html": "<button class=\"sn-x\" aria-label>"
+      }
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "default": "\"\"",
+      "required": false,
+      "desc": "芯片文字（chipHTML 用；组件写在子元素 / 默认插槽里）。",
+      "names": {
+        "js": "text"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "change",
+      "payload": "boolean",
+      "when": "点筛选芯片切换以后，参数是新的选中状态。",
+      "names": {
+        "react": "onChange",
+        "vue": "@update:modelValue / @change",
+        "preact": "onChange",
+        "angular": "(click)",
+        "svelte": "onclick",
+        "solid": "onClick",
+        "html": "addEventListener(\"click\")"
+      }
+    },
+    {
+      "name": "remove",
+      "payload": "—",
+      "when": "点 ×，收起动画放完以后（这时再从列表里删掉这一项）。",
+      "names": {
+        "react": "onRemove",
+        "vue": "@remove",
+        "preact": "onRemove",
+        "html": "容器上冒泡的 chipremove（detail.chip）"
+      }
+    }
+  ],
+  "slots": [
+    {
+      "name": "default",
+      "desc": "芯片文字。",
+      "names": {
+        "react": "children",
+        "vue": "默认插槽",
+        "preact": "children",
+        "markup": "芯片里的文字",
+        "html": "芯片里的文字"
+      },
+      "native": [
+        "react"
+      ]
+    }
+  ],
+  "methods": [],
+  "functions": [
+    {
+      "name": "chipHTML",
+      "signature": "chipHTML(o?: { text?: string; on?: boolean; removable?: boolean }): string",
+      "returns": "string",
+      "from": "satin-ui",
+      "desc": "生成芯片 / 标签的标记（纯字符串，服务端渲染也能用）。"
+    },
+    {
+      "name": "removeChip",
+      "signature": "removeChip(chip: HTMLElement, o?: { onRemoved?(): void; keep?: boolean }): void",
+      "returns": "void",
+      "from": "satin-ui",
+      "desc": "移除：先脱离布局淡出，旁边的用弹簧补位；`keep: true` 时不删节点（框架里由父组件删），放完调 `onRemoved`。"
+    }
+  ],
+  "cssVars": [
+    {
+      "name": "--sn-b-soft-active",
+      "desc": "选中时的底色",
+      "default": "浅灰",
+      "token": true
+    },
+    {
+      "name": "--sn-press",
+      "desc": "按下时缩放到多少",
+      "default": ".97",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-chip",
+      "desc": "芯片（高 28，胶囊）"
+    },
+    {
+      "name": ".sn-chip.sn-on",
+      "desc": "选中：对勾展开、底色加深"
+    },
+    {
+      "name": ".sn-chip.sn-tag + .sn-x",
+      "desc": "能移除的标签和它的 × 按钮"
+    },
+    {
+      "name": "data-toggle",
+      "desc": "筛选芯片（`<sn-enhance>` / `enhance()` 接上切换，`aria-pressed` 跟着变）"
+    },
+    {
+      "name": "data-chips=\"removable\"",
+      "desc": "能移除的标签的容器（点 × 播完动画移除，冒泡 `chipremove`）"
+    }
+  ],
+  "types": [
+    "ChipProps"
+  ],
+  "keyboard": [
+    {
+      "keys": "Tab",
+      "does": "聚焦筛选芯片；能移除的标签聚焦到它的 × 按钮。"
+    },
+    {
+      "keys": "Enter / 空格",
+      "does": "切换选中，或者移除这个标签（原生 `<button>` 的行为）。"
+    }
+  ],
+  "design": {
+    "do": [
+      "同一组芯片放在一行，按常用程度排；选中的不挪位置。",
+      "筛选芯片选了马上生效，不再要\"应用\"按钮（要攒好几个条件一起提交时，用 Popover 里的复选框）。",
+      "标签多到一行放不下时换行，不要把芯片缩小。"
+    ],
+    "dont": [
+      {
+        "text": "用颜色区分芯片的种类（红芯片、蓝芯片）：颜色只表达状态。",
+        "rule": "status-color"
+      },
+      {
+        "text": "芯片上加渐变、阴影。",
+        "rule": "no-gradient"
+      },
+      {
+        "text": "把芯片当按钮用（点了执行一个动作）。"
+      }
+    ],
+    "copy": [
+      "一两个词：\"进行中\"\"已完成\"；不要写成句子。",
+      "移除按钮的读屏名称写\"移除 雨夜\"，不写\"关闭\"。"
+    ],
+    "motion": [
+      {
+        "what": "选中时对勾展开、文字往右让",
+        "easing": "ease.outStrong",
+        "duration": "200ms"
+      },
+      {
+        "what": "移除：淡出 + 缩到 .96，旁边的补位",
+        "easing": "ease.in / spring",
+        "duration": "160ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "chip-basic",
+      "title": "只显示的芯片",
+      "why": "只读地标出几个属性：给一个选中的样子就行，不能点。",
+      "html": "<div class=\"sn-row\"><span class=\"sn-chip sn-on\">进行中</span><span class=\"sn-chip\">已完成</span><span class=\"sn-chip\">失败</span></div>",
+      "code": {
+        "html": "<div class=\"sn-row\">\n  <span class=\"sn-chip sn-on\">进行中</span>\n  <span class=\"sn-chip\">已完成</span>\n  <span class=\"sn-chip\">失败</span>\n</div>\n",
+        "react": "import { Chip } from \"satin-ui/react\";\n\nexport default function ChipBasic() {\n  return (\n    <div className=\"sn-row\">\n      <Chip selected>进行中</Chip>\n      <Chip>已完成</Chip>\n      <Chip>失败</Chip>\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Chip } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <Chip selected>进行中</Chip>\n    <Chip>已完成</Chip>\n    <Chip>失败</Chip>\n  </div>\n</template>\n",
+        "svelte": "<div class=\"sn-row\">\n  <span class=\"sn-chip sn-on\">进行中</span>\n  <span class=\"sn-chip\">已完成</span>\n  <span class=\"sn-chip\">失败</span>\n</div>\n",
+        "angular": "import { Component } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-chip-basic\",\n  template: `\n    <div class=\"sn-row\">\n      <span class=\"sn-chip sn-on\">进行中</span>\n      <span class=\"sn-chip\">已完成</span>\n      <span class=\"sn-chip\">失败</span>\n    </div>\n  `,\n})\nexport class ChipBasicComponent {}\n",
+        "solid": "export default function ChipBasic() {\n  return (\n    <div class=\"sn-row\">\n      <span class=\"sn-chip sn-on\">进行中</span>\n      <span class=\"sn-chip\">已完成</span>\n      <span class=\"sn-chip\">失败</span>\n    </div>\n  );\n}\n",
+        "preact": "import { Chip } from \"satin-ui/react\";\n\nexport default function ChipBasic() {\n  return (\n    <div class=\"sn-row\">\n      <Chip selected>进行中</Chip>\n      <Chip>已完成</Chip>\n      <Chip>失败</Chip>\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "chip-controlled",
+      "title": "筛选芯片（受控）",
+      "why": "可以同时选几个，选了马上生效：选中的状态放在父组件里，用它去筛列表。",
+      "html": "<div class=\"sn-row\"><button type=\"button\" class=\"sn-chip sn-on\" aria-pressed=\"true\" data-toggle><span data-i=\"check\"></span>进行中</button><button type=\"button\" class=\"sn-chip\" aria-pressed=\"false\" data-toggle><span data-i=\"check\"></span>已完成</button><button type=\"button\" class=\"sn-chip\" aria-pressed=\"false\" data-toggle><span data-i=\"check\"></span>失败</button><button type=\"button\" class=\"sn-chip\" aria-pressed=\"false\" data-toggle><span data-i=\"check\"></span>已归档</button></div>",
+      "code": {
+        "html": "<sn-enhance>\n  <div class=\"sn-row\">\n    <button type=\"button\" class=\"sn-chip sn-on\" aria-pressed=\"true\" data-toggle><span data-i=\"check\"></span>进行中</button>\n    <button type=\"button\" class=\"sn-chip\" aria-pressed=\"false\" data-toggle><span data-i=\"check\"></span>已完成</button>\n    <button type=\"button\" class=\"sn-chip\" aria-pressed=\"false\" data-toggle><span data-i=\"check\"></span>失败</button>\n    <button type=\"button\" class=\"sn-chip\" aria-pressed=\"false\" data-toggle><span data-i=\"check\"></span>已归档</button>\n  </div>\n</sn-enhance>\n",
+        "react": "import { useState } from \"react\";\nimport { Chip } from \"satin-ui/react\";\n\nconst STATUS = [\"进行中\", \"已完成\", \"失败\", \"已归档\"];\n\nexport default function StatusFilter() {\n  const [picked, setPicked] = useState([\"进行中\"]);\n  const toggle = (s, on) => setPicked((p) => (on ? [...p, s] : p.filter((x) => x !== s)));\n  return (\n    <div className=\"sn-row\">\n      {STATUS.map((s) => (\n        <Chip key={s} selected={picked.includes(s)} onChange={(on) => toggle(s, on)}>{s}</Chip>\n      ))}\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Chip } from \"satin-ui/vue\";\n\nconst STATUS = [\"进行中\", \"已完成\", \"失败\", \"已归档\"];\nconst picked = ref([\"进行中\"]);\nconst toggle = (s, on) => { picked.value = on ? [...picked.value, s] : picked.value.filter((x) => x !== s); };\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <Chip v-for=\"s in STATUS\" :key=\"s\" :model-value=\"picked.includes(s)\" @update:model-value=\"(on) => toggle(s, on)\">{{ s }}</Chip>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Icon from \"satin-ui/svelte/Icon.svelte\";\n\n  const STATUS = [\"进行中\", \"已完成\", \"失败\", \"已归档\"];\n  let picked = $state([\"进行中\"]);\n  const toggle = (s) => (picked = picked.includes(s) ? picked.filter((x) => x !== s) : [...picked, s]);\n</script>\n\n<div class=\"sn-row\">\n  {#each STATUS as s (s)}\n    <button type=\"button\" class=\"sn-chip\" class:sn-on={picked.includes(s)} aria-pressed={picked.includes(s)} onclick={() => toggle(s)}><Icon name=\"check\" />{s}</button>\n  {/each}\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-chip-controlled\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>\n  template: `\n    <sn-enhance>\n      <div class=\"sn-row\">\n        @for (s of status; track s) {\n          <button type=\"button\" class=\"sn-chip\" [class.sn-on]=\"picked().includes(s)\" [attr.aria-pressed]=\"picked().includes(s)\" (click)=\"toggle(s)\"><span data-i=\"check\"></span>{{ s }}</button>\n        }\n      </div>\n    </sn-enhance>\n  `,\n})\nexport class ChipControlledComponent {\n  status = [\"进行中\", \"已完成\", \"失败\", \"已归档\"];\n  picked = signal([\"进行中\"]);\n  toggle(s: string) { this.picked.update((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s])); }\n}\n",
+        "solid": "import { createSignal, For } from \"solid-js\";\n\nconst STATUS = [\"进行中\", \"已完成\", \"失败\", \"已归档\"];\n\nexport default function StatusFilter() {\n  const [picked, setPicked] = createSignal([\"进行中\"]);\n  const toggle = (s) => setPicked((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));\n  return (\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <For each={STATUS}>\n          {(s) => (\n            <button type=\"button\" class=\"sn-chip\" classList={{ \"sn-on\": picked().includes(s) }} aria-pressed={picked().includes(s)} onClick={() => toggle(s)}><span data-i=\"check\"></span>{s}</button>\n          )}\n        </For>\n      </div>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Chip } from \"satin-ui/react\";\n\nconst STATUS = [\"进行中\", \"已完成\", \"失败\", \"已归档\"];\n\nexport default function StatusFilter() {\n  const [picked, setPicked] = useState([\"进行中\"]);\n  const toggle = (s, on) => setPicked((p) => (on ? [...p, s] : p.filter((x) => x !== s)));\n  return (\n    <div class=\"sn-row\">\n      {STATUS.map((s) => (\n        <Chip key={s} selected={picked.includes(s)} onChange={(on) => toggle(s, on)}>{s}</Chip>\n      ))}\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "chip-removable",
+      "title": "能移除的标签",
+      "why": "已经选好的几项，每项都能单独移除：动画放完再从列表里删，旁边的平滑补位。",
+      "html": "<div class=\"sn-row\" data-chips=\"removable\"><span class=\"sn-chip sn-tag sn-on\">雨夜<button type=\"button\" class=\"sn-x\" aria-label=\"移除 雨夜\" data-i=\"x\"></button></span><span class=\"sn-chip sn-tag sn-on\">车站<button type=\"button\" class=\"sn-x\" aria-label=\"移除 车站\" data-i=\"x\"></button></span><span class=\"sn-chip sn-tag sn-on\">列车<button type=\"button\" class=\"sn-x\" aria-label=\"移除 列车\" data-i=\"x\"></button></span></div>",
+      "code": {
+        "html": "<sn-enhance>\n  <div class=\"sn-row\" data-chips=\"removable\">\n    <span class=\"sn-chip sn-tag sn-on\">雨夜<button type=\"button\" class=\"sn-x\" aria-label=\"移除 雨夜\" data-i=\"x\"></button></span>\n    <span class=\"sn-chip sn-tag sn-on\">车站<button type=\"button\" class=\"sn-x\" aria-label=\"移除 车站\" data-i=\"x\"></button></span>\n    <span class=\"sn-chip sn-tag sn-on\">列车<button type=\"button\" class=\"sn-x\" aria-label=\"移除 列车\" data-i=\"x\"></button></span>\n  </div>\n</sn-enhance>\n",
+        "react": "import { useState } from \"react\";\nimport { Chip } from \"satin-ui/react\";\n\nexport default function SceneTags() {\n  const [tags, setTags] = useState([\"雨夜\", \"车站\", \"列车\"]);\n  return (\n    <div className=\"sn-row\">\n      {tags.map((t) => (\n        // onRemove 在收起动画放完以后调，这时再从列表里删\n        <Chip key={t} selected removable removeLabel={`移除 ${t}`} onRemove={() => setTags((x) => x.filter((y) => y !== t))}>{t}</Chip>\n      ))}\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Chip } from \"satin-ui/vue\";\n\nconst tags = ref([\"雨夜\", \"车站\", \"列车\"]);\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <!-- remove 在收起动画放完以后发，这时再从列表里删 -->\n    <Chip v-for=\"t in tags\" :key=\"t\" selected removable :remove-label=\"`移除 ${t}`\" @remove=\"tags = tags.filter((x) => x !== t)\">{{ t }}</Chip>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import { removeChip } from \"satin-ui\";\n  import Icon from \"satin-ui/svelte/Icon.svelte\";\n\n  let tags = $state([\"雨夜\", \"车站\", \"列车\"]);\n  // 先播收起动画（keep：节点交给 Svelte 删），放完再从数组里删\n  const remove = (e, t) => removeChip(e.currentTarget.parentElement, { keep: true, onRemoved: () => (tags = tags.filter((x) => x !== t)) });\n</script>\n\n<div class=\"sn-row\">\n  {#each tags as t (t)}\n    <span class=\"sn-chip sn-tag sn-on\">{t}<button type=\"button\" class=\"sn-x\" aria-label=\"移除 {t}\" onclick={(e) => remove(e, t)}><Icon name=\"x\" /></button></span>\n  {/each}\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\nimport { removeChip } from \"satin-ui\";\n\n@Component({\n  selector: \"demo-chip-removable\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>\n  template: `\n    <sn-enhance>\n      <div class=\"sn-row\">\n        @for (t of tags(); track t) {\n          <span class=\"sn-chip sn-tag sn-on\">{{ t }}<button type=\"button\" class=\"sn-x\" [attr.aria-label]=\"'移除 ' + t\" data-i=\"x\" (click)=\"remove($event, t)\"></button></span>\n        }\n      </div>\n    </sn-enhance>\n  `,\n})\nexport class ChipRemovableComponent {\n  tags = signal([\"雨夜\", \"车站\", \"列车\"]);\n  // 先播收起动画（keep：节点交给 Angular 删），放完再从列表里删\n  remove(e: Event, t: string) {\n    const chip = (e.currentTarget as HTMLElement).parentElement!;\n    removeChip(chip, { keep: true, onRemoved: () => this.tags.update((x) => x.filter((y) => y !== t)) });\n  }\n}\n",
+        "solid": "import { createSignal, For } from \"solid-js\";\nimport { removeChip } from \"satin-ui\";\n\nexport default function SceneTags() {\n  const [tags, setTags] = createSignal([\"雨夜\", \"车站\", \"列车\"]);\n  // 先播收起动画（keep：节点交给 Solid 删），放完再从列表里删\n  const remove = (e, t) => removeChip(e.currentTarget.parentElement, { keep: true, onRemoved: () => setTags((x) => x.filter((y) => y !== t)) });\n  return (\n    <sn-enhance>\n      <div class=\"sn-row\">\n        <For each={tags()}>\n          {(t) => <span class=\"sn-chip sn-tag sn-on\">{t}<button type=\"button\" class=\"sn-x\" aria-label={`移除 ${t}`} data-i=\"x\" onClick={(e) => remove(e, t)}></button></span>}\n        </For>\n      </div>\n    </sn-enhance>\n  );\n}\n",
+        "preact": "import { useState } from \"react\";\nimport { Chip } from \"satin-ui/react\";\n\nexport default function SceneTags() {\n  const [tags, setTags] = useState([\"雨夜\", \"车站\", \"列车\"]);\n  return (\n    <div class=\"sn-row\">\n      {tags.map((t) => (\n        // onRemove 在收起动画放完以后调，这时再从列表里删\n        <Chip key={t} selected removable removeLabel={`移除 ${t}`} onRemove={() => setTags((x) => x.filter((y) => y !== t))}>{t}</Chip>\n      ))}\n    </div>\n  );\n}\n"
+      }
+    }
+  ]
 }

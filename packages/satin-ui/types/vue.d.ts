@@ -23,7 +23,8 @@ export const Input: C<{ size?: "sm" | "md" | "lg" | "xl"; invalid?: boolean }>;
 export const Field: DefineComponent<{ label?: string; help?: string; error?: string; for?: string }>;
 export const Checkbox: C<{ label?: string; indeterminate?: boolean; disabled?: boolean }>;
 export const Switch: C<{ label?: string; disabled?: boolean }>;
-export const Chip: DefineComponent<{ on?: boolean; removable?: boolean }>;
+/** 芯片：v-model（布尔）给了是能切换的筛选芯片；removable 是能移除的标签（@remove 在收起动画放完以后发）；selected 只显示选中的样子 */
+export const Chip: DefineComponent<{ modelValue?: boolean; selected?: boolean; removable?: boolean; removeLabel?: string }>;
 export const Progress: DefineComponent<{ value?: number; ring?: boolean; size?: "lg" }>;
 export const Spinner: DefineComponent<{ size?: "lg" }>;
 export const Steps: DefineComponent<{ steps: string[]; current?: number }>;

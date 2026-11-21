@@ -26,6 +26,9 @@ import ButtonDemo3 from "./demos/button-3.jsx";
 import IconbuttonDemo0 from "./demos/iconbutton-0.jsx";
 import LinkDemo0 from "./demos/link-0.jsx";
 import CompoundDemo0 from "./demos/compound-0.jsx";
+import ChipRemovable from "./demos/chip-removable.jsx";
+import ChipControlled from "./demos/chip-controlled.jsx";
+import ChipBasic from "./demos/chip-basic.jsx";
 import ChipDemo0 from "./demos/chip-0.jsx";
 import FieldDemo0 from "./demos/field-0.jsx";
 import InputDemo0 from "./demos/input-0.jsx";
@@ -184,6 +187,9 @@ function Gallery() {
       </section>
       <section id="chip">
         <h2>切换芯片</h2>
+        <div class="demo" data-demo="chip-removable"><ChipRemovable /></div>
+        <div class="demo" data-demo="chip-controlled"><ChipControlled /></div>
+        <div class="demo" data-demo="chip-basic"><ChipBasic /></div>
         <div class="demo" data-demo="chip-0"><ChipDemo0 /></div>
       </section>
       <section id="field">

@@ -198,6 +198,36 @@
   "css": false
  },
  {
+  "slug": "chip-removable",
+  "id": "chip",
+  "n": -1,
+  "name": "切换芯片",
+  "group": "按钮",
+  "cap": "能移除的标签",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "chip-controlled",
+  "id": "chip",
+  "n": -1,
+  "name": "切换芯片",
+  "group": "按钮",
+  "cap": "筛选芯片（受控）",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "chip-basic",
+  "id": "chip",
+  "n": -1,
+  "name": "切换芯片",
+  "group": "按钮",
+  "cap": "只显示的芯片",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "chip-0",
   "id": "chip",
   "n": 0,

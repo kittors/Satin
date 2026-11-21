@@ -11,7 +11,7 @@ import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
 import { initSeg } from "../src/core.js";
 import { ICONS } from "../src/icons.js";
-import { CHECK } from "../src/form.js";
+import { CHECK, removeChip } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
 import { wrap, useIso, cx } from "./wrap.js";
@@ -92,9 +92,24 @@ export const Checkbox = /* @__PURE__ */ forwardRef(function Checkbox({ label, ch
 export const Switch = /* @__PURE__ */ forwardRef(function Switch({ label, children, className, ...rest }, ref) {
   return h("label", { className: cx("sn-switch", className) }, h("input", { ref, type: "checkbox", role: "switch", ...rest }), h("span", { className: "sn-track" }, h("span", { className: "sn-knob" })), label ?? children);
 });
-export function Chip({ on, removable, onRemove, className, children, ...rest }) {
-  return h("span", { ...rest, className: cx("sn-chip", removable && "sn-tag", on && "sn-on", className) }, children, removable ? h("button", { className: "sn-x", "aria-label": tt("components.remove"), onClick: onRemove }, h(Icon, { name: "x", size: 10 })) : null);
-}
+// 芯片三种：
+// · 给了 onChange 或 defaultSelected：能切换的筛选芯片（<button aria-pressed>，选中时前面长出对勾）；selected + onChange 受控，defaultSelected 非受控
+// · removable：能移除的标签（点 × 先收起、旁边的补位，动画放完才调 onRemove——父组件这时再从列表里删掉这一项）
+// · 都没给：只显示的芯片（selected 只决定选中的样子）
+export const Chip = /* @__PURE__ */ forwardRef(function Chip({ selected, defaultSelected, onChange, removable, onRemove, removeLabel, className, children, onClick, ...rest }, ref) {
+  const own = useRef(null), [inner, setInner] = useState(!!defaultSelected), on = selected ?? inner;
+  const setRefs = (n) => { own.current = n; if (typeof ref === "function") ref(n); else if (ref) ref.current = n; };
+  if (removable) {
+    const label = removeLabel ?? `${tt("components.remove")} ${typeof children === "string" ? children : ""}`.trim();
+    return h("span", { ...rest, ref: setRefs, className: cx("sn-chip", "sn-tag", on && "sn-on", className) }, children,
+      h("button", { type: "button", className: "sn-x", "aria-label": label, onClick: () => removeChip(own.current, { keep: true, onRemoved: () => onRemove?.() }) }, h(Icon, { name: "x" })));
+  }
+  if (defaultSelected !== undefined || onChange) {
+    return h("button", { type: "button", ...rest, ref: setRefs, className: cx("sn-chip", on && "sn-on", className), "aria-pressed": on,
+      onClick: (e) => { onClick?.(e); if (e.defaultPrevented) return; const v = !on; if (selected === undefined) setInner(v); onChange?.(v); } }, h(Icon, { name: "check" }), children);
+  }
+  return h("span", { ...rest, ref: setRefs, className: cx("sn-chip", on && "sn-on", className) }, children);
+});
 export function Progress({ value, ring, size, className }) {
   const v = value == null ? undefined : String(+value).replace(/^0\./, ".");
   return ring ? h("span", { className: cx("sn-pring", size === "lg" && "sn-lg", className), style: { "--sn-p": v ?? "0" } })

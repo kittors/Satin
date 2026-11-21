@@ -110,7 +110,8 @@ export function icon(name: string, size?: number): string;
 export function busy(btn: HTMLElement, work: number | PromiseLike<unknown>): Promise<void>;
 export function succeed(btn: HTMLElement, back?: number): void;
 export function copied(btn: HTMLElement): void;
-export function removeChip(chip: HTMLElement, o?: { onRemoved?(): void }): void;
+/** 移除芯片：先脱离布局淡出，旁边的用弹簧补位；keep 为 true 时不删节点（React、Vue 里由父组件删） */
+export function removeChip(chip: HTMLElement, o?: { onRemoved?(): void; keep?: boolean }): void;
 
 // 反馈
 export interface ToastOptions { text: string; /** "status"（默认，3 秒）| "action"（倒计时环 + 按钮，5 秒）| "progress"（进度环 + 百分比，直到 update 成结果） */ kind?: "status" | "action" | "progress"; /** 图标颜色："ok"（成功，status 默认）| "danger" | "info" */ tone?: "ok" | "danger" | "info"; icon?: string; duration?: number; action?: { label: string; run(t: ToastHandle): void }; progress?: number; alert?: boolean; done?: boolean }
