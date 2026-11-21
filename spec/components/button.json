@@ -270,6 +270,19 @@
       }
     },
     {
+      "name": "caret",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "菜单按钮后面的小箭头（12px、半透明）：菜单开着时转过去。点了会弹菜单的按钮才加。",
+      "names": {
+        "react": "caret",
+        "vue": "caret",
+        "preact": "caret",
+        "html": "data-i=\"chevron-down:caret\"（写在按钮上）"
+      }
+    },
+    {
       "name": "round",
       "type": "boolean",
       "default": "false",
@@ -341,6 +354,20 @@
         "preact": "done",
         "markup": "类名 sn-ok（一般由 succeed() 加上）",
         "html": "类名 sn-ok（一般由 succeed() 加上）"
+      }
+    },
+    {
+      "name": "badge",
+      "type": "boolean | number | string",
+      "default": "—",
+      "required": false,
+      "desc": "图标按钮右上角的标记：`true` 是一个小圆点（有新消息），数字、文字显示成数量（0 和空字符串不显示）。",
+      "example": "badge={3}",
+      "names": {
+        "react": "badge",
+        "vue": "badge",
+        "preact": "badge",
+        "html": "按钮里最后放 <span class=\"sn-dot\"> 或 <span class=\"sn-count\">3</span>"
       }
     },
     {

@@ -1,4 +1,4 @@
-const ITEMS = JSON.stringify(["全部","进行中","已完成"]);
+const ITEMS = JSON.stringify(["全部", "进行中", "已完成"]);
 
 export default function StatusBar() {
   return (

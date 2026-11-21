@@ -258,9 +258,9 @@
       "code": {
         "html": "<sn-otp length=\"6\"></sn-otp>\n",
         "react": "import { Otp } from \"satin-ui/react\";\n\nexport default function VerifyCode() {\n  return <Otp length={6} />;\n}\n",
-        "vue": "<script setup>\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length='6' />\n</template>\n",
+        "vue": "<script setup>\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length=\"6\" />\n</template>\n",
         "svelte": "<script>\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n</script>\n\n<Otp length={6} />\n",
-        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `<sn-otp length=\"6\"></sn-otp>`,\n})\nexport class OtpBasicComponent {\n\n}\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `<sn-otp length=\"6\"></sn-otp>`,\n})\nexport class OtpBasicComponent {}\n",
         "solid": "export default function VerifyCode() {\n  return <sn-otp length=\"6\"></sn-otp>;\n}\n",
         "preact": "import { Otp } from \"satin-ui/react\";\n\nexport default function VerifyCode() {\n  return <Otp length={6} />;\n}\n"
       }
@@ -288,9 +288,9 @@
       "code": {
         "html": "<sn-otp length=\"4\"></sn-otp>\n",
         "react": "import { Otp } from \"satin-ui/react\";\n\nexport default function ShortCode() {\n  return <Otp length={4} />;\n}\n",
-        "vue": "<script setup>\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length='4' />\n</template>\n",
+        "vue": "<script setup>\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length=\"4\" />\n</template>\n",
         "svelte": "<script>\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n</script>\n\n<Otp length={4} />\n",
-        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-length\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `<sn-otp length=\"4\"></sn-otp>`,\n})\nexport class OtpLengthComponent {\n\n}\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-length\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `<sn-otp length=\"4\"></sn-otp>`,\n})\nexport class OtpLengthComponent {}\n",
         "solid": "export default function ShortCode() {\n  return <sn-otp length=\"4\"></sn-otp>;\n}\n",
         "preact": "import { Otp } from \"satin-ui/react\";\n\nexport default function ShortCode() {\n  return <Otp length={4} />;\n}\n"
       }

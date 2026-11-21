@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Segmented } from "satin-ui/react";
 
-const RANGES = ["7 天","30 天","全部"];
+const RANGES = ["7 天", "30 天", "全部"];
 const noteOf = (r) => (r === "全部" ? "显示全部数据" : `显示最近 ${r}的数据`);
 
 export default function RangeSwitch() {

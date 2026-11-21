@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, computed } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
 
 @Component({
   selector: "demo-slider-controlled",
@@ -6,11 +6,10 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, computed } from "@angular/co
   template: `
     <div class="sn-stack sn-gap-8">
       <sn-slider max="100" label="不透明度" [attr.value]="value()" (sn-change)="value.set($any($event).detail)"></sn-slider>
-      <span class="sn-help">{{ note() }}</span>
+      <span class="sn-help">不透明度 {{ value() }}%</span>
     </div>
   `,
 })
 export class SliderControlledComponent {
   protected value = signal(72);
-  protected note = computed(() => { const v = this.value(); return `不透明度 ${v}%`; });
 }

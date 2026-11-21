@@ -75,7 +75,7 @@ import { Slider } from "satin-ui/vue";
 </script>
 
 <template>
-  <Slider :value='40' :max='100' label="音量" />
+  <Slider :value="40" :max="100" label="音量" />
 </template>
 ```
 
@@ -99,9 +99,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-slider>
   template: `<sn-slider value="40" max="100" label="音量"></sn-slider>`,
 })
-export class SliderBasicComponent {
-
-}
+export class SliderBasicComponent {}
 ```
 
 Solid 的写法：
@@ -158,7 +156,7 @@ export default function OpacitySlider() {
   return (
     <div className="sn-stack sn-gap-8">
       <Slider max={100} label="不透明度" value={value} onChange={setValue} />
-      <span className="sn-help">{`不透明度 ${value}%`}</span>
+      <span className="sn-help">不透明度 {value}%</span>
     </div>
   );
 }
@@ -176,8 +174,8 @@ const value = ref(72);
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <Slider v-model="value" :max='100' label="不透明度" />
-    <span class="sn-help">{{ `不透明度 ${value}%` }}</span>
+    <Slider v-model="value" :max="100" label="不透明度" />
+    <span class="sn-help">不透明度 {{ value }}%</span>
   </div>
 </template>
 ```
@@ -193,14 +191,14 @@ Svelte 的写法：
 
 <div class="sn-stack sn-gap-8">
   <Slider max={100} label="不透明度" bind:value={value} />
-  <span class="sn-help">{`不透明度 ${value}%`}</span>
+  <span class="sn-help">不透明度 {value}%</span>
 </div>
 ```
 
 Angular 的写法：
 
 ```ts
-import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, computed } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
 
 @Component({
   selector: "demo-slider-controlled",
@@ -208,13 +206,12 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, computed } from "@angular/co
   template: `
     <div class="sn-stack sn-gap-8">
       <sn-slider max="100" label="不透明度" [attr.value]="value()" (sn-change)="value.set($any($event).detail)"></sn-slider>
-      <span class="sn-help">{{ note() }}</span>
+      <span class="sn-help">不透明度 {{ value() }}%</span>
     </div>
   `,
 })
 export class SliderControlledComponent {
   protected value = signal(72);
-  protected note = computed(() => { const v = this.value(); return `不透明度 ${v}%`; });
 }
 ```
 
@@ -231,7 +228,7 @@ export default function OpacitySlider() {
   return (
     <div class="sn-stack sn-gap-8">
       <sn-slider max="100" label="不透明度" value={value()} ref={on("sn-change", (e) => setValue(e.detail))}></sn-slider>
-      <span class="sn-help">{`不透明度 ${value()}%`}</span>
+      <span class="sn-help">不透明度 {value()}%</span>
     </div>
   );
 }
@@ -248,7 +245,7 @@ export default function OpacitySlider() {
   return (
     <div class="sn-stack sn-gap-8">
       <Slider max={100} label="不透明度" value={value} onChange={setValue} />
-      <span class="sn-help">{`不透明度 ${value}%`}</span>
+      <span class="sn-help">不透明度 {value}%</span>
     </div>
   );
 }
@@ -286,7 +283,7 @@ import { Slider } from "satin-ui/vue";
 </script>
 
 <template>
-  <Slider :value='6' :max='10' label="风格强度" />
+  <Slider :value="6" :max="10" label="风格强度" />
 </template>
 ```
 
@@ -310,9 +307,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-slider>
   template: `<sn-slider value="6" max="10" label="风格强度"></sn-slider>`,
 })
-export class SliderMaxComponent {
-
-}
+export class SliderMaxComponent {}
 ```
 
 Solid 的写法：

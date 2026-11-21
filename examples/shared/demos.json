@@ -307,6 +307,36 @@
   "css": true
  },
  {
+  "slug": "field-optional",
+  "id": "field",
+  "n": -1,
+  "name": "字段与错误",
+  "group": "表单",
+  "cap": "只标\"可选\"",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "field-error",
+  "id": "field",
+  "n": -1,
+  "name": "字段与错误",
+  "group": "表单",
+  "cap": "提交时校验",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "field-basic",
+  "id": "field",
+  "n": -1,
+  "name": "字段与错误",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "field-0",
   "id": "field",
   "n": 0,
@@ -314,6 +344,36 @@
   "group": "表单",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "input-controlled",
+  "id": "input",
+  "n": -1,
+  "name": "输入框",
+  "group": "表单",
+  "cap": "受控：边输边算字数",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "input-sizes",
+  "id": "input",
+  "n": -1,
+  "name": "输入框",
+  "group": "表单",
+  "cap": "四档高度",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "input-basic",
+  "id": "input",
+  "n": -1,
+  "name": "输入框",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "input-0",
@@ -361,6 +421,36 @@
   "css": true
  },
  {
+  "slug": "taginput-hint",
+  "id": "taginput",
+  "n": -1,
+  "name": "标签输入",
+  "group": "表单",
+  "cap": "限制个数、换说明",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "taginput-controlled",
+  "id": "taginput",
+  "n": -1,
+  "name": "标签输入",
+  "group": "表单",
+  "cap": "受控：标签放在父组件里",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "taginput-basic",
+  "id": "taginput",
+  "n": -1,
+  "name": "标签输入",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "taginput-0",
   "id": "taginput",
   "n": 0,
@@ -368,6 +458,36 @@
   "group": "表单",
   "cap": "",
   "css": false
+ },
+ {
+  "slug": "number-range",
+  "id": "number",
+  "n": -1,
+  "name": "数字步进",
+  "group": "表单",
+  "cap": "自己的范围",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "number-controlled",
+  "id": "number",
+  "n": -1,
+  "name": "数字步进",
+  "group": "表单",
+  "cap": "受控：旁边算出结果",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "number-basic",
+  "id": "number",
+  "n": -1,
+  "name": "数字步进",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "number-0",
@@ -404,6 +524,36 @@
   "group": "表单",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "choice-controlled",
+  "id": "choice",
+  "n": -1,
+  "name": "复选、单选、开关",
+  "group": "表单",
+  "cap": "受控：全选和半选",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "choice-radio",
+  "id": "choice",
+  "n": -1,
+  "name": "复选、单选、开关",
+  "group": "表单",
+  "cap": "单选：一组里选一个",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "choice-basic",
+  "id": "choice",
+  "n": -1,
+  "name": "复选、单选、开关",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "choice-0",
@@ -532,6 +682,36 @@
   "css": false
  },
  {
+  "slug": "tooltip-truncate",
+  "id": "tooltip",
+  "n": -1,
+  "name": "文字提示",
+  "group": "浮层",
+  "cap": "截断时显示全文",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tooltip-kbd",
+  "id": "tooltip",
+  "n": -1,
+  "name": "文字提示",
+  "group": "浮层",
+  "cap": "带快捷键",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tooltip-basic",
+  "id": "tooltip",
+  "n": -1,
+  "name": "文字提示",
+  "group": "浮层",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "tooltip-0",
   "id": "tooltip",
   "n": 0,
@@ -539,6 +719,36 @@
   "group": "浮层",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "popover-align",
+  "id": "popover",
+  "n": -1,
+  "name": "弹出面板",
+  "group": "浮层",
+  "cap": "和按钮右边对齐",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "popover-controlled",
+  "id": "popover",
+  "n": -1,
+  "name": "弹出面板",
+  "group": "浮层",
+  "cap": "受控：选了就关上",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "popover-basic",
+  "id": "popover",
+  "n": -1,
+  "name": "弹出面板",
+  "group": "浮层",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "popover-0",
@@ -559,6 +769,36 @@
   "css": false
  },
  {
+  "slug": "ctxmenu-submenu",
+  "id": "ctxmenu",
+  "n": -1,
+  "name": "右键菜单与子菜单",
+  "group": "浮层",
+  "cap": "子菜单",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "ctxmenu-context",
+  "id": "ctxmenu",
+  "n": -1,
+  "name": "右键菜单与子菜单",
+  "group": "浮层",
+  "cap": "右键菜单",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "ctxmenu-basic",
+  "id": "ctxmenu",
+  "n": -1,
+  "name": "右键菜单与子菜单",
+  "group": "浮层",
+  "cap": "最简单的用法：更多操作",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "ctxmenu-0",
   "id": "ctxmenu",
   "n": 0,
@@ -577,6 +817,36 @@
   "css": false
  },
  {
+  "slug": "drawer-footer",
+  "id": "drawer",
+  "n": -1,
+  "name": "抽屉",
+  "group": "浮层",
+  "cap": "带底栏",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "drawer-controlled",
+  "id": "drawer",
+  "n": -1,
+  "name": "抽屉",
+  "group": "浮层",
+  "cap": "受控：边改边反映到背后",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "drawer-basic",
+  "id": "drawer",
+  "n": -1,
+  "name": "抽屉",
+  "group": "浮层",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "drawer-0",
   "id": "drawer",
   "n": 0,
@@ -584,6 +854,36 @@
   "group": "浮层",
   "cap": "",
   "css": false
+ },
+ {
+  "slug": "cmdk-hotkey",
+  "id": "cmdk",
+  "n": -1,
+  "name": "命令面板",
+  "group": "浮层",
+  "cap": "关掉快捷键、每条带说明",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "cmdk-empty",
+  "id": "cmdk",
+  "n": -1,
+  "name": "命令面板",
+  "group": "浮层",
+  "cap": "没有结果时给出口",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "cmdk-basic",
+  "id": "cmdk",
+  "n": -1,
+  "name": "命令面板",
+  "group": "浮层",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "cmdk-0",
@@ -595,6 +895,36 @@
   "css": true
  },
  {
+  "slug": "toast-progress",
+  "id": "toast",
+  "n": -1,
+  "name": "轻提示",
+  "group": "反馈",
+  "cap": "进度 → 结果",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "toast-action",
+  "id": "toast",
+  "n": -1,
+  "name": "轻提示",
+  "group": "反馈",
+  "cap": "带\"撤销\"",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "toast-basic",
+  "id": "toast",
+  "n": -1,
+  "name": "轻提示",
+  "group": "反馈",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "toast-0",
   "id": "toast",
   "n": 0,
@@ -602,6 +932,36 @@
   "group": "反馈",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "notify-fail",
+  "id": "notify",
+  "n": -1,
+  "name": "通知",
+  "group": "反馈",
+  "cap": "失败",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "notify-actions",
+  "id": "notify",
+  "n": -1,
+  "name": "通知",
+  "group": "反馈",
+  "cap": "带按钮",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "notify-basic",
+  "id": "notify",
+  "n": -1,
+  "name": "通知",
+  "group": "反馈",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "notify-0",
@@ -670,6 +1030,36 @@
   "css": true
  },
  {
+  "slug": "progress-controlled",
+  "id": "progress",
+  "n": -1,
+  "name": "进度",
+  "group": "反馈",
+  "cap": "受控：跟着任务走",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "progress-ring",
+  "id": "progress",
+  "n": -1,
+  "name": "进度",
+  "group": "反馈",
+  "cap": "进度环和转圈",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "progress-basic",
+  "id": "progress",
+  "n": -1,
+  "name": "进度",
+  "group": "反馈",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "progress-0",
   "id": "progress",
   "n": 0,
@@ -677,6 +1067,36 @@
   "group": "反馈",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "numflow-styles",
+  "id": "numflow",
+  "n": -1,
+  "name": "数字变化",
+  "group": "反馈",
+  "cap": "换个样子：模糊滚动",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "numflow-counter",
+  "id": "numflow",
+  "n": -1,
+  "name": "数字变化",
+  "group": "反馈",
+  "cap": "值变了：只动变了的那几位",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "numflow-basic",
+  "id": "numflow",
+  "n": -1,
+  "name": "数字变化",
+  "group": "反馈",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "numflow-0",
@@ -769,6 +1189,66 @@
   "css": true
  },
  {
+  "slug": "grid-states",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格 · DOM",
+  "group": "数据展示",
+  "cap": "空、加载、出错",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "grid-edit",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格 · DOM",
+  "group": "数据展示",
+  "cap": "编辑：editable 和 cellEdit",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "grid-remote",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格 · DOM",
+  "group": "数据展示",
+  "cap": "服务端的十万行：dataSource",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "grid-render",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格 · DOM",
+  "group": "数据展示",
+  "cap": "自定义格子：format 和 render",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "grid-select",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格 · DOM",
+  "group": "数据展示",
+  "cap": "勾选：受控的 selectedKeys",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "grid-sort",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格 · DOM",
+  "group": "数据展示",
+  "cap": "排序：受控的 sort",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "grid-0",
   "id": "grid",
   "n": 0,
@@ -776,6 +1256,46 @@
   "group": "数据展示",
   "cap": "",
   "css": false
+ },
+ {
+  "slug": "cgrid-controlled",
+  "id": "cgrid",
+  "n": -1,
+  "name": "数据表格 · Canvas",
+  "group": "数据展示",
+  "cap": "受控：勾选",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "cgrid-events",
+  "id": "cgrid",
+  "n": -1,
+  "name": "数据表格 · Canvas",
+  "group": "数据展示",
+  "cap": "事件：排序、勾选、改值",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "cgrid-million",
+  "id": "cgrid",
+  "n": -1,
+  "name": "数据表格 · Canvas",
+  "group": "数据展示",
+  "cap": "一百万行：dataSource",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "cgrid-basic",
+  "id": "cgrid",
+  "n": -1,
+  "name": "数据表格 · Canvas",
+  "group": "数据展示",
+  "cap": "基础用法：列和数据",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "cgrid-0",
@@ -842,6 +1362,36 @@
   "group": "数据展示",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "collapse-controlled",
+  "id": "collapse",
+  "n": -1,
+  "name": "折叠面板",
+  "group": "数据展示",
+  "cap": "受控：知道展开了哪几项",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "collapse-single",
+  "id": "collapse",
+  "n": -1,
+  "name": "折叠面板",
+  "group": "数据展示",
+  "cap": "一次只开一项（手风琴）",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "collapse-basic",
+  "id": "collapse",
+  "n": -1,
+  "name": "折叠面板",
+  "group": "数据展示",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "collapse-0",
@@ -995,6 +1545,46 @@
   "group": "导航",
   "cap": "",
   "css": false
+ },
+ {
+  "slug": "tabs-steps",
+  "id": "tabs",
+  "n": -1,
+  "name": "标签页、面包屑、分页、步骤",
+  "group": "导航",
+  "cap": "步骤条",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tabs-pager",
+  "id": "tabs",
+  "n": -1,
+  "name": "标签页、面包屑、分页、步骤",
+  "group": "导航",
+  "cap": "分页",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tabs-controlled",
+  "id": "tabs",
+  "n": -1,
+  "name": "标签页、面包屑、分页、步骤",
+  "group": "导航",
+  "cap": "受控：从外面换标签",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tabs-basic",
+  "id": "tabs",
+  "n": -1,
+  "name": "标签页、面包屑、分页、步骤",
+  "group": "导航",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "tabs-0",
@@ -1169,26 +1759,6 @@
   "name": "数据表格",
   "group": "数据展示",
   "cap": "基础用法",
-  "css": false,
-  "contract": true
- },
- {
-  "slug": "grid-seed",
-  "id": "grid",
-  "n": -1,
-  "name": "数据表格",
-  "group": "数据展示",
-  "cap": "固定数据：行数和种子",
-  "css": false,
-  "contract": true
- },
- {
-  "slug": "grid-component",
-  "id": "grid",
-  "n": -1,
-  "name": "数据表格",
-  "group": "数据展示",
-  "cap": "在 React、Vue 里包成组件",
   "css": false,
   "contract": true
  },

@@ -75,7 +75,7 @@ import { Otp } from "satin-ui/vue";
 </script>
 
 <template>
-  <Otp :length='6' />
+  <Otp :length="6" />
 </template>
 ```
 
@@ -99,9 +99,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>
   template: `<sn-otp length="6"></sn-otp>`,
 })
-export class OtpBasicComponent {
-
-}
+export class OtpBasicComponent {}
 ```
 
 Solid 的写法：
@@ -290,7 +288,7 @@ import { Otp } from "satin-ui/vue";
 </script>
 
 <template>
-  <Otp :length='4' />
+  <Otp :length="4" />
 </template>
 ```
 
@@ -314,9 +312,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>
   template: `<sn-otp length="4"></sn-otp>`,
 })
-export class OtpLengthComponent {
-
-}
+export class OtpLengthComponent {}
 ```
 
 Solid 的写法：

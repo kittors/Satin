@@ -568,6 +568,7 @@ export default function GridToggle() {
 | `tip` | `string` | — | 否 | 名称：悬停 500ms、键盘聚焦时用 Tooltip 显示，同时写成 `aria-label`（读屏读它）。组件里是可选的，但纯图标按钮一定要写。 | React：`tip`；Vue：`tip`；Preact：`tip`；标记：`data-tip + aria-label`；纯 HTML：`data-tip + aria-label` |
 | `variant` | `"ghost" \| "tertiary" \| "secondary" \| "primary"` | "secondary" | 否 | 外观：ghost 没有面（工具栏里最常用）、tertiary 浅底、secondary 带边框、primary 实色（播放这类主操作，配 round）。 | React：`variant`；Vue：`variant`；Preact：`variant`；标记：`类名 sn-ghost / sn-tertiary / sn-secondary / sn-primary`；纯 HTML：`类名 sn-ghost / sn-tertiary / sn-secondary / sn-primary` |
 | `size` | `"sm" \| "md"` | "md" | 否 | sm 用在表格行、紧凑的工具条里。 | React：`size`；Vue：`size`；Preact：`size`；标记：`类名 sn-sm`；纯 HTML：`类名 sn-sm` |
+| `caret` | `boolean` | false | 否 | 菜单按钮后面的小箭头（图标按钮一般不用；有字的菜单按钮用）。 | React：`caret`；Vue：`caret`；Preact：`caret`；纯 HTML：`data-i="chevron-down:caret"` |
 | `round` | `boolean` | false | 否 | 圆形：播放器、浮动操作。 | React：`round`；Vue：`round`；Preact：`round`；标记：`类名 sn-round`；纯 HTML：`类名 sn-round` |
 | `selected` | `boolean` | false | 否 | 选中（开关型按钮开着），底色加深；名称里写清状态（"图层（已打开）"）。 | React：`selected`；Vue：`selected`；Preact：`selected`；标记：`类名 sn-selected`；纯 HTML：`类名 sn-selected` |
 | `badge` | `number \| string \| boolean` | — | 否 | 徽标：数字是右上角的计数（中性色、等宽数字），true 是小红点；0 不显示。 | React：`badge`；Vue：`badge`；Preact：`badge`；标记：`<span class="sn-count">3</span> / <span class="sn-dot"></span>`；纯 HTML：`<span class="sn-count">3</span> / <span class="sn-dot"></span>` |

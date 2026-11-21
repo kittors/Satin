@@ -33,17 +33,32 @@ import ChipRemovable from "../demos/chip-removable.jsx";
 import ChipControlled from "../demos/chip-controlled.jsx";
 import ChipBasic from "../demos/chip-basic.jsx";
 import ChipDemo0 from "../demos/chip-0.jsx";
+import FieldOptional from "../demos/field-optional.jsx";
+import FieldError from "../demos/field-error.jsx";
+import FieldBasic from "../demos/field-basic.jsx";
 import FieldDemo0 from "../demos/field-0.jsx";
+import InputControlled from "../demos/input-controlled.jsx";
+import InputSizes from "../demos/input-sizes.jsx";
+import InputBasic from "../demos/input-basic.jsx";
 import InputDemo0 from "../demos/input-0.jsx";
 import InputDemo1 from "../demos/input-1.jsx";
 import InputDemo2 from "../demos/input-2.jsx";
 import SpecialDemo0 from "../demos/special-0.jsx";
 import CountDemo0 from "../demos/count-0.jsx";
+import TaginputHint from "../demos/taginput-hint.jsx";
+import TaginputControlled from "../demos/taginput-controlled.jsx";
+import TaginputBasic from "../demos/taginput-basic.jsx";
 import TaginputDemo0 from "../demos/taginput-0.jsx";
+import NumberRange from "../demos/number-range.jsx";
+import NumberControlled from "../demos/number-controlled.jsx";
+import NumberBasic from "../demos/number-basic.jsx";
 import NumberDemo0 from "../demos/number-0.jsx";
 import PromptDemo0 from "../demos/prompt-0.jsx";
 import SelectDemo0 from "../demos/select-0.jsx";
 import PickerDemo0 from "../demos/picker-0.jsx";
+import ChoiceControlled from "../demos/choice-controlled.jsx";
+import ChoiceRadio from "../demos/choice-radio.jsx";
+import ChoiceBasic from "../demos/choice-basic.jsx";
 import ChoiceDemo0 from "../demos/choice-0.jsx";
 import SegmentedSizes from "../demos/segmented-sizes.jsx";
 import SegmentedControlled from "../demos/segmented-controlled.jsx";
@@ -57,14 +72,35 @@ import OtpLength from "../demos/otp-length.jsx";
 import OtpComplete from "../demos/otp-complete.jsx";
 import OtpBasic from "../demos/otp-basic.jsx";
 import OtpDemo0 from "../demos/otp-0.jsx";
+import TooltipTruncate from "../demos/tooltip-truncate.jsx";
+import TooltipKbd from "../demos/tooltip-kbd.jsx";
+import TooltipBasic from "../demos/tooltip-basic.jsx";
 import TooltipDemo0 from "../demos/tooltip-0.jsx";
+import PopoverAlign from "../demos/popover-align.jsx";
+import PopoverControlled from "../demos/popover-controlled.jsx";
+import PopoverBasic from "../demos/popover-basic.jsx";
 import PopoverDemo0 from "../demos/popover-0.jsx";
 import PopconfirmDemo0 from "../demos/popconfirm-0.jsx";
+import CtxmenuSubmenu from "../demos/ctxmenu-submenu.jsx";
+import CtxmenuContext from "../demos/ctxmenu-context.jsx";
+import CtxmenuBasic from "../demos/ctxmenu-basic.jsx";
 import CtxmenuDemo0 from "../demos/ctxmenu-0.jsx";
 import DialogDemo0 from "../demos/dialog-0.jsx";
+import DrawerFooter from "../demos/drawer-footer.jsx";
+import DrawerControlled from "../demos/drawer-controlled.jsx";
+import DrawerBasic from "../demos/drawer-basic.jsx";
 import DrawerDemo0 from "../demos/drawer-0.jsx";
+import CmdkHotkey from "../demos/cmdk-hotkey.jsx";
+import CmdkEmpty from "../demos/cmdk-empty.jsx";
+import CmdkBasic from "../demos/cmdk-basic.jsx";
 import CmdkDemo0 from "../demos/cmdk-0.jsx";
+import ToastProgress from "../demos/toast-progress.jsx";
+import ToastAction from "../demos/toast-action.jsx";
+import ToastBasic from "../demos/toast-basic.jsx";
 import ToastDemo0 from "../demos/toast-0.jsx";
+import NotifyFail from "../demos/notify-fail.jsx";
+import NotifyActions from "../demos/notify-actions.jsx";
+import NotifyBasic from "../demos/notify-basic.jsx";
 import NotifyDemo0 from "../demos/notify-0.jsx";
 import BannerDemo0 from "../demos/banner-0.jsx";
 import EmptyError from "../demos/empty-error.jsx";
@@ -72,7 +108,13 @@ import EmptySearch from "../demos/empty-search.jsx";
 import EmptyBasic from "../demos/empty-basic.jsx";
 import EmptyDemo0 from "../demos/empty-0.jsx";
 import LoadingDemo0 from "../demos/loading-0.jsx";
+import ProgressControlled from "../demos/progress-controlled.jsx";
+import ProgressRing from "../demos/progress-ring.jsx";
+import ProgressBasic from "../demos/progress-basic.jsx";
 import ProgressDemo0 from "../demos/progress-0.jsx";
+import NumflowStyles from "../demos/numflow-styles.jsx";
+import NumflowCounter from "../demos/numflow-counter.jsx";
+import NumflowBasic from "../demos/numflow-basic.jsx";
 import NumflowDemo0 from "../demos/numflow-0.jsx";
 import TableDemo0 from "../demos/table-0.jsx";
 import TableDemo1 from "../demos/table-1.jsx";
@@ -83,7 +125,17 @@ import TableDemo5 from "../demos/table-5.jsx";
 import TableDemo6 from "../demos/table-6.jsx";
 import TableDemo7 from "../demos/table-7.jsx";
 import TableDemo8 from "../demos/table-8.jsx";
+import GridStates from "../demos/grid-states.jsx";
+import GridEdit from "../demos/grid-edit.jsx";
+import GridRemote from "../demos/grid-remote.jsx";
+import GridRender from "../demos/grid-render.jsx";
+import GridSelect from "../demos/grid-select.jsx";
+import GridSort from "../demos/grid-sort.jsx";
 import GridDemo0 from "../demos/grid-0.jsx";
+import CgridControlled from "../demos/cgrid-controlled.jsx";
+import CgridEvents from "../demos/cgrid-events.jsx";
+import CgridMillion from "../demos/cgrid-million.jsx";
+import CgridBasic from "../demos/cgrid-basic.jsx";
 import CgridDemo0 from "../demos/cgrid-0.jsx";
 import ListDemo0 from "../demos/list-0.jsx";
 import CardDemo0 from "../demos/card-0.jsx";
@@ -91,6 +143,9 @@ import TagsAvatar from "../demos/tags-avatar.jsx";
 import TagsBadge from "../demos/tags-badge.jsx";
 import TagsBasic from "../demos/tags-basic.jsx";
 import TagsDemo0 from "../demos/tags-0.jsx";
+import CollapseControlled from "../demos/collapse-controlled.jsx";
+import CollapseSingle from "../demos/collapse-single.jsx";
+import CollapseBasic from "../demos/collapse-basic.jsx";
 import CollapseDemo0 from "../demos/collapse-0.jsx";
 import ScrollareaDemo0 from "../demos/scrollarea-0.jsx";
 import ScrollareaDemo1 from "../demos/scrollarea-1.jsx";
@@ -108,6 +163,10 @@ import ImageDemo0 from "../demos/image-0.jsx";
 import MediaDemo0 from "../demos/media-0.jsx";
 import UploadDemo0 from "../demos/upload-0.jsx";
 import SidebarDemo0 from "../demos/sidebar-0.jsx";
+import TabsSteps from "../demos/tabs-steps.jsx";
+import TabsPager from "../demos/tabs-pager.jsx";
+import TabsControlled from "../demos/tabs-controlled.jsx";
+import TabsBasic from "../demos/tabs-basic.jsx";
 import TabsDemo0 from "../demos/tabs-0.jsx";
 import ReorderDemo0 from "../demos/reorder-0.jsx";
 import AddremoveDemo0 from "../demos/addremove-0.jsx";
@@ -126,8 +185,6 @@ import DialogGuard from "../demos/dialog-guard.jsx";
 import DialogEvents from "../demos/dialog-events.jsx";
 import DialogControlled from "../demos/dialog-controlled.jsx";
 import GridBasic from "../demos/grid-basic.jsx";
-import GridSeed from "../demos/grid-seed.jsx";
-import GridComponent from "../demos/grid-component.jsx";
 import PickerBasic from "../demos/picker-basic.jsx";
 import PickerRange from "../demos/picker-range.jsx";
 import PickerTime from "../demos/picker-time.jsx";
@@ -219,10 +276,16 @@ export default function Gallery() {
       </section>
       <section id="field">
         <h2>字段与错误</h2>
+        <div className="demo" data-demo="field-optional"><FieldOptional /></div>
+        <div className="demo" data-demo="field-error"><FieldError /></div>
+        <div className="demo" data-demo="field-basic"><FieldBasic /></div>
         <div className="demo" data-demo="field-0"><FieldDemo0 /></div>
       </section>
       <section id="input">
         <h2>输入框</h2>
+        <div className="demo" data-demo="input-controlled"><InputControlled /></div>
+        <div className="demo" data-demo="input-sizes"><InputSizes /></div>
+        <div className="demo" data-demo="input-basic"><InputBasic /></div>
         <div className="demo" data-demo="input-0"><InputDemo0 /></div>
         <div className="demo" data-demo="input-1"><InputDemo1 /></div>
         <div className="demo" data-demo="input-2"><InputDemo2 /></div>
@@ -237,10 +300,16 @@ export default function Gallery() {
       </section>
       <section id="taginput">
         <h2>标签输入</h2>
+        <div className="demo" data-demo="taginput-hint"><TaginputHint /></div>
+        <div className="demo" data-demo="taginput-controlled"><TaginputControlled /></div>
+        <div className="demo" data-demo="taginput-basic"><TaginputBasic /></div>
         <div className="demo" data-demo="taginput-0"><TaginputDemo0 /></div>
       </section>
       <section id="number">
         <h2>数字步进</h2>
+        <div className="demo" data-demo="number-range"><NumberRange /></div>
+        <div className="demo" data-demo="number-controlled"><NumberControlled /></div>
+        <div className="demo" data-demo="number-basic"><NumberBasic /></div>
         <div className="demo" data-demo="number-0"><NumberDemo0 /></div>
       </section>
       <section id="prompt">
@@ -257,6 +326,9 @@ export default function Gallery() {
       </section>
       <section id="choice">
         <h2>复选、单选、开关</h2>
+        <div className="demo" data-demo="choice-controlled"><ChoiceControlled /></div>
+        <div className="demo" data-demo="choice-radio"><ChoiceRadio /></div>
+        <div className="demo" data-demo="choice-basic"><ChoiceBasic /></div>
         <div className="demo" data-demo="choice-0"><ChoiceDemo0 /></div>
       </section>
       <section id="segmented">
@@ -282,10 +354,16 @@ export default function Gallery() {
       </section>
       <section id="tooltip">
         <h2>文字提示</h2>
+        <div className="demo" data-demo="tooltip-truncate"><TooltipTruncate /></div>
+        <div className="demo" data-demo="tooltip-kbd"><TooltipKbd /></div>
+        <div className="demo" data-demo="tooltip-basic"><TooltipBasic /></div>
         <div className="demo" data-demo="tooltip-0"><TooltipDemo0 /></div>
       </section>
       <section id="popover">
         <h2>弹出面板</h2>
+        <div className="demo" data-demo="popover-align"><PopoverAlign /></div>
+        <div className="demo" data-demo="popover-controlled"><PopoverControlled /></div>
+        <div className="demo" data-demo="popover-basic"><PopoverBasic /></div>
         <div className="demo" data-demo="popover-0"><PopoverDemo0 /></div>
       </section>
       <section id="popconfirm">
@@ -294,6 +372,9 @@ export default function Gallery() {
       </section>
       <section id="ctxmenu">
         <h2>右键菜单与子菜单</h2>
+        <div className="demo" data-demo="ctxmenu-submenu"><CtxmenuSubmenu /></div>
+        <div className="demo" data-demo="ctxmenu-context"><CtxmenuContext /></div>
+        <div className="demo" data-demo="ctxmenu-basic"><CtxmenuBasic /></div>
         <div className="demo" data-demo="ctxmenu-0"><CtxmenuDemo0 /></div>
       </section>
       <section id="dialog">
@@ -302,18 +383,30 @@ export default function Gallery() {
       </section>
       <section id="drawer">
         <h2>抽屉</h2>
+        <div className="demo" data-demo="drawer-footer"><DrawerFooter /></div>
+        <div className="demo" data-demo="drawer-controlled"><DrawerControlled /></div>
+        <div className="demo" data-demo="drawer-basic"><DrawerBasic /></div>
         <div className="demo" data-demo="drawer-0"><DrawerDemo0 /></div>
       </section>
       <section id="cmdk">
         <h2>命令面板</h2>
+        <div className="demo" data-demo="cmdk-hotkey"><CmdkHotkey /></div>
+        <div className="demo" data-demo="cmdk-empty"><CmdkEmpty /></div>
+        <div className="demo" data-demo="cmdk-basic"><CmdkBasic /></div>
         <div className="demo" data-demo="cmdk-0"><CmdkDemo0 /></div>
       </section>
       <section id="toast">
         <h2>轻提示</h2>
+        <div className="demo" data-demo="toast-progress"><ToastProgress /></div>
+        <div className="demo" data-demo="toast-action"><ToastAction /></div>
+        <div className="demo" data-demo="toast-basic"><ToastBasic /></div>
         <div className="demo" data-demo="toast-0"><ToastDemo0 /></div>
       </section>
       <section id="notify">
         <h2>通知</h2>
+        <div className="demo" data-demo="notify-fail"><NotifyFail /></div>
+        <div className="demo" data-demo="notify-actions"><NotifyActions /></div>
+        <div className="demo" data-demo="notify-basic"><NotifyBasic /></div>
         <div className="demo" data-demo="notify-0"><NotifyDemo0 /></div>
       </section>
       <section id="banner">
@@ -333,10 +426,16 @@ export default function Gallery() {
       </section>
       <section id="progress">
         <h2>进度</h2>
+        <div className="demo" data-demo="progress-controlled"><ProgressControlled /></div>
+        <div className="demo" data-demo="progress-ring"><ProgressRing /></div>
+        <div className="demo" data-demo="progress-basic"><ProgressBasic /></div>
         <div className="demo" data-demo="progress-0"><ProgressDemo0 /></div>
       </section>
       <section id="numflow">
         <h2>数字变化</h2>
+        <div className="demo" data-demo="numflow-styles"><NumflowStyles /></div>
+        <div className="demo" data-demo="numflow-counter"><NumflowCounter /></div>
+        <div className="demo" data-demo="numflow-basic"><NumflowBasic /></div>
         <div className="demo" data-demo="numflow-0"><NumflowDemo0 /></div>
       </section>
       <section id="table">
@@ -352,11 +451,21 @@ export default function Gallery() {
         <div className="demo" data-demo="table-8"><TableDemo8 /></div>
       </section>
       <section id="grid">
-        <h2>数据表格</h2>
+        <h2>数据表格 · DOM</h2>
+        <div className="demo" data-demo="grid-states"><GridStates /></div>
+        <div className="demo" data-demo="grid-edit"><GridEdit /></div>
+        <div className="demo" data-demo="grid-remote"><GridRemote /></div>
+        <div className="demo" data-demo="grid-render"><GridRender /></div>
+        <div className="demo" data-demo="grid-select"><GridSelect /></div>
+        <div className="demo" data-demo="grid-sort"><GridSort /></div>
         <div className="demo" data-demo="grid-0"><GridDemo0 /></div>
       </section>
       <section id="cgrid">
-        <h2>Canvas 表格</h2>
+        <h2>数据表格 · Canvas</h2>
+        <div className="demo" data-demo="cgrid-controlled"><CgridControlled /></div>
+        <div className="demo" data-demo="cgrid-events"><CgridEvents /></div>
+        <div className="demo" data-demo="cgrid-million"><CgridMillion /></div>
+        <div className="demo" data-demo="cgrid-basic"><CgridBasic /></div>
         <div className="demo" data-demo="cgrid-0"><CgridDemo0 /></div>
       </section>
       <section id="list">
@@ -376,6 +485,9 @@ export default function Gallery() {
       </section>
       <section id="collapse">
         <h2>折叠面板</h2>
+        <div className="demo" data-demo="collapse-controlled"><CollapseControlled /></div>
+        <div className="demo" data-demo="collapse-single"><CollapseSingle /></div>
+        <div className="demo" data-demo="collapse-basic"><CollapseBasic /></div>
         <div className="demo" data-demo="collapse-0"><CollapseDemo0 /></div>
       </section>
       <section id="scrollarea">
@@ -425,7 +537,11 @@ export default function Gallery() {
         <div className="demo" data-demo="sidebar-0"><SidebarDemo0 /></div>
       </section>
       <section id="tabs">
-        <h2>标签页、分页、步骤</h2>
+        <h2>标签页、面包屑、分页、步骤</h2>
+        <div className="demo" data-demo="tabs-steps"><TabsSteps /></div>
+        <div className="demo" data-demo="tabs-pager"><TabsPager /></div>
+        <div className="demo" data-demo="tabs-controlled"><TabsControlled /></div>
+        <div className="demo" data-demo="tabs-basic"><TabsBasic /></div>
         <div className="demo" data-demo="tabs-0"><TabsDemo0 /></div>
       </section>
       <section id="reorder">
@@ -462,8 +578,6 @@ export default function Gallery() {
       <section id="grid">
         <h2>数据表格</h2>
         <div className="demo" data-demo="grid-basic"><GridBasic /></div>
-        <div className="demo" data-demo="grid-seed"><GridSeed /></div>
-        <div className="demo" data-demo="grid-component"><GridComponent /></div>
       </section>
       <section id="picker">
         <h2>日期、时间、地址</h2>

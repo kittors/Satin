@@ -7,5 +7,5 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 })
 export class SegmentedBasicComponent {
   // 自定义元素的属性只认字符串：数组写成 JSON
-  protected items = JSON.stringify(["网格","列表"]);
+  protected items = JSON.stringify(["网格", "列表"]);
 }

@@ -65,7 +65,7 @@ React 的写法：
 import { Segmented } from "satin-ui/react";
 
 export default function ViewSwitch() {
-  return <Segmented items={["网格","列表"]} defaultValue="网格" label="视图" />;
+  return <Segmented items={["网格", "列表"]} defaultValue="网格" label="视图" />;
 }
 ```
 
@@ -77,7 +77,7 @@ import { Segmented } from "satin-ui/vue";
 </script>
 
 <template>
-  <Segmented :items='["网格","列表"]' value="网格" label="视图" />
+  <Segmented :items='["网格", "列表"]' value="网格" label="视图" />
 </template>
 ```
 
@@ -88,7 +88,7 @@ Svelte 的写法：
   import Segmented from "satin-ui/svelte/Segmented.svelte";
 </script>
 
-<Segmented items={["网格","列表"]} value="网格" label="视图" />
+<Segmented items={["网格", "列表"]} value="网格" label="视图" />
 ```
 
 Angular 的写法：
@@ -103,7 +103,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 })
 export class SegmentedBasicComponent {
   // 自定义元素的属性只认字符串：数组写成 JSON
-  protected items = JSON.stringify(["网格","列表"]);
+  protected items = JSON.stringify(["网格", "列表"]);
 }
 ```
 
@@ -111,7 +111,7 @@ Solid 的写法：
 
 ```jsx
 // 自定义元素的属性只认字符串：数组写成 JSON
-const ITEMS = JSON.stringify(["网格","列表"]);
+const ITEMS = JSON.stringify(["网格", "列表"]);
 
 export default function ViewSwitch() {
   return <sn-segmented items={ITEMS} value="网格" label="视图"></sn-segmented>;
@@ -124,7 +124,7 @@ Preact 的写法：
 import { Segmented } from "satin-ui/react";
 
 export default function ViewSwitch() {
-  return <Segmented items={["网格","列表"]} defaultValue="网格" label="视图" />;
+  return <Segmented items={["网格", "列表"]} defaultValue="网格" label="视图" />;
 }
 ```
 
@@ -158,7 +158,7 @@ React 的写法：
 import { useState } from "react";
 import { Segmented } from "satin-ui/react";
 
-const RANGES = ["7 天","30 天","全部"];
+const RANGES = ["7 天", "30 天", "全部"];
 const noteOf = (r) => (r === "全部" ? "显示全部数据" : `显示最近 ${r}的数据`);
 
 export default function RangeSwitch() {
@@ -179,7 +179,7 @@ Vue 的写法：
 import { ref, computed } from "vue";
 import { Segmented } from "satin-ui/vue";
 
-const RANGES = ["7 天","30 天","全部"];
+const RANGES = ["7 天", "30 天", "全部"];
 const range = ref("30 天");
 const note = computed(() => (range.value === "全部" ? "显示全部数据" : `显示最近 ${range.value}的数据`));
 </script>
@@ -198,7 +198,7 @@ Svelte 的写法：
 <script>
   import Segmented from "satin-ui/svelte/Segmented.svelte";
 
-  const RANGES = ["7 天","30 天","全部"];
+  const RANGES = ["7 天", "30 天", "全部"];
   let range = $state("30 天");
 </script>
 
@@ -225,7 +225,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, computed } from "@angular/co
 })
 export class SegmentedControlledComponent {
   // 自定义元素的属性只认字符串：数组写成 JSON
-  protected ranges = JSON.stringify(["7 天","30 天","全部"]);
+  protected ranges = JSON.stringify(["7 天", "30 天", "全部"]);
   protected range = signal("30 天");
   protected note = computed(() => (this.range() === "全部" ? "显示全部数据" : `显示最近 ${this.range()}的数据`));
 }
@@ -237,7 +237,7 @@ Solid 的写法：
 import { createSignal } from "solid-js";
 
 // 自定义元素的属性只认字符串：数组写成 JSON
-const RANGES = JSON.stringify(["7 天","30 天","全部"]);
+const RANGES = JSON.stringify(["7 天", "30 天", "全部"]);
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
 const on = (type, fn) => (el) => el.addEventListener(type, fn);
 
@@ -258,7 +258,7 @@ Preact 的写法：
 import { useState } from "react";
 import { Segmented } from "satin-ui/react";
 
-const RANGES = ["7 天","30 天","全部"];
+const RANGES = ["7 天", "30 天", "全部"];
 const noteOf = (r) => (r === "全部" ? "显示全部数据" : `显示最近 ${r}的数据`);
 
 export default function RangeSwitch() {
@@ -297,7 +297,7 @@ import { Button, Segmented } from "satin-ui/react";
 export default function StatusBar() {
   return (
     <div className="sn-row">
-      <Segmented items={["全部","进行中","已完成"]} defaultValue="全部" size="sm" label="状态" />
+      <Segmented items={["全部", "进行中", "已完成"]} defaultValue="全部" size="sm" label="状态" />
       <Button size="sm">导出</Button>
     </div>
   );
@@ -313,7 +313,7 @@ import { Button, Segmented } from "satin-ui/vue";
 
 <template>
   <div class="sn-row">
-    <Segmented :items='["全部","进行中","已完成"]' value="全部" size="sm" label="状态" />
+    <Segmented :items='["全部", "进行中", "已完成"]' value="全部" size="sm" label="状态" />
     <Button size="sm">导出</Button>
   </div>
 </template>
@@ -327,7 +327,7 @@ Svelte 的写法：
 </script>
 
 <div class="sn-row">
-  <Segmented items={["全部","进行中","已完成"]} value="全部" size="sm" label="状态" />
+  <Segmented items={["全部", "进行中", "已完成"]} value="全部" size="sm" label="状态" />
   <button type="button" class="sn-btn sn-secondary sn-sm">导出</button>
 </div>
 ```
@@ -348,14 +348,14 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   `,
 })
 export class SegmentedSizesComponent {
-  protected items = JSON.stringify(["全部","进行中","已完成"]);
+  protected items = JSON.stringify(["全部", "进行中", "已完成"]);
 }
 ```
 
 Solid 的写法：
 
 ```jsx
-const ITEMS = JSON.stringify(["全部","进行中","已完成"]);
+const ITEMS = JSON.stringify(["全部", "进行中", "已完成"]);
 
 export default function StatusBar() {
   return (
@@ -375,7 +375,7 @@ import { Button, Segmented } from "satin-ui/react";
 export default function StatusBar() {
   return (
     <div class="sn-row">
-      <Segmented items={["全部","进行中","已完成"]} defaultValue="全部" size="sm" label="状态" />
+      <Segmented items={["全部", "进行中", "已完成"]} defaultValue="全部" size="sm" label="状态" />
       <Button size="sm">导出</Button>
     </div>
   );

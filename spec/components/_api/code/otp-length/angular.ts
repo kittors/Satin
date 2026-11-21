@@ -5,6 +5,4 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>
   template: `<sn-otp length="4"></sn-otp>`,
 })
-export class OtpLengthComponent {
-
-}
+export class OtpLengthComponent {}

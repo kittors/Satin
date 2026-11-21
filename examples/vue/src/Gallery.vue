@@ -33,17 +33,32 @@ import ChipRemovable from "./demos/chip-removable.vue";
 import ChipControlled from "./demos/chip-controlled.vue";
 import ChipBasic from "./demos/chip-basic.vue";
 import ChipDemo0 from "./demos/chip-0.vue";
+import FieldOptional from "./demos/field-optional.vue";
+import FieldError from "./demos/field-error.vue";
+import FieldBasic from "./demos/field-basic.vue";
 import FieldDemo0 from "./demos/field-0.vue";
+import InputControlled from "./demos/input-controlled.vue";
+import InputSizes from "./demos/input-sizes.vue";
+import InputBasic from "./demos/input-basic.vue";
 import InputDemo0 from "./demos/input-0.vue";
 import InputDemo1 from "./demos/input-1.vue";
 import InputDemo2 from "./demos/input-2.vue";
 import SpecialDemo0 from "./demos/special-0.vue";
 import CountDemo0 from "./demos/count-0.vue";
+import TaginputHint from "./demos/taginput-hint.vue";
+import TaginputControlled from "./demos/taginput-controlled.vue";
+import TaginputBasic from "./demos/taginput-basic.vue";
 import TaginputDemo0 from "./demos/taginput-0.vue";
+import NumberRange from "./demos/number-range.vue";
+import NumberControlled from "./demos/number-controlled.vue";
+import NumberBasic from "./demos/number-basic.vue";
 import NumberDemo0 from "./demos/number-0.vue";
 import PromptDemo0 from "./demos/prompt-0.vue";
 import SelectDemo0 from "./demos/select-0.vue";
 import PickerDemo0 from "./demos/picker-0.vue";
+import ChoiceControlled from "./demos/choice-controlled.vue";
+import ChoiceRadio from "./demos/choice-radio.vue";
+import ChoiceBasic from "./demos/choice-basic.vue";
 import ChoiceDemo0 from "./demos/choice-0.vue";
 import SegmentedSizes from "./demos/segmented-sizes.vue";
 import SegmentedControlled from "./demos/segmented-controlled.vue";
@@ -57,14 +72,35 @@ import OtpLength from "./demos/otp-length.vue";
 import OtpComplete from "./demos/otp-complete.vue";
 import OtpBasic from "./demos/otp-basic.vue";
 import OtpDemo0 from "./demos/otp-0.vue";
+import TooltipTruncate from "./demos/tooltip-truncate.vue";
+import TooltipKbd from "./demos/tooltip-kbd.vue";
+import TooltipBasic from "./demos/tooltip-basic.vue";
 import TooltipDemo0 from "./demos/tooltip-0.vue";
+import PopoverAlign from "./demos/popover-align.vue";
+import PopoverControlled from "./demos/popover-controlled.vue";
+import PopoverBasic from "./demos/popover-basic.vue";
 import PopoverDemo0 from "./demos/popover-0.vue";
 import PopconfirmDemo0 from "./demos/popconfirm-0.vue";
+import CtxmenuSubmenu from "./demos/ctxmenu-submenu.vue";
+import CtxmenuContext from "./demos/ctxmenu-context.vue";
+import CtxmenuBasic from "./demos/ctxmenu-basic.vue";
 import CtxmenuDemo0 from "./demos/ctxmenu-0.vue";
 import DialogDemo0 from "./demos/dialog-0.vue";
+import DrawerFooter from "./demos/drawer-footer.vue";
+import DrawerControlled from "./demos/drawer-controlled.vue";
+import DrawerBasic from "./demos/drawer-basic.vue";
 import DrawerDemo0 from "./demos/drawer-0.vue";
+import CmdkHotkey from "./demos/cmdk-hotkey.vue";
+import CmdkEmpty from "./demos/cmdk-empty.vue";
+import CmdkBasic from "./demos/cmdk-basic.vue";
 import CmdkDemo0 from "./demos/cmdk-0.vue";
+import ToastProgress from "./demos/toast-progress.vue";
+import ToastAction from "./demos/toast-action.vue";
+import ToastBasic from "./demos/toast-basic.vue";
 import ToastDemo0 from "./demos/toast-0.vue";
+import NotifyFail from "./demos/notify-fail.vue";
+import NotifyActions from "./demos/notify-actions.vue";
+import NotifyBasic from "./demos/notify-basic.vue";
 import NotifyDemo0 from "./demos/notify-0.vue";
 import BannerDemo0 from "./demos/banner-0.vue";
 import EmptyError from "./demos/empty-error.vue";
@@ -72,7 +108,13 @@ import EmptySearch from "./demos/empty-search.vue";
 import EmptyBasic from "./demos/empty-basic.vue";
 import EmptyDemo0 from "./demos/empty-0.vue";
 import LoadingDemo0 from "./demos/loading-0.vue";
+import ProgressControlled from "./demos/progress-controlled.vue";
+import ProgressRing from "./demos/progress-ring.vue";
+import ProgressBasic from "./demos/progress-basic.vue";
 import ProgressDemo0 from "./demos/progress-0.vue";
+import NumflowStyles from "./demos/numflow-styles.vue";
+import NumflowCounter from "./demos/numflow-counter.vue";
+import NumflowBasic from "./demos/numflow-basic.vue";
 import NumflowDemo0 from "./demos/numflow-0.vue";
 import TableDemo0 from "./demos/table-0.vue";
 import TableDemo1 from "./demos/table-1.vue";
@@ -83,7 +125,17 @@ import TableDemo5 from "./demos/table-5.vue";
 import TableDemo6 from "./demos/table-6.vue";
 import TableDemo7 from "./demos/table-7.vue";
 import TableDemo8 from "./demos/table-8.vue";
+import GridStates from "./demos/grid-states.vue";
+import GridEdit from "./demos/grid-edit.vue";
+import GridRemote from "./demos/grid-remote.vue";
+import GridRender from "./demos/grid-render.vue";
+import GridSelect from "./demos/grid-select.vue";
+import GridSort from "./demos/grid-sort.vue";
 import GridDemo0 from "./demos/grid-0.vue";
+import CgridControlled from "./demos/cgrid-controlled.vue";
+import CgridEvents from "./demos/cgrid-events.vue";
+import CgridMillion from "./demos/cgrid-million.vue";
+import CgridBasic from "./demos/cgrid-basic.vue";
 import CgridDemo0 from "./demos/cgrid-0.vue";
 import ListDemo0 from "./demos/list-0.vue";
 import CardDemo0 from "./demos/card-0.vue";
@@ -91,6 +143,9 @@ import TagsAvatar from "./demos/tags-avatar.vue";
 import TagsBadge from "./demos/tags-badge.vue";
 import TagsBasic from "./demos/tags-basic.vue";
 import TagsDemo0 from "./demos/tags-0.vue";
+import CollapseControlled from "./demos/collapse-controlled.vue";
+import CollapseSingle from "./demos/collapse-single.vue";
+import CollapseBasic from "./demos/collapse-basic.vue";
 import CollapseDemo0 from "./demos/collapse-0.vue";
 import ScrollareaDemo0 from "./demos/scrollarea-0.vue";
 import ScrollareaDemo1 from "./demos/scrollarea-1.vue";
@@ -108,6 +163,10 @@ import ImageDemo0 from "./demos/image-0.vue";
 import MediaDemo0 from "./demos/media-0.vue";
 import UploadDemo0 from "./demos/upload-0.vue";
 import SidebarDemo0 from "./demos/sidebar-0.vue";
+import TabsSteps from "./demos/tabs-steps.vue";
+import TabsPager from "./demos/tabs-pager.vue";
+import TabsControlled from "./demos/tabs-controlled.vue";
+import TabsBasic from "./demos/tabs-basic.vue";
 import TabsDemo0 from "./demos/tabs-0.vue";
 import ReorderDemo0 from "./demos/reorder-0.vue";
 import AddremoveDemo0 from "./demos/addremove-0.vue";
@@ -126,8 +185,6 @@ import DialogGuard from "./demos/dialog-guard.vue";
 import DialogEvents from "./demos/dialog-events.vue";
 import DialogControlled from "./demos/dialog-controlled.vue";
 import GridBasic from "./demos/grid-basic.vue";
-import GridSeed from "./demos/grid-seed.vue";
-import GridComponent from "./demos/grid-component.vue";
 import PickerBasic from "./demos/picker-basic.vue";
 import PickerRange from "./demos/picker-range.vue";
 import PickerTime from "./demos/picker-time.vue";
@@ -219,10 +276,16 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="field">
     <h2>字段与错误</h2>
+    <div class="demo" data-demo="field-optional"><FieldOptional /></div>
+    <div class="demo" data-demo="field-error"><FieldError /></div>
+    <div class="demo" data-demo="field-basic"><FieldBasic /></div>
     <div class="demo" data-demo="field-0"><FieldDemo0 /></div>
   </section>
   <section id="input">
     <h2>输入框</h2>
+    <div class="demo" data-demo="input-controlled"><InputControlled /></div>
+    <div class="demo" data-demo="input-sizes"><InputSizes /></div>
+    <div class="demo" data-demo="input-basic"><InputBasic /></div>
     <div class="demo" data-demo="input-0"><InputDemo0 /></div>
     <div class="demo" data-demo="input-1"><InputDemo1 /></div>
     <div class="demo" data-demo="input-2"><InputDemo2 /></div>
@@ -237,10 +300,16 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="taginput">
     <h2>标签输入</h2>
+    <div class="demo" data-demo="taginput-hint"><TaginputHint /></div>
+    <div class="demo" data-demo="taginput-controlled"><TaginputControlled /></div>
+    <div class="demo" data-demo="taginput-basic"><TaginputBasic /></div>
     <div class="demo" data-demo="taginput-0"><TaginputDemo0 /></div>
   </section>
   <section id="number">
     <h2>数字步进</h2>
+    <div class="demo" data-demo="number-range"><NumberRange /></div>
+    <div class="demo" data-demo="number-controlled"><NumberControlled /></div>
+    <div class="demo" data-demo="number-basic"><NumberBasic /></div>
     <div class="demo" data-demo="number-0"><NumberDemo0 /></div>
   </section>
   <section id="prompt">
@@ -257,6 +326,9 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="choice">
     <h2>复选、单选、开关</h2>
+    <div class="demo" data-demo="choice-controlled"><ChoiceControlled /></div>
+    <div class="demo" data-demo="choice-radio"><ChoiceRadio /></div>
+    <div class="demo" data-demo="choice-basic"><ChoiceBasic /></div>
     <div class="demo" data-demo="choice-0"><ChoiceDemo0 /></div>
   </section>
   <section id="segmented">
@@ -282,10 +354,16 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="tooltip">
     <h2>文字提示</h2>
+    <div class="demo" data-demo="tooltip-truncate"><TooltipTruncate /></div>
+    <div class="demo" data-demo="tooltip-kbd"><TooltipKbd /></div>
+    <div class="demo" data-demo="tooltip-basic"><TooltipBasic /></div>
     <div class="demo" data-demo="tooltip-0"><TooltipDemo0 /></div>
   </section>
   <section id="popover">
     <h2>弹出面板</h2>
+    <div class="demo" data-demo="popover-align"><PopoverAlign /></div>
+    <div class="demo" data-demo="popover-controlled"><PopoverControlled /></div>
+    <div class="demo" data-demo="popover-basic"><PopoverBasic /></div>
     <div class="demo" data-demo="popover-0"><PopoverDemo0 /></div>
   </section>
   <section id="popconfirm">
@@ -294,6 +372,9 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="ctxmenu">
     <h2>右键菜单与子菜单</h2>
+    <div class="demo" data-demo="ctxmenu-submenu"><CtxmenuSubmenu /></div>
+    <div class="demo" data-demo="ctxmenu-context"><CtxmenuContext /></div>
+    <div class="demo" data-demo="ctxmenu-basic"><CtxmenuBasic /></div>
     <div class="demo" data-demo="ctxmenu-0"><CtxmenuDemo0 /></div>
   </section>
   <section id="dialog">
@@ -302,18 +383,30 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="drawer">
     <h2>抽屉</h2>
+    <div class="demo" data-demo="drawer-footer"><DrawerFooter /></div>
+    <div class="demo" data-demo="drawer-controlled"><DrawerControlled /></div>
+    <div class="demo" data-demo="drawer-basic"><DrawerBasic /></div>
     <div class="demo" data-demo="drawer-0"><DrawerDemo0 /></div>
   </section>
   <section id="cmdk">
     <h2>命令面板</h2>
+    <div class="demo" data-demo="cmdk-hotkey"><CmdkHotkey /></div>
+    <div class="demo" data-demo="cmdk-empty"><CmdkEmpty /></div>
+    <div class="demo" data-demo="cmdk-basic"><CmdkBasic /></div>
     <div class="demo" data-demo="cmdk-0"><CmdkDemo0 /></div>
   </section>
   <section id="toast">
     <h2>轻提示</h2>
+    <div class="demo" data-demo="toast-progress"><ToastProgress /></div>
+    <div class="demo" data-demo="toast-action"><ToastAction /></div>
+    <div class="demo" data-demo="toast-basic"><ToastBasic /></div>
     <div class="demo" data-demo="toast-0"><ToastDemo0 /></div>
   </section>
   <section id="notify">
     <h2>通知</h2>
+    <div class="demo" data-demo="notify-fail"><NotifyFail /></div>
+    <div class="demo" data-demo="notify-actions"><NotifyActions /></div>
+    <div class="demo" data-demo="notify-basic"><NotifyBasic /></div>
     <div class="demo" data-demo="notify-0"><NotifyDemo0 /></div>
   </section>
   <section id="banner">
@@ -333,10 +426,16 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="progress">
     <h2>进度</h2>
+    <div class="demo" data-demo="progress-controlled"><ProgressControlled /></div>
+    <div class="demo" data-demo="progress-ring"><ProgressRing /></div>
+    <div class="demo" data-demo="progress-basic"><ProgressBasic /></div>
     <div class="demo" data-demo="progress-0"><ProgressDemo0 /></div>
   </section>
   <section id="numflow">
     <h2>数字变化</h2>
+    <div class="demo" data-demo="numflow-styles"><NumflowStyles /></div>
+    <div class="demo" data-demo="numflow-counter"><NumflowCounter /></div>
+    <div class="demo" data-demo="numflow-basic"><NumflowBasic /></div>
     <div class="demo" data-demo="numflow-0"><NumflowDemo0 /></div>
   </section>
   <section id="table">
@@ -352,11 +451,21 @@ import SelectMenu from "./demos/select-menu.vue";
     <div class="demo" data-demo="table-8"><TableDemo8 /></div>
   </section>
   <section id="grid">
-    <h2>数据表格</h2>
+    <h2>数据表格 · DOM</h2>
+    <div class="demo" data-demo="grid-states"><GridStates /></div>
+    <div class="demo" data-demo="grid-edit"><GridEdit /></div>
+    <div class="demo" data-demo="grid-remote"><GridRemote /></div>
+    <div class="demo" data-demo="grid-render"><GridRender /></div>
+    <div class="demo" data-demo="grid-select"><GridSelect /></div>
+    <div class="demo" data-demo="grid-sort"><GridSort /></div>
     <div class="demo" data-demo="grid-0"><GridDemo0 /></div>
   </section>
   <section id="cgrid">
-    <h2>Canvas 表格</h2>
+    <h2>数据表格 · Canvas</h2>
+    <div class="demo" data-demo="cgrid-controlled"><CgridControlled /></div>
+    <div class="demo" data-demo="cgrid-events"><CgridEvents /></div>
+    <div class="demo" data-demo="cgrid-million"><CgridMillion /></div>
+    <div class="demo" data-demo="cgrid-basic"><CgridBasic /></div>
     <div class="demo" data-demo="cgrid-0"><CgridDemo0 /></div>
   </section>
   <section id="list">
@@ -376,6 +485,9 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="collapse">
     <h2>折叠面板</h2>
+    <div class="demo" data-demo="collapse-controlled"><CollapseControlled /></div>
+    <div class="demo" data-demo="collapse-single"><CollapseSingle /></div>
+    <div class="demo" data-demo="collapse-basic"><CollapseBasic /></div>
     <div class="demo" data-demo="collapse-0"><CollapseDemo0 /></div>
   </section>
   <section id="scrollarea">
@@ -425,7 +537,11 @@ import SelectMenu from "./demos/select-menu.vue";
     <div class="demo" data-demo="sidebar-0"><SidebarDemo0 /></div>
   </section>
   <section id="tabs">
-    <h2>标签页、分页、步骤</h2>
+    <h2>标签页、面包屑、分页、步骤</h2>
+    <div class="demo" data-demo="tabs-steps"><TabsSteps /></div>
+    <div class="demo" data-demo="tabs-pager"><TabsPager /></div>
+    <div class="demo" data-demo="tabs-controlled"><TabsControlled /></div>
+    <div class="demo" data-demo="tabs-basic"><TabsBasic /></div>
     <div class="demo" data-demo="tabs-0"><TabsDemo0 /></div>
   </section>
   <section id="reorder">
@@ -462,8 +578,6 @@ import SelectMenu from "./demos/select-menu.vue";
   <section id="grid">
     <h2>数据表格</h2>
     <div class="demo" data-demo="grid-basic"><GridBasic /></div>
-    <div class="demo" data-demo="grid-seed"><GridSeed /></div>
-    <div class="demo" data-demo="grid-component"><GridComponent /></div>
   </section>
   <section id="picker">
     <h2>日期、时间、地址</h2>

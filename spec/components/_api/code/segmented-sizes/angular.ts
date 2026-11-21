@@ -11,5 +11,5 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   `,
 })
 export class SegmentedSizesComponent {
-  protected items = JSON.stringify(["全部","进行中","已完成"]);
+  protected items = JSON.stringify(["全部", "进行中", "已完成"]);
 }

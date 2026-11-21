@@ -8,7 +8,7 @@ export default function OpacitySlider() {
   return (
     <div class="sn-stack sn-gap-8">
       <sn-slider max="100" label="不透明度" value={value()} ref={on("sn-change", (e) => setValue(e.detail))}></sn-slider>
-      <span class="sn-help">{`不透明度 ${value()}%`}</span>
+      <span class="sn-help">不透明度 {value()}%</span>
     </div>
   );
 }

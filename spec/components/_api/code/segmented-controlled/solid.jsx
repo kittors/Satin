@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 
 // 自定义元素的属性只认字符串：数组写成 JSON
-const RANGES = JSON.stringify(["7 天","30 天","全部"]);
+const RANGES = JSON.stringify(["7 天", "30 天", "全部"]);
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
 const on = (type, fn) => (el) => el.addEventListener(type, fn);
 

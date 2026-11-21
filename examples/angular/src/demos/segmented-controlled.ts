@@ -12,7 +12,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, computed } from "@angular/co
 })
 export class SegmentedControlledComponent {
   // 自定义元素的属性只认字符串：数组写成 JSON
-  protected ranges = JSON.stringify(["7 天","30 天","全部"]);
+  protected ranges = JSON.stringify(["7 天", "30 天", "全部"]);
   protected range = signal("30 天");
   protected note = computed(() => (this.range() === "全部" ? "显示全部数据" : `显示最近 ${this.range()}的数据`));
 }

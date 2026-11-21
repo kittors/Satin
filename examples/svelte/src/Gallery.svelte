@@ -33,17 +33,32 @@
   import ChipControlled from "./demos/chip-controlled.svelte";
   import ChipBasic from "./demos/chip-basic.svelte";
   import ChipDemo0 from "./demos/chip-0.svelte";
+  import FieldOptional from "./demos/field-optional.svelte";
+  import FieldError from "./demos/field-error.svelte";
+  import FieldBasic from "./demos/field-basic.svelte";
   import FieldDemo0 from "./demos/field-0.svelte";
+  import InputControlled from "./demos/input-controlled.svelte";
+  import InputSizes from "./demos/input-sizes.svelte";
+  import InputBasic from "./demos/input-basic.svelte";
   import InputDemo0 from "./demos/input-0.svelte";
   import InputDemo1 from "./demos/input-1.svelte";
   import InputDemo2 from "./demos/input-2.svelte";
   import SpecialDemo0 from "./demos/special-0.svelte";
   import CountDemo0 from "./demos/count-0.svelte";
+  import TaginputHint from "./demos/taginput-hint.svelte";
+  import TaginputControlled from "./demos/taginput-controlled.svelte";
+  import TaginputBasic from "./demos/taginput-basic.svelte";
   import TaginputDemo0 from "./demos/taginput-0.svelte";
+  import NumberRange from "./demos/number-range.svelte";
+  import NumberControlled from "./demos/number-controlled.svelte";
+  import NumberBasic from "./demos/number-basic.svelte";
   import NumberDemo0 from "./demos/number-0.svelte";
   import PromptDemo0 from "./demos/prompt-0.svelte";
   import SelectDemo0 from "./demos/select-0.svelte";
   import PickerDemo0 from "./demos/picker-0.svelte";
+  import ChoiceControlled from "./demos/choice-controlled.svelte";
+  import ChoiceRadio from "./demos/choice-radio.svelte";
+  import ChoiceBasic from "./demos/choice-basic.svelte";
   import ChoiceDemo0 from "./demos/choice-0.svelte";
   import SegmentedSizes from "./demos/segmented-sizes.svelte";
   import SegmentedControlled from "./demos/segmented-controlled.svelte";
@@ -57,14 +72,35 @@
   import OtpComplete from "./demos/otp-complete.svelte";
   import OtpBasic from "./demos/otp-basic.svelte";
   import OtpDemo0 from "./demos/otp-0.svelte";
+  import TooltipTruncate from "./demos/tooltip-truncate.svelte";
+  import TooltipKbd from "./demos/tooltip-kbd.svelte";
+  import TooltipBasic from "./demos/tooltip-basic.svelte";
   import TooltipDemo0 from "./demos/tooltip-0.svelte";
+  import PopoverAlign from "./demos/popover-align.svelte";
+  import PopoverControlled from "./demos/popover-controlled.svelte";
+  import PopoverBasic from "./demos/popover-basic.svelte";
   import PopoverDemo0 from "./demos/popover-0.svelte";
   import PopconfirmDemo0 from "./demos/popconfirm-0.svelte";
+  import CtxmenuSubmenu from "./demos/ctxmenu-submenu.svelte";
+  import CtxmenuContext from "./demos/ctxmenu-context.svelte";
+  import CtxmenuBasic from "./demos/ctxmenu-basic.svelte";
   import CtxmenuDemo0 from "./demos/ctxmenu-0.svelte";
   import DialogDemo0 from "./demos/dialog-0.svelte";
+  import DrawerFooter from "./demos/drawer-footer.svelte";
+  import DrawerControlled from "./demos/drawer-controlled.svelte";
+  import DrawerBasic from "./demos/drawer-basic.svelte";
   import DrawerDemo0 from "./demos/drawer-0.svelte";
+  import CmdkHotkey from "./demos/cmdk-hotkey.svelte";
+  import CmdkEmpty from "./demos/cmdk-empty.svelte";
+  import CmdkBasic from "./demos/cmdk-basic.svelte";
   import CmdkDemo0 from "./demos/cmdk-0.svelte";
+  import ToastProgress from "./demos/toast-progress.svelte";
+  import ToastAction from "./demos/toast-action.svelte";
+  import ToastBasic from "./demos/toast-basic.svelte";
   import ToastDemo0 from "./demos/toast-0.svelte";
+  import NotifyFail from "./demos/notify-fail.svelte";
+  import NotifyActions from "./demos/notify-actions.svelte";
+  import NotifyBasic from "./demos/notify-basic.svelte";
   import NotifyDemo0 from "./demos/notify-0.svelte";
   import BannerDemo0 from "./demos/banner-0.svelte";
   import EmptyError from "./demos/empty-error.svelte";
@@ -72,7 +108,13 @@
   import EmptyBasic from "./demos/empty-basic.svelte";
   import EmptyDemo0 from "./demos/empty-0.svelte";
   import LoadingDemo0 from "./demos/loading-0.svelte";
+  import ProgressControlled from "./demos/progress-controlled.svelte";
+  import ProgressRing from "./demos/progress-ring.svelte";
+  import ProgressBasic from "./demos/progress-basic.svelte";
   import ProgressDemo0 from "./demos/progress-0.svelte";
+  import NumflowStyles from "./demos/numflow-styles.svelte";
+  import NumflowCounter from "./demos/numflow-counter.svelte";
+  import NumflowBasic from "./demos/numflow-basic.svelte";
   import NumflowDemo0 from "./demos/numflow-0.svelte";
   import TableDemo0 from "./demos/table-0.svelte";
   import TableDemo1 from "./demos/table-1.svelte";
@@ -83,7 +125,17 @@
   import TableDemo6 from "./demos/table-6.svelte";
   import TableDemo7 from "./demos/table-7.svelte";
   import TableDemo8 from "./demos/table-8.svelte";
+  import GridStates from "./demos/grid-states.svelte";
+  import GridEdit from "./demos/grid-edit.svelte";
+  import GridRemote from "./demos/grid-remote.svelte";
+  import GridRender from "./demos/grid-render.svelte";
+  import GridSelect from "./demos/grid-select.svelte";
+  import GridSort from "./demos/grid-sort.svelte";
   import GridDemo0 from "./demos/grid-0.svelte";
+  import CgridControlled from "./demos/cgrid-controlled.svelte";
+  import CgridEvents from "./demos/cgrid-events.svelte";
+  import CgridMillion from "./demos/cgrid-million.svelte";
+  import CgridBasic from "./demos/cgrid-basic.svelte";
   import CgridDemo0 from "./demos/cgrid-0.svelte";
   import ListDemo0 from "./demos/list-0.svelte";
   import CardDemo0 from "./demos/card-0.svelte";
@@ -91,6 +143,9 @@
   import TagsBadge from "./demos/tags-badge.svelte";
   import TagsBasic from "./demos/tags-basic.svelte";
   import TagsDemo0 from "./demos/tags-0.svelte";
+  import CollapseControlled from "./demos/collapse-controlled.svelte";
+  import CollapseSingle from "./demos/collapse-single.svelte";
+  import CollapseBasic from "./demos/collapse-basic.svelte";
   import CollapseDemo0 from "./demos/collapse-0.svelte";
   import ScrollareaDemo0 from "./demos/scrollarea-0.svelte";
   import ScrollareaDemo1 from "./demos/scrollarea-1.svelte";
@@ -108,6 +163,10 @@
   import MediaDemo0 from "./demos/media-0.svelte";
   import UploadDemo0 from "./demos/upload-0.svelte";
   import SidebarDemo0 from "./demos/sidebar-0.svelte";
+  import TabsSteps from "./demos/tabs-steps.svelte";
+  import TabsPager from "./demos/tabs-pager.svelte";
+  import TabsControlled from "./demos/tabs-controlled.svelte";
+  import TabsBasic from "./demos/tabs-basic.svelte";
   import TabsDemo0 from "./demos/tabs-0.svelte";
   import ReorderDemo0 from "./demos/reorder-0.svelte";
   import AddremoveDemo0 from "./demos/addremove-0.svelte";
@@ -126,8 +185,6 @@
   import DialogEvents from "./demos/dialog-events.svelte";
   import DialogControlled from "./demos/dialog-controlled.svelte";
   import GridBasic from "./demos/grid-basic.svelte";
-  import GridSeed from "./demos/grid-seed.svelte";
-  import GridComponent from "./demos/grid-component.svelte";
   import PickerBasic from "./demos/picker-basic.svelte";
   import PickerRange from "./demos/picker-range.svelte";
   import PickerTime from "./demos/picker-time.svelte";
@@ -218,10 +275,16 @@
   </section>
   <section id="field">
     <h2>字段与错误</h2>
+    <div class="demo" data-demo="field-optional"><FieldOptional /></div>
+    <div class="demo" data-demo="field-error"><FieldError /></div>
+    <div class="demo" data-demo="field-basic"><FieldBasic /></div>
     <div class="demo" data-demo="field-0"><FieldDemo0 /></div>
   </section>
   <section id="input">
     <h2>输入框</h2>
+    <div class="demo" data-demo="input-controlled"><InputControlled /></div>
+    <div class="demo" data-demo="input-sizes"><InputSizes /></div>
+    <div class="demo" data-demo="input-basic"><InputBasic /></div>
     <div class="demo" data-demo="input-0"><InputDemo0 /></div>
     <div class="demo" data-demo="input-1"><InputDemo1 /></div>
     <div class="demo" data-demo="input-2"><InputDemo2 /></div>
@@ -236,10 +299,16 @@
   </section>
   <section id="taginput">
     <h2>标签输入</h2>
+    <div class="demo" data-demo="taginput-hint"><TaginputHint /></div>
+    <div class="demo" data-demo="taginput-controlled"><TaginputControlled /></div>
+    <div class="demo" data-demo="taginput-basic"><TaginputBasic /></div>
     <div class="demo" data-demo="taginput-0"><TaginputDemo0 /></div>
   </section>
   <section id="number">
     <h2>数字步进</h2>
+    <div class="demo" data-demo="number-range"><NumberRange /></div>
+    <div class="demo" data-demo="number-controlled"><NumberControlled /></div>
+    <div class="demo" data-demo="number-basic"><NumberBasic /></div>
     <div class="demo" data-demo="number-0"><NumberDemo0 /></div>
   </section>
   <section id="prompt">
@@ -256,6 +325,9 @@
   </section>
   <section id="choice">
     <h2>复选、单选、开关</h2>
+    <div class="demo" data-demo="choice-controlled"><ChoiceControlled /></div>
+    <div class="demo" data-demo="choice-radio"><ChoiceRadio /></div>
+    <div class="demo" data-demo="choice-basic"><ChoiceBasic /></div>
     <div class="demo" data-demo="choice-0"><ChoiceDemo0 /></div>
   </section>
   <section id="segmented">
@@ -281,10 +353,16 @@
   </section>
   <section id="tooltip">
     <h2>文字提示</h2>
+    <div class="demo" data-demo="tooltip-truncate"><TooltipTruncate /></div>
+    <div class="demo" data-demo="tooltip-kbd"><TooltipKbd /></div>
+    <div class="demo" data-demo="tooltip-basic"><TooltipBasic /></div>
     <div class="demo" data-demo="tooltip-0"><TooltipDemo0 /></div>
   </section>
   <section id="popover">
     <h2>弹出面板</h2>
+    <div class="demo" data-demo="popover-align"><PopoverAlign /></div>
+    <div class="demo" data-demo="popover-controlled"><PopoverControlled /></div>
+    <div class="demo" data-demo="popover-basic"><PopoverBasic /></div>
     <div class="demo" data-demo="popover-0"><PopoverDemo0 /></div>
   </section>
   <section id="popconfirm">
@@ -293,6 +371,9 @@
   </section>
   <section id="ctxmenu">
     <h2>右键菜单与子菜单</h2>
+    <div class="demo" data-demo="ctxmenu-submenu"><CtxmenuSubmenu /></div>
+    <div class="demo" data-demo="ctxmenu-context"><CtxmenuContext /></div>
+    <div class="demo" data-demo="ctxmenu-basic"><CtxmenuBasic /></div>
     <div class="demo" data-demo="ctxmenu-0"><CtxmenuDemo0 /></div>
   </section>
   <section id="dialog">
@@ -301,18 +382,30 @@
   </section>
   <section id="drawer">
     <h2>抽屉</h2>
+    <div class="demo" data-demo="drawer-footer"><DrawerFooter /></div>
+    <div class="demo" data-demo="drawer-controlled"><DrawerControlled /></div>
+    <div class="demo" data-demo="drawer-basic"><DrawerBasic /></div>
     <div class="demo" data-demo="drawer-0"><DrawerDemo0 /></div>
   </section>
   <section id="cmdk">
     <h2>命令面板</h2>
+    <div class="demo" data-demo="cmdk-hotkey"><CmdkHotkey /></div>
+    <div class="demo" data-demo="cmdk-empty"><CmdkEmpty /></div>
+    <div class="demo" data-demo="cmdk-basic"><CmdkBasic /></div>
     <div class="demo" data-demo="cmdk-0"><CmdkDemo0 /></div>
   </section>
   <section id="toast">
     <h2>轻提示</h2>
+    <div class="demo" data-demo="toast-progress"><ToastProgress /></div>
+    <div class="demo" data-demo="toast-action"><ToastAction /></div>
+    <div class="demo" data-demo="toast-basic"><ToastBasic /></div>
     <div class="demo" data-demo="toast-0"><ToastDemo0 /></div>
   </section>
   <section id="notify">
     <h2>通知</h2>
+    <div class="demo" data-demo="notify-fail"><NotifyFail /></div>
+    <div class="demo" data-demo="notify-actions"><NotifyActions /></div>
+    <div class="demo" data-demo="notify-basic"><NotifyBasic /></div>
     <div class="demo" data-demo="notify-0"><NotifyDemo0 /></div>
   </section>
   <section id="banner">
@@ -332,10 +425,16 @@
   </section>
   <section id="progress">
     <h2>进度</h2>
+    <div class="demo" data-demo="progress-controlled"><ProgressControlled /></div>
+    <div class="demo" data-demo="progress-ring"><ProgressRing /></div>
+    <div class="demo" data-demo="progress-basic"><ProgressBasic /></div>
     <div class="demo" data-demo="progress-0"><ProgressDemo0 /></div>
   </section>
   <section id="numflow">
     <h2>数字变化</h2>
+    <div class="demo" data-demo="numflow-styles"><NumflowStyles /></div>
+    <div class="demo" data-demo="numflow-counter"><NumflowCounter /></div>
+    <div class="demo" data-demo="numflow-basic"><NumflowBasic /></div>
     <div class="demo" data-demo="numflow-0"><NumflowDemo0 /></div>
   </section>
   <section id="table">
@@ -351,11 +450,21 @@
     <div class="demo" data-demo="table-8"><TableDemo8 /></div>
   </section>
   <section id="grid">
-    <h2>数据表格</h2>
+    <h2>数据表格 · DOM</h2>
+    <div class="demo" data-demo="grid-states"><GridStates /></div>
+    <div class="demo" data-demo="grid-edit"><GridEdit /></div>
+    <div class="demo" data-demo="grid-remote"><GridRemote /></div>
+    <div class="demo" data-demo="grid-render"><GridRender /></div>
+    <div class="demo" data-demo="grid-select"><GridSelect /></div>
+    <div class="demo" data-demo="grid-sort"><GridSort /></div>
     <div class="demo" data-demo="grid-0"><GridDemo0 /></div>
   </section>
   <section id="cgrid">
-    <h2>Canvas 表格</h2>
+    <h2>数据表格 · Canvas</h2>
+    <div class="demo" data-demo="cgrid-controlled"><CgridControlled /></div>
+    <div class="demo" data-demo="cgrid-events"><CgridEvents /></div>
+    <div class="demo" data-demo="cgrid-million"><CgridMillion /></div>
+    <div class="demo" data-demo="cgrid-basic"><CgridBasic /></div>
     <div class="demo" data-demo="cgrid-0"><CgridDemo0 /></div>
   </section>
   <section id="list">
@@ -375,6 +484,9 @@
   </section>
   <section id="collapse">
     <h2>折叠面板</h2>
+    <div class="demo" data-demo="collapse-controlled"><CollapseControlled /></div>
+    <div class="demo" data-demo="collapse-single"><CollapseSingle /></div>
+    <div class="demo" data-demo="collapse-basic"><CollapseBasic /></div>
     <div class="demo" data-demo="collapse-0"><CollapseDemo0 /></div>
   </section>
   <section id="scrollarea">
@@ -424,7 +536,11 @@
     <div class="demo" data-demo="sidebar-0"><SidebarDemo0 /></div>
   </section>
   <section id="tabs">
-    <h2>标签页、分页、步骤</h2>
+    <h2>标签页、面包屑、分页、步骤</h2>
+    <div class="demo" data-demo="tabs-steps"><TabsSteps /></div>
+    <div class="demo" data-demo="tabs-pager"><TabsPager /></div>
+    <div class="demo" data-demo="tabs-controlled"><TabsControlled /></div>
+    <div class="demo" data-demo="tabs-basic"><TabsBasic /></div>
     <div class="demo" data-demo="tabs-0"><TabsDemo0 /></div>
   </section>
   <section id="reorder">
@@ -461,8 +577,6 @@
   <section id="grid">
     <h2>数据表格</h2>
     <div class="demo" data-demo="grid-basic"><GridBasic /></div>
-    <div class="demo" data-demo="grid-seed"><GridSeed /></div>
-    <div class="demo" data-demo="grid-component"><GridComponent /></div>
   </section>
   <section id="picker">
     <h2>日期、时间、地址</h2>

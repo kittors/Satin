@@ -51,6 +51,8 @@ export default {
     { name: "size", type: '"sm" | "md"', default: '"md"', required: false,
       desc: "sm 用在表格行、紧凑的工具条里。",
       names: { react: "size", vue: "size", preact: "size", markup: "类名 sn-sm", html: "类名 sn-sm" } },
+    { name: "caret", type: "boolean", default: "false", required: false,
+      desc: "菜单按钮后面的小箭头（图标按钮一般不用；有字的菜单按钮用）。", names: { react: "caret", vue: "caret", preact: "caret", html: "data-i=\"chevron-down:caret\"" } },
     { name: "round", type: "boolean", default: "false", required: false,
       desc: "圆形：播放器、浮动操作。", names: { react: "round", vue: "round", preact: "round", markup: "类名 sn-round", html: "类名 sn-round" } },
     { name: "selected", type: "boolean", default: "false", required: false,
