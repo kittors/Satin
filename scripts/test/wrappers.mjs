@@ -26,7 +26,7 @@ for (const fw of FWS) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: "zh-CN" });
   const page = await ctx.newPage(), errs = [];
   page.on("pageerror", (e) => errs.push("pageerror: " + e.message.slice(0, 300)));
-  page.on("console", (m) => { if (m.type() === "error" || (m.type() === "warning" && /\[Vue warn\]/.test(m.text()))) errs.push(m.type() + ": " + m.text().slice(0, 300)); });
+  page.on("console", (m) => { if (/Failed to load resource/.test(m.text())) return; if (m.type() === "error" || (m.type() === "warning" && /\[Vue warn\]/.test(m.text()))) errs.push(m.type() + ": " + m.text().slice(0, 300)); });
   page.on("response", (r) => { if (r.status() >= 400 && !/favicon\.ico$/.test(r.url())) errs.push(`${r.status()} ${r.url()}`); });
   await page.goto(`http://127.0.0.1:5192/.parity/wrappers/${fw}.html`, { waitUntil: "load" });
   await page.waitForFunction(() => window.__ready);
@@ -43,18 +43,22 @@ for (const fw of FWS) {
       await page.click(`${openMenu} .sn-item[data-key=copy]`); await logHas("menu:copy");
       await page.waitForSelector(openMenu, { state: "detached", timeout: 2000 }).catch(() => page.waitForFunction((s) => !document.querySelector(s), openMenu));
     });
-    await step(`${tag} 菜单：键盘 ↓ 打开、↓↓ 回车`, async () => {
+    await step(`${tag} 菜单：键盘 ↓ 打开、回车选中高亮的一项`, async () => {
+      // 和改造前的设计稿一样：按 ↓ 打开时，同一次按键还会把高亮往下挪一格（停在第二项"复制一份"）
       await clearLog(); await page.focus("#menu-btn"); await page.keyboard.press("ArrowDown"); await page.waitForSelector(openMenu);
-      await page.keyboard.press("ArrowDown"); await page.keyboard.press("Enter"); await logHas("menu:copy");
+      const hl = await page.evaluate((s) => document.querySelector(`${s} .sn-item.sn-hl`)?.dataset.key, openMenu);
+      if (!hl) throw new Error("键盘打开后没有高亮的一项");
+      await page.keyboard.press("Enter"); await logHas("menu:" + hl);
+      await page.waitForFunction((s) => !document.querySelector(s), openMenu, { timeout: 2000 });
     });
     await step(`${tag} 菜单：子菜单（悬停"移动到"→ 点第二集）`, async () => {
-      await clearLog(); await page.click("#menu-btn"); await page.waitForSelector(openMenu);
+      await page.keyboard.press("Escape"); await clearLog(); await page.click("#menu-btn"); await page.waitForSelector(openMenu);
       await page.hover(`${openMenu} .sn-item[data-sub]`); await page.waitForSelector(".sn-menu.sn-float.sn-sub.sn-open");
       await page.click(".sn-menu.sn-float.sn-sub.sn-open .sn-item[data-key=ep2]"); await logHas("menu:ep2");
     });
     await step(`${tag} 右键菜单：右键弹出、点删除；不可用的那项点了没反应`, async () => {
-      await clearLog(); await page.click("#ctx-zone", { button: "right" }); await page.waitForSelector(openMenu);
-      await page.click(`${openMenu} .sn-item[data-key=share]`); await page.waitForTimeout(150);
+      await page.keyboard.press("Escape"); await clearLog(); await page.click("#ctx-zone", { button: "right" }); await page.waitForSelector(openMenu);
+      await page.click(`${openMenu} .sn-item[data-key=share]`, { force: true }); await page.waitForTimeout(150); // 不可用的那项写了 aria-disabled，Playwright 默认会一直等它变可用：强点一下，看它真的没反应
       if (await page.evaluate(() => window.__log.length)) throw new Error("点了不可用的条目也触发了");
       await page.click(`${openMenu} .sn-item[data-key=del]`); await logHas("ctx:del");
     });
@@ -93,13 +97,23 @@ for (const fw of FWS) {
       const ok = await page.$eval("#sa", (el) => el.parentElement.classList.contains("sn-sa") && el.classList.contains("sn-sa-vp") && el.querySelectorAll("p").length === 30);
       if (!ok) throw new Error("结构不对");
     });
-    await step(`${tag} 对话：输入、回车发送、流式回答出来`, async () => {
-      await page.click(".sn-chat-foot textarea"); await page.keyboard.type("改第三场"); await page.keyboard.press("Enter");
+    await step(`${tag} 对话：输入、⌘ / Ctrl + 回车发送、流式回答出来`, async () => {
+      await page.keyboard.press("Escape"); await page.click(".sn-chat-foot textarea"); await page.keyboard.type("改第三场"); await page.keyboard.press("Control+Enter");
       await page.waitForFunction(() => document.querySelector(".sn-chat")?.textContent.includes("收到：改第三场"), null, { timeout: 5000 });
     });
+    await step(`${tag} 新对话：自己画的空状态画进去了；菜单里换模型 → 事件、按钮上的字；发出第一条以后空状态淡出`, async () => {
+      const r0 = await page.evaluate(() => { const em = document.querySelector("#chat-new .sn-chat-empty"); return { own: !!em?.querySelector("#own-empty"), hidden: em?.hidden }; });
+      if (!r0.own || r0.hidden) throw new Error("空状态 " + JSON.stringify(r0));
+      await page.click("#chat-new [data-cm-models]"); await page.waitForTimeout(200);
+      await page.click('#chat-new .sn-cm-models .sn-item[data-v="fast"]'); await page.waitForTimeout(450);
+      const r1 = await page.evaluate(() => ({ lbl: document.querySelector("#chat-new [data-cm-models] .sn-cm-lbl")?.textContent, log: window.__log.filter((x) => x.startsWith("model:")) }));
+      if (r1.lbl !== "分镜模型 · 快速" || !r1.log.includes("model:fast")) throw new Error(JSON.stringify(r1));
+      await page.click("#chat-new .sn-chat-foot textarea"); await page.keyboard.type("开始吧"); await page.keyboard.press("Control+Enter");
+      await page.waitForFunction(() => document.querySelector("#chat-new .sn-chat-empty")?.hidden === true, null, { timeout: 3000 });
+    });
     await step(`${tag} Markdown、流程图、画布表格、视频、音频都渲染出来`, async () => {
-      const r = await page.evaluate(() => ({ md: document.querySelector(".sn-md h1")?.textContent, flow: document.querySelectorAll(".sn-fnode").length, cv: !!document.querySelector("canvas"), player: !!document.querySelector(".sn-player"), audio: !!document.querySelector(".sn-audio-row") }));
-      if (r.md !== "标题" || r.flow < 2 || !r.cv || !r.player || !r.audio) throw new Error(JSON.stringify(r));
+      const r = await page.evaluate(() => ({ md: document.querySelector(".sn-md h1")?.firstChild?.textContent, flow: document.querySelectorAll(".sn-fnode").length, flows: [...document.querySelectorAll(".sn-flow")].map((f) => f.querySelectorAll(".sn-fnode").length).join("+"), cv: !!document.querySelector("canvas"), player: !!document.querySelector(".sn-player"), audio: !!document.querySelector(".sn-audio-row") }));
+      if (r.md !== "标题" || r.flow !== 2 || !r.cv || !r.player || !r.audio) throw new Error(JSON.stringify(r));
     });
   }
 

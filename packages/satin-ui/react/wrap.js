@@ -24,7 +24,12 @@ export function wrap(create, { valueKey = "value", events = ["change"], stateKey
     // 传给 Satin 的选项：去掉回调（回调走下面固定的转发函数，props 换了也不用重新挂）和 defaultValue
     const optsOf = (p) => { const o = {}; for (const [k, v] of Object.entries(p)) if (!/^on[A-Z]/.test(k) && k !== defKey && k !== "className" && k !== "style" && (passId || k !== "id") && k !== "children") o[k] = v; if (p[valueKey] === undefined && p[defKey] !== undefined) o[valueKey] = p[defKey]; return o; };
     const [html] = useState(() => create.html({ ...optsOf(props) }));
+    const made = useRef(false);
     useIso(() => {
+      // 同一个宿主再挂一次（StrictMode 挂两次、Fast Refresh）：先把标记恢复成没接过的样子——组件是接在已有标记上的，
+      // 销毁时不会拿掉自己挂载时加进去的节点（流程图的节点、对话的消息……），不恢复就会叠两份
+      if (made.current) host.current.innerHTML = html;
+      made.current = true;
       const unsetup = setup();
       const handlers = {};
       for (const ev of events) handlers["on" + cap(ev)] = (v) => {

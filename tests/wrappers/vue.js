@@ -11,6 +11,7 @@ const assetCols = [{ key: "name", title: "名称", sortable: true }, { key: "kin
 const assets = Array.from({ length: 2000 }, (_, i) => ({ id: i + 1, name: "素材 " + (i + 1), kind: i % 3, size: (i * 37) % 900 + 12 }));
 
 const log = (window.__log = []);
+const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 const items = [
   { key: "open", label: "打开", icon: "external-link", kbd: "↵" },
   { key: "copy", label: "复制一份", icon: "copy", kbd: "⌘D" },
@@ -28,7 +29,7 @@ async function* respond(text) { yield "收到："; yield text; }
 
 const Kit = defineComponent({
   setup() {
-    const lb = ref(null), side = ref("all"), pop = ref(false), cmd = ref(false), thumbs = [];
+    const lb = ref(null), side = ref("all"), pop = ref(false), cmd = ref(false), model = ref("fine"), thumbs = [];
     return () => h("div", { id: "kit", style: "display: grid; gap: 16px; padding: 16px" }, [
       h(Menu, { items, onSelect: (k) => log.push("menu:" + k) }, () => h(Button, { id: "menu-btn", icon: "more-horizontal" }, () => "更多")),
       h(ContextMenu, { items, onSelect: (k) => log.push("ctx:" + k) }, () => h("div", { id: "ctx-zone", style: "height: 80px; border: 1px dashed gray" }, "在这里右键")),
@@ -43,6 +44,8 @@ const Kit = defineComponent({
       h(ScrollArea, { id: "sa", style: "max-height: 120px" }, () => Array.from({ length: 30 }, (_, i) => h("p", { key: i }, `第 ${i + 1} 行`))),
       h(Player, { label: "样片" }), h(AudioPlayer, { title: "旁白", sub: "00:32" }),
       h("div", { style: "height: 420px" }, [h(Chat, { title: "写作助手", status: "在线", respond })]),
+      // 新对话：自己画的空状态（#empty 插槽）、v-model:model
+      h("div", { id: "chat-new", style: "height: 420px" }, [h(Chat, { title: "新对话", respond, models: MODELS, model: model.value, "onUpdate:model": (v) => { model.value = v; log.push("model:" + v); } }, { empty: () => h("p", { id: "own-empty" }, "自己画的空状态") })]),
       h(Markdown, { source: "# 标题\n\n正文 **加粗**\n\n```js\nconst a = 1;\n```" }),
       h("div", { style: "height: 320px" }, [h(Flow, { label: "流程", nodes: [{ id: "a", x: 40, y: 40, t: "剧本", ic: "file-text" }, { id: "b", x: 260, y: 40, t: "分镜", ic: "image" }], edges: [["a", "b"]] })]),
       h("div", { style: "height: 320px" }, [h(CanvasGrid, { columns: assetCols, data: assets, rowKey: "id", selection: "multiple", onSelectionChange: (e) => log.push("cgrid:sel:" + (e.keys?.length ?? "all")), label: "素材明细" })]),

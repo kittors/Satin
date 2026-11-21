@@ -13,6 +13,7 @@ import { CanvasGrid } from "../../packages/satin-ui/react/canvas-grid.js";
 const assetCols = [{ key: "name", title: "名称", sortable: true }, { key: "kind", title: "类型", type: "tag", options: ["图片", "视频", "音频"], filter: "enum" }, { key: "size", title: "大小", type: "int", sortable: true, format: (v) => v + " KB" }];
 const assets = Array.from({ length: 2000 }, (_, i) => ({ id: i + 1, name: "素材 " + (i + 1), kind: i % 3, size: (i * 37) % 900 + 12 }));
 const log = (window.__log = []);
+const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 const items = [
   { key: "open", label: "打开", icon: "external-link", kbd: "↵" },
   { key: "copy", label: "复制一份", icon: "copy", kbd: "⌘D" },
@@ -29,6 +30,7 @@ const load = (o, n) => new Promise((r) => setTimeout(() => r(o >= 180 ? [] : Arr
 async function* respond(text) { yield "收到："; yield text; }
 
 function Kit() {
+  const [model, setModel] = useState("fine");
   const [lb, setLb] = useState(null), [side, setSide] = useState("all"), [pop, setPop] = useState(false), [cmd, setCmd] = useState(false);
   const thumbs = useRef([]);
   return h("div", { id: "kit", style: { display: "grid", gap: 16, padding: 16 } },
@@ -45,6 +47,8 @@ function Kit() {
     h(ScrollArea, { id: "sa", style: { maxHeight: 120 } }, Array.from({ length: 30 }, (_, i) => h("p", { key: i }, `第 ${i + 1} 行`))),
     h(Player, { label: "样片" }), h(AudioPlayer, { title: "旁白", sub: "00:32" }),
     h("div", { style: { height: 420 } }, h(Chat, { title: "写作助手", status: "在线", respond })),
+    // 新对话：自己画的空状态（renderEmpty）、受控的模型
+    h("div", { id: "chat-new", style: { height: 420 } }, h(Chat, { title: "新对话", respond, renderEmpty: () => h("p", { id: "own-empty" }, "自己画的空状态"), models: MODELS, model, onModelChange: (v) => { setModel(v); log.push("model:" + v); } })),
     h(Markdown, { source: "# 标题\n\n正文 **加粗**\n\n```js\nconst a = 1;\n```" }),
     h("div", { style: { height: 320 } }, h(Flow, { label: "流程", nodes: [{ id: "a", x: 40, y: 40, t: "剧本", ic: "file-text" }, { id: "b", x: 260, y: 40, t: "分镜", ic: "image" }], edges: [["a", "b"]] })),
     h("div", { style: { height: 320 } }, h(CanvasGrid, { columns: assetCols, data: assets, rowKey: "id", selection: "multiple", onSelectionChange: (e) => log.push("cgrid:sel:" + (e.keys?.length ?? "all")), label: "素材明细" })));
