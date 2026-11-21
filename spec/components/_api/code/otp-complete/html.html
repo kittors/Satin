@@ -1,0 +1,11 @@
+<div class="sn-stack sn-gap-8" id="otp-box">
+  <sn-otp length="6"></sn-otp>
+  <span class="sn-help">输入 6 位验证码</span>
+</div>
+
+<script type="module">
+  const box = document.getElementById("otp-box");
+  box.addEventListener("sn-complete", (e) => {
+    box.querySelector(".sn-help").textContent = `正在校验 ${e.detail}…`; // 换成真实的校验请求
+  });
+</script>

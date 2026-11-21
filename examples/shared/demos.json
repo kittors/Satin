@@ -493,6 +493,36 @@
   "css": true
  },
  {
+  "slug": "otp-length",
+  "id": "otp",
+  "n": -1,
+  "name": "验证码",
+  "group": "表单",
+  "cap": "4 位",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "otp-complete",
+  "id": "otp",
+  "n": -1,
+  "name": "验证码",
+  "group": "表单",
+  "cap": "填满时校验",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "otp-basic",
+  "id": "otp",
+  "n": -1,
+  "name": "验证码",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "otp-0",
   "id": "otp",
   "n": 0,

@@ -53,6 +53,9 @@
   import SliderControlled from "./demos/slider-controlled.svelte";
   import SliderBasic from "./demos/slider-basic.svelte";
   import SliderDemo0 from "./demos/slider-0.svelte";
+  import OtpLength from "./demos/otp-length.svelte";
+  import OtpComplete from "./demos/otp-complete.svelte";
+  import OtpBasic from "./demos/otp-basic.svelte";
   import OtpDemo0 from "./demos/otp-0.svelte";
   import TooltipDemo0 from "./demos/tooltip-0.svelte";
   import PopoverDemo0 from "./demos/popover-0.svelte";
@@ -271,6 +274,9 @@
   </section>
   <section id="otp">
     <h2>验证码</h2>
+    <div class="demo" data-demo="otp-length"><OtpLength /></div>
+    <div class="demo" data-demo="otp-complete"><OtpComplete /></div>
+    <div class="demo" data-demo="otp-basic"><OtpBasic /></div>
     <div class="demo" data-demo="otp-0"><OtpDemo0 /></div>
   </section>
   <section id="tooltip">

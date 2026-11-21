@@ -8,7 +8,8 @@ export const Table: C<Omit<import("./components").TableOptions, "onSort" | "onSe
 export const Segmented: C<{ items: Item[]; value?: string; size?: "sm" | "md"; label?: string }>;
 export const Slider: C<{ value?: number; max?: number; label?: string }>;
 export const Select: C<{ items: Item[]; value?: string; placeholder?: string; label?: string }>;
-export const Otp: C<{ length?: number }>;
+/** 验证码：不用 v-model（填满时发 complete，参数是整串数字） */
+export const Otp: DefineComponent<{ length?: number }>;
 export const Tabs: C<{ tabs: { label: string; badge?: string | number; content?: string; html?: string }[]; value?: number }>;
 export const Pager: C<{ total: number; page?: number; count?: number }>;
 export const Collapse: C<{ items: { title: string; content?: string; html?: string }[]; single?: boolean; open?: number[] }>;

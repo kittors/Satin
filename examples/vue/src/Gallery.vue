@@ -53,6 +53,9 @@ import SliderMax from "./demos/slider-max.vue";
 import SliderControlled from "./demos/slider-controlled.vue";
 import SliderBasic from "./demos/slider-basic.vue";
 import SliderDemo0 from "./demos/slider-0.vue";
+import OtpLength from "./demos/otp-length.vue";
+import OtpComplete from "./demos/otp-complete.vue";
+import OtpBasic from "./demos/otp-basic.vue";
 import OtpDemo0 from "./demos/otp-0.vue";
 import TooltipDemo0 from "./demos/tooltip-0.vue";
 import PopoverDemo0 from "./demos/popover-0.vue";
@@ -272,6 +275,9 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="otp">
     <h2>验证码</h2>
+    <div class="demo" data-demo="otp-length"><OtpLength /></div>
+    <div class="demo" data-demo="otp-complete"><OtpComplete /></div>
+    <div class="demo" data-demo="otp-basic"><OtpBasic /></div>
     <div class="demo" data-demo="otp-0"><OtpDemo0 /></div>
   </section>
   <section id="tooltip">

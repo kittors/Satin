@@ -58,6 +58,9 @@ import SliderMax from "./demos/slider-max.jsx";
 import SliderControlled from "./demos/slider-controlled.jsx";
 import SliderBasic from "./demos/slider-basic.jsx";
 import SliderDemo0 from "./demos/slider-0.jsx";
+import OtpLength from "./demos/otp-length.jsx";
+import OtpComplete from "./demos/otp-complete.jsx";
+import OtpBasic from "./demos/otp-basic.jsx";
 import OtpDemo0 from "./demos/otp-0.jsx";
 import TooltipDemo0 from "./demos/tooltip-0.jsx";
 import PopoverDemo0 from "./demos/popover-0.jsx";
@@ -277,6 +280,9 @@ function Gallery() {
       </section>
       <section id="otp">
         <h2>验证码</h2>
+        <div className="demo" data-demo="otp-length"><OtpLength /></div>
+        <div className="demo" data-demo="otp-complete"><OtpComplete /></div>
+        <div className="demo" data-demo="otp-basic"><OtpBasic /></div>
         <div className="demo" data-demo="otp-0"><OtpDemo0 /></div>
       </section>
       <section id="tooltip">
