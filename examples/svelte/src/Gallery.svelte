@@ -102,11 +102,17 @@
   import NotifyActions from "./demos/notify-actions.svelte";
   import NotifyBasic from "./demos/notify-basic.svelte";
   import NotifyDemo0 from "./demos/notify-0.svelte";
+  import BannerError from "./demos/banner-error.svelte";
+  import BannerDismiss from "./demos/banner-dismiss.svelte";
+  import BannerBasic from "./demos/banner-basic.svelte";
   import BannerDemo0 from "./demos/banner-0.svelte";
   import EmptyError from "./demos/empty-error.svelte";
   import EmptySearch from "./demos/empty-search.svelte";
   import EmptyBasic from "./demos/empty-basic.svelte";
   import EmptyDemo0 from "./demos/empty-0.svelte";
+  import LoadingQuiet from "./demos/loading-quiet.svelte";
+  import LoadingList from "./demos/loading-list.svelte";
+  import LoadingBasic from "./demos/loading-basic.svelte";
   import LoadingDemo0 from "./demos/loading-0.svelte";
   import ProgressControlled from "./demos/progress-controlled.svelte";
   import ProgressRing from "./demos/progress-ring.svelte";
@@ -137,7 +143,13 @@
   import CgridMillion from "./demos/cgrid-million.svelte";
   import CgridBasic from "./demos/cgrid-basic.svelte";
   import CgridDemo0 from "./demos/cgrid-0.svelte";
+  import ListSwitch from "./demos/list-switch.svelte";
+  import ListKv from "./demos/list-kv.svelte";
+  import ListBasic from "./demos/list-basic.svelte";
   import ListDemo0 from "./demos/list-0.svelte";
+  import CardSelect from "./demos/card-select.svelte";
+  import CardGrid from "./demos/card-grid.svelte";
+  import CardBasic from "./demos/card-basic.svelte";
   import CardDemo0 from "./demos/card-0.svelte";
   import TagsAvatar from "./demos/tags-avatar.svelte";
   import TagsBadge from "./demos/tags-badge.svelte";
@@ -410,6 +422,9 @@
   </section>
   <section id="banner">
     <h2>横幅与条目上的失败</h2>
+    <div class="demo" data-demo="banner-error"><BannerError /></div>
+    <div class="demo" data-demo="banner-dismiss"><BannerDismiss /></div>
+    <div class="demo" data-demo="banner-basic"><BannerBasic /></div>
     <div class="demo" data-demo="banner-0"><BannerDemo0 /></div>
   </section>
   <section id="empty">
@@ -421,6 +436,9 @@
   </section>
   <section id="loading">
     <h2>骨架与加载</h2>
+    <div class="demo" data-demo="loading-quiet"><LoadingQuiet /></div>
+    <div class="demo" data-demo="loading-list"><LoadingList /></div>
+    <div class="demo" data-demo="loading-basic"><LoadingBasic /></div>
     <div class="demo" data-demo="loading-0"><LoadingDemo0 /></div>
   </section>
   <section id="progress">
@@ -469,10 +487,16 @@
   </section>
   <section id="list">
     <h2>列表与键值</h2>
+    <div class="demo" data-demo="list-switch"><ListSwitch /></div>
+    <div class="demo" data-demo="list-kv"><ListKv /></div>
+    <div class="demo" data-demo="list-basic"><ListBasic /></div>
     <div class="demo" data-demo="list-0"><ListDemo0 /></div>
   </section>
   <section id="card">
     <h2>卡片</h2>
+    <div class="demo" data-demo="card-select"><CardSelect /></div>
+    <div class="demo" data-demo="card-grid"><CardGrid /></div>
+    <div class="demo" data-demo="card-basic"><CardBasic /></div>
     <div class="demo" data-demo="card-0"><CardDemo0 /></div>
   </section>
   <section id="tags">

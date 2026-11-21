@@ -1,6 +1,6 @@
 # 组件清单
 
-每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`chip`、`field`、`input`、`taginput`、`number`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`empty`、`progress`、`numflow`、`grid`、`cgrid`、`tags`、`collapse`、`tabs`。
+每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`chip`、`field`、`input`、`taginput`、`number`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`grid`、`cgrid`、`list`、`card`、`tags`、`collapse`、`tabs`。
 
 ## 契约格式（手写的 API 契约）
 
@@ -118,9 +118,9 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | --- | --- | --- | --- |
 | `toast` | 轻提示（Toast） | ✓ | 只回应用户刚做的事。三种：状态（确认结果，3 秒消失）、操作（能撤销的事直接做，给 5 秒撤销，一圈倒计时）、进度（先显示进度，完成后原地变成结果）。进入时下落… |
 | `notify` | 通知（Notification） | ✓ | 不是用户刚才的操作引起的：后台任务完成或失败、额度、更新、审核。显示在右上角，直到用户处理或关闭；铃铛和窗口标题都显示数量，铃铛里能找回全部。新的一条从上方落到… |
-| `banner` | 横幅与条目上的失败（Banner · Inline error） |  | 必须修好的问题不用 Toast：整页受影响的放在内容顶部的横幅，单个条目的失败留在条目上，附修复入口，一直留到修好为止。 |
+| `banner` | 横幅与条目上的失败（Banner · Inline error） | ✓ | 必须修好的问题不用 Toast：整页受影响的放在内容顶部的横幅，单个条目的失败留在条目上，附修复入口，一直留到修好为止。 |
 | `empty` | 空状态（Empty） | ✓ | 空的时候告诉用户这里会有什么、下一步做什么。三种：第一次用、筛选没结果、出错。不用插画，只用一个图标。 |
-| `loading` | 骨架与加载（Skeleton · Spinner） |  | 300ms 以内的等待什么都不显示；超过 300ms 才出现，一旦出现至少留 500ms。布局已知时用骨架，不用孤零零的转圈；数据到了逐行替换，每行间隔 40m… |
+| `loading` | 骨架与加载（Skeleton · Spinner） | ✓ | 300ms 以内的等待什么都不显示；超过 300ms 才出现，一旦出现至少留 500ms。布局已知时用骨架，不用孤零零的转圈；数据到了逐行替换，每行间隔 40m… |
 | `progress` | 进度（Progress） | ✓ | 能数清楚、超过 3 秒的工作（导入、导出、上传、批量生成）显示进度：数量、进度条、剩余时间，可以取消。完成时旧文字模糊淡出，新文字淡入，不整块重画。AI 生成先… |
 | `numflow` | 数字变化（NumberFlow） | ✓ | 数字变了只动变了的那几位：变大往上走、变小往下走，从个位开始依次动；位数变化时新的一位从 0 宽长出来，逗号、小数点、货币符号不跟着滚。四种样式按场合选。 |
 
@@ -131,8 +131,8 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | `table` | 表格（Table） |  | 后台的主力组件。点表头排序，行按新顺序移到位，不是一下子跳过去；勾选后底部浮出批量操作条；行操作悬停时才出现；数字列右对齐、用等宽数字。两种密度：舒适 48、紧… |
 | `grid` | 数据表格 · DOM（Data grid · 十万行） | ✓ | 十万行，只渲染看得见的行。数据在后台线程（当作服务端）里筛选、排序，按 100 行一块懒加载，每块有 240～520ms 的网络延迟，还没到的行显示静止的占位条… |
 | `cgrid` | 数据表格 · Canvas（Canvas grid · 一百万行） | ✓ | 一百万行，表体画在一块画布上，功能和上面的 DOM 版一样：懒加载（200 行一块）、搜索和列头筛选、排序、拖列、改宽、左右固定列、拖行、编辑、勾选、键盘。表头… |
-| `list` | 列表与键值（List · Description） |  | 设置页、详情页用。行高 44，左边图标、中间标题和说明、右边是值或开关；能点进去的行末尾有箭头，悬停时箭头往右挪 2px。 |
-| `card` | 卡片（Card） |  | 项目、素材用卡片。悬停时卡片不上浮、不加阴影：封面在框里慢慢放大一点，右上角出现"更多"，左上角出现勾选框。选中后外圈一道 2px 的线。 |
+| `list` | 列表与键值（List · Description） | ✓ | 设置页、详情页用。行高 44，左边图标、中间标题和说明、右边是值或开关；能点进去的行末尾有箭头，悬停时箭头往右挪 2px。 |
+| `card` | 卡片（Card） | ✓ | 项目、素材用卡片。悬停时卡片不上浮、不加阴影：封面在框里慢慢放大一点，右上角出现"更多"，左上角出现勾选框。选中后外圈一道 2px 的线。 |
 | `tags` | 标签、徽标与头像（Tag · Badge · Avatar） | ✓ | 标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块。头像没有照片时用名字的第一个字，底色从几种低饱和色里按名字固定取一种。 |
 | `collapse` | 折叠面板（Collapse） | ✓ | 高度用 0fr → 1fr 过渡，内容在展开过半时淡入；箭头跟着转 90°。可以同时展开多个，也可以只开一个（手风琴）。 |
 | `scrollarea` | 滚动区域（ScrollArea） |  | 所有会溢出滚动的地方都用它：原生滚动（惯性、键盘、读屏都在），系统滚动条换成一根细的悬浮滚动条，不滚动 0.7 秒后淡出，悬停或拖动时变粗；边缘渐隐只在那个方向… |

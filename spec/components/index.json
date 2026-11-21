@@ -285,7 +285,7 @@
     "en": "Banner · Inline error",
     "group": "反馈",
     "summary": "必须修好的问题不用 Toast：整页受影响的放在内容顶部的横幅，单个条目的失败留在条目上，附修复入口，一直留到修好为止。",
-    "contract": 0
+    "contract": 1
   },
   {
     "id": "empty",
@@ -301,7 +301,7 @@
     "en": "Skeleton · Spinner",
     "group": "反馈",
     "summary": "300ms 以内的等待什么都不显示；超过 300ms 才出现，一旦出现至少留 500ms。布局已知时用骨架，不用孤零零的转圈；数据到了逐行替换，每行间隔 40ms 淡入。",
-    "contract": 0
+    "contract": 1
   },
   {
     "id": "progress",
@@ -349,7 +349,7 @@
     "en": "List · Description",
     "group": "数据展示",
     "summary": "设置页、详情页用。行高 44，左边图标、中间标题和说明、右边是值或开关；能点进去的行末尾有箭头，悬停时箭头往右挪 2px。",
-    "contract": 0
+    "contract": 1
   },
   {
     "id": "card",
@@ -357,7 +357,7 @@
     "en": "Card",
     "group": "数据展示",
     "summary": "项目、素材用卡片。悬停时卡片不上浮、不加阴影：封面在框里慢慢放大一点，右上角出现\"更多\"，左上角出现勾选框。选中后外圈一道 2px 的线。",
-    "contract": 0
+    "contract": 1
   },
   {
     "id": "tags",

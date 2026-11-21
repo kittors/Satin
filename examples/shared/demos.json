@@ -973,6 +973,36 @@
   "css": true
  },
  {
+  "slug": "banner-error",
+  "id": "banner",
+  "n": -1,
+  "name": "横幅与条目上的失败",
+  "group": "反馈",
+  "cap": "失败",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "banner-dismiss",
+  "id": "banner",
+  "n": -1,
+  "name": "横幅与条目上的失败",
+  "group": "反馈",
+  "cap": "能关的横幅",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "banner-basic",
+  "id": "banner",
+  "n": -1,
+  "name": "横幅与条目上的失败",
+  "group": "反馈",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "banner-0",
   "id": "banner",
   "n": 0,
@@ -1019,6 +1049,36 @@
   "group": "反馈",
   "cap": "",
   "css": false
+ },
+ {
+  "slug": "loading-quiet",
+  "id": "loading",
+  "n": -1,
+  "name": "骨架与加载",
+  "group": "反馈",
+  "cap": "小区域转圈",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "loading-list",
+  "id": "loading",
+  "n": -1,
+  "name": "骨架与加载",
+  "group": "反馈",
+  "cap": "按规矩加载：300ms 内不闪",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "loading-basic",
+  "id": "loading",
+  "n": -1,
+  "name": "骨架与加载",
+  "group": "反馈",
+  "cap": "最简单的用法：骨架",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "loading-0",
@@ -1307,6 +1367,36 @@
   "css": false
  },
  {
+  "slug": "list-switch",
+  "id": "list",
+  "n": -1,
+  "name": "列表与键值",
+  "group": "数据展示",
+  "cap": "带开关的行",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "list-kv",
+  "id": "list",
+  "n": -1,
+  "name": "列表与键值",
+  "group": "数据展示",
+  "cap": "键值",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "list-basic",
+  "id": "list",
+  "n": -1,
+  "name": "列表与键值",
+  "group": "数据展示",
+  "cap": "最简单的用法：设置列表",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "list-0",
   "id": "list",
   "n": 0,
@@ -1314,6 +1404,36 @@
   "group": "数据展示",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "card-select",
+  "id": "card",
+  "n": -1,
+  "name": "卡片",
+  "group": "数据展示",
+  "cap": "受控：可以勾选的卡片",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "card-grid",
+  "id": "card",
+  "n": -1,
+  "name": "卡片",
+  "group": "数据展示",
+  "cap": "卡片网格",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "card-basic",
+  "id": "card",
+  "n": -1,
+  "name": "卡片",
+  "group": "数据展示",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "card-0",
