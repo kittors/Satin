@@ -1,6 +1,6 @@
 // satin-ui/react 的第二部分（react/extra.js，主入口一起转出）
 import type * as React from "react";
-import type { SatinInstance } from "./components";
+import type { SatinInstance, ScrollAreaOptions } from "./components";
 type Base = { className?: string; style?: React.CSSProperties; id?: string };
 // ———— 菜单、右键菜单、Popover、命令面板、看图、上传、侧栏、无限列表、滚动区域、视频、音频（satin-ui/react 主入口） ————
 /** 菜单的一条：key 不给就用 label；children 是子菜单。分隔线 { type: "divider" }，分组标题 { type: "group", label } */
@@ -32,7 +32,7 @@ export const Sidebar: React.ForwardRefExoticComponent<SidebarProps & React.RefAt
 export interface InfiniteListProps<T = any> extends Base { loadPage(offset: number, size: number): Promise<T[]>; renderItem?(item: T, index: number): React.ReactNode; renderRow?(row: HTMLElement, item: T, index: number): void; rowHeight?: number; total?: number; pageSize?: number; onCount?(loaded: number): void }
 export const InfiniteList: React.ForwardRefExoticComponent<InfiniteListProps & React.RefAttributes<SatinInstance & { reload(): void; scrollTop(): void; readonly count: number }>>;
 /** 滚动区域：写法和 div 一样（限高写在 style 上），as 换标签 */
-export type ScrollAreaProps = React.HTMLAttributes<HTMLElement> & Omit<import("./components").ScrollAreaOptions, "inner"> & { as?: keyof React.JSX.IntrinsicElements };
-export const ScrollArea: React.ForwardRefExoticComponent<ScrollAreaProps & React.RefAttributes<SatinInstance & { refresh(): void; set(o: Partial<import("./components").ScrollAreaOptions>): void }>>;
+export type ScrollAreaProps = React.HTMLAttributes<HTMLElement> & Omit<ScrollAreaOptions, "inner"> & { as?: keyof React.JSX.IntrinsicElements };
+export const ScrollArea: React.ForwardRefExoticComponent<ScrollAreaProps & React.RefAttributes<SatinInstance & { refresh(): void; set(o: Partial<ScrollAreaOptions>): void }>>;
 export const Player: React.ForwardRefExoticComponent<Base & { src?: string; poster?: string; label?: string; onError?(e: unknown): void } & React.RefAttributes<SatinInstance & { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; readonly video: HTMLVideoElement }>>;
 export const AudioPlayer: React.ForwardRefExoticComponent<Base & { src?: string; title?: string; sub?: string; wave?: string; onError?(e: unknown): void } & React.RefAttributes<SatinInstance & { toggle(): void; readonly audio: HTMLAudioElement }>>;

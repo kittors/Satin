@@ -1,5 +1,6 @@
 // satin-ui/vue 的第二部分（vue/extra.js，主入口一起转出）
 import type { DefineComponent } from "vue";
+import type { ScrollAreaOptions } from "./components";
 // ———— 菜单、右键菜单、Popover、命令面板、看图、上传、侧栏、无限列表、滚动区域、视频、音频（satin-ui/vue 主入口） ————
 /** 菜单的一条：key 不给就用 label；children 是子菜单。分隔线 { type: "divider" }，分组标题 { type: "group", label } */
 export type MenuItem = { type?: undefined; key?: string; label: string; icon?: string; kbd?: string; danger?: boolean; disabled?: boolean; checked?: boolean; children?: MenuItem[] } | { type: "divider" } | { type: "group"; label: string };
@@ -22,6 +23,6 @@ export const Sidebar: DefineComponent<{ items: SidebarItem[]; footer?: SidebarIt
 /** 无限列表：#row="{ item, index }" 插槽画一行；@count */
 export const InfiniteList: DefineComponent<{ loadPage(offset: number, size: number): Promise<unknown[]>; renderRow?(row: HTMLElement, item: any, index: number): void; rowHeight?: number; total?: number; pageSize?: number }>;
 /** 滚动区域：写法和 div 一样，as 换标签 */
-export const ScrollArea: DefineComponent<Omit<import("./components").ScrollAreaOptions, "inner"> & { as?: string }>;
+export const ScrollArea: DefineComponent<Omit<ScrollAreaOptions, "inner"> & { as?: string }>;
 export const Player: DefineComponent<{ src?: string; poster?: string; label?: string }>;
 export const AudioPlayer: DefineComponent<{ src?: string; title?: string; sub?: string; wave?: string }>;

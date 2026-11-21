@@ -41,6 +41,8 @@ function norm(html) {
   for (const l of [...host.querySelectorAll('link[rel="preload"]')]) l.remove();
   // 封装组件外面那层 <div class="sn-host" style="display: contents">（不占布局）拆掉
   for (const w of [...host.querySelectorAll("div.sn-host")]) if (/display:\s*contents/.test(w.getAttribute("style") || "")) w.replaceWith(...w.childNodes);
+  // 只写了 display: contents 的 <div>（滚动区域封装在视口外面套的那层，React 管的父子关系不受影响）：不占布局，也拆掉
+  for (const w of [...host.querySelectorAll("div")]) if (w.attributes.length === 1 && /^display:\s*contents;?$/.test((w.getAttribute("style") || "").trim())) w.replaceWith(...w.childNodes);
   // <sn-enhance>（不占布局）拆掉；Vue 的 v-enhance 挂在最外面一个不带属性的 <div> 上：也拆掉（只拆最外面那一个）
   for (const w of [...host.querySelectorAll("sn-enhance")]) w.replaceWith(...w.childNodes);
   if (host.children.length === 1 && host.firstElementChild.tagName === "DIV" && !host.firstElementChild.attributes.length) host.firstElementChild.replaceWith(...host.firstElementChild.childNodes);

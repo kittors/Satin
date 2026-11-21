@@ -1,6 +1,6 @@
 // satin-ui/react
 import type * as React from "react";
-import type { SatinInstance, Item, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail } from "./components";
+import type { SatinInstance, Item, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions } from "./components";
 type Base = { className?: string; style?: React.CSSProperties; id?: string };
 type Controlled<T, K extends string = "value"> = { [P in K]?: T } & { [P in `default${Capitalize<K>}`]?: T };
 type Ref = React.Ref<SatinInstance | null>;
@@ -15,7 +15,7 @@ export const Pager: React.ForwardRefExoticComponent<Base & Controlled<number, "p
 export const Collapse: React.ForwardRefExoticComponent<Base & Controlled<number[], "open"> & { items: { title: string; content?: string; html?: string }[]; single?: boolean; onToggle?(e: { index: number; open: boolean }): void; onChange?(open: number[]): void } & React.RefAttributes<SatinInstance>>;
 export const TagInput: React.ForwardRefExoticComponent<Base & Controlled<string[], "tags"> & { max?: number; placeholder?: string; hint?: string; onChange?(tags: string[]): void } & React.RefAttributes<SatinInstance>>;
 export const Stepper: React.ForwardRefExoticComponent<Base & Controlled<number> & { min?: number; max?: number; unit?: string; label?: string; onChange?(value: number): void } & React.RefAttributes<SatinInstance>>;
-export const Table: React.ForwardRefExoticComponent<Base & import("./components").TableOptions & { selected?: (string | number)[]; defaultSelected?: (string | number)[] } & React.RefAttributes<SatinInstance>>;
+export const Table: React.ForwardRefExoticComponent<Base & TableOptions & { selected?: (string | number)[]; defaultSelected?: (string | number)[] } & React.RefAttributes<SatinInstance>>;
 export const Password: React.ForwardRefExoticComponent<Base & Controlled<string> & { label?: string; help?: string; name?: string; placeholder?: string; meter?: boolean; size?: "sm" | "lg" | "xl"; autocomplete?: string; onChange?(value: string): void } & React.RefAttributes<SatinInstance>>;
 /** 搜索框：search(q) 返回结果数（或数组、Promise），超过 300ms 放大镜换成转圈；onSearch(q)；id 写在输入框上 */
 export type SearchProps = Base & { search?(q: string): number | unknown[] | Promise<number | unknown[]>; debounce?: number; placeholder?: string; label?: string; kbd?: string | false; name?: string; size?: "sm" | "lg" | "xl"; onSearch?(q: string): void };

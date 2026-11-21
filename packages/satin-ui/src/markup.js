@@ -46,7 +46,7 @@ const sideLink = (it, on) => it.type === "group" ? `<p>${esc(it.label)}</p>`
 export const sidebarHTML = ({ items = [], footer = [], value, title = "", logo = true, collapsible = true } = {}) => {
   const on = (it) => !it.type && String(it.key ?? it.label) === String(value);
   return `<div class="sn-side-top">${logo ? '<span class="sn-logo"></span>' : ""}<b>${esc(title)}</b>`
-    + (collapsible ? `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="${esc(tt("nav.10"))}" data-kbd="⌘\\" aria-label="${esc(tt("nav.10"))}">${icon("panel-left")}</button>` : "") + "</div>"
+    + (collapsible ? `<button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="${esc(tt("nav.10"))}" data-kbd="⌘\\" aria-label="${esc(tt("nav.10"))}">${icon("panel-left")}</button>` : "") + "</div>"
     + `<nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span>${items.map((it) => sideLink(it, on(it))).join("")}</nav>`
     + (footer.length ? `<div class="sn-side-foot">${footer.map((it) => sideLink(it, on(it))).join("")}</div>` : "");
 };
