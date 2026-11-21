@@ -191,7 +191,17 @@ const fwr = (fn) => `<div class="d-fwr" data-fwr="${FWR.push(fn) - 1}">${fn()}</
 const nameKey = () => { const e = getEnv()?.id; return e === "next" ? "react" : e === "nuxt" ? "vue" : getFw().id; };
 // 说明文字按框架分：契约里的文字可以写成 { react, vue, svelte, angular, solid, preact, html, default }，只显示当前框架那一句（没写的框架用 default）
 const fwText = (t) => (t && typeof t === "object" && !Array.isArray(t) ? t[nameKey()] ?? t[getFw().id] ?? t.default ?? "" : t || "");
-const nameOf = (x) => { const n = x.names || {}, k = nameKey(); return n[k] ?? (["svelte", "angular", "solid", "preact", "html"].includes(k) ? n.element ?? n.html : undefined) ?? n.js ?? x.name; };
+// 契约约定（spec/components/_api/README.md）：names 只列有这一项的写法，没写的那种写法就是没有（返回 null，表里不列）；
+// Preact 用 React 的组件；Svelte、Angular、Solid、纯 HTML 没写自己那一项时看 element，再看 html；纯 HTML 最后看 js（createXxx 的选项）
+const nameOf = (x) => {
+  const n = x.names; if (!n) return x.name;
+  const k = nameKey(); if (n[k] != null) return n[k];
+  if (k === "preact") return n.react ?? null;
+  if (k === "svelte" || k === "angular" || k === "solid") return n.element ?? n.html ?? n.markup ?? null;
+  if (k === "html") return n.element ?? n.markup ?? n.js ?? null;
+  return null;
+};
+const hasIn = (x) => nameOf(x) != null && !(x.markupOnly && nameKey() !== "html");
 // 一个演示 / 配方在当前框架下的文件；这个框架还没有对应写法时明说，给自定义元素写法（纯 HTML 那份），不悄悄换成别的框架
 async function codeFiles(kind, key) {
   const fw = getFw(), rel = kind === "demo" ? fw.demo(key) : fw.recipe(key), main = `../${fw.dir}/${rel}`, dir = main.slice(0, main.lastIndexOf("/") + 1);
@@ -631,6 +641,20 @@ function playBox(c, ex) {
   return `<div class="dx" data-demo="${c.id}" data-play="${ex.slug}"><div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div><div class="dx-stage">${frame}</div><div class="dx-code" data-slug="${ex.slug}"><div class="dx-cx"></div></div></div>`;
 }
 const tbl = (head, rows) => BLOCK.table(head, rows);
+// 组件页的 API 表（属性、列定义、事件、插槽、方法、函数、样式定制、类名、键盘）：桌面照旧是表格；窄屏（< 640px）每一项一块——
+// 第一行名称，右边小字"类型 · 默认 … · 必填"（太长就整行放到名称下面），说明整行在下面（样式见 next.css 的 .d-api）。
+// cols 每列一个角色："n" 名称、"m" 小字信息（"m:默认" 带标签）、"r" 必填（"是" → 小字"必填"）、"d" 说明。空的（""、"—"）不进小字那一行
+const plainOf = (s) => String(s).replace(/<[^>]+>/g, "").trim();
+const apiTbl = (head, rows, cols) => `<div class="d-tablewrap"><table class="d-table d-api"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => {
+  const sum = [];
+  const tds = r.map((c, i) => {
+    const [k, label] = cols[i].split(":"), v = String(c ?? "");
+    if ((k === "m" || k === "r") && v && plainOf(v) !== "—") sum.push(k === "r" ? "必填" : (label ? `<span class="d-k-l">${label}</span>` : "") + v.replace(/^<p>([\s\S]*)<\/p>$/, "$1"));
+    return `<td class="d-k-${k === "r" ? "m" : k}">${v}</td>`;
+  }).join("");
+  const plain = (s) => String(s).replace(/<[^>]+>/g, "").trim(), long = plain(r[0]).length + plain(sum.join(" · ")).length > 30;
+  return `<tr>${tds}${sum.length ? `<td class="d-k-sum${long ? " d-k-long" : ""}">${sum.join('<i class="d-k-dot">·</i>')}</td>` : ""}</tr>`;
+}).join("")}</tbody></table></div>`;
 const md = (t) => md2html(String(t ?? ""));
 function contractHTML(c, k) {
   const cat0 = cat.byId[c.id], out = [];
@@ -648,20 +672,20 @@ function contractHTML(c, k) {
   if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示"), `<p>设计稿里把几种用法组合在一起的样子，可以直接操作；代码看上面的示例。</p>`); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n, code: false }))); }
   // 4. API（按当前框架的叫法）
   out.push(anchor("api", "API"));
-  if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => tbl(["名称", "类型", "默认值", "必填", "说明"], k.props.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", x.required ? "是" : "", md(x.desc) + (x.example ? `<br><code>${esc(x.example)}</code>` : "")]))));
+  if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => { const ps = k.props.filter(hasIn); return !ps.length ? "<p>这种写法里没有单独的属性。</p>" : apiTbl(["名称", "类型", "默认值", "必填", "说明"], ps.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", x.required ? "是" : "", md(x.desc) + (x.example ? `<br><code>${esc(x.example)}</code>` : "")]), ["n", "m", "m:默认", "r", "d"]); }));
   // 列定义（数据表格、Canvas 表格契约里的 columnProps）：columns 里每一项的字段，各框架写法一样
-  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 里每一项的字段（各框架写法一样）。</p>`, tbl(["字段", "类型", "默认值", "说明"], k.columnProps.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", md(x.desc)])));
-  if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => tbl(["名称", "参数", "什么时候触发"], k.events.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.payload || "")}</code>`, md(x.when)]))));
-  if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => tbl(["名称", "说明"], k.slots.map((x) => [`<code>${esc(nameOf(x))}</code>`, md(x.desc)]))));
-  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, tbl(["名称", "签名", "说明"], k.methods.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(x.signature || "")}</code>`, md(x.desc)])));
-  if (k.functions?.length) out.push(`<h3 class="d-h3">函数</h3>`, tbl(["名称", "签名", "说明"], k.functions.map((x) => [`<code>${esc(x.name)}</code>${x.from ? `<br><small>${esc(x.from)}</small>` : ""}`, `<code>${esc(x.signature || "")}</code>`, md(x.desc)])));
-  if (k.cssVars?.length) out.push(`<h3 class="d-h3">样式定制</h3>`, tbl(["CSS 变量", "作用", "默认"], k.cssVars.map((x) => [`<code>${esc(x.name)}</code>${x.token ? " <small>全局令牌</small>" : ""}`, md(x.desc), esc(x.default || "")])));
-  if (k.classes?.length) out.push(`<h3 class="d-h3">纯 HTML 写法的类名、data 属性</h3>`, tbl(["写法", "说明"], k.classes.map((x) => [`<code>${esc(x.name)}</code>`, md(x.desc)])));
+  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 里每一项的字段（各框架写法一样）。</p>`, apiTbl(["字段", "类型", "默认值", "说明"], k.columnProps.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", md(x.desc)]), ["n", "m", "m:默认", "d"]));
+  if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => { const es = k.events.filter(hasIn); return !es.length ? "<p>这种写法里没有单独的事件。</p>" : apiTbl(["名称", "参数", "什么时候触发"], es.map((x) => [`<code>${esc(nameOf(x))}</code>`, x.payload ? `<code>${esc(x.payload)}</code>` : "", md(x.when)]), ["n", "m:参数", "d"]); }));
+  if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => { const ss = k.slots.filter(hasIn); return !ss.length ? "<p>这种写法里没有插槽 / 子元素。</p>" : apiTbl(["名称", "说明"], ss.map((x) => [`<code>${esc(nameOf(x))}</code>`, md(x.desc)]), ["n", "d"]); }));
+  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, apiTbl(["名称", "签名", "说明"], k.methods.map((x) => [`<code>${esc(x.name)}</code>`, x.signature ? `<code>${esc(x.signature)}</code>` : "", md(x.desc)]), ["n", "m", "d"]));
+  if (k.functions?.length) out.push(`<h3 class="d-h3">函数</h3>`, apiTbl(["名称", "签名", "说明"], k.functions.map((x) => [`<code>${esc(x.name)}</code>${x.from ? `<br><small>${esc(x.from)}</small>` : ""}`, x.signature ? `<code>${esc(x.signature)}</code>` : "", md(x.desc)]), ["n", "m", "d"]));
+  if (k.cssVars?.length) out.push(`<h3 class="d-h3">样式定制</h3>`, apiTbl(["CSS 变量", "作用", "默认"], k.cssVars.map((x) => [`<code>${esc(x.name)}</code>${x.token ? " <small>全局令牌</small>" : ""}`, md(x.desc), esc(x.default || "")]), ["n", "d", "m:默认"]));
+  if (k.classes?.length) out.push(`<h3 class="d-h3">纯 HTML 写法的类名、data 属性</h3>`, apiTbl(["写法", "说明"], k.classes.map((x) => [`<code>${esc(x.name)}</code>`, md(x.desc)]), ["n", "d"]));
   if (k.types?.length) out.push(`<h3 class="d-h3">TypeScript 类型</h3><p>${k.types.map((t) => `<code>${esc(t)}</code>`).join("、")}</p>`);
   // 5. 键盘与无障碍
   if (k.keyboard?.length || k.a11y) {
     out.push(anchor("a11y", "键盘与无障碍"));
-    if (k.keyboard?.length) out.push(tbl(["按键", "什么时候", "做什么"], k.keyboard.map((x) => [`<kbd>${esc(x.keys)}</kbd>`, md(x.when || ""), md(x.does)])));
+    if (k.keyboard?.length) out.push(apiTbl(["按键", "什么时候", "做什么"], k.keyboard.map((x) => [`<kbd>${esc(x.keys)}</kbd>`, md(x.when || ""), md(x.does)]), ["n", "m", "d"]));
     for (const [t, list] of [["角色", k.a11y?.roles], ["焦点", k.a11y?.focus], ["说明", k.a11y?.notes]]) if (list?.length) out.push(`<h3 class="d-h3">${t}</h3><ul class="d-list">${list.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
   }
   // 6. 设计规范
