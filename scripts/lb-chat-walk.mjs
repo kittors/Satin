@@ -1,5 +1,6 @@
 // 对话页实录：照用户录屏的操作，在「聊天与 AI 对话」页一镜到底录下来（带鼠标指针和点击圈，滚轮翻对话、滚文档页），
 // 每一步都逐帧量：演示内容动没动、图从哪儿飞出来 / 落回哪儿、有没有画到顶栏上、关上后回没回原样。
+// （2026-11-21）组件页现在先放契约示例（.dx[data-play]，iframe 是 examples/html/play.html），这里测的是设计稿演示（index.html?embed=区块），只在 .dx:not([data-play]) 里找
 // 用法（先起服务）：node scripts/lb-chat-walk.mjs [--theme dark] [--width 1440]
 // 结果：/tmp/satin-walk/对话页实录-<主题>-<宽>.mp4、每一步的打开 / 关上拼图、report.txt
 import { createRequire } from "node:module";
@@ -37,11 +38,11 @@ try {
   const click = async (x, y) => { if (Math.hypot(x - mx, y - my) > 1) await move(x, y); await page.evaluate(([a, b]) => window.__ring(a, b), [x, y]); await page.mouse.click(x, y); };
   const wheel = async (dy, x, y) => { await move(x, y, 250); const n = Math.max(1, Math.round(Math.abs(dy) / 80)); for (let i = 0; i < n; i++) { await page.mouse.wheel(0, dy / n); await page.waitForTimeout(28); } await page.waitForTimeout(260); };
   await cdp.send("Page.startScreencast", { format: "jpeg", quality: 80, maxWidth: W, maxHeight: H });
-  if (process.env.LB_DEBUG) { page.on("console", (m) => { if (m.text().startsWith("[lb]")) console.log("   ", m.text()); }); await page.evaluate(() => { document.querySelector(".dx .d-frame iframe").contentWindow.__lbDebug = true; }); }
+  if (process.env.LB_DEBUG) { page.on("console", (m) => { if (m.text().startsWith("[lb]")) console.log("   ", m.text()); }); await page.evaluate(() => { document.querySelector(".dx:not([data-play]) .d-frame iframe").contentWindow.__lbDebug = true; }); }
 
   // ———— 量 ————
   const geo = (sel) => page.evaluate(([sel]) => {
-    const f = document.querySelector(".dx .d-frame iframe"), d = f.contentDocument, fr = f.getBoundingClientRect(), vp = d.querySelector(".sn-chat-vp"), el = [...d.querySelectorAll(sel)].sort((a, b) => Math.abs(a.getBoundingClientRect().top - 300) - Math.abs(b.getBoundingClientRect().top - 300))[0];
+    const f = document.querySelector(".dx:not([data-play]) .d-frame iframe"), d = f.contentDocument, fr = f.getBoundingClientRect(), vp = d.querySelector(".sn-chat-vp"), el = [...d.querySelectorAll(sel)].sort((a, b) => Math.abs(a.getBoundingClientRect().top - 300) - Math.abs(b.getBoundingClientRect().top - 300))[0];
     const r = el?.getBoundingClientRect(), v = vp.getBoundingClientRect(), nav = document.querySelector(".s-nav").getBoundingClientRect().bottom;
     // 对话列表真正露出来的上下沿（输入框浮在列表底部上面）：沿缩略图那一列点
     let top = v.top, bot = v.bottom; if (r) { const x = (r.left + r.right) / 2; const inV = (y) => { const e = d.elementFromPoint(x, y); return !!e && vp.contains(e); }; let a = Math.ceil(v.top) + .5; while (a < v.bottom && !inV(a)) a++; let best = null, s0 = null; for (let y = a; y < v.bottom; y++) { const h = inV(y); if (h && s0 == null) s0 = y; if ((!h || y + 1 >= v.bottom) && s0 != null) { const e = h ? y : y - 1; if (!best || e - s0 > best[1] - best[0]) best = [s0, e]; s0 = null; } } if (best) { top = best[0]; bot = best[1]; } }
@@ -49,7 +50,7 @@ try {
   }, [sel]);
   // 缩略图在屏幕上露出来的那块（文档页顶栏、窗口、对话列表、输入框都算上）
   const seen = (sel) => page.evaluate(([sel]) => {
-    const f = document.querySelector(".dx .d-frame iframe"), d = f.contentDocument, fr = f.getBoundingClientRect();
+    const f = document.querySelector(".dx:not([data-play]) .d-frame iframe"), d = f.contentDocument, fr = f.getBoundingClientRect();
     const el = [...d.querySelectorAll(sel)].find((e) => { const r = e.getBoundingClientRect(); return fr.top + r.bottom > 0 && fr.top + r.top < innerHeight && r.bottom > 0; }); if (!el) return null;
     d.querySelectorAll("[data-wt]").forEach((e) => e.removeAttribute("data-wt")); el.dataset.wt = "1";
     const r = el.getBoundingClientRect(); let q = { l: fr.left + r.left, t: fr.top + r.top, r: fr.left + r.right, b: fr.top + r.bottom };
@@ -64,7 +65,7 @@ try {
   }, [sel]);
   // 逐帧取样：演示里的参照文字（缩略图以外）、文档页目录、看图框露出来的那块、演示有没有画到顶栏上
   const startSample = () => page.evaluate(() => {
-    const f = document.querySelector(".dx .d-frame iframe"), d = f.contentDocument, w = f.contentWindow, th = d.querySelector("[data-wt]"), sec = d.getElementById("chat"), fr0 = f.getBoundingClientRect();
+    const f = document.querySelector(".dx:not([data-play]) .d-frame iframe"), d = f.contentDocument, w = f.contentWindow, th = d.querySelector("[data-wt]"), sec = d.getElementById("chat"), fr0 = f.getBoundingClientRect();
     const nb = document.querySelector(".s-nav").getBoundingClientRect().bottom;
     const txt = [...sec.querySelectorAll("*")].filter((e) => !e.contains(th) && !th.contains(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && !e.closest(".sn-tip, .sn-menu, [role=tooltip]")).map((e) => ({ e, r: e.getBoundingClientRect() }))
       .filter(({ r }) => r.width > 8 && r.height > 6 && fr0.top + r.top >= nb && fr0.top + r.bottom <= innerHeight && fr0.left + r.left >= 0).sort((a, b) => a.r.top - b.r.top);
@@ -113,7 +114,7 @@ try {
       if (how === "zoom") { await click(W / 2, H / 2 - 40); await page.waitForTimeout(900); }
     }
     let tClose = Date.now();
-    if (how === "x") { const p = await page.evaluate(() => { const f = document.querySelector(".dx .d-frame iframe"), fr = f.getBoundingClientRect(), q = f.contentDocument.querySelector('.sn-lb-bar [data-lb="x"]')?.getBoundingClientRect(); return q ? [fr.left + q.left + q.width / 2, fr.top + q.top + q.height / 2] : null; }); if (p) { await move(p[0], p[1], 500); await page.waitForTimeout(250); tClose = Date.now(); await click(p[0], p[1]); } else { tClose = Date.now(); await page.keyboard.press("Escape"); } }
+    if (how === "x") { const p = await page.evaluate(() => { const f = document.querySelector(".dx:not([data-play]) .d-frame iframe"), fr = f.getBoundingClientRect(), q = f.contentDocument.querySelector('.sn-lb-bar [data-lb="x"]')?.getBoundingClientRect(); return q ? [fr.left + q.left + q.width / 2, fr.top + q.top + q.height / 2] : null; }); if (p) { await move(p[0], p[1], 500); await page.waitForTimeout(250); tClose = Date.now(); await click(p[0], p[1]); } else { tClose = Date.now(); await page.keyboard.press("Escape"); } }
     else if (how === "backdrop") { await move(60, H / 2, 400); await page.waitForTimeout(150); tClose = Date.now(); await click(60, H / 2); }
     else { tClose = Date.now(); await page.keyboard.press("Escape"); }
     await page.waitForTimeout(1100);
@@ -152,12 +153,15 @@ try {
     }
   };
   const pageTo = async (dy) => { if (Math.abs(dy) >= 1) await wheel(dy, W - 220, H / 2); };
-  const demoTop = () => page.evaluate(() => document.querySelector(".dx .d-frame").getBoundingClientRect().top);
+  const demoTop = () => page.evaluate(() => document.querySelector(".dx:not([data-play]) .d-frame").getBoundingClientRect().top);
   const thumbMid = (sel) => geo(sel).then((g) => (g.th ? (g.th.t + g.th.b) / 2 : null));
 
   // ———— 和用户录屏一样：演示上沿滚到顶栏底下，对话里翻到视频，点开，点关闭按钮 ————
   await say("对话页：演示上半截滚进顶栏底下"); await move(W - 220, H / 2, 400);
   await pageTo(await demoTop() + 40);
+  // 组件页现在先放契约示例，设计稿那块演示在下面，滚到了才开始载入：等它载好、对话里有消息了再开始翻
+  await page.waitForFunction(() => { const f = document.querySelector(".dx:not([data-play]) .d-frame iframe"); try { return f.parentElement.classList.contains("sn-ready") && !!f.contentDocument.querySelector(".sn-chat-vp .sn-bubble"); } catch { return false; } }, null, { timeout: 20000 }).catch(() => {});
+  await page.waitForTimeout(800);
   await chatTo(VID, "mid");
   await openClose("看视频：演示上沿在窗口外，点关闭按钮", VID, "x");
   await chatTo(IMG, "mid"); await openClose("看图片：演示上沿在窗口外，按 Esc", IMG, "esc");

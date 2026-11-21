@@ -132,11 +132,14 @@ function syncBg(box) {
   scr.style.setProperty("--s-page", bg || "var(--sn-canvas)");
   scr.style.setProperty("--s-band-t", top || "var(--s-page)"); scr.style.setProperty("--s-band-b", bot || "var(--s-page)");
 }
-// iframe 里滚动 / 改尺寸时重新取上下两条的颜色（一帧最多一次）
+// iframe 里滚动、改尺寸、内容换了（play.html 是 load 以后才把示例插进来的）时重新取上下两条的颜色（一帧最多一次）
 function watchFrame(box) {
-  const f = $("iframe", box); let raf = 0;
+  const f = $("iframe", box); let raf = 0, mo = null;
   const again = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; syncBg(box); }); };
-  f.addEventListener("load", () => { syncBg(box); try { const w = f.contentWindow; w.addEventListener("scroll", again, { passive: true }); w.addEventListener("resize", again); } catch {} });
+  f.addEventListener("load", () => {
+    syncBg(box); mo?.disconnect();
+    try { const w = f.contentWindow, d = f.contentDocument; w.addEventListener("scroll", again, { passive: true }); w.addEventListener("resize", again); mo = new MutationObserver(again); mo.observe(d.body, { childList: true, subtree: true }); } catch {}
+  });
 }
 export function mountDevices(scope = document) {
   for (const box of $$("[data-devbox]:not([data-ready])", scope)) {

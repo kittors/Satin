@@ -205,6 +205,8 @@ const nameOf = (x) => {
 };
 // 契约里写成"—"的也算这种写法里没有（进度卡片的 cancel / open 事件只有 createProgressCard 和纯 HTML 写法有）
 const hasIn = (x) => { const nm = nameOf(x); return nm != null && !/^[—–-]?$/.test(String(nm).trim()) && !(x.markupOnly && nameKey() !== "html"); };
+// 契约里按写法给的字段（typeBy / descBy / payloadBy / whenBy，键和 names 一样）：当前写法写了就用它，没写用通用的那个。Next 算 React、Nuxt 算 Vue（nameKey 已经换好）
+const by = (x, f) => x[f + "By"]?.[nameKey()] ?? x[f];
 // 一个演示 / 配方在当前框架下的文件；这个框架还没有对应写法时明说，给自定义元素写法（纯 HTML 那份），不悄悄换成别的框架
 async function codeFiles(kind, key) {
   const fw = getFw(), rel = kind === "demo" ? fw.demo(key) : fw.recipe(key), main = `../${fw.dir}/${rel}`, dir = main.slice(0, main.lastIndexOf("/") + 1);
@@ -264,7 +266,8 @@ function variantFiles(c, doc, n) {
 // 给 scripts/examples/gallery.mjs 用：这一页每个演示（等演示载好、按真实排版判断空白以后）7 种写法的文件
 // 设计稿里的演示（有契约的组件页上"完整演示"那几块不带代码面板，也要算；契约示例的框 data-play 另外按契约生成，不算在这里；
 // 展示页自己的演示（USAGE 里 demoOnly，比如万级节点压测）没有组件库的代码，生成出来是空的，也不算）
-window.__satinDemoFiles = () => $$(".dx[data-demo]", main).filter((box) => !box.dataset.play && !USAGE[box.dataset.demo]?.demoOnly).map((box) => {
+// 写法以契约示例为准的设计稿演示（USAGE 的 skipDemos，比如表格 8 的完整示例）也不算
+window.__satinDemoFiles = () => $$(".dx[data-demo]", main).filter((box) => !box.dataset.play && !USAGE[box.dataset.demo]?.demoOnly && !USAGE[box.dataset.demo]?.skipDemos?.includes(+(box.dataset.n ?? 0))).map((box) => {
   const c = cat.byId[box.dataset.demo], n = box.dataset.n != null ? +box.dataset.n : 0, f = box.querySelector("iframe");
   let doc = null; try { doc = f.contentDocument; } catch {}
   const ready = !!(doc && doc.__dx), fs = variantFiles(c, ready ? doc : null, n);
@@ -312,6 +315,8 @@ function wireDemo(box, c) {
   whenReady(f, (doc) => {
     try { doc.documentElement.dataset.theme = root.dataset.theme; doc.documentElement.style.setProperty("--sn-vh", innerHeight + "px"); } catch {} // --vh：演示里浮层的高度上限按文档页的真实窗口高算（见 form.css 的 .menu）
     requestAnimationFrame(() => requestAnimationFrame(() => {
+      // 这两帧里已经换页了（演示框被拿掉、iframe 没了窗口）：不接了，不然 watchFloats 拿 null 的 contentWindow 报错
+      if (!f.isConnected || !f.contentWindow || f.contentDocument !== doc) return;
       // 窗口样式的演示：挡住整页的浮层（弹窗、抽屉、命令面板、看图）和全局提示照样铺满整个窗口；跟着元素弹出的浮层留在窗口里（窗口有边框，不往外伸）
       if (box.classList.contains("is-win")) { mirrorCtl(box, doc, box.dataset.demo); watchFloats(f, doc, { anchored: false }); } else watchFloats(f, doc);
     }));
@@ -705,7 +710,7 @@ const md = (t) => md2html(String(t ?? ""));
 // 契约里提到的另一项（相近组件、别用时改用什么）：是组件就链到组件页；基础那几项（颜色、间距、布局……）没有组件页，链到规范里同名的那页
 function refOf(id) {
   if (!id) return null;
-  const c = cat.byId[id]; if (c) return { href: "#/c/" + id, name: c.name, en: (c.en || "").split(" · ")[0] };
+  const c = cat.byId[id]; if (c && byHash.has("#/c/" + id)) return { href: "#/c/" + id, name: c.name, en: (c.en || "").split(" · ")[0] }; // 目录里有、但不是组件页的（基础那几项）往下找规范页
   const g = byHash.get("#/guide/" + id); return g ? { href: g.hash, name: g.title, en: g.p?.en || "规范" } : null;
 }
 function contractHTML(c, k) {
@@ -724,13 +729,13 @@ function contractHTML(c, k) {
   if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示"), `<p>设计稿里把几种用法组合在一起的样子，可以直接操作；代码看上面的示例。</p>`); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n, code: false }))); }
   // 4. API（按当前框架的叫法）
   out.push(anchor("api", "API"));
-  if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => { const ps = k.props.filter(hasIn); return !ps.length ? "<p>这种写法里没有单独的属性。</p>" : apiTbl(["名称", "类型", "默认值", "必填", "说明"], ps.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", x.required ? "是" : "", md(x.desc) + (x.example ? `<br><code>${esc(x.example)}</code>` : "")]), ["n", "m", "m:默认", "r", "d"]); }));
+  if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => { const ps = k.props.filter(hasIn); return !ps.length ? "<p>这种写法里没有单独的属性。</p>" : apiTbl(["名称", "类型", "默认值", "必填", "说明"], ps.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(by(x, "type") || "")}</code>`, by(x, "default") != null ? `<code>${esc(by(x, "default"))}</code>` : "—", x.required ? "是" : "", md(by(x, "desc")) + (by(x, "example") ? `<br><code>${esc(by(x, "example"))}</code>` : "")]), ["n", "m", "m:默认", "r", "d"]); }));
   // 列定义（数据表格、Canvas 表格契约里的 columnProps）：columns 里每一项的字段，各框架写法一样
-  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 里每一项的字段（各框架写法一样）。</p>`, apiTbl(["字段", "类型", "默认值", "说明"], k.columnProps.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", md(x.desc)]), ["n", "m", "m:默认", "d"]));
-  if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => { const es = k.events.filter(hasIn); return !es.length ? "<p>这种写法里没有单独的事件。</p>" : apiTbl(["名称", "参数", "什么时候触发"], es.map((x) => [`<code>${esc(nameOf(x))}</code>`, x.payload ? `<code>${esc(x.payload)}</code>` : "", md(x.when)]), ["n", "m:参数", "d"]); }));
-  if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => { const ss = k.slots.filter(hasIn); return !ss.length ? "<p>这种写法里没有插槽 / 子元素。</p>" : apiTbl(["名称", "说明"], ss.map((x) => [`<code>${esc(nameOf(x))}</code>`, md(x.desc)]), ["n", "d"]); }));
-  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, apiTbl(["名称", "签名", "说明"], k.methods.map((x) => [`<code>${esc(x.name)}</code>`, x.signature ? `<code>${esc(x.signature)}</code>` : "", md(x.desc)]), ["n", "m", "d"]));
-  if (k.functions?.length) out.push(`<h3 class="d-h3">函数</h3>`, apiTbl(["名称", "签名", "说明"], k.functions.map((x) => [`<code>${esc(x.name)}</code>${x.from ? `<br><small>${esc(x.from)}</small>` : ""}`, x.signature ? `<code>${esc(x.signature)}</code>` : "", md(x.desc)]), ["n", "m", "d"]));
+  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 里每一项的字段（各框架写法一样）。</p>`, apiTbl(["字段", "类型", "默认值", "说明"], k.columnProps.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(by(x, "type") || "")}</code>`, by(x, "default") != null ? `<code>${esc(by(x, "default"))}</code>` : "—", md(by(x, "desc"))]), ["n", "m", "m:默认", "d"]));
+  if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => { const es = k.events.filter(hasIn); return !es.length ? "<p>这种写法里没有单独的事件。</p>" : apiTbl(["名称", "参数", "什么时候触发"], es.map((x) => [`<code>${esc(nameOf(x))}</code>`, by(x, "payload") ? `<code>${esc(by(x, "payload"))}</code>` : "", md(by(x, "when"))]), ["n", "m:参数", "d"]); }));
+  if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => { const ss = k.slots.filter(hasIn); return !ss.length ? "<p>这种写法里没有插槽 / 子元素。</p>" : apiTbl(["名称", "说明"], ss.map((x) => [`<code>${esc(nameOf(x))}</code>`, md(by(x, "desc"))]), ["n", "d"]); }));
+  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, apiTbl(["名称", "签名", "说明"], k.methods.map((x) => [`<code>${esc(x.name)}</code>`, by(x, "signature") ? `<code>${esc(by(x, "signature"))}</code>` : "", md(by(x, "desc"))]), ["n", "m", "d"]));
+  if (k.functions?.length) out.push(`<h3 class="d-h3">函数</h3>`, apiTbl(["名称", "签名", "说明"], k.functions.map((x) => [`<code>${esc(x.name)}</code>${x.from ? `<br><small>${esc(x.from)}</small>` : ""}`, by(x, "signature") ? `<code>${esc(by(x, "signature"))}</code>` : "", md(by(x, "desc"))]), ["n", "m", "d"]));
   if (k.cssVars?.length) out.push(`<h3 class="d-h3">样式定制</h3>`, apiTbl(["CSS 变量", "作用", "默认"], k.cssVars.map((x) => [`<code>${esc(x.name)}</code>${x.token ? " <small>全局令牌</small>" : ""}`, md(x.desc), esc(x.default || "")]), ["n", "d", "m:默认"]));
   if (k.classes?.length) out.push(`<h3 class="d-h3">纯 HTML 写法的类名、data 属性</h3>`, apiTbl(["写法", "说明"], k.classes.map((x) => [`<code>${esc(x.name)}</code>`, md(x.desc)]), ["n", "d"]));
   if (k.types?.length) out.push(`<h3 class="d-h3">TypeScript 类型</h3><p>${k.types.map((t) => `<code>${esc(t)}</code>`).join("、")}</p>`);

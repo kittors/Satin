@@ -13,6 +13,7 @@
 //   node scripts/docs-audit.mjs                                  浅色、1440 宽，全部检查
 //   node scripts/docs-audit.mjs --theme dark --width 390
 //   node scripts/docs-audit.mjs --pages popover,select --no-floats  只查这几页（组件 id 或 #/… 地址），不点浮层
+//   node scripts/docs-audit.mjs --theme dark --part 1/3           按侧栏顺序分三段，只跑第一段
 // 结果：终端打印汇总；--out 目录（默认 /tmp/satin-audit/主题-宽度）里有 report.json 和有问题时的截图。
 // 需要 Playwright 和本机 Chrome：PLAYWRIGHT 环境变量指向 playwright 包，默认用 TaleFrame 的
 import { createRequire } from "node:module";
@@ -184,6 +185,8 @@ try {
   await page.goto(`${BASE}#/intro`); await page.waitForTimeout(1500);
   let pages = await page.evaluate(() => [...document.querySelectorAll("[data-side] a[href]")].map((a) => ({ h: a.getAttribute("href"), t: a.textContent.trim() })));
   if (ONLY) { const want = String(ONLY).split(","); pages = pages.filter((p) => want.some((w) => p.h === w || p.h === "#/c/" + w || p.h.endsWith("/" + w))); }
+  // --part 2/3：按侧栏顺序切成几段，只跑第几段（全站一次跑太久，分段排队拿浏览器锁）
+  const PART = arg("part", ""); if (PART) { const [k, n] = String(PART).split("/").map(Number), per = Math.ceil(pages.length / n); pages = pages.slice((k - 1) * per, k * per); }
   console.log(`${THEME} · ${W}×${H} · ${pages.length} 页 · 浮层${FLOATS ? "检查" : "不查"}`);
   // 自检（--selftest）：用一条样式把弹出面板页演示的画布钉死、不许伸（模拟浮层处理失效），点"筛选"，巡检必须报出被裁——证明这套检查抓得到问题
   if (arg("selftest", false)) {

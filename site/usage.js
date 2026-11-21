@@ -35,7 +35,8 @@ export const USAGE = {
   loading: { css: ["feedback.css"], api: [["loadWithSkeleton(容器, { load, skeleton, render, stagger })", C]] },
   progress: { css: ["feedback.css"], api: [["createProgressCard(.sn-pcard, { onCancel, onOpen })", C], ["progressHTML({ value, ring, size })", C]] },
   numflow: { css: ["number.css"], api: [["createNumberFlow(元素, { value, format, style })", C]] },
-  table: { css: ["data.css"], js: "排序、勾选批量、多级展开这些交互目前只在展示页里接上，组件库里还没有公开的表格组件；静态的几种只要标记和样式" },
+  // skipDemos：这几个设计稿演示的写法以契约示例为准，不单独生成示例（表格 8 的"完整示例"拆成了契约里的树形、合并、拖动等几个示例）
+  table: { css: ["data.css"], js: "createTable（satin-ui）：列定义 + 数据；排序、勾选、多级展开、合并、拖行拖列、改列宽都是选项，写法见上面的示例；静态的几种只要标记和样式", skipDemos: [8] },
   grid: { css: ["grid.css", "data.css"], api: [["createDataGrid(空容器, { columns, data 或 dataSource, rowKey })", "satin-ui/grid"]] },
   cgrid: { css: ["grid.css", "data.css"], api: [["createCanvasGrid(空容器, { columns, data 或 dataSource, rowKey })", "satin-ui/canvas-grid"]] },
   list: { css: ["data.css"] },

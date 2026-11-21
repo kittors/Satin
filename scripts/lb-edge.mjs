@@ -1,4 +1,5 @@
 // 看图（缩略图 → 大图 → 缩回）边界测试：缩略图摆在各种位置打开、关上，逐帧量 + 录像。
+// （2026-11-21）组件页现在先放契约示例（.dx[data-play]，iframe 是 examples/html/play.html），这里测的是设计稿演示（index.html?embed=区块），只在 .dx:not([data-play]) 里找
 // 和用户一样的环境：滚动条常显、1440×900（--width 改宽度，--theme dark 深色）。
 //
 // 位置（文档页滚到哪）× 位置（缩略图在它自己的滚动区里在哪）× 关法：
@@ -39,9 +40,9 @@ const CASES = [
   { name: "图片组件·正中·Esc", page: "image", trig: ".sn-im.sn-loaded", outer: "center", close: "esc" },
   { name: "图片组件·一半在顶栏底下·Esc", page: "image", trig: ".sn-im.sn-loaded", outer: "navedge", close: "esc" },
   { name: "图片组件·一半在窗口下沿外·点空白处", page: "image", trig: ".sn-im.sn-loaded", outer: "bottom", close: "backdrop" },
-  { name: "Markdown 图片·正中·Esc", page: "md", trig: ".md-img.blk.ok img", inner: "full", outer: "center", close: "esc" },
-  { name: "Markdown 图片·一半被窗口上沿裁掉·Esc", page: "md", trig: ".md-img.blk.ok img", inner: "cutTop", outer: "center", close: "esc" },
-  { name: "Markdown 图片·一半在顶栏底下·Esc", page: "md", trig: ".md-img.blk.ok img", inner: "full", outer: "navedge", close: "esc" },
+  { name: "Markdown 图片·正中·Esc", page: "md", trig: ".sn-md-img.sn-blk.sn-ok img", inner: "full", outer: "center", close: "esc" },
+  { name: "Markdown 图片·一半被窗口上沿裁掉·Esc", page: "md", trig: ".sn-md-img.sn-blk.sn-ok img", inner: "cutTop", outer: "center", close: "esc" },
+  { name: "Markdown 图片·一半在顶栏底下·Esc", page: "md", trig: ".sn-md-img.sn-blk.sn-ok img", inner: "full", outer: "navedge", close: "esc" },
 ].filter((c) => !ONLY || String(ONLY).split(",").some((k) => c.name.includes(k)));
 
 const browser = await pw.chromium.launch({ channel: "chrome", ignoreDefaultArgs: ["--hide-scrollbars"], args: [`--window-size=${W},${H}`, "--autoplay-policy=no-user-gesture-required", "--disable-features=OverlayScrollbar"] });
@@ -63,7 +64,7 @@ try {
       // 先找有这种缩略图的演示（不看加载没加载好），滚到它那里等它载好、图片加载好；对话里图片在上面的历史消息里，往上翻到它出现
       const base = trig.replace(".sn-ok", "");
       for (let i = 0; i < 150; i++) {
-        const fs = [...document.querySelectorAll(".dx .d-frame iframe")], f = fs.find((g) => g.contentDocument?.querySelector(base));
+        const fs = [...document.querySelectorAll(".dx:not([data-play]) .d-frame iframe")], f = fs.find((g) => g.contentDocument?.querySelector(base));
         if (f) {
           if (i % 10 === 0) f.closest(".dx").scrollIntoView({ block: "center", behavior: "instant" });
           // 图片是懒加载的：在它自己的滚动区里滚到看得见的地方它才会加载（Markdown 窗口里第一张图在窗口下面）
@@ -75,7 +76,7 @@ try {
           if (f.parentElement.classList.contains("sn-ready") && f.contentDocument.querySelector(trig)) { f.dataset.lbt = "1"; f.contentDocument.querySelector(trig).dataset.lbtEl = "1"; return true; }
         } else {
           (fs.find((g) => !g.parentElement.classList.contains("sn-ready")) || fs[i % fs.length])?.closest(".dx").scrollIntoView({ block: "center", behavior: "instant" });
-          if (i > 15) for (const g of document.querySelectorAll(".dx .d-frame.ready iframe")) { const vp = g.contentDocument?.querySelector(".sn-chat-vp"); if (vp) { vp.dispatchEvent(new WheelEvent("wheel", { bubbles: true })); vp.scrollTop -= 400; } }
+          if (i > 15) for (const g of document.querySelectorAll(".dx:not([data-play]) .d-frame.sn-ready iframe")) { const vp = g.contentDocument?.querySelector(".sn-chat-vp"); if (vp) { vp.dispatchEvent(new WheelEvent("wheel", { bubbles: true })); vp.scrollTop -= 400; } }
         }
         await new Promise((r) => setTimeout(r, 100));
       }

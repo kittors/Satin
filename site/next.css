@@ -484,11 +484,11 @@
 /* 全局浮层打开时：演示画布铺满整个窗口，层级盖过顶栏；挡住整页的浮层打开时页面不滚 */
 /* 宽高按窗口里能放东西的区域（不含常显的滚动条）：用 100vw 会伸到滚动条底下，靠右的轻提示被滚动条挡住一截 */
 .dx .d-frame iframe.global { position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 1000; }
-/* 深色主题下演示文档是 color-scheme: dark，iframe 元素上写的是 normal：两边不一致，浏览器给 iframe 垫一层不透明的底（Canvas 色）。
-   在框里看不出来；铺满窗口时这层底把整个文档页盖成一片黑，轻提示四周也会多出一圈深色方块（2026-11-20 看图边界测试深色抓到）。
-   铺满时 iframe 跟随页面配色（底变透明），原来那层底改由预览框画同样的 Canvas 色：演示看起来一点不变，文档页照常露出来 */
-.dx .d-frame iframe.global { color-scheme: inherit; }
-[data-theme="dark"] .dx .d-frame:has(> iframe.global) { background: Canvas; }
+/* 深色主题下演示文档是 color-scheme: dark，原版（site.css）在 iframe 元素上写的是 normal：两边不一致，浏览器给 iframe 垫一层不透明的 Canvas 底（#121212）——
+   预览框比内容高时，框里中间一条深灰、上下露出预览框的黑底；铺满窗口时这层底还会把整个文档页盖成一片黑（2026-11-20 看图边界测试深色抓到，当时只给铺满的情况绕开）。
+   2026-11-21 主会话看图确认是毛病：深色下 iframe 元素也写 dark，两边一致就没有这层底，框里整块是预览框的底色，铺满窗口时也透明，原来那条补色规则不要了。
+   浅色下 iframe 还是 normal，和原来一像素不差 */
+[data-theme="dark"] .dx .d-frame iframe { color-scheme: dark; }
 .mac:has(iframe.global) { isolation: auto; } /* 窗口样式的演示铺满窗口时：窗口自己的层叠上下文会把画布压在页头下面，先放开 */
 /* 弹窗、看图时锁住整页：常显的滚动条收起，同时在右边补上滚动条那么宽的内边距（--sbw，锁之前量好），页面一像素都不挪、演示不重新排版。
    不用 scrollbar-gutter: stable 留着滚动条的位置：留着的那一条遮罩盖不到，看图时窗口右边一直亮着一条（2026-11-20 看图边界测试逐帧抓到） */
