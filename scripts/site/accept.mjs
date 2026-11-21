@@ -81,6 +81,21 @@ if (!SKIP.includes("fw")) {
     await ctx.close();
   }
 }
+// 5. 组件文档样板（有契约的 5 个）：React、Vue × 桌面、手机，各截示例那一段和 API 那一段
+if (!SKIP.includes("comps")) {
+  for (const W of [1440, 390]) {
+    const ctx = await ctxOf(W, "light"), page = await ctx.newPage(); watch(page, `comp-${W}`);
+    for (const fw of ["react", "vue"]) for (const id of ["button", "select", "dialog", "picker", "grid"]) {
+      await page.goto(`${B}next-docs.html?fw=${fw}#/c/${id}`, { waitUntil: "load" }); await sleep(2600);
+      await page.screenshot({ path: `${OUT}/comp-${id}-${fw}-${W}-top.png` });
+      for (const sec of ["examples", "api"]) {
+        await page.evaluate((sec) => document.getElementById(sec)?.scrollIntoView({ block: "start" }), sec); await sleep(1400);
+        await page.screenshot({ path: `${OUT}/comp-${id}-${fw}-${W}-${sec}.png` });
+      }
+    }
+    await ctx.close();
+  }
+}
 await browser.close();
 report.errors = [...new Set(errs)].slice(0, 30);
 fs.writeFileSync(path.join(OUT, "report.json"), JSON.stringify(report, null, 1));
