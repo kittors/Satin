@@ -197,7 +197,7 @@
     "en": "Slider",
     "group": "表单",
     "summary": "悬停时圆钮放大，拖动时再放大一点，并在上方显示数值。方向键每次走一格，按住 Shift 走十格。",
-    "contract": 0
+    "contract": 1
   },
   {
     "id": "otp",

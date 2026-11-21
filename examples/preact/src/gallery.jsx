@@ -53,6 +53,9 @@ import SegmentedSizes from "./demos/segmented-sizes.jsx";
 import SegmentedControlled from "./demos/segmented-controlled.jsx";
 import SegmentedBasic from "./demos/segmented-basic.jsx";
 import SegmentedDemo0 from "./demos/segmented-0.jsx";
+import SliderMax from "./demos/slider-max.jsx";
+import SliderControlled from "./demos/slider-controlled.jsx";
+import SliderBasic from "./demos/slider-basic.jsx";
 import SliderDemo0 from "./demos/slider-0.jsx";
 import OtpDemo0 from "./demos/otp-0.jsx";
 import TooltipDemo0 from "./demos/tooltip-0.jsx";
@@ -266,6 +269,9 @@ function Gallery() {
       </section>
       <section id="slider">
         <h2>滑块</h2>
+        <div class="demo" data-demo="slider-max"><SliderMax /></div>
+        <div class="demo" data-demo="slider-controlled"><SliderControlled /></div>
+        <div class="demo" data-demo="slider-basic"><SliderBasic /></div>
         <div class="demo" data-demo="slider-0"><SliderDemo0 /></div>
       </section>
       <section id="otp">

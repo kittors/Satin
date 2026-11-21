@@ -454,6 +454,36 @@
   "css": true
  },
  {
+  "slug": "slider-max",
+  "id": "slider",
+  "n": -1,
+  "name": "滑块",
+  "group": "表单",
+  "cap": "自己的范围",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "slider-controlled",
+  "id": "slider",
+  "n": -1,
+  "name": "滑块",
+  "group": "表单",
+  "cap": "受控：旁边显示当前值",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "slider-basic",
+  "id": "slider",
+  "n": -1,
+  "name": "滑块",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "slider-0",
   "id": "slider",
   "n": 0,
