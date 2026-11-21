@@ -224,9 +224,9 @@ export function setStep(steps, i) {
 // 行是列表里的 .drag-row（可以用 row 选项换）。返回 { rows() }
 export function mountReorder(list, { onReorder, row: rowSel = ".sn-drag-row" } = {}) {
   if (list._ro) return list._ro;
-  let line = $(".sn-drop-line", list); if (!line) { line = document.createElement("span"); line.className = "sn-drop-line"; list.prepend(line); }
+  let line = $(".sn-drop-line", list); if (!line) { line = document.createElement("span"); line.className = "sn-drop-line"; list.prepend(line); onCleanup(() => line.remove()); }
   const live = document.createElement("span");
-live.className = "sn-dl-sr"; live.setAttribute("aria-live", "assertive"); list.after(live);
+live.className = "sn-dl-sr"; live.setAttribute("aria-live", "assertive"); list.after(live); onCleanup(() => live.remove()); // 组件销毁时拿掉（框架里卸载、重挂不会越积越多）
 const rowsOf = () => $$(rowSel, list), GAP = 6, A = 8, SLOP = 4, AWAY = 40, EDGE = 56, RUB = 36;
 const say = (t) => { live.textContent = ""; if (t) setTimeout(() => (live.textContent = t), 30); };
 const rubber = (o) => (1 - 1 / ((o * .55) / RUB + 1)) * RUB; // 超出的距离 → 实际多走的距离：越拉越沉，最多 36px
@@ -339,18 +339,36 @@ list.addEventListener("focusout", (e) => { if (kb) return; const row = e.target.
 }
 // ———— 8. 新增与删除：插进来的从下面淡入，别的元素让位；删掉的先脱离布局淡出，剩下的用弹簧补位 ————
 // insertWithFlip(容器, 元素, 放在谁前面)；removeWithFlip(元素) 返回 Promise（动画走完、元素移除后）
+// 框架里（DOM 由 React、Vue……改）：删用 removeWithFlip(元素, { keep: true })，Promise 完成后再改数据；加用 flipSnapshot，见下
+const ENTER = [{ opacity: 0, transform: "translateY(8px) scale(.96)" }, { opacity: 1, transform: "none" }];
 export function insertWithFlip(box, el, before = null) {
   const sibs = [...box.children].filter((x) => x !== el && getComputedStyle(x).position !== "absolute");
   flip(sibs, () => box.insertBefore(el, before), { duration: 260 });
-  if (!reduced()) el.animate([{ opacity: 0, transform: "translateY(8px) scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 240, easing: OUT });
+  if (!reduced()) el.animate(ENTER, { duration: 240, easing: OUT });
   return el;
 }
-export function removeWithFlip(el) {
+// keep：动画走完不把元素拿掉（留在原处、脱离布局、透明），交给框架按数据删——框架自己删节点，库不跟它抢
+export function removeWithFlip(el, { keep = false } = {}) {
   const box = el.parentElement, sibs = [...box.children].filter((s) => s !== el), r = el.getBoundingClientRect(), br = box.getBoundingClientRect();
   if (getComputedStyle(box).position === "static") box.style.position = "relative";
   flip(sibs, () => Object.assign(el.style, { position: "absolute", left: r.left - br.left + "px", top: r.top - br.top + "px", width: r.width + "px", pointerEvents: "none" }), { duration: 520, easing: SPRING });
-  if (reduced()) { el.remove(); return Promise.resolve(); }
-  return new Promise((ok) => { el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.96)" }], { duration: 160, easing: EASE_IN, fill: "forwards" }).onfinish = () => { el.remove(); ok(); }; });
+  const done = () => { if (keep) el.style.opacity = "0"; else el.remove(); };
+  if (reduced()) { done(); return Promise.resolve(); }
+  return new Promise((ok) => { el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.96)" }], { duration: 160, easing: EASE_IN, fill: "forwards" }).onfinish = () => { done(); ok(); }; });
+}
+// 框架里加一项：改数据之前 const play = flipSnapshot(容器) 记下每个子元素现在的位置；DOM 更新以后 play(新元素)——
+// 留下来的元素从旧位置平滑移到新位置，新元素按"新增"的方式出现（和 insertWithFlip 一样的动画）
+export function flipSnapshot(box) {
+  const before = new Map([...box.children].filter((x) => getComputedStyle(x).position !== "absolute").map((e) => [e, e.getBoundingClientRect()]));
+  return (entering) => {
+    if (reduced()) return;
+    for (const [e, a] of before) {
+      if (e.parentElement !== box) continue;
+      const b = e.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+      if (dx || dy) e.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }], { duration: 260, easing: IN_OUT, fill: "backwards" });
+    }
+    for (const el of [entering].flat()) if (el && !before.has(el)) el.animate(ENTER, { duration: 240, easing: OUT });
+  };
 }
 // ———— 9. 乐观更新：先显示结果再保存；失败时抖两下、恢复、给重试 ————
 // optimistic({ apply, revert, save, shake, failText })：apply() 马上改界面；save() 返回 Promise；失败就 revert()、shake 元素抖两下、

@@ -122,7 +122,9 @@ export const Chip = /* @__PURE__ */ defineComponent({
     const el = ref(null);
     return () => {
       const on = p.modelValue ?? p.selected ?? false;
-      if (p.removable) return h("span", { ref: el, class: cx("sn-chip", "sn-tag", on && "sn-on") }, [slots.default?.(), h("button", { type: "button", class: "sn-x", "aria-label": p.removeLabel ?? tt("components.remove"), onClick: () => removeChip(el.value, { keep: true, onRemoved: () => emit("remove") }) }, [h(Icon, { name: "x" })])]);
+      // 移除按钮读作"移除 雨夜"（和 React 版一样带上标签的字；插槽里只有文字时取得到）
+      if (p.removable) { const kids = slots.default?.(), text = (kids || []).map((v) => (typeof v.children === "string" ? v.children : "")).join("").trim();
+        return h("span", { ref: el, class: cx("sn-chip", "sn-tag", on && "sn-on") }, [kids, h("button", { type: "button", class: "sn-x", "aria-label": p.removeLabel ?? `${tt("components.remove")} ${text}`.trim(), onClick: () => removeChip(el.value, { keep: true, onRemoved: () => emit("remove") }) }, [h(Icon, { name: "x" })])]); }
       if (p.modelValue !== undefined) return h("button", { type: "button", class: cx("sn-chip", on && "sn-on"), "aria-pressed": String(on), onClick: () => { emit("update:modelValue", !on); emit("change", !on); } }, [h(Icon, { name: "check" }), slots.default?.()]);
       return h("span", { class: cx("sn-chip", on && "sn-on") }, slots.default?.());
     };

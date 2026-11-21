@@ -85,7 +85,10 @@ export type PickerKind = "date" | "range" | "time" | "datetime" | "region";
 export interface PickerOptions { kind?: PickerKind; placeholder?: string; label?: string; today?: Date; now?: Date; onChange?(detail: PickDetail): void }
 export const createPicker: SatinFactory<PickerOptions>;
 export const createUpload: SatinFactory<{ list?: HTMLElement; accept?: RegExp; maxSize?: number; /** 类型不对时那一行的提示 */ badType?: string; /** 超过 maxSize 时那一行的提示 */ tooBig?: string; upload?(file: File, progress: (p: number) => void): Promise<unknown> }, { add(files: FileList | File[]): void }>;
-export const createReorder: SatinFactory<{ row?: string; onReorder?(e: { from: number; to: number; row: HTMLElement }): void }>;
+/** 拖拽重排：row 行的选择器（默认 ".sn-drag-row"，拖的把手是行里的 .sn-grip）；onReorder 顺序变了（拖拽、键盘都算）：from 原来第几个、to 放到第几个、row 这一行 */
+export interface ReorderOptions { row?: string; onReorder?(e: { from: number; to: number; row: HTMLElement }): void }
+/** 行由库直接挪（DOM 顺序就是新顺序）；rows() 按现在的顺序返回行 */
+export const createReorder: SatinFactory<ReorderOptions, { rows(): HTMLElement[] }>;
 /** 侧栏布局（.sn-app）：选中切换、收起 / 展开（⌘\\）。collapseBelow：布局窄于这个宽度时自动收成图标栏（手机上用，比如 720） */
 export const createSidebar: SatinFactory<{ onNavigate?(link: HTMLElement): void; collapseBelow?: number }, { toggle(): void; select(link: HTMLElement): void; setFx(fx: "slide" | "bar" | "fade" | "text"): void }>;
 export const createInfiniteList: SatinFactory<{ loadPage(offset: number, size: number): Promise<unknown[]>; /** 把一行画出来：row 是行元素（会复用，子元素可以缓存在 row._d 上），item 是这一行的数据 */ renderRow(row: HTMLElement, item: any, index: number): void; rowHeight?: number; total?: number; pageSize?: number; /** 数量变了调：loaded 已加载的条数；total 总数（mountInfiniteList 会给；createInfiniteList 现在只转第一个参数，total 是 undefined） */ onCount?(loaded: number, total?: number): void }, { reload(): void; scrollTop(): void; readonly count: number }>;
@@ -172,10 +175,14 @@ export function mountSelect(el: HTMLElement, options?: { onChange?(value: string
 export function bindSelects(root?: ParentNode): void;
 /** 插入一行：其余行平滑让位（FLIP） */
 export function insertWithFlip(container: HTMLElement, el: HTMLElement, before?: Element | null): void;
-/** 删掉一行：先淡出收起，其余行平滑补位 */
-export function removeWithFlip(el: HTMLElement): void;
+/** 删掉一行：先脱离布局淡出，其余行用弹簧补位；Promise 在动画走完后完成。keep：不从页面上拿掉（框架里用：Promise 完成后再改数据，让框架删节点） */
+export function removeWithFlip(el: HTMLElement, options?: { keep?: boolean }): Promise<void>;
+/** 框架里加一项：改数据之前调，记下容器里每个子元素现在的位置；DOM 更新以后调返回的函数——留下的元素平滑移到新位置，传进来的新元素按"新增"的方式出现 */
+export function flipSnapshot(container: HTMLElement): (entering?: Element | Element[] | null) => void;
 /** 乐观更新：先 apply() 显示结果，再 save()；失败时 revert()、抖一下 shake 元素、弹出带"重试"的 Toast */
-export function optimistic(options: { apply(): void; revert(): void; save(): Promise<unknown> | unknown; shake?: HTMLElement; failText?: string }): Promise<unknown>;
+/** apply 马上改界面；revert 保存失败时改回去；save 保存（返回 Promise，reject 算失败）；shake 失败时左右抖两下的元素；failText 失败提示（默认"没保存上，已恢复原样"），带"重试" */
+export interface OptimisticOptions { apply(): void; revert(): void; save(): Promise<unknown> | unknown; shake?: HTMLElement; failText?: string }
+export function optimistic(options: OptimisticOptions): Promise<unknown>;
 /** load() 超过一小会儿还没回来才显示骨架屏 skeleton；回来以后换成 render(数据) 的内容（逐行错开淡入）。shown：骨架屏有没有出现过，waited：等了多少毫秒 */
 export function loadWithSkeleton<T>(el: HTMLElement, options: { load(): Promise<T> | T; skeleton?: string; render?(data: T): string; stagger?: number }): Promise<{ shown: boolean; waited: number }>;
 /** Toast 出现的位置：顶部居中（默认）或底部居中；记在 localStorage，刷新后保持 */

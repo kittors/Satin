@@ -300,7 +300,7 @@ export { icon } from "./icons.js";
 // 表单校验：validateForm(form) 逐个查 required / pattern / 自定义校验，把错误写到字段下面；setFieldError / clearFieldError 单独设、清
 export { validateForm, setFieldError, clearFieldError, prepBusy, initSlider, mountSelect, bindSelects } from "./form.js";
 // 列表增删的动画（FLIP）、乐观更新（先改界面、失败再退回）
-export { insertWithFlip, removeWithFlip, optimistic } from "./nav.js";
+export { insertWithFlip, removeWithFlip, flipSnapshot, optimistic } from "./nav.js";
 // 骨架屏占位到真内容的过渡；Toast 的位置（右下、顶部居中……）
 export { loadWithSkeleton, setToastPos, mountProgress } from "./feedback.js";
 // 在任意位置开浮层（右键菜单、表格单元格里的编辑器）；在一段已有标记里把浮层的触发器接上
