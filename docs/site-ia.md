@@ -1,6 +1,7 @@
 # 官网信息架构（site/next.html、site/next-docs.html）
 
 > 2026-11-21 按用户反馈重排（主会话转达）："设计要非常合理"——展示页是以前的 demo，不在官网露出；顶栏每一项进到和名字一致的专属页面；要有 CLI 的快速开始。
+> 入口：`/site/` 和旧的 `site/docs.html` 都转到新版（查询参数和 # 原样带过去）；旧版官网挪进 `site/legacy/` 保留，官网任何地方都不链接它。
 > 页面清单只有一份：`site/nav-pages.js`（文档页左边的目录、上一页 / 下一页、窄屏抽屉、⌘K 搜索都读它）；页面正文在 `site/pages.js`、`site/pages-more.js`。
 
 ## 站点地图

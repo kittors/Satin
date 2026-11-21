@@ -109,6 +109,14 @@
 - 14:10 对基线跑同样几页（表格、数据表格、滚动区域、播放器）：播放器"全屏"挪 7.5px、"静音"悬停没提示**基线里一样有**（不是回归）；基线的表格页换页不慢（基线没有那个 211KB 的示例）。基线那次的"演示没载出来"是巡检按新类名判断载好、套在基线上判断不了，不算。
 - 14:12 量着色耗时（官网 code.js 的 codePanel）：table-8.jsx 211KB / 3815 行 **3104ms**，icons-0.jsx 75KB 465ms，button-1.jsx 27KB 51ms，不着色都只要 1–3ms——库里 `markdown.js` 的 `lex()` 每个标识符都 `code.slice(i + w.length)`、`code.slice(0, i).match(/(\S)\s*$/)`，是 O(n²)。和"table-8 示例把运行时生成的几百行写进了标记"一起发给库会话（改法写清楚了）；官网的代码区取法先不动（和基线一样），等库改完复跑表格页。
 
+### 14:25 主会话验收里程碑 1 通过；旧版官网挪进 site/legacy/；库修好的三处复测
+- 主会话答复：`scripts/site/`、`scripts/docs-audit.mjs` 归官网会话维护；`/site/` 要打开新版首页。
+- **旧版官网挪进 `site/legacy/`**（`index.html`、`docs.html`、`home.js`、`docs.js`——只给旧版用的就这四个，`site.css`、`shell.js`、`pages.js`、`catalog.js`、`media.js`、`usage.js` 新版也在用，留在原处）：相对路径都多加一层（`../../packages/`、`../site.css`、`../shell.js`……，演示 iframe 和"展示页"链接 `../../index.html`），`<html data-docs="docs.html">` 让 shell.js 把搜索、换页都留在旧版里。官网任何地方都不链接它。
+- **`site/index.html` 转到 `next.html`、`site/docs.html` 转到 `next-docs.html`**，查询参数和 # 后面原样带过去（`location.replace`，不开脚本时 meta refresh 兜底）；docs.html 也转是为了旧书签不 404（旧地址 `#/c/button`、`#/guide/…` 新版都有）。
+- 验证：`/site/` → next.html；`/site/?fw=vue#theme` → `next.html?fw=vue#theme`；`index.html#ai` → `next.html#ai`；`docs.html#/c/button` → `next-docs.html#/c/button`；`docs.html?fw=vue#/guide/color` → 新版文档按自己的规矩把参数挪进 #（`#/guide/color?fw=vue`）。旧版三页（首页、按钮、颜色）在 legacy/ 下样式、演示都在，深浅切换只露一个图标，无报错（外网视频、音乐在无头浏览器里取不到，和以前一样）。
+- 库会话 51410e9 修了三处，复测：**表格页换页 3323ms → 56ms**，数据表格 73ms、滚动区域 83ms；Canvas 表格页不再报错；主题面板状态色回到绿、橙、红。
+- 主会话说 `examples.js` 里 Angular 的 grid-0、cgrid-0 还在用 rows：`examples.js` 只有一份代码，各框架写法由 `variants.js` 转出来；`examples/angular/…/grid-0.ts` 是 09:36 生成的旧文件。在页面里调 `__satinDemoFiles()` 看生成器拿到的 grid-0、cgrid-0 Angular 写法：已经是 columns + dataSource、模板 `<div id="grid">`，库会话重新跑 `gallery.mjs` 就是新的。
+
 ### 检查工具（scripts/site/，官网会话维护）
 - `selector-hits.mjs`：DOM 命中检查。site.css / next.css 每个选择器（991 条）+ site/*.js 里写死的选择器和 classList.contains / remove 查的类名，走遍新版首页、93 个文档页、旧版首页和 69 个旧版文档页，各种状态（滚到底、深浅、390 / 768 窄屏、抽屉和抽屉里的类别 / 框架列表 / 主题第二层、搜索、侧栏和代码块头的框架下拉、悬停提示、播放、列表删除动画中……）采样；命中不了的试"加 / 去 sn- 前缀"的变体；顺带查不存在的 @keyframes、没声明过的变量。结果 `/tmp/satin-header-restore/selector-hits/report.md`。
 - `main-vs-base.mjs`：没改动的部分按元素截图和基线逐像素比（首页各节、规范 13 章正文和本页目录，深浅各一遍）。整页截图比不了：顶栏文字、侧栏目录、首页新加的一节会让下面全部错位（12:30 整页比了一遍，215 张全不一样，就是这个原因）。

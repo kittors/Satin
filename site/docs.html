@@ -1,50 +1,14 @@
 <!doctype html>
-<!-- 旧版官网，已由 next-*.html 取代，保留待删（见 docs/report.md 建议删除清单） -->
+<!-- 旧的文档地址转到新版文档：查询参数和 # 后面的部分原样带过去（旧地址 #/c/button、#/guide/… 新版都有）。旧版文档页挪到 legacy/docs.html 保留（官网不链接它） -->
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>文档 · Satin</title>
-<meta name="description" content="Satin 组件库文档：快速上手、主题定制、UI/UX 规范，以及每个组件的演示、标记和验收要点。">
+<script>location.replace("next-docs.html" + location.search + location.hash);</script>
+<meta http-equiv="refresh" content="0; url=next-docs.html">
+<link rel="canonical" href="next-docs.html">
 <link rel="icon" href="data:,">
-<script src="../packages/satin-ui/src/theme-boot.js"></script>
-<link rel="stylesheet" href="../packages/satin-ui/css/tokens.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/reset.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/base.css">
-<link rel="stylesheet" href="../demo/kit-demo.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/buttons.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/form.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/overlay.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/feedback.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/data.css">
-<link rel="stylesheet" href="../packages/satin-ui/css/scroll.css">
-<link rel="stylesheet" href="site.css">
 </head>
-<body class="s-body d-body">
-
-<header class="s-nav">
-  <div class="s-wrap s-wrap-wide">
-    <button class="sn-btn sn-ghost sn-sm sn-ibtn s-burger" data-burger aria-label="打开目录" aria-expanded="false" data-i="list"></button>
-    <a class="s-logo" href="./" aria-label="Satin 首页"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><mask id="lg"><rect width="24" height="24" rx="6.5" fill="#fff"/><rect x="-4" y="10.75" width="32" height="2.5" fill="#000" transform="rotate(-34 12 12)"/></mask></defs><rect width="24" height="24" rx="6.5" fill="currentColor" mask="url(#lg)"/></svg>Satin</a>
-    <nav class="s-links" aria-label="主导航">
-      <a href="docs.html#/start" data-nav="start">文档</a><a href="docs.html#/c/button" data-nav="c">组件</a><a href="docs.html#/guide/principles" data-nav="guide">规范</a><a href="./#theme">主题</a><a href="../" target="_blank" rel="noopener">展示页</a>
-    </nav>
-    <div class="s-nav-end">
-      <button class="s-search" data-search aria-label="搜索组件和规范"><span data-i="search"></span>搜索组件<kbd data-kbd-k>⌘K</kbd></button>
-      <button class="sn-btn sn-ghost sn-sm sn-ibtn" data-custom-btn data-tip="主题定制" aria-label="主题定制" aria-haspopup="dialog" aria-expanded="false" data-i="sliders-horizontal"></button>
-      <button class="sn-btn sn-ghost sn-sm sn-ibtn s-mode" data-mode-btn><span data-i="sun:sun"></span><span data-i="moon:moon"></span></button>
-    </div>
-  </div>
-</header>
-<div class="sn-pop sn-th-panel s-pop" data-theme-panel role="dialog" aria-label="主题定制"></div>
-
-<div class="d-layout">
-  <aside class="d-side" data-side aria-label="文档目录"></aside>
-  <main class="d-main" data-main tabindex="-1"><div class="d-skel" aria-hidden="true"></div></main>
-  <aside class="d-toc" data-toc aria-label="本页目录"></aside>
-</div>
-<div class="d-scrim" data-scrim></div>
-
-<script type="module" src="docs.js"></script>
-</body>
+<body><p><a href="next-docs.html">Satin 文档</a></p></body>
 </html>

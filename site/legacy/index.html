@@ -1,0 +1,227 @@
+<!doctype html>
+<!-- 旧版官网，已由 next-*.html 取代，保留待删（见 docs/report.md 建议删除清单） -->
+<html lang="zh-CN" data-docs="docs.html">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satin · 每一帧都打磨过的界面组件库</title>
+<meta name="description" content="Satin 是一套克制、细腻的界面组件：动效逐帧验收，深浅两套主题，主色、字体、字号随时可调。纯 HTML、CSS 和 ES 模块，引入就能用。">
+<link rel="icon" href="data:,">
+<script src="../../packages/satin-ui/src/theme-boot.js"></script>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link rel="preconnect" href="https://assets.mixkit.co" crossorigin>
+<link rel="stylesheet" href="../../packages/satin-ui/css/tokens.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/reset.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/base.css">
+<link rel="stylesheet" href="../../demo/kit-demo.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/buttons.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/form.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/overlay.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/feedback.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/data.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/scroll.css">
+<link rel="stylesheet" href="../../packages/satin-ui/css/number.css">
+<link rel="stylesheet" href="../site.css">
+</head>
+<body class="s-body">
+
+<header class="s-nav">
+  <div class="s-wrap">
+    <a class="s-logo" href="./" aria-label="Satin 首页"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><mask id="lg"><rect width="24" height="24" rx="6.5" fill="#fff"/><rect x="-4" y="10.75" width="32" height="2.5" fill="#000" transform="rotate(-34 12 12)"/></mask></defs><rect width="24" height="24" rx="6.5" fill="currentColor" mask="url(#lg)"/></svg>Satin</a>
+    <nav class="s-links" aria-label="主导航">
+      <a href="docs.html#/start">文档</a><a href="docs.html#/c/button">组件</a><a href="docs.html#/guide/principles">规范</a><a href="#theme">主题</a><a href="../../" target="_blank" rel="noopener">展示页</a>
+    </nav>
+    <div class="s-nav-end">
+      <a class="sn-btn sn-ghost sn-sm s-only-m" href="docs.html#/start">文档</a>
+      <button class="s-search" data-search aria-label="搜索组件和规范"><span data-i="search"></span>搜索组件<kbd data-kbd-k>⌘K</kbd></button>
+      <button class="sn-btn sn-ghost sn-sm sn-ibtn" data-custom-btn data-tip="主题定制" aria-label="主题定制" aria-haspopup="dialog" aria-expanded="false" data-i="sliders-horizontal"></button>
+      <button class="sn-btn sn-ghost sn-sm sn-ibtn s-mode" data-mode-btn><span data-i="sun:sun"></span><span data-i="moon:moon"></span></button>
+    </div>
+  </div>
+</header>
+<div class="sn-pop sn-th-panel s-pop" data-theme-panel role="dialog" aria-label="主题定制"></div>
+
+<main>
+  <!-- 第一屏 -->
+  <section class="s-hero">
+    <div class="s-wrap">
+      <a class="s-pill rv" href="docs.html#/intro"><i></i>60 个组件，每一个都逐帧验收过<span data-i="chevron-right"></span></a>
+      <h1 class="s-h1 rv" style="--sn-d:.06s">每一帧都打磨过的<br>界面组件库</h1>
+      <p class="s-lead rv" style="--sn-d:.12s">克制、细腻、经得起放慢看。动效逐帧验收，深浅两套主题，主色、字体、字号随时可调；纯 HTML、CSS 和 ES 模块，引入就能用。</p>
+      <div class="s-cta rv" style="--sn-d:.18s"><a class="sn-btn sn-primary" href="docs.html#/start">开始使用</a><a class="sn-btn sn-secondary" href="docs.html#/c/button">浏览组件</a></div>
+      <p class="s-note rv" style="--sn-d:.24s">十万行 DOM 表格、一百万行 Canvas 表格、上万个节点的流程图，滚起来都不掉帧</p>
+
+      <!-- 一组用组件拼出来的真实界面：素材全部来自网上的真实照片、视频和音乐 -->
+      <div class="s-show">
+        <div class="s-col">
+          <article class="s-card pad np rv" style="--sn-d:.3s" aria-label="正在播放">
+            <div class="np-top">
+              <button class="sn-btn sn-primary np-play" data-np-play aria-label="播放" data-tip="播放"><span data-i="play:pl"></span><span data-i="pause:pa"></span><span class="sn-spinner"></span></button>
+              <div class="np-meta"><b class="s-title" data-np-title></b><span class="s-sub" data-np-by></span></div>
+              <img class="np-cover" data-photo="mist" data-w="160" alt="">
+            </div>
+            <div class="np-wave" data-np-wave role="slider" tabindex="0" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+            <div class="np-bar"><span class="sn-num" data-np-cur>0:00</span><span class="s-sub">第三集 · 配乐候选</span><span class="sn-num" data-np-dur></span></div>
+          </article>
+          <article class="s-card pad sn-st rv" style="--sn-d:.42s" aria-label="画面设置">
+            <div class="s-row" style="justify-content:space-between"><b class="s-title">画面设置</b><span class="s-sub">第三集 · 镜头 12</span></div>
+            <div class="sn-seg sn-sm" data-show-seg role="tablist" aria-label="画面比例"><span class="sn-thumb"></span><button data-v="16:9">16:9</button><button data-v="9:16">9:16</button><button data-v="1:1">1:1</button><button data-v="2.39">2.39:1</button></div>
+            <div class="st-item"><span>自动配乐</span><label class="sn-switch"><input type="checkbox" checked aria-label="自动配乐"><span class="sn-track"><span class="sn-knob"></span></span></label></div>
+            <div class="st-item"><span>生成字幕</span><label class="sn-switch"><input type="checkbox" aria-label="生成字幕"><span class="sn-track"><span class="sn-knob"></span></span></label></div>
+            <div class="st-item"><span>运动强度</span><span class="sn-num s-sub" data-motion-v>64</span></div>
+            <div class="sn-slider" data-slider data-max="100" tabindex="0" role="slider" aria-label="运动强度" aria-valuenow="64"><span class="sn-rail"></span><span class="sn-fillbar"></span><span class="sn-knob"></span><span class="sn-bubble"></span></div>
+          </article>
+          <article class="s-card pad sn-sk rv" style="--sn-d:.54s" aria-label="搜索">
+            <button class="sk-field" data-search><span data-i="search"></span><span>搜索组件、规范</span><kbd data-kbd-k>⌘K</kbd></button>
+            <p class="s-sub">命令面板：输入就筛选，高亮条在行间滑过去，留下的行移到新位置。</p>
+          </article>
+        </div>
+
+        <div class="s-col">
+          <article class="s-card vc rv" style="--sn-d:.36s" aria-label="镜头预览">
+            <video data-video="4451" muted loop playsinline preload="none" aria-label="夜里安静的东京街道"></video>
+            <span class="vc-chip">镜头 12 · 已采用</span>
+            <div class="scrim"></div>
+            <div class="vc-info">
+              <div><b class="s-title">夜里安静的街道</b><div class="s-sub">第三集 · 0:08 · 720p</div></div>
+              <button class="vc-btn" data-vc-btn aria-label="暂停"><span data-i="pause:pa"></span><span data-i="play:pl"></span></button>
+            </div>
+          </article>
+          <article class="s-card pad ch rv" style="--sn-d:.48s" aria-label="分镜讨论">
+            <div class="s-row" style="justify-content:space-between"><b class="s-title">分镜讨论</b><span class="s-sub">林夏 · 周屿</span></div>
+            <div class="ch-list" data-chat>
+              <div class="ch-msg"><img class="ch-av" data-photo="lin" data-w="96" alt="林夏"><div class="ch-b">第三场的雨再大一点，镜头往左推半步。</div></div>
+              <div class="ch-msg sn-me"><div class="ch-b">好，雨量调到 70%，这一段重新生成。</div></div>
+              <div class="ch-msg"><img class="ch-av" data-photo="zhou" data-w="96" alt="周屿"><div class="ch-b">配乐用刚才那首 Valley Sunset 试试。</div></div>
+            </div>
+            <form class="ch-in" data-chat-form><input class="sn-input sn-sm" placeholder="回复，回车发送" aria-label="回复"><button class="sn-btn sn-primary sn-sm sn-ibtn" aria-label="发送" data-tip="发送" data-i="arrow-up" disabled></button></form>
+          </article>
+        </div>
+
+        <div class="s-col">
+          <article class="s-card pad sn-pc rv" style="--sn-d:.42s" aria-label="导演">
+            <img class="pc-photo" data-photo="suwan" data-w="160" alt="苏婉">
+            <div><b class="s-title">苏婉</b><div class="s-sub">导演 · 上海</div></div>
+            <p class="s-sub pc-line">24 部作品 · 1.2 万人关注 · 最近在拍《雨夜车站》</p>
+            <div class="pc-act"><button class="sn-btn sn-primary sn-sm" data-follow>关注</button><button class="sn-btn sn-secondary sn-sm" data-dm>私信</button></div>
+          </article>
+          <article class="s-card pad pl rv" style="--sn-d:.54s" aria-label="最近的项目">
+            <div class="s-row" style="justify-content:space-between;margin-bottom:4px"><b class="s-title">最近的项目</b><a class="sn-textbtn" href="docs.html#/c/card">全部</a></div>
+            <div class="pl-row"><img class="pl-thumb" data-photo="clapboard" data-w="200" alt=""><div class="pl-meta"><b class="s-title">雨夜车站</b><span class="s-sub">第三集 · 48 个镜头</span></div><span class="sn-tag sn-run" data-gen><i></i><span data-gen-t>生成中</span></span></div>
+            <div class="pl-row"><img class="pl-thumb" data-photo="hallway" data-w="200" alt=""><div class="pl-meta"><b class="s-title">旧城往事</b><span class="s-sub">第一集 · 32 个镜头</span></div><span class="sn-tag sn-need"><i></i>待审核</span></div>
+            <div class="pl-row"><img class="pl-thumb" data-photo="studio" data-w="200" alt=""><div class="pl-meta"><b class="s-title">第七号片场</b><span class="s-sub">预告片 · 12 个镜头</span></div><span class="sn-tag">已交付</span></div>
+            <div class="pl-foot"><button class="sn-btn sn-primary sn-sm" data-export data-i="download:before">导出成片</button><button class="sn-btn sn-secondary sn-sm" data-share data-i="link:before">复制链接</button></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 细节：三个真组件 -->
+  <section class="s-sec" id="details">
+    <div class="s-wrap">
+      <div class="s-sec-head rv"><div class="s-eyebrow">细节</div><h2 class="s-h2">好用，差在看不见的地方</h2><p class="s-p">悬停、按下、拖拽、打断、等待。Satin 把每一种都做到位，下面三个都是真组件，试一下。</p></div>
+      <div class="s-feats">
+        <article class="s-card s-feat rv">
+          <h3>前缘先到，后缘跟上</h3>
+          <p>分段控件的滑块，左右两条边各走一条曲线，落定时纵向轻压一下。下面是这次切换每一帧的间隔，在你的浏览器里实测。</p>
+          <div class="demo-area sn-fr">
+            <div class="sn-seg" data-fr-seg role="tablist" aria-label="筛选"><span class="sn-thumb"></span><button data-v="all">全部</button><button data-v="run">进行中</button><button data-v="need">待审核</button><button data-v="done">已交付</button></div>
+            <div class="fr-strip" data-fr-strip aria-hidden="true"><i class="fr-line"></i></div>
+            <div class="fr-read sn-num" data-fr-read>点一下上面任意一格</div>
+          </div>
+        </article>
+        <article class="s-card s-feat rv" style="--sn-d:.08s">
+          <h3>能撤销，就别确认</h3>
+          <p>归档、移除这类能撤回的操作直接做，再给 5 秒撤销，一圈倒计时。离开的一行马上脱离布局淡出，下面的用弹簧补位。</p>
+          <div class="demo-area ar">
+            <ul class="ar-list" data-ar>
+              <li data-name="雨夜车站"><img data-photo="slate" data-w="120" alt=""><span><b>雨夜车站</b><small>3 分钟前改过</small></span><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-tip="归档" aria-label="归档" data-i="archive"></button></li>
+              <li data-name="旧城往事"><img data-photo="crew" data-w="120" alt=""><span><b>旧城往事</b><small>昨天 14:20</small></span><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-tip="归档" aria-label="归档" data-i="archive"></button></li>
+              <li data-name="第七号片场"><img data-photo="soundstage" data-w="120" alt=""><span><b>第七号片场</b><small>11 月 12 日</small></span><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-tip="归档" aria-label="归档" data-i="archive"></button></li>
+            </ul>
+          </div>
+        </article>
+        <article class="s-card s-feat rv" style="--sn-d:.16s">
+          <h3>等一下，就给个结果</h3>
+          <p>300ms 内完成，什么都不显示；超过才转圈，转圈一旦出现至少留 500ms，不会闪一下就没。成功后对勾在原地画出来。</p>
+          <div class="demo-area bz">
+            <button class="sn-btn sn-primary" data-bz="1100">保存修改</button>
+            <button class="sn-btn sn-secondary" data-bz="180">刷新</button>
+            <span class="bz-note s-sub">"刷新"180ms 就回来了，所以不转圈</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主题定制 -->
+  <section class="s-sec" id="theme">
+    <div class="s-wrap">
+      <div class="s-sec-head rv"><div class="s-eyebrow">主题</div><h2 class="s-h2">换一种颜色，还是 Satin</h2><p class="s-p">主色、状态色、字体、字号随时可调。所有组件只认 CSS 变量，改了立即生效；深色下主色自动提亮，主色上的字自动选黑或白。</p></div>
+      <div class="s-theme">
+        <div class="s-card s-theme-ctl rv">
+          <div class="sn-th-sec"><span class="sn-th-h">外观</span><div class="sn-seg sn-sm" data-mode-seg role="tablist" aria-label="外观"><span class="sn-thumb"></span><button data-v="auto">跟随系统</button><button data-v="light">浅色</button><button data-v="dark">深色</button></div></div>
+          <div class="sn-th-panel" data-inline-theme></div>
+        </div>
+        <div class="s-card s-preview rv" style="--sn-d:.08s">
+          <div class="s-preview-head"><div><b class="s-title" style="font-size:calc(17px * var(--fsx))">新建项目</b><div class="s-sub">从小说、剧本到成片，都在这里完成</div></div><span class="sn-tag" style="margin-left:auto">草稿</span></div>
+          <div class="s-preview-grid">
+            <label class="sn-field"><span class="sn-lbl">项目名称</span><input class="sn-input" value="雨夜车站"></label>
+            <div class="sn-field"><span class="sn-lbl">画面比例</span><div class="sn-seg" data-pv-seg role="tablist" aria-label="画面比例"><span class="sn-thumb"></span><button data-v="16:9">横屏 16:9</button><button data-v="9:16">竖屏 9:16</button></div></div>
+          </div>
+          <div class="sn-field"><span class="sn-lbl">风格</span><div class="s-row" style="gap:8px;flex-wrap:wrap" data-chips><button class="sn-chip sn-on"><span data-i="check"></span>电影感</button><button class="sn-chip"><span data-i="check"></span>胶片颗粒</button><button class="sn-chip sn-on"><span data-i="check"></span>冷色调</button><button class="sn-chip"><span data-i="check"></span>手持</button></div></div>
+          <div class="s-preview-grid">
+            <label class="sn-switch"><input type="checkbox" checked><span class="sn-track"><span class="sn-knob"></span></span>自动配乐</label>
+            <label class="sn-check" data-box><input type="checkbox" checked>生成字幕</label>
+          </div>
+          <div class="sn-field"><span class="sn-lbl">本月额度<span class="sn-aside s-sub sn-num">64 / 100 分钟</span></span><div class="sn-pbar" style="--sn-p:.64"><i></i></div></div>
+          <div class="s-row" style="gap:8px"><span class="sn-tag sn-run"><i></i>生成中</span><span class="sn-tag sn-need"><i></i>待审核 2</span><span class="sn-tag sn-bad"><i></i>失败 1</span><span class="sn-tag">已交付 9</span></div>
+          <div class="s-row" style="justify-content:flex-end;gap:8px;margin-top:4px"><button class="sn-btn sn-ghost">取消</button><button class="sn-btn sn-primary" data-pv-ok>创建项目</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 全部组件 -->
+  <section class="s-sec" id="components">
+    <div class="s-wrap">
+      <div class="s-sec-head rv"><div class="s-eyebrow">组件</div><h2 class="s-h2">从一个按钮，到一百万行</h2><p class="s-p">按钮、表单、浮层、反馈、数据展示、媒体、导航、拖拽行为。每个组件页都有能直接操作的演示、能直接抄的标记和它的验收要点。</p></div>
+      <div class="s-card s-index rv" data-comps></div>
+    </div>
+  </section>
+
+  <!-- 规范 -->
+  <section class="s-sec" id="guides">
+    <div class="s-wrap">
+      <div class="s-sec-head rv"><div class="s-eyebrow">规范</div><h2 class="s-h2">不只给组件，也给规矩</h2><p class="s-p">颜色、排版、间距、动效、交互质感、去 AI 感。每一条都写清楚数值，组件页里的要点就是它的验收标准。</p></div>
+      <div class="s-guides" data-guides></div>
+    </div>
+  </section>
+
+  <!-- 横幅 -->
+  <section class="s-sec" style="padding-top:0">
+    <div class="s-wrap">
+      <div class="s-band rv">
+        <img data-photo="soundstage" data-w="1600" data-q="70" alt="">
+        <div><h2 class="s-h2">把故事拍成画面的那套界面，<br>也给你用</h2><p>Satin 是从一个视频创作工具里长出来的：后台的表格、客户端的分镜和播放器、AI 对话，都用这一套。</p><div class="s-row" style="gap:12px"><a class="sn-btn sn-primary" href="docs.html#/start">开始使用</a><a class="sn-btn sn-secondary" href="../../" target="_blank" rel="noopener">打开组件展示页</a></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="s-foot">
+  <div class="s-wrap">
+    <div class="s-foot-grid">
+      <div><a class="s-logo" href="./"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><mask id="lg2"><rect width="24" height="24" rx="6.5" fill="#fff"/><rect x="-4" y="10.75" width="32" height="2.5" fill="#000" transform="rotate(-34 12 12)"/></mask></defs><rect width="24" height="24" rx="6.5" fill="currentColor" mask="url(#lg2)"/></svg>Satin</a><p class="s-sub" style="margin-top:12px;max-width:280px">每一帧都打磨过的界面组件库。纯 HTML、CSS 和 ES 模块。</p></div>
+      <div><h4>开始</h4><ul><li><a href="docs.html#/intro">介绍</a></li><li><a href="docs.html#/start">快速上手</a></li><li><a href="docs.html#/theming">主题定制</a></li></ul></div>
+      <div><h4>规范</h4><ul><li><a href="docs.html#/guide/principles">设计原则</a></li><li><a href="docs.html#/guide/motion">动效</a></li><li><a href="docs.html#/guide/feel">交互质感</a></li><li><a href="docs.html#/guide/no-ai">去 AI 感</a></li></ul></div>
+      <div><h4>资源</h4><ul><li><a href="../../" target="_blank" rel="noopener">组件展示页</a></li><li><a href="docs.html#/c/grid">十万行数据表格</a></li><li><a href="docs.html#/c/flowstress">万级节点流程图</a></li></ul></div>
+    </div>
+    <div class="s-credits" data-credits></div>
+  </div>
+</footer>
+
+<script type="module" src="home.js"></script>
+</body>
+</html>

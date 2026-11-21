@@ -56,7 +56,7 @@ const parsed = FILES.map(parse);
 const RULES = parsed.flatMap((p) => p.rules), ANIMS = parsed.flatMap((p) => p.anims), VARS = parsed.flatMap((p) => p.vars);
 // JS 里写死的选择器（$ / $$ / querySelector / closest / matches 的字符串参数）和 classList.contains / remove 查的类名，也一起查：
 // 样式改了前缀、脚本里找元素的选择器没跟着改（比如 .na-shot.on），CSS 那边查不出来
-const JS_FILES = fs.readdirSync(path.join(ROOT, "site")).filter((f) => f.endsWith(".js") && f !== "examples.js").map((f) => "site/" + f);
+const JS_FILES = [["site", ""], ["site/legacy", "legacy/"]].flatMap(([d, pre]) => (fs.existsSync(path.join(ROOT, d)) ? fs.readdirSync(path.join(ROOT, d)) : []).filter((f) => f.endsWith(".js") && f !== "examples.js").map((f) => `site/${pre}${f}`));
 for (const file of JS_FILES) {
   const src = fs.readFileSync(path.join(ROOT, file), "utf8"), lines = src.split("\n");
   lines.forEach((ln, i) => {
@@ -149,10 +149,12 @@ async function scrollThrough(page, where, step = 0.8) {
 }
 const tryDo = async (page, where, fn, wait = 350) => { try { await fn(); await sleep(wait); await sample(page, where); } catch (e) { log.push(`${where}: ${String(e.message || e).split("\n")[0].slice(0, 160)}`); } };
 const S = BASE + "/site/";
+// 旧版官网（2026-11-21 挪进 site/legacy/；基线还在 site/ 下）
+const OLD = fs.existsSync(path.join(ROOT, "site/legacy/index.html")) ? "legacy/" : "";
 
 // 文档页的全部路由（侧栏里的链接）
 const routesOf = async (file) => { const { ctx, page } = await open(S + file); const r = await page.evaluate(() => [...new Set([...document.querySelectorAll("[data-side] a[href^='#/'], .d-side a[href^='#/']")].map((a) => a.getAttribute("href")))]); await ctx.close(); return r; };
-const nextRoutes = await routesOf("next-docs.html#/start"), oldRoutes = await routesOf("docs.html#/start");
+const nextRoutes = await routesOf("next-docs.html#/start"), oldRoutes = await routesOf(OLD + "docs.html#/start");
 const pick = (rs, keep) => rs.filter((r) => keep.some((k) => r === k || r.startsWith(k)));
 const REP = ["#/start", "#/intro", "#/cli", "#/frameworks", "#/mobile", "#/ai", "#/eval", "#/components", "#/recipes", "#/c/button", "#/c/grid", "#/recipe/admin-table", "#/guide/principles", "#/theming", "#/changelog"];
 const docRoutes = QUICK ? pick(nextRoutes, REP) : nextRoutes;
@@ -224,7 +226,7 @@ for (const r of docRoutes) {
 // 4.4 旧版首页、旧版文档页（也用 site.css）
 {
   for (const w of [1440, 390]) {
-    const { ctx, page } = await open(S + "index.html", { w, h: w < 500 ? 844 : 900, mobile: w < 500 });
+    const { ctx, page } = await open(S + OLD + "index.html", { w, h: w < 500 ? 844 : 900, mobile: w < 500 });
     await sample(page, `旧版首页 ${w}`); await scrollThrough(page, `旧版首页 ${w}`);
     if (w === 1440) {
       await tryDo(page, "旧版首页 播放", async () => { const b = page.locator("[data-np-play]").first(); await b.scrollIntoViewIfNeeded(); await b.click(); await sleep(200); });
@@ -235,8 +237,8 @@ for (const r of docRoutes) {
     await ctx.close();
   }
   const rs = QUICK ? pick(oldRoutes, ["#/start", "#/c/button", "#/guide/principles"]) : oldRoutes;
-  for (const r of rs) { const { ctx, page } = await open(S + "docs.html" + r); await sample(page, `旧版文档 ${r}`); await scrollThrough(page, `旧版文档 ${r}`, 1); await ctx.close(); }
-  const { ctx, page } = await open(S + "docs.html#/c/button", { w: 390, h: 844, mobile: true });
+  for (const r of rs) { const { ctx, page } = await open(S + OLD + "docs.html" + r); await sample(page, `旧版文档 ${r}`); await scrollThrough(page, `旧版文档 ${r}`, 1); await ctx.close(); }
+  const { ctx, page } = await open(S + OLD + "docs.html#/c/button", { w: 390, h: 844, mobile: true });
   await sample(page, "旧版文档 390"); await tryDo(page, "旧版文档 390 目录打开", async () => { await page.click("[data-burger]"); await sleep(400); });
   await ctx.close();
 }

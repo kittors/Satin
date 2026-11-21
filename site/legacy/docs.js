@@ -1,14 +1,14 @@
 // 旧版官网，已由 next-*.html 取代，保留待删（见 docs/report.md 建议删除清单）
 // 文档：一页里切换（地址 #/…，冒号后面是页内小节：#/c/button:usage）。左边目录、中间内容、右边本页目录。
 // 组件页的标题、说明、要点、演示源码都读组件展示页（catalog.js），演示本身用 iframe 嵌展示页的那一块（?embed=区块）。
-import { onMode } from "./shell.js";
-import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
-import { copied } from "../packages/satin-ui/src/form.js";
-import { scrollArea } from "../packages/satin-ui/src/scroll.js";
-import { loadCatalog, highlight, highlightJS } from "./catalog.js";
-import { START, GUIDES } from "./pages.js";
-import { USAGE, TALL } from "./usage.js";
-import { setup } from "../packages/satin-ui/src/setup.js";
+import { onMode } from "../shell.js";
+import { $, $$, root, reduced, injectIcons, initSeg } from "../../packages/satin-ui/src/core.js";
+import { copied } from "../../packages/satin-ui/src/form.js";
+import { scrollArea } from "../../packages/satin-ui/src/scroll.js";
+import { loadCatalog, highlight, highlightJS } from "../catalog.js";
+import { START, GUIDES } from "../pages.js";
+import { USAGE, TALL } from "../usage.js";
+import { setup } from "../../packages/satin-ui/src/setup.js";
 setup(); // 页面级的全局行为（Tooltip、浮层栈、主题……），原来导入时就装上
 
 const side = $("[data-side]"), main = $("[data-main]"), toc = $("[data-toc]"), cat = await loadCatalog();
@@ -61,8 +61,8 @@ function demoBox(id, { code = true, title = "" } = {}) {
   const min = TALL[id] || 140;
   return `<div class="d-demo" data-demo="${id}">
     <div class="d-demo-bar">${code ? '<div class="sn-seg sn-sm" data-view role="tablist" aria-label="演示视图"><span class="sn-thumb"></span><button data-v="view">预览</button><button data-v="code">代码</button></div>' : `<span class="d-demo-t">${title || "演示"}</span>`}
-      <a class="sn-btn sn-ghost sn-sm sn-ibtn" href="../index.html#${id}" target="_blank" rel="noopener" data-tip="在展示页里打开" aria-label="在展示页里打开" data-i="external-link"></a></div>
-    <div class="d-frame" style="--sn-h:${Math.max(min, 200)}px" data-min="${min}"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="演示" src="../index.html?embed=${id}"></iframe></div>
+      <a class="sn-btn sn-ghost sn-sm sn-ibtn" href="../../index.html#${id}" target="_blank" rel="noopener" data-tip="在展示页里打开" aria-label="在展示页里打开" data-i="external-link"></a></div>
+    <div class="d-frame" style="--sn-h:${Math.max(min, 200)}px" data-min="${min}"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="演示" src="../../index.html?embed=${id}"></iframe></div>
     ${code ? '<div class="d-codes" hidden></div>' : ""}
   </div>`;
 }

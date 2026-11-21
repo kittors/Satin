@@ -1,16 +1,16 @@
 // 旧版官网，已由 next-*.html 取代，保留待删（见 docs/report.md 建议删除清单）
 // 官网首页：真实素材、真组件。所有交互都直接用组件库导出的函数（分段控件、滑块、Toast、数字变化、等待按钮、主题面板）。
-import { reveal, bindModeSeg } from "./shell.js";
-import { $, $$, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
-import { initSlider, busy, succeed, prepBusy, BOX } from "../packages/satin-ui/src/form.js";
-import { toast } from "../packages/satin-ui/src/feedback.js";
-import { numberFlow } from "../packages/satin-ui/src/number.js";
-import { scrollArea } from "../packages/satin-ui/src/scroll.js";
-import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
-import { PHOTO, img, MUSIC, musicSrc, waveSrc, VIDEO, videoSrc, creditsHTML } from "./media.js";
-import { loadCatalog } from "./catalog.js";
-import { GUIDES } from "./pages.js";
-import { setup } from "../packages/satin-ui/src/setup.js";
+import { reveal, bindModeSeg } from "../shell.js";
+import { $, $$, reduced, injectIcons, initSeg } from "../../packages/satin-ui/src/core.js";
+import { initSlider, busy, succeed, prepBusy, BOX } from "../../packages/satin-ui/src/form.js";
+import { toast } from "../../packages/satin-ui/src/feedback.js";
+import { numberFlow } from "../../packages/satin-ui/src/number.js";
+import { scrollArea } from "../../packages/satin-ui/src/scroll.js";
+import { mountThemePanel } from "../../packages/satin-ui/src/theme-panel.js";
+import { PHOTO, img, MUSIC, musicSrc, waveSrc, VIDEO, videoSrc, creditsHTML } from "../media.js";
+import { loadCatalog } from "../catalog.js";
+import { GUIDES } from "../pages.js";
+import { setup } from "../../packages/satin-ui/src/setup.js";
 setup(); // 页面级的全局行为（Tooltip、浮层栈、主题……），原来导入时就装上
 
 const SPRING = "linear(0, .32, .78, 1.04, 1.09, 1.06, 1.02, 1, .99, .99, 1)", EASE_IN = "cubic-bezier(.42,0,1,1)", OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
