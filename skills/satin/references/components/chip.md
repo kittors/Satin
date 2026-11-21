@@ -455,7 +455,7 @@ export default function SceneTags() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `selected` | `boolean` | false | 否 | 选中的样子（底色加深；筛选芯片前面还有对勾）。<br>React、Preact：选中的样子（底色加深；筛选芯片前面还有对勾）。和 `onChange` 一起给就是受控的筛选芯片；只给它是只显示的芯片。 | createXxx 选项：`on`；React：`selected`；Vue：`selected`；Preact：`selected`；标记：`类名 sn-on（筛选芯片再写 aria-pressed="true"）`；纯 HTML：`类名 sn-on（筛选芯片再写 aria-pressed="true"）` |
-| `modelValue` | `boolean` | — | 否 | `v-model` 绑一个布尔值，就是能切换的筛选芯片（点了回写）。 | Vue：`v-model` |
+| `modelValue` | `boolean` | — | 否 | 绑一个布尔值：能切换的筛选芯片（点了回写）。<br>Vue：`v-model` 绑一个布尔值，就是能切换的筛选芯片（点了回写）。 | Vue：`v-model` |
 | `defaultSelected` | `boolean` | false | 否 | 非受控的初始选中状态：组件自己管开关，`onChange` 只负责通知。 | React：`defaultSelected`；Preact：`defaultSelected` |
 | `removable` | `boolean` | false | 否 | 能移除的标签：后面有 ×，点了先脱离布局淡出、旁边的用弹簧补位，动画放完才通知移除。 | createXxx 选项：`removable`；React：`removable`；Vue：`removable`；Preact：`removable`；标记：`类名 sn-tag + 里面的 <button class="sn-x">`；纯 HTML：`放进 data-chips="removable" 的容器` |
 | `removeLabel` | `string` | "移除 + 文字" | 否 | × 按钮给读屏的名称，比如"移除 雨夜"。 | React：`removeLabel`；Vue：`removeLabel（模板里写 remove-label）`；Preact：`removeLabel`；标记：`<button class="sn-x" aria-label>`；纯 HTML：`<button class="sn-x" aria-label>` |

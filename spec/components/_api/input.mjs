@@ -46,7 +46,7 @@ export default {
       desc: "空着时的提示：写个例子（\"比如：雨夜车站\"），不要拿它代替标签。", names: { react: "placeholder", preact: "placeholder", vue: "placeholder", html: "placeholder" } },
   ],
   events: [
-    { name: "input", payload: "ChangeEvent（React 的 onChange）/ string（Vue 的 v-model）", payloadBy: { react: "ChangeEvent", preact: "Event", vue: "string", svelte: "Event", angular: "Event", solid: "Event", html: "Event" }, when: "每输入一个字（原生的 input 事件）。", whenBy: { vue: "每输入一个字：`v-model` 跟着变（`@update:modelValue` 拿到新的文字）。" }, native: true,
+    { name: "input", payload: "Event（原生的 input 事件）", payloadBy: { react: "ChangeEvent", preact: "Event", vue: "string", svelte: "Event", angular: "Event", solid: "Event", html: "Event" }, when: "每输入一个字（原生的 input 事件）。", whenBy: { vue: "每输入一个字：`v-model` 跟着变（`@update:modelValue` 拿到新的文字）。" }, native: true,
       names: { react: "onChange", preact: "onChange / onInput", vue: "@update:modelValue / @input", svelte: "bind:value / oninput", angular: "(input)", solid: "onInput", html: "input" } },
   ],
   slots: [],

@@ -138,9 +138,10 @@
     },
     {
       "name": "label",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "—",
       "required": false,
@@ -187,7 +188,7 @@
   "events": [
     {
       "name": "change",
-      "payload": "ChangeEvent（React）/ boolean（Vue 的 v-model）",
+      "payload": "Event（原生的 change 事件）",
       "payloadBy": {
         "react": "ChangeEvent",
         "preact": "Event",

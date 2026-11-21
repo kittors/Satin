@@ -178,7 +178,7 @@
   "events": [
     {
       "name": "input",
-      "payload": "ChangeEvent（React 的 onChange）/ string（Vue 的 v-model）",
+      "payload": "Event（原生的 input 事件）",
       "payloadBy": {
         "react": "ChangeEvent",
         "preact": "Event",

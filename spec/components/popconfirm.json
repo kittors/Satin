@@ -146,9 +146,10 @@
   "props": [
     {
       "name": "title",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "—",
       "required": true,
@@ -162,9 +163,10 @@
     },
     {
       "name": "description",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "—",
       "required": false,
@@ -178,9 +180,10 @@
     },
     {
       "name": "confirmText",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "\"确定\"",
       "required": false,
@@ -194,9 +197,10 @@
     },
     {
       "name": "cancelText",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "\"取消\"",
       "required": false,

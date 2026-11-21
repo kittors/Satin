@@ -160,9 +160,10 @@
   "props": [
     {
       "name": "label",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "—",
       "required": false,
@@ -176,9 +177,10 @@
     },
     {
       "name": "help",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "—",
       "required": false,
@@ -192,9 +194,10 @@
     },
     {
       "name": "error",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "不给就没有错误区",
       "required": false,

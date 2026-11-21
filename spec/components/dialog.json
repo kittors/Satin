@@ -259,8 +259,10 @@
     },
     {
       "name": "footer",
-      "type": "React.ReactNode",
+      "type": "标记（.sn-ft 里放按钮）",
       "typeBy": {
+        "react": "React.ReactNode",
+        "preact": "React.ReactNode",
         "vue": "插槽 #footer",
         "svelte": "片段 footer"
       },

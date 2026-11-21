@@ -7,6 +7,7 @@
 // · 自定义元素 <sn-xxx> 能写的属性（elements/index.js）↔ names.element
 // · 上面这些声明用到的、我们导出的类型（顺着引用一路找下去）↔ 契约的 types
 // 多了、少了都报错。没填契约的组件列为"未填"，不算失败；合并出来的 JSON 和 _api 源文件对不上（忘了重跑生成）也报错。
+// · 属性、事件、方法的 type / desc / payload / when 默认值里不许有框架专有的词（ReactNode、v-model、插槽 #……），只能写进 xxxBy
 // 用法：node scripts/test/contracts.mjs [--only id,id]
 import fs from "node:fs";
 import path from "node:path";
@@ -161,6 +162,12 @@ for (const id of ids) {
   const c = src || json, dts = c.dts || {};
   if (!c.dts) errs.push("契约里没写 dts（去类型声明里找哪些声明）");
   const props = c.props || [], events = c.events || [], slots = c.slots || [], methods = c.methods || [];
+  // 默认的写法里不许出现某个框架专有的词（官网没写 xxxBy 的写法——Angular、Solid、纯 HTML……——会退回默认值，露出别的框架的词）：
+  // ReactNode、React.、JSX、v-model、插槽 #、片段、bind:、{#snippet} 只能写进 typeBy / descBy / payloadBy / whenBy
+  const FW_WORDS = /ReactNode|React\.|\bJSX\b|\bv-model\b|插槽 ?#|#[a-z][a-z-]* ?插槽|片段|\bbind:[a-z]|\{#snippet/;
+  for (const [sec, list] of [["属性", props], ["事件", events], ["方法", methods]]) for (const x of list) for (const k of ["type", "desc", "payload", "when"]) {
+    if (typeof x[k] === "string" && FW_WORDS.test(x[k])) errs.push(`${sec} ${x.name} 的 ${k} 默认值里有框架专有的词（"${x[k].match(FW_WORDS)[0]}"）：默认写成不偏向哪个框架的，专有写法放进 ${k}By`);
+  }
   const refs = new Set();
 
   // 1. 选项：createXxx 的第一个类型参数，或者 dts.options 写的接口

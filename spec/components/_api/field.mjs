@@ -33,10 +33,10 @@ export default {
   },
   dts: { react: "Field", vue: "Field", functions: ["validateForm", "setFieldError", "clearFieldError", "fieldHTML"] },
   props: [
-    { name: "label", type: "ReactNode | string", typeBy: { vue: "string" }, default: "—", required: false,
+    { name: "label", type: "string", typeBy: { react: "ReactNode | string", preact: "ReactNode | string" }, default: "—", required: false,
       desc: "标签，写在控件上面；能不填的在后面加 `<span class=\"sn-opt\">可选</span>`，必填的不标。", names: { react: "label", preact: "label", vue: "label", html: "label.sn-lbl" } },
-    { name: "help", type: "ReactNode | string", typeBy: { vue: "string" }, default: "—", required: false, desc: "控件下面的说明：规则、会用在哪里。", names: { react: "help", preact: "help", vue: "help", html: ".sn-help" } },
-    { name: "error", type: "ReactNode | string", typeBy: { vue: "string" }, default: "不给就没有错误区", required: false,
+    { name: "help", type: "string", typeBy: { react: "ReactNode | string", preact: "ReactNode | string" }, default: "—", required: false, desc: "控件下面的说明：规则、会用在哪里。", names: { react: "help", preact: "help", vue: "help", html: ".sn-help" } },
+    { name: "error", type: "string", typeBy: { react: "ReactNode | string", preact: "ReactNode | string" }, default: "不给就没有错误区", required: false,
       desc: "错误：给了字就在下面展开、字段标红、输入框抖两下；空字符串收起（先占好位置）。", names: { react: "error", preact: "error", vue: "error", html: ".sn-err > span（字段加 .sn-bad）" } },
     { name: "htmlFor", type: "string", default: "—", required: false, desc: "标签对应的控件 id：点标签聚焦到控件。", names: { react: "htmlFor", preact: "htmlFor", vue: "for", html: "label 的 for" } },
     { name: "className", type: "string", default: "—", required: false, desc: "加在字段最外层的类名（排版用）。", names: { react: "className", preact: "class" } },

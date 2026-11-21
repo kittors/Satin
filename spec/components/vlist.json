@@ -147,13 +147,20 @@
     },
     {
       "name": "renderItem",
-      "type": "(item: T, index: number) => ReactNode",
+      "type": "(item: T, index: number) => string | Node",
       "typeBy": {
+        "react": "(item: T, index: number) => ReactNode",
+        "preact": "(item: T, index: number) => ReactNode",
         "vue": "插槽 #row=\"{ item, index }\""
       },
       "default": "—",
       "required": false,
-      "desc": "React 里画一行：返回节点（Vue 用 #row 插槽）。",
+      "desc": "画一行：返回这一行的内容。",
+      "descBy": {
+        "react": "画一行：返回 React 节点。",
+        "preact": "画一行：返回节点（经 preact/compat，和 React 一样）。",
+        "vue": "用 #row 插槽画一行（插槽拿到 item、index）。"
+      },
       "names": {
         "react": "renderItem",
         "preact": "renderItem",

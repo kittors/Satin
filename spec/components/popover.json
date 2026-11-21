@@ -186,9 +186,10 @@
   "props": [
     {
       "name": "title",
-      "type": "ReactNode | string",
+      "type": "string",
       "typeBy": {
-        "vue": "string"
+        "react": "ReactNode | string",
+        "preact": "ReactNode | string"
       },
       "default": "—",
       "required": false,

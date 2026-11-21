@@ -184,7 +184,10 @@
       "type": "boolean",
       "default": "—",
       "required": false,
-      "desc": "`v-model` 绑一个布尔值，就是能切换的筛选芯片（点了回写）。",
+      "desc": "绑一个布尔值：能切换的筛选芯片（点了回写）。",
+      "descBy": {
+        "vue": "`v-model` 绑一个布尔值，就是能切换的筛选芯片（点了回写）。"
+      },
       "names": {
         "vue": "v-model"
       }

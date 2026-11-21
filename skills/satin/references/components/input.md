@@ -379,7 +379,7 @@ export default function ProjectNameCount() {
 
 | 名称 | 参数 | 什么时候 | 各写法 |
 |---|---|---|---|
-| `input` | `ChangeEvent（React 的 onChange）/ string（Vue 的 v-model）` | 每输入一个字（原生的 input 事件）。 | React：`onChange`；Preact：`onChange / onInput`；Vue：`@update:modelValue / @input`；Svelte：`bind:value / oninput`；Angular：`(input)`；Solid：`onInput`；纯 HTML：`input` |
+| `input` | `Event（原生的 input 事件）` | 每输入一个字（原生的 input 事件）。 | React：`onChange`；Preact：`onChange / onInput`；Vue：`@update:modelValue / @input`；Svelte：`bind:value / oninput`；Angular：`(input)`；Solid：`onInput`；纯 HTML：`input` |
 
 ## 样式定制
 

@@ -650,7 +650,7 @@ export default function ShotFeed() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `loadPage` | `(offset: number, size: number) => Promise<unknown[]>` | — | 是 | 要一页：offset 从第几条开始、size 要几条；返回空数组就是到底了，reject 时末尾那一行变成"重试"。 | createXxx 选项：`loadPage`；React：`loadPage`；Preact：`loadPage`；Vue：`loadPage（模板里写 load-page）` |
-| `renderItem` | `(item: T, index: number) => ReactNode`（Vue：插槽 #row="{ item, index }"） | — | 否 | React 里画一行：返回节点（Vue 用 #row 插槽）。 | React：`renderItem`；Preact：`renderItem`；Vue：`#row 插槽` |
+| `renderItem` | `(item: T, index: number) => string \| Node`（React：(item: T, index: number) => ReactNode；Preact：(item: T, index: number) => ReactNode；Vue：插槽 #row="{ item, index }"） | — | 否 | 画一行：返回这一行的内容。<br>React：画一行：返回 React 节点。<br>Preact：画一行：返回节点（经 preact/compat，和 React 一样）。<br>Vue：用 #row 插槽画一行（插槽拿到 item、index）。 | React：`renderItem`；Preact：`renderItem`；Vue：`#row 插槽` |
 | `renderRow` | `(row: HTMLElement, item: any, index: number) => void` | — | 否 | 直接改 DOM 画一行（行元素复用；纯 JS 写法必填）。 | createXxx 选项：`renderRow`；React：`renderRow`；Preact：`renderRow`；Vue：`renderRow` |
 | `rowHeight` | `number` | 56 | 否 | 每行多高（px）：只画看得见的行，按它算位置。 | createXxx 选项：`rowHeight`；React：`rowHeight`；Preact：`rowHeight`；Vue：`rowHeight（模板里写 row-height）` |
 | `total` | `number` | 不限 | 否 | 知道一共多少条时给：加载到这么多条就停，最后一页只要剩下的条数。 | createXxx 选项：`total`；React：`total`；Preact：`total`；Vue：`total` |

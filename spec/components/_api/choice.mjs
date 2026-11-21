@@ -40,7 +40,7 @@ export default {
     { name: "checked", type: "boolean", default: "false", required: false, native: ["react"],
       desc: "勾上没有。", descBy: { react: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", preact: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", vue: "勾上没有：`v-model` 绑定。", svelte: "勾上没有：`bind:checked` 绑定。" },
       names: { react: "checked / defaultChecked", preact: "checked / defaultChecked", vue: "v-model", svelte: "bind:checked", angular: "[checked]", solid: "checked", html: "checked" } },
-    { name: "label", type: "ReactNode | string", typeBy: { vue: "string" }, default: "—", required: false,
+    { name: "label", type: "string", typeBy: { react: "ReactNode | string", preact: "ReactNode | string" }, default: "—", required: false,
       desc: "旁边的文字（也可以写在子元素、默认插槽里）。", names: { react: "label", preact: "label", vue: "label", html: "<label> 里 input 后面的文字" } },
     { name: "indeterminate", type: "boolean", default: "false", required: false,
       desc: "半选（全选框下面只选了一部分）：方框里是一道横线。它没有对应的 HTML 属性，只能用 DOM 属性设。",
@@ -49,7 +49,7 @@ export default {
       desc: "不可用：变灰、点不动，Tab 也跳过。", names: { react: "disabled", preact: "disabled", vue: "disabled", html: "disabled" } },
   ],
   events: [
-    { name: "change", payload: "ChangeEvent（React）/ boolean（Vue 的 v-model）", payloadBy: { react: "ChangeEvent", preact: "Event", vue: "boolean", svelte: "Event", angular: "Event", solid: "Event", html: "Event" }, when: "勾上、取消以后（原生的 change 事件）。", whenBy: { vue: "勾上、取消以后：`v-model` 跟着变（`@update:modelValue` 拿到新的 true / false）。" }, native: true,
+    { name: "change", payload: "Event（原生的 change 事件）", payloadBy: { react: "ChangeEvent", preact: "Event", vue: "boolean", svelte: "Event", angular: "Event", solid: "Event", html: "Event" }, when: "勾上、取消以后（原生的 change 事件）。", whenBy: { vue: "勾上、取消以后：`v-model` 跟着变（`@update:modelValue` 拿到新的 true / false）。" }, native: true,
       names: { react: "onChange", preact: "onChange", vue: "@update:modelValue", svelte: "bind:checked / onchange", angular: "(change)", solid: "onChange", html: "change" } },
   ],
   slots: [{ name: "default", desc: "旁边的文字（和 label 二选一）。", names: { react: "children", vue: "默认插槽" }, native: ["react"] }],

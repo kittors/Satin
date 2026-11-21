@@ -44,7 +44,7 @@ export default {
       desc: "选中的样子（底色加深；筛选芯片前面还有对勾）。", descBy: { react: "选中的样子（底色加深；筛选芯片前面还有对勾）。和 `onChange` 一起给就是受控的筛选芯片；只给它是只显示的芯片。", preact: "选中的样子（底色加深；筛选芯片前面还有对勾）。和 `onChange` 一起给就是受控的筛选芯片；只给它是只显示的芯片。" },
       names: { js: "on", react: "selected", vue: "selected", preact: "selected", markup: "类名 sn-on（筛选芯片再写 aria-pressed=\"true\"）", html: "类名 sn-on（筛选芯片再写 aria-pressed=\"true\"）" } },
     { name: "modelValue", type: "boolean", default: "—", required: false,
-      desc: "`v-model` 绑一个布尔值，就是能切换的筛选芯片（点了回写）。",
+      desc: "绑一个布尔值：能切换的筛选芯片（点了回写）。", descBy: { vue: "`v-model` 绑一个布尔值，就是能切换的筛选芯片（点了回写）。" },
       names: { vue: "v-model" } },
     { name: "defaultSelected", type: "boolean", default: "false", required: false,
       desc: "非受控的初始选中状态：组件自己管开关，`onChange` 只负责通知。",
