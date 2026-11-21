@@ -1,0 +1,17 @@
+<sn-enhance id="demo-select-events">
+  <div class="sn-stack sn-gap-8" data-ex="ratio">
+    <sn-select items="[&quot;16:9 · 横屏&quot;,&quot;9:16 · 竖屏&quot;,&quot;1:1 · 方形&quot;]" value="16:9 · 横屏" label="画面比例"></sn-select>
+    <span class="sn-help" data-out="">当前：16:9 · 横屏</span>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+  const root = document.getElementById("demo-select-events");
+  const box = root.querySelector('[data-ex="ratio"]');
+  box.addEventListener("sn-change", (e) => {
+    box.querySelector("[data-out]").textContent = "当前：" + e.detail;
+  });
+</script>

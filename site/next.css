@@ -654,3 +654,5 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 @media (max-width: 1080px) { .d-mtoc { display: flex; flex-wrap: wrap; align-items: center; } }
 @media (min-width: 861px) { .d-mtoc-fw { display: none; } .d-mtoc:not(:has(> .d-mtoc-btn)) { display: none; } }
 @media (max-width: 860px) { .s-nav [data-fw-slot], .s-nav .s-fw-btn, .n-end .s-fw-btn { display: none; } }
+/* 组件页"设计规范"里的这样做 / 不要：一条一行 */
+.d-dodont ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; font: 400 calc(14px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); }

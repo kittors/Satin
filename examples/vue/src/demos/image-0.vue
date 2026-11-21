@@ -44,7 +44,7 @@ onBeforeUnmount(() => off());
         <span class="sn-tag-ratio">16:9</span>
         <div class="sn-err"><span data-i="image-off"></span>图片加载失败<button class="sn-textbtn" data-img-retry="">重试</button></div>
       </div>
-      <div class="sn-im sn-loaded" data-n="1">
+      <div class="sn-im" data-n="1">
         <span class="sn-ph sn-sk"></span>
         <span class="sn-pic"></span>
         <span class="sn-tag-ratio">1:1</span>

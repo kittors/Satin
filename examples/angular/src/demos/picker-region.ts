@@ -1,0 +1,45 @@
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
+import { setup, enhance } from "satin-ui";
+
+@Component({
+  selector: "demo-picker-region",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素
+  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式
+  template: `
+    <div #root>
+      <div class="sn-field">
+        <span class="sn-lbl">寄送地址</span>
+        <div class="sn-pk" data-pk="region" style="min-width:250px">
+          <button class="sn-pk-trigger" type="button" aria-haspopup="dialog">
+            <span class="sn-val sn-ph" data-ph="选择省 / 市 / 区">选择省 / 市 / 区</span>
+            <span class="sn-end sn-swap">
+              <span class="sn-a" data-i="map-pin"></span>
+              <span class="sn-b" data-i="x" role="button" aria-label="清除"></span>
+            </span>
+          </button>
+          <div class="sn-pk-panel sn-rg" role="dialog" aria-label="选择地址">
+            <div class="sn-rg-search">
+              <input class="sn-input sn-sm" type="text" enterkeyhint="search" placeholder="搜索省、市、区，比如：西湖" aria-label="搜索地址">
+            </div>
+            <div class="sn-rg-hot">常用<button type="button" data-path="北京市/北京市">北京</button><button type="button" data-path="上海市/上海市">上海</button><button type="button" data-path="广东省/广州市">广州</button><button type="button" data-path="广东省/深圳市">深圳</button><button type="button" data-path="浙江省/杭州市">杭州</button><button type="button" data-path="四川省/成都市">成都</button></div>
+            <div class="sn-rg-tabs" role="tablist">
+              <span class="sn-ink"></span>
+            </div>
+            <div class="sn-rg-vp">
+              <div class="sn-rg-res sn-sa-vp sn-fy" role="listbox" hidden></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`,
+})
+export class PickerRegionComponent {
+  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;
+  private off = () => {};
+  ngAfterViewInit() {
+    const unsetup = setup();
+    const done = enhance(this.root.nativeElement);
+    this.off = () => { done(); unsetup(); };
+  }
+  ngOnDestroy() { this.off(); }
+}

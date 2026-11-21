@@ -1,0 +1,16 @@
+<sn-enhance id="demo-select-menu">
+  <div class="sn-select">
+    <button type="button" class="sn-btn sn-secondary" data-menubtn="" data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
+    <div class="sn-menu" role="menu">
+      <div class="sn-item sn-sel" data-i="check:chk">最近更新</div>
+      <div class="sn-item" data-i="check:chk">名称</div>
+      <div class="sn-item" data-i="check:chk">创建时间</div>
+    </div>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+</script>

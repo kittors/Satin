@@ -781,5 +781,295 @@
   "group": "行为",
   "cap": "",
   "css": false
+ },
+ {
+  "slug": "button-basic",
+  "id": "button",
+  "n": -1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "基础用法",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "button-variants",
+  "id": "button",
+  "n": -1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "变体",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "button-sizes",
+  "id": "button",
+  "n": -1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "尺寸",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "button-icons",
+  "id": "button",
+  "n": -1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "带图标",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "button-states",
+  "id": "button",
+  "n": -1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "状态：禁用、等待、成功",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "button-busy",
+  "id": "button",
+  "n": -1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "等待 → 成功（发请求）",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "button-actions",
+  "id": "button",
+  "n": -1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "组合：底部操作区",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "button-mobile",
+  "id": "button",
+  "n": -1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "手机上：底部操作栏",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "dialog-basic",
+  "id": "dialog",
+  "n": -1,
+  "name": "弹窗",
+  "group": "浮层",
+  "cap": "基础用法：打开、取消、提交",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "dialog-danger",
+  "id": "dialog",
+  "n": -1,
+  "name": "弹窗",
+  "group": "浮层",
+  "cap": "危险确认",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "dialog-guard",
+  "id": "dialog",
+  "n": -1,
+  "name": "弹窗",
+  "group": "浮层",
+  "cap": "填了内容再关：底栏原地问一句",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "dialog-events",
+  "id": "dialog",
+  "n": -1,
+  "name": "弹窗",
+  "group": "浮层",
+  "cap": "关上以后做点什么",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "dialog-controlled",
+  "id": "dialog",
+  "n": -1,
+  "name": "弹窗",
+  "group": "浮层",
+  "cap": "受控：开关放在自己的状态里",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "grid-basic",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格",
+  "group": "数据展示",
+  "cap": "基础用法",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "grid-seed",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格",
+  "group": "数据展示",
+  "cap": "固定数据：行数和种子",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "grid-component",
+  "id": "grid",
+  "n": -1,
+  "name": "数据表格",
+  "group": "数据展示",
+  "cap": "在 React、Vue 里包成组件",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "picker-basic",
+  "id": "picker",
+  "n": -1,
+  "name": "日期、时间、地址",
+  "group": "表单",
+  "cap": "基础用法：选一天",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "picker-range",
+  "id": "picker",
+  "n": -1,
+  "name": "日期、时间、地址",
+  "group": "表单",
+  "cap": "日期范围",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "picker-time",
+  "id": "picker",
+  "n": -1,
+  "name": "日期、时间、地址",
+  "group": "表单",
+  "cap": "时间",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "picker-datetime",
+  "id": "picker",
+  "n": -1,
+  "name": "日期、时间、地址",
+  "group": "表单",
+  "cap": "定时发布：日期 + 时间",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "picker-region",
+  "id": "picker",
+  "n": -1,
+  "name": "日期、时间、地址",
+  "group": "表单",
+  "cap": "省 / 市 / 区",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "picker-events",
+  "id": "picker",
+  "n": -1,
+  "name": "日期、时间、地址",
+  "group": "表单",
+  "cap": "拿到选中的值",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "select-basic",
+  "id": "select",
+  "n": -1,
+  "name": "下拉选择与菜单",
+  "group": "表单",
+  "cap": "基础用法",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "select-placeholder",
+  "id": "select",
+  "n": -1,
+  "name": "下拉选择与菜单",
+  "group": "表单",
+  "cap": "还没选：占位文字",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "select-options",
+  "id": "select",
+  "n": -1,
+  "name": "下拉选择与菜单",
+  "group": "表单",
+  "cap": "值和文字分开、不能选的项",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "select-field",
+  "id": "select",
+  "n": -1,
+  "name": "下拉选择与菜单",
+  "group": "表单",
+  "cap": "放进表单字段",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "select-events",
+  "id": "select",
+  "n": -1,
+  "name": "下拉选择与菜单",
+  "group": "表单",
+  "cap": "监听选中",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "select-controlled",
+  "id": "select",
+  "n": -1,
+  "name": "下拉选择与菜单",
+  "group": "表单",
+  "cap": "受控：值放在自己的状态里",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "select-menu",
+  "id": "select",
+  "n": -1,
+  "name": "下拉选择与菜单",
+  "group": "表单",
+  "cap": "菜单按钮",
+  "css": false,
+  "contract": true
  }
 ]

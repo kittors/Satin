@@ -67,6 +67,37 @@ for (const sec of SECTIONS) {
   demos.push(...got.map((d) => ({ ...d, section: sec })));
   console.log(`${sec.id.padEnd(12)} ${got.length} 个演示${bad.length ? `（没等到载好：${bad.join(", ")}，按标签猜的空白）` : ""}`);
 }
+// ———— 组件契约里的示例（spec/components/<id>.json 的 examples：由浅入深，官网组件页一个示例一块）————
+// 在纯 HTML 的演示页（play.html，空的）里把标记放进来量计算样式，再生成 7 种写法
+const CONTRACT = [];
+for (const f of fs.readdirSync(path.join(ROOT, "spec/components")).filter((x) => x.endsWith(".json"))) {
+  const c = JSON.parse(fs.readFileSync(path.join(ROOT, "spec/components", f), "utf8"));
+  if (!c.contract || !c.examples?.length) continue;
+  if (ONLY && !ONLY.split(",").includes(c.id) && !ONLY.split(",").includes("contracts")) continue;
+  CONTRACT.push(c);
+}
+if (CONTRACT.length) {
+  await page.goto(`${BASE}/examples/html/play.html`, { waitUntil: "load" });
+  for (const c of CONTRACT) {
+    const got = await page.evaluate(async ({ c }) => {
+      const V = await import("/site/variants.js");
+      const inline = (el) => /^inline/.test(getComputedStyle(el).display), flex = (el) => el.nodeType === 1 && /flex|grid/.test(getComputedStyle(el).display);
+      const box = document.querySelector(".play");
+      return c.examples.map((e) => {
+        const host = document.createElement("div"); host.innerHTML = e.html; box.append(host);
+        const files = V.variants({ node: host, js: e.js || "", css: e.css || "", slug: e.slug, inline, flex });
+        // 契约里给了某个框架的手写写法（React 的受控 value / onChange、Vue 的 v-model 这类惯用法）：用手写的
+        for (const [fw, code] of Object.entries(e.code || {})) if (files[fw]) files[fw][0] = { ...files[fw][0], code: code.endsWith("\n") ? code : code + "\n" };
+        host.remove();
+        return { id: c.id, n: -1, slug: e.slug, cap: e.title, ready: true, contract: true, files, extra: [] };
+      });
+    }, { c });
+    const sec = SECTIONS.find((x) => x.id === c.id) || { id: c.id, name: c.name || c.id, group: c.group || "" };
+    demos.push(...got.map((d) => ({ ...d, section: sec })));
+    console.log(`${c.id.padEnd(12)} 契约示例 ${got.length} 个`);
+  }
+}
+
 // ———— 页面配方：8 种整页（spec/recipes），预览载好以后按真实排版生成 7 种写法 ————
 const recipes = [];
 if (!ONLY || ONLY.split(",").includes("recipes")) {
@@ -109,7 +140,7 @@ for (const r of recipes) for (const fw of FRAMEWORKS) {
   write(path.join(cdir, "manifest.json"), JSON.stringify({ title, files: files.map((f, i) => (i === 0 ? path.basename(main) : f.name)), entry: path.basename(main) }, null, 1) + "\n");
 }
 // 清单：官网、入口页、比对脚本都按它走
-const manifest = demos.map((d) => ({ slug: d.slug, id: d.id, n: d.n, name: d.section.name, group: d.section.group, cap: d.cap, css: !!d.files.react[1] }));
+const manifest = demos.map((d) => ({ slug: d.slug, id: d.id, n: d.n, name: d.section.name, group: d.section.group, cap: d.cap, css: !!d.files.react[1], ...(d.contract ? { contract: true } : {}) }));
 if (!ONLY) write(path.join(ROOT, "examples/shared/demos.json"), JSON.stringify(manifest, null, 1) + "\n");
 console.log(`演示 ${demos.length} 个，写了 ${nFiles} 个文件（${((Date.now() - t0) / 1000).toFixed(0)} 秒）${errs.length ? `；页面报错 ${errs.length} 条：${errs.slice(0, 3).join(" | ")}` : ""}`);
 if (ENTRIES && !ONLY) { const { writeEntries } = await import("./gallery-entries.mjs"); writeEntries(manifest); }

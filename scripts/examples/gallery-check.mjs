@@ -65,7 +65,7 @@ try {
   const ctx = await newContext(browser, { side: "cur", theme: THEME, size: "desktop", still: true });
   const page = await ctx.newPage(); const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   // 设计稿：整页（每个演示是 #区块 > .demo 的第 n 个）
-  const design = await shoot(page, `${U}/index.html`, (d) => `#${d.id} > .demo >> nth=${d.n}`, "design");
+  const design = await shoot(page, `${U}/index.html`, (d) => (d.contract ? "#__none__" : `#${d.id} > .demo >> nth=${d.n}`), "design");
   const shots = {};
   for (const fw of FWS) {
     if ((fw === "next" || fw === "nuxt") && !(await serve(fw))) { report.fw[fw] = { err: "服务没起来（先构建）" }; continue; }
@@ -75,8 +75,9 @@ try {
   }
   // 纯 HTML ↔ 设计稿
   const dd = {}; let same = 0;
-  for (const d of list) { const r = diff(shots.html?.[d.slug], design[d.slug], path.join(OUT, "_diff", `html-vs-design-${d.slug}.png`)); dd[d.slug] = r; if (r.px === 0) same++; }
-  report.design = { same, total: list.length, bad: Object.fromEntries(Object.entries(dd).filter(([, r]) => r.px !== 0)) };
+  const vsDesign = list.filter((d) => !d.contract); // 契约里的示例是新写的，设计稿里没有，只和各框架互比
+  for (const d of vsDesign) { const r = diff(shots.html?.[d.slug], design[d.slug], path.join(OUT, "_diff", `html-vs-design-${d.slug}.png`)); dd[d.slug] = r; if (r.px === 0) same++; }
+  report.design = { same, total: vsDesign.length, bad: Object.fromEntries(Object.entries(dd).filter(([, r]) => r.px !== 0)) };
   // 每个框架 ↔ 纯 HTML
   for (const fw of FWS) {
     if (fw === "html" || !shots[fw]) continue;

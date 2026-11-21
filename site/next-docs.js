@@ -180,6 +180,14 @@ const DEMOS = new Map((await fetch(new URL("../examples/shared/demos.json", impo
 const texts = new Map();
 const getText = (u) => texts.get(u) || (texts.set(u, fetch(new URL(u, import.meta.url)).then((r) => (r.ok ? r.text() : null)).catch(() => null)), texts.get(u));
 const htmlFw = FRAMEWORKS.find((f) => f.id === "html");
+// 填了契约的组件（全量示例的清单里带 contract 的示例）：组件页用统一的七部分结构（ASYNC.contract）
+const CONTRACTED = new Set([...DEMOS.values()].filter((d) => d.contract).map((d) => d.id));
+// 跟着框架变的小块（引入那一行、API 表里的叫法）：换框架时只重画这些，演示框不动
+const FWR = [];
+const fwr = (fn) => `<div class="d-fwr" data-fwr="${FWR.push(fn) - 1}">${fn()}</div>`;
+// 各框架里的叫法：Next.js 看 React、Nuxt 看 Vue；"自定义元素"那一列给 Svelte、Angular、Solid、Preact、纯 HTML 兜底
+const nameKey = () => { const e = getEnv()?.id; return e === "next" ? "react" : e === "nuxt" ? "vue" : getFw().id; };
+const nameOf = (x) => { const n = x.names || {}, k = nameKey(); return n[k] ?? (["svelte", "angular", "solid", "preact", "html"].includes(k) ? n.element ?? n.html : undefined) ?? n.js ?? x.name; };
 // 一个演示 / 配方在当前框架下的文件；这个框架还没有对应写法时明说，给自定义元素写法（纯 HTML 那份），不悄悄换成别的框架
 async function codeFiles(kind, key) {
   const fw = getFw(), rel = kind === "demo" ? fw.demo(key) : fw.recipe(key), main = `../${fw.dir}/${rel}`, dir = main.slice(0, main.lastIndexOf("/") + 1);
@@ -208,6 +216,7 @@ onFw(() => {
   fillAll();
   for (const el of $$(".d-fw[data-fwb]", main)) { el.innerHTML = renderFwb(FWB[+el.dataset.fwb]); injectIcons(el); mountCode(el); }
   for (const el of $$("[data-fw-name]", main)) el.textContent = getFw().name + (getEnv() ? " · " + getEnv().name : "");
+  for (const el of $$(".d-fwr[data-fwr]", main)) { el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); for (const w of $$(".d-tablewrap", el)) scrollArea(w, { fade: "x", size: 20 }); }
 });
 // 计算样式拿来判断空白要不要留：在演示文档里找同样标签、同样类名的元素
 const liveOf = (doc, el) => { if (!doc || !el.classList?.length) return null; try { return doc.querySelector(el.localName + "." + [...el.classList].map((c) => CSS.escape(c)).join(".")); } catch { return null; } };
@@ -560,6 +569,7 @@ function demosHTML(c) {
 }
 function compPage(pg) {
   const c = pg.c;
+  if (CONTRACTED.has(c.id)) return head(pg, c.name, `${c.group}${c.en ? ` <span>${esc(c.en)}</span>` : ""}`, `<span data-async-lead>${c.desc}</span>`) + `<div data-async="contract:${c.id}"></div>`;
   return head(pg, c.name, `${c.group}${c.en ? ` <span>${esc(c.en)}</span>` : ""}`, c.desc)
     + demosHTML(c) + usage(c.id) + apiHTML(c.id) + rulesHTML(c.rules);
 }
@@ -603,7 +613,62 @@ window.__satinRecipeFiles = async () => {
   const f = $(".d-rframe iframe", main); let doc = null; try { doc = f?.contentDocument; } catch {}
   const d = await loadRecipe(pg.r); return { id: pg.r.id, ready: !!doc && doc.readyState === "complete", files: recipeFiles(pg.r, d, doc && doc.URL !== "about:blank" ? doc : null) };
 };
+// 契约示例的演示框：现场演示就是纯 HTML 示例那份代码本身（examples/html/play.html?demo=<slug>），代码块读当前框架的同名文件
+function playBox(c, ex) {
+  const frame = `<div class="d-frame" style="--sn-h:120px" data-min="0"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="${esc(ex.title)}演示" data-src="../examples/html/play.html?demo=${ex.slug}"></iframe></div>`;
+  return `<div class="dx" data-demo="${c.id}" data-play="${ex.slug}"><div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div><div class="dx-stage">${frame}</div><div class="dx-code" data-slug="${ex.slug}"><div class="dx-cx"></div></div></div>`;
+}
+const tbl = (head, rows) => BLOCK.table(head, rows);
+const md = (t) => md2html(String(t ?? ""));
+function contractHTML(c, k) {
+  const cat0 = cat.byId[c.id], out = [];
+  // 1. 什么时候用、别用、和相近组件的区别
+  out.push(anchor("when", "什么时候用"), `<ul class="d-list">${(k.whenToUse || []).map((t) => `<li>${md(t)}</li>`).join("")}</ul>`);
+  if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">什么时候别用</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${x.use && cat.byId[x.use] ? ` → <a href="#/c/${x.use}">${esc(cat.byId[x.use].name)}</a>` : ""}</li>`).join("")}</ul>`);
+  if (k.related?.length) out.push(`<h3 class="d-h3">和相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [cat.byId[r.id] ? `<a href="#/c/${r.id}">${esc(cat.byId[r.id].name)}</a>` : esc(r.id), md(r.diff)])));
+  // 2. 引入（当前框架）
+  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return snippet(getFw().lang === "vue" ? "js" : "js", line, `${getFw().name}${getEnv() ? " · " + getEnv().name : ""}`); }), k.importNote ? `<p>${md(k.importNote)}</p>` : "");
+  // 3. 示例：由浅入深，每个都是现场演示 + 当前框架的代码
+  out.push(anchor("examples", "示例"));
+  for (const ex of k.examples || []) out.push(`<h3 class="d-h3" id="ex-${ex.slug}">${esc(ex.title)}</h3>`, ex.why ? `<p>${md(ex.why)}</p>` : "", playBox(c, ex));
+  // 设计稿里的完整演示（更丰富的组合）
+  if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示")); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n }))); }
+  // 4. API（按当前框架的叫法）
+  out.push(anchor("api", "API"));
+  if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => tbl(["名称", "类型", "默认值", "必填", "说明"], k.props.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", x.required ? "是" : "", md(x.desc) + (x.example ? `<br><code>${esc(x.example)}</code>` : "")]))));
+  if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => tbl(["名称", "参数", "什么时候触发"], k.events.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.payload || "")}</code>`, md(x.when)]))));
+  if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => tbl(["名称", "说明"], k.slots.map((x) => [`<code>${esc(nameOf(x))}</code>`, md(x.desc)]))));
+  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, tbl(["名称", "签名", "说明"], k.methods.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(x.signature || "")}</code>`, md(x.desc)])));
+  if (k.functions?.length) out.push(`<h3 class="d-h3">函数</h3>`, tbl(["名称", "签名", "说明"], k.functions.map((x) => [`<code>${esc(x.name)}</code>${x.from ? `<br><small>${esc(x.from)}</small>` : ""}`, `<code>${esc(x.signature || "")}</code>`, md(x.desc)])));
+  if (k.cssVars?.length) out.push(`<h3 class="d-h3">样式定制</h3>`, tbl(["CSS 变量", "作用", "默认"], k.cssVars.map((x) => [`<code>${esc(x.name)}</code>${x.token ? " <small>全局令牌</small>" : ""}`, md(x.desc), esc(x.default || "")])));
+  if (k.classes?.length) out.push(`<h3 class="d-h3">纯 HTML 写法的类名、data 属性</h3>`, tbl(["写法", "说明"], k.classes.map((x) => [`<code>${esc(x.name)}</code>`, md(x.desc)])));
+  if (k.types?.length) out.push(`<h3 class="d-h3">TypeScript 类型</h3><p>${k.types.map((t) => `<code>${esc(t)}</code>`).join("、")}</p>`);
+  // 5. 键盘与无障碍
+  if (k.keyboard?.length || k.a11y) {
+    out.push(anchor("a11y", "键盘与无障碍"));
+    if (k.keyboard?.length) out.push(tbl(["按键", "什么时候", "做什么"], k.keyboard.map((x) => [`<kbd>${esc(x.keys)}</kbd>`, md(x.when || ""), md(x.does)])));
+    for (const [t, list] of [["角色", k.a11y?.roles], ["焦点", k.a11y?.focus], ["说明", k.a11y?.notes]]) if (list?.length) out.push(`<h3 class="d-h3">${t}</h3><ul class="d-list">${list.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
+  }
+  // 6. 设计规范
+  const dz = k.design || {};
+  if (dz.do || dz.dont || dz.copy || dz.motion) {
+    out.push(anchor("design", "设计规范"));
+    if (dz.do?.length || dz.dont?.length) out.push(`<div class="d-dodont"><div class="do"><b><span data-i="check"></span>这样做</b><ul>${(dz.do || []).map((x) => `<li>${md(x.text ?? x)}</li>`).join("")}</ul></div><div class="dont"><b><span data-i="x"></span>不要</b><ul>${(dz.dont || []).map((x) => `<li>${md(x.text ?? x)}${x.rule ? ` <a href="#/guide/no-ai">${esc(x.rule)}</a>` : ""}</li>`).join("")}</ul></div></div>`);
+    if (dz.copy?.length) out.push(`<h3 class="d-h3">文案</h3><ul class="d-list">${dz.copy.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
+    if (dz.motion?.length) out.push(`<h3 class="d-h3">动效</h3>`, tbl(["哪里", "曲线", "时长"], dz.motion.map((x) => [md(x.what), `<code>${esc(x.easing || "")}</code>`, esc(x.duration || "")])));
+  }
+  // 7. 相关组件
+  if (k.related?.length) out.push(anchor("related", "相关组件"), `<div class="d-cards">${k.related.filter((r) => cat.byId[r.id]).map((r) => `<a class="d-card" href="#/c/${r.id}"><b>${esc(cat.byId[r.id].name)}</b><small>${esc(cat.byId[r.id].en.split(" · ")[0])}</small><span>${md(r.diff)}</span></a>`).join("")}</div>`);
+  // 原来的用法说明（要点）
+  if (cat0?.rules?.length) out.push(rulesHTML(cat0.rules));
+  return out.join("");
+}
 const ASYNC = {
+  async contract(id) {
+    const k = await fetch(new URL(`../spec/components/${id}.json`, location.href)).then((x) => x.json());
+    const lead = $("[data-async-lead]", main); if (lead && k.lead) lead.outerHTML = md(k.lead);
+    return contractHTML(cat.byId[id], k);
+  },
   async recipe(id) {
     const r = RECIPES.find((x) => x.id === id), d = await loadRecipe(r);
     const lead = $("[data-async-lead]", main); if (lead) lead.outerHTML = md2html(d.lead.join(" "));
@@ -641,6 +706,8 @@ async function fillAsync(scope, base) {
   if (curPage?.hash !== base) return; // 载入期间已经换页了
   injectIcons(main); mountCode(main);
   for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
+  for (const box of $$(".dx:not([data-wired])", main)) { box.dataset.wired = ""; wireDemo(box, cat.byId[box.dataset.demo]); }
+  pump();
   await fillAll();
   buildToc(base);
 }
@@ -720,7 +787,7 @@ function swapPage(pg, part) {
     injectIcons(main); mountCode(main);
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     for (const w of $$(".dx-wall", main)) { const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); }
-    for (const box of $$(".dx", main)) wireDemo(box, pg.c || cat.byId[box.dataset.demo]);
+    for (const box of $$(".dx", main)) { box.dataset.wired = ""; wireDemo(box, pg.c || cat.byId[box.dataset.demo]); }
     fillAll();
     buildToc(pg.hash); fillAsync(main, pg.hash); fitPrev();
     document.title = `${pg.title} · Satin`;

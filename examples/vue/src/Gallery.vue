@@ -87,6 +87,35 @@ import TabsDemo0 from "./demos/tabs-0.vue";
 import ReorderDemo0 from "./demos/reorder-0.vue";
 import AddremoveDemo0 from "./demos/addremove-0.vue";
 import OptimisticDemo0 from "./demos/optimistic-0.vue";
+import ButtonBasic from "./demos/button-basic.vue";
+import ButtonVariants from "./demos/button-variants.vue";
+import ButtonSizes from "./demos/button-sizes.vue";
+import ButtonIcons from "./demos/button-icons.vue";
+import ButtonStates from "./demos/button-states.vue";
+import ButtonBusy from "./demos/button-busy.vue";
+import ButtonActions from "./demos/button-actions.vue";
+import ButtonMobile from "./demos/button-mobile.vue";
+import DialogBasic from "./demos/dialog-basic.vue";
+import DialogDanger from "./demos/dialog-danger.vue";
+import DialogGuard from "./demos/dialog-guard.vue";
+import DialogEvents from "./demos/dialog-events.vue";
+import DialogControlled from "./demos/dialog-controlled.vue";
+import GridBasic from "./demos/grid-basic.vue";
+import GridSeed from "./demos/grid-seed.vue";
+import GridComponent from "./demos/grid-component.vue";
+import PickerBasic from "./demos/picker-basic.vue";
+import PickerRange from "./demos/picker-range.vue";
+import PickerTime from "./demos/picker-time.vue";
+import PickerDatetime from "./demos/picker-datetime.vue";
+import PickerRegion from "./demos/picker-region.vue";
+import PickerEvents from "./demos/picker-events.vue";
+import SelectBasic from "./demos/select-basic.vue";
+import SelectPlaceholder from "./demos/select-placeholder.vue";
+import SelectOptions from "./demos/select-options.vue";
+import SelectField from "./demos/select-field.vue";
+import SelectEvents from "./demos/select-events.vue";
+import SelectControlled from "./demos/select-controlled.vue";
+import SelectMenu from "./demos/select-menu.vue";
 </script>
 
 <template>
@@ -360,6 +389,50 @@ import OptimisticDemo0 from "./demos/optimistic-0.vue";
   <section id="optimistic">
     <h2>乐观更新</h2>
     <div class="demo" data-demo="optimistic-0"><OptimisticDemo0 /></div>
+  </section>
+  <section id="button">
+    <h2>按钮</h2>
+    <div class="demo" data-demo="button-basic"><ButtonBasic /></div>
+    <div class="demo" data-demo="button-variants"><ButtonVariants /></div>
+    <div class="demo" data-demo="button-sizes"><ButtonSizes /></div>
+    <div class="demo" data-demo="button-icons"><ButtonIcons /></div>
+    <div class="demo" data-demo="button-states"><ButtonStates /></div>
+    <div class="demo" data-demo="button-busy"><ButtonBusy /></div>
+    <div class="demo" data-demo="button-actions"><ButtonActions /></div>
+    <div class="demo" data-demo="button-mobile"><ButtonMobile /></div>
+  </section>
+  <section id="dialog">
+    <h2>弹窗</h2>
+    <div class="demo" data-demo="dialog-basic"><DialogBasic /></div>
+    <div class="demo" data-demo="dialog-danger"><DialogDanger /></div>
+    <div class="demo" data-demo="dialog-guard"><DialogGuard /></div>
+    <div class="demo" data-demo="dialog-events"><DialogEvents /></div>
+    <div class="demo" data-demo="dialog-controlled"><DialogControlled /></div>
+  </section>
+  <section id="grid">
+    <h2>数据表格</h2>
+    <div class="demo" data-demo="grid-basic"><GridBasic /></div>
+    <div class="demo" data-demo="grid-seed"><GridSeed /></div>
+    <div class="demo" data-demo="grid-component"><GridComponent /></div>
+  </section>
+  <section id="picker">
+    <h2>日期、时间、地址</h2>
+    <div class="demo" data-demo="picker-basic"><PickerBasic /></div>
+    <div class="demo" data-demo="picker-range"><PickerRange /></div>
+    <div class="demo" data-demo="picker-time"><PickerTime /></div>
+    <div class="demo" data-demo="picker-datetime"><PickerDatetime /></div>
+    <div class="demo" data-demo="picker-region"><PickerRegion /></div>
+    <div class="demo" data-demo="picker-events"><PickerEvents /></div>
+  </section>
+  <section id="select">
+    <h2>下拉选择与菜单</h2>
+    <div class="demo" data-demo="select-basic"><SelectBasic /></div>
+    <div class="demo" data-demo="select-placeholder"><SelectPlaceholder /></div>
+    <div class="demo" data-demo="select-options"><SelectOptions /></div>
+    <div class="demo" data-demo="select-field"><SelectField /></div>
+    <div class="demo" data-demo="select-events"><SelectEvents /></div>
+    <div class="demo" data-demo="select-controlled"><SelectControlled /></div>
+    <div class="demo" data-demo="select-menu"><SelectMenu /></div>
   </section>
 </main>
 </template>

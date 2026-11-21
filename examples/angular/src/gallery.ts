@@ -87,10 +87,39 @@ import { TabsDemo0Component } from "./demos/tabs-0";
 import { ReorderDemo0Component } from "./demos/reorder-0";
 import { AddremoveDemo0Component } from "./demos/addremove-0";
 import { OptimisticDemo0Component } from "./demos/optimistic-0";
+import { ButtonBasicComponent } from "./demos/button-basic";
+import { ButtonVariantsComponent } from "./demos/button-variants";
+import { ButtonSizesComponent } from "./demos/button-sizes";
+import { ButtonIconsComponent } from "./demos/button-icons";
+import { ButtonStatesComponent } from "./demos/button-states";
+import { ButtonBusyComponent } from "./demos/button-busy";
+import { ButtonActionsComponent } from "./demos/button-actions";
+import { ButtonMobileComponent } from "./demos/button-mobile";
+import { DialogBasicComponent } from "./demos/dialog-basic";
+import { DialogDangerComponent } from "./demos/dialog-danger";
+import { DialogGuardComponent } from "./demos/dialog-guard";
+import { DialogEventsComponent } from "./demos/dialog-events";
+import { DialogControlledComponent } from "./demos/dialog-controlled";
+import { GridBasicComponent } from "./demos/grid-basic";
+import { GridSeedComponent } from "./demos/grid-seed";
+import { GridComponentComponent } from "./demos/grid-component";
+import { PickerBasicComponent } from "./demos/picker-basic";
+import { PickerRangeComponent } from "./demos/picker-range";
+import { PickerTimeComponent } from "./demos/picker-time";
+import { PickerDatetimeComponent } from "./demos/picker-datetime";
+import { PickerRegionComponent } from "./demos/picker-region";
+import { PickerEventsComponent } from "./demos/picker-events";
+import { SelectBasicComponent } from "./demos/select-basic";
+import { SelectPlaceholderComponent } from "./demos/select-placeholder";
+import { SelectOptionsComponent } from "./demos/select-options";
+import { SelectFieldComponent } from "./demos/select-field";
+import { SelectEventsComponent } from "./demos/select-events";
+import { SelectControlledComponent } from "./demos/select-controlled";
+import { SelectMenuComponent } from "./demos/select-menu";
 
 @Component({
   selector: "app-root",
-  imports: [ColorDemo0Component, TypeDemo0Component, TypeDemo1Component, TypeDemo2Component, SpacingDemo0Component, SpacingDemo1Component, SpacingDemo2Component, SpacingDemo3Component, LayoutDemo0Component, LayoutDemo1Component, SpaceDemo0Component, SpaceDemo1Component, ElevationDemo0Component, MotionDemo0Component, IconsDemo0Component, ButtonDemo0Component, ButtonDemo1Component, ButtonDemo2Component, ButtonDemo3Component, IconbuttonDemo0Component, LinkDemo0Component, CompoundDemo0Component, ChipDemo0Component, FieldDemo0Component, InputDemo0Component, InputDemo1Component, InputDemo2Component, SpecialDemo0Component, CountDemo0Component, TaginputDemo0Component, NumberDemo0Component, PromptDemo0Component, SelectDemo0Component, PickerDemo0Component, ChoiceDemo0Component, SegmentedDemo0Component, SliderDemo0Component, OtpDemo0Component, TooltipDemo0Component, PopoverDemo0Component, PopconfirmDemo0Component, CtxmenuDemo0Component, DialogDemo0Component, DrawerDemo0Component, CmdkDemo0Component, ToastDemo0Component, NotifyDemo0Component, BannerDemo0Component, EmptyDemo0Component, LoadingDemo0Component, ProgressDemo0Component, NumflowDemo0Component, TableDemo0Component, TableDemo1Component, TableDemo2Component, TableDemo3Component, TableDemo4Component, TableDemo5Component, TableDemo6Component, TableDemo7Component, TableDemo8Component, GridDemo0Component, CgridDemo0Component, ListDemo0Component, CardDemo0Component, TagsDemo0Component, CollapseDemo0Component, ScrollareaDemo0Component, ScrollareaDemo1Component, ScrollareaDemo2Component, ScrollareaDemo3Component, ScrollareaDemo4Component, ScrollareaDemo5Component, ScrollareaDemo6Component, VlistDemo0Component, ChatDemo0Component, MdDemo0Component, FlowDemo0Component, FlowstressDemo0Component, ImageDemo0Component, MediaDemo0Component, UploadDemo0Component, SidebarDemo0Component, TabsDemo0Component, ReorderDemo0Component, AddremoveDemo0Component, OptimisticDemo0Component],
+  imports: [ColorDemo0Component, TypeDemo0Component, TypeDemo1Component, TypeDemo2Component, SpacingDemo0Component, SpacingDemo1Component, SpacingDemo2Component, SpacingDemo3Component, LayoutDemo0Component, LayoutDemo1Component, SpaceDemo0Component, SpaceDemo1Component, ElevationDemo0Component, MotionDemo0Component, IconsDemo0Component, ButtonDemo0Component, ButtonDemo1Component, ButtonDemo2Component, ButtonDemo3Component, IconbuttonDemo0Component, LinkDemo0Component, CompoundDemo0Component, ChipDemo0Component, FieldDemo0Component, InputDemo0Component, InputDemo1Component, InputDemo2Component, SpecialDemo0Component, CountDemo0Component, TaginputDemo0Component, NumberDemo0Component, PromptDemo0Component, SelectDemo0Component, PickerDemo0Component, ChoiceDemo0Component, SegmentedDemo0Component, SliderDemo0Component, OtpDemo0Component, TooltipDemo0Component, PopoverDemo0Component, PopconfirmDemo0Component, CtxmenuDemo0Component, DialogDemo0Component, DrawerDemo0Component, CmdkDemo0Component, ToastDemo0Component, NotifyDemo0Component, BannerDemo0Component, EmptyDemo0Component, LoadingDemo0Component, ProgressDemo0Component, NumflowDemo0Component, TableDemo0Component, TableDemo1Component, TableDemo2Component, TableDemo3Component, TableDemo4Component, TableDemo5Component, TableDemo6Component, TableDemo7Component, TableDemo8Component, GridDemo0Component, CgridDemo0Component, ListDemo0Component, CardDemo0Component, TagsDemo0Component, CollapseDemo0Component, ScrollareaDemo0Component, ScrollareaDemo1Component, ScrollareaDemo2Component, ScrollareaDemo3Component, ScrollareaDemo4Component, ScrollareaDemo5Component, ScrollareaDemo6Component, VlistDemo0Component, ChatDemo0Component, MdDemo0Component, FlowDemo0Component, FlowstressDemo0Component, ImageDemo0Component, MediaDemo0Component, UploadDemo0Component, SidebarDemo0Component, TabsDemo0Component, ReorderDemo0Component, AddremoveDemo0Component, OptimisticDemo0Component, ButtonBasicComponent, ButtonVariantsComponent, ButtonSizesComponent, ButtonIconsComponent, ButtonStatesComponent, ButtonBusyComponent, ButtonActionsComponent, ButtonMobileComponent, DialogBasicComponent, DialogDangerComponent, DialogGuardComponent, DialogEventsComponent, DialogControlledComponent, GridBasicComponent, GridSeedComponent, GridComponentComponent, PickerBasicComponent, PickerRangeComponent, PickerTimeComponent, PickerDatetimeComponent, PickerRegionComponent, PickerEventsComponent, SelectBasicComponent, SelectPlaceholderComponent, SelectOptionsComponent, SelectFieldComponent, SelectEventsComponent, SelectControlledComponent, SelectMenuComponent],
   encapsulation: ViewEncapsulation.None,
   styleUrl: "../../shared/gallery.css",
   template: `
@@ -364,6 +393,50 @@ import { OptimisticDemo0Component } from "./demos/optimistic-0";
   <section id="optimistic">
     <h2>乐观更新</h2>
     <div class="demo" data-demo="optimistic-0"><demo-optimistic-0 /></div>
+  </section>
+  <section id="button">
+    <h2>按钮</h2>
+    <div class="demo" data-demo="button-basic"><demo-button-basic /></div>
+    <div class="demo" data-demo="button-variants"><demo-button-variants /></div>
+    <div class="demo" data-demo="button-sizes"><demo-button-sizes /></div>
+    <div class="demo" data-demo="button-icons"><demo-button-icons /></div>
+    <div class="demo" data-demo="button-states"><demo-button-states /></div>
+    <div class="demo" data-demo="button-busy"><demo-button-busy /></div>
+    <div class="demo" data-demo="button-actions"><demo-button-actions /></div>
+    <div class="demo" data-demo="button-mobile"><demo-button-mobile /></div>
+  </section>
+  <section id="dialog">
+    <h2>弹窗</h2>
+    <div class="demo" data-demo="dialog-basic"><demo-dialog-basic /></div>
+    <div class="demo" data-demo="dialog-danger"><demo-dialog-danger /></div>
+    <div class="demo" data-demo="dialog-guard"><demo-dialog-guard /></div>
+    <div class="demo" data-demo="dialog-events"><demo-dialog-events /></div>
+    <div class="demo" data-demo="dialog-controlled"><demo-dialog-controlled /></div>
+  </section>
+  <section id="grid">
+    <h2>数据表格</h2>
+    <div class="demo" data-demo="grid-basic"><demo-grid-basic /></div>
+    <div class="demo" data-demo="grid-seed"><demo-grid-seed /></div>
+    <div class="demo" data-demo="grid-component"><demo-grid-component /></div>
+  </section>
+  <section id="picker">
+    <h2>日期、时间、地址</h2>
+    <div class="demo" data-demo="picker-basic"><demo-picker-basic /></div>
+    <div class="demo" data-demo="picker-range"><demo-picker-range /></div>
+    <div class="demo" data-demo="picker-time"><demo-picker-time /></div>
+    <div class="demo" data-demo="picker-datetime"><demo-picker-datetime /></div>
+    <div class="demo" data-demo="picker-region"><demo-picker-region /></div>
+    <div class="demo" data-demo="picker-events"><demo-picker-events /></div>
+  </section>
+  <section id="select">
+    <h2>下拉选择与菜单</h2>
+    <div class="demo" data-demo="select-basic"><demo-select-basic /></div>
+    <div class="demo" data-demo="select-placeholder"><demo-select-placeholder /></div>
+    <div class="demo" data-demo="select-options"><demo-select-options /></div>
+    <div class="demo" data-demo="select-field"><demo-select-field /></div>
+    <div class="demo" data-demo="select-events"><demo-select-events /></div>
+    <div class="demo" data-demo="select-controlled"><demo-select-controlled /></div>
+    <div class="demo" data-demo="select-menu"><demo-select-menu /></div>
   </section>
 </main>`,
 })

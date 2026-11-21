@@ -52,7 +52,7 @@ export function toast(o = {}) {
 
   function setIcon(kind, tone, animate) {
     const old = ico.firstElementChild, wrap = document.createElement("span");
-    wrap.className = "sn-glyph" + (tone ? " " + tone : "");
+    wrap.className = "sn-glyph" + (tone ? " sn-" + tone : ""); // 状态色：.sn-glyph.sn-ok / .sn-danger / .sn-info（前缀不能漏，不然图标没有颜色）
     wrap.innerHTML = kind === "count" || kind === "progress" ? ringSVG() : icon(kind, 16);
     ico.append(wrap); ring?.cancel(); ring = null;
     if (old) {

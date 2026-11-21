@@ -41,7 +41,7 @@ export default function ImageDemo0() {
           <span className="sn-tag-ratio">16:9</span>
           <div className="sn-err"><span data-i="image-off"></span>图片加载失败<button className="sn-textbtn" data-img-retry="">重试</button></div>
         </div>
-        <div className="sn-im sn-loaded" data-n="1">
+        <div className="sn-im" data-n="1">
           <span className="sn-ph sn-sk"></span>
           <span className="sn-pic"></span>
           <span className="sn-tag-ratio">1:1</span>

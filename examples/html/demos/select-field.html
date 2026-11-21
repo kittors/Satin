@@ -1,0 +1,13 @@
+<sn-enhance id="demo-select-field">
+  <div class="sn-field">
+    <span class="sn-lbl">画面比例</span>
+    <sn-select items="[&quot;16:9 · 横屏&quot;,&quot;9:16 · 竖屏&quot;,&quot;1:1 · 方形&quot;]" value="16:9 · 横屏" label="画面比例"></sn-select>
+    <div class="sn-help">导出成片时用这个比例。</div>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+</script>

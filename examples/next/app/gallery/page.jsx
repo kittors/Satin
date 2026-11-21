@@ -87,6 +87,35 @@ import TabsDemo0 from "../demos/tabs-0.jsx";
 import ReorderDemo0 from "../demos/reorder-0.jsx";
 import AddremoveDemo0 from "../demos/addremove-0.jsx";
 import OptimisticDemo0 from "../demos/optimistic-0.jsx";
+import ButtonBasic from "../demos/button-basic.jsx";
+import ButtonVariants from "../demos/button-variants.jsx";
+import ButtonSizes from "../demos/button-sizes.jsx";
+import ButtonIcons from "../demos/button-icons.jsx";
+import ButtonStates from "../demos/button-states.jsx";
+import ButtonBusy from "../demos/button-busy.jsx";
+import ButtonActions from "../demos/button-actions.jsx";
+import ButtonMobile from "../demos/button-mobile.jsx";
+import DialogBasic from "../demos/dialog-basic.jsx";
+import DialogDanger from "../demos/dialog-danger.jsx";
+import DialogGuard from "../demos/dialog-guard.jsx";
+import DialogEvents from "../demos/dialog-events.jsx";
+import DialogControlled from "../demos/dialog-controlled.jsx";
+import GridBasic from "../demos/grid-basic.jsx";
+import GridSeed from "../demos/grid-seed.jsx";
+import GridComponent from "../demos/grid-component.jsx";
+import PickerBasic from "../demos/picker-basic.jsx";
+import PickerRange from "../demos/picker-range.jsx";
+import PickerTime from "../demos/picker-time.jsx";
+import PickerDatetime from "../demos/picker-datetime.jsx";
+import PickerRegion from "../demos/picker-region.jsx";
+import PickerEvents from "../demos/picker-events.jsx";
+import SelectBasic from "../demos/select-basic.jsx";
+import SelectPlaceholder from "../demos/select-placeholder.jsx";
+import SelectOptions from "../demos/select-options.jsx";
+import SelectField from "../demos/select-field.jsx";
+import SelectEvents from "../demos/select-events.jsx";
+import SelectControlled from "../demos/select-controlled.jsx";
+import SelectMenu from "../demos/select-menu.jsx";
 
 export default function Gallery() {
   return (
@@ -360,6 +389,50 @@ export default function Gallery() {
       <section id="optimistic">
         <h2>乐观更新</h2>
         <div className="demo" data-demo="optimistic-0"><OptimisticDemo0 /></div>
+      </section>
+      <section id="button">
+        <h2>按钮</h2>
+        <div className="demo" data-demo="button-basic"><ButtonBasic /></div>
+        <div className="demo" data-demo="button-variants"><ButtonVariants /></div>
+        <div className="demo" data-demo="button-sizes"><ButtonSizes /></div>
+        <div className="demo" data-demo="button-icons"><ButtonIcons /></div>
+        <div className="demo" data-demo="button-states"><ButtonStates /></div>
+        <div className="demo" data-demo="button-busy"><ButtonBusy /></div>
+        <div className="demo" data-demo="button-actions"><ButtonActions /></div>
+        <div className="demo" data-demo="button-mobile"><ButtonMobile /></div>
+      </section>
+      <section id="dialog">
+        <h2>弹窗</h2>
+        <div className="demo" data-demo="dialog-basic"><DialogBasic /></div>
+        <div className="demo" data-demo="dialog-danger"><DialogDanger /></div>
+        <div className="demo" data-demo="dialog-guard"><DialogGuard /></div>
+        <div className="demo" data-demo="dialog-events"><DialogEvents /></div>
+        <div className="demo" data-demo="dialog-controlled"><DialogControlled /></div>
+      </section>
+      <section id="grid">
+        <h2>数据表格</h2>
+        <div className="demo" data-demo="grid-basic"><GridBasic /></div>
+        <div className="demo" data-demo="grid-seed"><GridSeed /></div>
+        <div className="demo" data-demo="grid-component"><GridComponent /></div>
+      </section>
+      <section id="picker">
+        <h2>日期、时间、地址</h2>
+        <div className="demo" data-demo="picker-basic"><PickerBasic /></div>
+        <div className="demo" data-demo="picker-range"><PickerRange /></div>
+        <div className="demo" data-demo="picker-time"><PickerTime /></div>
+        <div className="demo" data-demo="picker-datetime"><PickerDatetime /></div>
+        <div className="demo" data-demo="picker-region"><PickerRegion /></div>
+        <div className="demo" data-demo="picker-events"><PickerEvents /></div>
+      </section>
+      <section id="select">
+        <h2>下拉选择与菜单</h2>
+        <div className="demo" data-demo="select-basic"><SelectBasic /></div>
+        <div className="demo" data-demo="select-placeholder"><SelectPlaceholder /></div>
+        <div className="demo" data-demo="select-options"><SelectOptions /></div>
+        <div className="demo" data-demo="select-field"><SelectField /></div>
+        <div className="demo" data-demo="select-events"><SelectEvents /></div>
+        <div className="demo" data-demo="select-controlled"><SelectControlled /></div>
+        <div className="demo" data-demo="select-menu"><SelectMenu /></div>
       </section>
     </main>
   );

@@ -1,0 +1,12 @@
+<sn-enhance id="demo-grid-component">
+  <div data-ex="grid3"></div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+  import { createDataGrid } from "satin-ui/grid";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+  const root = document.getElementById("demo-grid-component");
+  createDataGrid(root.querySelector('[data-ex="grid3"]'), { rows: 100000, seed: 11 });
+</script>
