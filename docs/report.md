@@ -55,18 +55,19 @@
 | 验证 | 工具 | 标准 |
 |---|---|---|
 | 和改造前逐像素一致 | `scripts/parity/shots.mjs` + `compare.mjs`：嵌入区块 61 个、整页分屏、官网各页 × 深浅 × 桌面 1440 / 平板 768 / 手机 390 | 截图逐像素（pixelmatch 阈值 0）、DOM 和计算样式逐项（类名、变量名去掉 sn- 前缀再比） |
-| 和改造前逐帧一致 | `scripts/parity/trace.mjs` + `trace-compare.mjs`：每个区块的每个触发器 | 动画定义完全一样、DOM 变化一一对上、逐帧位置透明度 transform（≤0.5px / 0.01，允许前后差 1 帧） |
+| 和改造前逐帧一致 | `scripts/parity/trace.mjs` + `trace-compare.mjs`：每个区块的每个触发器（帧时钟：每个真实帧前进一帧、发事件时停表、rAF 统一调度、动画两帧之间暂停由时钟设进度） | 基线两遍一致的区块：动画定义完全一样、DOM 变化一一对上、逐帧位置透明度 transform（≤0.5px / 0.01，允许前后差 1 帧）；基线自己不确定的区块：改造后每个动作要和基线 5 遍里某一遍一致（`trace-any.mjs`，决策 37） |
 | 工具本身没有噪声 | 基线对基线各跑两遍 | 0 差异（不放宽阈值） |
 | 令牌 | `scripts/tokens/check.mjs` | 30 种组合 3480 次取值和改造前一致 |
 | 导入无副作用、Node / SSR 能用 | `scripts/test/node-import.mjs`、`ssr.mjs` | 38 个入口 0 报错；React、Vue 服务端渲染出完整标记 |
-| 不泄漏 | `scripts/test/lifecycle.mjs`（10 个组件 × 100 次挂载 → 更新 → 销毁）、`framework-leaks.mjs`（React StrictMode / Vue × 切路由 + 条件渲染） | 活着的监听、观察器、定时器回到起点，脱离文档的节点不涨 |
+| 不泄漏 | `scripts/test/lifecycle.mjs`（32 个组件 + 3 个自定义元素 × 100 次挂载 → 更新 → 销毁）、`framework-leaks.mjs`（React StrictMode / Vue × 切路由 + 条件渲染；计数和量堆分两遍） | 活着的监听、观察器、定时器、后台线程回到起点；堆快照里脱离文档的节点不涨；销毁后元素上不留实例；量堆不带计数探针、看第三批 |
 | 体积 | `scripts/test/size.mjs` | 单组件打包体积在预算内 |
 | 安全 | `scripts/test/md-xss.mjs` | 64 个 XSS 向量全部拦住 |
 | 框架示例 | `scripts/examples/check.mjs` | 8 个框架的截图和纯 HTML 版逐像素一致；0 报错；Next / Nuxt 服务端直出完整、不跑 JS 的第一帧 = 水合以后；纯 HTML 版的组件和设计稿同一状态的组件逐项一致 |
-| 手机 | `scripts/mobile/check.mjs` | 配方页 Chromium 手机模拟 + WebKit 没有报错和横向溢出；触屏交互（点、长按、拖、滑）结果对、CPU 降速 4 倍时帧间隔 p95 ≤ 17ms、最长 ≤ 34ms |
+| 手机 | `scripts/mobile/check.mjs`（`--side base` 在改造前的设计稿上跑同样的触屏操作对照） | 配方页 Chromium 手机模拟 + WebKit 没有报错和横向溢出；触屏交互（点、长按、拖、手指滑——用浏览器合成手势）结果对、CPU 降速 4 倍时帧间隔 p95 ≤ 17ms、最长 ≤ 34ms（WebKit 无头模式没有真实刷新节奏，帧间隔只记录不判） |
 | 官网 | `scripts/docs-audit.mjs`（含 `--selftest`）、`lb-edge.mjs`、`lb-chat-walk.mjs` | 浮层不被裁、不被挡，换页、载入、溢出、按钮换行、报错 0 |
 | 技能 | `skills/satin/scripts/check.test.mjs`、`eval/` | 检查器自测全过；低档模型有技能时的结果见"数据" |
-| 代码 | `pnpm lint`、`pnpm test:types` | 0 处 |
+| 代码 | `pnpm lint`、`pnpm test:types`、`scripts/test/i18n-shadow.mjs`（取词函数被局部变量挡住）、`prefix-leaks.mjs`（类名前缀漏改） | 0 处 |
+| 重组件放进空容器 | `scripts/test/heavy-shots.mjs`（对话、Markdown、流程图、两种数据表格、主题面板 × 深浅） | 0 报错；和设计稿那一块对着看 |
 
 ## 数据
 

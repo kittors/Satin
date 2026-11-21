@@ -42,9 +42,13 @@
     P.clockLoading = () => loading;
     const frozen = () => loading > 0 || (held && budget <= 0);
     const tick = (ts) => { if (frozen()) return frameT; if (ts !== lastReal) { frameT += FR; lastReal = ts; calls = 0; if (held) budget--; } return frameT; };
+    // 页面的 rAF 回调不直接交给浏览器：进队列，由 drive 每帧在推进时间、设好动画进度、跑完到点的定时器之后按登记顺序执行。
+    // 原来每个回调各自挂在浏览器的 rAF 上，和 drive 谁先谁后取决于登记时刻（冻结时还会反复重挂），同一帧里读到的动画进度两遍可能差一帧
+    let rafQ = [], rafSeq = 0;
     performance.now = () => (++calls > 200000 ? frameT + (calls - 200000) * 1e-3 : frameT); // 防止"同一帧里等时间走"的循环卡死
-    window.requestAnimationFrame = (cb) => realRAF(function f(ts) { if (frozen() && ts !== lastReal) return realRAF(f); cb(tick(ts)); });
-    window.cancelAnimationFrame = (id) => realCAF(id);
+    window.requestAnimationFrame = (cb) => { const id = ++rafSeq; rafQ.push({ id, cb }); return id; };
+    window.cancelAnimationFrame = (id) => { const i = rafQ.findIndex((x) => x.id === id); if (i >= 0) rafQ.splice(i, 1); };
+    void realCAF;
     const timers = new Map();
     const add = (fn, ms, args, every) => { const id = ++seq; timers.set(id, { fn, args, due: frameT + Math.max(0, +ms || 0), every: every ? Math.max(1, +ms || 0) : 0, seq: id }); return id; };
     window.setTimeout = (fn, ms, ...args) => (typeof fn === "function" ? add(fn, ms, args, false) : 0);
@@ -56,28 +60,36 @@
     // 这一帧画出来、记录器读到的就只取决于帧号，浏览器在两帧之间按真实时间走了多少都不算。
     // 页面自己动过的（设 currentTime / startTime / playbackRate，调 play / pause / reverse / finish / updatePlaybackRate）
     // 从页面给的值接着走：拦下这些调用做记号（我们自己设的不算）。页面暂停的、CSS 里 animation-play-state 停住的只记下进度，不推
-    const vt = new WeakMap(), touched = new WeakSet(); let lastFT = null, ours = false;
+    const vt = new WeakMap(), touched = new WeakSet(), ctl = new WeakSet(); let lastFT = null, ours = false;
     const AP = Animation.prototype;
     for (const k of ["currentTime", "startTime", "playbackRate"]) {
       const d = Object.getOwnPropertyDescriptor(AP, k); if (!d?.set) continue;
       Object.defineProperty(AP, k, { ...d, set(v) { if (!ours) touched.add(this); d.set.call(this, v); } });
     }
-    for (const m of ["play", "pause", "reverse", "finish", "updatePlaybackRate"]) { const o = AP[m]; if (o) AP[m] = function (...x) { if (!ours) touched.add(this); return o.apply(this, x); }; }
-    const setCT = (a, v) => { ours = true; try { a.currentTime = v; } finally { ours = false; } };
+    for (const m of ["play", "pause", "reverse", "finish", "updatePlaybackRate", "cancel"]) { const o = AP[m]; if (o) AP[m] = function (...x) { if (!ours) touched.add(this); return o.apply(this, x); }; }
+    const asUs = (fn) => { ours = true; try { fn(); } finally { ours = false; } };
+    const endOf = (a) => { const e = a.effect?.getComputedTiming?.().endTime; return typeof e === "number" ? e : Infinity; };
+    // 帧时钟接管的动画（ctl）：两帧之间是暂停的，进度只在这里按帧号设
+    P.isControlled = (a) => ctl.has(a);
     const syncAnims = () => {
       const dt = lastFT == null ? 0 : frameT - lastFT; lastFT = frameT;
       for (const a of document.getAnimations()) {
         if (a.timeline !== document.timeline) continue; // 滚动驱动的不管
-        const cur = a.currentTime, st = vt.get(a), byPage = touched.has(a);
-        if (byPage) touched.delete(a);
-        if (a.playState !== "running" || cur == null) { if (cur != null) vt.set(a, { ct: cur, rate: a.playbackRate }); else vt.delete(a); continue; }
-        // 第一次见到：浏览器已经按真实时间播了零点几到十几毫秒（开始时刻落在真实帧里的位置，每次不同），一律从 0 起；
-        // 页面自己设过进度的（animate() 后马上设 currentTime 这类）照页面的
-        if (!st) { const ct = byPage ? cur : 0; vt.set(a, { ct, rate: a.playbackRate }); setCT(a, ct); continue; }
-        // 页面动过：从页面给的值接着走；没动过：只按帧号推进，浏览器按真实时间多走的那一截不算
-        const next = (byPage ? cur : st.ct) + a.playbackRate * dt;
-        st.ct = next; st.rate = a.playbackRate;
-        setCT(a, next);
+        const byPage = touched.has(a); if (byPage) touched.delete(a);
+        if (byPage && ctl.has(a)) ctl.delete(a); // 页面自己动过：放手，按页面给的状态来（暂停的就停着，播放的下一帧再接管）
+        const st = vt.get(a);
+        if (!ctl.has(a)) {
+          if (a.playState !== "running" || a.pending || a.currentTime == null) { if (a.currentTime != null) vt.set(a, { ct: a.currentTime, rate: a.playbackRate }); continue; }
+          // 接管：第一次见到的从 0 起（开始时刻落在真实帧里的哪个位置不算；页面自己设过进度的照页面的），见过的从记下的值起
+          const ct = !st ? (byPage ? a.currentTime : 0) : byPage ? a.currentTime : st.ct;
+          vt.set(a, { ct, rate: a.playbackRate }); ctl.add(a);
+          asUs(() => { a.pause(); a.currentTime = ct; });
+          continue;
+        }
+        // 已接管：按帧号推进；播到头（正着播到终点、倒着播到 0）就恢复播放并 finish()
+        const next = st.ct + st.rate * dt, end = endOf(a);
+        if ((st.rate > 0 && next >= end) || (st.rate < 0 && next <= 0)) { ctl.delete(a); vt.delete(a); asUs(() => { a.play(); a.finish(); }); continue; }
+        st.ct = next; asUs(() => { a.currentTime = next; });
       }
     };
     P.syncAnims = syncAnims;
@@ -92,6 +104,8 @@
         if (next.every && window.__paritySlowIntervals === "pause" && next.every >= 1000) continue;
         try { next.fn.apply(window, next.args); } catch (e) { queueMicrotask(() => { throw e; }); }
       }
+      const q = rafQ; rafQ = [];
+      for (const { cb } of q) { try { cb(frameT); } catch (e) { queueMicrotask(() => { throw e; }); } }
       realRAF(drive);
     };
     realRAF(drive);
@@ -240,7 +254,8 @@
   P.sinceMutation = () => performance.now() - lastMut;
   // 正在播、有尽头、跟着文档时间走的动画（滚动驱动的动画、无限循环的、一直在"等待开始"的不算）
   const finite = (a) => { const e = a.effect?.getComputedTiming().endTime; return a.timeline === document.timeline && typeof e === "number" && isFinite(e); };
-  P.busyAnims = () => document.getAnimations().filter((a) => a.playState === "running" && !a.pending && finite(a)).length;
+  // 在播的有限动画（帧时钟接管的那些两帧之间是暂停的，也算在播）
+  P.busyAnims = () => document.getAnimations().filter((a) => ((a.playState === "running" && !a.pending) || P.isControlled?.(a)) && finite(a)).length;
   // CSS 背景图（图片演示的 .pic、头像这类）：document.images 里没有，单独等它们载完、解码完
   const bgDone = new Set();
   const waitBackgrounds = async () => {
