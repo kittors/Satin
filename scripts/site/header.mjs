@@ -18,7 +18,7 @@ const errs = [], bad = [], notes = [];
 const PAGES = [["home", "next.html", ".n-nav"], ["docs", "next-docs.html#/c/button", ".s-nav"]];
 async function ctxFor(W, theme, base = CUR) {
   const phone = W < 768, ctx = await browser.newContext({ viewport: { width: W, height: phone ? 844 : 900 }, colorScheme: theme, hasTouch: phone, isMobile: phone, deviceScaleFactor: phone ? 2 : 1 });
-  await ctx.addInitScript((t) => localStorage.setItem("satin-theme", t), theme);
+  await ctx.addInitScript((t) => { if (window.top !== window) return; try { localStorage.setItem("satin-theme", t); } catch {} }, theme);
   const page = await ctx.newPage();
   page.on("pageerror", (e) => errs.push(`${base === CUR ? "" : "基线 "}${theme}-${W} pageerror ${e.message.slice(0, 160)}`));
   page.on("console", (m) => { if (m.type() === "error") errs.push(`${base === CUR ? "" : "基线 "}${theme}-${W} console ${m.text().slice(0, 160)}`); });

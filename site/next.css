@@ -719,6 +719,7 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 }
 
 /* 组件页"设计规范"里的这样做 / 不要：一条一行 */
+.d-dodont.d-dodont-one { grid-template-columns: 1fr; } /* 只有"这样做"或只有"不要"：一张卡占整行 */
 .d-dodont ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; font: 400 calc(14px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); }
 
 /* 组件页 API 表（契约）：表头只有两三个字（名称、类型、默认值、必填、说明），不许折行——"必填"那列常空着，会被挤成竖排两行 */
@@ -726,6 +727,18 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 /* 组件页 API 表（next-docs.js 的 apiTbl）：桌面是表格；窄屏（< 640px）每一项一块，不横着滑、不截断，行高跟着内容走——
    第一行名称（代码样式），右边小字"类型 · 默认 … · 必填"，太长就整行放到名称下面（.d-k-long，脚本按字数判断）；说明整行在下面，不加列线；项和项之间一条细线 */
 .n-docs .d-api .d-k-sum { display: none; }
+/* 类型、默认值、名称里的代码一截一截包成行内块（nbCode / nbName 的 .d-nb）：放得下整截就不从中间断开（"确定"、"danger-soft"、(close:），
+   比格子还宽才在里面折；"默认""必填""全局令牌"这几个小字不断开。
+   桌面表格固定排法，各列宽度按表头（apiTbl 的 colgroup），说明那列至少占三成，不再被名称、类型挤成一小条 */
+.n-docs .d-api .d-nb, .n-docs .d-api .d-kv { display: inline-block; max-width: 100%; }
+/* 桌面表格里名称、类型、默认值格子里的代码本身也是行内块：一截比格子还宽、只能在里面折时，代码的底色跟着整块走（行内的底色只铺在最后一行上，会错位）；
+   行高从 1 放到 1.45，折成两行时不挤在一起。手机上那行小字（.d-k-sum）里的代码照常是行内的：长的默认值紧跟在"默认"后面往下折 */
+.n-docs .d-api td.d-k-m code, .n-docs .d-api td.d-k-n code { display: inline-block; max-width: 100%; line-height: 1.45; }
+.n-docs .d-api .d-k-l, .n-docs .d-api .d-k-req, .n-docs .d-api td small { white-space: nowrap; }
+@media (min-width: 640px) { .n-docs .d-api { table-layout: fixed; } .n-docs .d-api td { overflow-wrap: anywhere; } }
+/* 名称那列：名字本身不断开，后面括号里的说明（模板里写 xxx、写成 JSON……）是小字，可以折到下一行（旧版表格第一列整列不折行，这里放开） */
+.n-docs .d-api td.d-k-n { white-space: normal; }
+.n-docs .d-api .d-k-note { margin-left: 2px; font: 400 calc(12px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
 @media (max-width: 639px) {
   .n-docs .d-api, .n-docs .d-api tbody { display: block; width: 100%; }
   .n-docs .d-api thead { display: none; }

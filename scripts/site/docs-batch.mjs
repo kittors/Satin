@@ -27,7 +27,8 @@ const rows = [];
 for (const [fw, dev, theme] of COMBOS) {
   const phone = dev === "phone", tag = `${fw}-${dev}-${theme}`;
   const ctx = await b.newContext({ viewport: phone ? { width: 390, height: 844 } : { width: 1440, height: 900 }, colorScheme: theme, isMobile: phone, hasTouch: phone, deviceScaleFactor: 1 });
-  await ctx.addInitScript(([t, f]) => { localStorage.setItem("satin-theme", t); localStorage.setItem("satin-fw", f); }, [theme, fw]);
+  // 只在顶层页面设偏好：init script 也会跑进演示的 iframe，Markdown 实时预览那种 sandbox iframe 里一读 localStorage 就抛错，会被当成页面报错
+  await ctx.addInitScript(([t, f]) => { if (window.top !== window) return; try { localStorage.setItem("satin-theme", t); localStorage.setItem("satin-fw", f); } catch {} }, [theme, fw]);
   const page = await ctx.newPage(), errs = [];
   page.on("pageerror", (e) => errs.push(e.message.slice(0, 140)));
   for (const id of ids) {

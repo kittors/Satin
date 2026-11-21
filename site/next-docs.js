@@ -203,7 +203,8 @@ const nameOf = (x) => {
   if (k === "html") return n.element ?? n.markup ?? n.js ?? null;
   return null;
 };
-const hasIn = (x) => nameOf(x) != null && !(x.markupOnly && nameKey() !== "html");
+// 契约里写成"—"的也算这种写法里没有（进度卡片的 cancel / open 事件只有 createProgressCard 和纯 HTML 写法有）
+const hasIn = (x) => { const nm = nameOf(x); return nm != null && !/^[—–-]?$/.test(String(nm).trim()) && !(x.markupOnly && nameKey() !== "html"); };
 // 一个演示 / 配方在当前框架下的文件；这个框架还没有对应写法时明说，给自定义元素写法（纯 HTML 那份），不悄悄换成别的框架
 async function codeFiles(kind, key) {
   const fw = getFw(), rel = kind === "demo" ? fw.demo(key) : fw.recipe(key), main = `../${fw.dir}/${rel}`, dir = main.slice(0, main.lastIndexOf("/") + 1);
@@ -666,7 +667,8 @@ function mountPhoneToggles(scope) {
     btn.addEventListener("click", () => {
       const on = !box.classList.contains("dx-phone");
       box.classList.toggle("dx-phone", on); btn.setAttribute("aria-pressed", String(on)); // 先显示出来再挂设备框（藏着的时候量不到宽度）
-      if (on && !$(".s-devbox", stage)) { stage.insertAdjacentHTML("beforeend", deviceHTML({ src: `../examples/html/play.html?demo=${box.dataset.play}`, title: box.dataset.phone, fit: "block", maxH: 700 })); mountDevices(stage); }
+      // play.html 的 phone=1：内容区撑满屏幕，贴底操作栏落在屏幕最下面（库会话加的）
+      if (on && !$(".s-devbox", stage)) { stage.insertAdjacentHTML("beforeend", deviceHTML({ src: `../examples/html/play.html?demo=${box.dataset.play}&phone=1`, title: box.dataset.phone, fit: "block", maxH: 700 })); mountDevices(stage); }
     });
   }
 }
@@ -674,23 +676,44 @@ function mountPhoneToggles(scope) {
 // 第一行名称，右边小字"类型 · 默认 … · 必填"（太长就整行放到名称下面），说明整行在下面（样式见 next.css 的 .d-api）。
 // cols 每列一个角色："n" 名称、"m" 小字信息（"m:默认" 带标签）、"r" 必填（"是" → 小字"必填"）、"d" 说明。空的（""、"—"）不进小字那一行
 const plainOf = (s) => String(s).replace(/<[^>]+>/g, "").trim();
-const apiTbl = (head, rows, cols) => `<div class="d-tablewrap"><table class="d-table d-api"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => {
+// 类型、默认值、名称里的代码：只在空格处换行，一截（"确定"、"danger-soft"、GridColumn<Row>[]）放得下就不从中间断开——
+// 每截包成行内块（.d-nb，最宽不超过格子）：放得下整截换到下一行，比格子还宽才在里面折。不按字数定死，表格宽窄都对
+const nbText = (t) => t.split(/( +)/).map((w) => (/\S/.test(w) && w.replace(/&\w+;/g, "x").length <= 24 ? `<span class="d-nb">${w}</span>` : w)).join("");
+const nbCode = (html) => html.replace(/<code>([^<]*)<\/code>/g, (_, t) => "<code>" + nbText(t) + "</code>");
+// 名称：契约里有的写法带括号说明（"confirmText（模板里写 confirm-text）"）——名字是代码，括号里的说明是小字，可以折到下一行，
+// 不然整串不折行，名称那列被撑得很宽，说明那列被挤成一小条
+const nbName = (html) => html.replace(/<code>([^<]*)<\/code>/g, (_, t) => { const i = t.indexOf("（"); return i > 0 ? `<code>${nbText(t.slice(0, i))}</code><wbr><span class="d-k-note">${t.slice(i)}</span>` : `<code>${nbText(t)}</code>`; });
+// 桌面上各列按表头给定宽度（固定排法）：浏览器自动分宽时，名称带说明、类型很长的那几页，"说明"会被挤成一小条、一格几十行
+const COLW = { 名称: 19, 字段: 19, 类型: 21, 默认值: 14, 必填: 8, 参数: 22, 签名: 34, "CSS 变量": 32, 默认: 18, 写法: 36, 按键: 18, 什么时候: 30 };
+const colgroup = (head, cols) => {
+  const hs = head.map(plainOf), ev = hs.includes("参数"); // 事件表：名称常是 @update:modelValue / @change 这种长名字，名称那列宽一点
+  const ws = hs.map((h, i) => (cols[i] === "d" ? null : ev && h === "名称" ? 26 : ev && h === "参数" ? 20 : COLW[h] ?? 20)), used = ws.reduce((a, w) => a + (w || 0), 0);
+  return `<colgroup>${ws.map((w) => `<col style="width:${w ?? Math.max(30, 100 - used)}%">`).join("")}</colgroup>`;
+};
+const apiTbl = (head, rows, cols) => `<div class="d-tablewrap"><table class="d-table d-api">${colgroup(head, cols)}<thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => {
   const sum = [];
   const tds = r.map((c, i) => {
-    const [k, label] = cols[i].split(":"), v = String(c ?? "");
-    if ((k === "m" || k === "r") && v && plainOf(v) !== "—") sum.push(k === "r" ? "必填" : (label ? `<span class="d-k-l">${label}</span>` : "") + v.replace(/^<p>([\s\S]*)<\/p>$/, "$1"));
-    return `<td class="d-k-${k === "r" ? "m" : k}">${v}</td>`;
+    const [k, label] = cols[i].split(":"), v = k === "m" ? nbCode(String(c ?? "")) : k === "n" ? nbName(String(c ?? "")) : String(c ?? "");
+    // 带标签的（"默认 "secondary""、"参数 number"）标签和值包成一块，不在两者之间断行
+    if ((k === "m" || k === "r") && v && plainOf(v) !== "—") { const val = v.replace(/^<p>([\s\S]*)<\/p>$/, "$1"); sum.push(k === "r" ? '<span class="d-k-req">必填</span>' : label ? `<span class="d-kv"><span class="d-k-l">${label}</span>${val}</span>` : val); }
+    return `<td class="d-k-${k === "r" ? "m d-k-r" : k}">${v}</td>`;
   }).join("");
   const plain = (s) => String(s).replace(/<[^>]+>/g, "").trim(), long = plain(r[0]).length + plain(sum.join(" · ")).length > 30;
   return `<tr>${tds}${sum.length ? `<td class="d-k-sum${long ? " d-k-long" : ""}">${sum.join('<i class="d-k-dot">·</i>')}</td>` : ""}</tr>`;
 }).join("")}</tbody></table></div>`;
 const md = (t) => md2html(String(t ?? ""));
+// 契约里提到的另一项（相近组件、别用时改用什么）：是组件就链到组件页；基础那几项（颜色、间距、布局……）没有组件页，链到规范里同名的那页
+function refOf(id) {
+  if (!id) return null;
+  const c = cat.byId[id]; if (c) return { href: "#/c/" + id, name: c.name, en: (c.en || "").split(" · ")[0] };
+  const g = byHash.get("#/guide/" + id); return g ? { href: g.hash, name: g.title, en: g.p?.en || "规范" } : null;
+}
 function contractHTML(c, k) {
   const cat0 = cat.byId[c.id], out = [];
   // 1. 什么时候用、别用、和相近组件的区别
   out.push(anchor("when", "什么时候用"), `<ul class="d-list">${(k.whenToUse || []).map((t) => `<li>${md(t)}</li>`).join("")}</ul>`);
-  if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">什么时候别用</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${x.use && cat.byId[x.use] ? ` → <a href="#/c/${x.use}">${esc(cat.byId[x.use].name)}</a>` : ""}</li>`).join("")}</ul>`);
-  if (k.related?.length) out.push(`<h3 class="d-h3">和相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [cat.byId[r.id] ? `<a href="#/c/${r.id}">${esc(cat.byId[r.id].name)}</a>` : esc(r.id), md(r.diff)])));
+  if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">什么时候别用</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${refOf(x.use) ? ` → <a href="${refOf(x.use).href}">${esc(refOf(x.use).name)}</a>` : ""}</li>`).join("")}</ul>`);
+  if (k.related?.length) out.push(`<h3 class="d-h3">和相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [refOf(r.id) ? `<a href="${refOf(r.id).href}">${esc(refOf(r.id).name)}</a>` : esc(r.id), md(r.diff)])));
   // 2. 引入（当前框架）
   out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return codePanel([{ name: "", lang: "js", code: line }], { solo: true, lead: fwLead() }); }), k.importNote ? fwr(() => { const t = fwText(k.importNote); return t ? `<p>${md(t)}</p>` : ""; }) : "");
   // 3. 示例：由浅入深，每个都是现场演示 + 当前框架的代码
@@ -721,12 +744,15 @@ function contractHTML(c, k) {
   const dz = k.design || {};
   if (dz.do || dz.dont || dz.copy || dz.motion) {
     out.push(anchor("design", "设计规范"));
-    if (dz.do?.length || dz.dont?.length) out.push(`<div class="d-dodont"><div class="do"><b><span data-i="check"></span>这样做</b><ul>${(dz.do || []).map((x) => `<li>${md(x.text ?? x)}</li>`).join("")}</ul></div><div class="dont"><b><span data-i="x"></span>不要</b><ul>${(dz.dont || []).map((x) => `<li>${md(x.text ?? x)}${x.rule ? ` <a href="#/guide/no-ai">${esc(x.rule)}</a>` : ""}</li>`).join("")}</ul></div></div>`);
+    // 只有一边有条目时只放那一张卡（整行宽），不留一张空的"不要"（万级节点压测只写了"这样做"）
+    const doH = dz.do?.length ? `<div class="do"><b><span data-i="check"></span>这样做</b><ul>${dz.do.map((x) => `<li>${md(x.text ?? x)}</li>`).join("")}</ul></div>` : "";
+    const dontH = dz.dont?.length ? `<div class="dont"><b><span data-i="x"></span>不要</b><ul>${dz.dont.map((x) => `<li>${md(x.text ?? x)}${x.rule ? ` <a href="#/guide/no-ai">${esc(x.rule)}</a>` : ""}</li>`).join("")}</ul></div>` : "";
+    if (doH || dontH) out.push(`<div class="d-dodont${doH && dontH ? "" : " d-dodont-one"}">${doH}${dontH}</div>`);
     if (dz.copy?.length) out.push(`<h3 class="d-h3">文案</h3><ul class="d-list">${dz.copy.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
     if (dz.motion?.length) out.push(`<h3 class="d-h3">动效</h3>`, tbl(["哪里", "曲线", "时长"], dz.motion.map((x) => [md(x.what), `<code>${esc(x.easing || "")}</code>`, esc(x.duration || "")])));
   }
   // 7. 相关组件
-  if (k.related?.length) out.push(anchor("related", "相关组件"), `<div class="d-cards">${k.related.filter((r) => cat.byId[r.id]).map((r) => `<a class="d-card" href="#/c/${r.id}"><b>${esc(cat.byId[r.id].name)}</b><small>${esc(cat.byId[r.id].en.split(" · ")[0])}</small><span>${md(r.diff)}</span></a>`).join("")}</div>`);
+  if (k.related?.length) out.push(anchor("related", "相关组件"), `<div class="d-cards">${k.related.filter((r) => refOf(r.id)).map((r) => { const f = refOf(r.id); return `<a class="d-card" href="${f.href}"><b>${esc(f.name)}</b><small>${esc(f.en)}</small><span>${md(r.diff)}</span></a>`; }).join("")}</div>`);
   // 原来的用法说明（要点）
   if (cat0?.rules?.length) out.push(rulesHTML(cat0.rules));
   return out.join("");
@@ -840,6 +866,9 @@ let curPage = null, first = true;
 function route() {
   followURL(); // 网址里的 fw 变了（手改地址、带参数的链接）：先换框架
   const { base: b0, part } = parseHash(location.hash || "#/intro"), base = b0 || "#/intro";
+  // 基础那几项（颜色、排版、间距……）契约 id 在 #/c/ 下没有页，内容在规范里：#/c/color 转到 #/guide/color（契约、AI 引用的地址照样能打开）
+  const alias = base.startsWith("#/c/") && !byHash.has(base) && byHash.has("#/guide/" + base.slice(4)) ? "#/guide/" + base.slice(4) : null;
+  if (alias) { location.replace(alias + (part ? ":" + part : "")); return; }
   const pg = byHash.get(base === "#/" || base === "#" ? "#/intro" : base);
   queueMicrotask(syncURL); // 用户选过框架：换页以后把 ?fw= 写回网址（复制地址栏分享出去对方看到同一种写法）
   if (pg !== curPage) {
