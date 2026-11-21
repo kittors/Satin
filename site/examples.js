@@ -76,60 +76,62 @@ doc.set({ codeMax: 0 });` },
 <div class="sn-strip">…</div>
 <div class="board" style="max-height: 240px">…</div>`,
       js: `import { createScrollArea } from "satin-ui/components";
-import "satin-ui/css/scroll.css";
 
-// 竖向：上下渐隐（默认），系统滚动条换成悬浮的细滚动条
-createScrollArea(document.querySelector(".sn-list"));
-
-// 横向长条：左右渐隐 40px；竖着滚滚轮也横向滚，滚到头放行给页面
-createScrollArea(document.querySelector(".sn-strip"), { fade: "x", size: 40, wheel: "x" });
-
-// 两个方向都能滚：四边渐隐
-createScrollArea(document.querySelector(".board"), { fade: "both" });`,
+// 写在标记上的滚动区域：data-sa="y | x | both | none | top bottom…" 是渐隐方向，其余选项写成 data-sa-*（size、bar、bar-size、inset、over、wheel）
+const num = (v) => (v == null || v === "" ? undefined : Number(v));
+for (const el of document.querySelectorAll("[data-sa]")) {
+  const d = el.dataset;
+  createScrollArea(el, { fade: d.sa || "y", wheel: d.saWheel || "auto", bar: d.saBar || "auto", overscroll: d.saOver || "auto", size: num(d.saSize), barSize: num(d.saBarSize), barInset: num(d.saInset) });
+}
+// 竖向：上下渐隐（默认）；横向长条：左右渐隐 40px，竖着滚滚轮也横向滚（wheel: "x"）；两个方向都能滚：四边渐隐（fade: "both"）`,
     },
     1: {
       html: SA_PANE('data-sa="y" data-sa-size="24"', "展示页把 data-sa、data-sa-size 读成 createScrollArea 的 fade、size 选项"),
       js: `import { createScrollArea } from "satin-ui/components";
 
-// size：渐隐带有多宽（px）。只在那个方向还有内容时出现，滚多少长多宽，滚到头消失
-const sa = createScrollArea(list, { size: 24 }); // 默认
-sa.set({ size: 0 });   // 不渐隐
-sa.set({ size: 16 });  // 菜单、小列表
-sa.set({ size: 40 });  // 横向长条、大面板
-
-// 只要一边：fade 写成要的那几条边
-sa.set({ fade: "bottom" });`,
+// 写在标记上的滚动区域：data-sa="y | x | both | none | top bottom…" 是渐隐方向，其余选项写成 data-sa-*（size、bar、bar-size、inset、over、wheel）
+const num = (v) => (v == null || v === "" ? undefined : Number(v));
+for (const el of document.querySelectorAll("[data-sa]")) {
+  const d = el.dataset;
+  createScrollArea(el, { fade: d.sa || "y", wheel: d.saWheel || "auto", bar: d.saBar || "auto", overscroll: d.saOver || "auto", size: num(d.saSize), barSize: num(d.saBarSize), barInset: num(d.saInset) });
+}
+// size：渐隐带有多宽（px）——0 不渐隐、16 菜单和小列表、24 默认、40 横向长条和大面板。只在那个方向还有内容时出现，滚多少长多宽，滚到头消失；只要一边就把 fade 写成那几条边（"bottom"）`,
     },
     2: {
       html: SA_PANE('data-sa="y" data-sa-bar="hover"', "data-sa-bar：滚动条怎么出现（对应 bar 选项）"),
       js: `import { createScrollArea } from "satin-ui/components";
 
-const sa = createScrollArea(list, { bar: "auto" }); // 默认：滚动或悬停时出现，停下 0.7 秒淡出
-sa.set({ bar: "hover" });   // 只在指针停在区域上时出现
-sa.set({ bar: "always" });  // 一直显示，悬浮在内容上
-sa.set({ bar: "gutter" });  // 一直显示，有自己的一条位置，不压内容（只在真的溢出时占位）
-sa.set({ bar: "none" });    // 不显示，只靠渐隐、滚轮和触控板`,
+// 写在标记上的滚动区域：data-sa="y | x | both | none | top bottom…" 是渐隐方向，其余选项写成 data-sa-*（size、bar、bar-size、inset、over、wheel）
+const num = (v) => (v == null || v === "" ? undefined : Number(v));
+for (const el of document.querySelectorAll("[data-sa]")) {
+  const d = el.dataset;
+  createScrollArea(el, { fade: d.sa || "y", wheel: d.saWheel || "auto", bar: d.saBar || "auto", overscroll: d.saOver || "auto", size: num(d.saSize), barSize: num(d.saBarSize), barInset: num(d.saInset) });
+}
+// bar：滚动条怎么出现——auto（默认：滚动或悬停时出现，停下 0.7 秒淡出）、hover（只在指针停在区域上时）、always（一直显示，悬浮在内容上）、gutter（一直显示，有自己的一条位置）、none（不显示）`,
     },
     3: {
       html: SA_PANE('data-sa="y" data-sa-bar="always" data-sa-bar-size="8" data-sa-inset="4"', "data-sa-bar-size、data-sa-inset（对应 barSize、barInset）"),
       js: `import { createScrollArea } from "satin-ui/components";
 
-// barSize：平时多粗（px，默认 5），悬停、拖动时再粗 3px；barInset：离边多远（px，默认 1）
-createScrollArea(list, { bar: "always", barSize: 8, barInset: 4 });
-
-// 颜色跟主题走，要改就覆盖 CSS 变量
-// :root { --sn-sa-thumb: rgba(0, 0, 0, .26); --sn-sa-thumb-hover: rgba(0, 0, 0, .44); }`,
+// 写在标记上的滚动区域：data-sa="y | x | both | none | top bottom…" 是渐隐方向，其余选项写成 data-sa-*（size、bar、bar-size、inset、over、wheel）
+const num = (v) => (v == null || v === "" ? undefined : Number(v));
+for (const el of document.querySelectorAll("[data-sa]")) {
+  const d = el.dataset;
+  createScrollArea(el, { fade: d.sa || "y", wheel: d.saWheel || "auto", bar: d.saBar || "auto", overscroll: d.saOver || "auto", size: num(d.saSize), barSize: num(d.saBarSize), barInset: num(d.saInset) });
+}
+// barSize：平时多粗（px，默认 5），悬停、拖动时再粗 3px；barInset：离边多远（px，默认 1）。颜色跟主题走，要改就覆盖 --sn-sa-thumb、--sn-sa-thumb-hover`,
     },
     4: {
       html: SA_PANE('data-sa="y" data-sa-over="contain"', "data-sa-over：滚到头怎么办（对应 overscroll）"),
       js: `import { createScrollArea } from "satin-ui/components";
 
-// 默认：一次滚动在区域里开始，滚到头就停住——不回弹，也不带着页面滚；
-// 新的一次滚动开始时已经到头，交给外层（页面接着滚）；横向停住
-createScrollArea(list, { overscroll: "auto" });
-createScrollArea(menu, { overscroll: "contain" });  // 两个方向都停住：弹层、菜单、抽屉里的列表
-createScrollArea(board, { overscroll: "bounce" });  // 回弹：再拉会多出一段、越拉越紧，松手弹回（表格别用）
-createScrollArea(panel, { overscroll: "chain" });   // 两个方向都交给外层`,
+// 写在标记上的滚动区域：data-sa="y | x | both | none | top bottom…" 是渐隐方向，其余选项写成 data-sa-*（size、bar、bar-size、inset、over、wheel）
+const num = (v) => (v == null || v === "" ? undefined : Number(v));
+for (const el of document.querySelectorAll("[data-sa]")) {
+  const d = el.dataset;
+  createScrollArea(el, { fade: d.sa || "y", wheel: d.saWheel || "auto", bar: d.saBar || "auto", overscroll: d.saOver || "auto", size: num(d.saSize), barSize: num(d.saBarSize), barInset: num(d.saInset) });
+}
+// overscroll：滚到头怎么办——auto（默认：一次滚动在区域里开始，滚到头就停住，新的一次交给页面）、contain（两个方向都停住：弹层、菜单、抽屉里的列表）、bounce（回弹，表格别用）、chain（都交给外层）`,
     },
     5: {
       html: `<div class="sn-tbl-wrap" style="--sn-tbl-max: 236px">
@@ -143,9 +145,13 @@ createScrollArea(panel, { overscroll: "chain" });   // 两个方向都交给外�
 </div>`,
       js: `import { createScrollArea } from "satin-ui/components";
 
-// 表格用默认的 overscroll: "auto"，不回弹：浏览器自带的回弹会把吸附的表头、合计行一起拉走，
-// 表身和合计行之间露出空隙。一次滚动在表格里开始，滚到头就停住；开始时已经到头，交给页面接着滚
-createScrollArea(document.querySelector(".sn-tbl-sc"), { fade: "none" }); // 不加边缘渐隐，免得表头、合计行被淡掉`,
+// 写在标记上的滚动区域：data-sa="y | x | both | none | top bottom…" 是渐隐方向，其余选项写成 data-sa-*（size、bar、bar-size、inset、over、wheel）
+const num = (v) => (v == null || v === "" ? undefined : Number(v));
+for (const el of document.querySelectorAll("[data-sa]")) {
+  const d = el.dataset;
+  createScrollArea(el, { fade: d.sa || "y", wheel: d.saWheel || "auto", bar: d.saBar || "auto", overscroll: d.saOver || "auto", size: num(d.saSize), barSize: num(d.saBarSize), barInset: num(d.saInset) });
+}
+// 表格用默认的 overscroll: "auto"，不回弹（浏览器自带的回弹会把吸附的表头、合计行一起拉走）；data-sa="none" 不加边缘渐隐，免得表头、合计行被淡掉`,
     },
     6: {
       html: `<textarea class="sn-input" rows="6">…</textarea>`,
@@ -248,22 +254,17 @@ for (const b of document.querySelectorAll("[data-copy]")) {
   <p>拿到链接的人可以查看，不能修改。</p>
   <div class="sn-acts"><button class="sn-btn sn-primary sn-sm">复制链接</button></div>
 </div>`,
-      js: `import { setup } from "satin-ui";
-import { bindOverlays, openPopover, popoverOf } from "satin-ui/components";
-import "satin-ui/css/overlay.css";
+      js: `import { popoverOf, copied } from "satin-ui/components";
 
-setup(); // 页面级行为（Esc、点外面关上），整页调一次
-
-// 写在标记上：[data-pop="面板 id"] 点了开、再点关；Esc、点外面、焦点离开面板都会关
-bindOverlays(document);
-
-// 或者自己控制：贴着按钮打开（align: "end" 右对齐），返回的 close() 关上
-const btn = document.querySelector("#share"), pop = document.querySelector("#pop-share");
-btn.addEventListener("click", () => {
-  const open = popoverOf(pop);
-  if (open) open.close();
-  else openPopover(pop, btn, { align: "end", onClose: () => console.log("关了") });
-});`,
+// 写在标记上：[data-pop="面板 id"] 点了开、再点关；Esc、点外面、焦点离开面板都会关——enhance() 已经接上
+// 面板里的操作做完以后关上：popoverOf(面板) 拿到正开着的那一层，close() 关上（焦点回到按钮）
+const pop = document.querySelector("#pop-share"), copyBtn = pop.querySelector(".sn-btn");
+copyBtn.addEventListener("click", async () => {
+  await navigator.clipboard?.writeText(location.href).catch(() => {});
+  copied(copyBtn);
+  setTimeout(() => popoverOf(pop)?.close(true), 700);
+});
+// 不用标记也行：openPopover(面板, 按钮, { align: "end", onClose })，返回的那一层有 close()`,
     },
   },
   popconfirm: {
@@ -279,17 +280,15 @@ btn.addEventListener("click", () => {
     <button class="sn-btn sn-danger sn-sm" data-yes>永久删除</button>
   </div>
 </div>`,
-      js: `import { setup } from "satin-ui";
-import { openPopover } from "satin-ui/components";
-
-setup(); // 页面级行为（Esc、点外面关上），整页调一次
+      js: `import { openPopover, toast } from "satin-ui/components";
 
 // 气泡确认就是一个弹出面板：打开时焦点先落在"取消"上（防止回车误删）
 const btn = document.querySelector("#purge"), pc = document.querySelector("#pc");
 btn.addEventListener("click", () => {
   const confirm = openPopover(pc, btn, { align: "end" });
+  pc.querySelector("[data-no]").focus();
   pc.querySelector("[data-no]").onclick = () => confirm.close(true);
-  pc.querySelector("[data-yes]").onclick = () => { confirm.close(); removeShot(); };
+  pc.querySelector("[data-yes]").onclick = () => { confirm.close(); toast({ text: "镜头已永久删除" }); }; // 换成你的删除
 });`,
     },
   },
@@ -314,27 +313,15 @@ btn.addEventListener("click", () => {
   <div class="sn-item">第一集</div>
   <div class="sn-item">第二集</div>
 </div>`,
-      js: `import { setup } from "satin-ui";
-import { bindOverlays, openMenu, closeMenu } from "satin-ui/components";
+      js: `import { toast } from "satin-ui/components";
 
-setup(); // 页面级行为（菜单的键盘操作、点外面关上），整页调一次
-bindOverlays(document);
-
+// 写在标记上：[data-ctx="菜单 id"] 右键（或 Shift+F10、菜单键）在指针处弹，触屏长按 500ms 弹；[data-fmenu="菜单 id"] 贴着按钮弹——enhance() 已经接上
 // 选中：根菜单上冒泡 menuselect，detail 里有条目文字和子菜单路径
-document.addEventListener("menuselect", (e) => {
-  const { label, path } = e.detail;   // 比如 "第二集"、["移动到"]
-  console.log([...path, label].join(" › "));
+document.querySelector("#m-shot").addEventListener("menuselect", (e) => {
+  const { label, path } = e.detail; // 比如 "第二集"、["移动到"]
+  toast({ text: [...path, label].join(" › ") });
 });
-
-// 自己控制：在指针处弹，只能待在某个容器里（子菜单也不出这个框）
-box.addEventListener("contextmenu", (e) => {
-  e.preventDefault();
-  openMenu(document.querySelector("#m-shot"), {
-    trigger: box, x: e.clientX, y: e.clientY, bound: box,
-    onSelect: ({ label }) => run(label),
-  });
-});
-// closeMenu() 关上整套菜单`,
+// 自己控制：openMenu(菜单, { trigger, x, y, bound })，在指针处弹、只待在 bound 这个框里；closeMenu() 关上整套菜单`,
     },
   },
   dialog: {
@@ -356,33 +343,33 @@ box.addEventListener("contextmenu", (e) => {
     </div>
   </form>
 </dialog>`,
-      js: `import { setup } from "satin-ui";
-import { bindOverlays, openDialog, closeDialog, busy } from "satin-ui/components";
+      js: `import { closeDialog, busy, toast } from "satin-ui/components";
 
-setup(); // 页面级行为（Esc、浮层栈），整页调一次
-
-// [data-dlg="弹窗 id"] 打开：从按钮那里长出来，关闭时原路缩回，焦点回到按钮
+// [data-dlg="弹窗 id"] 打开：从按钮那里长出来，关闭时原路缩回，焦点回到按钮——enhance() 已经接上
 // 弹窗里的 [data-x]、[data-cancel] 和 Esc 关闭；点背景只"顶一下"，不关
-bindOverlays(document);
-
 const dlg = document.querySelector("#dlg-new"), name = dlg.querySelector("#dn-name");
 
-// 关闭前先问一句：挂一个 guard，Esc / 取消 / 点 × 都会先调它
-dlg.guard = () => (name.value.trim() ? askDiscard() : closeDialog(dlg));
+// 关闭前先问一句：挂一个 guard，Esc / 取消 / 点 × 都会先调它（填了名字就先提示，不弹系统对话框）
+dlg.guard = () => {
+  if (!name.value.trim()) { closeDialog(dlg); return; }
+  toast({ kind: "action", text: "名字还没保存", action: { label: "放弃并关闭", run: (t) => { name.value = ""; closeDialog(dlg); t.close(); } } });
+};
 
-dlg.querySelector("form").addEventListener("submit", async () => {
-  await busy(dlg.querySelector(".sn-ft .sn-primary"), createProject(name.value));
-  closeDialog(dlg);
+dlg.querySelector("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const v = name.value.trim(); if (!v) { name.focus(); return; }
+  await busy(dlg.querySelector(".sn-ft .sn-primary"), 900); // 换成你的创建请求（Promise）
+  name.value = ""; closeDialog(dlg);
+  toast({ text: \`已创建"\${v}"\` });
 });
-
 // 不用标记也行：openDialog(弹窗, 触发按钮)`,
     },
   },
   drawer: {
     0: {
-      html: `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-drawer="dr-edit" data-i="pencil"></button>
+      html: `<button class="sn-btn sn-ghost sn-sm sn-ibtn" id="edit-shot" data-tip="编辑镜头" aria-label="编辑镜头" data-i="pencil"></button>
 
-<!-- 遮罩可以不写：没有 .sn-drawer-scrim 会自动建一个 -->
+<!-- 遮罩可以不写：没有 .sn-drawer-scrim 会自动建一个。写在标记上也行：按钮加 data-drawer="dr-edit"，enhance() 接上就能开 -->
 <aside class="sn-drawer" id="dr-edit" role="dialog" aria-modal="true" aria-labelledby="dr-t" tabindex="-1">
   <div class="sn-hd">
     <h3 id="dr-t">编辑镜头</h3>
@@ -393,21 +380,21 @@ dlg.querySelector("form").addEventListener("submit", async () => {
   </div>
   <div class="sn-ft"><button class="sn-btn sn-ghost" data-x>完成</button></div>
 </aside>`,
-      js: `import { setup } from "satin-ui";
-import { bindOverlays, openDrawer } from "satin-ui/components";
+      js: `import { openDrawer, toast } from "satin-ui/components";
 
-setup(); // 页面级行为（Esc、点外面关上），整页调一次
-
-// [data-drawer="抽屉 id"] 打开；抽屉里的 [data-x]、Esc、点外面关闭；焦点圈在抽屉里
-bindOverlays(document);
-
+// 抽屉里的 [data-x]、Esc、点外面关闭，焦点圈在抽屉里，触屏上手指往右拖也能关
 // 自己控制：先把要编辑的内容填进去再打开，关上时收尾
+const editBtn = document.querySelector("#edit-shot"), drawer = document.querySelector("#dr-edit"), title = document.querySelector("#dr-title");
+const shot = { title: "车站外，雨刚停" };
 editBtn.addEventListener("click", () => {
   title.value = shot.title;
-  openDrawer(document.querySelector("#dr-edit"), {
-    trigger: editBtn,       // 关上后焦点回到这里
-    focus: title,           // 打开后焦点先落在这里
-    onClose: () => save(shot),
+  openDrawer(drawer, {
+    trigger: editBtn, // 关上后焦点回到这里
+    focus: title,     // 打开后焦点先落在这里
+    onClose: () => {  // 换成你的保存
+      const v = title.value.trim();
+      if (v && v !== shot.title) { shot.title = v; toast({ text: \`已保存"\${v}"\` }); }
+    },
   });
 });`,
     },
@@ -463,25 +450,26 @@ row.addEventListener("chipremove", (e) => console.log("移除了", e.detail.chip
   },
   field: {
     0: {
-      js: `import { setup } from "satin-ui";
-import { validateForm, setFieldError, clearFieldError } from "satin-ui/components";
-
-setup(); // 页面级行为：字段一改就自动收起错误，整页调一次
+      js: `import { validateForm, busy, succeed } from "satin-ui/components";
 
 // 每个要校验的字段写 data-f="名字"，下面放 <div class="sn-err"><span></span></div>
+const form = document.querySelector("#fieldDemo"), desc = document.querySelector("#f-desc"), count = form.querySelector(".sn-count");
 const rules = {
   name: (v) => !v.trim() && "请填写项目名称",
-  mail: (v) => v.trim() && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v) && "邮箱格式不对",
+  mail: (v) => v.trim() && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v.trim()) && "邮箱格式不对",
+  desc: (v) => !v.trim() && "写一句话就好，方便以后找到",
 };
-form.addEventListener("submit", (e) => {
+// 字数：到上限变色
+desc.addEventListener("input", () => { count.textContent = \`\${desc.value.length}/80\`; count.classList.toggle("sn-over", desc.value.length >= 80); });
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!validateForm(form, rules)) return; // 有错的都标出来（错误在下方展开、输入框抖两下），焦点到第一个
-  submit();
+  const btn = form.querySelector("button[type=submit]");
+  await busy(btn, 900); // 换成你的提交请求（Promise）
+  succeed(btn);
 });
-
-// 也能单独标：服务器说名字重复了
-setFieldError(form.querySelector('[data-f="name"]'), "已经有叫这个名字的项目了");
-// 一开始输入就自动收起；要手动收起：clearFieldError(字段)`,
+// 也能单独标：比如服务器说名字重复了 → setFieldError(form.querySelector('[data-f="name"]'), "已经有叫这个名字的项目了")
+// 一开始输入就自动收起（setup() 装好的页面级行为）`,
     },
   },
   special: {
@@ -494,44 +482,24 @@ createPassword(document.querySelector("input[data-pw]"));
 // 邮箱：停手 400ms 再判断，对了画对勾；离开时还不对才报错
 createEmail(document.querySelector("input[data-email]"));
 
-// 搜索：等待超过 300ms 才转圈、转了至少 500ms；search 返回结果数量（或数组）
+// 搜索：等待超过 300ms 才转圈、转了至少 500ms；search 返回结果数量（或 Promise）。换成你的搜索接口
+const SHOTS = ["车站外，雨刚停", "林夏走进候车厅", "站台上的最后一班车", "车窗里的倒影", "雨夜的公交站"];
 createSearch(document.querySelector("[data-search]"), {
-  search: async (q) => (await fetch("/api/search?q=" + encodeURIComponent(q)).then((r) => r.json())).length,
+  search: (q) => new Promise((done) => setTimeout(() => done(SHOTS.filter((s) => s.includes(q)).length), 400)),
 });
-
-// 清除按钮（[data-clearable]）：有内容时出现，点了清空并补发一次 input
-for (const w of document.querySelectorAll("[data-clearable]")) {
-  const input = w.querySelector("input"), sync = () => w.classList.toggle("sn-filled", !!input.value);
-  input.addEventListener("input", sync); sync();
-  w.querySelector(".sn-clear").addEventListener("click", () => {
-    input.value = ""; input.dispatchEvent(new Event("input", { bubbles: true })); input.focus();
-  });
-}
-// 显示密码（[data-eye]）：切换 type，图标原地换
-for (const b of document.querySelectorAll("[data-eye]")) {
-  b.addEventListener("click", () => {
-    const input = b.closest(".sn-ib").querySelector("input"), show = input.type === "password";
-    input.type = show ? "text" : "password";
-    b.querySelector(".sn-swap")?.classList.toggle("sn-on", show);
-    b.setAttribute("aria-label", show ? "隐藏密码" : "显示密码");
-    input.focus();
-  });
-}`,
+// 清除按钮（[data-clearable]）有内容时出现、点了清空，显示密码（[data-eye]）切换明文——这两个 enhance() 已经接上`,
     },
   },
   count: {
     0: {
-      js: `import { createCount, createLongText, bindInputs } from "satin-ui/components";
+      js: `import { createCount, createLongText, toast } from "satin-ui/components";
 
 // 单行：<input maxlength="20" data-count>，右边的计数跟着滚动，快满变色，写满还在敲时抖一下
-createCount(document.querySelector("input[data-count]"));
+for (const input of document.querySelectorAll("input[data-count]")) createCount(input);
 
-// 长文本：<div data-ta data-max="200">…<textarea>…</div>
+// 长文本：<div data-ta data-max="120">…<textarea>…</div>
 // 自动长高 + 量环计数；快满"还剩 N 字"，超出"超出 N 字"并整框变红；⌘↵ 提交
-createLongText(document.querySelector("[data-ta]"), { onSubmit: (text) => save(text) });
-
-// 或者按标记一次接上页面上所有的
-bindInputs(document);`,
+createLongText(document.querySelector("[data-ta]"), { onSubmit: () => toast({ text: "画面描述已保存" }) });`,
     },
   },
   taginput: {
@@ -575,94 +543,96 @@ createStepper(document.querySelector("#dur"), { value: 4, min: 1, max: 60, unit:
   },
   prompt: {
     0: {
-      js: `import { createComposer } from "satin-ui/components";
+      js: `import { createComposer, toast } from "satin-ui/components";
 
 // 提示词输入框：自动长高、字数、附件（拖进来、粘贴截图、附件菜单）；有文字或附件、附件传完才能发
-const composer = createComposer(document.querySelector("[data-composer]"), {
-  // 发送：期间"生成中"，发送键变成停止；生成完调 setBusy(false) 回到可发送
-  onSend: async ({ text, files }) => {
-    await generate(text, files);
-    composer.setBusy(false);
-  },
-  onStop: () => abortGeneration(),
-  // 真上传：报进度，结束就完成，出错就失败（点一下重试）
-  upload: (file, onProgress) => uploadFile(file, onProgress),
-});
-
-composer.clear({ smooth: true }); // 清空：附件淡出、输入框平滑收起
-composer.files();                 // 现在的附件元素`,
+let timer = 0;
+createComposer(document.querySelector("[data-composer]"), {
+  // 发送：返回 Promise，期间是"生成中"、发送键变成停止；Promise 结束回到可发送（换成你的生成请求）
+  onSend: ({ text }) => new Promise((done) => { timer = setTimeout(() => { done(); toast({ text: \`已生成 3 个镜头：\${text.slice(0, 12)}…\` }); }, 2600); }),
+  onStop: () => clearTimeout(timer),
+  // 上传：报进度，结束就完成，出错就失败（点一下重试）；换成你的上传
+  upload: (file, onProgress) => new Promise((ok) => { let p = 0; const iv = setInterval(() => { p = Math.min(1, p + 0.2); onProgress(p); if (p >= 1) { clearInterval(iv); ok(); } }, 220); }),
+});`,
     },
   },
   otp: {
     0: {
-      js: `import { createOtp } from "satin-ui/components";
+      js: `import { createOtp, toast } from "satin-ui/components";
 
 // 自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入
 const otp = createOtp(document.querySelector("[data-otp]"), {
-  onComplete: (code) => verify(code), // 6 位都填满时调
-});
-otp.value;   // 现在填了的
-otp.clear(); // 清空、焦点回第一格`,
+  onComplete: (code) => { // 6 位都填满时调：换成你的校验请求
+    toast({ text: \`已提交验证码 \${code}\` });
+    setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
+  },
+});`,
     },
   },
   toast: {
     0: {
-      html: `<!-- 不用写标记：第一次调 toast() 时在 body 末尾建一个 .sn-toasts 容器 -->`,
-      js: `import { toast, setToastPos } from "satin-ui/components";
-import "satin-ui/css/feedback.css";
+      js: `import { initSeg } from "satin-ui";
+import { toast, setToastPos } from "satin-ui/components";
 
-// 状态：对勾 + 一句话，3 秒后自己收起
-toast({ text: "链接已复制" });
-
-// 操作：倒计时环 + 按钮，5 秒；点"撤销"原地变成结果
-toast({
-  kind: "action", text: '已归档"雨夜车站"',
-  action: { label: "撤销", run: (t) => { restore(); t.update({ kind: "status", text: "已恢复", done: true }); } },
-});
-
-// 进度：进度环 + 百分比，直到 update 成结果
-const t = toast({ kind: "progress", text: "正在导出 第三集.mp4" });
-t.update({ progress: 0.42 });
-t.update({ kind: "status", text: '已导出到"下载"', done: true });
-
-// 失败：红色图标，读屏立即播报
-toast({ icon: "circle-x", tone: "danger", text: "复制失败，请再试一次", alert: true });
-
-setToastPos("bottom"); // 后台放顶部居中（默认），客户端放底部居中`,
+// 不用写标记：第一次调 toast() 时在 body 末尾建一个 .sn-toasts 容器。这里四个按钮各演示一种
+const exportToast = (name) => {
+  const t = toast({ kind: "progress", text: \`正在导出 \${name}\` }); let p = 0;
+  const iv = setInterval(() => { // 换成你的导出进度
+    p = Math.min(1, p + 0.06 + Math.random() * 0.05); t.update({ progress: p });
+    if (p >= 1) { clearInterval(iv); setTimeout(() => t.update({ kind: "status", text: '已导出到"下载"', action: { label: "打开", run: (x) => x.close() }, duration: 5000, done: true }), 260); }
+  }, 200);
+};
+const DEMO = {
+  status: () => toast({ text: "链接已复制" }), // 对勾 + 一句话，3 秒后自己收起
+  action: () => toast({ kind: "action", text: '已归档"雨夜车站"', action: { label: "撤销", run: (t) => t.update({ kind: "status", text: '已恢复"雨夜车站"', done: true, duration: 2000 }) } }), // 倒计时环 + 按钮
+  progress: () => exportToast("第三集.mp4"), // 进度环 + 百分比，直到 update 成结果
+  fail: () => toast({ icon: "circle-x", tone: "danger", text: "复制失败，请再试一次", alert: true }), // 读屏立即播报
+};
+for (const [kind, show] of Object.entries(DEMO)) document.querySelector(\`[data-toast="\${kind}"]\`)?.addEventListener("click", show);
+// 位置：后台放顶部居中（默认），客户端放底部居中
+const pos = document.querySelector('[data-seg="toastpos"]');
+if (pos) initSeg(pos, (v) => setToastPos(v));`,
     },
   },
   notify: {
     0: {
-      js: `import { notify } from "satin-ui/components";
+      js: `import { notify, toast } from "satin-ui/components";
 
 // 卡片在右上角叠起来：后面的底边露出 12px、最多 3 层；指针移上去展开成列表；可以一键全部清除
-const n = notify({
-  icon: "circle-check", tone: "ok",          // tone："ok" | "bad" | "warn" | ""
-  title: "第三集生成完成",
-  body: "12 个镜头都生成好了，可以开始剪辑。",
-  actions: [{ label: "查看", variant: "secondary", run: (card) => { open(); card.close(); } }],
-});
-n.close();
-
-// 每来一条都会在 document 上发 notify 事件，铃铛这类地方可以跟着记未读
-document.addEventListener("notify", (e) => bell.add(e.detail));`,
+const NOTES = [
+  { icon: "circle-check", tone: "ok", title: "第三集生成完成", body: "12 个镜头都生成好了，可以开始剪辑。", actions: [{ label: "查看", variant: "secondary", run: (card) => { toast({ text: "打开第三集" }); card.close(); } }] },
+  { icon: "circle-x", tone: "bad", title: "镜头 11 没有生成", body: "画面描述里有不允许的内容，改一下再试。" },
+  { icon: "user-plus", tone: "", title: "周屿加入了项目", body: "可以编辑分镜和配音。" },
+];
+let i = 0;
+for (const b of document.querySelectorAll("[data-notify]")) b.addEventListener("click", () => notify(NOTES[i++ % NOTES.length]));
+// 每来一条都会在 document 上发 notify 事件，铃铛这类地方可以跟着记未读：document.addEventListener("notify", (e) => …)`,
     },
   },
   banner: {
     0: {
       js: `import { busy } from "satin-ui/components";
 
-// 横幅里的 [data-dismiss]：点了给 .sn-banner-wrap 加 .sn-closing，高度过渡收起，下面的内容跟着上来
-for (const x of document.querySelectorAll(".sn-banner-wrap [data-dismiss]")) {
-  x.addEventListener("click", () => x.closest(".sn-banner-wrap").classList.add("sn-closing"));
-}
+// 横幅里的 [data-dismiss]：enhance() 已经接上——点了给 .sn-banner-wrap 加 .sn-closing，高度过渡收起，下面的内容跟着上来
 
-// 问题解决了：原地变成成功，过一会儿自己收起
-retry.addEventListener("click", async () => {
-  await busy(retry, reconnect());
-  const banner = retry.closest(".sn-banner");
-  banner.classList.replace("sn-bad", "sn-ok");
+// 网络断了：点"重新连接"，等待结束后原地变成成功，过一会儿自己收起
+const net = document.querySelector("[data-retry-net]");
+net.addEventListener("click", async () => {
+  const banner = net.closest(".sn-banner");
+  await busy(net, 1000); // 换成你的重连请求（Promise）
+  banner.classList.replace("sn-bad", "sn-ok"); banner.setAttribute("role", "status");
+  banner.querySelector(".sn-msg").innerHTML = "<b>已重新连接</b>，改动都同步好了。";
+  net.remove();
   setTimeout(() => banner.parentElement.classList.add("sn-closing"), 1600);
+});
+
+// 条目上的失败：点"修改后重新生成"，成功后整行恢复正常
+const fix = document.querySelector("[data-fix]");
+fix?.addEventListener("click", async () => {
+  const row = fix.closest(".sn-shot-row");
+  await busy(fix, 1100); // 换成你的重新生成请求
+  row.classList.remove("sn-failed");
+  fix.parentElement.classList.add("sn-off");
 });`,
     },
   },
@@ -680,16 +650,48 @@ const { shown, waited } = await loadWithSkeleton(document.querySelector(".sn-sk-
   },
   progress: {
     0: {
-      js: `import { createProgressCard } from "satin-ui/components";
+      js: `import { reduced } from "satin-ui";
+import { createProgressCard, toast } from "satin-ui/components";
 
-const card = createProgressCard(document.querySelector(".sn-pcard"), {
-  onCancel: () => { job.cancel(); card.cancel("已取消导出", "已导出的部分不会保留。"); },
-  onOpen: () => showInFolder(),
+// 进度卡：数量、进度条、剩余时间、可取消；完成时文字换掉，图标原地变对勾，出"打开文件夹"
+const pc = document.querySelector("#pcard");
+pc.querySelector(".sn-pc-acts").insertAdjacentHTML("beforeend", '<button class="sn-btn sn-secondary sn-sm sn-off" data-pc-open>打开文件夹</button>');
+let timer = 0;
+const card = createProgressCard(pc, {
+  onCancel: () => { clearInterval(timer); card.cancel("已取消导出", "已导出的部分不会保留。"); },
+  onOpen: () => toast({ icon: "folder-open", text: '这里会打开"下载"文件夹' }),
 });
+// 换成你的导出任务：这里每 260ms 走一点
+function startExport(enter) {
+  clearInterval(timer); let p = 0;
+  card.start("正在导出 第三集.mp4", "准备中…", enter);
+  timer = setInterval(() => {
+    p = Math.min(1, p + 0.035 + Math.random() * 0.03);
+    card.set(p, \`已完成 \${Math.round(p * 120)} / 120 个镜头 · 还剩约 \${Math.max(1, Math.ceil((1 - p) * 24))} 秒\`);
+    if (p >= 1) { clearInterval(timer); setTimeout(() => card.finish("导出完成", '第三集.mp4 · 1.2 GB · 已保存到"下载"'), 240); }
+  }, 260);
+}
+document.querySelector("[data-pc-start]").addEventListener("click", () => startExport(true));
+startExport(false);
 
-card.start("正在导出 第三集.mp4");
-job.on("progress", (p, done, total) => card.set(p, \`已完成 \${done} / \${total} 个镜头\`));
-job.on("end", () => card.finish("导出完成", '第三集.mp4 · 1.2 GB · 已保存到"下载"'));`,
+// AI 生成：先亮步骤；拆完镜头就按最终文字留好位置，再一段段淡入
+const PARAS = ["远景。夜里的车站广场积着水，路灯倒映在水面上，镜头从高处慢慢推近站门。", "全景。林夏收起伞走进候车厅，暖黄的灯光，人不多，广播在报晚点。",
+  "中景。站台尽头，最后一班车进站，车灯穿过雨幕，照亮她的侧脸，她没有上车。"];
+const ai = document.querySelector("#aigen"), steps = [...ai.querySelectorAll(".sn-ai-steps li")], out = ai.querySelector(".sn-ai-out"), run = ai.querySelector("[data-ai-run]");
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+let runId = 0;
+run.addEventListener("click", async () => {
+  const id = ++runId; run.setAttribute("aria-disabled", "true"); run.classList.add("sn-is-disabled");
+  steps.forEach((s) => s.classList.remove("sn-run", "sn-done")); out.innerHTML = "";
+  steps[0].classList.add("sn-run"); await wait(700); if (id !== runId) return; steps[0].classList.replace("sn-run", "sn-done");
+  steps[1].classList.add("sn-run"); await wait(800); if (id !== runId) return;
+  out.innerHTML = PARAS.map((t, i) => \`<div class="sn-para"><span class="sn-no">镜头 \${i + 1}</span><div class="sn-body"><div class="sn-txt">\${t}</div><div class="sn-ph"><span class="sn-sk" style="width:100%"></span><span class="sn-sk" style="width:\${[62, 48, 70][i]}%"></span></div></div></div>\`).join("");
+  if (!reduced()) out.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: "cubic-bezier(.32,.72,0,1)" });
+  steps[1].classList.replace("sn-run", "sn-done"); steps[2].classList.add("sn-run");
+  for (const para of out.querySelectorAll(".sn-para")) { await wait(650); if (id !== runId) return; para.classList.add("sn-on"); }
+  await wait(300); steps[2].classList.replace("sn-run", "sn-done");
+  run.removeAttribute("aria-disabled"); run.classList.remove("sn-is-disabled"); run.lastChild.textContent = "重新生成";
+});`,
     },
   },
   collapse: {
@@ -715,82 +717,93 @@ createCollapse(document.querySelector("#faq"), {
   },
   card: {
     0: {
-      js: `import { setup } from "satin-ui";
-import { openMenu } from "satin-ui/components";
-
-setup(); // 页面级行为（菜单的键盘操作、点外面关上），整页调一次
+      js: `import { injectIcons } from "satin-ui";
+import { openMenu, toast } from "satin-ui/components";
 
 // 卡片本身是标记：封面、标题、元信息；左上角的勾选框多选，右上角"更多"弹菜单
+const cards = document.querySelector("#pcards");
+const menu = document.createElement("div"); // 菜单也可以直接写在标记里
+menu.className = "sn-menu sn-float"; menu.setAttribute("role", "menu");
+menu.innerHTML = '<div class="sn-item" data-i="pencil:before">重命名</div><div class="sn-item" data-i="copy:before">复制一份</div><div class="sn-sep"></div><div class="sn-item sn-danger-item" data-i="trash-2:before">移到回收站</div>';
+injectIcons(menu); cards.after(menu);
+menu.addEventListener("menuselect", (e) => toast({ text: e.detail.label }));
+
 cards.addEventListener("change", (e) => e.target.closest(".sn-pc")?.classList.toggle("sn-sel", e.target.checked));
 cards.addEventListener("click", (e) => {
   const more = e.target.closest("[data-card-more]");
-  if (more) openMenu(document.querySelector("#m-card"), { trigger: more, anchor: more, align: "end" });
+  if (more) { e.stopPropagation(); openMenu(menu, { trigger: more, anchor: more, align: "end" }); return; }
+  if (e.target.closest(".sn-pick")) return;
+  const card = e.target.closest(".sn-pc"); if (card) toast({ icon: "info", text: \`这里会打开"\${card.getAttribute("aria-label")}"\` });
 });`,
     },
   },
   image: {
     0: {
-      js: `import { setup } from "satin-ui";
-import { openLightbox } from "satin-ui/lightbox";
+      js: `import { openLightbox } from "satin-ui/lightbox";
 
-setup(); // 页面级行为（看图层的键盘操作），整页调一次
+// 缩略图：加载中显示骨架，加载好淡入（.sn-loaded），失败显示重试（.sn-failed）。这里用定时器模拟加载，第 4 张模拟失败
+const grid = document.querySelector("#imgGrid");
+const ims = () => [...grid.querySelectorAll(".sn-im")];
+function load() {
+  ims().forEach((im, i) => { im.classList.remove("sn-loaded", "sn-failed"); setTimeout(() => im.classList.add(i === 3 ? "sn-failed" : "sn-loaded"), 400 + i * 260 + Math.random() * 300); });
+}
+load();
+document.querySelector("[data-img-reload]").addEventListener("click", load);
 
-// 缩略图：加载中显示骨架，加载好模糊淡入（.sn-loaded），失败显示重试（.sn-failed）
-// 每一项：src（图片地址）+ size（原图宽高：适应窗口时不放大超过原图）；视频写 type: "video"
-const items = shots.map((s) => ({ src: s.url, size: [s.w, s.h], alt: s.title }));
-
+// 点开：从缩略图那里放大到铺满窗口，关上时缩回去；能放大缩小、拖动、旋转、还原，← → 翻页、Esc 关闭
+// 每一项：src（图片地址）+ size（原图宽高）；这里的缩略图是 CSS 背景，就传 bg + ratio
+const RATIO = new Map([["16:9", 16 / 9], ["1:1", 1], ["4:3", 4 / 3], ["9:16", 9 / 16]]);
+const items = () => ims().map((im) => ({ bg: getComputedStyle(im).getPropertyValue("--sn-g") || im.style.getPropertyValue("--sn-g"), ratio: RATIO.get(im.querySelector(".sn-tag-ratio")?.textContent.trim()) || 16 / 9 }));
+const thumbOf = (i) => grid.querySelector(\`.sn-im[data-n="\${i}"]\`), enabled = (i) => thumbOf(i)?.classList.contains("sn-loaded");
 grid.addEventListener("click", (e) => {
-  const im = e.target.closest(".sn-im.sn-loaded"); if (!im) return;
-  // 从缩略图那里放大到铺满窗口，关上时缩回去；能放大缩小、拖动、旋转、还原，← → 翻页、Esc 关闭
-  openLightbox(items, +im.dataset.n, {
-    thumbOf: (i) => grid.querySelector(\`.sn-im[data-n="\${i}"]\`),
-    enabled: (i) => grid.querySelector(\`.sn-im[data-n="\${i}"]\`).classList.contains("sn-loaded"),
-  });
-});`,
+  const retry = e.target.closest("[data-img-retry]"), im = e.target.closest(".sn-im");
+  if (retry) { im.classList.remove("sn-failed"); setTimeout(() => im.classList.add("sn-loaded"), 700); return; } // 换成真的重新请求
+  if (im?.classList.contains("sn-loaded")) openLightbox(items(), Number(im.dataset.n), { thumbOf, enabled });
+});
+grid.addEventListener("keydown", (e) => { const im = e.target.closest(".sn-im"); if (im && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); im.click(); } });`,
     },
   },
   media: {
     0: {
-      js: `import { createPlayer, createAudio, toast } from "satin-ui/components";
+      js: `import { toast } from "satin-ui/components";
+import { createPlayer, createAudio } from "satin-ui/components";
 
-// 视频：缓冲转圈、拖动进度、音量、画中画、全屏、键盘；不动时控件自己藏起来
-// box 是空容器：按选项渲染播放器并接上
-const player = createPlayer(box, {
-  src: "/media/ep3.mp4", poster: "/media/ep3.jpg", label: "第三集预览",
-  onError: () => toast({ text: "视频没能加载" }),
-});
-player.play();
+// 视频：缓冲转圈、拖动进度、音量、画中画、全屏、键盘；不动时控件自己藏起来。在写好的播放器标记上接交互（也可以给空容器按选项渲染）
+createPlayer(document.querySelector("#player"), { onError: () => toast({ icon: "circle-x", tone: "danger", text: "视频没能加载，检查网络后再试", alert: true }) });
 
 // 音频：波形从音频本身算出来（拿不到就画平线，不编造）；同一时间只放一个
-// 列表里加一行：先插标记（createAudio.html 生成），再在这行标记上接交互
-list.insertAdjacentHTML("beforeend", createAudio.html({ src: "/media/bgm.mp3", title: "配乐 · 雨夜", sub: "2:14" }));
-createAudio(list.lastElementChild);`,
+createAudio(document.querySelector("#audio"), { onError: () => toast({ icon: "circle-x", tone: "danger", text: "音频没能加载，检查网络后再试", alert: true }) });
+// 列表里加一行：先插标记（createAudio.html({ src, title, sub }) 生成），再在这行标记上 createAudio(那一行)`,
     },
   },
   upload: {
     0: {
       js: `import { createUpload } from "satin-ui/components";
 
-// 点了选文件、拖进来；每个文件一行：进度、失败可重试、取消 / 移除
-const upl = createUpload(document.querySelector(".sn-drop"), {
-  list: document.querySelector(".sn-files"),
-  accept: /\\.(txt|docx|epub)$/i, badType: "格式不支持，只能上传 txt、docx、epub",
-  maxSize: 50 * 1024 * 1024, tooBig: "超过 50 MB",
-  upload: (file, onProgress) => uploadWithProgress("/api/upload", file, onProgress),
+// 点了选文件、拖进来；每个文件一行：进度、失败可重试、取消 / 移除。上传函数换成你的（报进度，结束 resolve，出错 reject）
+const fakeUpload = (file, onProgress) => new Promise((ok, fail) => {
+  let p = 0; const bad = /失败/.test(file.name);
+  const iv = setInterval(() => { p = Math.min(1, p + 0.08 + Math.random() * 0.08); onProgress(p); if (bad && p > 0.6) { clearInterval(iv); fail(new Error("网络断了")); } else if (p >= 1) { clearInterval(iv); ok(); } }, 180);
 });
-upl.add(filesFromSomewhere);`,
+createUpload(document.querySelector("#drop"), {
+  list: document.querySelector("#files"),
+  accept: /\\.(txt|docx|epub)$/i, maxSize: 50 * 1024 * 1024,
+  upload: fakeUpload,
+});`,
     },
   },
   sidebar: {
     0: {
-      js: `import { createSidebar } from "satin-ui/components";
+      js: `import { toast } from "satin-ui/components";
 
-// 选中的底色 / 指示条在条目之间滑动（.sn-app 上 data-navfx="slide | bar | fade | text"）；
-// [data-collapse] 收起 / 展开（⌘\\\\ 也行），主区宽度连续变，.sn-app-grid 里的卡片按新列数从原位置滑过去
-const side = createSidebar(document.querySelector(".sn-app"), {
-  onNavigate: (a) => router.go(a.getAttribute("href")),
+// 侧栏布局 enhance() 已经接上：选中的底色 / 指示条在条目之间滑动（.sn-app 上 data-navfx="slide | bar | fade | text"）；
+// [data-collapse] 收起 / 展开（⌘\\ 也行），主区宽度连续变，卡片按新列数从原位置滑过去；窄于 720 自动收成图标栏（data-collapse-below 可改）
+// 点导航：换成你的路由跳转
+document.querySelector(".sn-side-nav").addEventListener("click", (e) => {
+  const a = e.target.closest("a[href]"); if (!a) return;
+  e.preventDefault(); toast({ text: \`打开"\${a.textContent.trim()}"\` });
 });
-side.toggle();`,
+// 自己创建也行：createSidebar(元素, { collapseBelow: 720, onNavigate(a) {} })，返回 { toggle(), select(a) }`,
     },
   },
   tabs: {
@@ -798,14 +811,15 @@ side.toggle();`,
       js: `import { createTabs, createPager, setStep } from "satin-ui/components";
 
 // 标签页：下划线前缘先走、后缘跟上；新内容从所选标签那一侧滑进来；← → 切换
-createTabs(document.querySelector(".sn-tabs"), { onChange: (i) => load(i) });
+createTabs(document.querySelector(".sn-tabs"), { onChange: (i) => console.log("切到第", i + 1, "个标签") });
 
-// 分页：当前页的底色滑到新页码；页码多时中间用省略
-const pager = createPager(document.querySelector(".sn-pager"), { total: 13, onChange: (p) => fetchPage(p) });
-pager.go(5);
+// 分页：当前页的底色滑到新页码；页码多时中间用省略（onChange 里换成你的取数）
+createPager(document.querySelector(".sn-pager"), { total: 13, onChange: (p) => console.log("第", p, "页") });
 
 // 步骤：第 i 步是当前，前面的都完成
-setStep(document.querySelector(".sn-steps"), 2);`,
+const steps = document.querySelector(".sn-steps"), max = steps.querySelectorAll(".sn-st").length - 1;
+let cur = 1;
+for (const b of document.querySelectorAll("[data-step]")) b.addEventListener("click", () => { cur = Math.max(0, Math.min(max, cur + Number(b.dataset.step))); setStep(steps, cur); });`,
     },
   },
   reorder: {
@@ -814,41 +828,75 @@ setStep(document.querySelector(".sn-steps"), 2);`,
   <div class="sn-drag-row"><button class="sn-grip" aria-label="拖动排序：镜头 07" data-i="grip-vertical"></button><b>镜头 07 · 车站外</b></div>
   <div class="sn-drag-row"><button class="sn-grip" aria-label="拖动排序：镜头 08" data-i="grip-vertical"></button><b>镜头 08 · 候车厅</b></div>
 </div>`,
-      js: `import { createReorder } from "satin-ui/components";
+      js: `import { createReorder, toast } from "satin-ui/components";
 
 // 按住 .sn-grip 拖（先动 4px 才算拿起）；其他行让位、落点画线；拿出列表 40px 外松手就取消；
 // 键盘：空格拿起、↑↓ 移动、空格放下、Esc 取消（读屏会播报位置）
-createReorder(document.querySelector(".sn-drag-list"), {
-  onReorder: ({ from, to, row }) => save(order()),
+const list = document.querySelector(".sn-drag-list");
+createReorder(list, {
+  onReorder: ({ from, to }) => toast({ text: \`已从第 \${from + 1} 位移到第 \${to + 1} 位\` }), // 换成你的保存
 });`,
     },
   },
   addremove: {
     0: {
-      js: `import { insertWithFlip, removeWithFlip, toast } from "satin-ui/components";
+      js: `import { injectIcons } from "satin-ui";
+import { insertWithFlip, removeWithFlip, toast } from "satin-ui/components";
 
-// 新增：从下面淡入，别的元素让位
-insertWithFlip(box, chipEl("回忆"));
+// 新增：从下面淡入，别的标签让位；删除：先脱离布局淡出，剩下的用弹簧补位，给撤销
+const box = document.querySelector("#chipsBox"), input = document.querySelector("#addTag");
+const chipOf = (text) => {
+  const chip = document.createElement("span"); chip.className = "sn-chip sn-tag sn-on";
+  chip.innerHTML = \`\${text}<button class="sn-x" aria-label="移除 \${text}" data-i="x"></button>\`;
+  injectIcons(chip); return chip;
+};
+const add = (text, index) => insertWithFlip(box, chipOf(text), box.querySelectorAll(".sn-chip")[index ?? 1e9] || null);
+const submit = () => { const v = input.value.trim(); if (!v) return; add(v); input.value = ""; };
+input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+document.querySelector("[data-add-tag]").addEventListener("click", submit);
 
-// 删除：先脱离布局淡出，剩下的用弹簧补位；给撤销
-await removeWithFlip(chip);
-toast({ kind: "action", text: '已移除"雨夜"', action: { label: "撤销", run: () => insertWithFlip(box, chip, box.children[index]) } });`,
+box.addEventListener("click", (e) => {
+  const x = e.target.closest(".sn-x"); if (!x) return;
+  const chip = x.closest(".sn-chip"), text = chip.firstChild.textContent.trim(), index = [...box.querySelectorAll(".sn-chip")].indexOf(chip);
+  removeWithFlip(chip);
+  toast({ kind: "action", text: \`已移除标签"\${text}"\`, action: { label: "撤销", run: (t) => { add(text, index); t.update({ kind: "status", text: \`已恢复"\${text}"\`, done: true, duration: 2000 }); } } });
+});`,
     },
   },
   optimistic: {
     0: {
-      js: `import { optimistic } from "satin-ui/components";
+      js: `import { optimistic, createNumberFlow, toast } from "satin-ui/components";
 
-// 先显示结果再保存；失败时恢复、整行抖两下、出一条带"重试"的提示
+// 先显示结果再保存；失败时恢复、整行抖两下、出一条带"重试"的提示（勾上"模拟保存失败"看失败的样子）
+const row = document.querySelector(".sn-opt-row"), star = document.querySelector("[data-star]");
+const nameEl = document.querySelector("[data-rename]"), failBox = document.querySelector("#optFail");
+let count = 24;
+const num = createNumberFlow(star.querySelector(".sn-n"), { value: count, style: "blur" });
+// 保存：换成你的接口。这里 700ms 后成功，勾上"模拟保存失败"时失败
+const save = () => new Promise((ok, fail) => setTimeout(() => (failBox.checked ? fail(new Error("保存失败")) : ok()), 700));
+
 star.addEventListener("click", () => {
   const on = !star.classList.contains("sn-on");
-  optimistic({
-    apply: () => star.classList.toggle("sn-on", on),
-    revert: () => star.classList.toggle("sn-on", !on),
-    save: () => fetch("/api/star", { method: on ? "POST" : "DELETE" }).then((r) => { if (!r.ok) throw r; }),
-    shake: row,
-  });
-});`,
+  const show = (v) => { star.classList.toggle("sn-on", v); star.setAttribute("aria-pressed", String(v)); count += v ? 1 : -1; num.update({ value: count }); };
+  optimistic({ shake: row, apply: () => show(on), revert: () => show(!on), save });
+});
+
+// 改名：双击或按回车进入编辑；回车保存、Esc 放弃，同样先显示再保存
+function rename() {
+  const old = nameEl.textContent.trim(), inp = document.createElement("input");
+  inp.className = "sn-input sn-sm"; inp.value = old; nameEl.replaceChildren(inp); inp.focus(); inp.select();
+  let done = false;
+  const commit = (keep) => {
+    if (done) return; done = true; const v = inp.value.trim() || old;
+    if (!keep || v === old) { nameEl.textContent = old; return; }
+    optimistic({ shake: row, apply: () => (nameEl.textContent = v), revert: () => (nameEl.textContent = old), save })
+      .then(() => toast({ text: \`已改名为"\${v}"\` }), () => {});
+  };
+  inp.addEventListener("keydown", (e) => { if (e.key === "Enter") commit(true); if (e.key === "Escape") { e.stopPropagation(); commit(false); } });
+  inp.addEventListener("blur", () => commit(true));
+}
+nameEl.addEventListener("dblclick", rename);
+nameEl.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target === nameEl) rename(); });`,
     },
   },
   numflow: {
@@ -870,19 +918,14 @@ views.update({ style: "fade" }); // 换样式`,
     0: {
       js: `import { createChat } from "satin-ui/chat";
 
-// 空容器：顶栏、消息区、底部输入框都由 createChat 填好、接好（已有设计稿里的 .sn-chat 标记也可以直接传）
-// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文
-// 不给 history 就从空的对话开始；要带历史：history: { initial(), older(), hasMore() }
-// React：const Chat = wrapSatin(createChat, { events: [] })（satin-ui/react）；自己在 effect 里创建的，卸载时调 chat.destroy()
-const chat = createChat(document.querySelector("#chat"), {
-  title: "分镜助手", placeholder: "和分镜助手一起改这一集",
+// 已有设计稿里的 .sn-chat 标记直接传（空容器也行：顶栏、消息区、底部输入框都由 createChat 填好、接好）
+// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文；先进缓冲、匀速放出来。这里用写好的一段话模拟
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+createChat(document.querySelector("#chatBox"), {
   respond: async function* (question, state) {
-    const res = await fetch("/api/chat", { method: "POST", body: JSON.stringify({ question }) });
-    for await (const ev of readEvents(res.body)) {
-      if (state.stopped) break;              // 用户点了停止
-      if (ev.type === "reasoning") yield { think: ev.text };
-      if (ev.type === "text") yield ev.text;   // 先进缓冲、匀速放出来
-    }
+    for (const piece of ["先看这一场的节奏：", "雨夜、车站、", "等最后一班车的人。"]) { if (state.stopped) return; yield { think: piece }; await wait(120); }
+    const text = \`好的。"\${question}"可以拆成三个镜头：远景站台、林夏的中景、车灯穿过雨幕的特写。\`;
+    for (const ch of text) { if (state.stopped) return; yield ch; await wait(16); } // 换成你的模型流式输出
   },
 });`,
     },
@@ -891,21 +934,22 @@ const chat = createChat(document.querySelector("#chat"), {
     0: {
       js: `import { createInfiniteList } from "satin-ui/components";
 
-// 行高固定：只画看得见的几十行，一万条照样流畅；滚到离底部 400px 自动要下一页
-const list = createInfiniteList(document.querySelector(".sn-vl"), {
-  rowHeight: 56,
-  total: 10000,
-  pageSize: 60,
-  loadPage: (offset, size) => fetch(\`/api/shots?offset=\${offset}&limit=\${size}\`).then((r) => r.json()),
-  renderRow: (el, shot) => {
-    // 行元素会复用：子元素缓存在 el._d 上
-    el._d ??= (el.innerHTML = '<span class="sn-th"></span><span class="sn-tx"><b></b><span></span></span>', { th: el.firstChild, b: el.querySelector("b"), m: el.querySelector(".sn-tx span") });
-    el._d.th.style.setProperty("--sn-g", \`url(\${shot.thumb}) center / cover\`);
-    el._d.b.textContent = shot.title; el._d.m.textContent = shot.meta;
+// 行高固定：只画看得见的几十行，一万条照样流畅；滚到离底部 400px 自动要下一页（勾上"模拟加载失败"看失败后的重试）
+const vl = document.querySelector("#vl"), countEl = document.querySelector("#vlCount"), topBtn = document.querySelector("[data-vl-top]"), failBox = document.querySelector("#vlFail");
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const list = createInfiniteList(vl, {
+  total: 10000, pageSize: 400, rowHeight: 56,
+  // 换成你的接口：返回这一页的数据数组
+  loadPage: async (offset, size) => { await wait(offset === 0 ? 200 : 500 + Math.random() * 700); if (failBox.checked && offset > 0) throw new Error("加载失败"); return Array.from({ length: size }, (_, k) => offset + k); },
+  // 行元素会复用：子元素缓存在 el._d 上，每次只改文字
+  renderRow: (el, i) => {
+    if (!el._d) { el.innerHTML = '<span class="sn-th"></span><span class="sn-tx"><b></b><span></span></span><span class="sn-no"></span>'; el._d = { b: el.querySelector("b"), m: el.querySelector(".sn-tx span"), no: el.children[2] }; }
+    el._d.b.textContent = \`镜头 \${i + 1}\`; el._d.m.textContent = \`第 \${Math.floor(i / 40) + 1} 集 · \${3 + (i % 6)} 秒\`; el._d.no.textContent = String(i + 1);
   },
-  onCount: (n) => (counter.textContent = \`已加载 \${n} 条\`),
+  onCount: (n, total) => { countEl.textContent = n >= total ? \`已全部加载 · \${n.toLocaleString("zh-CN")} 条\` : \`已加载 \${n.toLocaleString("zh-CN")} 条 · 共 \${total.toLocaleString("zh-CN")} 条\`; },
 });
-list.reload();`,
+vl.addEventListener("vlscroll", (e) => topBtn.classList.toggle("sn-on", e.detail.top > vl.clientHeight));
+topBtn.addEventListener("click", () => list.scrollTop());`,
     },
   },
   flow: {

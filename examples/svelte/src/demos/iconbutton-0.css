@@ -1,0 +1,3 @@
+.mx-r { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; align-items: center; }
+.mx-c { display: grid; justify-items: start; }
+.mx-c > small { display: none; }

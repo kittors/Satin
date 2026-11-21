@@ -1,0 +1,1 @@
+code.k { font: calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label2); background: var(--sn-fill-subtle); padding: 1px 4px; border-radius: var(--sn-r-xs); }

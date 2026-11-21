@@ -1,0 +1,8 @@
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.row + .row { margin-top: 16px; }
+.sn-nf-card .row { display: flex; flex-wrap: wrap; gap: 6px; }
+.grid-m { display: grid; align-items: center; gap: 14px 16px; }
+.grid-m .sn-cap { white-space: nowrap; }
+.grid-m.lc { grid-template-columns: var(--lc, 112px) minmax(0, 1fr); }
+.grid-m.lc { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
+.grid-m.lc > .sn-cap:not(:first-child) { margin-top: 12px; }

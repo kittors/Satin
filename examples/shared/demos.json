@@ -1,0 +1,785 @@
+[
+ {
+  "slug": "color-0",
+  "id": "color",
+  "n": 0,
+  "name": "颜色",
+  "group": "基础",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "type-0",
+  "id": "type",
+  "n": 0,
+  "name": "排版",
+  "group": "基础",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "type-1",
+  "id": "type",
+  "n": 1,
+  "name": "排版",
+  "group": "基础",
+  "cap": "色调",
+  "css": true
+ },
+ {
+  "slug": "type-2",
+  "id": "type",
+  "n": 2,
+  "name": "排版",
+  "group": "基础",
+  "cap": "数字与截断",
+  "css": true
+ },
+ {
+  "slug": "spacing-0",
+  "id": "spacing",
+  "n": 0,
+  "name": "间距",
+  "group": "基础",
+  "cap": "刻度",
+  "css": true
+ },
+ {
+  "slug": "spacing-1",
+  "id": "spacing",
+  "n": 1,
+  "name": "间距",
+  "group": "基础",
+  "cap": "越相关越近",
+  "css": true
+ },
+ {
+  "slug": "spacing-2",
+  "id": "spacing",
+  "n": 2,
+  "name": "间距",
+  "group": "基础",
+  "cap": "实例与标注",
+  "css": true
+ },
+ {
+  "slug": "spacing-3",
+  "id": "spacing",
+  "n": 3,
+  "name": "间距",
+  "group": "基础",
+  "cap": "控件内边距",
+  "css": true
+ },
+ {
+  "slug": "layout-0",
+  "id": "layout",
+  "n": 0,
+  "name": "布局",
+  "group": "基础",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "layout-1",
+  "id": "layout",
+  "n": 1,
+  "name": "布局",
+  "group": "基础",
+  "cap": "断点与栅格",
+  "css": true
+ },
+ {
+  "slug": "space-0",
+  "id": "space",
+  "n": 0,
+  "name": "圆角与线",
+  "group": "基础",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "space-1",
+  "id": "space",
+  "n": 1,
+  "name": "圆角与线",
+  "group": "基础",
+  "cap": "嵌套圆角：内层 = 外层 − 内边距",
+  "css": true
+ },
+ {
+  "slug": "elevation-0",
+  "id": "elevation",
+  "n": 0,
+  "name": "阴影与层级",
+  "group": "基础",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "motion-0",
+  "id": "motion",
+  "n": 0,
+  "name": "动效曲线",
+  "group": "基础",
+  "cap": "时长",
+  "css": true
+ },
+ {
+  "slug": "icons-0",
+  "id": "icons",
+  "n": 0,
+  "name": "图标",
+  "group": "基础",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "button-0",
+  "id": "button",
+  "n": 0,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "变体 × 尺寸",
+  "css": true
+ },
+ {
+  "slug": "button-1",
+  "id": "button",
+  "n": 1,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "状态（静态展示）",
+  "css": true
+ },
+ {
+  "slug": "button-2",
+  "id": "button",
+  "n": 2,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "图标位置和下拉",
+  "css": true
+ },
+ {
+  "slug": "button-3",
+  "id": "button",
+  "n": 3,
+  "name": "按钮",
+  "group": "按钮",
+  "cap": "试一下：等待 → 成功",
+  "css": false
+ },
+ {
+  "slug": "iconbutton-0",
+  "id": "iconbutton",
+  "n": 0,
+  "name": "纯图标按钮",
+  "group": "按钮",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "link-0",
+  "id": "link",
+  "n": 0,
+  "name": "文字链接",
+  "group": "按钮",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "compound-0",
+  "id": "compound",
+  "n": 0,
+  "name": "组合按钮",
+  "group": "按钮",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "chip-0",
+  "id": "chip",
+  "n": 0,
+  "name": "切换芯片",
+  "group": "按钮",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "field-0",
+  "id": "field",
+  "n": 0,
+  "name": "字段与错误",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "input-0",
+  "id": "input",
+  "n": 0,
+  "name": "输入框",
+  "group": "表单",
+  "cap": "状态",
+  "css": true
+ },
+ {
+  "slug": "input-1",
+  "id": "input",
+  "n": 1,
+  "name": "输入框",
+  "group": "表单",
+  "cap": "尺寸",
+  "css": true
+ },
+ {
+  "slug": "input-2",
+  "id": "input",
+  "n": 2,
+  "name": "输入框",
+  "group": "表单",
+  "cap": "前缀、后缀、清除",
+  "css": true
+ },
+ {
+  "slug": "special-0",
+  "id": "special",
+  "n": 0,
+  "name": "搜索、密码、邮箱",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "count-0",
+  "id": "count",
+  "n": 0,
+  "name": "字数统计",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "taginput-0",
+  "id": "taginput",
+  "n": 0,
+  "name": "标签输入",
+  "group": "表单",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "number-0",
+  "id": "number",
+  "n": 0,
+  "name": "数字步进",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "prompt-0",
+  "id": "prompt",
+  "n": 0,
+  "name": "提示词输入框",
+  "group": "表单",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "select-0",
+  "id": "select",
+  "n": 0,
+  "name": "下拉选择与菜单",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "picker-0",
+  "id": "picker",
+  "n": 0,
+  "name": "日期、时间、地址",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "choice-0",
+  "id": "choice",
+  "n": 0,
+  "name": "复选、单选、开关",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "segmented-0",
+  "id": "segmented",
+  "n": 0,
+  "name": "分段控件",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "slider-0",
+  "id": "slider",
+  "n": 0,
+  "name": "滑块",
+  "group": "表单",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "otp-0",
+  "id": "otp",
+  "n": 0,
+  "name": "验证码",
+  "group": "表单",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "tooltip-0",
+  "id": "tooltip",
+  "n": 0,
+  "name": "文字提示",
+  "group": "浮层",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "popover-0",
+  "id": "popover",
+  "n": 0,
+  "name": "弹出面板",
+  "group": "浮层",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "popconfirm-0",
+  "id": "popconfirm",
+  "n": 0,
+  "name": "气泡确认",
+  "group": "浮层",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "ctxmenu-0",
+  "id": "ctxmenu",
+  "n": 0,
+  "name": "右键菜单与子菜单",
+  "group": "浮层",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "dialog-0",
+  "id": "dialog",
+  "n": 0,
+  "name": "弹窗",
+  "group": "浮层",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "drawer-0",
+  "id": "drawer",
+  "n": 0,
+  "name": "抽屉",
+  "group": "浮层",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "cmdk-0",
+  "id": "cmdk",
+  "n": 0,
+  "name": "命令面板",
+  "group": "浮层",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "toast-0",
+  "id": "toast",
+  "n": 0,
+  "name": "轻提示",
+  "group": "反馈",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "notify-0",
+  "id": "notify",
+  "n": 0,
+  "name": "通知",
+  "group": "反馈",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "banner-0",
+  "id": "banner",
+  "n": 0,
+  "name": "横幅与条目上的失败",
+  "group": "反馈",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "empty-0",
+  "id": "empty",
+  "n": 0,
+  "name": "空状态",
+  "group": "反馈",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "loading-0",
+  "id": "loading",
+  "n": 0,
+  "name": "骨架与加载",
+  "group": "反馈",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "progress-0",
+  "id": "progress",
+  "n": 0,
+  "name": "进度",
+  "group": "反馈",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "numflow-0",
+  "id": "numflow",
+  "n": 0,
+  "name": "数字变化",
+  "group": "反馈",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "table-0",
+  "id": "table",
+  "n": 0,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "基础",
+  "css": false
+ },
+ {
+  "slug": "table-1",
+  "id": "table",
+  "n": 1,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "斑马纹",
+  "css": false
+ },
+ {
+  "slug": "table-2",
+  "id": "table",
+  "n": 2,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "网格线",
+  "css": false
+ },
+ {
+  "slug": "table-3",
+  "id": "table",
+  "n": 3,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "紧凑",
+  "css": false
+ },
+ {
+  "slug": "table-4",
+  "id": "table",
+  "n": 4,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "无外框（放在卡片、面板里）",
+  "css": false
+ },
+ {
+  "slug": "table-5",
+  "id": "table",
+  "n": 5,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "固定表头、限高滚动",
+  "css": false
+ },
+ {
+  "slug": "table-6",
+  "id": "table",
+  "n": 6,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "空状态",
+  "css": false
+ },
+ {
+  "slug": "table-7",
+  "id": "table",
+  "n": 7,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "加载中",
+  "css": false
+ },
+ {
+  "slug": "table-8",
+  "id": "table",
+  "n": 8,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "完整示例：搜索、排序、勾选批量、多级展开、合并、拖动换行列、改列宽行高",
+  "css": true
+ },
+ {
+  "slug": "grid-0",
+  "id": "grid",
+  "n": 0,
+  "name": "数据表格",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "cgrid-0",
+  "id": "cgrid",
+  "n": 0,
+  "name": "Canvas 表格",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "list-0",
+  "id": "list",
+  "n": 0,
+  "name": "列表与键值",
+  "group": "数据展示",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "card-0",
+  "id": "card",
+  "n": 0,
+  "name": "卡片",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "tags-0",
+  "id": "tags",
+  "n": 0,
+  "name": "标签、徽标与头像",
+  "group": "数据展示",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "collapse-0",
+  "id": "collapse",
+  "n": 0,
+  "name": "折叠面板",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "scrollarea-0",
+  "id": "scrollarea",
+  "n": 0,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "竖向、横向、双向",
+  "css": false
+ },
+ {
+  "slug": "scrollarea-1",
+  "id": "scrollarea",
+  "n": 1,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "渐隐宽度（size）",
+  "css": false
+ },
+ {
+  "slug": "scrollarea-2",
+  "id": "scrollarea",
+  "n": 2,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "滚动条怎么出现（bar）",
+  "css": false
+ },
+ {
+  "slug": "scrollarea-3",
+  "id": "scrollarea",
+  "n": 3,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "滚动条粗细、离边距离（barSize、barInset）",
+  "css": false
+ },
+ {
+  "slug": "scrollarea-4",
+  "id": "scrollarea",
+  "n": 4,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "滚到头（overscroll）",
+  "css": false
+ },
+ {
+  "slug": "scrollarea-5",
+  "id": "scrollarea",
+  "n": 5,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "表格：滚到头就停住，不回弹",
+  "css": false
+ },
+ {
+  "slug": "scrollarea-6",
+  "id": "scrollarea",
+  "n": 6,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "多行输入",
+  "css": false
+ },
+ {
+  "slug": "vlist-0",
+  "id": "vlist",
+  "n": 0,
+  "name": "无限列表",
+  "group": "数据展示",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "chat-0",
+  "id": "chat",
+  "n": 0,
+  "name": "聊天与 AI 对话",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "md-0",
+  "id": "md",
+  "n": 0,
+  "name": "Markdown 文档",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "flow-0",
+  "id": "flow",
+  "n": 0,
+  "name": "流程图",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "flowstress-0",
+  "id": "flowstress",
+  "n": 0,
+  "name": "万级节点压测",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "image-0",
+  "id": "image",
+  "n": 0,
+  "name": "图片",
+  "group": "媒体与上传",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "media-0",
+  "id": "media",
+  "n": 0,
+  "name": "视频与音频",
+  "group": "媒体与上传",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "upload-0",
+  "id": "upload",
+  "n": 0,
+  "name": "上传",
+  "group": "媒体与上传",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "sidebar-0",
+  "id": "sidebar",
+  "n": 0,
+  "name": "侧栏与布局",
+  "group": "导航",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "tabs-0",
+  "id": "tabs",
+  "n": 0,
+  "name": "标签页、分页、步骤",
+  "group": "导航",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "reorder-0",
+  "id": "reorder",
+  "n": 0,
+  "name": "拖拽重排",
+  "group": "行为",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "addremove-0",
+  "id": "addremove",
+  "n": 0,
+  "name": "新增与删除",
+  "group": "行为",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "optimistic-0",
+  "id": "optimistic",
+  "n": 0,
+  "name": "乐观更新",
+  "group": "行为",
+  "cap": "",
+  "css": false
+ }
+]

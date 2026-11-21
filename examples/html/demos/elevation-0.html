@@ -1,0 +1,35 @@
+<sn-enhance id="demo-elevation-0">
+  <div class="elev e0">
+    <b>卡片</b>
+    <span class="sn-t-caption sn-c-tertiary">raised + 1px 描边</span>
+  </div>
+  <div class="elev e1">
+    <b>浮层</b>
+    <span class="sn-t-caption sn-c-tertiary">菜单、Popover、通知</span>
+  </div>
+  <div class="elev e2">
+    <b>对话框</b>
+    <span class="sn-t-caption sn-c-tertiary">对话框、抽屉</span>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+</script>
+
+<style>
+  .demo.sn-cv { content-visibility: auto; contain-intrinsic-size: auto var(--sn-ch, 400px); }
+  .demo { margin-top: 12px; padding: 24px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+  .demo + .demo { margin-top: 12px; }
+  .demo { container: demo / inline-size; }
+  .demo > .sn-app { height: 420px; }
+  .demo > .sn-app .sn-app-main { overflow: hidden; }
+  .elev-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 28px; padding: 40px; background: var(--sn-canvas); }
+  .elev { height: 128px; border-radius: var(--sn-r-lg); padding: 16px; display: grid; align-content: end; gap: 2px; }
+  .elev b { font-weight: 600; }
+  .elev.e0 { background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+  .elev.e1 { background: var(--sn-overlay); box-shadow: var(--sn-e1); }
+  .elev.e2 { background: var(--sn-overlay); box-shadow: var(--sn-e2); border-radius: var(--sn-r-xl); }
+</style>

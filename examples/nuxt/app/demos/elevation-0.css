@@ -1,0 +1,12 @@
+.demo.sn-cv { content-visibility: auto; contain-intrinsic-size: auto var(--sn-ch, 400px); }
+.demo { margin-top: 12px; padding: 24px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+.demo + .demo { margin-top: 12px; }
+.demo { container: demo / inline-size; }
+.demo > .sn-app { height: 420px; }
+.demo > .sn-app .sn-app-main { overflow: hidden; }
+.elev-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 28px; padding: 40px; background: var(--sn-canvas); }
+.elev { height: 128px; border-radius: var(--sn-r-lg); padding: 16px; display: grid; align-content: end; gap: 2px; }
+.elev b { font-weight: 600; }
+.elev.e0 { background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+.elev.e1 { background: var(--sn-overlay); box-shadow: var(--sn-e1); }
+.elev.e2 { background: var(--sn-overlay); box-shadow: var(--sn-e2); border-radius: var(--sn-r-xl); }

@@ -1,0 +1,4 @@
+.stack { display: grid; gap: 16px; }
+.grid-m { display: grid; align-items: center; gap: 14px 16px; }
+.grid-m .sn-cap { white-space: nowrap; }
+.grid-m.auto { grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min, 220px)), 1fr)); }

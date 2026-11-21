@@ -15,7 +15,8 @@ import { img } from "./media.js";
 import { variants, demoCSS, guessInline, guessFlex } from "./variants.js";
 
 const side = $("[data-side]"), main = $("[data-main]"), toc = $("[data-toc]"), cat = await loadCatalog();
-const DEMO_SHEET = await fetch(new URL("../demo/kit-demo.css", import.meta.url)).then((r) => r.text()).catch(() => "");
+// 展示页给演示排版用的样式（库里没有的类）：生成代码时挑出这个演示用到的规则，跟代码一起给
+const DEMO_SHEET = (await Promise.all(["kit-demo", "layout", "stress", "doc"].map((f) => fetch(new URL(`../demo/${f}.css`, import.meta.url)).then((r) => r.text()).catch(() => "")))).join("\n");
 const OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
@@ -141,6 +142,16 @@ function tidy(el) {
   }
   return c;
 }
+// 演示的完整标记（不删减、不重新排版）：生成各框架的代码用——空白照原样，演示里有几个就是几个，和现场演示一模一样
+function rawOf(demo, doc) {
+  const t = document.createElement("template"); t.innerHTML = demo.html;
+  if (doc) for (const el of t.content.querySelectorAll("[id]")) {
+    if (el.children.length || el.textContent.trim()) continue;
+    const live = doc.getElementById(el.id); if (!live?.children.length) continue;
+    el.replaceChildren(...tidy(live).childNodes);
+  }
+  return t.content;
+}
 function codeOf(demo, doc) {
   const t = document.createElement("template"); t.innerHTML = demo.html;
   if (doc) for (const el of t.content.querySelectorAll("[id]")) {
@@ -174,13 +185,26 @@ const inlineIn = (doc) => (el) => { const l = liveOf(doc, el); return l ? /^inli
 const flexIn = (doc) => (el) => { const l = el.nodeType === 1 && liveOf(doc, el); return l ? /flex|grid/.test(doc.defaultView.getComputedStyle(l).display) : guessFlex(el); };
 function variantFiles(c, doc, n) {
   const html = filesOf(c, doc, n), ex = EXAMPLES[c.id]?.[n ?? 0];
-  const src = ex?.files || html, markup = src.find((f) => f.lang === "html")?.code || "", js = src.find((f) => f.lang === "js")?.code || "";
-  const extra = src.filter((f) => f.lang !== "html" && f.lang !== "js");
-  const tp = document.createElement("template"); tp.innerHTML = markup;
-  const css = DEMO_SHEET ? demoCSS(DEMO_SHEET, tp.content) : "", cssFile = css ? [{ name: "demo.css", lang: "css", code: css }] : [];
-  const v = variants({ node: tp.content, js, css, name: c.id, htmlCode: markup, inline: inlineIn(doc), flex: flexIn(doc) });
-  return { html: [...html, ...cssFile], react: [...v.react, ...extra], vue: [...v.vue, ...extra], element: [...v.element, ...extra] };
+  const src = ex?.files || html, markup = src.find((f) => f.lang === "html")?.code || "";
+  let js = src.find((f) => f.lang === "js")?.code || "", extra = src.filter((f) => f.lang !== "html" && f.lang !== "js");
+  // 原文另放一个文件、脚本里 fetch 进来的（Markdown）：换成写在脚本里的常量，组件里不用 await、也不依赖服务器上的路径，复制就能跑
+  const md = extra.find((f) => f.lang === "md");
+  if (md && /await\s*\(await fetch\([^)]*\)\)\.text\(\)/.test(js)) { js = js.replace(/await\s*\(await fetch\([^)]*\)\)\.text\(\)/, "`" + md.code.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${") + "`"); extra = extra.filter((f) => f !== md); }
+  // 手写了标记的用手写的；否则用演示的完整标记（不删减、不重新排版）
+  // 手写的标记里有"…"省略的（讲解用的片段），不能直接跑：还是用演示的完整标记
+  const hand = ex?.files || (ex?.html != null && !ex.html.includes("…"));
+  let node; if (hand) { const tp = document.createElement("template"); tp.innerHTML = markup; node = tp.content; } else node = rawOf(c.demos[n ?? 0] || { html: "" }, doc);
+  const css = DEMO_SHEET ? demoCSS(DEMO_SHEET, node) : "", cssFile = css ? [{ name: "demo.css", lang: "css", code: css }] : [];
+  const v = variants({ node, js, css, slug: `${c.id}-${n ?? 0}`, inline: inlineIn(doc), flex: flexIn(doc) });
+  return { html: [...html, ...cssFile], react: [...v.react, ...extra], vue: [...v.vue, ...extra], element: [...v.html, ...extra], all: v, extra, markup, js, css };
 }
+// 给 scripts/examples/gallery.mjs 用：这一页每个演示（等演示载好、按真实排版判断空白以后）7 种写法的文件
+window.__satinDemoFiles = () => $$(".dx", main).filter((box) => box.querySelector(".dx-code")).map((box) => {
+  const c = cat.byId[box.dataset.demo], n = box.dataset.n != null ? +box.dataset.n : 0, f = box.querySelector("iframe");
+  let doc = null; try { doc = f.contentDocument; } catch {}
+  const ready = !!(doc && doc.__dx), fs = variantFiles(c, ready ? doc : null, n);
+  return { id: c.id, n, slug: `${c.id}-${n}`, cap: c.demos[n]?.cap || "", ready, files: fs.all, extra: fs.extra, markup: fs.markup, js: fs.js, css: fs.css };
+});
 // 代码区放进页面以后：接上写法切换（组件库的分段控件）；切了一个，整页的演示一起换
 function mountVars(scope) {
   for (const row of $$(".dx-vars:not([data-ready])", scope)) {
@@ -565,7 +589,7 @@ function recipeFiles(r, d, doc) {
   const tp = document.createElement("template"); tp.innerHTML = d.code;
   const js = [...tp.content.querySelectorAll("script")].map((x) => x.textContent.replace(/^\n|\s+$/g, "").split("\n").map((l) => l.replace(/^ {2}/, "")).join("\n")).join("\n");
   for (const x of tp.content.querySelectorAll("script, meta, link, title")) x.remove();
-  const v = variants({ node: tp.content, js, name: r.id.replace(/-./g, (m) => m[1].toUpperCase()) + "Page", ...(doc ? { inline: inlineIn(doc), flex: flexIn(doc) } : {}) });
+  const v = variants({ node: tp.content, js, slug: r.id, ...(doc ? { inline: inlineIn(doc), flex: flexIn(doc) } : {}) });
   return (d.fs = { html: [{ name: "HTML", lang: "html", code: d.code }], react: v.react, vue: v.vue });
 }
 const ASYNC = {

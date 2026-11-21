@@ -1,0 +1,67 @@
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
+import { setup, enhance } from "satin-ui";
+
+@Component({
+  selector: "demo-spacing-1",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素
+  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式
+  styles: [`
+    .demo.sn-cv { content-visibility: auto; contain-intrinsic-size: auto var(--sn-ch, 400px); }
+    .demo { margin-top: 12px; padding: 24px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+    .demo + .demo { margin-top: 12px; }
+    .sp-compare { display: flex; flex-wrap: wrap; gap: 32px; }
+    .sp-cmp { margin: 0; display: grid; gap: 12px; }
+    .sp-cmp figcaption { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); }
+    .sp-set { width: 260px; display: flex; flex-direction: column; padding: 16px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: var(--sn-e1); }
+    .sp-set b { font: 600 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+    .sp-set span { display: flex; align-items: center; justify-content: space-between; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+    .sp-set span::after { content: ""; width: 26px; height: 16px; border-radius: 8px; background: var(--sn-fill-active); }
+    .sp-cmp.sn-bad .sp-set { gap: 16px; }
+    .sp-cmp.good .sp-set { gap: 24px; }
+    .sp-cmp.good .sp-set > div { display: flex; flex-direction: column; gap: 8px; }
+    .demo { container: demo / inline-size; }
+    .demo > .sn-app { height: 420px; }
+    .demo > .sn-app .sn-app-main { overflow: hidden; }
+  `],
+  template: `
+    <div #root>
+      <div class="sp-compare">
+        <figure class="sp-cmp sn-bad">
+          <div class="sp-set">
+            <b>通知</b>
+            <span>新评论</span>
+            <span>生成完成</span>
+            <b>隐私</b>
+            <span>公开主页</span>
+            <span>允许搜索到我</span>
+          </div>
+          <figcaption class="sn-c-danger">都是 16：看不出哪几行是一组</figcaption>
+        </figure>
+        <figure class="sp-cmp good">
+          <div class="sp-set">
+            <div>
+              <b>通知</b>
+              <span>新评论</span>
+              <span>生成完成</span>
+            </div>
+            <div>
+              <b>隐私</b>
+              <span>公开主页</span>
+              <span>允许搜索到我</span>
+            </div>
+          </div>
+          <figcaption>组内 8、组和组之间 24：一眼分成两组</figcaption>
+        </figure>
+      </div>
+    </div>`,
+})
+export class SpacingDemo1Component {
+  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;
+  private off = () => {};
+  ngAfterViewInit() {
+    const unsetup = setup();
+    const done = enhance(this.root.nativeElement);
+    this.off = () => { done(); unsetup(); };
+  }
+  ngOnDestroy() { this.off(); }
+}

@@ -27,8 +27,9 @@ export function fmtHTML(root, W = 80) {
     if (n.nodeType === 8) { out.push(pad + `<!--${n.data}-->`); return; }
     if (n.nodeType !== 1) return;
     const line = inline(n);
-    // 写得下，或者只是一段长文字（属性不多）：一行
-    if (cols(pad + line) <= W || (!n.children.length && n.attributes.length < 2)) { out.push(pad + line); return; }
+    // 写得下，或者只是一段长文字（属性不多），或者里面有文字（行内内容：拆行会在文字和标签之间多出空格，排出来就不一样了）：一行
+    const mixed = [...n.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim());
+    if (cols(pad + line) <= W || (!n.children.length && n.attributes.length < 2) || mixed) { out.push(pad + line); return; }
     const t = n.tagName.toLowerCase(), at = [...n.attributes].map(attrOf), open = `<${t}${at.length ? " " + at.join(" ") : ""}>`;
     const kids = [...n.childNodes].filter((c) => c.nodeType === 1 || c.nodeType === 8 || (c.nodeType === 3 && c.textContent.trim()));
     if (cols(pad + open) <= W) out.push(pad + open);

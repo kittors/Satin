@@ -1,0 +1,26 @@
+<sn-enhance id="demo-otp-0">
+  <div class="sn-otp" data-otp="">
+    <input inputmode="numeric" maxlength="1" aria-label="第 1 位">
+    <input inputmode="numeric" maxlength="1" aria-label="第 2 位">
+    <input inputmode="numeric" maxlength="1" aria-label="第 3 位">
+    <span class="sn-gap"></span>
+    <input inputmode="numeric" maxlength="1" aria-label="第 4 位">
+    <input inputmode="numeric" maxlength="1" aria-label="第 5 位">
+    <input inputmode="numeric" maxlength="1" aria-label="第 6 位">
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+  import { createOtp, toast } from "satin-ui/components";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+  const root = document.getElementById("demo-otp-0");
+  // 自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入
+  const otp = createOtp(root.querySelector("[data-otp]"), {
+    onComplete: (code) => { // 6 位都填满时调：换成你的校验请求
+      toast({ text: `已提交验证码 ${code}` });
+      setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
+    },
+  });
+</script>

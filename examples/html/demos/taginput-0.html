@@ -1,0 +1,29 @@
+<sn-enhance id="demo-taginput-0">
+  <div class="sn-box-in sn-tagin" data-tagin="" data-max="8">
+    <input placeholder="输入标签，回车确认" aria-label="添加标签">
+  </div>
+  <div class="sn-tagin-foot">
+    <span>回车或逗号添加 · 退格删除</span>
+    <span class="sn-num"><span class="sn-roll">
+    <span>0</span>
+  </span> / 8</span>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+  import { createTagInput } from "satin-ui/components";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+  const root = document.getElementById("demo-taginput-0");
+  // 回车或逗号加标签；重复的抖一下；超过 data-max 个不让加；
+  // 退格先"点亮"最后一个、再按才删；粘贴一串自动拆开；中文输入法拼字时不响应
+  const tags = createTagInput(root.querySelector("[data-tagin]"), {
+    tags: ["雨夜", "车站"],
+    onChange: (list) => console.log(list),
+  });
+  tags.tags;    // ["雨夜", "车站"]
+
+  // 不写标记也行：给一个空容器，按选项渲染（输入框 + 下面的计数行）
+  createTagInput(root.querySelector("#tags"), { tags: ["雨夜"], max: 8 });
+</script>

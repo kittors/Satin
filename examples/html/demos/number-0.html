@@ -1,0 +1,54 @@
+<sn-enhance id="demo-number-0">
+  <div class="row" style="gap:28px">
+    <div class="sn-field">
+      <span class="sn-lbl">镜头时长</span>
+      <div class="sn-stepper" data-stepper="" data-min="1" data-max="60" data-value="4">
+        <button class="sn-st-btn" data-d="-1" aria-label="减少" data-i="minus"></button>
+        <span class="sn-st-val" tabindex="0" role="spinbutton" aria-label="镜头时长">
+          <span class="sn-roll">
+            <span>4</span>
+          </span>
+        </span>
+        <span class="sn-st-unit">秒</span>
+        <button class="sn-st-btn" data-d="1" aria-label="增加" data-i="plus"></button>
+      </div>
+    </div>
+    <div class="sn-field">
+      <span class="sn-lbl">生成数量</span>
+      <div class="sn-stepper" data-stepper="" data-min="1" data-max="4" data-value="2">
+        <button class="sn-st-btn" data-d="-1" aria-label="减少" data-i="minus"></button>
+        <span class="sn-st-val" tabindex="0" role="spinbutton" aria-label="生成数量">
+          <span class="sn-roll">
+            <span>2</span>
+          </span>
+        </span>
+        <span class="sn-st-unit">张</span>
+        <button class="sn-st-btn" data-d="1" aria-label="增加" data-i="plus"></button>
+      </div>
+    </div>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+  import { createStepper } from "satin-ui/components";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+  const root = document.getElementById("demo-number-0");
+  // <div class="sn-stepper" data-stepper data-min="1" data-max="60" data-value="4">…</div>
+  // 按住连发（400ms 起、越来越快，最快 50ms 一次）；在数字上左右拖每 8px 一格；方向键一格、Shift 十格
+  const dur = createStepper(root.querySelector("[data-stepper]"), {
+    onChange: (v) => console.log("时长", v),
+  });
+  dur.set(10);
+  dur.value; // 10
+
+  // 不写标记也行：给一个空容器，按选项渲染
+  createStepper(root.querySelector("#dur"), { value: 4, min: 1, max: 60, unit: "秒", label: "镜头时长" });
+</script>
+
+<style>
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .row + .row { margin-top: 16px; }
+  .sn-nf-card .row { display: flex; flex-wrap: wrap; gap: 6px; }
+</style>

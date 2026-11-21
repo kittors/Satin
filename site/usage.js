@@ -98,15 +98,20 @@ setup(); // 整页调一次：写了 data-tip 的元素自动有提示
 const field = document.querySelector("#name");
 field.addEventListener("invalid", () => showTip(field, "名称不能为空"));
 field.addEventListener("input", hideTip);`,
-  cmdk: `import { createCommandPalette } from "satin-ui/components";
+  cmdk: `import { createCommandPalette, toast } from "satin-ui/components";
 
+// 命令面板：⌘K（Windows 上 Ctrl K）打开；输入就筛，↑↓ 选、回车执行、Esc 关；分组、图标、副标题、快捷键
 const cmdk = createCommandPalette([
   { name: "项目", items: [
-    { icon: "folder", name: "雨夜车站", sub: "第三集", run: () => open(42) },
-    { icon: "folder", name: "旧城往事", sub: "第一集", run: () => open(17) },
+    { icon: "folder", name: "雨夜车站", sub: "第三集", run: () => toast({ text: '打开"雨夜车站"' }) },
+    { icon: "folder", name: "旧城往事", sub: "第一集", run: () => toast({ text: '打开"旧城往事"' }) },
+  ] },
+  { name: "命令", items: [
+    { icon: "plus", name: "新建项目", keys: "⌘N", run: () => toast({ text: "新建项目" }) },
+    { icon: "download", name: "导出当前一集", run: () => toast({ text: "开始导出" }) },
   ] },
 ], { placeholder: "搜索项目、命令", onRun: (item) => item.run() });
-// ⌘K 自动打开；也可以 cmdk.open()`,
+document.querySelector("[data-cmdk]")?.addEventListener("click", () => cmdk.open()); // 按钮也能打开`,
   toast: `import { toast } from "satin-ui/components";
 
 const t = toast({ kind: "progress", text: "正在导出成片" });
@@ -125,12 +130,10 @@ createScrollArea(document.querySelector(".sn-list"), { size: 24 });`,
 
 const doc = renderMarkdown(document.querySelector("#readme"), text, { codeMax: 240 });
 doc.update(newText); // 换内容；doc.set({ codeMax: 0 }) 改折叠高度`,
-  choice: `import { setup } from "satin-ui";
-import { checkHTML, switchHTML } from "satin-ui/components";
-
-setup(); // 整页调一次：复选框勾上时方框轻轻弹一下
-// 标记可以照"HTML"手写，也可以用标记函数生成，两种一模一样
-box.innerHTML = checkHTML({ label: "自动保存草稿", checked: true }) + switchHTML({ label: "生成完成后提醒我" });`,
+  choice: `// 复选、单选、开关都是纯标记：勾上时方框轻轻弹一下是 setup() 装好的页面级行为，不用另外接
+// 标记可以照着手写，也可以用标记函数生成，两种一模一样：
+//   import { checkHTML, switchHTML } from "satin-ui/components";
+//   box.innerHTML = checkHTML({ label: "自动保存草稿", checked: true }) + switchHTML({ label: "生成完成后提醒我" });`,
 };
 
 // 像一个应用的演示（侧栏布局、表格、流程图、对话……）放进 macOS 窗口里展示：标题栏写窗口名，背后是桌面壁纸

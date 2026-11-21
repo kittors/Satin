@@ -1,0 +1,12 @@
+.demo.sn-cv { content-visibility: auto; contain-intrinsic-size: auto var(--sn-ch, 400px); }
+.demo { margin-top: 12px; padding: 24px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+.demo + .demo { margin-top: 12px; }
+code.k { font: calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label2); background: var(--sn-fill-subtle); padding: 1px 4px; border-radius: var(--sn-r-xs); }
+.sp-scale { display: grid; grid-template-columns: max-content 28px 96px 1fr; align-items: center; column-gap: 16px; row-gap: 6px; }
+.sp-row { display: contents; }
+.sp-row .sn-num { text-align: right; font: 500 calc(12px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); }
+.sp-bar { display: flex; align-items: center; height: 20px; }
+.sp-bar i { display: block; height: 8px; border-radius: 1px; background: color-mix(in srgb, var(--sn-label) 22%, transparent); }
+.demo { container: demo / inline-size; }
+.demo > .sn-app { height: 420px; }
+.demo > .sn-app .sn-app-main { overflow: hidden; }
