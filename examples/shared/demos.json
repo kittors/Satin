@@ -415,6 +415,36 @@
   "css": true
  },
  {
+  "slug": "segmented-sizes",
+  "id": "segmented",
+  "n": -1,
+  "name": "分段控件",
+  "group": "表单",
+  "cap": "小号",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "segmented-controlled",
+  "id": "segmented",
+  "n": -1,
+  "name": "分段控件",
+  "group": "表单",
+  "cap": "受控：用它切换内容",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "segmented-basic",
+  "id": "segmented",
+  "n": -1,
+  "name": "分段控件",
+  "group": "表单",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "segmented-0",
   "id": "segmented",
   "n": 0,

@@ -45,6 +45,9 @@
   import SelectDemo0 from "./demos/select-0.svelte";
   import PickerDemo0 from "./demos/picker-0.svelte";
   import ChoiceDemo0 from "./demos/choice-0.svelte";
+  import SegmentedSizes from "./demos/segmented-sizes.svelte";
+  import SegmentedControlled from "./demos/segmented-controlled.svelte";
+  import SegmentedBasic from "./demos/segmented-basic.svelte";
   import SegmentedDemo0 from "./demos/segmented-0.svelte";
   import SliderDemo0 from "./demos/slider-0.svelte";
   import OtpDemo0 from "./demos/otp-0.svelte";
@@ -251,6 +254,9 @@
   </section>
   <section id="segmented">
     <h2>分段控件</h2>
+    <div class="demo" data-demo="segmented-sizes"><SegmentedSizes /></div>
+    <div class="demo" data-demo="segmented-controlled"><SegmentedControlled /></div>
+    <div class="demo" data-demo="segmented-basic"><SegmentedBasic /></div>
     <div class="demo" data-demo="segmented-0"><SegmentedDemo0 /></div>
   </section>
   <section id="slider">

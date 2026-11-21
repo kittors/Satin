@@ -13,6 +13,15 @@ type DialogProps = Attrs & {
 };
 type IconProps = { name: string; size?: number; class?: string };
 type SatinProps = Attrs & Inst & { create: SatinFactory<any, any>; options?: Record<string, unknown> };
+type SegmentedProps = Attrs & Inst & { items: Item[]; size?: "sm" | "md"; label?: string; /** bind:value 双向绑定 */ value?: string; onchange?(value: string): void };
+type SliderProps = Attrs & Inst & { max?: number; label?: string; /** bind:value 双向绑定 */ value?: number; onchange?(value: number): void };
+type TabsProps = Attrs & Inst & { tabs: { label: string; badge?: string | number; content?: string; html?: string }[]; /** bind:value 双向绑定 */ value?: number; onchange?(value: number): void };
+type PagerProps = Attrs & Inst & { total: number; count?: number; /** bind:page 双向绑定 */ page?: number; onchange?(page: number): void };
+type TagInputProps = Attrs & Inst & { max?: number; placeholder?: string; hint?: string; /** bind:tags 双向绑定 */ tags?: string[]; onchange?(tags: string[]): void };
+type StepperProps = Attrs & Inst & { min?: number; max?: number; unit?: string; label?: string; /** bind:value 双向绑定 */ value?: number; onchange?(value: number): void };
+type OtpProps = Attrs & Inst & { length?: number; oncomplete?(code: string): void };
+type CollapseProps = Attrs & Inst & { items: { title: string; content?: string; html?: string }[]; single?: boolean; open?: number[]; ontoggle?(e: { index: number; open: boolean }): void };
+type NumberFlowProps = Attrs & Inst & { value: number; style?: "roll" | "blur" | "push" | "fade"; format?(v: number): string };
 /** 下拉选择：<Select items={…} bind:value label="…" /> */
 export const Select: Component<SelectProps, {}, "value" | "instance">;
 /** 日期、时间、地址选择器：<DatePicker kind="range" onchange={(d) => …} />；没有 bind:value（现在只能读出选中的结果） */
@@ -23,3 +32,21 @@ export const Dialog: Component<DialogProps, {}, "open">;
 export const Icon: Component<IconProps>;
 /** 把任意 createXxx 包成组件：<Satin create={createChat} options={{ … }} bind:instance /> */
 export const Satin: Component<SatinProps, {}, "instance">;
+/** 分段控件：<Segmented items={["网格", "列表"]} bind:value={view} label="视图" /> */
+export const Segmented: Component<SegmentedProps, {}, "value" | "instance">;
+/** 滑块：<Slider bind:value={volume} max={100} label="音量" /> */
+export const Slider: Component<SliderProps, {}, "value" | "instance">;
+/** 标签页：<Tabs tabs={[{ label: "概览", content: "…" }]} bind:value={tab} />（value 是第几个，从 0 数） */
+export const Tabs: Component<TabsProps, {}, "value" | "instance">;
+/** 分页：<Pager total={24} bind:page={page} /> */
+export const Pager: Component<PagerProps, {}, "page" | "instance">;
+/** 标签输入：<TagInput bind:tags={tags} max={5} placeholder="输入后回车" /> */
+export const TagInput: Component<TagInputProps, {}, "tags" | "instance">;
+/** 步进器：<Stepper bind:value={count} min={1} max={10} unit="集" label="集数" /> */
+export const Stepper: Component<StepperProps, {}, "value" | "instance">;
+/** 验证码：<Otp length={6} oncomplete={(code) => …} /> */
+export const Otp: Component<OtpProps, {}, "instance">;
+/** 折叠面板：<Collapse items={[{ title: "…", content: "…" }]} single open={[0]} ontoggle={(e) => …} /> */
+export const Collapse: Component<CollapseProps, {}, "instance">;
+/** 数字滚动：<NumberFlow value={count} style="roll" />（value 变了数字滚过去） */
+export const NumberFlow: Component<NumberFlowProps, {}, "instance">;

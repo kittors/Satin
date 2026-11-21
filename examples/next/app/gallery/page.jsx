@@ -45,6 +45,9 @@ import PromptDemo0 from "../demos/prompt-0.jsx";
 import SelectDemo0 from "../demos/select-0.jsx";
 import PickerDemo0 from "../demos/picker-0.jsx";
 import ChoiceDemo0 from "../demos/choice-0.jsx";
+import SegmentedSizes from "../demos/segmented-sizes.jsx";
+import SegmentedControlled from "../demos/segmented-controlled.jsx";
+import SegmentedBasic from "../demos/segmented-basic.jsx";
 import SegmentedDemo0 from "../demos/segmented-0.jsx";
 import SliderDemo0 from "../demos/slider-0.jsx";
 import OtpDemo0 from "../demos/otp-0.jsx";
@@ -252,6 +255,9 @@ export default function Gallery() {
       </section>
       <section id="segmented">
         <h2>分段控件</h2>
+        <div className="demo" data-demo="segmented-sizes"><SegmentedSizes /></div>
+        <div className="demo" data-demo="segmented-controlled"><SegmentedControlled /></div>
+        <div className="demo" data-demo="segmented-basic"><SegmentedBasic /></div>
         <div className="demo" data-demo="segmented-0"><SegmentedDemo0 /></div>
       </section>
       <section id="slider">

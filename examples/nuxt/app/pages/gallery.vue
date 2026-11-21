@@ -46,6 +46,9 @@ import PromptDemo0 from "../demos/prompt-0.vue";
 import SelectDemo0 from "../demos/select-0.vue";
 import PickerDemo0 from "../demos/picker-0.vue";
 import ChoiceDemo0 from "../demos/choice-0.vue";
+import SegmentedSizes from "../demos/segmented-sizes.vue";
+import SegmentedControlled from "../demos/segmented-controlled.vue";
+import SegmentedBasic from "../demos/segmented-basic.vue";
 import SegmentedDemo0 from "../demos/segmented-0.vue";
 import SliderDemo0 from "../demos/slider-0.vue";
 import OtpDemo0 from "../demos/otp-0.vue";
@@ -253,6 +256,9 @@ import SelectMenu from "../demos/select-menu.vue";
   </section>
   <section id="segmented">
     <h2>分段控件</h2>
+    <div class="demo" data-demo="segmented-sizes"><SegmentedSizes /></div>
+    <div class="demo" data-demo="segmented-controlled"><SegmentedControlled /></div>
+    <div class="demo" data-demo="segmented-basic"><SegmentedBasic /></div>
     <div class="demo" data-demo="segmented-0"><SegmentedDemo0 /></div>
   </section>
   <section id="slider">

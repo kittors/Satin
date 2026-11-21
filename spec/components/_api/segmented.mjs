@@ -1,0 +1,105 @@
+// 分段控件的 API 契约（手写）。格式见 spec/components/_api/README.md
+import { code } from "./_code.mjs";
+
+export default {
+  title: "分段控件",
+  lead: "几个互斥的选项里选一个、并且总有一个选中：滑块从旧的一格滑到新的一格，前缘先到、后缘跟上。",
+  whenToUse: [
+    "切换同一份内容的看法：网格 / 列表、7 天 / 30 天。",
+    "两到五个、名字短的选项，选了马上生效。",
+  ],
+  whenNotToUse: [
+    { text: "可以多选、也可以都不选：用切换芯片。", use: "chip" },
+    { text: "选项多（六个以上）或者名字长：用下拉选择。", use: "select" },
+    { text: "切换的是几块完全不同的内容（概览 / 设置）：用标签页。", use: "tabs" },
+  ],
+  related: [
+    { id: "tabs", diff: "标签页切换的是不同的内容区；分段控件切换同一份内容的看法或筛选。" },
+    { id: "chip", diff: "芯片能多选、能都不选；分段控件单选、总有一个选中。" },
+    { id: "select", diff: "选项多、名字长时用下拉，省地方。" },
+  ],
+  import: {
+    html: '// 入口里调过 defineElements()：直接写 <sn-segmented>（也可以 import { createSegmented } from "satin-ui"）',
+    react: 'import { Segmented } from "satin-ui/react";',
+    vue: 'import { Segmented } from "satin-ui/vue";',
+    svelte: 'import Segmented from "satin-ui/svelte/Segmented.svelte";',
+    angular: '// 入口里调过 defineElements()：模板里写 <sn-segmented>（组件加 CUSTOM_ELEMENTS_SCHEMA）',
+    solid: '// 入口里调过 defineElements()：直接写 <sn-segmented>',
+    preact: 'import { Segmented } from "satin-ui/react"; // 经 preact/compat',
+  },
+  importNote: {
+    react: "`Segmented` 组件：`items` 是选项（字符串或 `{ value, label }`），`value` + `onChange` 受控，只给 `defaultValue` 是非受控；`label` 是给读屏的名称。",
+    preact: "经 preact/compat 用 `satin-ui/react` 的 `Segmented`：`value` + `onChange` 受控，`defaultValue` 非受控。",
+    vue: "`Segmented` 组件：`v-model` 绑选中的值，`items` 是选项，`label` 是给读屏的名称。",
+    svelte: "`Segmented` 组件（`satin-ui/svelte/Segmented.svelte`）：`bind:value` 双向绑定，`items`、`label`、`size`。",
+    angular: "写 `<sn-segmented>` 自定义元素：`[attr.items]` 传 JSON，`[attr.value]` 绑当前值，选中时发冒泡的 `(sn-change)`，`$event.detail` 是新值。",
+    solid: "写 `<sn-segmented>`：`items` 写成 JSON 字符串、`value` 绑信号；`sn-change` 这种带横线的事件用 `ref` 挂监听。",
+    html: "写 `<sn-segmented items='[\"网格\",\"列表\"]' value=\"网格\" label=\"视图\">`，选中时发冒泡的 `sn-change`，`e.detail` 是新值；也可以 `createSegmented(容器, 选项)`。",
+  },
+  dts: { factory: "createSegmented", react: "Segmented", vue: "Segmented", svelte: "Segmented" },
+  props: [
+    { name: "items", type: "Item[]", default: "[]", required: true,
+      desc: "选项：字符串，或者 `{ value, label }`。两到五个，名字短。",
+      names: { js: "items", react: "items", vue: "items", svelte: "items", preact: "items", element: "items（JSON）", markup: "每段一个 <button data-v>", html: "items（JSON）" } },
+    { name: "value", type: "string", default: "第一个", required: false,
+      desc: "选中的值。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`。",
+      names: { js: "value", react: "value", vue: "v-model", svelte: "bind:value", preact: "value", element: "value", markup: "选中的那段写 aria-selected=\"true\"", html: "value" } },
+    { name: "defaultValue", type: "string", default: "第一个", required: false,
+      desc: "非受控的初始值（Vue 里不绑 v-model、只写 value 也是这个意思）。", names: { react: "defaultValue", preact: "defaultValue", vue: "value" } },
+    { name: "size", type: '"sm" | "md"', default: '"md"', required: false,
+      desc: "sm 用在工具条、表格上方。", names: { js: "size", react: "size", vue: "size", svelte: "size", preact: "size", element: "size", markup: "类名 sn-sm", html: "size" } },
+    { name: "label", type: "string", default: "—", required: false,
+      desc: "给读屏的名称（这组选项选的是什么）：\"视图\"\"时间范围\"。", names: { js: "label", react: "label", vue: "label", svelte: "label", preact: "label", element: "label", markup: "aria-label", html: "label" } },
+  ],
+  events: [
+    { name: "change", payload: "string", when: "选中另一段以后，参数是新值（程序里改 value 不触发）。",
+      names: { js: "onChange", react: "onChange", vue: "@update:modelValue / @change", svelte: "onchange", preact: "onChange", angular: "(sn-change)", solid: "sn-change（ref 挂监听）", element: "sn-change", html: "sn-change（e.detail）" } },
+  ],
+  slots: [],
+  methods: [
+    { name: "value", kind: "property", signature: "readonly value: string", returns: "string", desc: "现在选中的值。" },
+    { name: "select", kind: "method", signature: "select(value: string): void", returns: "void", desc: "选中一段（会播滑块动画、发 change）。" },
+  ],
+  functions: [],
+  cssVars: [
+    { name: "--sn-seg-h", desc: "高度", default: "32px（sm 28px）" },
+    { name: "--sn-b-soft-active", desc: "滑块的底色", default: "浅灰", token: true },
+  ],
+  classes: [
+    { name: ".sn-seg", desc: "分段控件（role=\"tablist\"）" },
+    { name: ".sn-thumb", desc: "滑块" },
+    { name: ".sn-seg button[data-v]", desc: "每一段（role=\"tab\"、aria-selected）" },
+    { name: ".sn-seg.sn-sm", desc: "小号" },
+  ],
+  types: ["SegmentedOptions", "Item"],
+  keyboard: [
+    { keys: "Tab", does: "聚焦到选中的那一段。" },
+    { keys: "← / →", does: "选上一段 / 下一段（马上生效）。" },
+    { keys: "Home / End", does: "选第一段 / 最后一段。" },
+  ],
+  a11y: {
+    roles: ["容器 `role=\"tablist\"`，每段 `role=\"tab\"` + `aria-selected`；只有选中的那段在 Tab 顺序里（roving tabindex）。"],
+    focus: ["键盘聚焦时 2px 焦点环；方向键换段时焦点跟着走。"],
+    notes: ["写 `label`：读屏先读这组是选什么的，再读当前选中项。"],
+  },
+  design: {
+    do: ["两到五段，名字一两个词，等宽。", "选了马上生效，不再要\"应用\"。", "放在它影响的内容上方，靠左或靠右对齐。"],
+    dont: [
+      { text: "在分段里放图标 + 长文字，挤成两行。", rule: "button-wrap" },
+      { text: "选中段用彩色底。", rule: "status-color" },
+    ],
+    copy: ["\"网格 / 列表\"\"7 天 / 30 天 / 全部\"。"],
+    motion: [{ what: "滑块：前缘先到、后缘跟上，落定轻压", easing: "ease.outStrong / ease.inOut", duration: "300ms 左右" }],
+  },
+  examples: [
+    { slug: "segmented-basic", title: "最简单的用法", why: "给选项和初始值就能用：组件自己管选中，切换时滑块滑过去。",
+      html: `<sn-segmented items='["网格","列表"]' value="网格" label="视图"></sn-segmented>`,
+      code: code("segmented-basic") },
+    { slug: "segmented-controlled", title: "受控：用它切换内容", why: "选中的值放在父组件里，下面的内容跟着它变。",
+      html: `<div class="sn-stack sn-gap-8"><sn-segmented items='["7 天","30 天","全部"]' value="30 天" label="时间范围"></sn-segmented><span class="sn-help">显示最近 30 天的数据</span></div>`,
+      code: code("segmented-controlled") },
+    { slug: "segmented-sizes", title: "小号", why: "工具条、表格上方用小号，和旁边的小按钮一样高。",
+      html: `<div class="sn-row"><sn-segmented items='["全部","进行中","已完成"]' value="全部" size="sm" label="状态"></sn-segmented><button type="button" class="sn-btn sn-secondary sn-sm">导出</button></div>`,
+      code: code("segmented-sizes") },
+  ],
+};

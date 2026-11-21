@@ -1,0 +1,11 @@
+<div class="sn-stack sn-gap-8" id="range-box">
+  <sn-segmented items='["7 天","30 天","全部"]' value="30 天" label="时间范围"></sn-segmented>
+  <span class="sn-help">显示最近 30 天的数据</span>
+</div>
+
+<script type="module">
+  const box = document.getElementById("range-box");
+  box.addEventListener("sn-change", (e) => {
+    box.querySelector(".sn-help").textContent = e.detail === "全部" ? "显示全部数据" : `显示最近 ${e.detail}的数据`;
+  });
+</script>
