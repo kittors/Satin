@@ -11,7 +11,7 @@ import { scoped } from "./i18n.js";
 import { defineComponent } from "./lifecycle.js";
 import I18N_DEFAULTS from "./locales/zh-CN/flow.js";
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
-// 演示的流水线：原文 → 拆分 → 分镜；分镜一张卡连出五条线（画面、配音、配乐、音效、字幕），再汇到合成；合成之后分出横屏、竖屏两个导出
+// 节点、连线都由使用的人传（库里不带演示数据）；设计稿那条流水线（原文 → 拆分 → 分镜 → 画面、配音… → 合成 → 横屏、竖屏导出）在 demo/sections/flow.js
 // mountFlow(.flow, { nodes, edges })：节点 [{ id, x, y, t, ic, d, k }]、连线 [[从, 到]]。
 //   拖动画布平移、滚轮 / 触控板缩放（只改一层 transform，线宽按缩放倍数反算，屏幕上始终 1px）；拖节点只重算相连的线；
 //   悬停一个节点高亮它的上下游；右下角小地图；"运行"按依赖一层层点亮。返回 { nodes, edges }

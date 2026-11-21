@@ -2,7 +2,6 @@
 export default {
   "canvas-grid.0": "Loading more…",
   "canvas-grid.1": "That's everything — {p0} rows",
-  "canvas-grid.2": "More actions for “{p0}”",
   "canvas-grid.3": "Level {p0}{p1}, ",
   "canvas-grid.4": "Row {p0}, {p1}{p2}: {p3}",
   "canvas-grid.5": "Clear sorting and filters before reordering rows by hand",
@@ -11,7 +10,6 @@ export default {
   "canvas-grid.8": "All rows {p0}",
   "canvas-grid.9": "Row height {p0}",
   "canvas-grid.10": "Sorting or filtering — move it again in a moment",
-  "canvas-grid.11": "{p0} · {p1} shots · {p2} long · {p3}, {p4}% done · owner {p5} · updated {p6}",
   "canvas-grid.12": "Merging cells needs the grid view (row and column lines)",
   "canvas-grid.13": "Pinned and regular columns can't be merged together",
   "canvas-grid.14": "In a tree you can only merge rows under the same parent",
@@ -30,6 +28,6 @@ export default {
   "canvas-grid.27": "Name",
   "canvas-grid.28": "sorting, filtering or expanding",
   "canvas-grid.29": "sorting or filtering",
-  "canvas-grid.30": "Data grid, 1,000,000 rows, drawn on canvas",
-  "canvas-grid.31": "Search names"
+  "canvas-grid.30": "Data grid (drawn on canvas)",
+  "canvas-grid.31": "Search {p0}"
 };

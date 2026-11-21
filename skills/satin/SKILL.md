@@ -152,7 +152,8 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 步骤条 | `<Steps steps current>` | `stepsHTML({ steps, current })` | |
 | 折叠面板 | `<Collapse items open>` | `<sn-collapse>` | |
 | 表格 | `<Table columns rows selectable onSelect onSort>`（Vue `<SnTable v-model="选中的键">`） | `createTable(el, { columns, rows })`，或照抄下面的 `.sn-tbl` 标记 | 排序时行平滑移到新位置；数字列 `align: "right"`；斑马纹 `striped`、紧凑 `compact`、限高 `maxHeight` |
-| 十万行数据表格 | | `satin-ui/grid` 的 `createDataGrid` | 只在数据真的很多时用（列和数据目前是演示用的；一般的表格用上面的 `createTable`） |
+| 十万行数据表格 | `<DataGrid columns data rowKey>`（`satin-ui/react/grid`、`satin-ui/vue/grid`、`satin-ui/svelte/DataGrid.svelte`） | `createDataGrid(el, { columns, data })`（`satin-ui/grid`）；服务端的数据给 `dataSource: { total, load }` | 只在行数真的很多（上千）或要编辑、拖列、树形时用；几十行的表用上面的 `Table`。列定义见 `components/grid.md` |
+| 百万行画布表格 | `<CanvasGrid columns dataSource>`（`satin-ui/react/canvas-grid`、`satin-ui/vue/canvas-grid`） | `createCanvasGrid(el, { columns, dataSource })`（`satin-ui/canvas-grid`） | 表体画在画布上：格子只能写文字（`format`），要放自己的标记用 DataGrid |
 | 状态标签 | | `<span class="sn-tag sn-ok"><i></i>已完成</span>` | `sn-run` 进行中、`sn-ok` 完成、`sn-warn` 待处理、`sn-bad` 失败、不加是草稿 |
 | 数量徽标 / 头像 | | `<span class="sn-badge">3</span>`、`<span class="sn-av sn-sm" style="--sn-h:210">林</span>` | 头像底色用 `--sn-h` 色相，不写颜色 |
 | 设置列表 | | `.sn-set-list > .sn-set-row` | 见 `list.md` |

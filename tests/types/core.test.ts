@@ -28,6 +28,8 @@ const chat = createChat(host, { title: "助手", async *respond(q) { yield "收�
 chat.send("你好"); chat.update({ status: "在线" }); chat.destroy();
 const md = createMarkdown(host, { source: "# 标题", codeMax: 0 }); md.update({ source: "## 新" }); const src: string = md.source; void src; md.destroy();
 const flow = createFlow(host, { nodes: [{ id: "a", x: 0, y: 0, t: "原文" }], edges: [] }); void flow.nodes; flow.destroy();
-createDataGrid(host, { rows: 1000 }).destroy(); createCanvasGrid(host).destroy();
+const grid = createDataGrid(host, { columns: [{ key: "name", title: "名称", sortable: true }, { key: "shots", title: "镜头", type: "int", editable: true, min: 1 }], data: [{ id: 1, name: "雨夜车站", shots: 12 }], rowKey: "id", onCellEdit: (e) => void e.oldValue });
+grid.merge(0, 1, ["name"]); void grid.sort; void grid.selectedKeys; grid.update({ loading: true }); grid.destroy();
+createCanvasGrid(host, { columns: [{ key: "name" }], dataSource: { total: 10, load: async ({ start, end, sort, filter }) => { void sort; void filter.q; return Array.from({ length: end - start }, (_, i) => ({ id: start + i, name: "第 " + i + " 行" })); } } }).destroy();
 createThemePanel(host).sync();
 const mdHtml: string = createMarkdown.html({}); void mdHtml;

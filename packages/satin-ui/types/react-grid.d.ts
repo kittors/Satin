@@ -1,8 +1,10 @@
 // satin-ui/react/grid
 import type * as React from "react";
 import type { SatinInstance } from "./components";
-import type { GridOptions } from "./heavy";
+import type { GridOptions, GridColumn, GridApi } from "./heavy";
 type Base = { className?: string; style?: React.CSSProperties; id?: string };
-/** 数据表格的属性：rows、seed、label 只在创建时用，变了会换一张新表；ref 拿到 Satin 实例 */
-export type DataGridProps = Base & GridOptions;
-export const DataGrid: React.ForwardRefExoticComponent<DataGridProps & React.RefAttributes<SatinInstance>>;
+/** 列定义（React 版：render 可以返回 React 节点） */
+export type DataGridColumn<Row = any> = Omit<GridColumn<Row>, "render"> & { render?(value: any, row: Row, ctx: { cell: HTMLElement; key: string; index: number }): React.ReactNode | string | Node | void };
+/** 数据表格的属性：columns + data（或 dataSource）；受控的 sort / selectedKeys；事件 onXxx。列的 key 变了换一张新表；ref 拿到实例 */
+export type DataGridProps<Row = any> = Base & Omit<GridOptions<Row>, "columns"> & { columns: DataGridColumn<Row>[] };
+export const DataGrid: React.ForwardRefExoticComponent<DataGridProps & React.RefAttributes<SatinInstance & GridApi>>;

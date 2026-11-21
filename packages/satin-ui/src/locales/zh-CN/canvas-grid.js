@@ -2,7 +2,6 @@
 export default {
   "canvas-grid.0": "正在加载更多…",
   "canvas-grid.1": "已经到底了，共 {p0} 行",
-  "canvas-grid.2": "\"{p0}\"的更多操作",
   "canvas-grid.3": "第 {p0} 级{p1}，",
   "canvas-grid.4": "第 {p0} 行，{p1}{p2}：{p3}",
   "canvas-grid.5": "排序或筛选时不能手动调整顺序，先清除再拖",
@@ -11,7 +10,6 @@ export default {
   "canvas-grid.8": "所有行 {p0}",
   "canvas-grid.9": "行高 {p0}",
   "canvas-grid.10": "正在排序或筛选，稍等一下再挪",
-  "canvas-grid.11": "{p0} · {p1} 个镜头 · 时长 {p2} · {p3}，进度 {p4}% · 负责人 {p5} · {p6} 更新",
   "canvas-grid.12": "合并单元格要在网格下用（行线 + 列线）",
   "canvas-grid.13": "固定列和普通列不能合在一起",
   "canvas-grid.14": "树形里只能合并同一个上级下面的行",
@@ -30,6 +28,6 @@ export default {
   "canvas-grid.27": "名称",
   "canvas-grid.28": "排序、筛选或展开状态",
   "canvas-grid.29": "排序或筛选",
-  "canvas-grid.30": "数据表格，一百万行，画布绘制",
-  "canvas-grid.31": "搜索名称，比如 书店 9"
+  "canvas-grid.30": "数据表格（画布绘制）",
+  "canvas-grid.31": "搜索{p0}"
 };

@@ -1,18 +1,18 @@
 // 数据表格在页面这边的数据源：只缓存已经"到了"的块；看到哪里要哪里（每 80ms 最多要一次，快速划过去的块不会一路要过去）；
-// 筛选、排序交给后台线程（table-worker.js）。视图换了（筛选、排序变了）就作废还没到的旧块。
+// 筛选、排序交给后端（table-backends.js：数组在页面里算、dataSource 交给服务端、设计稿的演示是后台线程）。视图换了（筛选、排序变了）就作废还没到的旧块。
 // 两种加载方式：known 总数已知，按需取块；append 先只给 200 行，滚到底再加载 200 行（像信息流）。
 // 编辑、手动换行先在本地生效（乐观更新），再告诉"服务端"。
 // 树形模式（setTree）：后台线程按筛选、排序算好整棵树的先序（行号 + 每个节点连同下级一共几个），页面这边按展开状态把它展开成看得见的行——
 // 展开收起在页面这边同步算（不等后台线程），各列的值仍按行号懒加载；筛选时保留命中的和它的所有上级（上级临时展开，不改原来的展开状态）。
-import { NUM_KEYS, TYPES, nameOf, treeName } from "./table-data.js";
+// 有没有筛选：搜索词，或者哪一列的筛选有值（选项下标数组非空、范围有一头）
+export const hasFilter = (q) => !!((q.q && q.q.trim()) || Object.values(q.filters || {}).some((v) => (Array.isArray(v) ? v.length : v && (v.min != null || v.max != null))));
 
-export const hasFilter = (q) => !!((q.q && q.q.trim()) || q.status?.length || q.owner?.length || q.tag?.length || q.durMin != null || q.durMax != null);
-
-export function createSource({ n, seed = 7, block = 100, rowH: rh0 = 40, onChange }) {
-  const worker = new Worker(new URL("./table-worker.js", import.meta.url), { type: "module" });
-  const cache = {}; for (const k of NUM_KEYS) cache[k] = new TYPES[k](n);
-  const names = new Map(), tnames = new Map(), pending = new Set(), handlers = new Map();
-  let total = 0, rows = new Int32Array(0), ver = 0, reqId = 0, query = {}, mode = "known", shown = 0, busy = true, lastMs = 0, appending = false;
+export function createSource({ backend, n: n0 = 0, primary = "name", block = 100, rowH: rh0 = 40, query: q0, onChange }) {
+  let B = backend, n = n0;
+  // 已经到了的行：行号 → 这一行的数据对象（平铺、树形各一份：两种模式的名字可能不一样）
+  let byId = new Map(), tById = new Map();
+  const pending = new Set();
+  let total = 0, rows = new Int32Array(0), ver = 0, query = q0 ? { ...q0 } : {}, mode = "known", shown = 0, busy = true, lastMs = 0, appending = false, failed = null;
   let want = [0, 0], wantT = 0;
   const emit = (what) => onChange?.(what);
   // ———— 行高：默认行高 + 单独拖过高度的行 ————
@@ -33,13 +33,12 @@ export function createSource({ n, seed = 7, block = 100, rowH: rh0 = 40, onChang
   const rowY = (p) => { const k = below(HP, p); return p * base + (k ? HC[k - 1] : 0); };
   const rowHt = (p) => { const k = below(HP, p); return k < HP.length && HP[k] === p ? HH[k] : base; };
   function rowAtY(y) { const n = api.shown; if (n <= 0) return 0; let lo = 0, hi = n - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (rowY(m) <= y) lo = m; else hi = m - 1; } return lo; }
-  worker.onmessage = (e) => { const d = e.data; if (d.type === "block") { take(d.block, d.ver); return; } const h = handlers.get(d.id); handlers.delete(d.id); if (h) h(d); else if (d.type === "vals") takeVals(d.vals); };
-  const ask = (msg) => new Promise((res) => { const id = ++reqId; handlers.set(id, res); worker.postMessage({ ...msg, id }); });
-  // 一块到了：按视图位置记下行号，按行号记下各列的值
+  // 后端出错（load 抛错、网络断了）：记下来、发 "error"，表格显示出错状态（retry() 重来）
+  const fail = (e) => { failed = e || new Error("加载失败"); busy = false; emit("error"); };
+  // 一块到了：按视图位置记下行号，按行号记下这一行的数据
   function take(b, v) {
     pending.delete(`${v}:${(b.start / block) | 0}`); if (v !== ver) return;
-    for (let j = 0; j < b.rows.length; j++) { const r = b.rows[j]; rows[b.start + j] = r; for (const k of NUM_KEYS) cache[k][r] = b[k][j]; if (got) got[r] = 1; }
-    for (const [r, s] of Object.entries(b.names)) names.set(+r, s);
+    for (let j = 0; j < b.rows.length; j++) { const r = b.rows[j]; rows[b.start + j] = r; byId.set(r, b.items[j]); if (got) got[r] = 1; }
     emit("block");
   }
   const blockLoaded = (k) => { const a = k * block, z = Math.min(total, a + block); for (let p = a; p < z; p++) if (rows[p] === -1) return false; return true; };
@@ -47,15 +46,16 @@ export function createSource({ n, seed = 7, block = 100, rowH: rh0 = 40, onChang
     wantT = 0; if (tree) return pullTree(); const [a, z] = want; if (z <= a) return;
     for (let k = (a / block) | 0, k1 = ((z - 1) / block) | 0; k <= k1; k++) {
       const key = `${ver}:${k}`; if (pending.has(key) || blockLoaded(k)) continue;
-      pending.add(key); worker.postMessage({ type: "block", ver, start: k * block, count: block });
+      pending.add(key); const v = ver; Promise.resolve(B.block({ ver, start: k * block, count: block })).then((b) => take(b, v), (e) => { pending.delete(key); if (v === ver) fail(e); });
     }
   }
   // 视口里要看 [p0, p1)：记下来，80ms 后把还没到的块要过来
   function ensure(p0, p1) { want = [Math.max(0, p0), Math.min(api.shown, p1)]; if (!wantT) wantT = setTimeout(pull, 80); }
   async function refresh() {
-    const v = ++ver; busy = true; pending.clear(); emit("busy");
+    const v = ++ver; busy = true; failed = null; pending.clear(); emit("busy");
     if (tree) return refreshTree(v);
-    const ids = [...tpos.keys()], d = await ask({ type: "view", ver: v, query, first: block, ids });
+    const ids = [...tpos.keys()]; let d;
+    try { d = await B.view({ ver: v, query, first: block, ids }); } catch (e) { if (v === ver) fail(e); return; }
     if (v !== ver || tree) return;
     ids.forEach((id, k) => tpos.set(id, d.pos ? d.pos[k] : -1)); heights(); pver++;
     total = d.total; lastMs = d.ms; rows = new Int32Array(total).fill(-1); shown = mode === "append" ? Math.min(total, 200) : total; busy = false;
@@ -88,13 +88,13 @@ export function createSource({ n, seed = 7, block = 100, rowH: rh0 = 40, onChang
   // 一个节点连同看得见的下级到哪一行为止（不含）：先序里它那一段之后的第一个看得见的行
   function blockEnd(p) { const id = vrows[p], t = pidx[id] + psz[pidx[id]]; let lo = p + 1, hi = vn; while (lo < hi) { const h = (lo + hi) >> 1; if (pidx[vrows[h]] < t) lo = h + 1; else hi = h; } return lo; }
   async function refreshTree(v) {
-    const d = await ask({ type: "tview", ver: v, query });
+    let d; try { d = await B.tview({ ver: v, query }); } catch (e) { if (v === ver) fail(e); return; }
     if (v !== ver || !tree) return;
     const f = hasFilter(query); if (f && !filt) shut.fill(0); // 开始筛选：上级都先临时展开；筛选中改条件，临时的展开收起留着；清掉筛选就回到原来的展开状态
     // 第一屏的值先要过来（不等网络延迟），再一起换上：换上的那一刻就有内容，也不会有一帧是新的结构、旧的滚动位置
     const isO = f ? (id) => !shut[id] : (id) => open[id] === 1, ids = [];
     for (let i = 0, k = 0; i < d.total && k < block; k++) { const id = d.pre[i]; if (!got[id]) { ids.push(id); req[id] = 1; } i += d.sz[i] > 1 && isO(id) ? 1 : d.sz[i]; }
-    if (ids.length) { const r = await ask({ type: "vals", ids: Int32Array.from(ids), first: true }); takeVals(r.vals, true); if (v !== ver || !tree) return; }
+    if (ids.length) { const r = await B.vals({ ids: Int32Array.from(ids), first: true }); takeVals(r, true); if (v !== ver || !tree) return; }
     pre = d.pre; psz = d.sz; m = d.total; troots = d.roots; lastMs = d.ms; filt = f; frozen = null;
     pidx.fill(-1); for (let i = 0; i < m; i++) pidx[pre[i]] = i;
     { const F = filt ? shut : open, want = filt ? 0 : 1; sAll = sOn = 0; for (let i = 0; i < m; i++) if (psz[i] > 1) { sAll++; if (F[pre[i]] === want) sOn++; } }
@@ -104,13 +104,13 @@ export function createSource({ n, seed = 7, block = 100, rowH: rh0 = 40, onChang
   function pullTree() {
     const [a, z] = want; if (z <= a) return; const ids = [];
     for (let p = Math.floor(a / block) * block, e = Math.min(vn, Math.ceil(z / block) * block); p < e; p++) { const id = vrows[p]; if (!got[id] && !req[id]) { req[id] = 1; ids.push(id); } }
-    if (ids.length) worker.postMessage({ type: "vals", ids: Int32Array.from(ids), id: ++reqId });
+    if (ids.length) Promise.resolve(B.vals({ ids: Int32Array.from(ids) })).then((r) => takeVals(r), fail);
   }
-  function takeVals(b, quiet) { for (let j = 0; j < b.ids.length; j++) { const r = b.ids[j]; got[r] = 1; req[r] = 0; for (const k of NUM_KEYS) cache[k][r] = b[k][j]; } for (const [r, s] of Object.entries(b.names)) tnames.set(+r, s); if (!quiet) emit("block"); }
+  function takeVals(b, quiet) { for (let j = 0; j < b.ids.length; j++) { const r = b.ids[j]; got[r] = 1; req[r] = 0; tById.set(r, b.items[j]); } if (!quiet) emit("block"); }
   async function setTree(on) {
-    on = !!on; if (on === tree) return; ver++; busy = true; emit("busy");
+    on = !!on; if (on === tree || (on && typeof B.tree !== "function")) return; ver++; busy = true; emit("busy");
     if (on && !T) {
-      const d = await ask({ type: "tree" }), fsz = new Int32Array(n).fill(1); for (let i = n - 1; i > 0; i--) if (d.par[i] >= 0) fsz[d.par[i]] += fsz[i];
+      const d = await B.tree(), fsz = new Int32Array(n).fill(1); for (let i = n - 1; i > 0; i--) if (d.par[i] >= 0) fsz[d.par[i]] += fsz[i];
       T = { par: d.par, lv: d.lv, ord: d.ord, fsz, roots: d.roots }; open = new Uint8Array(n); shut = new Uint8Array(n); pidx = new Int32Array(n).fill(-1); req = new Uint8Array(n); got ??= new Uint8Array(n);
     }
     tree = on; hById = HB[on ? "tree" : "flat"]; tpos = TP[on ? "tree" : "flat"]; query = {}; filt = false; tlim = 200;
@@ -119,19 +119,22 @@ export function createSource({ n, seed = 7, block = 100, rowH: rh0 = 40, onChang
 
   const api = {
     get total() { return tree ? m : total; }, get shown() { return tree ? (mode === "append" ? tshown : vn) : mode === "append" ? shown : total; }, get busy() { return busy; }, get ms() { return lastMs; },
-    get mode() { return mode; }, get query() { return query; }, get appending() { return appending; }, n,
+    get mode() { return mode; }, get query() { return query; }, get appending() { return appending; },
     rowAt: (p) => (tree ? (p >= 0 && p < vn && got[vrows[p]] ? vrows[p] : -1) : p >= 0 && p < total ? rows[p] : -1),
-    val: (r, k) => cache[k][r], name: (r) => (tree ? tnames.get(r) ?? treeName(T.lv[r], T.ord[r], r) : names.get(r) ?? nameOf(r)),
+    // 第 r 行（行号）的数据对象、某一列的值；name 是主列的值（树形的名字、详情标题用）
+    row: (r) => (tree ? tById.get(r) : byId.get(r)), val: (r, k) => (tree ? tById.get(r) : byId.get(r))?.[k], name: (r) => (tree ? tById.get(r) : byId.get(r))?.[primary],
+    get error() { return failed; }, retry: () => refresh(), allRows: () => B.items ?? null, viewIds: () => B.viewIds?.() ?? null, /* 数组数据：全部的行、当前视图的全部行号（按 rowKey 找行号、全选时列出 rowKey 用） */ get canTree() { return typeof B.tree === "function"; }, get canReorder() { return typeof B.move === "function"; },
     ensure,
     setQuery(q) { query = { ...q, sort: query.sort }; refresh(); },
     setSort(s) { query = { ...query, sort: s }; refresh(); },
     canMove: () => (tree ? !busy : !query.sort && !hasFilter(query)),
-    edit(r, k, v) { if (k === "name") (tree ? tnames : names).set(r, v); else cache[k][r] = v; worker.postMessage({ type: "edit", row: r, key: k, value: v, tree }); },
+    // 改一个值：先在本地生效（乐观更新；主列在平铺、树形里各是各的名字，别的列两边一起改），再告诉后端
+    edit(r, k, v) { for (const m of k === primary ? [tree ? tById : byId] : [byId, tById]) { const o = m.get(r); if (o) m.set(r, { ...o, [k]: v }); } B.edit?.({ row: r, key: k, value: v, tree }); },
     move(from, to) {
       const x = rows[from]; if (from < to) rows.copyWithin(from, from + 1, to + 1); else rows.copyWithin(to + 1, to, from); rows[to] = x;
       for (const [id, q] of tpos) if (q >= 0) tpos.set(id, q === from ? to : from < to && q > from && q <= to ? q - 1 : from > to && q >= to && q < from ? q + 1 : q); // 关心位置的行跟着挪
       heights(); pver++;
-      worker.postMessage({ type: "move", from, to });
+      B.move?.({ from, to });
     },
     // 行高：rowY(p) 第 p 行顶部、rowH(p) 第 p 行多高、rowAtY(y) 高度 y 落在哪一行、rowsH() 看得到的行一共多高
     rowY, rowH: rowHt, rowAtY, rowsH: () => rowY(api.shown), get baseH() { return base; }, get tallRows() { return HP.length; },
@@ -145,7 +148,11 @@ export function createSource({ n, seed = 7, block = 100, rowH: rh0 = 40, onChang
     setMode(m2) { mode = m2; shown = m2 === "append" ? Math.min(total, 200) : total; if (tree) { tlim = 200; rebuild(); } emit("view"); },
     // 滚到底：再加载 200 行（400ms 后到）；树形模式再加载 200 个项目
     more() { if (mode !== "append" || appending || api.shown >= (tree ? vn : total)) return; appending = true; emit("more"); setTimeout(() => { if (tree) { tlim += 200; rebuild(); } else shown = Math.min(total, shown + 200); appending = false; emit("more"); }, 400); },
-    ready: ask({ type: "init", n, seed }).then(() => refresh()),
+    ready: Promise.resolve().then(() => B.init?.()).then((i) => { n = i?.n ?? n0; return refresh(); }, fail),
+    get n() { return n; },
+    // 换一套数据（data / dataSource 变了）：缓存、树形状态都清掉，按现在的筛选、排序重新要
+    reset(b) { B.destroy?.(); B = b; byId = new Map(); tById = new Map(); tree = false; T = null; got = null; pidx = null; return Promise.resolve().then(() => B.init?.()).then((i) => { n = i?.n ?? n0; return refresh(); }, fail); },
+    destroy() { clearTimeout(wantT); ver++; B.destroy?.(); },
 
     // ———— 树形模式 ————
     get tree() { return tree; }, setTree, get roots() { return troots; }, get sver() { return sver; }, get filtered() { return filt; },
@@ -194,10 +201,10 @@ export function createSource({ n, seed = 7, block = 100, rowH: rh0 = 40, onChang
         if (b < a) { pre.copyWithin(b + s, b, a); psz.copyWithin(b + s, b, a); pre.set(seg, b); psz.set(ss, b); for (let i = b; i < a + s; i++) pidx[pre[i]] = i; }
         else { pre.copyWithin(a, a + s, b); psz.copyWithin(a, a + s, b); pre.set(seg, b - s); psz.set(ss, b - s); for (let i = a; i < b; i++) pidx[pre[i]] = i; }
       }
-      worker.postMessage({ type: "tmove", node: id, before, after }); prevN = 0; rebuild(); return true;
+      B.tmove?.({ node: id, before, after }); prevN = 0; rebuild(); return true;
     },
     // 排序时拖了行：现在排好的顺序就当成手动顺序（和简单表格一样，"拖了就是手动顺序"），排序标记去掉，看到的顺序不变
-    adoptSort() { if (!query.sort) return; worker.postMessage({ type: "adopt" }); query = { ...query, sort: null }; emit("sort"); },
+    adoptSort() { if (!query.sort) return; B.adopt?.(); query = { ...query, sort: null }; emit("sort"); },
   };
   return api;
 }

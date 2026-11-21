@@ -51,9 +51,12 @@ export function Demo2() {
       <DatePicker {...props} />
       {/* @ts-expect-error 种类写错要报错 */}
       <DatePicker kind="week" />
-      <DataGrid rows={2000} seed={7} label="镜头清单" />
-      {/* @ts-expect-error rows 是数字 */}
-      <DataGrid rows="2000" />
+      <DataGrid columns={[{ key: "name", title: "名称", sortable: true, editable: true }, { key: "status", title: "状态", type: "status", options: ["待开始", "进行中"], filter: "enum" }, { key: "shots", title: "镜头", type: "int", render: (v) => <b>{v}</b> }]}
+        data={[{ id: 1, name: "雨夜车站", status: "进行中", shots: 12 }]} rowKey="id" selection="multiple" selectedKeys={[1]} onSelectionChange={(e) => void e.keys} sort={{ key: "shots", dir: -1 }} onSortChange={(s) => void s?.key}
+        onCellEdit={(e) => void e.value} loading={false} emptyText="还没有镜头" label="镜头清单" />
+      <DataGrid columns={[{ key: "name", title: "名称" }]} dataSource={{ total: 100000, load: async ({ start, end }) => ({ rows: [], total: end - start }) }} />
+      {/* @ts-expect-error 列要有 key */}
+      <DataGrid columns={[{ title: "名称" }]} data={[]} />
       <Dialog open={open} onClose={() => setOpen(false)} onSubmit={(e) => e.preventDefault()} icon="trash-2" title="删除项目？" footerClassName="sn-two" footer={<Button variant="danger" type="submit">删除</Button>} />
     </div>
   );

@@ -27,7 +27,7 @@ export function Extra() {
       <Markdown source="# 标题" />
       <Markdown>{"# 标题"}</Markdown>
       <Flow nodes={[{ id: "a", x: 0, y: 0, t: "剧本" }]} edges={[]} label="流程" />
-      <CanvasGrid rows={1000000} seed={7} label="素材明细" />
+      <CanvasGrid columns={[{ key: "name", title: "名称" }, { key: "size", title: "大小", type: "int", format: (v) => `${v} KB` }]} dataSource={{ total: 1000000, load: async () => [] }} label="素材明细" />
     </div>
   );
 }

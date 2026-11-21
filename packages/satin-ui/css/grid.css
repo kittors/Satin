@@ -13,7 +13,7 @@
 .sn-g-info b { font-weight: 600; color: var(--sn-label); }
 .sn-g-spin { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -2px; border-radius: 50%; border: 1.5px solid var(--sn-line-control); border-top-color: var(--sn-label2); animation: sn-g-spin .8s linear infinite; }
 @keyframes sn-g-spin { to { rotate: 360deg; } }
-.sn-g-frame { position: relative; height: 480px; overflow: hidden; border-radius: var(--sn-r-lg); box-shadow: 0 0 0 1px var(--sn-line); background: var(--sn-g-bg); timeline-scope: --sn-gy, --sn-gx; --sn-g-sbbg: color-mix(in srgb, var(--sn-label) 3%, var(--sn-g-bg)); }
+.sn-g-frame { position: relative; height: var(--sn-g-h, 480px); overflow: hidden; border-radius: var(--sn-r-lg); box-shadow: 0 0 0 1px var(--sn-line); background: var(--sn-g-bg); timeline-scope: --sn-gy, --sn-gx; --sn-g-sbbg: color-mix(in srgb, var(--sn-label) 3%, var(--sn-g-bg)); }
 .sn-g-vp { position: relative; height: 100%; overflow: auto; outline: none; overscroll-behavior-x: none; overscroll-behavior-y: auto; /* 横向滚到头停住（不回弹、不触发浏览器左右滑动返回）；竖向滚到头交给页面接着滚 */ background: var(--sn-g-bg); will-change: scroll-position; scrollbar-width: none; scroll-timeline: --sn-gy y, --sn-gx x; }
 .sn-g-vp::-webkit-scrollbar { display: none; } /* 系统滚动条藏起来（它会从表头顶上开始、压在内容上），换成 kit-grid-bars.js 的两根 */ /* 先把滚动区提成合成层：第一次滚动不再卡一帧 */
 
@@ -59,11 +59,11 @@
 .sn-g-row.sn-sel .sn-g-cell { background: var(--sn-g-selbg); }
 @media (hover: hover) {
 .sn-g-row.sn-sel:hover .sn-g-cell { background: var(--sn-g-selhover); } }
-.sn-g-cell[data-c="sel"] { gap: 6px; padding: 0 8px 0 6px; }
+.sn-g-cell:is([data-c="sel"], [data-t="sel"]) { gap: 6px; padding: 0 8px 0 6px; }
 .sn-g-grip { opacity: 0; } /* 把手本身是共用的 .grip（buttons.css） */
 @media (hover: hover) {
 .sn-g-row:hover .sn-g-grip { opacity: 1; } }
-.sn-g-hc[data-c="sel"] { padding: 0 8px 0 6px; }
+.sn-g-hc:is([data-c="sel"], [data-t="sel"]) { padding: 0 8px 0 6px; }
 .sn-g-hc .sn-check { margin-left: 24px; } /* 和行里的勾选框对齐：左边 6 + 把手 18 */
 .sn-g-st { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .sn-g-dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--sn-label3); }
@@ -77,8 +77,8 @@
 .sn-g-pbar b { display: block; height: 100%; background: var(--sn-label2); transform-origin: left center; scale: var(--sn-p, 0) 1; }
 .sn-g-cell.sn-done .sn-g-pbar b { background: var(--sn-success); }
 .sn-g-pg .sn-g-t { width: 34px; text-align: right; font-size: calc(12px * var(--sn-font-scale, 1)); color: var(--sn-label2); font-variant-numeric: tabular-nums; }
-.sn-g-cell[data-c="upd"] .sn-g-t { color: var(--sn-label2); }
-.sn-g-cell[data-c="act"] { gap: 2px; justify-content: flex-end; padding: 0 8px; }
+.sn-g-cell:is([data-t="time"], [data-c="upd"]) .sn-g-t { color: var(--sn-label2); } /* 时间列：次要信息，浅一档 */
+.sn-g-cell:is([data-c="act"], [data-t="act"]) { gap: 2px; justify-content: flex-end; padding: 0 8px; }
 .sn-g-ab { opacity: .5; } /* 按钮本身是组件库的 .btn.ghost.sm.ibtn（悬停出底、按下缩一下） */
 .sn-g-ab:focus-visible { opacity: 1; }
 @media (hover: hover) {
@@ -87,9 +87,9 @@
 .sn-g-row.sn-sk .sn-g-cell > * { visibility: hidden; }
 .sn-g-row.sn-dk .sn-g-cell > * { filter: opacity(var(--sn-dk, 1)); } /* 数据刚到：格子里的内容 120ms 从 40% 淡到 100%（render 里按时间写 --dk；用 filter 不和把手、操作按钮自己的透明度打架） */
 .sn-g-row.sn-sk .sn-g-cell::after { content: ""; position: absolute; left: 12px; top: 50%; width: 52%; height: 8px; margin-top: -4px; border-radius: 4px; background: var(--sn-fill-subtle); }
-.sn-g-row.sn-sk .sn-g-cell[data-c="name"]::after { width: 70%; }
+.sn-g-row.sn-sk .sn-g-cell:is([data-c="name"], [data-primary])::after { width: 70%; }
 .sn-g-row.sn-sk .sn-g-cell.sn-r::after { left: auto; right: 12px; width: 40%; }
-.sn-g-row.sn-sk .sn-g-cell[data-c="sel"]::after, .sn-g-row.sn-sk .sn-g-cell[data-c="act"]::after { display: none; }
+.sn-g-row.sn-sk .sn-g-cell:is([data-c="sel"], [data-t="sel"])::after, .sn-g-row.sn-sk .sn-g-cell:is([data-c="act"], [data-t="act"])::after { display: none; }
 /* 编辑 */
 .sn-g-cell.sn-editing, .sn-g-vp:focus-within .sn-g-cell.sn-editing { overflow: visible; z-index: 3; box-shadow: none; } /* 编辑时只留输入框自己的框 */
 .sn-g-err { position: fixed; z-index: 70; max-width: 300px; padding: 6px 10px; border-radius: 8px; background: var(--sn-danger); color: #fff; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); box-shadow: 0 6px 16px rgba(0, 0, 0, .16); pointer-events: none; }
@@ -267,8 +267,8 @@
 .sn-g-mhint { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 
 /* ———— 线：默认只有行线；切到"网格"时每一格右边也有一条（操作列除外；Canvas 版按同样的位置画） ———— */
-.sn-grid[data-lines="grid"] .sn-g-cell:not([data-c="act"]) { box-shadow: inset -1px -1px 0 var(--sn-g-rowline); }
-.sn-grid[data-lines="grid"] .sn-g-hc:not([data-c="act"]) { box-shadow: inset -1px 0 0 var(--sn-g-rowline); }
+.sn-grid[data-lines="grid"] .sn-g-cell:not(:is([data-c="act"], [data-t="act"])) { box-shadow: inset -1px -1px 0 var(--sn-g-rowline); }
+.sn-grid[data-lines="grid"] .sn-g-hc:not(:is([data-c="act"], [data-t="act"])) { box-shadow: inset -1px 0 0 var(--sn-g-rowline); }
 .sn-grid[data-lines="grid"] .sn-g-cell.sn-mg { box-shadow: inset -1px 0 0 var(--sn-g-rowline); }
 .sn-grid[data-lines="grid"] .sn-g-cell.sn-mg.sn-mg-last { box-shadow: inset -1px -1px 0 var(--sn-g-rowline); }
 
@@ -276,15 +276,15 @@
    每深一级缩进 24px，左边一条条竖的引导线（压在每一级展开箭头的中线上）；展开着的行从箭头下面往下引一条线，和下级的线接上；
    没有下级的是一个小圆点；名称后面是下级数量（"4 集"）；行详情挪到操作列的"详情"按钮上（名称前的箭头留给下级） */
 .sn-g-tg, .sn-g-leaf, .sn-g-cnt { display: none; }
-.sn-grid.sn-tree .sn-g-cell[data-c="name"] { padding-left: calc(12px + var(--sn-lv, 0) * 24px); }
+.sn-grid.sn-tree .sn-g-cell:is([data-c="name"], [data-primary]) { padding-left: calc(12px + var(--sn-lv, 0) * 24px); }
 .sn-grid.sn-tree .sn-g-tg { display: block; position: absolute; top: 0; bottom: 0; left: 12px; width: calc(var(--sn-lv, 0) * 24px); background: repeating-linear-gradient(90deg, transparent 0 3.5px, var(--sn-tree-line) 3.5px 4.5px, transparent 4.5px 24px); pointer-events: none; }
 .sn-grid.sn-tree .sn-g-row.sn-to .sn-g-tg::after { content: ""; position: absolute; left: calc(3.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); }
 .sn-grid.sn-tree .sn-g-row:not(.sn-tk) .sn-g-exp { display: none; }
 .sn-grid.sn-tree .sn-g-row:not(.sn-tk) .sn-g-leaf { display: grid; flex: none; place-items: center; width: 20px; height: 20px; margin: 0 2px 0 -6px; }
 .sn-g-leaf::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--sn-line-control); }
 .sn-grid.sn-tree .sn-g-cnt:not(:empty) { display: block; flex: none; margin-left: 8px; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
-.sn-grid.sn-tree .sn-g-row.sn-sk .sn-g-cell[data-c="name"] > :is(.sn-g-tg, .sn-g-exp, .sn-g-leaf) { visibility: visible; } /* 值还没到的行：缩进、引导线、箭头照样画（结构是知道的），占位条从名字的位置开始 */
-.sn-grid.sn-tree .sn-g-row.sn-sk .sn-g-cell[data-c="name"]::after { left: calc(38px + var(--sn-lv, 0) * 24px); width: calc(70% - 26px - var(--sn-lv, 0) * 24px); }
+.sn-grid.sn-tree .sn-g-row.sn-sk .sn-g-cell:is([data-c="name"], [data-primary]) > :is(.sn-g-tg, .sn-g-exp, .sn-g-leaf) { visibility: visible; } /* 值还没到的行：缩进、引导线、箭头照样画（结构是知道的），占位条从名字的位置开始 */
+.sn-grid.sn-tree .sn-g-row.sn-sk .sn-g-cell:is([data-c="name"], [data-primary])::after { left: calc(38px + var(--sn-lv, 0) * 24px); width: calc(70% - 26px - var(--sn-lv, 0) * 24px); }
 .sn-grid:not(.sn-tree) .sn-g-dtb { display: none; }
 .sn-g-dtb .sn-ic { transition: rotate .2s var(--sn-ease-out); }
 .sn-g-dtb[aria-expanded="true"] .sn-ic { rotate: 180deg; }
@@ -303,3 +303,17 @@
 /* 触屏没有悬停：行操作、列头筛选按钮一直显示 */
 @media (hover: none) { .sn-g-ab, .sn-g-fb { opacity: 1; } }
 }
+
+/* ———— 通用写法（columns + data / dataSource）用到的几种样子 ————
+   键名不是 name / sel / act 的主列、勾选列、操作列带 data-primary / data-t，和上面同一套样式。
+   不能拖行时把手藏起来；单选时表头没有全选；没给行详情时平铺模式不出详情箭头 */
+.sn-grid.sn-g-nodrag .sn-g-grip { display: none; }
+.sn-grid.sn-g-single .sn-g-hc [data-all] { visibility: hidden; }
+.sn-grid.sn-g-nodetail:not(.sn-tree) .sn-g-exp, .sn-grid.sn-g-nodetail .sn-g-dtb { display: none; }
+/* 空、加载、出错：盖在表身上（表头之下），居中一句话 + 一个按钮 */
+.sn-g-state { position: absolute; z-index: 3; left: 0; right: 0; top: 40px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px 16px;
+  font: 400 calc(14px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-align: center; }
+.sn-g-state[hidden] { display: none; }
+.sn-g-state b { font-weight: 500; color: var(--sn-label); }
+.sn-g-state .sn-spinner { margin-bottom: 4px; }
+.sn-grid.sn-g-st-on .sn-g-body, .sn-grid.sn-g-st-on .sn-cg-cv { visibility: hidden; }

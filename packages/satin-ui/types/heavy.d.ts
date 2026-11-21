@@ -27,15 +27,79 @@ export function mountFlow(flow: HTMLElement, o?: FlowOptions): { nodes: Map<stri
 export function flowHTML(o?: { label?: string }): string;
 /** 流程图（统一写法）：节点、连线只在创建时给；destroy 停掉"运行"、撤掉监听、清空容器 */
 export const createFlow: SatinFactory<FlowOptions, { readonly nodes: Map<string, unknown>; readonly edges: unknown[] }>;
-/** 十万行（DOM）/ 一百万行（Canvas）的数据表格：列和数据目前是演示用的项目表，rows 行数、seed 生成数据的种子 */
-export interface GridOptions { rows?: number; seed?: number; label?: string }
-export function mountDataGrid(root: HTMLElement, o?: GridOptions): { destroy(): void; [k: string]: unknown };
-export function mountCanvasGrid(root: HTMLElement, o?: GridOptions): { destroy(): void; [k: string]: unknown };
-export function dataGridHTML(o?: { label?: string }): string;
-export function canvasGridHTML(o?: { label?: string }): string;
+/** 数据表格（DOM 版十万行、Canvas 版一百万行也流畅）：columns 列定义 + data 数组（或 dataSource 按块从服务端要） */
+/** 选项列的一个选项：字符串，或者 { value, label, tone }（tone：status 列色点的色调 0～4，不写按第几个） */
+export type GridOption = string | { value: unknown; label?: string; tone?: number };
+/** 列定义 */
+export interface GridColumn<Row = any> {
+  /** 取数据里的哪个字段（唯一） */ key: string;
+  /** 表头文字 */ title?: string;
+  /** 列宽 / 拖边改宽时最窄多少（默认 160 / 64） */ width?: number; minWidth?: number;
+  align?: "left" | "right";
+  /** 点表头排序 */ sortable?: boolean;
+  /** 列头筛选："enum" 选项多选、"range" 数值范围 */ filter?: "enum" | "range";
+  /** 能不能拖右边缘改宽（默认能） */ resizable?: boolean;
+  /** 固定在左边 / 右边（固定列不能拖着换位置） */ pinned?: "left" | "right";
+  /** 能不能拖着换位置（默认：没固定的都能） */ fixed?: boolean;
+  /** 内置的显示：text（默认）| int | dur（秒 → 分:秒）| status | owner | tag | prog（0～100）| time | money | sel（勾选 + 拖行把手）| act（行末的操作按钮） */
+  type?: "text" | "int" | "dur" | "status" | "owner" | "tag" | "prog" | "time" | "money" | "sel" | "act";
+  /** 选项列（status / owner / tag、enum 编辑和筛选）的选项 */ options?: GridOption[];
+  /** 显示的文字 */ format?(value: any, row: Row): string;
+  /** 自己画格子（DOM 版）：返回 HTML 字符串或节点；返回 undefined 表示已经自己改好了 cell */ render?(value: any, row: Row, ctx: { cell: HTMLElement; key: string; index: number }): string | Node | void;
+  /** 能编辑（edit 写编辑器类型；不写按 type 猜） */ editable?: boolean; edit?: "text" | "int" | "enum" | "dur" | "money";
+  /** 编辑框里的文字 → 存的值；不合法返回 { error }（红框加这句话，不提交） */ parse?(text: string, col: GridColumn<Row>): { value: unknown } | { error: string };
+  /** 编辑框里显示的文字 */ editText?(value: any): string;
+  /** 编辑的范围（int / dur / money） */ min?: number; max?: number;
+  /** 主列：树形的缩进、展开箭头、详情箭头放在这一列（不写是第一列普通列） */ primary?: boolean;
+  /** 数组数据时，排序按这个取值 */ sortValue?(row: Row): unknown;
+}
+/** 每行唯一的字段名，或者从行里取唯一值的函数 */
+export type GridRowKey<Row = any> = string | ((row: Row) => unknown);
+/** 行详情（展开在行下面）：DOM 版给函数 (el, row, index) 或 { init(el), fill(el, row, index) }，往详情容器里填；Canvas 版给 { draw(ctx) } 画（ctx 有 g、row、r、y、w、h、C 颜色、F 字体、text、trunc、width） */
+export type GridDetail<Row = any> = ((el: HTMLElement, row: Row, index: number) => void) | { init?(el: HTMLElement): void; fill?(el: HTMLElement, row: Row, index: number): void; draw?(ctx: Record<string, unknown>): void };
+/** 排序 */ export interface GridSort { key: string; dir: 1 | -1 }
+/** 筛选：搜索词 + 每一列的筛选（选项列是选项的下标、范围列是 { min, max }） */ export interface GridFilter { q: string; filters: Record<string, number[] | { min?: number | null; max?: number | null } | null> }
+/** 服务端数据：按块加载（排序、筛选也交给服务端；filter 里选项列给的是选项的值） */
+export interface GridDataSource<Row = any> { total?: number; load(q: { start: number; end: number; sort: GridSort | null; filter: { q: string; [key: string]: unknown } }): Promise<Row[] | { rows: Row[]; total?: number }>; edit?(e: { row: number; key: string; value: unknown }): void; move?(e: { from: number; to: number }): void }
+export interface GridEvents<Row = any> {
+  onRowClick?(e: { row: Row; rowKey: unknown; key: string; index: number }): void;
+  onSortChange?(sort: GridSort | null): void;
+  onFilterChange?(filter: GridFilter): void;
+  /** 勾选变了：keys 是勾上的行的 rowKey；点了全选时 all 为 true、except 是全选以后又去掉的（数组数据 keys 照样列全；dataSource 按块加载时不知道全部的行，keys 是 null） */
+  onSelectionChange?(e: { keys: unknown[] | null; all: boolean; except: unknown[] }): void;
+  onColumnResize?(e: { key: string; width: number }): void;
+  onColumnReorder?(e: { keys: string[] }): void;
+  /** 改了一个值（表格先在本地生效；row 是改之前的行） */ onCellEdit?(e: { row: Row; rowKey: unknown; key: string; value: unknown; oldValue: unknown }): void;
+  /** 滚到底 */ onScrollEnd?(): void;
+  /** 操作列的按钮（"more" 更多）；"detail" 展开详情、"edit" 编辑主列是表格自己处理的 */ onRowAction?(e: { action: string; row: Row; rowKey: unknown; index: number }): void;
+  /** 出错状态里点了"重试" */ onRetry?(): void;
+}
+export interface GridOptions<Row = any> extends GridEvents<Row> {
+  columns: GridColumn<Row>[];
+  /** 数组数据（几万行以内：筛选、排序在页面里算；行里带 children 数组可以切树形） */ data?: Row[];
+  /** 服务端数据（按块加载），或者自己实现的整套后端（见 table-backends.js） */ dataSource?: GridDataSource<Row> | Record<string, unknown>;
+  /** 每行唯一的字段名或取值函数（默认 "id"） */ rowKey?: GridRowKey<Row>;
+  /** 勾选：多选 / 单选 / 不能选（写了 sel 列时默认多选；要勾选又没写 sel 列会自动加一列） */ selection?: "multiple" | "single" | "none";
+  /** 受控的勾选（rowKey 数组） */ selectedKeys?: unknown[]; defaultSelectedKeys?: unknown[];
+  /** 受控的排序 */ sort?: GridSort | null; defaultSort?: GridSort | null;
+  /** 能拖行换位置（没筛选、没排序时） */ rowDraggable?: boolean;
+  /** 一开始就合并的格子：第 rows[0]～rows[1] 行 × keys 这几列 */ merges?: { rows: [number, number]; keys: string[] }[];
+  /** 行详情：给了才有详情箭头 */ detail?: GridDetail<Row>;
+  /** 树形：主列名字后面的下级数量文字（"4 集"）；level 是 -1 时是工具条上第一级的个数（"12 个项目"）。返回空字符串不显示 */ treeCount?(count: number, level: number): string;
+  /** 三种状态 */ loading?: boolean; error?: string | null; emptyText?: string; noMatchText?: string; errorText?: string; loadingText?: string;
+  /** 行线 / 网格（默认网格；合并单元格只在网格下出现） */ lines?: "row" | "grid";
+  /** 表格框的高度（表头 + 行，不含工具条）：数字是 px，也可以写 "60vh"；默认 480 */ height?: number | string;
+  /** 读屏用的表格名字 */ label?: string;
+  /** 空容器时是否带工具条（搜索、筛选标签、行数），controls 再加设计稿演示的几个开关 */ toolbar?: boolean; controls?: boolean;
+}
+export interface GridApi { readonly sort: GridSort | null; readonly filter: GridFilter; readonly selectedKeys: unknown[] | null; merge(p0: number, p1: number, keys: string[]): void; reload(): void; readonly ready: Promise<unknown> }
+export function mountDataGrid(root: HTMLElement, o?: GridOptions): GridApi & { update(o: Partial<GridOptions>, prev?: Partial<GridOptions>): void; destroy(): void; [k: string]: unknown };
+export function mountCanvasGrid(root: HTMLElement, o?: GridOptions): GridApi & { update(o: Partial<GridOptions>, prev?: Partial<GridOptions>): void; destroy(): void; [k: string]: unknown };
+export function dataGridHTML(o?: { label?: string; toolbar?: boolean; controls?: boolean; columns?: GridColumn[]; height?: number | string }): string;
+export function canvasGridHTML(o?: { label?: string; toolbar?: boolean; controls?: boolean; columns?: GridColumn[]; height?: number | string }): string;
 /** 数据表格（统一写法）：destroy 撤掉监听、观察器、后台线程，拿掉放进 <head> 的样式，清空容器 */
-export const createDataGrid: SatinFactory<GridOptions>;
-export const createCanvasGrid: SatinFactory<GridOptions>;
+export const createDataGrid: SatinFactory<GridOptions, GridApi>;
+export const createCanvasGrid: SatinFactory<GridOptions, GridApi>;
 export function openLightbox(items: unknown[], index: number, o?: Record<string, unknown>): { close(): void };
 export function closeLightbox(): void;
 /** 页面上真正露出来的区域（视口坐标，比如固定顶栏下面那块）：缩略图被挡住的部分不算，图从露出来的那截飞出去；null 恢复整个窗口 */

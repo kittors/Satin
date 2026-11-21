@@ -19,7 +19,7 @@ export const Demo2 = defineComponent({
       h(Button, { variant: "primary", loading: true, done: false, iconAfter: "arrow-right" }, () => "保存修改"),
       h(DatePicker, { kind: "range", placeholder: "选择开始和结束日期", onChange: (d: { text: string }) => d.text }),
       h(Dialog, { open: open.value, title: "删除项目？", icon: "trash-2", footerClass: open.value ? "sn-two sn-asking" : "sn-two", guard: (close: () => void) => close() }),
-      h(DataGrid, { rows: 2000, seed: 7, label: "镜头清单" }),
+      h(DataGrid, { columns: [{ key: "name", title: "名称", sortable: true }], data: [{ id: 1, name: "雨夜车站" }], rowKey: "id", selected: [1], sort: { key: "name", dir: 1 }, label: "镜头清单" }),
     ]);
   },
 });

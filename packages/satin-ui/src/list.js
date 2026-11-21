@@ -1,4 +1,4 @@
-// UI 库设计稿：无限列表（虚拟滚动 + 分页加载）。滚动区域一节的演示内容也在这里生成。
+// 无限列表（虚拟滚动 + 分页加载）。数据由 loadPage 给（库里不带演示数据，设计稿的演示在 demo/sections/list.js）。
 import { scrollArea } from "./scroll.js";
 import { $, reduced } from "./core.js";
 import { scoped } from "./i18n.js";

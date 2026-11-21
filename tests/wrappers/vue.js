@@ -6,6 +6,10 @@ import { Markdown } from "../../packages/satin-ui/vue/markdown.js";
 import { Flow } from "../../packages/satin-ui/vue/flow.js";
 import { CanvasGrid } from "../../packages/satin-ui/vue/canvas-grid.js";
 
+// 画布表格：自己的列和数据（放在组件外，每次渲染是同一个数组）
+const assetCols = [{ key: "name", title: "名称", sortable: true }, { key: "kind", title: "类型", type: "tag", options: ["图片", "视频", "音频"], filter: "enum" }, { key: "size", title: "大小", type: "int", sortable: true, format: (v) => v + " KB" }];
+const assets = Array.from({ length: 2000 }, (_, i) => ({ id: i + 1, name: "素材 " + (i + 1), kind: i % 3, size: (i * 37) % 900 + 12 }));
+
 const log = (window.__log = []);
 const items = [
   { key: "open", label: "打开", icon: "external-link", kbd: "↵" },
@@ -41,7 +45,7 @@ const Kit = defineComponent({
       h("div", { style: "height: 420px" }, [h(Chat, { title: "写作助手", status: "在线", respond })]),
       h(Markdown, { source: "# 标题\n\n正文 **加粗**\n\n```js\nconst a = 1;\n```" }),
       h("div", { style: "height: 320px" }, [h(Flow, { label: "流程", nodes: [{ id: "a", x: 40, y: 40, t: "剧本", ic: "file-text" }, { id: "b", x: 260, y: 40, t: "分镜", ic: "image" }], edges: [["a", "b"]] })]),
-      h("div", { style: "height: 320px" }, [h(CanvasGrid, { rows: 2000, seed: 7, label: "素材明细" })]),
+      h("div", { style: "height: 320px" }, [h(CanvasGrid, { columns: assetCols, data: assets, rowKey: "id", selection: "multiple", onSelectionChange: (e) => log.push("cgrid:sel:" + (e.keys?.length ?? "all")), label: "素材明细" })]),
     ]);
   },
 });

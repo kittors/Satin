@@ -5,6 +5,9 @@ const N = +arg("n", 100);
 // 组件、初始选项、更新用的选项、怎么准备元素：
 //   不写 → 空容器（按 html() 渲染进去，框架里就这么用）；{ markup: 选择器 } → 从设计稿取那块标记放进去（没有 html()、要在现成标记上接的）；
 //   { el: "<标记>" } → 直接给一段标记
+// 两种表格用的列和数据（自己的数据：columns + data；更新时换一批数据、改排序）
+const GRID_COLS = [{ key: "name", title: "名称", sortable: true, editable: true }, { key: "status", title: "状态", type: "status", options: ["待开始", "进行中", "已完成"], filter: "enum" }, { key: "shots", title: "镜头", type: "int", sortable: true }];
+const gridRows = (n) => Array.from({ length: n }, (_, i) => ({ id: i, name: "第 " + (i + 1) + " 场", status: i % 3, shots: (i * 7) % 40 + 1 }));
 const CASES = [
   ["createSegmented", { items: ["网格", "列表", "时间线"], value: "网格" }, { value: "列表" }],
   ["createSlider", { value: 30, max: 100 }, { value: 60 }],
@@ -36,8 +39,8 @@ const CASES = [
   ["createChat", { title: "助手", placeholder: "说点什么" }, { status: "在线" }, { size: "height:420px" }],
   ["createMarkdown", { source: "# 标题\n\n正文 **加粗**，`代码`。\n\n```js\nconst a = 1;\n```\n\n| 列 | 值 |\n|---|---|\n| a | 1 |" }, { source: "## 换了\n\n- 一\n- 二" }],
   ["createFlow", { nodes: [{ id: "a", x: 40, y: 40, t: "原文", ic: "file-text", d: "第三集" }, { id: "b", x: 320, y: 40, t: "分镜", ic: "clapperboard", k: "board", d: "12 镜" }], edges: [["a", "b"]] }, {}, { size: "height:360px" }],
-  ["createDataGrid", { rows: 2000, seed: 3 }, {}, { size: "height:420px" }],
-  ["createCanvasGrid", { rows: 20000, seed: 3 }, {}, { size: "height:420px" }],
+  ["createDataGrid", { columns: GRID_COLS, data: gridRows(2000), selection: "multiple" }, { data: gridRows(300), sort: { key: "shots", dir: -1 } }, { size: "height:420px" }],
+  ["createCanvasGrid", { columns: GRID_COLS, data: gridRows(20000) }, { data: gridRows(300), loading: true }, { size: "height:420px" }],
   ["createThemePanel", {}, {}],
   // 自定义元素（Svelte、Angular、Solid、Preact、纯 HTML 都走这条路）：插进页面自动创建、改属性 update、拿出来自动销毁
   ["<sn-segmented>", { items: ["网格", "列表"], value: "网格" }, { value: "列表" }, { element: "sn-segmented" }],
