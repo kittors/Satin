@@ -11,7 +11,7 @@ export default function NewProject() {
   return (
     <form class="sn-stack sn-gap-12" novalidate onSubmit={submit}>
       {/* 有错时字段加 sn-bad：错误在下面展开，输入框边框变红 */}
-      <div class="sn-field" classList={{ "sn-bad": !!error() }}>
+      <div class={["sn-field", { "sn-bad": !!error() }]}>
         <label class="sn-lbl" for="new-name">项目名称</label>
         <input class="sn-input" id="new-name" placeholder="比如：雨夜车站" value={name()} onInput={(e) => { setName(e.currentTarget.value); setError(""); }} aria-invalid={error() ? "true" : undefined} />
         <div class="sn-err"><span>{error()}</span></div>

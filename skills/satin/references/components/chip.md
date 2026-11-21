@@ -274,7 +274,7 @@ export default function StatusFilter() {
       <div class="sn-row">
         <For each={STATUS}>
           {(s) => (
-            <button type="button" class="sn-chip" classList={{ "sn-on": picked().includes(s) }} aria-pressed={picked().includes(s)} onClick={() => toggle(s)}><span data-i="check"></span>{s}</button>
+            <button type="button" class={["sn-chip", { "sn-on": picked().includes(s) }]} aria-pressed={picked().includes(s)} onClick={() => toggle(s)}><span data-i="check"></span>{s}</button>
           )}
         </For>
       </div>

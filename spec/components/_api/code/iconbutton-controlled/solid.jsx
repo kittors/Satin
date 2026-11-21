@@ -6,7 +6,7 @@ export default function GridToggle() {
   return (
     <sn-enhance>
       <div class="sn-row">
-        <button type="button" class="sn-btn sn-ghost sn-ibtn" classList={{ "sn-selected": on() }} aria-pressed={on()} data-i="layout-grid" data-tip={tip()} aria-label={tip()} onClick={() => setOn(!on())}></button>
+        <button type="button" class={["sn-btn sn-ghost sn-ibtn", { "sn-selected": on() }]} aria-pressed={on()} data-i="layout-grid" data-tip={tip()} aria-label={tip()} onClick={() => setOn(!on())}></button>
       </div>
     </sn-enhance>
   );

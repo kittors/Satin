@@ -349,7 +349,7 @@ upload(file, progress)：在这里上传，progress 更新附件上的进度环�
   // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise
   const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
   // 拖进来、粘贴截图、点 + 都能加附件
-  createComposer(document.getElementById("prompt-upload"), { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) });
+  createComposer(document.getElementById("prompt-upload"), { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
 </script>
 ```
 
@@ -362,7 +362,7 @@ import { Composer, toast } from "satin-ui/react";
 const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function PromptWithFiles() {
-  return <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" upload={upload} onSend={({ files }) => toast({ text: `带着 ${files.length} 个附件发送` })} />;
+  return <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;
 }
 ```
 
@@ -377,7 +377,7 @@ const upload = (file, progress) => new Promise((done) => { let p = 0; const t = 
 </script>
 
 <template>
-  <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" :upload="upload" @send="({ files }) => toast({ text: `带着 ${files.length} 个附件发送` })" />
+  <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" :upload="upload" @send="({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }" />
 </template>
 ```
 
@@ -391,7 +391,7 @@ Svelte 的写法：
   const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
   // 拖进来、粘贴截图、点 + 都能加附件
-  const options = { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) };
+  const options = { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } };
 </script>
 
 <!-- 这个组件没有单独的 Svelte 封装：用 Satin 包 createComposer，选项写在 options 里 -->
@@ -417,7 +417,7 @@ export class PromptUploadComponent {
     const destroyRef = inject(DestroyRef);
     // 拖进来、粘贴截图、点 + 都能加附件；渲染完再建（只在浏览器里跑），组件销毁时 destroy()
     afterNextRender(() => {
-      const it = createComposer(this.host().nativeElement, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) });
+      const it = createComposer(this.host().nativeElement, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
       destroyRef.onDestroy(() => it.destroy());
     });
   }
@@ -437,7 +437,7 @@ export default function PromptWithFiles() {
   let host;
   // 拖进来、粘贴截图、点 + 都能加附件；挂上以后建，卸载时 destroy()
   onSettled(() => {
-    const it = createComposer(host, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) });
+    const it = createComposer(host, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
     return () => it.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;
@@ -453,7 +453,7 @@ import { Composer, toast } from "satin-ui/react";
 const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function PromptWithFiles() {
-  return <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" upload={upload} onSend={({ files }) => toast({ text: `带着 ${files.length} 个附件发送` })} />;
+  return <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;
 }
 ```
 

@@ -8,7 +8,7 @@ export default function PromptWithFiles() {
   let host;
   // 拖进来、粘贴截图、点 + 都能加附件；挂上以后建，卸载时 destroy()
   onSettled(() => {
-    const it = createComposer(host, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => toast({ text: `带着 ${files.length} 个附件发送` }) });
+    const it = createComposer(host, { placeholder: "拖进参考图，或者点左下角的 +", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
     return () => it.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;

@@ -10,8 +10,8 @@ export default function MakeSteps() {
         <For each={STEPS}>
           {(s, i) => (
             <>
-              <Show when={i()}><span class="sn-ln" classList={{ "sn-done": i() <= cur() }}><i></i></span></Show>
-              <span class="sn-st" classList={{ "sn-done": i() < cur(), "sn-cur": i() === cur() }}><span class="sn-n">{i() + 1}</span>{s}</span>
+              <Show when={i()}><span class={["sn-ln", { "sn-done": i() <= cur() }]}><i></i></span></Show>
+              <span class={["sn-st", { "sn-done": i() < cur(), "sn-cur": i() === cur() }]}><span class="sn-n">{i() + 1}</span>{s}</span>
             </>
           )}
         </For>

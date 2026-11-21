@@ -6,7 +6,7 @@ export default function EditShot() {
       <aside class="sn-drawer" id="drw-shot" role="dialog" aria-modal="true" aria-labelledby="drw-shot-t" tabindex="-1">
         <div class="sn-hd"><h3 id="drw-shot-t">编辑镜头</h3><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-x aria-label="关闭" data-tip="关闭" data-kbd="Esc" data-i="x"></button></div>
         <div class="sn-bd">
-          <div class="sn-field" /><label class="sn-lbl" for="drw-shot-name" />镜头名称</label><input class="sn-input" id="drw-shot-name" value="站台 · 远景" /></div>
+          <div class="sn-field"><label class="sn-lbl" for="drw-shot-name">镜头名称</label><input class="sn-input" id="drw-shot-name" value="站台 · 远景" /></div>
         </div>
       </aside>
     </sn-enhance>

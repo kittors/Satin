@@ -498,7 +498,7 @@ export default function PickCards() {
         <For each={SHOTS}>
           {(s) => (
             // 选中：卡片加 sn-sel（外圈一道 2px 的线）
-            <div class="sn-pc" classList={{ "sn-sel": picked().includes(s.name) }} tabindex="0" aria-label={s.name}>
+            <div class={["sn-pc", { "sn-sel": picked().includes(s.name) }]} tabindex="0" aria-label={s.name}>
               <div class="sn-cover">
                 <img class="sn-art" src={s.cover} alt="" />
                 <label class="sn-check sn-pick" aria-label={"选择" + s.name}><input type="checkbox" value={s.name} checked={picked().includes(s.name)} onChange={(e) => toggle(s.name, e.currentTarget.checked)} /><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5" /></svg><span class="sn-bar"></span></span></label>
