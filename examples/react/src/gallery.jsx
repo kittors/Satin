@@ -29,6 +29,9 @@ import IconbuttonStates from "./demos/iconbutton-states.jsx";
 import IconbuttonVariants from "./demos/iconbutton-variants.jsx";
 import IconbuttonBasic from "./demos/iconbutton-basic.jsx";
 import IconbuttonDemo0 from "./demos/iconbutton-0.jsx";
+import LinkArrow from "./demos/link-arrow.jsx";
+import LinkTextbtn from "./demos/link-textbtn.jsx";
+import LinkBasic from "./demos/link-basic.jsx";
 import LinkDemo0 from "./demos/link-0.jsx";
 import CompoundDemo0 from "./demos/compound-0.jsx";
 import ChipRemovable from "./demos/chip-removable.jsx";
@@ -187,7 +190,10 @@ function Gallery() {
         <div className="demo" data-demo="iconbutton-0"><IconbuttonDemo0 /></div>
       </section>
       <section id="link">
-        <h2>文字链接</h2>
+        <h2>文字链接与文字按钮</h2>
+        <div className="demo" data-demo="link-arrow"><LinkArrow /></div>
+        <div className="demo" data-demo="link-textbtn"><LinkTextbtn /></div>
+        <div className="demo" data-demo="link-basic"><LinkBasic /></div>
         <div className="demo" data-demo="link-0"><LinkDemo0 /></div>
       </section>
       <section id="compound">

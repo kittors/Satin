@@ -67,9 +67,11 @@ function check(c, foundation) {
     for (const s of c.slots || []) if (!has(s.desc)) add("4 API", `插槽 ${s.name} 缺说明`);
     for (const m of c.methods || []) { const lack = ["signature", "returns", "desc"].filter((k) => !has(m[k])); if (lack.length) add("4 API", `实例方法 ${m.name} 缺 ${lack.join("、")}`); }
     for (const f of c.functions || []) { const lack = ["signature", "returns", "desc"].filter((k) => !has(f[k])); if (lack.length) add("4 API", `函数 ${f.name} 缺 ${lack.join("、")}`); }
-    if (!has(c.props) && !has(c.functions)) add("4 API", "属性和函数都没有");
+    // 纯样式组件（没有框架组件、没有函数：链接、卡片、空状态……）的 API 就是类名；有组件或函数的还要有导出的类型
+    const pureCss = !c.dts?.react && !c.dts?.vue && !c.dts?.svelte && !c.dts?.factory && !c.dts?.options && !has(c.functions);
+    if (!has(c.props) && !has(c.functions) && !pureCss) add("4 API", "属性和函数都没有");
     if (!has(c.classes)) add("4 API", "纯 HTML 写法的类名、data 属性（classes）");
-    if (!has(c.types)) add("4 API", "导出的 TS 类型名（types）");
+    if (!has(c.types) && !pureCss) add("4 API", "导出的 TS 类型名（types）");
   }
   if (!has(c.cssVars)) add("4 API", "能改的 CSS 变量、令牌（cssVars）");
   for (const v of c.cssVars || []) { const lack = ["desc", "default"].filter((k) => !has(v[k])); if (lack.length) add("4 API", `CSS 变量 ${v.name} 缺 ${lack.join("、")}`); }

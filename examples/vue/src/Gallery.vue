@@ -24,6 +24,9 @@ import IconbuttonStates from "./demos/iconbutton-states.vue";
 import IconbuttonVariants from "./demos/iconbutton-variants.vue";
 import IconbuttonBasic from "./demos/iconbutton-basic.vue";
 import IconbuttonDemo0 from "./demos/iconbutton-0.vue";
+import LinkArrow from "./demos/link-arrow.vue";
+import LinkTextbtn from "./demos/link-textbtn.vue";
+import LinkBasic from "./demos/link-basic.vue";
 import LinkDemo0 from "./demos/link-0.vue";
 import CompoundDemo0 from "./demos/compound-0.vue";
 import ChipRemovable from "./demos/chip-removable.vue";
@@ -182,7 +185,10 @@ import SelectMenu from "./demos/select-menu.vue";
     <div class="demo" data-demo="iconbutton-0"><IconbuttonDemo0 /></div>
   </section>
   <section id="link">
-    <h2>文字链接</h2>
+    <h2>文字链接与文字按钮</h2>
+    <div class="demo" data-demo="link-arrow"><LinkArrow /></div>
+    <div class="demo" data-demo="link-textbtn"><LinkTextbtn /></div>
+    <div class="demo" data-demo="link-basic"><LinkBasic /></div>
     <div class="demo" data-demo="link-0"><LinkDemo0 /></div>
   </section>
   <section id="compound">

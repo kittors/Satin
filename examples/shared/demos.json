@@ -220,6 +220,36 @@
   "css": true
  },
  {
+  "slug": "link-arrow",
+  "id": "link",
+  "n": -1,
+  "name": "文字链接与文字按钮",
+  "group": "按钮",
+  "cap": "带箭头的入口",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "link-textbtn",
+  "id": "link",
+  "n": -1,
+  "name": "文字链接与文字按钮",
+  "group": "按钮",
+  "cap": "文字按钮",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "link-basic",
+  "id": "link",
+  "n": -1,
+  "name": "文字链接与文字按钮",
+  "group": "按钮",
+  "cap": "句子里的链接",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "link-0",
   "id": "link",
   "n": 0,

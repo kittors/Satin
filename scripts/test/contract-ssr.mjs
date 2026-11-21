@@ -67,7 +67,9 @@ async function reactOf(code, slug) {
   return renderToStaticMarkup(React.createElement(C));
 }
 async function vueOf(code, slug) {
-  const { descriptor, errors } = sfc.parse(code, { filename: slug + ".vue" }); if (errors.length) throw new Error(errors[0].message);
+  // 只有 <template> 的 SFC（纯样式组件）：补一个空的 <script setup> 再编译
+  const src = /<script[\s>]/.test(code) ? code : `<script setup>\nconst __onlyTemplate = true;\n</script>\n${code}`;
+  const { descriptor, errors } = sfc.parse(src, { filename: slug + ".vue" }); if (errors.length) throw new Error(errors[0].message);
   const script = sfc.compileScript(descriptor, { id: slug, inlineTemplate: true, templateOptions: { compilerOptions: { isCustomElement: (t) => t.startsWith("sn-") } } });
   const f = path.join(TMP, slug + ".vue.mjs"), entry = path.join(TMP, slug + ".vue.entry.mjs"), out = path.join(TMP, slug + ".vue.bundle.mjs");
   fs.writeFileSync(f, script.content);
