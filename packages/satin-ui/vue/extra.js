@@ -12,6 +12,12 @@ import { openLightbox } from "../src/lightbox.js";
 import { track } from "../src/lifecycle.js";
 import { menuHTML, findItem, uploadHTML, acceptRe, sidebarHTML } from "../src/markup.js";
 import { wrap, cx } from "./wrap.js";
+import { ICONS } from "../src/icons.js";
+import { scoped } from "../src/i18n.js";
+import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
+const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
+const Ic = (name) => h("svg", { class: "sn-ic", "data-icon": name, width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true", innerHTML: ICONS[name] || "" });
+let pcN = 0;
 
 // 挂载时 setup()（引用计数），卸载时撤掉
 function useSetup() { let un = null; onMounted(() => { un = setup(); }); onBeforeUnmount(() => { un?.(); un = null; }); }
@@ -99,6 +105,32 @@ export const Popover = /* @__PURE__ */ defineComponent({
       const first = firstNode(slots.default?.());
       const trigger = first && cloneVNode(first, { ref: trig, "aria-haspopup": "dialog", "aria-expanded": "false", onClick: (e) => { if (!e.defaultPrevented) set(!popoverOf(pop.value)); } }, true);
       const panel = mounted.value ? h(Teleport, { to: "body" }, h("div", { ...attrs, ref: pop, class: cx("sn-pop sn-popover", attrs.class), role: "dialog", "aria-label": p.label ?? p.title }, [p.title ? h("h4", p.title) : null, slots.content?.()])) : null;
+      return [trigger, panel];
+    };
+  },
+});
+
+// ———— 气泡确认：默认插槽是触发按钮。只给单条、属于自己、不能撤销的操作；@confirm / @cancel；打开时焦点先落在"取消"上 ————
+export const Popconfirm = /* @__PURE__ */ defineComponent({
+  name: "SnPopconfirm",
+  props: { title: String, description: String, confirmText: String, cancelText: String, danger: { type: Boolean, default: true }, align: { type: String, default: "end" } },
+  emits: ["confirm", "cancel"],
+  setup(p, { slots, emit }) {
+    useSetup();
+    const pop = ref(null), trig = ref(null), mounted = useMounted(), uid = "sn-pc-" + ++pcN;
+    const close = (refocus) => popoverOf(pop.value)?.close(refocus);
+    onBeforeUnmount(() => { const el = pop.value, l = el && popoverOf(el); if (l) l.close(false); });
+    return () => {
+      const first = firstNode(slots.default?.());
+      const trigger = first && cloneVNode(first, { ref: trig, "aria-haspopup": "dialog", "aria-expanded": "false", onClick: (e) => { if (e.defaultPrevented) return; const l = popoverOf(pop.value); l ? l.close(false) : openPopover(pop.value, elOf(trig.value), { align: p.align }); } }, true);
+      const panel = mounted.value ? h(Teleport, { to: "body" }, h("div", { ref: pop, class: "sn-pop sn-popconfirm", role: "alertdialog", "aria-labelledby": uid + "-q", "aria-describedby": p.description ? uid + "-d" : undefined }, [
+        h("div", { class: "sn-q" }, [Ic("triangle-alert"), h("div", [h("div", { id: uid + "-q" }, p.title), p.description ? h("div", { class: "sn-d", id: uid + "-d" }, p.description) : null])]),
+        h("div", { class: "sn-acts" }, [
+          // data-no：打开时焦点先落在它上面（和设计稿的标记一样）
+          h("button", { type: "button", class: "sn-btn sn-ghost sn-sm", "data-no": "", onClick: () => { close(true); emit("cancel"); } }, p.cancelText ?? tt("components.cancel")),
+          h("button", { type: "button", class: cx("sn-btn", p.danger ? "sn-danger" : "sn-primary", "sn-sm"), "data-yes": "", onClick: () => { close(false); emit("confirm"); } }, p.confirmText ?? tt("components.confirm")),
+        ]),
+      ])) : null;
       return [trigger, panel];
     };
   },

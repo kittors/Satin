@@ -2,7 +2,7 @@
 // 受控的标签输入、折叠面板跟着父组件的值变；只读（给 value 不给 onChange）的点了会退回去。scripts/test/controlled.mjs 打包后在浏览器里跑
 import { createElement as h, StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Segmented, Stepper, TagInput, Collapse, CountInput, Composer } from "../../packages/satin-ui/react/index.js";
+import { Segmented, Stepper, TagInput, Collapse, CountInput, Composer, Popconfirm } from "../../packages/satin-ui/react/index.js";
 
 const log = (window.__log = []);
 const FAQ = [{ title: "第一项", content: "一" }, { title: "第二项", content: "二" }, { title: "第三项", content: "三" }];
@@ -24,6 +24,7 @@ function Kit() {
     h("button", { id: "count-set", onClick: () => setRole("林夏和周屿") }, "换角色名"),
     // onSend 返回 Promise：发送后进入"生成中"，Promise 结束回到可发送
     h("div", { id: "cm" }, h(Composer, { placeholder: "描述画面", onSend: ({ text }) => { log.push("send:" + text); return new Promise((r) => setTimeout(r, 600)); } })),
+    h(Popconfirm, { title: "永久删除这个镜头？", description: "删除后无法恢复。", confirmText: "永久删除", onConfirm: () => log.push("pc:yes"), onCancel: () => log.push("pc:no") }, h("button", { id: "pc-btn" }, "永久删除")),
     h("output", { id: "state" }, JSON.stringify({ tags, open, role })));
 }
 createRoot(document.getElementById("app")).render(h(StrictMode, null, h(Kit)));

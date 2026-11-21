@@ -26,7 +26,8 @@ export function mountFlow(flow, { nodes: nodeList, edges: edgeList } = {}) {
   // 扇出、汇入的两处列间距放宽到 150px，让一束线有地方散开
   // 节点：{ id, x, y, t（标题）, ic（图标）, d（说明）, k（类型：text | board | image | audio | video | out）, bg（缩略图背景，CSS background 值，可选）}
   // 连线：[起点 id, 终点 id]。都不给就是一张空画布
-  const nodes = new Map((nodeList || []).map((n) => [n.id, { ...n, k: n.k || "text" }]));
+  // 节点字段：title / icon / detail / kind（短名 t / ic / d / k 也认，设计稿用的是短名）
+  const nodes = new Map((nodeList || []).map((n) => [n.id, { ...n, t: n.title ?? n.t, ic: n.icon ?? n.ic, d: n.detail ?? n.d, k: n.kind ?? n.k ?? "text" }]));
   let edges = (edgeList || []).map(([a, b]) => mkEdge(a, b));
   const view = { x: 40, y: 30, z: 1 };
   let sel = null, gid = 0;

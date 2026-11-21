@@ -1,7 +1,7 @@
 // 受控 / 非受控的运行时测试（Vue）：父组件重新渲染时，只写 value 的（非受控）组件不被打回初始值；
 // v-model 的标签输入、折叠面板跟着父组件的值变。scripts/test/controlled.mjs 打包后在浏览器里跑
 import { createApp, defineComponent, h, ref } from "vue";
-import { Segmented, Stepper, TagInput, Collapse, CountInput, Composer } from "../../packages/satin-ui/vue/index.js";
+import { Segmented, Stepper, TagInput, Collapse, CountInput, Composer, Popconfirm } from "../../packages/satin-ui/vue/index.js";
 
 const log = (window.__log = []);
 const FAQ = [{ title: "第一项", content: "一" }, { title: "第二项", content: "二" }, { title: "第三项", content: "三" }];
@@ -23,6 +23,7 @@ const Kit = defineComponent({
       h("button", { id: "count-set", onClick: () => { role.value = "林夏和周屿"; } }, "换角色名"),
       // @send 返回 Promise：发送后进入"生成中"，Promise 结束回到可发送
       h("div", { id: "cm" }, [h(Composer, { placeholder: "描述画面", onSend: ({ text }) => { log.push("send:" + text); return new Promise((r) => setTimeout(r, 600)); } })]),
+      h(Popconfirm, { title: "永久删除这个镜头？", description: "删除后无法恢复。", confirmText: "永久删除", onConfirm: () => log.push("pc:yes"), onCancel: () => log.push("pc:no") }, () => h("button", { id: "pc-btn" }, "永久删除")),
       h("output", { id: "state" }, JSON.stringify({ tags: tags.value, open: open.value, role: role.value })),
     ]);
   },

@@ -88,6 +88,15 @@ for (const fw of FWS) {
     await page.waitForTimeout(900);
     eq(await page.$eval("#cm .sn-cm-send", (b) => b.classList.contains("sn-busy")), false, "Promise 结束以后");
   });
+  await step(`${fw} 气泡确认：点按钮从按钮那里展开、焦点在"取消"上；Esc 关上；再点"永久删除"调 onConfirm`, async () => {
+    await page.click("#pc-btn"); await page.waitForSelector(".sn-popconfirm.sn-open"); await page.waitForTimeout(250);
+    eq(await page.evaluate(() => document.activeElement?.textContent), "取消", "打开后焦点");
+    eq(await page.$eval(".sn-popconfirm", (p) => p.getAttribute("role")), "alertdialog", "role");
+    await page.keyboard.press("Escape"); await page.waitForTimeout(300);
+    eq(await page.$$eval(".sn-popconfirm.sn-open", (x) => x.length), 0, "Esc 以后");
+    await page.click("#pc-btn"); await page.waitForSelector(".sn-popconfirm.sn-open"); await page.waitForTimeout(250);
+    await page.click(".sn-popconfirm .sn-danger"); await logHas("pc:yes");
+  });
   const fails = res.filter((r) => r[0] === "✗");
   console.log(`${fw}：${res.length - fails.length}/${res.length} 通过${errs.length ? `，报错 ${errs.length} 条` : ""}`);
   for (const r of res) console.log(`  ${r[0]} ${r[1]}${r[2] ? "：" + r[2] : ""}`);

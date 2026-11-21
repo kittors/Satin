@@ -21,7 +21,14 @@ export function mountChat(box: HTMLElement, o?: ChatOptions): ChatApi & { destro
 /** 对话（统一写法）：空容器按选项渲染；update({ status }) 改顶栏状态；destroy 停掉生成中的回答、撤掉监听、清空容器 */
 export const createChat: SatinFactory<ChatOptions, ChatApi>;
 export function chatHTML(o?: { title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean }): string;
-export interface FlowNode { id: string; x: number; y: number; t: string; ic?: string; d?: string; k?: "text" | "board" | "image" | "audio" | "video" | "out"; bg?: string }
+export interface FlowNode {
+  id: string; x: number; y: number;
+  /** 标题（短名 t） */ title?: string; t?: string;
+  /** 图标名（短名 ic） */ icon?: string; ic?: string;
+  /** 一行说明（短名 d） */ detail?: string; d?: string;
+  /** 类型：决定颜色和能连到哪（短名 k） */ kind?: "text" | "board" | "image" | "audio" | "video" | "out"; k?: "text" | "board" | "image" | "audio" | "video" | "out";
+  /** 缩略图（CSS 背景） */ bg?: string;
+}
 export interface FlowOptions { nodes?: FlowNode[]; edges?: [string, string][]; label?: string }
 export function mountFlow(flow: HTMLElement, o?: FlowOptions): { nodes: Map<string, unknown>; readonly edges: unknown[]; destroy(): void };
 export function flowHTML(o?: { label?: string }): string;

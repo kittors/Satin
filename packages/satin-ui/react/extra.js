@@ -12,6 +12,12 @@ import { openMenu, closeMenu, menuOpenFor, openPopover, popoverOf, mountCmdk } f
 import { openLightbox } from "../src/lightbox.js";
 import { track } from "../src/lifecycle.js";
 import { menuHTML, findItem, uploadHTML, acceptRe, sidebarHTML } from "../src/markup.js";
+import { ICONS } from "../src/icons.js";
+import { scoped } from "../src/i18n.js";
+import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
+const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
+// 图标（和主入口的 <Icon> 同一份标记）：这里直接画，免得和主入口互相导入
+const Ic = (name) => h("svg", { className: "sn-ic", "data-icon": name, width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true", dangerouslySetInnerHTML: { __html: ICONS[name] || "" } });
 import { wrap, useIso, cx } from "./wrap.js";
 
 const R19 = +version.split(".")[0] >= 19;
@@ -106,6 +112,29 @@ export function Popover({ content, title, align = "start", open, defaultOpen = f
     onClick: (e) => { p.onClick?.(e); if (!e.defaultPrevented) latest.current.set(!popoverOf(pop.current)); },
   });
   const panel = mounted ? createPortal(h("div", { ref: pop, className: cx("sn-pop sn-popover", className), role: "dialog", "aria-label": label ?? (typeof title === "string" ? title : undefined), style }, title ? h("h4", null, title) : null, content), document.body) : null;
+  return h(Fragment, null, trigger, panel);
+}
+
+// ———— 气泡确认：子元素是触发按钮。只给单条、属于自己、不能撤销的操作（能撤销的直接做、用轻提示给"撤销"） ————
+// title 问的是什么（"永久删除这个镜头？"）、description 后果、confirmText 确认按钮的字（写清楚做什么）；onConfirm / onCancel。
+// 锚在按钮上、从按钮那里展开；打开时焦点先落在"取消"上；Esc、点外面关上
+export function Popconfirm({ title, description, confirmText, cancelText, danger = true, align = "end", onConfirm, onCancel, children }) {
+  useSetup();
+  const pop = useRef(null), trig = useRef(null), mounted = useMounted(), uid = domId(useId()), latest = useLatest({ onConfirm, onCancel, align });
+  const close = (refocus) => popoverOf(pop.current)?.close(refocus);
+  useIso(() => () => { const el = pop.current, l = el && popoverOf(el); if (l) l.close(false); }, []);
+  const child = Children.only(children), p = child.props;
+  const trigger = cloneElement(child, {
+    ref: (n) => { trig.current = n; setRef(refOf(child), n); },
+    "aria-haspopup": "dialog", "aria-expanded": false,
+    onClick: (e) => { p.onClick?.(e); if (e.defaultPrevented) return; const l = popoverOf(pop.current); l ? l.close(false) : openPopover(pop.current, trig.current, { align: latest.current.align }); },
+  });
+  const panel = mounted ? createPortal(h("div", { ref: pop, className: "sn-pop sn-popconfirm", role: "alertdialog", "aria-labelledby": uid + "-q", "aria-describedby": description ? uid + "-d" : undefined },
+    h("div", { className: "sn-q" }, Ic("triangle-alert"), h("div", null, h("div", { id: uid + "-q" }, title), description ? h("div", { className: "sn-d", id: uid + "-d" }, description) : null)),
+    h("div", { className: "sn-acts" },
+      // data-no：打开时焦点先落在它上面（和设计稿的标记一样）
+      h("button", { type: "button", className: "sn-btn sn-ghost sn-sm", "data-no": "", onClick: () => { close(true); latest.current.onCancel?.(); } }, cancelText ?? tt("components.cancel")),
+      h("button", { type: "button", className: cx("sn-btn", danger ? "sn-danger" : "sn-primary", "sn-sm"), "data-yes": "", onClick: () => { close(false); latest.current.onConfirm?.(); } }, confirmText ?? tt("components.confirm")))), document.body) : null;
   return h(Fragment, null, trigger, panel);
 }
 

@@ -14,6 +14,9 @@ export function ContextMenu(p: Omit<MenuProps, "align">): React.ReactElement;
 /** Popover：子元素是触发按钮，content 是面板内容；open 受控（onOpenChange 里更新），只给 defaultOpen 就是非受控 */
 export interface PopoverProps { content: React.ReactNode; title?: React.ReactNode; align?: "start" | "center" | "end"; open?: boolean; defaultOpen?: boolean; onOpenChange?(open: boolean): void; label?: string; className?: string; style?: React.CSSProperties; children: React.ReactElement }
 export function Popover(p: PopoverProps): React.ReactElement;
+/** 气泡确认：子元素是触发按钮；只给单条、属于自己、不能撤销的操作；打开时焦点先落在"取消"上 */
+export interface PopconfirmProps { title: React.ReactNode; description?: React.ReactNode; confirmText?: React.ReactNode; cancelText?: React.ReactNode; danger?: boolean; align?: "start" | "center" | "end"; onConfirm?(): void; onCancel?(): void; children: React.ReactElement }
+export function Popconfirm(p: PopconfirmProps): React.ReactElement;
 export interface CommandPaletteHandle { open(): void; close(): void; toggle(): void }
 /** 命令面板：⌘K 打开（hotkey={false} 关掉快捷键）；选中一条 onRun(item)；open 受控 */
 export interface CommandPaletteProps<T extends import("./components").CommandItem = import("./components").CommandItem> { groups: { name: string; items: T[] }[]; onRun?(item: T): void; placeholder?: string; /** 没有结果时显示的 HTML；里面带 data-empty-act 的按钮点了（或直接回车）调 onEmpty */ empty?(q: string): string; onEmpty?(q: string): void; hotkey?: boolean; enterLabel?: string; open?: boolean; onOpenChange?(open: boolean): void }

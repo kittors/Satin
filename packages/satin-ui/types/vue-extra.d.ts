@@ -13,6 +13,8 @@ export const Popover: DefineComponent<{ title?: string; align?: "start" | "cente
 /** 命令面板：⌘K 打开；@run(item)、v-model:open；模板 ref 能调 open() / close() / toggle() */
 export const CommandPalette: DefineComponent<{ groups: { name: string; items: import("./components").CommandItem[] }[]; placeholder?: string; hotkey?: boolean; enterLabel?: string; empty?(q: string): string; open?: boolean }>;
 export interface LightboxItem { src?: string; bg?: string; ratio?: number; video?: string; caption?: string }
+/** 气泡确认：默认插槽是触发按钮；@confirm / @cancel；打开时焦点先落在"取消"上 */
+export const Popconfirm: DefineComponent<{ title: string; description?: string; confirmText?: string; cancelText?: string; danger?: boolean; align?: "start" | "center" | "end" }>;
 /** 看图：v-model:index（数字打开到那一张，关上时回写 null）；@close */
 export const Lightbox: DefineComponent<{ items: LightboxItem[]; index?: number | null; thumbOf?(i: number): HTMLElement | null | undefined; enabled?(i: number): boolean }>;
 /** 上传：拖放区 + 文件列表 */

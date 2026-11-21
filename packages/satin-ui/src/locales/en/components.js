@@ -17,6 +17,8 @@ export default {
   "components.14": "Remove ",
   "components.15": "Digit {p0}",
   "components.16": "{p0} items",
+  "components.cancel": "Cancel",
+  "components.confirm": "OK",
   "components.close": "Close",
   "components.longHint": "⇧↵ new line · ⌘↵ save",
   "components.loading": "Loading",

@@ -17,6 +17,8 @@ export default {
   "components.14": "移除 ",
   "components.15": "第 {p0} 位",
   "components.16": "共 {p0} 条",
+  "components.cancel": "取消",
+  "components.confirm": "确定",
   "components.close": "关闭",
   "components.longHint": "⇧↵ 换行 · ⌘↵ 保存",
   "components.loading": "加载中",
