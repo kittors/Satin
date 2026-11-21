@@ -1,0 +1,9 @@
+<button type="button" class="sn-btn sn-secondary" id="toast-basic-btn">存草稿</button>
+
+<script type="module">
+  import { toast } from "satin-ui";
+  // 状态提示：底部中间出现，3 秒后自己消失
+  document.getElementById("toast-basic-btn").addEventListener("click", () => {
+    toast({ text: "已保存到草稿箱" });
+  });
+</script>

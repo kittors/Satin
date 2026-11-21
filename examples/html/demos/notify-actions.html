@@ -1,0 +1,18 @@
+<button type="button" class="sn-btn sn-secondary" id="notify-actions-btn">模拟收到邀请</button>
+
+<script type="module">
+  import { notify } from "satin-ui";
+  document.getElementById("notify-actions-btn").addEventListener("click", () => {
+    notify({
+      title: "林夏邀请你一起编辑“雨夜车站”",
+      body: "你会看到她改的分镜，她也会看到你的。",
+      icon: "users",
+      time: "2 分钟前",
+      // 按钮点了跑 run(卡片)；要关上就调 card.close()
+      actions: [
+        { label: "接受", variant: "primary", run: (card) => card.close() },
+        { label: "稍后", run: (card) => card.close() },
+      ],
+    });
+  });
+</script>

@@ -1,0 +1,27 @@
+<script>
+  import { toast } from "satin-ui";
+
+  let menu;
+  // 选了一项：菜单上冒泡 menuselect，e.detail.item 是那一行
+  $effect(() => {
+    const pick = (e) => toast({ text: "选了：" + e.detail.item.textContent });
+    menu.addEventListener("menuselect", pick);
+    return () => menu.removeEventListener("menuselect", pick);
+  });
+</script>
+
+<!-- <sn-enhance> 接上触发器（点开、↓ 键）、键盘导航、子菜单 -->
+<sn-enhance>
+  <button type="button" class="sn-btn sn-secondary" data-fmenu="mn-move" aria-haspopup="menu" aria-expanded="false" data-i="chevron-down:caret">整理</button>
+  <div class="sn-menu sn-float" id="mn-move" bind:this={menu} role="menu" tabindex="-1" aria-label="整理">
+    <div class="sn-item" role="menuitem" data-key="移动到" data-sub="mn-move-1" aria-haspopup="menu" data-i="folder:before">移动到<span data-i="chevron-right:more"></span></div>
+    <div class="sn-sep"></div>
+    <div class="sn-item sn-danger-item" role="menuitem" data-key="trash" data-i="trash-2:before">移到回收站</div>
+  </div>
+  <div class="sn-menu sn-float sn-sub" id="mn-move-1" role="menu" tabindex="-1" aria-label="移动到">
+    <div class="sn-item sn-back" role="menuitem"><span data-i="chevron-left"></span><span></span></div>
+    <div class="sn-item" role="menuitem" data-key="ep1">第一集</div>
+    <div class="sn-item" role="menuitem" data-key="ep2">第二集</div>
+    <div class="sn-item" role="menuitem" data-key="ep3">第三集</div>
+  </div>
+</sn-enhance>

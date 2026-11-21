@@ -1,0 +1,103 @@
+// 右键菜单与子菜单的 API 契约（手写）。格式见 spec/components/_api/README.md
+import { code } from "./_code.mjs";
+
+export default {
+  title: "右键菜单与子菜单",
+  lead: "菜单按钮点开贴着按钮弹出；右键菜单出现在指针处，靠边时向内翻。子菜单和父层重叠 8px、首行对齐，右边放不下就翻到左边；斜着移向子菜单时，途经的行不会抢走高亮。菜单可以限定在一个容器里，太矮就在菜单里滚动。",
+  whenToUse: ["一行、一张卡片上的\"更多操作\"：收起不常用的几项。", "右键菜单：桌面端的快捷操作（同样的操作在别处也要有入口）。", "子菜单：\"移动到 › 第一集\"这种分两层的选择。"],
+  whenNotToUse: [
+    { text: "选一个值（画质、比例）：用下拉选择或分段控件。", use: "select" },
+    { text: "要放开关、输入框：用弹出面板。", use: "popover" },
+    { text: "全局的命令、搜索：用命令面板。", use: "cmdk" },
+  ],
+  related: [
+    { id: "select", diff: "下拉选择选的是值、显示在按钮上；菜单执行一个动作。" },
+    { id: "popover", diff: "弹出面板里能放控件；菜单只有一列命令。" },
+    { id: "cmdk", diff: "命令面板全局 ⌘K、能搜；菜单挂在某个按钮、某一块上。" },
+  ],
+  import: {
+    html: '// 入口里调过 setup()：菜单标记照设计稿写，按钮写 data-fmenu、右键区域写 data-ctx，外面包 <sn-enhance>',
+    react: 'import { Menu, ContextMenu } from "satin-ui/react";',
+    vue: 'import { Menu, ContextMenu } from "satin-ui/vue";',
+    svelte: '// 菜单标记照设计稿写，按钮写 data-fmenu、右键区域写 data-ctx，外面包 <sn-enhance>',
+    angular: '// 菜单标记照设计稿写，外面包 <sn-enhance>（组件加 CUSTOM_ELEMENTS_SCHEMA）',
+    solid: '// 菜单标记照设计稿写，外面包 <sn-enhance>',
+    preact: 'import { Menu, ContextMenu } from "satin-ui/react"; // 经 preact/compat',
+  },
+  importNote: {
+    react: "`<Menu items onSelect>` 包住触发按钮（点开、↓ 键打开）；`<ContextMenu items onSelect>` 包住右键区域（右键、长按、Shift+F10）。`items` 是 `{ key, label, icon, kbd, danger, disabled, checked, children }`，分隔线 `{ type: \"divider\" }`、分组标题 `{ type: \"group\", label }`。",
+    preact: "经 preact/compat 用 `satin-ui/react` 的 `Menu`、`ContextMenu`。",
+    vue: "`<Menu :items @select>` 默认插槽是触发按钮；`<ContextMenu :items @select>` 默认插槽是右键区域；`@select(key, 那一项)`。",
+    svelte: "没有专门的组件：照设计稿写 `.sn-menu.sn-float` 菜单，按钮写 `data-fmenu=\"菜单 id\"`，外面包 `<sn-enhance>`；选中时菜单上冒泡 `menuselect`。",
+    angular: "没有专门的组件：照设计稿写菜单和 `data-fmenu` / `data-ctx`，外面包 `<sn-enhance>`；菜单上写 `(menuselect)`。",
+    solid: "没有专门的组件：照设计稿写菜单，外面包 `<sn-enhance>`；`menuselect` 用 `ref` 挂监听。",
+    html: "`.sn-menu.sn-float[role=menu]` 里放 `.sn-item[role=menuitem]`（`data-key`）、`.sn-sep`、`.sn-head`；子菜单另写一个 `.sn-menu.sn-float.sn-sub`，父项写 `data-sub=\"子菜单 id\"`。按钮 `data-fmenu`、右键区域 `data-ctx`；选中时根菜单冒泡 `menuselect`，`e.detail` 是 `{ item, label, path, menu }`。",
+  },
+  dts: { react: "Menu", vue: "Menu", functions: ["openMenu", "closeMenu"] },
+  props: [
+    { name: "items", type: "MenuItem[]", default: "[]", required: true,
+      desc: "菜单项：`key`（不给用 label）、`label`、`icon`、`kbd` 快捷键、`danger` 危险、`disabled`、`checked` 打勾、`children` 子菜单；分隔线 `{ type: \"divider\" }`，分组标题 `{ type: \"group\", label }`。",
+      names: { react: "items", preact: "items", vue: "items", html: ".sn-item / .sn-sep / .sn-head" } },
+    { name: "align", type: '"start" | "center" | "end"', default: '"start"', required: false, desc: "菜单和按钮的哪一边对齐（只有菜单按钮有）。", names: { react: "align", preact: "align", vue: "align" } },
+    { name: "label", type: "string", default: "—", required: false, desc: "读屏读出来的菜单名字：\"更多操作\"。", names: { react: "label", preact: "label", vue: "label", html: "菜单的 aria-label" } },
+    { name: "bound", type: 'HTMLElement | RefObject | "window"', default: '"window"', required: false,
+      desc: "菜单（和每一层子菜单）只能待在这个容器里，四边留 8px；太矮就限高、在菜单里滚动；窄到子菜单放不下时点开它在原位下钻。", names: { react: "bound", preact: "bound", vue: "bound", html: "openMenu(菜单, { bound })" } },
+  ],
+  events: [
+    { name: "select", payload: "(key: string, item: MenuItem)", when: "选中一项（子菜单里的也算）、菜单收起以后；不可用的、已经打勾的项不触发。",
+      names: { react: "onSelect", preact: "onSelect", vue: "@select", svelte: "menuselect（菜单上）", angular: "(menuselect)", solid: "menuselect（ref 挂监听）", html: "menuselect（e.detail）" } },
+  ],
+  slots: [{ name: "trigger", desc: "触发器：菜单按钮（Menu），或者右键区域（ContextMenu）。", names: { react: "children", vue: "默认插槽", html: "data-fmenu 按钮 / data-ctx 区域" } }],
+  methods: [],
+  functions: [
+    { name: "openMenu", signature: "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; onSelect?(detail: MenuSelectDetail): void }): void", returns: "void", from: "satin-ui",
+      desc: "程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`keyboard: true` 先高亮第一项。" },
+    { name: "closeMenu", signature: "closeMenu(refocus?: boolean): void", returns: "void", from: "satin-ui", desc: "关上开着的菜单（`refocus` 焦点回到触发器）。" },
+  ],
+  cssVars: [
+    { name: "--sn-menu-bg", desc: "菜单底色（毛玻璃）", default: "白 82%", token: true },
+    { name: "--sn-menu-shadow", desc: "菜单阴影", default: "浮层一档", token: true },
+    { name: "--sn-danger", desc: "危险项的文字", default: "红", token: true },
+  ],
+  classes: [
+    { name: ".sn-menu.sn-float / .sn-menu.sn-sub", desc: "浮动菜单 / 子菜单" },
+    { name: ".sn-item / .sn-item.sn-danger-item / .sn-item.sn-is-off", desc: "一项 / 危险 / 不可用" },
+    { name: ".sn-sep / .sn-head / .sn-key", desc: "分隔线 / 分组标题 / 快捷键" },
+    { name: "[data-fmenu] / [data-ctx] / [data-sub]", desc: "菜单按钮 / 右键区域 / 有子菜单的项（值都是菜单 id）" },
+  ],
+  types: ["MenuProps", "MenuItem", "MenuSelectDetail"],
+  keyboard: [
+    { keys: "↓ / Enter / 空格（按钮上）", does: "打开菜单，高亮第一项。" },
+    { keys: "Shift+F10 / 菜单键（区域上）", does: "打开右键菜单。" },
+    { keys: "↑ / ↓", does: "在项之间移动。" },
+    { keys: "→ / ←", does: "打开 / 收起子菜单。" },
+    { keys: "Enter", does: "选中。" },
+    { keys: "Esc", does: "关上，焦点回到触发器。" },
+  ],
+  a11y: {
+    roles: ["菜单 `role=\"menu\"`、每项 `role=\"menuitem\"`；按钮 `aria-haspopup=\"menu\"`、`aria-expanded` 跟着变；有子菜单的项 `aria-haspopup=\"menu\"`。"],
+    focus: ["打开后焦点在菜单里；关上后回到触发器。右键区域要能聚焦（`tabindex=\"0\"`），写 `aria-label` 说明能按 Shift+F10。"],
+    notes: ["右键菜单里的操作在别处也要有入口（触屏、键盘用户不一定会右键）。"],
+  },
+  design: {
+    do: ["常用的在上、危险的放最后，中间用分隔线隔开。", "写上快捷键，用的人慢慢就记住了。"],
+    dont: [
+      { text: "菜单项配彩色图标。", rule: "no-ai-icons" },
+      { text: "菜单被容器裁掉、伸出窗口。", rule: "float-clipped" },
+    ],
+    copy: ["动词开头：\"复制一份\"\"移到回收站\"。"],
+    motion: [
+      { what: "从触发器那边长出来", easing: "ease.outStrong", duration: "160ms" },
+      { what: "子菜单打开等 220ms，切换最多等 1200ms，关闭等 360ms", easing: "—", duration: "220 / 1200 / 360ms" },
+      { what: "选中的行闪一下再收起", easing: "ease.in", duration: "140ms" },
+    ],
+  },
+  examples: [
+    { slug: "ctxmenu-basic", title: "最简单的用法：更多操作", why: "包住一个按钮：点开贴着它弹出；↓ 键也能打开，Esc 关上回到按钮。",
+      html: `<button type="button" class="sn-btn sn-ghost sn-ibtn" aria-haspopup="menu" aria-expanded="false" data-tip="更多操作" aria-label="更多操作"></button>`, code: code("ctxmenu-basic") },
+    { slug: "ctxmenu-context", title: "右键菜单", why: "包住一块区域：右键、触屏长按、Shift+F10 在指针处弹出，靠边时向内翻。",
+      html: `<div class="sn-ctx-zone" tabindex="0" aria-label="镜头卡片，按 Shift+F10 打开菜单">在这里点右键</div>`, code: code("ctxmenu-context") },
+    { slug: "ctxmenu-submenu", title: "子菜单", why: "children 写成子菜单：斜着移过去时途经的行不抢高亮；右边放不下就往左开。",
+      html: `<button type="button" class="sn-btn sn-secondary" aria-haspopup="menu" aria-expanded="false">整理</button>`, code: code("ctxmenu-submenu") },
+  ],
+};
