@@ -49,7 +49,8 @@ for (const [fw, dev, theme] of COMBOS) {
       const pager = document.querySelector(".d-pager"), pagerN = pager ? pager.querySelectorAll("a").length : 0;
       const pagerText = pager ? [...pager.querySelectorAll("a .t")].map((t) => getComputedStyle(t).fontSize + "/" + getComputedStyle(t).fontWeight).join(",") : "";
       // API 一节（到"键盘与无障碍"或"设计规范"为止）的文字：看有没有另一个框架的写法串进来
-      let apiText = ""; if (api) { for (let n = api.nextElementSibling; n && !(n.matches("h2") && n.id !== "api"); n = n.nextElementSibling) apiText += " " + n.textContent; }
+      // "列定义"那张表（columns 里每一项的字段，各框架写法一样，比如列对象的 className）不算串门，跳过这一小节
+      let apiText = "", inCols = false; if (api) { for (let n = api.nextElementSibling; n && !(n.matches("h2") && n.id !== "api"); n = n.nextElementSibling) { if (n.matches("h3")) inCols = n.id === "api-columns"; if (!inCols) apiText += " " + n.textContent; } }
       const cross = fwName === "Vue" ? [...new Set(apiText.match(/ReactNode|className|JSX\.Element|\bref=\{|onClick=\{/g) || [])] : [...new Set(apiText.match(/v-model|v-bind|#default|@click|defineProps/g) || [])];
       return { cross, h1: document.querySelector(".d-h1")?.textContent.trim(), codeHeads: heads.length, files: heads.map((h) => h.file).filter(Boolean).slice(0, 4), wrongFw, frames: frames.length, notReady, tiny, api: !!api, apiTables: tables.length, apiRows: tables[0] ? tables[0].querySelectorAll("tbody tr").length : 0, columns: !!cols, toc: vis(toc), tocN, pagerN, pagerText, overflow: document.documentElement.scrollWidth > innerWidth + 1 };
     }, [NAME[fw]]);

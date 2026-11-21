@@ -5,7 +5,7 @@
 //   --built（库会话重新生成、构建以后）：7 种写法逐个打开——纯 HTML 每个演示开 play.html?demo=<slug>，其余开 examples/<框架>/dist/gallery.html，
 //     记控制台报错（错误边界会把出错的演示名带上）和每个演示格子有没有画出来。
 //   --poke（配合默认模式）：打开以后再把演示里看得见的按钮挨个点一下（每次点完按 Esc 关掉浮层；表单不提交、链接不跳），点出来的报错、失败的请求也算
-// 用法（5192 起着）：node scripts/site/examples-run.mjs [--ids button,tooltip,…] [--poke] [--built] [--out /tmp/site-examples-run]
+// 用法（5192 起着）：node scripts/site/examples-run.mjs [--ids button,tooltip,…] [--poke] [--built [--fw angular,react]] [--out /tmp/site-examples-run]
 import fs from "node:fs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
@@ -78,8 +78,10 @@ if (!BUILT) {
   }
   await ctx.close();
 } else {
+  // --fw angular,react：只查这几种写法（默认 7 种都查）
+  const FWS = arg("fw", "") ? String(arg("fw")).split(",") : ["html", "react", "vue", "svelte", "angular", "solid", "preact"];
   // 纯 HTML：每个演示开 play.html?demo=
-  const demos = JSON.parse(fs.readFileSync(new URL("../../examples/shared/demos.json", import.meta.url), "utf8")).filter((d) => !ONLY || ONLY.includes(d.id));
+  const demos = FWS.includes("html") ? JSON.parse(fs.readFileSync(new URL("../../examples/shared/demos.json", import.meta.url), "utf8")).filter((d) => !ONLY || ONLY.includes(d.id)) : [];
   const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } });
   for (const d of demos) {
     const errs = [], page = await ctx.newPage(); watch(page, errs);
@@ -89,7 +91,7 @@ if (!BUILT) {
     process.stdout.write(`\rhtml ${d.slug.padEnd(16)} ${errs.length ? "✗" : "✓"}          `);
   }
   // 其余写法：全量页（构建产物）
-  for (const fw of ["react", "vue", "svelte", "angular", "solid", "preact"]) {
+  for (const fw of ["react", "vue", "svelte", "angular", "solid", "preact"].filter((f) => FWS.includes(f))) {
     const url = fw === "angular" ? `${B}/examples/angular/dist/browser/gallery.html` : `${B}/examples/${fw}/dist/gallery.html`;
     const errs = [], p2 = await ctx.newPage(); watch(p2, errs);
     const res = await p2.goto(url, { waitUntil: "load" }).catch((e) => ({ status: () => 0, e }));

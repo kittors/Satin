@@ -192,6 +192,19 @@ export function tsAny(js) {
     .replace(/\bfunction(\s+[\w$]+)?\s*\(([^()]*)\)/g, (m, name, p) => `function${name || ""}(${params(p)})`);
 }
 
+// TypeScript（Angular 组件里）：接线脚本是普通 JS，有两处严格模式下编译不过，生成时补上类型（2026-11-21 库会话构建 Angular 时发现，手改过生成的文件，这里搬过来）——
+// · 数据表格 / Canvas 表格的列定义单独写成 const columns = [...]：推断成 string，对不上 "left"、"sel" 这类字面量，标上 GridColumn[]，类型从同一个入口引
+// · 两层下标按字段名改值（all[i][key] = value）：内层是具体的对象类型，不能拿字符串下标写，先断言成 Record<string, unknown>
+export function tsTypes(body, imports) {
+  const gi = imports.findIndex((l) => /^import\s+\{[^}]*\}\s+from\s+["']satin-ui\/(grid|canvas-grid)["']/.test(l));
+  if (gi >= 0 && /\bconst columns = \[/.test(body)) {
+    body = body.replace(/\bconst columns = \[/, "const columns: GridColumn[] = [");
+    imports = imports.map((l, i) => (i === gi && !/\bGridColumn\b/.test(l) ? l.replace(/\s*\}\s+from/, ", type GridColumn } from") : l));
+  }
+  body = body.replace(/(\b[\w$.]+\[[^\][\n]+\])\[key\] = /g, "($1 as Record<string, unknown>)[key] = ");
+  return { body, imports };
+}
+
 // 主函数：一个演示 → 7 种写法的文件。slug：演示的名字（button-0）；node：标记的父节点（取它的子节点）；js：接线脚本；css：演示用的样式。
 // 返回 { html, react, vue, svelte, angular, solid, preact }，每种是 [{ name, lang, code }]（第一个是组件文件，后面是样式）
 export function variants({ node, js = "", css = "", name, slug, htmlCode, inline, flex }) {
@@ -221,10 +234,10 @@ export function variants({ node, js = "", css = "", name, slug, htmlCode, inline
   const svelte = `<script>\n${ind(sImp.join("\n"), "  ")}\n${usesElems ? "  defineElements();\n" : ""}\n  let root;\n  onMount(() => {\n    const unsetup = setup();\n    const off = ${wire("    ", "root")};\n    return () => { off(); unsetup(); };\n  });\n</script>\n\n<div bind:this={root}>\n${toHTML(node, { ...opt, indent: "  ", text: escSvelte, attr: escSvelte })}\n</div>\n`;
 
   // Angular：独立组件；模板写在组件里，ngAfterViewInit 接上、ngOnDestroy 撤掉；接线脚本的参数补成 any（严格模式能编译）
-  const cls = comp + "Component", sel = "demo-" + slug;
-  const aImp = mergeImports(['import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...imports.filter((l) => !/^import\s+["'][^"']+\.css["']/.test(l))]); // Angular 的样式走 angular.json（page.css 里已经包含全部组件样式），组件文件里不 import CSS
+  const cls = comp + "Component", sel = "demo-" + slug, ngTs = tsTypes(body, imports);
+  const aImp = mergeImports(['import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...ngTs.imports.filter((l) => !/^import\s+["'][^"']+\.css["']/.test(l))]); // Angular 的样式走 angular.json（page.css 里已经包含全部组件样式），组件文件里不 import CSS
   const ngTpl = tplLit(toHTML(node, { ...opt, indent: "      ", text: escNg, attr: (t) => t.replace(/\{\{/g, "&#123;&#123;") }));
-  const angular = `${aImp.join("\n")}\n${usesElems ? "\ndefineElements();\n" : ""}\n@Component({\n  selector: "${sel}",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素\n  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式\n${css ? `  styles: [\`\n${ind(tplLit(css), "    ")}\n  \`],\n` : ""}  template: \`\n    <div #root>\n${ngTpl}\n    </div>\`,\n})\nexport class ${cls} {\n  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;\n  private off = () => {};\n  ngAfterViewInit() {\n    const unsetup = setup();\n    const done = enhance(this.root.nativeElement${hasBody ? `, (root: any) => {\n${ind(tsAny(body), "      ")}\n    }` : ""});\n    this.off = () => { done(); unsetup(); };\n  }\n  ngOnDestroy() { this.off(); }\n}\n`;
+  const angular = `${aImp.join("\n")}\n${usesElems ? "\ndefineElements();\n" : ""}\n@Component({\n  selector: "${sel}",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素\n  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式\n${css ? `  styles: [\`\n${ind(tplLit(css), "    ")}\n  \`],\n` : ""}  template: \`\n    <div #root>\n${ngTpl}\n    </div>\`,\n})\nexport class ${cls} {\n  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;\n  private off = () => {};\n  ngAfterViewInit() {\n    const unsetup = setup();\n    const done = enhance(this.root.nativeElement${hasBody ? `, (root: any) => {\n${ind(tsAny(ngTs.body), "      ")}\n    }` : ""});\n    this.off = () => { done(); unsetup(); };\n  }\n  ngOnDestroy() { this.off(); }\n}\n`;
 
   // Solid 2：onSettled 里接上（相当于以前的 onMount），onCleanup 撤掉；属性名照 HTML 写
   const soImp = mergeImports(['import { onSettled, onCleanup } from "solid-js";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...imports, ...cssImport]);
