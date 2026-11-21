@@ -1,5 +1,7 @@
 import { toast } from "satin-ui";
 
+const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+
 // 名字不是驼峰的事件用 ref 挂
 const on = (type, fn) => (el) => el.addEventListener(type, fn);
 
@@ -8,7 +10,7 @@ export default function ShotCard() {
   return (
     <sn-enhance>
       <div class="sn-ctx-zone" data-ctx="mn-ctx" tabindex="0" aria-label="镜头卡片，按 Shift+F10 打开菜单">在这里点右键</div>
-      <div class="sn-menu sn-float" id="mn-ctx" ref={on("menuselect", (e) => toast({ text: "选了：" + e.detail.item.textContent }))} role="menu" tabindex="-1" aria-label="镜头">
+      <div class="sn-menu sn-float" id="mn-ctx" ref={on("menuselect", (e) => toast({ text: DONE[e.detail.item.dataset.key] }))} role="menu" tabindex="-1" aria-label="镜头">
         <div class="sn-item" role="menuitem" data-key="open" data-i="external-link:before">打开</div>
         <div class="sn-item" role="menuitem" data-key="copy" data-i="copy:before">复制一份<span class="sn-key">⌘D</span></div>
         <div class="sn-sep"></div>

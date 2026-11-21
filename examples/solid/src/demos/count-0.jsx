@@ -54,7 +54,7 @@ export default function CountDemo0() {
         <div class="sn-field">
           <label class="sn-lbl" for="c-desc">画面描述</label>
           <div class="sn-box-in" data-ta="" data-max="120" data-max-lines="7">
-            <textarea id="c-desc" rows="3" placeholder="写清楚人物、动作和光线，生成会更准。可以一直往下写，框会跟着长高。"></textarea>
+            <textarea id="c-desc" rows="3" placeholder="写清楚人物、动作和光线，生成会更准。"></textarea>
             <div class="sn-ta-foot">
               <span class="sn-hint">⇧↵ 换行 · ⌘↵ 保存</span>
               <span class="sn-ta-count">

@@ -6,5 +6,5 @@ const upload = (file, progress) => new Promise((done) => { let p = 0; const t = 
 </script>
 
 <template>
-  <Composer placeholder="拖进参考图，或者点左下角的 +" send="生成" :upload="upload" @send="({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }" />
+  <Composer placeholder="描述画面，可以附上参考图" send="生成" :upload="upload" @send="({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }" />
 </template>

@@ -10,7 +10,7 @@ export default function StoppablePrompt() {
   let host;
   // 生成中点停止，onStop 里取消；挂上以后建，卸载时 destroy()
   onSettled(() => {
-    const it = createComposer(host, { placeholder: "描述画面，发送后可以随时停止", send: "生成", onSend: generate, onStop: stop });
+    const it = createComposer(host, { placeholder: "描述你想要的画面", send: "生成", onSend: generate, onStop: stop });
     return () => it.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;

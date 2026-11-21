@@ -7,7 +7,7 @@
   const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
   // 生成中点停止，onStop 里取消
-  const options = { placeholder: "描述画面，发送后可以随时停止", send: "生成", onSend: generate, onStop: stop };
+  const options = { placeholder: "描述你想要的画面", send: "生成", onSend: generate, onStop: stop };
 </script>
 
 <!-- 这个组件没有单独的 Svelte 封装：用 Satin 包 createComposer，选项写在 options 里 -->

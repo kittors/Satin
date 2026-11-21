@@ -8,5 +8,5 @@ const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 </script>
 
 <template>
-  <Composer placeholder="描述画面，发送后可以随时停止" send="生成" @send="generate" @stop="stop" />
+  <Composer placeholder="描述你想要的画面" send="生成" @send="generate" @stop="stop" />
 </template>

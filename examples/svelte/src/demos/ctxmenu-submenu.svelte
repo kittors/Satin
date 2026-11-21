@@ -1,10 +1,11 @@
 <script>
   import { toast } from "satin-ui";
+  const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
   let menu;
   // 选了一项：菜单上冒泡 menuselect，e.detail.item 是那一行
   $effect(() => {
-    const pick = (e) => toast({ text: "选了：" + e.detail.item.textContent });
+    const pick = (e) => toast({ text: DONE[e.detail.item.dataset.key] });
     menu.addEventListener("menuselect", pick);
     return () => menu.removeEventListener("menuselect", pick);
   });

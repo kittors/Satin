@@ -11,5 +11,6 @@
 <script type="module">
   import { toast } from "satin-ui";
   // 选了一项：菜单上冒泡 menuselect，e.detail.item 是那一行（data-key 是哪一项）
-  document.getElementById("mn-ctx").addEventListener("menuselect", (e) => toast({ text: "选了：" + e.detail.item.textContent }));
+  const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+  document.getElementById("mn-ctx").addEventListener("menuselect", (e) => toast({ text: DONE[e.detail.item.dataset.key] }));
 </script>
