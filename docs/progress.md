@@ -1,8 +1,13 @@
 # 进度（web-v1）
 
-> 主会话巡检用。每完成一步或至少每 15 分钟更新一次。最后更新：2026-11-21 11:58（北京时间）。
+> 主会话巡检用。每完成一步或至少每 15 分钟更新一次。最后更新：2026-11-21 12:32（北京时间）。
 
 ## 现在在做
+- **12:32 分工调整**：官网（site/**）交给官网会话（交接说明在共享笔记 handover-site-from-lib.md；浏览器两个会话共用 /tmp/satin-browser.lock）。这边管库、封装、契约和示例、库的效果对比、CLI、移动端、评测、报告
+  - 组件文档铺开：13 / 61 个契约齐全（按钮、下拉、弹窗、日期、数据表格 5 个样板 + 芯片、纯图标按钮、文字链接、空状态、标签徽标头像、分段控件、滑块、验证码），每个都过契约 ↔ 类型、完整度、React / Vue 写法和纯 HTML 标记一致性
+  - 为铺开补的库：Chip（筛选芯片、能移除的标签带收起动画）、Button 的 badge、removeChip 的 keep；Svelte 补 9 个封装（Segmented、Slider、Tabs、Pager、TagInput、Stepper、Otp、Collapse、NumberFlow）
+  - 工具：scripts/spec/static-variants.mjs（纯样式示例从一份标记写出 7 种写法）、scripts/test/contract-ssr.mjs（标记一致性）、scripts/examples/contracts.mjs（契约示例不开浏览器写进示例目录）
+  - 数据表格真实 API 的子任务在跑；它改库期间设计稿的两块表格是坏的，库的截图比对、逐帧轨迹、浏览器运行时测试先停着，CLI 完整验收排在锁里
 - **11:58**
   - 已提交：按钮页地道写法 + 5 个样板 7 种写法（b6f96a4）；顶栏按 apple.com 思路重做、框架选择器换官方标志（4ba8205）。主会话验收：按钮页、下拉、弹窗、日期、顶栏通过；数据表格不合格（只能放演示数据）→ 子任务在做真正的 API（columns、data、dataSource、受控排序 / 选择、编辑、三种状态，演示数据挪出库），顺带审计所有组件的"只能放演示数据"参数
   - 第 2 项（补齐 React / Vue 封装）已合进库：菜单、右键菜单、Popover、命令面板、看图、上传、侧栏、无限列表、滚动区域、视频、音频（主入口），对话、Markdown、流程图、画布表格（子路径）；ESLint、导入、服务端渲染、tsc、体积、契约都过；浏览器运行时测试（scripts/test/wrappers.mjs）排在独占锁里
