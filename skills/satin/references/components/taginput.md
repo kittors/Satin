@@ -339,8 +339,8 @@ export default function SearchTags() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `tags` | `string[]` | [] | 否 | 现在的标签。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:tags`；传进来的值换了，就照它显示。 | createXxx 选项：`tags`；React：`tags`；Vue：`v-model`；Svelte：`bind:tags`；Preact：`tags`；自定义元素：`tags（JSON）`；标记：`每个标签一个 span.sn-chip.sn-tag（脚本加）`；纯 HTML：`tags（JSON）` |
-| `defaultTags` | `string[]` | [] | 否 | 非受控：一开始的标签（Vue 里不绑 v-model、只写 `:tags` 也是这个意思）。 | React：`defaultTags`；Preact：`defaultTags`；Vue：`tags` |
+| `tags` | `string[]` | [] | 否 | 现在的标签；传进来的值换了，就照它显示。<br>React、Preact：现在的标签，受控：在 `onChange` 里更新；传进来的值换了，就照它显示。<br>Vue：现在的标签：`v-model` 绑定；传进来的值换了，就照它显示。<br>Svelte：现在的标签：`bind:tags` 绑定；传进来的值换了，就照它显示。 | createXxx 选项：`tags`；React：`tags`；Vue：`v-model`；Svelte：`bind:tags`；Preact：`tags`；自定义元素：`tags（JSON）`；标记：`每个标签一个 span.sn-chip.sn-tag（脚本加）`；纯 HTML：`tags（JSON）` |
+| `defaultTags` | `string[]` | [] | 否 | 非受控：一开始的标签。<br>Vue：非受控：一开始的标签（不绑 `v-model`、只写 `:tags`）。 | React：`defaultTags`；Preact：`defaultTags`；Vue：`tags` |
 | `max` | `number` | 8 | 否 | 最多几个；满了再加，下面的计数抖一下。 | createXxx 选项：`max`；React：`max`；Vue：`max`；Svelte：`max`；Preact：`max`；自定义元素：`max`；标记：`data-max`；纯 HTML：`max` |
 | `placeholder` | `string` | "输入标签，回车确认" | 否 | 输入框里的提示（英文界面跟着换）。 | createXxx 选项：`placeholder`；React：`placeholder`；Vue：`placeholder`；Svelte：`placeholder`；Preact：`placeholder`；自定义元素：`placeholder`；标记：`input 的 placeholder`；纯 HTML：`placeholder` |
 | `hint` | `string` | "回车或逗号添加 · 退格删除" | 否 | 下面那行左边的说明（右边是计数）。 | createXxx 选项：`hint`；React：`hint`；Vue：`hint`；Svelte：`hint`；Preact：`hint`；自定义元素：`hint`；标记：`.sn-tagin-foot 里第一个 span`；纯 HTML：`hint` |

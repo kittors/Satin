@@ -253,7 +253,11 @@
       "type": "unknown[]",
       "default": "—",
       "required": false,
-      "desc": "受控的勾选：勾上的行的 `rowKey`。传进来的数组换了才跟着变（用户勾了、父组件没把新值传回来，不会退回去）；按块加载时只认已经到了的行，后面的行到了再补勾。Vue 写 `v-model:selected`，Svelte 写 `bind:selectedKeys`。",
+      "desc": "受控的勾选：勾上的行的 `rowKey`。传进来的数组换了才跟着变（用户勾了、父组件没把新值传回来，不会退回去）；按块加载时只认已经到了的行，后面的行到了再补勾。",
+      "descBy": {
+        "vue": "受控的勾选：勾上的行的 `rowKey`，`v-model:selected` 绑定。按块加载时只认已经到了的行，后面的行到了再补勾。",
+        "svelte": "受控的勾选：勾上的行的 `rowKey`，`bind:selectedKeys` 绑定。按块加载时只认已经到了的行，后面的行到了再补勾。"
+      },
       "names": {
         "js": "selectedKeys",
         "react": "selectedKeys",
@@ -281,7 +285,11 @@
       "type": "GridSort | null",
       "default": "—",
       "required": false,
-      "desc": "受控的排序：`{ key, dir }`（`dir` 1 升序、-1 降序）或 `null`。点表头时发 `sortChange`；传进来的值换了才跟着变。Vue 写 `v-model:sort`，Svelte 写 `bind:sort`。",
+      "desc": "受控的排序：`{ key, dir }`（`dir` 1 升序、-1 降序）或 `null`。点表头时发 `sortChange`；传进来的值换了才跟着变。",
+      "descBy": {
+        "vue": "受控的排序：`{ key, dir }`（`dir` 1 升序、-1 降序）或 `null`，`v-model:sort` 绑定。",
+        "svelte": "受控的排序：`{ key, dir }`（`dir` 1 升序、-1 降序）或 `null`，`bind:sort` 绑定。"
+      },
       "names": {
         "js": "sort",
         "react": "sort",
@@ -786,7 +794,7 @@
   "slots": [
     {
       "name": "cell-<key>",
-      "desc": "Vue：自己画某一列的格子，插槽拿到 `{ value, row, index }`（等于给那一列写 `render`）。",
+      "desc": "自己画某一列的格子，插槽拿到 `{ value, row, index }`（等于给那一列写 `render`）。",
       "names": {
         "vue": "#cell-<key>"
       }

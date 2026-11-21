@@ -663,8 +663,8 @@ export default function MakeSteps() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `tabs` | `{ label: string; badge?: string \| number; content?: string; html?: string }[]` | [] | 是 | 标签：`label` 名字，`badge` 后面的数量，`content` 这一块的内容（纯文字；带格式给 `html`）。 | createXxx 选项：`tabs`；React：`tabs`；Vue：`tabs`；Svelte：`tabs`；Preact：`tabs`；自定义元素：`tabs（JSON）`；纯 HTML：`tabs（JSON）` |
-| `value` | `number` | 0 | 否 | 选中第几个（从 0 数）。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`；传进来的值换了就滑过去。 | createXxx 选项：`value`；React：`value`；Vue：`v-model`；Svelte：`bind:value`；Preact：`value`；自定义元素：`value`；纯 HTML：`value` |
-| `defaultValue` | `number` | 0 | 否 | 非受控的初始值（Vue 里不绑 v-model、只写 :value 也是这个意思）。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
+| `value` | `number` | 0 | 否 | 选中第几个（从 0 数）；传进来的值换了就滑过去。<br>React、Preact：选中第几个（从 0 数），受控：在 `onChange` 里更新；传进来的值换了就滑过去。<br>Vue：选中第几个（从 0 数）：`v-model` 绑定；传进来的值换了就滑过去。<br>Svelte：选中第几个（从 0 数）：`bind:value` 绑定；传进来的值换了就滑过去。 | createXxx 选项：`value`；React：`value`；Vue：`v-model`；Svelte：`bind:value`；Preact：`value`；自定义元素：`value`；纯 HTML：`value` |
+| `defaultValue` | `number` | 0 | 否 | 非受控的初始值。<br>Vue：非受控的初始值（不绑 `v-model`、只写 `:value`）。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
 
 ## 事件
 

@@ -141,7 +141,12 @@
       "type": "string",
       "default": "\"\"",
       "required": false,
-      "desc": "写的字。React 里受控（`onChange` 里更新），Vue `v-model`；传进来的值换了，计数跟着滚。",
+      "desc": "写的字；传进来的值换了，计数跟着滚。",
+      "descBy": {
+        "react": "写的字，受控：在 `onChange` 里更新；传进来的值换了，计数跟着滚。",
+        "preact": "写的字，受控：在 `onChange` 里更新；传进来的值换了，计数跟着滚。",
+        "vue": "写的字：`v-model` 绑定；传进来的值换了，计数跟着滚。"
+      },
       "names": {
         "js": "value",
         "react": "value",

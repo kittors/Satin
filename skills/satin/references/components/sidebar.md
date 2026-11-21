@@ -568,7 +568,7 @@ export default function AppBar() {
 |---|---|---|---|---|---|
 | `items` | `SidebarItem[]` | [] | 是 | 导航项：`{ key, label, icon, badge, href }`；分组标题 `{ type: "group", label }`。 | React：`items`；Preact：`items`；Vue：`items`；纯 HTML：`nav.sn-side-nav > a[data-key] / p` |
 | `footer` | `SidebarItem[]` | [] | 否 | 底部的几项（设置、帮助）。 | React：`footer`；Preact：`footer`；Vue：`footer`；纯 HTML：`.sn-side-foot > a` |
-| `value` | `string` | — | 否 | 选中的 key。React 里受控（`onNavigate` 里更新），Vue `v-model`。 | React：`value`；Preact：`value`；Vue：`v-model`；纯 HTML：`选中的那项加 sn-on` |
+| `value` | `string` | — | 否 | 选中的 key。<br>React、Preact：选中的 key，受控：在 `onNavigate` 里更新。<br>Vue：选中的 key：`v-model` 绑定。 | React：`value`；Preact：`value`；Vue：`v-model`；纯 HTML：`选中的那项加 sn-on` |
 | `defaultValue` | `string` | — | 否 | 非受控：一开始选中哪一项。 | React：`defaultValue`；Preact：`defaultValue` |
 | `title` | `string` | "" | 否 | 顶部标志旁边的名字。 | React：`title`；Preact：`title`；Vue：`title`；纯 HTML：`.sn-side-top b` |
 | `logo` | `boolean` | true | 否 | 显示标志。 | React：`logo`；Preact：`logo`；Vue：`logo`；纯 HTML：`.sn-logo` |

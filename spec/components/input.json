@@ -111,7 +111,13 @@
       "native": [
         "react"
       ],
-      "desc": "输入的文字。React 里和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控；Vue `v-model`；Svelte `bind:value`。",
+      "desc": "输入的文字。",
+      "descBy": {
+        "react": "输入的文字。和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控。",
+        "preact": "输入的文字。和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控。",
+        "vue": "输入的文字：`v-model` 绑定。",
+        "svelte": "输入的文字：`bind:value` 绑定。"
+      },
       "names": {
         "react": "value / defaultValue",
         "preact": "value / defaultValue",

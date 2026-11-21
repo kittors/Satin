@@ -969,7 +969,7 @@ export default function SortMenu() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `items` | `Item[]` | [] | 是 | 选项：字符串，或者 { value, label, disabled }。value 是选中后拿到的值，label 是显示的文字，disabled 的那一项点不了。createSelect 接已经写好的标记时可以不给。（例：`items={["16:9 · 横屏", { value: "9:16", label: "9:16 · 竖屏" }]}`） | createXxx 选项：`items`；React：`items`；Vue：`items`；Svelte：`items`；Preact：`items`；自定义元素：`items（写成 JSON）`；Angular：`[attr.items]（JSON 字符串）`；标记：`.sn-menu > .sn-item（data-v 是值）` |
-| `value` | `string` | —（没有选中，显示 placeholder） | 否 | 选中项的值。React 里给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控；Vue 用 v-model，Svelte 用 bind:value；自定义元素改 value 属性，组件跟着更新。 | createXxx 选项：`value`；React：`value / defaultValue`；Vue：`v-model / value`；Svelte：`bind:value / value`；Preact：`value / defaultValue`；自定义元素：`value`；Angular：`[attr.value]`；标记：`.sn-item.sn-sel` |
+| `value` | `string` | —（没有选中，显示 placeholder） | 否 | 选中项的值。<br>React、Preact：选中项的值。给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控。<br>Vue：选中项的值：`v-model` 绑定。<br>Svelte：选中项的值：`bind:value` 绑定。<br>element：选中项的值：改 value 属性，组件跟着更新。 | createXxx 选项：`value`；React：`value / defaultValue`；Vue：`v-model / value`；Svelte：`bind:value / value`；Preact：`value / defaultValue`；自定义元素：`value`；Angular：`[attr.value]`；标记：`.sn-item.sn-sel` |
 | `placeholder` | `string` | "" | 否 | 还没选时触发器里显示的字，写要选什么："选择画面比例"。 | createXxx 选项：`placeholder`；React：`placeholder`；Vue：`placeholder`；Svelte：`placeholder`；Preact：`placeholder`；自定义元素：`placeholder` |
 | `label` | `string` | — | 否 | 触发器的读屏名称（`aria-label`）。页面上看得见的标签另外写在 `.sn-lbl` 里。 | createXxx 选项：`label`；React：`label`；Vue：`label`；Svelte：`label`；Preact：`label`；自定义元素：`label` |
 

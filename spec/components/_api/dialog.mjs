@@ -42,10 +42,10 @@ export default {
   dts: { functions: ["openDialog", "closeDialog", "wireDialog"], react: "Dialog", vue: "Dialog", svelte: "Dialog" },
   props: [
     { name: "open", type: "boolean", default: "false", required: true,
-      desc: "开着还是关着。关上以后（Esc、取消、程序关）React 调 onClose，在里面把它改回 false；Vue 用 v-model:open、Svelte 用 bind:open，会自己改回 false。手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。",
+      desc: "开着还是关着。", descBy: { react: "开着还是关着。关上以后（Esc、取消、程序关）调 onClose，在里面把它改回 false。", preact: "开着还是关着。关上以后（Esc、取消、程序关）调 onClose，在里面把它改回 false。", vue: "开着还是关着：`v-model:open` 绑定，关上以后（Esc、取消、程序关）自己改回 false。", svelte: "开着还是关着：`bind:open` 绑定，关上以后（Esc、取消、程序关）自己改回 false。", html: "手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。", angular: "手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。", solid: "手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。" },
       names: { react: "open", vue: "v-model:open / open", svelte: "bind:open / open", preact: "open" } },
     { name: "title", type: "string", default: "—", required: false,
-      desc: "标题，写要做的事：\"删除\"雨夜车站\"？\"。React 里可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。",
+      desc: "标题，写要做的事：\"删除\"雨夜车站\"？\"。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。", descBy: { react: "标题，写要做的事：\"删除\"雨夜车站\"？\"，可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。", preact: "标题，写要做的事：\"删除\"雨夜车站\"？\"，可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。" },
       names: { react: "title", vue: "title", svelte: "title", preact: "title", markup: ".sn-hd h3", html: ".sn-hd h3（<dialog> 写 aria-labelledby 指向它）" }, types: { react: "React.ReactNode", vue: "string" } },
     { name: "description", type: "string", default: "—", required: false,
       desc: "标题下面一句说明：后果、影响范围。",
@@ -55,7 +55,7 @@ export default {
       example: 'icon="trash-2"',
       names: { react: "icon", vue: "icon", svelte: "icon", preact: "icon", html: '.sn-hd 里先放 <span class="sn-dlg-icon" data-i="trash-2">' } },
     { name: "footer", type: "React.ReactNode", typeBy: { vue: "插槽 #footer", svelte: "片段 footer" }, default: "—", required: false,
-      desc: "底部的按钮（主按钮放最右）。Vue 写在 #footer 插槽里，Svelte 写在 footer 片段里。",
+      desc: "底部的按钮（主按钮放最右）。",
       names: { react: "footer", preact: "footer", markup: ".sn-ft", html: ".sn-ft" } },
     { name: "footerClass", type: "string", default: "—", required: false,
       desc: "加在底栏 `.sn-ft` 上的类名，比如两组按钮叠在一起原地切换的 `sn-two`、问的时候加的 `sn-asking`（见\"填了内容再关\"示例）。",
@@ -76,7 +76,7 @@ export default {
   ],
   slots: [
     { name: "default", desc: "弹窗的内容：字段、说明。没有内容就不放这一块。", names: { react: "children", vue: "默认插槽", svelte: "children（默认内容）", preact: "children", markup: ".sn-bd", html: ".sn-bd" } },
-    { name: "footer", desc: "底部的按钮（React 里是 footer 属性）。取消按钮写 `data-cancel`：和 Esc 一样先走 guard 再关。", names: { vue: "#footer", svelte: "footer（{#snippet footer()}）", markup: ".sn-ft", html: ".sn-ft" } },
+    { name: "footer", desc: "底部的按钮（主按钮放最右）。取消按钮写 `data-cancel`：和 Esc 一样先走 guard 再关。", names: { vue: "#footer", svelte: "footer（{#snippet footer()}）", markup: ".sn-ft", html: ".sn-ft" } },
   ],
   methods: [],
   functions: [

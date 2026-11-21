@@ -39,9 +39,9 @@ export default {
       desc: "标签：`label` 名字，`badge` 后面的数量，`content` 这一块的内容（纯文字；带格式给 `html`）。",
       names: { js: "tabs", react: "tabs", vue: "tabs", svelte: "tabs", preact: "tabs", element: "tabs（JSON）", html: "tabs（JSON）" } },
     { name: "value", type: "number", default: "0", required: false,
-      desc: "选中第几个（从 0 数）。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`；传进来的值换了就滑过去。",
+      desc: "选中第几个（从 0 数）；传进来的值换了就滑过去。", descBy: { react: "选中第几个（从 0 数），受控：在 `onChange` 里更新；传进来的值换了就滑过去。", preact: "选中第几个（从 0 数），受控：在 `onChange` 里更新；传进来的值换了就滑过去。", vue: "选中第几个（从 0 数）：`v-model` 绑定；传进来的值换了就滑过去。", svelte: "选中第几个（从 0 数）：`bind:value` 绑定；传进来的值换了就滑过去。" },
       names: { js: "value", react: "value", vue: "v-model", svelte: "bind:value", preact: "value", element: "value", html: "value" } },
-    { name: "defaultValue", type: "number", default: "0", required: false, desc: "非受控的初始值（Vue 里不绑 v-model、只写 :value 也是这个意思）。", names: { react: "defaultValue", preact: "defaultValue", vue: "value" } },
+    { name: "defaultValue", type: "number", default: "0", required: false, desc: "非受控的初始值。", descBy: { vue: "非受控的初始值（不绑 `v-model`、只写 `:value`）。" }, names: { react: "defaultValue", preact: "defaultValue", vue: "value" } },
   ],
   events: [
     { name: "change", payload: "number", when: "点了另一个标签、或者用方向键换了以后（程序里改 value 不触发）。",

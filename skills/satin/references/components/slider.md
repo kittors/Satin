@@ -332,8 +332,8 @@ export default function StrengthSlider() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `value` | `number` | 0 | 否 | 当前值。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`。 | createXxx 选项：`value`；React：`value`；Vue：`v-model`；Svelte：`bind:value`；Preact：`value`；自定义元素：`value`；标记：`--sn-v（0–1）+ aria-valuenow`；纯 HTML：`value` |
-| `defaultValue` | `number` | 0 | 否 | 非受控的初始值（Vue 里不绑 v-model、只写 value 也是这个意思）。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
+| `value` | `number` | 0 | 否 | 当前值。<br>React、Preact：当前值，受控：在 `onChange` 里更新。<br>Vue：当前值：`v-model` 绑定。<br>Svelte：当前值：`bind:value` 绑定。 | createXxx 选项：`value`；React：`value`；Vue：`v-model`；Svelte：`bind:value`；Preact：`value`；自定义元素：`value`；标记：`--sn-v（0–1）+ aria-valuenow`；纯 HTML：`value` |
+| `defaultValue` | `number` | 0 | 否 | 非受控的初始值。<br>Vue：非受控的初始值（不绑 `v-model`、只写 `value`）。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
 | `max` | `number` | 100 | 否 | 最大值（最小是 0，每次一格是 1）。 | createXxx 选项：`max`；React：`max`；Vue：`max`；Svelte：`max`；Preact：`max`；自定义元素：`max`；标记：`aria-valuemax`；纯 HTML：`max` |
 | `label` | `string` | — | 否 | 给读屏的名称："音量""不透明度"。 | createXxx 选项：`label`；React：`label`；Vue：`label`；Svelte：`label`；Preact：`label`；自定义元素：`label`；标记：`aria-label`；纯 HTML：`label` |
 

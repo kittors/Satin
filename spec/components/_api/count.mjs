@@ -33,7 +33,7 @@ export default {
   },
   dts: { factory: "createCount", react: "CountInput", vue: "CountInput", functions: ["longTextHTML"] },
   props: [
-    { name: "value", type: "string", default: "\"\"", required: false, desc: "写的字。React 里受控（`onChange` 里更新），Vue `v-model`；传进来的值换了，计数跟着滚。",
+    { name: "value", type: "string", default: "\"\"", required: false, desc: "写的字；传进来的值换了，计数跟着滚。", descBy: { react: "写的字，受控：在 `onChange` 里更新；传进来的值换了，计数跟着滚。", preact: "写的字，受控：在 `onChange` 里更新；传进来的值换了，计数跟着滚。", vue: "写的字：`v-model` 绑定；传进来的值换了，计数跟着滚。" },
       names: { js: "value", react: "value", preact: "value", vue: "v-model", html: "input 的 value" } },
     { name: "defaultValue", type: "string", default: "\"\"", required: false, desc: "非受控的初始值。", names: { react: "defaultValue", preact: "defaultValue", vue: "value" } },
     { name: "max", type: "number", default: "20", required: false, desc: "上限（中文、英文、标点、表情都按一个字算）；写满了再敲计数抖一下。", names: { js: "max", react: "max", preact: "max", vue: "max", html: "maxlength" } },

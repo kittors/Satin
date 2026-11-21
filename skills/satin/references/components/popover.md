@@ -516,7 +516,7 @@ export default function InfoPopover() {
 |---|---|---|---|---|---|
 | `title` | `ReactNode \| string`（Vue：string） | — | 否 | 面板的标题（13/600）。 | React：`title`；Preact：`title`；Vue：`title`；纯 HTML：`.sn-popover h4` |
 | `align` | `"start" \| "center" \| "end"` | "start" | 否 | 和按钮的哪一边对齐：按钮靠右时用 end，面板不会伸出窗口。 | React：`align`；Preact：`align`；Vue：`align`；纯 HTML：`面板的 data-align` |
-| `open` | `boolean` | — | 否 | 开着没有。React 里受控（在 `onOpenChange` 里更新）；Vue `v-model:open`。 | React：`open`；Preact：`open`；Vue：`v-model:open` |
+| `open` | `boolean` | — | 否 | 开着没有。<br>React、Preact：开着没有，受控：在 `onOpenChange` 里更新。<br>Vue：开着没有：`v-model:open` 绑定。 | React：`open`；Preact：`open`；Vue：`v-model:open` |
 | `defaultOpen` | `boolean` | false | 否 | 非受控：一开始开着没有。 | React：`defaultOpen`；Preact：`defaultOpen`；Vue：`defaultOpen` |
 | `label` | `string` | 标题文字 | 否 | 读屏读出来的名字（标题不是纯文字时写）。 | React：`label`；Preact：`label`；Vue：`label`；纯 HTML：`面板的 aria-label` |
 | `className / style` | `string / CSSProperties` | — | 否 | 加在面板上（改宽度：面板 248–320）。 | React：`className / style`；Preact：`class / style` |

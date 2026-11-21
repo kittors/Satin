@@ -247,7 +247,14 @@
       "type": "string",
       "default": "—（没有选中，显示 placeholder）",
       "required": false,
-      "desc": "选中项的值。React 里给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控；Vue 用 v-model，Svelte 用 bind:value；自定义元素改 value 属性，组件跟着更新。",
+      "desc": "选中项的值。",
+      "descBy": {
+        "react": "选中项的值。给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控。",
+        "preact": "选中项的值。给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控。",
+        "vue": "选中项的值：`v-model` 绑定。",
+        "svelte": "选中项的值：`bind:value` 绑定。",
+        "element": "选中项的值：改 value 属性，组件跟着更新。"
+      },
       "names": {
         "js": "value",
         "react": "value / defaultValue",

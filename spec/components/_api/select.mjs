@@ -48,7 +48,7 @@ export default {
       example: 'items={["16:9 · 横屏", { value: "9:16", label: "9:16 · 竖屏" }]}',
       names: { js: "items", react: "items", vue: "items", svelte: "items", preact: "items", element: "items（写成 JSON）", angular: "[attr.items]（JSON 字符串）", markup: ".sn-menu > .sn-item（data-v 是值）" } },
     { name: "value", type: "string", default: "—（没有选中，显示 placeholder）", required: false,
-      desc: "选中项的值。React 里给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控；Vue 用 v-model，Svelte 用 bind:value；自定义元素改 value 属性，组件跟着更新。",
+      desc: "选中项的值。", descBy: { react: "选中项的值。给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控。", preact: "选中项的值。给 value 是受控（onChange 里不改它，选中项会退回去），只给 defaultValue 是非受控。", vue: "选中项的值：`v-model` 绑定。", svelte: "选中项的值：`bind:value` 绑定。", element: "选中项的值：改 value 属性，组件跟着更新。" },
       names: { js: "value", react: "value / defaultValue", vue: "v-model / value", svelte: "bind:value / value", preact: "value / defaultValue", element: "value", angular: "[attr.value]", markup: ".sn-item.sn-sel" } },
     { name: "placeholder", type: "string", default: '""', required: false,
       desc: "还没选时触发器里显示的字，写要选什么：\"选择画面比例\"。",

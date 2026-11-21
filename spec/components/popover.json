@@ -218,7 +218,12 @@
       "type": "boolean",
       "default": "—",
       "required": false,
-      "desc": "开着没有。React 里受控（在 `onOpenChange` 里更新）；Vue `v-model:open`。",
+      "desc": "开着没有。",
+      "descBy": {
+        "react": "开着没有，受控：在 `onOpenChange` 里更新。",
+        "preact": "开着没有，受控：在 `onOpenChange` 里更新。",
+        "vue": "开着没有：`v-model:open` 绑定。"
+      },
       "names": {
         "react": "open",
         "preact": "open",

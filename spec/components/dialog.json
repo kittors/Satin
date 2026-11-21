@@ -183,7 +183,16 @@
       "type": "boolean",
       "default": "false",
       "required": true,
-      "desc": "开着还是关着。关上以后（Esc、取消、程序关）React 调 onClose，在里面把它改回 false；Vue 用 v-model:open、Svelte 用 bind:open，会自己改回 false。手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。",
+      "desc": "开着还是关着。",
+      "descBy": {
+        "react": "开着还是关着。关上以后（Esc、取消、程序关）调 onClose，在里面把它改回 false。",
+        "preact": "开着还是关着。关上以后（Esc、取消、程序关）调 onClose，在里面把它改回 false。",
+        "vue": "开着还是关着：`v-model:open` 绑定，关上以后（Esc、取消、程序关）自己改回 false。",
+        "svelte": "开着还是关着：`bind:open` 绑定，关上以后（Esc、取消、程序关）自己改回 false。",
+        "html": "手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。",
+        "angular": "手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。",
+        "solid": "手写标记没有这个属性：触发按钮写 `data-dlg`，或者调 `openDialog()`。"
+      },
       "names": {
         "react": "open",
         "vue": "v-model:open / open",
@@ -196,7 +205,11 @@
       "type": "string",
       "default": "—",
       "required": false,
-      "desc": "标题，写要做的事：\"删除\"雨夜车站\"？\"。React 里可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。",
+      "desc": "标题，写要做的事：\"删除\"雨夜车站\"？\"。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。",
+      "descBy": {
+        "react": "标题，写要做的事：\"删除\"雨夜车站\"？\"，可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。",
+        "preact": "标题，写要做的事：\"删除\"雨夜车站\"？\"，可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。"
+      },
       "names": {
         "react": "title",
         "vue": "title",
@@ -253,7 +266,7 @@
       },
       "default": "—",
       "required": false,
-      "desc": "底部的按钮（主按钮放最右）。Vue 写在 #footer 插槽里，Svelte 写在 footer 片段里。",
+      "desc": "底部的按钮（主按钮放最右）。",
       "names": {
         "react": "footer",
         "preact": "footer",
@@ -354,7 +367,7 @@
     },
     {
       "name": "footer",
-      "desc": "底部的按钮（React 里是 footer 属性）。取消按钮写 `data-cancel`：和 Esc 一样先走 guard 再关。",
+      "desc": "底部的按钮（主按钮放最右）。取消按钮写 `data-cancel`：和 Esc 一样先走 guard 再关。",
       "names": {
         "vue": "#footer",
         "svelte": "footer（{#snippet footer()}）",

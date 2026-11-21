@@ -161,7 +161,13 @@
       "type": "string[]",
       "default": "[]",
       "required": false,
-      "desc": "现在的标签。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:tags`；传进来的值换了，就照它显示。",
+      "desc": "现在的标签；传进来的值换了，就照它显示。",
+      "descBy": {
+        "react": "现在的标签，受控：在 `onChange` 里更新；传进来的值换了，就照它显示。",
+        "preact": "现在的标签，受控：在 `onChange` 里更新；传进来的值换了，就照它显示。",
+        "vue": "现在的标签：`v-model` 绑定；传进来的值换了，就照它显示。",
+        "svelte": "现在的标签：`bind:tags` 绑定；传进来的值换了，就照它显示。"
+      },
       "names": {
         "js": "tags",
         "react": "tags",
@@ -178,7 +184,10 @@
       "type": "string[]",
       "default": "[]",
       "required": false,
-      "desc": "非受控：一开始的标签（Vue 里不绑 v-model、只写 `:tags` 也是这个意思）。",
+      "desc": "非受控：一开始的标签。",
+      "descBy": {
+        "vue": "非受控：一开始的标签（不绑 `v-model`、只写 `:tags`）。"
+      },
       "names": {
         "react": "defaultTags",
         "preact": "defaultTags",

@@ -34,10 +34,10 @@ export default {
   dts: { factory: "createSlider", functions: ["initSlider"], react: "Slider", vue: "Slider", svelte: "Slider" },
   props: [
     { name: "value", type: "number", default: "0", required: false,
-      desc: "当前值。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`。",
+      desc: "当前值。", descBy: { react: "当前值，受控：在 `onChange` 里更新。", preact: "当前值，受控：在 `onChange` 里更新。", vue: "当前值：`v-model` 绑定。", svelte: "当前值：`bind:value` 绑定。" },
       names: { js: "value", react: "value", vue: "v-model", svelte: "bind:value", preact: "value", element: "value", markup: "--sn-v（0–1）+ aria-valuenow", html: "value" } },
     { name: "defaultValue", type: "number", default: "0", required: false,
-      desc: "非受控的初始值（Vue 里不绑 v-model、只写 value 也是这个意思）。", names: { react: "defaultValue", preact: "defaultValue", vue: "value" } },
+      desc: "非受控的初始值。", descBy: { vue: "非受控的初始值（不绑 `v-model`、只写 `value`）。" }, names: { react: "defaultValue", preact: "defaultValue", vue: "value" } },
     { name: "max", type: "number", default: "100", required: false,
       desc: "最大值（最小是 0，每次一格是 1）。", names: { js: "max", react: "max", vue: "max", svelte: "max", preact: "max", element: "max", markup: "aria-valuemax", html: "max" } },
     { name: "label", type: "string", default: "—", required: false,

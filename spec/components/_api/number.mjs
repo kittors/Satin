@@ -34,10 +34,10 @@ export default {
   dts: { factory: "createStepper", react: "Stepper", vue: "Stepper", svelte: "Stepper" },
   props: [
     { name: "value", type: "number", default: "0", required: false,
-      desc: "当前值。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`；传进来的值换了就滚过去（超出范围按边界算）。",
+      desc: "当前值；传进来的值换了就滚过去（超出范围按边界算）。", descBy: { react: "当前值，受控：在 `onChange` 里更新；传进来的值换了就滚过去（超出范围按边界算）。", preact: "当前值，受控：在 `onChange` 里更新；传进来的值换了就滚过去（超出范围按边界算）。", vue: "当前值：`v-model` 绑定；传进来的值换了就滚过去（超出范围按边界算）。", svelte: "当前值：`bind:value` 绑定；传进来的值换了就滚过去（超出范围按边界算）。" },
       names: { js: "value", react: "value", vue: "v-model", svelte: "bind:value", preact: "value", element: "value", markup: "data-value + 数字", html: "value" } },
     { name: "defaultValue", type: "number", default: "0", required: false,
-      desc: "非受控的初始值（Vue 里不绑 v-model、只写 `:value` 也是这个意思）。", names: { react: "defaultValue", preact: "defaultValue", vue: "value" } },
+      desc: "非受控的初始值。", descBy: { vue: "非受控的初始值（不绑 `v-model`、只写 `:value`）。" }, names: { react: "defaultValue", preact: "defaultValue", vue: "value" } },
     { name: "min", type: "number", default: "0", required: false, desc: "最小值。", names: { js: "min", react: "min", vue: "min", svelte: "min", preact: "min", element: "min", markup: "data-min", html: "min" } },
     { name: "max", type: "number", default: "100", required: false, desc: "最大值。", names: { js: "max", react: "max", vue: "max", svelte: "max", preact: "max", element: "max", markup: "data-max", html: "max" } },
     { name: "unit", type: "string", default: "—", required: false, desc: "数字后面的单位：\"秒\"\"集\"\"张\"。", names: { js: "unit", react: "unit", vue: "unit", svelte: "unit", preact: "unit", element: "unit", markup: "span.sn-st-unit", html: "unit" } },

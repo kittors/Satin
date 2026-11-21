@@ -460,7 +460,7 @@ export default function ShotDescription() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `value` | `string` | "" | 否 | 写的字。React 里受控（`onChange` 里更新），Vue `v-model`；传进来的值换了，计数跟着滚。 | createXxx 选项：`value`；React：`value`；Preact：`value`；Vue：`v-model`；纯 HTML：`input 的 value` |
+| `value` | `string` | "" | 否 | 写的字；传进来的值换了，计数跟着滚。<br>React、Preact：写的字，受控：在 `onChange` 里更新；传进来的值换了，计数跟着滚。<br>Vue：写的字：`v-model` 绑定；传进来的值换了，计数跟着滚。 | createXxx 选项：`value`；React：`value`；Preact：`value`；Vue：`v-model`；纯 HTML：`input 的 value` |
 | `defaultValue` | `string` | "" | 否 | 非受控的初始值。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
 | `max` | `number` | 20 | 否 | 上限（中文、英文、标点、表情都按一个字算）；写满了再敲计数抖一下。 | createXxx 选项：`max`；React：`max`；Preact：`max`；Vue：`max`；纯 HTML：`maxlength` |
 | `placeholder` | `string` | — | 否 | 空着时的提示。 | createXxx 选项：`placeholder`；React：`placeholder`；Preact：`placeholder`；Vue：`placeholder`；纯 HTML：`placeholder` |

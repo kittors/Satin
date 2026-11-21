@@ -38,7 +38,7 @@ export default {
   dts: { react: "Checkbox", vue: "Checkbox" },
   props: [
     { name: "checked", type: "boolean", default: "false", required: false, native: ["react"],
-      desc: "勾上没有。React 里和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控；Vue `v-model`；Svelte `bind:checked`。",
+      desc: "勾上没有。", descBy: { react: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", preact: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", vue: "勾上没有：`v-model` 绑定。", svelte: "勾上没有：`bind:checked` 绑定。" },
       names: { react: "checked / defaultChecked", preact: "checked / defaultChecked", vue: "v-model", svelte: "bind:checked", angular: "[checked]", solid: "checked", html: "checked" } },
     { name: "label", type: "ReactNode | string", typeBy: { vue: "string" }, default: "—", required: false,
       desc: "旁边的文字（也可以写在子元素、默认插槽里）。", names: { react: "label", preact: "label", vue: "label", html: "<label> 里 input 后面的文字" } },

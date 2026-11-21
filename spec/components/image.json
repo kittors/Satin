@@ -219,7 +219,12 @@
       "type": "number | null",
       "default": "null",
       "required": false,
-      "desc": "打开到第几张；null 关着。React 里在 onClose 里设回 null，Vue `v-model:index`。在看图层里翻页不回写，只在关上时回写 null。",
+      "desc": "打开到第几张；null 关着。在看图层里翻页不回写，只在关上时回写 null。",
+      "descBy": {
+        "react": "打开到第几张；null 关着，受控：在 `onClose` 里设回 null。在看图层里翻页不回写。",
+        "preact": "打开到第几张；null 关着，受控：在 `onClose` 里设回 null。在看图层里翻页不回写。",
+        "vue": "打开到第几张；null 关着：`v-model:index` 绑定，关上时回写 null（在看图层里翻页不回写）。"
+      },
       "names": {
         "react": "index",
         "preact": "index",

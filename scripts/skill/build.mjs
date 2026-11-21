@@ -73,7 +73,9 @@ function contractMD(c) {
   // 某种写法的类型不一样（typeBy）：跟在后面写上，比如 Vue 里只收字符串
   const FWN = { react: "React", preact: "Preact", vue: "Vue", svelte: "Svelte", angular: "Angular", solid: "Solid", html: "纯 HTML", js: "JS" };
   const typeByOf = (x) => (x.typeBy ? "（" + Object.entries(x.typeBy).map(([k, v]) => `${FWN[k] || k}：${v}`).join("；") + "）" : "");
-  if (c.props?.length) o += `## 属性\n\n` + tbl(["名称", "类型", "默认值", "必填", "说明", "各写法里的叫法"], c.props.map((x) => [`\`${x.name}\``, `\`${x.type}\`` + typeByOf(x), x.default, x.required ? "是" : "否", pr(x.desc) + (x.example ? `（例：\`${x.example}\`）` : ""), namesOf(x.names)]));
+  // 说明按写法给（descBy）：通用说明后面按写法列出来（React、Preact 一样的只写一次）
+  const descByOf = (x) => { if (!x.descBy) return ""; const seen = new Map(); for (const [k, v] of Object.entries(x.descBy)) { if (v === x.desc) continue; seen.set(v, [...(seen.get(v) || []), FWN[k] || k]); } return seen.size ? "<br>" + [...seen].map(([v, ks]) => `${ks.join("、")}：${v}`).join("<br>") : ""; };
+  if (c.props?.length) o += `## 属性\n\n` + tbl(["名称", "类型", "默认值", "必填", "说明", "各写法里的叫法"], c.props.map((x) => [`\`${x.name}\``, `\`${x.type}\`` + typeByOf(x), x.default, x.required ? "是" : "否", pr(x.desc) + (x.example ? `（例：\`${x.example}\`）` : "") + pr(descByOf(x)), namesOf(x.names)]));
   // 列定义（表格的 columns 里每一列能写的字段）
   if (c.columnProps?.length) o += `## 列定义（columns 的每一项）\n\n` + tbl(["字段", "类型", "默认值", "说明"], c.columnProps.map((x) => [`\`${x.name}\``, `\`${x.type}\``, x.default, pr(x.desc)]));
   if (c.events?.length) o += `## 事件\n\n` + tbl(["名称", "参数", "什么时候", "各写法"], c.events.map((x) => [`\`${x.name}\``, `\`${x.payload}\``, pr(x.when), namesOf(x.names)]));

@@ -332,8 +332,8 @@ export default function BatchSize() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `value` | `number` | 0 | 否 | 当前值。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`；传进来的值换了就滚过去（超出范围按边界算）。 | createXxx 选项：`value`；React：`value`；Vue：`v-model`；Svelte：`bind:value`；Preact：`value`；自定义元素：`value`；标记：`data-value + 数字`；纯 HTML：`value` |
-| `defaultValue` | `number` | 0 | 否 | 非受控的初始值（Vue 里不绑 v-model、只写 `:value` 也是这个意思）。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
+| `value` | `number` | 0 | 否 | 当前值；传进来的值换了就滚过去（超出范围按边界算）。<br>React、Preact：当前值，受控：在 `onChange` 里更新；传进来的值换了就滚过去（超出范围按边界算）。<br>Vue：当前值：`v-model` 绑定；传进来的值换了就滚过去（超出范围按边界算）。<br>Svelte：当前值：`bind:value` 绑定；传进来的值换了就滚过去（超出范围按边界算）。 | createXxx 选项：`value`；React：`value`；Vue：`v-model`；Svelte：`bind:value`；Preact：`value`；自定义元素：`value`；标记：`data-value + 数字`；纯 HTML：`value` |
+| `defaultValue` | `number` | 0 | 否 | 非受控的初始值。<br>Vue：非受控的初始值（不绑 `v-model`、只写 `:value`）。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
 | `min` | `number` | 0 | 否 | 最小值。 | createXxx 选项：`min`；React：`min`；Vue：`min`；Svelte：`min`；Preact：`min`；自定义元素：`min`；标记：`data-min`；纯 HTML：`min` |
 | `max` | `number` | 100 | 否 | 最大值。 | createXxx 选项：`max`；React：`max`；Vue：`max`；Svelte：`max`；Preact：`max`；自定义元素：`max`；标记：`data-max`；纯 HTML：`max` |
 | `unit` | `string` | — | 否 | 数字后面的单位："秒""集""张"。 | createXxx 选项：`unit`；React：`unit`；Vue：`unit`；Svelte：`unit`；Preact：`unit`；自定义元素：`unit`；标记：`span.sn-st-unit`；纯 HTML：`unit` |

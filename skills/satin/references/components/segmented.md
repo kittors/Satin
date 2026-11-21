@@ -387,8 +387,8 @@ export default function StatusBar() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `items` | `Item[]` | [] | 是 | 选项：字符串，或者 `{ value, label }`。两到五个，名字短。 | createXxx 选项：`items`；React：`items`；Vue：`items`；Svelte：`items`；Preact：`items`；自定义元素：`items（JSON）`；标记：`每段一个 <button data-v>`；纯 HTML：`items（JSON）` |
-| `value` | `string` | 第一个 | 否 | 选中的值。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`。 | createXxx 选项：`value`；React：`value`；Vue：`v-model`；Svelte：`bind:value`；Preact：`value`；自定义元素：`value`；标记：`选中的那段写 aria-selected="true"`；纯 HTML：`value` |
-| `defaultValue` | `string` | 第一个 | 否 | 非受控的初始值（Vue 里不绑 v-model、只写 value 也是这个意思）。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
+| `value` | `string` | 第一个 | 否 | 选中的值。<br>React、Preact：选中的值，受控：在 `onChange` 里更新。<br>Vue：选中的值：`v-model` 绑定。<br>Svelte：选中的值：`bind:value` 绑定。 | createXxx 选项：`value`；React：`value`；Vue：`v-model`；Svelte：`bind:value`；Preact：`value`；自定义元素：`value`；标记：`选中的那段写 aria-selected="true"`；纯 HTML：`value` |
+| `defaultValue` | `string` | 第一个 | 否 | 非受控的初始值。<br>Vue：非受控的初始值（不绑 `v-model`、只写 `value`）。 | React：`defaultValue`；Preact：`defaultValue`；Vue：`value` |
 | `size` | `"sm" \| "md"` | "md" | 否 | sm 用在工具条、表格上方。 | createXxx 选项：`size`；React：`size`；Vue：`size`；Svelte：`size`；Preact：`size`；自定义元素：`size`；标记：`类名 sn-sm`；纯 HTML：`size` |
 | `label` | `string` | — | 否 | 给读屏的名称（这组选项选的是什么）："视图""时间范围"。 | createXxx 选项：`label`；React：`label`；Vue：`label`；Svelte：`label`；Preact：`label`；自定义元素：`label`；标记：`aria-label`；纯 HTML：`label` |
 

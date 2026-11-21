@@ -157,7 +157,12 @@
       "type": "string",
       "default": "—",
       "required": false,
-      "desc": "选中的 key。React 里受控（`onNavigate` 里更新），Vue `v-model`。",
+      "desc": "选中的 key。",
+      "descBy": {
+        "react": "选中的 key，受控：在 `onNavigate` 里更新。",
+        "preact": "选中的 key，受控：在 `onNavigate` 里更新。",
+        "vue": "选中的 key：`v-model` 绑定。"
+      },
       "names": {
         "react": "value",
         "preact": "value",

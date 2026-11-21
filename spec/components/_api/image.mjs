@@ -31,7 +31,7 @@ export default {
   dts: { react: "Lightbox", vue: "Lightbox", functions: ["openLightbox", "closeLightbox"] },
   props: [
     { name: "items", type: "LightboxItem[]", default: "[]", required: true, desc: "每张：`src` 图片地址（或 `bg` 直接给 CSS 背景）；`size` 原图 [宽, 高]（不放大超过原图），只知道比例时给 `ratio`；`alt` 读屏读的说明。视频写 `type: \"video\"`，`src` 是视频地址、`poster` 是封面。", names: { react: "items", preact: "items", vue: "items", html: "openLightbox 的第一个参数" } },
-    { name: "index", type: "number | null", default: "null", required: false, desc: "打开到第几张；null 关着。React 里在 onClose 里设回 null，Vue `v-model:index`。在看图层里翻页不回写，只在关上时回写 null。", names: { react: "index", preact: "index", vue: "v-model:index", html: "openLightbox 的第二个参数" } },
+    { name: "index", type: "number | null", default: "null", required: false, desc: "打开到第几张；null 关着。在看图层里翻页不回写，只在关上时回写 null。", descBy: { react: "打开到第几张；null 关着，受控：在 `onClose` 里设回 null。在看图层里翻页不回写。", preact: "打开到第几张；null 关着，受控：在 `onClose` 里设回 null。在看图层里翻页不回写。", vue: "打开到第几张；null 关着：`v-model:index` 绑定，关上时回写 null（在看图层里翻页不回写）。" }, names: { react: "index", preact: "index", vue: "v-model:index", html: "openLightbox 的第二个参数" } },
     { name: "thumbOf", type: "(i: number) => HTMLElement | null | undefined", default: "—", required: false, desc: "第 i 张的缩略图元素：从它的位置长出来、关上时缩回去（翻页以后缩回到那一张的缩略图；不给就在中间淡入淡出）。", names: { react: "thumbOf", preact: "thumbOf", vue: "thumbOf（模板里写 thumb-of）", html: "选项 thumbOf" } },
     { name: "enabled", type: "(i: number) => boolean", default: "全部", required: false, desc: "左右翻页能不能停在这一张（加载失败的跳过）。", names: { react: "enabled", preact: "enabled", vue: "enabled", html: "选项 enabled" } },
   ],

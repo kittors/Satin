@@ -35,10 +35,10 @@ export default {
   dts: { factory: "createTagInput", react: "TagInput", vue: "TagInput", svelte: "TagInput" },
   props: [
     { name: "tags", type: "string[]", default: "[]", required: false,
-      desc: "现在的标签。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:tags`；传进来的值换了，就照它显示。",
+      desc: "现在的标签；传进来的值换了，就照它显示。", descBy: { react: "现在的标签，受控：在 `onChange` 里更新；传进来的值换了，就照它显示。", preact: "现在的标签，受控：在 `onChange` 里更新；传进来的值换了，就照它显示。", vue: "现在的标签：`v-model` 绑定；传进来的值换了，就照它显示。", svelte: "现在的标签：`bind:tags` 绑定；传进来的值换了，就照它显示。" },
       names: { js: "tags", react: "tags", vue: "v-model", svelte: "bind:tags", preact: "tags", element: "tags（JSON）", markup: "每个标签一个 span.sn-chip.sn-tag（脚本加）", html: "tags（JSON）" } },
     { name: "defaultTags", type: "string[]", default: "[]", required: false,
-      desc: "非受控：一开始的标签（Vue 里不绑 v-model、只写 `:tags` 也是这个意思）。", names: { react: "defaultTags", preact: "defaultTags", vue: "tags" } },
+      desc: "非受控：一开始的标签。", descBy: { vue: "非受控：一开始的标签（不绑 `v-model`、只写 `:tags`）。" }, names: { react: "defaultTags", preact: "defaultTags", vue: "tags" } },
     { name: "max", type: "number", default: "8", required: false,
       desc: "最多几个；满了再加，下面的计数抖一下。", names: { js: "max", react: "max", vue: "max", svelte: "max", preact: "max", element: "max", markup: "data-max", html: "max" } },
     { name: "placeholder", type: "string", default: "\"输入标签，回车确认\"", required: false,

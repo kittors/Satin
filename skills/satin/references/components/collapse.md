@@ -462,8 +462,8 @@ export default function FaqControlled() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `items` | `{ title: string; content?: string; html?: string }[]` | [] | 是 | 条目：`title` 标题，`content` 内容（纯文字）；内容要带链接、列表时给 `html`（自己保证内容安全）。 | createXxx 选项：`items`；React：`items`；Vue：`items`；Svelte：`items`；Preact：`items`；自定义元素：`items（JSON）`；标记：`每项一个 .sn-acc-item：标题 button.sn-acc-hd + 内容 .sn-acc-bd`；纯 HTML：`items（JSON）` |
-| `open` | `number[]` | [] | 否 | 展开的是第几项（从 0 数）。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:open`；传进来的值换了，面板就照它开合。 | createXxx 选项：`open`；React：`open`；Vue：`v-model`；Svelte：`bind:open`；Preact：`open`；自定义元素：`open（JSON）`；标记：`展开的那项加 .sn-open，标题 aria-expanded="true"`；纯 HTML：`open（JSON）` |
-| `defaultOpen` | `number[]` | [] | 否 | 非受控：一开始展开哪几项（Vue 里不绑 v-model、只写 `:open` 也是这个意思）。 | React：`defaultOpen`；Preact：`defaultOpen`；Vue：`open` |
+| `open` | `number[]` | [] | 否 | 展开的是第几项（从 0 数）；传进来的值换了，面板就照它开合。<br>React、Preact：展开的是第几项（从 0 数），受控：在 `onChange` 里更新；传进来的值换了，面板就照它开合。<br>Vue：展开的是第几项（从 0 数）：`v-model` 绑定；传进来的值换了，面板就照它开合。<br>Svelte：展开的是第几项（从 0 数）：`bind:open` 绑定；传进来的值换了，面板就照它开合。 | createXxx 选项：`open`；React：`open`；Vue：`v-model`；Svelte：`bind:open`；Preact：`open`；自定义元素：`open（JSON）`；标记：`展开的那项加 .sn-open，标题 aria-expanded="true"`；纯 HTML：`open（JSON）` |
+| `defaultOpen` | `number[]` | [] | 否 | 非受控：一开始展开哪几项。<br>Vue：非受控：一开始展开哪几项（不绑 `v-model`、只写 `:open`）。 | React：`defaultOpen`；Preact：`defaultOpen`；Vue：`open` |
 | `single` | `boolean` | false | 否 | 一次只开一项（手风琴）：点开一项，别的自动收起。 | createXxx 选项：`single`；React：`single`；Vue：`single`；Svelte：`single`；Preact：`single`；自定义元素：`single`；纯 HTML：`single` |
 
 ## 事件

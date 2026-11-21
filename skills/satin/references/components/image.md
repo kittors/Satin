@@ -1016,7 +1016,7 @@ export default function GalleryRetry() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `items` | `LightboxItem[]` | [] | 是 | 每张：`src` 图片地址（或 `bg` 直接给 CSS 背景）；`size` 原图 [宽, 高]（不放大超过原图），只知道比例时给 `ratio`；`alt` 读屏读的说明。视频写 `type: "video"`，`src` 是视频地址、`poster` 是封面。 | React：`items`；Preact：`items`；Vue：`items`；纯 HTML：`openLightbox 的第一个参数` |
-| `index` | `number \| null` | null | 否 | 打开到第几张；null 关着。React 里在 onClose 里设回 null，Vue `v-model:index`。在看图层里翻页不回写，只在关上时回写 null。 | React：`index`；Preact：`index`；Vue：`v-model:index`；纯 HTML：`openLightbox 的第二个参数` |
+| `index` | `number \| null` | null | 否 | 打开到第几张；null 关着。在看图层里翻页不回写，只在关上时回写 null。<br>React、Preact：打开到第几张；null 关着，受控：在 `onClose` 里设回 null。在看图层里翻页不回写。<br>Vue：打开到第几张；null 关着：`v-model:index` 绑定，关上时回写 null（在看图层里翻页不回写）。 | React：`index`；Preact：`index`；Vue：`v-model:index`；纯 HTML：`openLightbox 的第二个参数` |
 | `thumbOf` | `(i: number) => HTMLElement \| null \| undefined` | — | 否 | 第 i 张的缩略图元素：从它的位置长出来、关上时缩回去（翻页以后缩回到那一张的缩略图；不给就在中间淡入淡出）。 | React：`thumbOf`；Preact：`thumbOf`；Vue：`thumbOf（模板里写 thumb-of）`；纯 HTML：`选项 thumbOf` |
 | `enabled` | `(i: number) => boolean` | 全部 | 否 | 左右翻页能不能停在这一张（加载失败的跳过）。 | React：`enabled`；Preact：`enabled`；Vue：`enabled`；纯 HTML：`选项 enabled` |
 

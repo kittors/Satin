@@ -119,7 +119,13 @@
       "native": [
         "react"
       ],
-      "desc": "勾上没有。React 里和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控；Vue `v-model`；Svelte `bind:checked`。",
+      "desc": "勾上没有。",
+      "descBy": {
+        "react": "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。",
+        "preact": "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。",
+        "vue": "勾上没有：`v-model` 绑定。",
+        "svelte": "勾上没有：`bind:checked` 绑定。"
+      },
       "names": {
         "react": "checked / defaultChecked",
         "preact": "checked / defaultChecked",

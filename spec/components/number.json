@@ -126,7 +126,13 @@
       "type": "number",
       "default": "0",
       "required": false,
-      "desc": "当前值。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`；传进来的值换了就滚过去（超出范围按边界算）。",
+      "desc": "当前值；传进来的值换了就滚过去（超出范围按边界算）。",
+      "descBy": {
+        "react": "当前值，受控：在 `onChange` 里更新；传进来的值换了就滚过去（超出范围按边界算）。",
+        "preact": "当前值，受控：在 `onChange` 里更新；传进来的值换了就滚过去（超出范围按边界算）。",
+        "vue": "当前值：`v-model` 绑定；传进来的值换了就滚过去（超出范围按边界算）。",
+        "svelte": "当前值：`bind:value` 绑定；传进来的值换了就滚过去（超出范围按边界算）。"
+      },
       "names": {
         "js": "value",
         "react": "value",
@@ -143,7 +149,10 @@
       "type": "number",
       "default": "0",
       "required": false,
-      "desc": "非受控的初始值（Vue 里不绑 v-model、只写 `:value` 也是这个意思）。",
+      "desc": "非受控的初始值。",
+      "descBy": {
+        "vue": "非受控的初始值（不绑 `v-model`、只写 `:value`）。"
+      },
       "names": {
         "react": "defaultValue",
         "preact": "defaultValue",

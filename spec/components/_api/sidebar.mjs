@@ -35,7 +35,7 @@ export default {
   props: [
     { name: "items", type: "SidebarItem[]", default: "[]", required: true, desc: "导航项：`{ key, label, icon, badge, href }`；分组标题 `{ type: \"group\", label }`。", names: { react: "items", preact: "items", vue: "items", html: "nav.sn-side-nav > a[data-key] / p" } },
     { name: "footer", type: "SidebarItem[]", default: "[]", required: false, desc: "底部的几项（设置、帮助）。", names: { react: "footer", preact: "footer", vue: "footer", html: ".sn-side-foot > a" } },
-    { name: "value", type: "string", default: "—", required: false, desc: "选中的 key。React 里受控（`onNavigate` 里更新），Vue `v-model`。", names: { react: "value", preact: "value", vue: "v-model", html: "选中的那项加 sn-on" } },
+    { name: "value", type: "string", default: "—", required: false, desc: "选中的 key。", descBy: { react: "选中的 key，受控：在 `onNavigate` 里更新。", preact: "选中的 key，受控：在 `onNavigate` 里更新。", vue: "选中的 key：`v-model` 绑定。" }, names: { react: "value", preact: "value", vue: "v-model", html: "选中的那项加 sn-on" } },
     { name: "defaultValue", type: "string", default: "—", required: false, desc: "非受控：一开始选中哪一项。", names: { react: "defaultValue", preact: "defaultValue" } },
     { name: "title", type: "string", default: "\"\"", required: false, desc: "顶部标志旁边的名字。", names: { react: "title", preact: "title", vue: "title", html: ".sn-side-top b" } },
     { name: "logo", type: "boolean", default: "true", required: false, desc: "显示标志。", names: { react: "logo", preact: "logo", vue: "logo", html: ".sn-logo" } },

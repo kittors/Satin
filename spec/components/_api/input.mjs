@@ -36,7 +36,7 @@ export default {
   dts: { react: "Input", vue: "Input" },
   props: [
     { name: "value", type: "string", default: "\"\"", required: false, native: ["react"],
-      desc: "输入的文字。React 里和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控；Vue `v-model`；Svelte `bind:value`。",
+      desc: "输入的文字。", descBy: { react: "输入的文字。和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控。", preact: "输入的文字。和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控。", vue: "输入的文字：`v-model` 绑定。", svelte: "输入的文字：`bind:value` 绑定。" },
       names: { react: "value / defaultValue", preact: "value / defaultValue", vue: "v-model", svelte: "bind:value", angular: "[value]", solid: "value", html: "value" } },
     { name: "size", type: '"sm" | "md" | "lg" | "xl"', default: '"md"', required: false,
       desc: "高度：sm 28（工具条、表格里）、md 32、lg 40（表单）、xl 48（大搜索框）。", names: { react: "size", preact: "size", vue: "size", html: "类名 sn-sm / sn-lg / sn-xl" } },

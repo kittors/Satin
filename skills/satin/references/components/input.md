@@ -370,7 +370,7 @@ export default function ProjectNameCount() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `value` | `string` | "" | 否 | 输入的文字。React 里和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控；Vue `v-model`；Svelte `bind:value`。 | React：`value / defaultValue`；Preact：`value / defaultValue`；Vue：`v-model`；Svelte：`bind:value`；Angular：`[value]`；Solid：`value`；纯 HTML：`value` |
+| `value` | `string` | "" | 否 | 输入的文字。<br>React、Preact：输入的文字。和原生一样：`value` + `onChange` 受控，`defaultValue` 非受控。<br>Vue：输入的文字：`v-model` 绑定。<br>Svelte：输入的文字：`bind:value` 绑定。 | React：`value / defaultValue`；Preact：`value / defaultValue`；Vue：`v-model`；Svelte：`bind:value`；Angular：`[value]`；Solid：`value`；纯 HTML：`value` |
 | `size` | `"sm" \| "md" \| "lg" \| "xl"` | "md" | 否 | 高度：sm 28（工具条、表格里）、md 32、lg 40（表单）、xl 48（大搜索框）。 | React：`size`；Preact：`size`；Vue：`size`；纯 HTML：`类名 sn-sm / sn-lg / sn-xl` |
 | `invalid` | `boolean` | false | 否 | 出错：边框变红，写上 `aria-invalid="true"`（放进字段里时字段会管）。 | React：`invalid`；Preact：`invalid`；Vue：`invalid`；Svelte：`aria-invalid`；Angular：`[attr.aria-invalid]`；Solid：`aria-invalid`；纯 HTML：`aria-invalid="true"` |
 | `placeholder` | `string` | — | 否 | 空着时的提示：写个例子（"比如：雨夜车站"），不要拿它代替标签。 | React：`placeholder`；Preact：`placeholder`；Vue：`placeholder`；纯 HTML：`placeholder` |

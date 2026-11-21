@@ -193,7 +193,13 @@
       "type": "string",
       "default": "第一个",
       "required": false,
-      "desc": "选中的值。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:value`。",
+      "desc": "选中的值。",
+      "descBy": {
+        "react": "选中的值，受控：在 `onChange` 里更新。",
+        "preact": "选中的值，受控：在 `onChange` 里更新。",
+        "vue": "选中的值：`v-model` 绑定。",
+        "svelte": "选中的值：`bind:value` 绑定。"
+      },
       "names": {
         "js": "value",
         "react": "value",
@@ -210,7 +216,10 @@
       "type": "string",
       "default": "第一个",
       "required": false,
-      "desc": "非受控的初始值（Vue 里不绑 v-model、只写 value 也是这个意思）。",
+      "desc": "非受控的初始值。",
+      "descBy": {
+        "vue": "非受控的初始值（不绑 `v-model`、只写 `value`）。"
+      },
       "names": {
         "react": "defaultValue",
         "preact": "defaultValue",

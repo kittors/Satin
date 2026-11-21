@@ -167,7 +167,13 @@
       "type": "number[]",
       "default": "[]",
       "required": false,
-      "desc": "展开的是第几项（从 0 数）。React 里受控（`onChange` 里更新），Vue `v-model`，Svelte `bind:open`；传进来的值换了，面板就照它开合。",
+      "desc": "展开的是第几项（从 0 数）；传进来的值换了，面板就照它开合。",
+      "descBy": {
+        "react": "展开的是第几项（从 0 数），受控：在 `onChange` 里更新；传进来的值换了，面板就照它开合。",
+        "preact": "展开的是第几项（从 0 数），受控：在 `onChange` 里更新；传进来的值换了，面板就照它开合。",
+        "vue": "展开的是第几项（从 0 数）：`v-model` 绑定；传进来的值换了，面板就照它开合。",
+        "svelte": "展开的是第几项（从 0 数）：`bind:open` 绑定；传进来的值换了，面板就照它开合。"
+      },
       "names": {
         "js": "open",
         "react": "open",
@@ -184,7 +190,10 @@
       "type": "number[]",
       "default": "[]",
       "required": false,
-      "desc": "非受控：一开始展开哪几项（Vue 里不绑 v-model、只写 `:open` 也是这个意思）。",
+      "desc": "非受控：一开始展开哪几项。",
+      "descBy": {
+        "vue": "非受控：一开始展开哪几项（不绑 `v-model`、只写 `:open`）。"
+      },
       "names": {
         "react": "defaultOpen",
         "preact": "defaultOpen",
