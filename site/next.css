@@ -711,40 +711,10 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 [data-theme="dark"] .s-fwlogo[data-fw-logo="next"] { color: var(--sn-label); }
 [data-theme="dark"] .s-fwlogo[data-fw-logo="nuxt"] { color: #00DC82; }
 
-/* ———— 11. 顶栏（2026-11-21 按 apple.com 的思路重做：只负责导航，内容优先，靠字和留白、不靠装饰） ————
-   高 56；左 20px 标志 + "Satin"（16px / 600）；中间 5 个导航（14px / 400，二级字色，悬停一级，当前页一级 + 500，不加底、不加下划线）；
-   右边两个 18px 细线图标按钮（搜索、外观）。在页面顶部完全透明；滚动以后底色半透明 + 虚化，底下 1px 细线——只有这一层淡入淡出（opacity，200ms） */
-html { --nav-h: 56px; }
-.s-nav { position: sticky; top: 0; z-index: 30; height: var(--nav-h); background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; transition: none; }
-.s-nav.s-nav-home { position: fixed; left: 0; right: 0; }
-.s-nav::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; pointer-events: none;
-  background: color-mix(in srgb, var(--sn-canvas) 72%, transparent); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px);
-  box-shadow: inset 0 -1px 0 var(--sn-line); transition: opacity .2s var(--sn-ease-out); }
-.s-nav.scrolled::before { opacity: 1; }
-.s-nav-in { position: relative; height: 100%; width: min(100%, var(--hdr-w, 1360px)); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; }
-.s-nav-home .s-nav-in { --hdr-w: calc(var(--nwrap, 1152px) + 48px); }
-.s-nav .s-logo { display: inline-flex; align-items: center; gap: 8px; height: 32px; font: 600 calc(16px * var(--fsx))/1 var(--sn-sans); letter-spacing: -.01em; color: var(--sn-label); text-decoration: none; }
-.s-nav .s-logo svg { width: 20px; height: 20px; flex: none; color: var(--sn-label); }
-.s-nav .s-links { position: absolute; left: 50%; translate: -50% 0; display: flex; align-items: center; gap: 32px; }
-.s-nav .s-links a { padding: 0; border-radius: 0; background: none; font: 400 calc(14px * var(--fsx))/calc(20px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); text-decoration: none; white-space: nowrap; transition: color .15s var(--sn-ease-out); }
-.s-nav .s-links a:hover { color: var(--sn-label); background: none; }
-.s-nav .s-links a[aria-current] { color: var(--sn-label); font-weight: 500; }
-.s-nav .s-links a:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 4px; border-radius: 4px; }
-.s-nav .s-nav-end { margin-left: auto; margin-right: -7px; display: flex; align-items: center; gap: 4px; } /* 按钮 32、图标 18：往右挪 7，图标和内容的右边缘对齐 */
-.s-hbtn { all: unset; box-sizing: border-box; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: var(--sn-r-full); color: var(--sn-label2); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color .15s var(--sn-ease-out); }
-.s-hbtn:hover, .s-hbtn.sn-is-open { color: var(--sn-label); }
-.s-hbtn:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 0; }
-.s-hbtn .sn-ic { width: 18px; height: 18px; }
-.s-appear-ic { display: inline-grid; place-items: center; width: 18px; height: 18px; }
-.sn-menu.s-appear-menu { min-width: 200px; }
+/* ———— 11. 窄屏顶栏（首页、文档页同一套）：搜索、菜单只有线条图标，不加圆底（点击区仍是 44）。桌面顶栏和基线一样 ———— */
 @media (max-width: 860px) {
-  /* 窄屏顶栏的搜索、菜单：和桌面一样只有线条图标，不加圆底（点击区仍是 44） */
-  .s-nav .sn-btn.s-mbtn { --sn-bg: transparent; --sn-fg: var(--sn-label); }
-  .s-nav .sn-btn.s-mbtn:active, .s-nav .sn-btn.s-mbtn[aria-expanded="true"] { --sn-bg: var(--sn-fill-hover); }
-  .s-nav .s-links, .s-nav .s-hbtn { display: none; }
-  .s-nav .s-nav-end { margin-right: 0; }
-  .s-nav-in { padding: 0 max(12px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
-  .s-nav { height: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); }
+  .s-nav .sn-btn.s-mbtn, .n-nav .sn-btn.s-mbtn { --sn-bg: transparent; --sn-fg: var(--sn-label); }
+  .s-nav .sn-btn.s-mbtn:active, .s-nav .sn-btn.s-mbtn[aria-expanded="true"], .n-nav .sn-btn.s-mbtn:active, .n-nav .sn-btn.s-mbtn[aria-expanded="true"] { --sn-bg: var(--sn-fill-hover); }
 }
 
 /* 组件页"设计规范"里的这样做 / 不要：一条一行 */
