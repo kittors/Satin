@@ -38,7 +38,10 @@
 @media (hover: hover) {
 .sn-danger:hover { --sn-bg: var(--sn-b-danger-hover); } }
 .sn-danger:active, .sn-danger.sn-is-active { --sn-bg: var(--sn-b-danger-active); }
-.sn-danger-soft { --sn-bg: var(--sn-b-danger-soft); --sn-fg: var(--sn-danger); }
+/* 浅红底上的红字：浅色主题用深一档的红（#b42318，在这层底上对比度约 5.7）；原来用 --sn-danger 只有 4.28，不到 4.5 */
+.sn-danger-soft { --sn-bg: var(--sn-b-danger-soft); --sn-fg: var(--sn-b-danger-active); }
+:where([data-theme="dark"]) .sn-danger-soft { --sn-fg: var(--sn-danger); }
+@media (prefers-color-scheme: dark) { :where(:root:not([data-theme])) .sn-danger-soft { --sn-fg: var(--sn-danger); } }
 .sn-danger-soft.sn-is-hover { --sn-bg: var(--sn-b-danger-soft-hover); }
 @media (hover: hover) {
 .sn-danger-soft:hover { --sn-bg: var(--sn-b-danger-soft-hover); } }
