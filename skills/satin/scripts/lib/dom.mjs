@@ -147,7 +147,7 @@ function pageChecks({ theme, width, want }) {
   }
   // 头像放字、浏览器默认样式、处处加粗 / 徽标（只在第一种宽度量一次）
   if (want.includes("layout")) {
-    for (const el of vis.filter((x) => x.matches(".sn-av"))) { const txt = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join(""); if (txt) add("text-avatar", el, `头像里放了字"${txt.slice(0, 4)}"`); }
+    for (const el of vis.filter((x) => x.matches(".sn-av:not(.sn-more)"))) { const txt = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join(""); if (txt) add("text-avatar", el, `头像里放了字"${txt.slice(0, 4)}"`); }
     for (const el of vis.filter((x) => x.matches("a[href]"))) { const s = cs(el); if (/^rgb\((0, 0, 238|85, 26, 139)\)$/.test(s.color)) { add("browser-default", el, `链接还是浏览器默认的颜色 ${s.color}`); break; } }
     for (const el of vis.filter((x) => x.matches("button, select, input[type=checkbox], input[type=radio], input[type=text], input:not([type])"))) { const s = cs(el); if (s.appearance === "auto" && !el.closest("[class*='sn-']") && !/(^|\s)sn-/.test(el.className)) { add("browser-default", el, `${el.tagName.toLowerCase()} 还是浏览器默认的样子`); break; } }
     const blocks = vis.filter((x) => x.matches("p, li, td, dd, .sn-msg") && x.textContent.trim().length > 8 && !x.closest("nav, .sn-side, header"));

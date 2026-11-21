@@ -279,7 +279,7 @@
 .sn-chat-hd { height: 52px; padding: 0 20px; background: transparent; }
 .sn-chat-hd b { font-size: calc(14px * var(--sn-font-scale, 1)); }
 /* 顶栏两侧的按钮（menu、newChat 选项）：单色细线图标、ghost，按下有反馈（sn-btn 自带）；标题夹在中间 */
-.sn-chat-hd.sn-has-btns { padding: 0 8px; gap: 4px; }
+.sn-chat-hd.sn-has-btns { padding-left: 8px; padding-right: 8px; gap: 4px; } /* 只写左右：手机上顶栏的 padding-top（让出刘海、灵动岛）不能被盖掉 */
 .sn-chat-hd.sn-has-btns .sn-tx { flex: 1; min-width: 0; padding: 0 8px; }
 .sn-chat-hd .sn-chat-hb { --sn-h: 36px; flex: none; width: 36px; }
 .sn-chat-hd .sn-chat-hb .sn-ic { width: 20px; height: 20px; }
@@ -382,7 +382,7 @@
   .sn-chat-hd .sn-chat-hb { --sn-h: 40px; width: 40px; }
   .sn-chat-hd .sn-chat-hb[data-chat-menu] { grid-column: 1; } .sn-chat-hd .sn-chat-hb[data-chat-new] { grid-column: 3; }
   .sn-chat::after { display: none; }
-  .sn-chat-foot { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .sn-chat-foot { padding-bottom: max(12px, env(safe-area-inset-bottom)); } /* 输入框贴着横条上面：有安全区就只让出安全区，没有就留 12 */
 }
 
 /* 无限列表的表头一行：窄的时候计数单独占一行，从一开始就是两行——计数从“已加载 0 条”变成“已加载 40 条 · 共 10,000 条”变长了，

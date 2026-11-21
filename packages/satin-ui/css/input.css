@@ -178,8 +178,8 @@
 .sn-inline-menu.sn-up.sn-open > .sn-menu { translate: 0; }
 /* 底部一行永远不折行：发送按钮永远在最右；中间放不下就收起（风格收成图标、模型只显示档位，见下面 sn-cm-compact） */
 .sn-cm-bar { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; padding: 4px 8px 8px; }
-.sn-cm-bar > .sn-cm-chip, .sn-cm-bar > .sn-cm-model { flex: 0 1 auto; min-width: 0; }
-.sn-cm-chip .sn-cm-lbl, .sn-cm-bar > .sn-cm-model .sn-cm-lbl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 老写法（设计稿里的标记）：风格、模型按钮不缩、字不裁（overflow: hidden 会把 line-height: 1 的字裁掉一行像素），一行撑出去了就整体收起 */
+.sn-cm-bar > .sn-cm-chip { flex: none; }
 .sn-cm-chip .sn-cm-ic { display: none; }
 .sn-cm-compact .sn-cm-chip .sn-cm-ic { display: inline-grid; }
 .sn-cm-compact .sn-cm-chip .sn-cm-lbl { display: none; }
