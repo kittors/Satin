@@ -496,7 +496,7 @@ export default function MillionShots() {
 
 ### 受控：勾选
 
-和数据表格一样：React 给 `selectedKeys` + `onSelectionChange`，Vue 写 `v-model:selected`；程序里改勾选调 `update({ selectedKeys })`。
+和数据表格一样，勾选可以受控：给选中行的键、勾选变化时写回；程序里改勾选调 `update({ selectedKeys })`。
 
 ```html
 <div class="sn-stack sn-gap-8">
@@ -809,7 +809,7 @@ export default function PickShots() {
 
 ### 事件：排序、勾选、改值
 
-选项、事件和数据表格一样：`onSortChange`、`onSelectionChange`、`onCellEdit`……（Vue 写 `@sort-change`；纯 JS 也可以 `grid.on("sortChange", fn)`）。
+选项、事件和数据表格一样：排序、勾选、改格子各有一个事件（sortChange、selectionChange、cellEdit……）。
 
 ```html
 <div class="sn-stack sn-gap-8">

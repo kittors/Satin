@@ -449,9 +449,9 @@ export default function MailField() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `label` | `string`（React：ReactNode \| string；Preact：ReactNode \| string） | — | 否 | 标签，写在控件上面；能不填的在后面加 `<span class="sn-opt">可选</span>`，必填的不标。 | React：`label`；Preact：`label`；Vue：`label`；纯 HTML：`label.sn-lbl` |
-| `help` | `string`（React：ReactNode \| string；Preact：ReactNode \| string） | — | 否 | 控件下面的说明：规则、会用在哪里。 | React：`help`；Preact：`help`；Vue：`help`；纯 HTML：`.sn-help` |
-| `error` | `string`（React：ReactNode \| string；Preact：ReactNode \| string） | 不给就没有错误区 | 否 | 错误：给了字就在下面展开、字段标红、输入框抖两下；空字符串收起（先占好位置）。 | React：`error`；Preact：`error`；Vue：`error`；纯 HTML：`.sn-err > span（字段加 .sn-bad）` |
+| `label` | `string`（React：ReactNode \| string；Preact：ComponentChildren \| string） | — | 否 | 标签，写在控件上面；能不填的在后面加 `<span class="sn-opt">可选</span>`，必填的不标。 | React：`label`；Preact：`label`；Vue：`label`；纯 HTML：`label.sn-lbl` |
+| `help` | `string`（React：ReactNode \| string；Preact：ComponentChildren \| string） | — | 否 | 控件下面的说明：规则、会用在哪里。 | React：`help`；Preact：`help`；Vue：`help`；纯 HTML：`.sn-help` |
+| `error` | `string`（React：ReactNode \| string；Preact：ComponentChildren \| string） | 不给就没有错误区 | 否 | 错误：给了字就在下面展开、字段标红、输入框抖两下；空字符串收起（先占好位置）。 | React：`error`；Preact：`error`；Vue：`error`；纯 HTML：`.sn-err > span（字段加 .sn-bad）` |
 | `htmlFor` | `string` | — | 否 | 标签对应的控件 id：点标签聚焦到控件。 | React：`htmlFor`；Preact：`htmlFor`；Vue：`for`；纯 HTML：`label 的 for` |
 | `className` | `string` | — | 否 | 加在字段最外层的类名（排版用）。 | React：`className`；Preact：`class` |
 

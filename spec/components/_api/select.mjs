@@ -123,7 +123,7 @@ export default {
     ],
   },
   examples: [
-    { slug: "select-basic", title: "基础用法", why: "给选项和当前值就行。React 只给 `defaultValue` 时组件自己管选中，Vue、Svelte 绑一个变量。",
+    { slug: "select-basic", title: "基础用法", why: "给选项和当前值就行；不受控时组件自己管选中。", whyBy: { react: "给选项和当前值就行。只给 `defaultValue` 时组件自己管选中。", preact: "给选项和当前值就行。只给 `defaultValue` 时组件自己管选中。", vue: "给选项，再用 `v-model` 绑一个变量就行。", svelte: "给选项，再用 `bind:value` 绑一个变量就行。" },
       html: `<sn-select items='${RATIOS}' value="16:9 · 横屏" label="画面比例"></sn-select>`, code: code("select-basic") },
     { slug: "select-placeholder", title: "还没选：占位文字", why: "还没选时显示 placeholder，写要选什么，不写\"请选择\"。",
       html: `<sn-select items='${RATIOS}' placeholder="选择画面比例" label="画面比例"></sn-select>`, code: code("select-placeholder") },
@@ -135,17 +135,17 @@ export default {
   <sn-select items='${RATIOS}' value="16:9 · 横屏" label="画面比例"></sn-select>
   <div class="sn-help">导出成片时用这个比例。</div>
 </div>`, code: code("select-field") },
-    { slug: "select-events", title: "监听选中", why: "选中一项时拿到选中的值：React `onChange`、Vue `@change`、Svelte `onchange`；自定义元素在自己身上发冒泡的 `sn-change`，`e.detail` 是值。",
+    { slug: "select-events", title: "监听选中", why: "选中一项时拿到选中的值。", whyBy: { react: "选中一项时 `onChange` 拿到选中的值。", preact: "选中一项时 `onChange` 拿到选中的值。", vue: "选中一项时 `@change` 拿到选中的值。", svelte: "选中一项时 `onchange` 拿到选中的值。", default: "选中一项时，自定义元素在自己身上发冒泡的 `sn-change`，`e.detail` 是值。" },
       html: `<div class="sn-stack sn-gap-8" id="ratio-events">
   <sn-select items='${RATIOS}' value="16:9 · 横屏" label="画面比例"></sn-select>
   <span class="sn-help">当前：16:9 · 横屏</span>
 </div>`, code: code("select-events") },
-    { slug: "select-controlled", title: "受控：值放在自己的状态里", why: "React 用 value + onChange，Vue 用 v-model，Svelte 用 bind:value；自定义元素把值放在自己的状态里，`sn-change` 时写回 value 属性。",
+    { slug: "select-controlled", title: "受控：值放在自己的状态里", why: "值放在你自己的状态里，选了以后写回。", whyBy: { react: "受控：`value` + `onChange`，值放在你自己的状态里。", preact: "受控：`value` + `onChange`，值放在你自己的状态里。", vue: "用 `v-model` 绑一个变量。", svelte: "用 `bind:value` 绑一个变量。", default: "自定义元素把值放在你自己的状态里，`sn-change` 时写回 value 属性。" },
       html: `<div class="sn-stack sn-gap-8" id="ratio-controlled">
   <sn-select items='${RATIOS}' value="9:16 · 竖屏" label="画面比例"></sn-select>
   <span class="sn-help">当前：9:16 · 竖屏</span>
 </div>`, code: code("select-controlled") },
-    { slug: "select-menu", title: "菜单按钮", why: "不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，包一层 `<sn-enhance>`（Vue 用 `v-enhance` 指令）接上交互；每一项后面留出对勾的位置。",
+    { slug: "select-menu", title: "菜单按钮", why: "不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，包一层 `<sn-enhance>` 接上交互；每一项后面留出对勾的位置。", whyBy: { vue: "不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，用 `v-enhance` 指令接上交互；每一项后面留出对勾的位置。" },
       html: `<div class="sn-select">
   <button type="button" class="sn-btn sn-secondary" data-menubtn data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
   <div class="sn-menu" role="menu">

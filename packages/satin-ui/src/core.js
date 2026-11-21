@@ -150,11 +150,14 @@ tipEl();
 const noHover = matchMedia("(hover: none)");
 document.addEventListener("pointerover", (e) => {
   if (e.pointerType === "touch" || e.pointerType === "pen" || noHover.matches) return;
-  const el = e.target.closest("[data-tip],[data-tip-full]"); if (!el || el === tipFor) return;
+  const el = e.target.closest("[data-tip],[data-tip-full]"); if (!el || el === tipFor || el === dismissed) return;
   const text = tipText(el); if (!text) return;
   clearTimeout(tipTimer); const w = tipWait = { el, text }; tipTimer = setTimeout(() => { tipWait = null; showTip(w.el, w.text); }, performance.now() - lastHide < 300 ? 0 : 500);
 });
-document.addEventListener("pointerout", (e) => { const el = e.target.closest("[data-tip],[data-tip-full]"); if (el && !el.contains(e.relatedTarget)) hideTip(); });
+document.addEventListener("pointerout", (e) => { const el = e.target.closest("[data-tip],[data-tip-full]"); if (el && !el.contains(e.relatedTarget)) { if (el === dismissed) dismissed = null; hideTip(); } });
+// 按 Esc 收起提示（WCAG 1.4.13：不挪指针、不挪焦点也能关掉）；不拦这个键——弹窗、菜单照样一起关。收起以后指针还停在这个元素上就不再冒出来，移出去再移进来才出
+let dismissed = null;
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && (tipFor || tipWait)) { dismissed = tipFor || tipWait.el; hideTip(); } });
 document.addEventListener("focusin", (e) => { const el = e.target.closest?.("[data-tip]"); if (el?.matches(":focus-visible")) showTip(el, el.dataset.tip); });
 document.addEventListener("focusout", hideTip);
 addEventListener("scroll", hideTip, { passive: true });

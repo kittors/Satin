@@ -478,10 +478,10 @@ export default function SubmitReview() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `title` | `string`（React：ReactNode \| string；Preact：ReactNode \| string） | — | 是 | 问的是什么："永久删除这个镜头？" | React：`title`；Preact：`title`；Vue：`title`；纯 HTML：`.sn-q 里的问题` |
-| `description` | `string`（React：ReactNode \| string；Preact：ReactNode \| string） | — | 否 | 后果："删除后无法恢复。" | React：`description`；Preact：`description`；Vue：`description`；纯 HTML：`.sn-d` |
-| `confirmText` | `string`（React：ReactNode \| string；Preact：ReactNode \| string） | "确定" | 否 | 确认按钮的字：写清楚做什么（"永久删除"），不写"确定"。 | React：`confirmText`；Preact：`confirmText`；Vue：`confirmText（模板里写 confirm-text）`；纯 HTML：`[data-yes]` |
-| `cancelText` | `string`（React：ReactNode \| string；Preact：ReactNode \| string） | "取消" | 否 | 取消按钮的字。 | React：`cancelText`；Preact：`cancelText`；Vue：`cancelText（模板里写 cancel-text）`；纯 HTML：`[data-no]` |
+| `title` | `string`（React：ReactNode \| string；Preact：ComponentChildren \| string） | — | 是 | 问的是什么："永久删除这个镜头？" | React：`title`；Preact：`title`；Vue：`title`；纯 HTML：`.sn-q 里的问题` |
+| `description` | `string`（React：ReactNode \| string；Preact：ComponentChildren \| string） | — | 否 | 后果："删除后无法恢复。" | React：`description`；Preact：`description`；Vue：`description`；纯 HTML：`.sn-d` |
+| `confirmText` | `string`（React：ReactNode \| string；Preact：ComponentChildren \| string） | "确定" | 否 | 确认按钮的字：写清楚做什么（"永久删除"），不写"确定"。 | React：`confirmText`；Preact：`confirmText`；Vue：`confirmText（模板里写 confirm-text）`；纯 HTML：`[data-yes]` |
+| `cancelText` | `string`（React：ReactNode \| string；Preact：ComponentChildren \| string） | "取消" | 否 | 取消按钮的字。 | React：`cancelText`；Preact：`cancelText`；Vue：`cancelText（模板里写 cancel-text）`；纯 HTML：`[data-no]` |
 | `danger` | `boolean` | true | 否 | 确认按钮用危险样式；不是删除的操作关掉（用主按钮）。 | React：`danger`；Preact：`danger`；Vue：`danger`；纯 HTML：`确认按钮 sn-danger / sn-primary` |
 | `align` | `"start" \| "center" \| "end"` | "end" | 否 | 和按钮的哪一边对齐。 | React：`align`；Preact：`align`；Vue：`align`；纯 HTML：`openPopover 的 align` |
 

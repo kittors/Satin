@@ -191,12 +191,12 @@ export default {
   examples: [
     { slug: "grid-basic", title: "基础用法：列和数据", why: "给 `columns`（每列取行里的哪个字段、表头叫什么、`type` 选内置的显示）和 `data`（数组）就能用；每行要有唯一的 `id`（字段不叫 id 就写 `rowKey`）。行少时用 `height` 把表格框调矮。",
       html: `<div id="shots-basic"></div>`, code: code("grid-basic") },
-    { slug: "grid-sort", title: "排序：受控的 sort", why: "`sortable` 的列点表头排序。React 给 `sort` + `onSortChange`，Vue 写 `v-model:sort`，Svelte 写 `bind:sort`；直接用 createDataGrid 时给 `defaultSort`、在 `onSortChange` 里拿新的排序。",
+    { slug: "grid-sort", title: "排序：受控的 sort", why: "`sortable` 的列点表头排序；排序可以受控，也可以给一个初始排序、在排序变化时拿新的。", whyBy: { react: "`sortable` 的列点表头排序。受控给 `sort` + `onSortChange`。", preact: "`sortable` 的列点表头排序。受控给 `sort` + `onSortChange`。", vue: "`sortable` 的列点表头排序。用 `v-model:sort` 绑排序。", svelte: "`sortable` 的列点表头排序。用 `bind:sort` 绑排序。", default: "`sortable` 的列点表头排序。直接用 createDataGrid 时给 `defaultSort`、在 `onSortChange` 里拿新的排序。" },
       html: `<div class="sn-stack sn-gap-8">
   <div id="shots-sort"></div>
   <span class="sn-help" id="shots-sort-note">按镜头从大到小排</span>
 </div>`, code: code("grid-sort") },
-    { slug: "grid-select", title: "勾选：受控的 selectedKeys", why: "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：React 给 `selectedKeys` + `onSelectionChange`，Vue 写 `v-model:selected`，Svelte 写 `bind:selectedKeys`；程序里改勾选调 `update({ selectedKeys })`。",
+    { slug: "grid-select", title: "勾选：受控的 selectedKeys", why: "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记，勾选可以受控；程序里改勾选调 `update({ selectedKeys })`。", whyBy: { react: "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：给 `selectedKeys` + `onSelectionChange`；程序里改勾选调 `update({ selectedKeys })`。", preact: "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：给 `selectedKeys` + `onSelectionChange`；程序里改勾选调 `update({ selectedKeys })`。", vue: "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：写 `v-model:selected`；程序里改勾选调实例的 `update({ selectedKeys })`。", svelte: "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：写 `bind:selectedKeys`；程序里改勾选调 `update({ selectedKeys })`。", default: "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：选项里给 `selectedKeys`、在 `onSelectionChange` 里写回；程序里改勾选调 `update({ selectedKeys })`。" },
       html: `<div class="sn-stack sn-gap-8">
   <div id="shots-select"></div>
   <div class="sn-row sn-gap-8">
@@ -204,7 +204,7 @@ export default {
     <button type="button" class="sn-textbtn sn-sm" id="shots-select-clear">清空</button>
   </div>
 </div>`, code: code("grid-select") },
-    { slug: "grid-render", title: "自定义格子：format 和 render", why: "只改显示的文字用 `format`；要放自己的标记用 `render`（返回 HTML 字符串或节点；React 返回 JSX，Vue 写插槽 `#cell-<key>`）。数据里的文字用 `textContent` 放，别拼进 HTML。",
+    { slug: "grid-render", title: "自定义格子：format 和 render", why: "只改显示的文字用 `format`；要放自己的标记用 `render`（返回 HTML 字符串或节点）。数据里的文字用 `textContent` 放，别拼进 HTML。", whyBy: { react: "只改显示的文字用 `format`；要放自己的标记用 `render`（返回 JSX）。数据里的文字照常写在 JSX 里，别拼成 HTML 字符串。", preact: "只改显示的文字用 `format`；要放自己的标记用 `render`（返回 JSX）。数据里的文字照常写在 JSX 里，别拼成 HTML 字符串。", vue: "只改显示的文字用 `format`；要放自己的标记写插槽 `#cell-<key>`。数据里的文字用插值放，别拼进 HTML。" },
       html: `<div id="shots-render"></div>`, code: code("grid-render") },
     { slug: "grid-remote", title: "服务端的十万行：dataSource", why: "数据在服务端时给 `dataSource`：`total` + `load({ start, end, sort, filter })`，表格滚到哪要到哪（一块 100 行），排序、搜索、列头筛选都交给服务端。例子里用一个假的服务端，换成 `fetch` 就行。",
       html: `<div id="shots-remote"></div>`, code: code("grid-remote") },

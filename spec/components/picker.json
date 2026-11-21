@@ -517,7 +517,14 @@
     {
       "slug": "picker-events",
       "title": "拿到选中的值",
-      "why": "选好、清除时拿到 `{ text }`：组件是 `onChange`（Vue `@change`、Svelte `onchange`），手写标记听冒泡上来的 `pick`。text 是触发框里显示的文字，交给接口时按需要的格式自己转。",
+      "why": "选好、清除时拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。",
+      "whyBy": {
+        "react": "选好、清除时 `onChange` 拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。",
+        "preact": "选好、清除时 `onChange` 拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。",
+        "vue": "选好、清除时 `@change` 拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。",
+        "svelte": "选好、清除时 `onchange` 拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。",
+        "default": "选好、清除时听冒泡上来的 `pick` 事件，拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。"
+      },
       "html": "<div class=\"sn-stack sn-gap-8\" id=\"due-events\">\n  <div class=\"sn-field\"><span class=\"sn-lbl\">交付日期</span>\n    <div class=\"sn-pk\" data-pk=\"date\">\n    <button class=\"sn-pk-trigger\" type=\"button\" aria-haspopup=\"dialog\"><span class=\"sn-val sn-ph\" data-ph=\"选择日期\">选择日期</span><span class=\"sn-end sn-swap\"><span class=\"sn-a\" data-i=\"calendar\"></span><span class=\"sn-b\" data-i=\"x\" role=\"button\" aria-label=\"清除\"></span></span></button>\n    <div class=\"sn-pk-panel\" role=\"dialog\" aria-label=\"选择日期\"><div class=\"sn-cal-slot\"></div><div class=\"sn-pk-foot\"><button class=\"sn-btn sn-ghost sn-sm\" type=\"button\" data-today>今天</button><span class=\"sn-grow\"></span><button class=\"sn-btn sn-ghost sn-sm\" type=\"button\" data-clear>清除</button></div></div>\n  </div>\n  </div>\n  <span class=\"sn-help\">还没选交付日期</span>\n</div>",
       "code": {
         "html": "<sn-enhance>\n  <div class=\"sn-stack sn-gap-8\" id=\"due-events\">\n    <div class=\"sn-field\">\n      <span class=\"sn-lbl\">交付日期</span>\n      <div class=\"sn-pk\" data-pk=\"date\">\n        <button class=\"sn-pk-trigger\" type=\"button\" aria-haspopup=\"dialog\"><span class=\"sn-val sn-ph\" data-ph=\"选择日期\">选择日期</span><span class=\"sn-end sn-swap\"><span class=\"sn-a\" data-i=\"calendar\"></span><span class=\"sn-b\" data-i=\"x\" role=\"button\" aria-label=\"清除\"></span></span></button>\n        <div class=\"sn-pk-panel\" role=\"dialog\" aria-label=\"选择日期\"><div class=\"sn-cal-slot\"></div><div class=\"sn-pk-foot\"><button class=\"sn-btn sn-ghost sn-sm\" type=\"button\" data-today>今天</button><span class=\"sn-grow\"></span><button class=\"sn-btn sn-ghost sn-sm\" type=\"button\" data-clear>清除</button></div></div>\n      </div>\n    </div>\n    <span class=\"sn-help\">还没选交付日期</span>\n  </div>\n</sn-enhance>\n\n<script type=\"module\">\n  const box = document.getElementById(\"due-events\");\n  // 选好、清除时选择器上冒泡一个 pick 事件，e.detail.text 是触发框里显示的文字（清除时是空字符串）\n  box.addEventListener(\"pick\", (e) => {\n    box.querySelector(\".sn-help\").textContent = e.detail.text ? \"交付日期：\" + e.detail.text : \"还没选交付日期\";\n  });\n</script>\n",

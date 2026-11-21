@@ -510,7 +510,13 @@
     {
       "slug": "select-basic",
       "title": "基础用法",
-      "why": "给选项和当前值就行。React 只给 `defaultValue` 时组件自己管选中，Vue、Svelte 绑一个变量。",
+      "why": "给选项和当前值就行；不受控时组件自己管选中。",
+      "whyBy": {
+        "react": "给选项和当前值就行。只给 `defaultValue` 时组件自己管选中。",
+        "preact": "给选项和当前值就行。只给 `defaultValue` 时组件自己管选中。",
+        "vue": "给选项，再用 `v-model` 绑一个变量就行。",
+        "svelte": "给选项，再用 `bind:value` 绑一个变量就行。"
+      },
       "html": "<sn-select items='[\"16:9 · 横屏\",\"9:16 · 竖屏\",\"1:1 · 方形\"]' value=\"16:9 · 横屏\" label=\"画面比例\"></sn-select>",
       "code": {
         "html": "<sn-select items='[\"16:9 · 横屏\",\"9:16 · 竖屏\",\"1:1 · 方形\"]' value=\"16:9 · 横屏\" label=\"画面比例\"></sn-select>\n",
@@ -570,7 +576,14 @@
     {
       "slug": "select-events",
       "title": "监听选中",
-      "why": "选中一项时拿到选中的值：React `onChange`、Vue `@change`、Svelte `onchange`；自定义元素在自己身上发冒泡的 `sn-change`，`e.detail` 是值。",
+      "why": "选中一项时拿到选中的值。",
+      "whyBy": {
+        "react": "选中一项时 `onChange` 拿到选中的值。",
+        "preact": "选中一项时 `onChange` 拿到选中的值。",
+        "vue": "选中一项时 `@change` 拿到选中的值。",
+        "svelte": "选中一项时 `onchange` 拿到选中的值。",
+        "default": "选中一项时，自定义元素在自己身上发冒泡的 `sn-change`，`e.detail` 是值。"
+      },
       "html": "<div class=\"sn-stack sn-gap-8\" id=\"ratio-events\">\n  <sn-select items='[\"16:9 · 横屏\",\"9:16 · 竖屏\",\"1:1 · 方形\"]' value=\"16:9 · 横屏\" label=\"画面比例\"></sn-select>\n  <span class=\"sn-help\">当前：16:9 · 横屏</span>\n</div>",
       "code": {
         "html": "<div class=\"sn-stack sn-gap-8\" id=\"ratio-events\">\n  <sn-select items='[\"16:9 · 横屏\",\"9:16 · 竖屏\",\"1:1 · 方形\"]' value=\"16:9 · 横屏\" label=\"画面比例\"></sn-select>\n  <span class=\"sn-help\">当前：16:9 · 横屏</span>\n</div>\n\n<script type=\"module\">\n  const box = document.getElementById(\"ratio-events\");\n  // 选中一项时 <sn-select> 发 sn-change（冒泡），e.detail 是选中的值\n  box.addEventListener(\"sn-change\", (e) => {\n    box.querySelector(\".sn-help\").textContent = \"当前：\" + e.detail;\n  });\n</script>\n",
@@ -585,7 +598,14 @@
     {
       "slug": "select-controlled",
       "title": "受控：值放在自己的状态里",
-      "why": "React 用 value + onChange，Vue 用 v-model，Svelte 用 bind:value；自定义元素把值放在自己的状态里，`sn-change` 时写回 value 属性。",
+      "why": "值放在你自己的状态里，选了以后写回。",
+      "whyBy": {
+        "react": "受控：`value` + `onChange`，值放在你自己的状态里。",
+        "preact": "受控：`value` + `onChange`，值放在你自己的状态里。",
+        "vue": "用 `v-model` 绑一个变量。",
+        "svelte": "用 `bind:value` 绑一个变量。",
+        "default": "自定义元素把值放在你自己的状态里，`sn-change` 时写回 value 属性。"
+      },
       "html": "<div class=\"sn-stack sn-gap-8\" id=\"ratio-controlled\">\n  <sn-select items='[\"16:9 · 横屏\",\"9:16 · 竖屏\",\"1:1 · 方形\"]' value=\"9:16 · 竖屏\" label=\"画面比例\"></sn-select>\n  <span class=\"sn-help\">当前：9:16 · 竖屏</span>\n</div>",
       "code": {
         "html": "<div class=\"sn-stack sn-gap-8\" id=\"ratio-controlled\">\n  <sn-select items='[\"16:9 · 横屏\",\"9:16 · 竖屏\",\"1:1 · 方形\"]' value=\"9:16 · 竖屏\" label=\"画面比例\"></sn-select>\n  <span class=\"sn-help\">当前：9:16 · 竖屏</span>\n</div>\n\n<script type=\"module\">\n  const box = document.getElementById(\"ratio-controlled\"), select = box.querySelector(\"sn-select\");\n  box.addEventListener(\"sn-change\", (e) => {\n    select.setAttribute(\"value\", e.detail); // 自己保管值：改属性，组件跟着更新\n    box.querySelector(\".sn-help\").textContent = \"当前：\" + e.detail;\n  });\n</script>\n",
@@ -600,7 +620,10 @@
     {
       "slug": "select-menu",
       "title": "菜单按钮",
-      "why": "不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，包一层 `<sn-enhance>`（Vue 用 `v-enhance` 指令）接上交互；每一项后面留出对勾的位置。",
+      "why": "不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，包一层 `<sn-enhance>` 接上交互；每一项后面留出对勾的位置。",
+      "whyBy": {
+        "vue": "不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，用 `v-enhance` 指令接上交互；每一项后面留出对勾的位置。"
+      },
       "html": "<div class=\"sn-select\">\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-menubtn data-prefix=\"排序：\" data-i=\"chevron-down:caret\">排序：最近更新</button>\n  <div class=\"sn-menu\" role=\"menu\">\n    <div class=\"sn-item sn-sel\" data-i=\"check:chk\">最近更新</div>\n    <div class=\"sn-item\" data-i=\"check:chk\">名称</div>\n    <div class=\"sn-item\" data-i=\"check:chk\">创建时间</div>\n  </div>\n</div>",
       "code": {
         "html": "<sn-enhance>\n  <div class=\"sn-select\">\n    <button type=\"button\" class=\"sn-btn sn-secondary\" data-menubtn data-prefix=\"排序：\" data-i=\"chevron-down:caret\">排序：最近更新</button>\n    <div class=\"sn-menu\" role=\"menu\">\n      <div class=\"sn-item sn-sel\" data-i=\"check:chk\">最近更新</div>\n      <div class=\"sn-item\" data-i=\"check:chk\">名称</div>\n      <div class=\"sn-item\" data-i=\"check:chk\">创建时间</div>\n    </div>\n  </div>\n</sn-enhance>\n",

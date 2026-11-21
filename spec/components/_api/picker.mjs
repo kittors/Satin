@@ -172,7 +172,7 @@ export default {
       <div class="sn-rg-tabs" role="tablist"><span class="sn-ink"></span></div><div class="sn-rg-vp"><div class="sn-rg-res sn-sa-vp sn-fy" role="listbox" hidden></div></div></div>
   </div>
 </div>`, code: code("picker-region") },
-    { slug: "picker-events", title: "拿到选中的值", why: "选好、清除时拿到 `{ text }`：组件是 `onChange`（Vue `@change`、Svelte `onchange`），手写标记听冒泡上来的 `pick`。text 是触发框里显示的文字，交给接口时按需要的格式自己转。",
+    { slug: "picker-events", title: "拿到选中的值", why: "选好、清除时拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。", whyBy: { react: "选好、清除时 `onChange` 拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。", preact: "选好、清除时 `onChange` 拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。", vue: "选好、清除时 `@change` 拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。", svelte: "选好、清除时 `onchange` 拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。", default: "选好、清除时听冒泡上来的 `pick` 事件，拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。" },
       html: `<div class="sn-stack sn-gap-8" id="due-events">
   <div class="sn-field"><span class="sn-lbl">交付日期</span>
     ${DATE}

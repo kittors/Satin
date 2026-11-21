@@ -35,7 +35,7 @@ export default {
   },
   dts: { react: "Popover", vue: "Popover", functions: ["openPopover", "popoverOf"] },
   props: [
-    { name: "title", type: "string", typeBy: { react: "ReactNode | string", preact: "ReactNode | string" }, default: "—", required: false, desc: "面板的标题（13/600）。", names: { react: "title", preact: "title", vue: "title", html: ".sn-popover h4" } },
+    { name: "title", type: "string", typeBy: { react: "ReactNode | string", preact: "ComponentChildren | string" }, default: "—", required: false, desc: "面板的标题（13/600）。", names: { react: "title", preact: "title", vue: "title", html: ".sn-popover h4" } },
     { name: "align", type: '"start" | "center" | "end"', default: '"start"', required: false, desc: "和按钮的哪一边对齐：按钮靠右时用 end，面板不会伸出窗口。", names: { react: "align", preact: "align", vue: "align", html: "面板的 data-align" } },
     { name: "open", type: "boolean", default: "—", required: false, desc: "开着没有。", descBy: { react: "开着没有，受控：在 `onOpenChange` 里更新。", preact: "开着没有，受控：在 `onOpenChange` 里更新。", vue: "开着没有：`v-model:open` 绑定。" }, names: { react: "open", preact: "open", vue: "v-model:open" } },
     { name: "defaultOpen", type: "boolean", default: "false", required: false, desc: "非受控：一开始开着没有。", names: { react: "defaultOpen", preact: "defaultOpen", vue: "defaultOpen" } },

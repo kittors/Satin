@@ -170,7 +170,7 @@ export default {
     { slug: "table-basic", title: "最简单的用法", why: "给列和数据：点表头排序，行按新顺序移到位。", html: `<div id="table-basic"></div>`, code: code("table-basic") },
     { slug: "table-controlled", title: "受控：勾选", why: "勾上的行放在父组件里：拿去批量操作。", html: `<div id="table-controlled"></div>`, code: code("table-controlled") },
     { slug: "table-states", title: "加载中、空表", why: "加载中给 loading（骨架行）；空数组显示 empty；compact 紧凑密度。", html: `<div id="table-states"></div>`, code: code("table-states") },
-    { slug: "table-tree", title: "多级展开：树形数据", why: "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行受控：React 给 `expandedKeys` + `onExpandChange`，Vue 写 `v-model:expanded`；直接用 createTable 时给 `defaultExpandedKeys`、在 `onExpandChange` 里拿 `keys`。",
+    { slug: "table-tree", title: "多级展开：树形数据", why: "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开；展开着的行可以受控，也可以只给初始展开、在变化时拿新的。", whyBy: { react: "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行受控：给 `expandedKeys` + `onExpandChange`。", preact: "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行受控：给 `expandedKeys` + `onExpandChange`。", vue: "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行用 `v-model:expanded` 绑。", default: "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。直接用 createTable 时给 `defaultExpandedKeys`、在 `onExpandChange` 里拿 `keys`。" },
       html: `<div class="sn-stack sn-gap-8">
   <div id="table-tree"></div>
   <span class="sn-help" id="table-tree-note">展开着 1 行</span>

@@ -141,7 +141,7 @@
       "type": "string",
       "typeBy": {
         "react": "ReactNode | string",
-        "preact": "ReactNode | string"
+        "preact": "ComponentChildren | string"
       },
       "default": "—",
       "required": false,
@@ -316,7 +316,15 @@
     {
       "slug": "choice-basic",
       "title": "最简单的用法",
-      "why": "复选框和开关就是原生的 <input>：React 里 defaultChecked，Vue 里 v-model。",
+      "why": "复选框和开关就是原生的 <input>：照原生的写法给初始状态、读写选中。",
+      "whyBy": {
+        "react": "复选框和开关就是原生的 <input>：不受控写 `defaultChecked`，受控写 `checked` + `onChange`。",
+        "preact": "复选框和开关就是原生的 <input>：不受控写 `defaultChecked`，受控写 `checked` + `onChange`。",
+        "vue": "复选框和开关就是原生的 <input>：用 `v-model` 绑一个变量。",
+        "svelte": "复选框和开关就是原生的 <input>：用 `bind:checked` 绑一个变量。",
+        "solid": "复选框和开关就是原生的 <input>：`checked` 给初始状态，在 `onChange` 里读 `e.currentTarget.checked`。",
+        "default": "复选框和开关就是原生的 <input>：写 `checked` 属性给初始状态，读写 `input.checked`。"
+      },
       "html": "<div class=\"sn-stack sn-gap-8\"><label class=\"sn-check\"><input type=\"checkbox\" checked><span class=\"sn-box\"><svg viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.5 6.2l2.4 2.4 4.6-5\"/></svg><span class=\"sn-bar\"></span></span>自动保存草稿</label><label class=\"sn-switch\"><input type=\"checkbox\" role=\"switch\"><span class=\"sn-track\"><span class=\"sn-knob\"></span></span>生成完成后提醒我</label></div>",
       "code": {
         "html": "<div class=\"sn-stack sn-gap-8\">\n  <label class=\"sn-check\"><input type=\"checkbox\" checked><span class=\"sn-box\"><svg viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.5 6.2l2.4 2.4 4.6-5\"/></svg><span class=\"sn-bar\"></span></span>自动保存草稿</label>\n  <label class=\"sn-switch\"><input type=\"checkbox\" role=\"switch\"><span class=\"sn-track\"><span class=\"sn-knob\"></span></span>生成完成后提醒我</label>\n</div>\n",

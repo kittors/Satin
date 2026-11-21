@@ -1052,7 +1052,14 @@
     {
       "slug": "grid-sort",
       "title": "排序：受控的 sort",
-      "why": "`sortable` 的列点表头排序。React 给 `sort` + `onSortChange`，Vue 写 `v-model:sort`，Svelte 写 `bind:sort`；直接用 createDataGrid 时给 `defaultSort`、在 `onSortChange` 里拿新的排序。",
+      "why": "`sortable` 的列点表头排序；排序可以受控，也可以给一个初始排序、在排序变化时拿新的。",
+      "whyBy": {
+        "react": "`sortable` 的列点表头排序。受控给 `sort` + `onSortChange`。",
+        "preact": "`sortable` 的列点表头排序。受控给 `sort` + `onSortChange`。",
+        "vue": "`sortable` 的列点表头排序。用 `v-model:sort` 绑排序。",
+        "svelte": "`sortable` 的列点表头排序。用 `bind:sort` 绑排序。",
+        "default": "`sortable` 的列点表头排序。直接用 createDataGrid 时给 `defaultSort`、在 `onSortChange` 里拿新的排序。"
+      },
       "html": "<div class=\"sn-stack sn-gap-8\">\n  <div id=\"shots-sort\"></div>\n  <span class=\"sn-help\" id=\"shots-sort-note\">按镜头从大到小排</span>\n</div>",
       "code": {
         "html": "<div class=\"sn-stack sn-gap-8\">\n  <div id=\"shots-sort\"></div>\n  <span class=\"sn-help\" id=\"shots-sort-note\">按镜头从大到小排</span>\n</div>\n\n<script type=\"module\">\n  import { createDataGrid } from \"satin-ui/grid\";\n\n  // sortable 的列点表头排序：升序 → 降序 → 不排\n  const columns = [\n    { key: \"name\", title: \"名称\", width: 180, sortable: true },\n    { key: \"status\", title: \"状态\", type: \"status\", width: 120, options: [\"待开始\", \"进行中\", \"审核中\", \"已完成\"] },\n    { key: \"shots\", title: \"镜头\", type: \"int\", width: 96, sortable: true },\n    { key: \"dur\", title: \"时长\", type: \"dur\", width: 96, sortable: true },\n  ];\n  const rows = [\n    { id: 1, name: \"雨夜车站\", status: \"进行中\", owner: \"林夏\", shots: 12, dur: 154 },\n    { id: 2, name: \"候车厅\", status: \"已完成\", owner: \"周屿\", shots: 4, dur: 48 },\n    { id: 3, name: \"站台告别\", status: \"待开始\", owner: \"林夏\", shots: 9, dur: 131 },\n    { id: 4, name: \"末班列车\", status: \"审核中\", owner: \"陈默\", shots: 16, dur: 212 },\n    { id: 5, name: \"出站口\", status: \"已完成\", owner: \"周屿\", shots: 6, dur: 75 },\n    { id: 6, name: \"天桥\", status: \"进行中\", owner: \"许棠\", shots: 8, dur: 96 },\n  ];\n  const TITLES = { name: \"名称\", shots: \"镜头\", dur: \"时长\" };\n  const describe = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? \"从小到大\" : \"从大到小\"}排` : \"没有排序：按原来的顺序\");\n  const note = document.getElementById(\"shots-sort-note\");\n  // defaultSort：一开始的排序；点表头时 onSortChange 给出 { key, dir }（dir 1 升序、-1 降序）或 null\n  createDataGrid(document.getElementById(\"shots-sort\"), {\n    columns, data: rows, height: 280, label: \"镜头清单\",\n    defaultSort: { key: \"shots\", dir: -1 },\n    onSortChange: (s) => (note.textContent = describe(s)),\n  });\n</script>\n",
@@ -1067,7 +1074,14 @@
     {
       "slug": "grid-select",
       "title": "勾选：受控的 selectedKeys",
-      "why": "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：React 给 `selectedKeys` + `onSelectionChange`，Vue 写 `v-model:selected`，Svelte 写 `bind:selectedKeys`；程序里改勾选调 `update({ selectedKeys })`。",
+      "why": "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记，勾选可以受控；程序里改勾选调 `update({ selectedKeys })`。",
+      "whyBy": {
+        "react": "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：给 `selectedKeys` + `onSelectionChange`；程序里改勾选调 `update({ selectedKeys })`。",
+        "preact": "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：给 `selectedKeys` + `onSelectionChange`；程序里改勾选调 `update({ selectedKeys })`。",
+        "vue": "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：写 `v-model:selected`；程序里改勾选调实例的 `update({ selectedKeys })`。",
+        "svelte": "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：写 `bind:selectedKeys`；程序里改勾选调 `update({ selectedKeys })`。",
+        "default": "`selection: \"multiple\"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：选项里给 `selectedKeys`、在 `onSelectionChange` 里写回；程序里改勾选调 `update({ selectedKeys })`。"
+      },
       "html": "<div class=\"sn-stack sn-gap-8\">\n  <div id=\"shots-select\"></div>\n  <div class=\"sn-row sn-gap-8\">\n    <span class=\"sn-help\" id=\"shots-select-note\">已选 2 个：雨夜车站、末班列车</span>\n    <button type=\"button\" class=\"sn-textbtn sn-sm\" id=\"shots-select-clear\">清空</button>\n  </div>\n</div>",
       "code": {
         "html": "<div class=\"sn-stack sn-gap-8\">\n  <div id=\"shots-select\"></div>\n  <div class=\"sn-row sn-gap-8\">\n    <span class=\"sn-help\" id=\"shots-select-note\">已选 2 个：雨夜车站、末班列车</span>\n    <button type=\"button\" class=\"sn-textbtn sn-sm\" id=\"shots-select-clear\">清空</button>\n  </div>\n</div>\n\n<script type=\"module\">\n  import { createDataGrid } from \"satin-ui/grid\";\n\n  const columns = [\n    { key: \"name\", title: \"名称\", width: 180 },\n    { key: \"status\", title: \"状态\", type: \"status\", width: 120, options: [\"待开始\", \"进行中\", \"审核中\", \"已完成\"] },\n    { key: \"owner\", title: \"负责人\", type: \"owner\", width: 120 },\n    { key: \"shots\", title: \"镜头\", type: \"int\", width: 96 },\n  ];\n  const rows = [\n    { id: 1, name: \"雨夜车站\", status: \"进行中\", owner: \"林夏\", shots: 12, dur: 154 },\n    { id: 2, name: \"候车厅\", status: \"已完成\", owner: \"周屿\", shots: 4, dur: 48 },\n    { id: 3, name: \"站台告别\", status: \"待开始\", owner: \"林夏\", shots: 9, dur: 131 },\n    { id: 4, name: \"末班列车\", status: \"审核中\", owner: \"陈默\", shots: 16, dur: 212 },\n    { id: 5, name: \"出站口\", status: \"已完成\", owner: \"周屿\", shots: 6, dur: 75 },\n    { id: 6, name: \"天桥\", status: \"进行中\", owner: \"许棠\", shots: 8, dur: 96 },\n  ];\n  const nameOf = (id) => rows.find((r) => r.id === id)?.name;\n  const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join(\"、\")}` : \"还没选\");\n  const note = document.getElementById(\"shots-select-note\"), clear = document.getElementById(\"shots-select-clear\");\n  const show = (keys) => { note.textContent = noteOf(keys); clear.disabled = !keys.length; };\n  // defaultSelectedKeys：一开始勾上的行（rowKey，这里是 id）；用户勾选时 onSelectionChange 给出新的\n  const grid = createDataGrid(document.getElementById(\"shots-select\"), {\n    columns, data: rows, selection: \"multiple\", defaultSelectedKeys: [1, 4], height: 280, label: \"镜头清单\",\n    onSelectionChange: (e) => show(e.keys ?? []),\n  });\n  // 程序里改勾选：update({ selectedKeys })\n  clear.addEventListener(\"click\", () => { grid.update({ selectedKeys: [] }); show([]); });\n</script>\n",
@@ -1082,7 +1096,12 @@
     {
       "slug": "grid-render",
       "title": "自定义格子：format 和 render",
-      "why": "只改显示的文字用 `format`；要放自己的标记用 `render`（返回 HTML 字符串或节点；React 返回 JSX，Vue 写插槽 `#cell-<key>`）。数据里的文字用 `textContent` 放，别拼进 HTML。",
+      "why": "只改显示的文字用 `format`；要放自己的标记用 `render`（返回 HTML 字符串或节点）。数据里的文字用 `textContent` 放，别拼进 HTML。",
+      "whyBy": {
+        "react": "只改显示的文字用 `format`；要放自己的标记用 `render`（返回 JSX）。数据里的文字照常写在 JSX 里，别拼成 HTML 字符串。",
+        "preact": "只改显示的文字用 `format`；要放自己的标记用 `render`（返回 JSX）。数据里的文字照常写在 JSX 里，别拼成 HTML 字符串。",
+        "vue": "只改显示的文字用 `format`；要放自己的标记写插槽 `#cell-<key>`。数据里的文字用插值放，别拼进 HTML。"
+      },
       "html": "<div id=\"shots-render\"></div>",
       "code": {
         "html": "<div id=\"shots-render\"></div>\n\n<script type=\"module\">\n  import { createDataGrid } from \"satin-ui/grid\";\n\n  // render 返回节点（或 HTML 字符串）：值是数据里来的，用 textContent 放，不拼进 HTML\n  const tagList = (tags) => {\n    const box = document.createElement(\"span\");\n    box.className = \"sn-row sn-gap-4\";\n    for (const t of tags) box.append(Object.assign(document.createElement(\"span\"), { className: \"sn-tag sn-sm\", textContent: t }));\n    return box;\n  };\n  // 只改显示的文字用 format（预算加上 ¥ 和千分位）；要放自己的标记用 render（一行好几个标签）\n  const columns = [\n    { key: \"name\", title: \"名称\", width: 160 },\n    { key: \"tags\", title: \"标签\", width: 200, render: tagList },\n    { key: \"budget\", title: \"预算\", type: \"money\", width: 120, format: (v) => \"¥\" + v.toLocaleString(\"zh-CN\") },\n    { key: \"dur\", title: \"时长\", type: \"dur\", width: 96 },\n  ];\n  const rows = [\n    { id: 1, name: \"雨夜车站\", tags: [\"外景\", \"夜戏\"], budget: 12800, dur: 154 },\n    { id: 2, name: \"候车厅\", tags: [\"内景\"], budget: 4600, dur: 48 },\n    { id: 3, name: \"站台告别\", tags: [\"外景\", \"群演\"], budget: 21500, dur: 131 },\n    { id: 4, name: \"末班列车\", tags: [\"夜戏\", \"特效\"], budget: 36000, dur: 212 },\n    { id: 5, name: \"出站口\", tags: [\"外景\"], budget: 5200, dur: 75 },\n    { id: 6, name: \"天桥\", tags: [\"外景\", \"航拍\"], budget: 18900, dur: 96 },\n  ];\n  createDataGrid(document.getElementById(\"shots-render\"), { columns, data: rows, height: 280, label: \"镜头预算\" });\n</script>\n",

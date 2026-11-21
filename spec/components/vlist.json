@@ -150,7 +150,7 @@
       "type": "(item: T, index: number) => string | Node",
       "typeBy": {
         "react": "(item: T, index: number) => ReactNode",
-        "preact": "(item: T, index: number) => ReactNode",
+        "preact": "(item: T, index: number) => ComponentChildren",
         "vue": "插槽 #row=\"{ item, index }\""
       },
       "default": "—",

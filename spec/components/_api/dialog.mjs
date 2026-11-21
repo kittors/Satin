@@ -46,15 +46,15 @@ export default {
       names: { react: "open", vue: "v-model:open / open", svelte: "bind:open / open", preact: "open" } },
     { name: "title", type: "string", default: "—", required: false,
       desc: "标题，写要做的事：\"删除\"雨夜车站\"？\"。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。", descBy: { react: "标题，写要做的事：\"删除\"雨夜车站\"？\"，可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。", preact: "标题，写要做的事：\"删除\"雨夜车站\"？\"，可以是任意节点。组件会把 `<dialog>` 的 `aria-labelledby` 指向它。" },
-      names: { react: "title", vue: "title", svelte: "title", preact: "title", markup: ".sn-hd h3", html: ".sn-hd h3（<dialog> 写 aria-labelledby 指向它）" }, types: { react: "React.ReactNode", vue: "string" } },
+      names: { react: "title", vue: "title", svelte: "title", preact: "title", markup: ".sn-hd h3", html: ".sn-hd h3（<dialog> 写 aria-labelledby 指向它）" }, types: { react: "React.ReactNode", preact: "ComponentChildren", vue: "string" } },
     { name: "description", type: "string", default: "—", required: false,
       desc: "标题下面一句说明：后果、影响范围。",
-      names: { react: "description", vue: "description", svelte: "description", preact: "description", markup: ".sn-hd .sn-sub", html: ".sn-hd .sn-sub" }, types: { react: "React.ReactNode", vue: "string" } },
+      names: { react: "description", vue: "description", svelte: "description", preact: "description", markup: ".sn-hd .sn-sub", html: ".sn-hd .sn-sub" }, types: { react: "React.ReactNode", preact: "ComponentChildren", vue: "string" } },
     { name: "icon", type: "string", default: "—", required: false,
       desc: "标题左边的图标，放在红色圆底里（危险确认用 trash-2）。",
       example: 'icon="trash-2"',
       names: { react: "icon", vue: "icon", svelte: "icon", preact: "icon", html: '.sn-hd 里先放 <span class="sn-dlg-icon" data-i="trash-2">' } },
-    { name: "footer", type: "标记（.sn-ft 里放按钮）", typeBy: { react: "React.ReactNode", preact: "React.ReactNode", vue: "插槽 #footer", svelte: "片段 footer" }, default: "—", required: false,
+    { name: "footer", type: "标记（.sn-ft 里放按钮）", typeBy: { react: "React.ReactNode", preact: "ComponentChildren", vue: "插槽 #footer", svelte: "片段 footer" }, default: "—", required: false,
       desc: "底部的按钮（主按钮放最右）。",
       names: { react: "footer", preact: "footer", markup: ".sn-ft", html: ".sn-ft" } },
     { name: "footerClass", type: "string", default: "—", required: false,
@@ -177,7 +177,7 @@ export default {
     </div>
   </form>
 </dialog>`, code: code("dialog-guard") },
-    { slug: "dialog-events", title: "关上以后做点什么", why: "关完（Esc、取消、程序关）会发 close：React `onClose`、Vue `@close`、Svelte `onclose`，手写标记听 `<dialog>` 的原生 close 事件——在这里同步你自己的状态。",
+    { slug: "dialog-events", title: "关上以后做点什么", why: "关完（Esc、取消、程序关）会发 close 事件——在这里同步你自己的状态。", whyBy: { react: "关完（Esc、取消、程序关）会调 `onClose`——在这里同步你自己的状态。", preact: "关完（Esc、取消、程序关）会调 `onClose`——在这里同步你自己的状态。", vue: "关完（Esc、取消、程序关）会发 `@close`——在这里同步你自己的状态。", svelte: "关完（Esc、取消、程序关）会调 `onclose`——在这里同步你自己的状态。", default: "关完（Esc、取消、程序关）`<dialog>` 会发原生的 close 事件——在这里同步你自己的状态。" },
       html: `<div class="sn-row">
   <button type="button" class="sn-btn sn-secondary" data-dlg="dlg-ev-d">导出设置</button>
   <span class="sn-help" id="dlg-ev-out">还没打开过</span>
@@ -188,7 +188,7 @@ export default {
     <div class="sn-ft"><button type="button" class="sn-btn sn-primary" data-cancel>关闭</button></div>
   </form>
 </dialog>`, code: code("dialog-events") },
-    { slug: "dialog-controlled", title: "受控：开关放在自己的状态里", why: "React 用 open + onClose，Vue 用 v-model:open，Svelte 用 bind:open；手写标记自己调 `openDialog(弹窗, 按钮)` 打开（从按钮那里长出来，顺便接上 Esc、取消）、`closeDialog()` 关。",
+    { slug: "dialog-controlled", title: "受控：开关放在自己的状态里", why: "开关由你自己的状态决定：打开时从按钮那里长出来，Esc、取消都接好了。", whyBy: { react: "用 `open` + `onClose` 受控：开关由你的状态决定，Esc、取消都接好了。", preact: "用 `open` + `onClose` 受控：开关由你的状态决定，Esc、取消都接好了。", vue: "用 `v-model:open` 绑开关，Esc、取消都接好了。", svelte: "用 `bind:open` 绑开关，Esc、取消都接好了。", default: "手写标记自己调 `openDialog(弹窗, 按钮)` 打开（从按钮那里长出来，顺便接上 Esc、取消）、`closeDialog()` 关。" },
       html: `<button type="button" class="sn-btn sn-primary" id="new-project">新建项目</button>
 <dialog class="sn-dlg" id="dlg-ctl" aria-labelledby="dlg-ctl-t">
   <form method="dialog">

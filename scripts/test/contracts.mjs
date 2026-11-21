@@ -168,6 +168,9 @@ for (const id of ids) {
   for (const [sec, list] of [["属性", props], ["事件", events], ["方法", methods]]) for (const x of list) for (const k of ["type", "desc", "payload", "when"]) {
     if (typeof x[k] === "string" && FW_WORDS.test(x[k])) errs.push(`${sec} ${x.name} 的 ${k} 默认值里有框架专有的词（"${x[k].match(FW_WORDS)[0]}"）：默认写成不偏向哪个框架的，专有写法放进 ${k}By`);
   }
+  // 示例说明（examples[].why）也一样：每种写法的页面都会露出来，拿几个框架对比着写的放进 whyBy（键和 names 一样，可以带 default）
+  const FW_NAMES = /\b(React|Vue|Svelte|Angular|Solid|Preact)\b(?! ?Native)/;
+  for (const ex of c.examples || []) if (typeof ex.why === "string" && (FW_WORDS.test(ex.why) || FW_NAMES.test(ex.why))) errs.push(`示例 ${ex.slug} 的说明里有框架专有的词（"${(ex.why.match(FW_WORDS) || ex.why.match(FW_NAMES))[0]}"）：why 写不偏向哪个框架的，专有写法放进 whyBy`);
   const refs = new Set();
 
   // 1. 选项：createXxx 的第一个类型参数，或者 dts.options 写的接口

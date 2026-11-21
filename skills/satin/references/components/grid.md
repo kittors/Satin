@@ -276,7 +276,7 @@ export default function ShotList() {
 
 ### 排序：受控的 sort
 
-`sortable` 的列点表头排序。React 给 `sort` + `onSortChange`，Vue 写 `v-model:sort`，Svelte 写 `bind:sort`；直接用 createDataGrid 时给 `defaultSort`、在 `onSortChange` 里拿新的排序。
+`sortable` 的列点表头排序；排序可以受控，也可以给一个初始排序、在排序变化时拿新的。
 
 ```html
 <div class="sn-stack sn-gap-8">
@@ -556,7 +556,7 @@ export default function SortedShots() {
 
 ### 勾选：受控的 selectedKeys
 
-`selection: "multiple"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记：React 给 `selectedKeys` + `onSelectionChange`，Vue 写 `v-model:selected`，Svelte 写 `bind:selectedKeys`；程序里改勾选调 `update({ selectedKeys })`。
+`selection: "multiple"` 会在最左边加一列勾选框。勾上的行用 `rowKey` 记，勾选可以受控；程序里改勾选调 `update({ selectedKeys })`。
 
 ```html
 <div class="sn-stack sn-gap-8">
@@ -867,7 +867,7 @@ export default function PickShots() {
 
 ### 自定义格子：format 和 render
 
-只改显示的文字用 `format`；要放自己的标记用 `render`（返回 HTML 字符串或节点；React 返回 JSX，Vue 写插槽 `#cell-<key>`）。数据里的文字用 `textContent` 放，别拼进 HTML。
+只改显示的文字用 `format`；要放自己的标记用 `render`（返回 HTML 字符串或节点）。数据里的文字用 `textContent` 放，别拼进 HTML。
 
 ```html
 <div id="shots-render"></div>

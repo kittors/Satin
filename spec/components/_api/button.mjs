@@ -206,7 +206,7 @@ export default {
   <button type="button" class="sn-btn sn-primary sn-busy"><span class="sn-label"><span class="sn-spin"></span>${TICK}<span class="sn-txt">正在保存</span></span></button>
   <button type="button" class="sn-btn sn-primary sn-ok"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span>${TICK}<span class="sn-txt">保存修改</span></span></button>
 </div>`, code: code("button-states") },
-    { slug: "button-busy", title: "等待 → 成功（发请求）", why: "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒。React、Vue 改 `loading`、`done` 两个属性；其余写法调 `busy()`、`succeed()`，按钮里先写好 `.sn-label` 结构，宽度全程不变。",
+    { slug: "button-busy", title: "等待 → 成功（发请求）", why: "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。", whyBy: { react: "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。改 `loading`、`done` 两个属性就行。", preact: "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。改 `loading`、`done` 两个属性就行。", vue: "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。改 `loading`、`done` 两个属性就行。", default: "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。调 `busy()`、`succeed()`；按钮里先写好 `.sn-label` 结构。" },
       html: `<button type="button" class="sn-btn sn-primary" id="save-project"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span>${TICK}<span class="sn-txt">保存修改</span></span></button>`, code: code("button-busy") },
     { slug: "button-actions", title: "组合：底部操作区", why: "主按钮在最右，取消紧挨着它；\"不保存\"这类第三个出口放到最左，和前两个隔开，免得误点。",
       html: `<div class="sn-row sn-between">

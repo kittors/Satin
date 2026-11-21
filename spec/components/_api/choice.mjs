@@ -40,7 +40,7 @@ export default {
     { name: "checked", type: "boolean", default: "false", required: false, native: ["react"],
       desc: "勾上没有。", descBy: { react: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", preact: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", vue: "勾上没有：`v-model` 绑定。", svelte: "勾上没有：`bind:checked` 绑定。" },
       names: { react: "checked / defaultChecked", preact: "checked / defaultChecked", vue: "v-model", svelte: "bind:checked", angular: "[checked]", solid: "checked", html: "checked" } },
-    { name: "label", type: "string", typeBy: { react: "ReactNode | string", preact: "ReactNode | string" }, default: "—", required: false,
+    { name: "label", type: "string", typeBy: { react: "ReactNode | string", preact: "ComponentChildren | string" }, default: "—", required: false,
       desc: "旁边的文字（也可以写在子元素、默认插槽里）。", names: { react: "label", preact: "label", vue: "label", html: "<label> 里 input 后面的文字" } },
     { name: "indeterminate", type: "boolean", default: "false", required: false,
       desc: "半选（全选框下面只选了一部分）：方框里是一道横线。它没有对应的 HTML 属性，只能用 DOM 属性设。",
@@ -89,7 +89,7 @@ export default {
     ],
   },
   examples: [
-    { slug: "choice-basic", title: "最简单的用法", why: "复选框和开关就是原生的 <input>：React 里 defaultChecked，Vue 里 v-model。",
+    { slug: "choice-basic", title: "最简单的用法", why: "复选框和开关就是原生的 <input>：照原生的写法给初始状态、读写选中。", whyBy: { react: "复选框和开关就是原生的 <input>：不受控写 `defaultChecked`，受控写 `checked` + `onChange`。", preact: "复选框和开关就是原生的 <input>：不受控写 `defaultChecked`，受控写 `checked` + `onChange`。", vue: "复选框和开关就是原生的 <input>：用 `v-model` 绑一个变量。", svelte: "复选框和开关就是原生的 <input>：用 `bind:checked` 绑一个变量。", solid: "复选框和开关就是原生的 <input>：`checked` 给初始状态，在 `onChange` 里读 `e.currentTarget.checked`。", default: "复选框和开关就是原生的 <input>：写 `checked` 属性给初始状态，读写 `input.checked`。" },
       html: `<div class="sn-stack sn-gap-8"><label class="sn-check"><input type="checkbox" checked>${BOX}自动保存草稿</label><label class="sn-switch"><input type="checkbox" role="switch"><span class="sn-track"><span class="sn-knob"></span></span>生成完成后提醒我</label></div>`,
       code: code("choice-basic") },
     { slug: "choice-radio", title: "单选：一组里选一个", why: "同一组写同一个 name；外面包 role=\"radiogroup\"，方向键在组里移动。",

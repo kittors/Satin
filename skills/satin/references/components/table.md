@@ -635,7 +635,7 @@ export default function EmptyTable() {
 
 ### 多级展开：树形数据
 
-行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行受控：React 给 `expandedKeys` + `onExpandChange`，Vue 写 `v-model:expanded`；直接用 createTable 时给 `defaultExpandedKeys`、在 `onExpandChange` 里拿 `keys`。
+行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开；展开着的行可以受控，也可以只给初始展开、在变化时拿新的。
 
 ```html
 <div class="sn-stack sn-gap-8">

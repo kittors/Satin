@@ -1,6 +1,6 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 253,
+  "var(--sn-ease-out)": 254,
   "var(--sn-ease-out-strong)": 58,
   "linear": 37,
   "var(--sn-ease-overshoot)": 10,
@@ -1981,9 +1981,15 @@
   },
   {
    "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-page-hd > .sn-back",
+   "selector": ".sn-page-hd > .sn-nav-back",
    "prop": "transition",
    "value": "color .15s var(--sn-ease-out), background-color .15s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/shell.css",
+   "selector": ".sn-tabbar > .sn-nav-item",
+   "prop": "transition",
+   "value": "color .15s var(--sn-ease-out)"
   }
  ],
  "js": [

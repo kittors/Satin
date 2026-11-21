@@ -756,7 +756,13 @@
     {
       "slug": "button-busy",
       "title": "等待 → 成功（发请求）",
-      "why": "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒。React、Vue 改 `loading`、`done` 两个属性；其余写法调 `busy()`、`succeed()`，按钮里先写好 `.sn-label` 结构，宽度全程不变。",
+      "why": "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。",
+      "whyBy": {
+        "react": "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。改 `loading`、`done` 两个属性就行。",
+        "preact": "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。改 `loading`、`done` 两个属性就行。",
+        "vue": "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。改 `loading`、`done` 两个属性就行。",
+        "default": "请求发出去就进入等待：300ms 内回来不闪转圈，转圈出现后至少留 500ms；成功后原地打勾 1.5 秒，宽度全程不变。调 `busy()`、`succeed()`；按钮里先写好 `.sn-label` 结构。"
+      },
       "html": "<button type=\"button\" class=\"sn-btn sn-primary\" id=\"save-project\"><span class=\"sn-sheen\"></span><span class=\"sn-label\"><span class=\"sn-spin\"></span><svg class=\"sn-tick\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3.5 8.5l3 3 6-7\"/></svg><span class=\"sn-txt\">保存修改</span></span></button>",
       "code": {
         "html": "<button type=\"button\" class=\"sn-btn sn-primary\" id=\"save-project\"><span class=\"sn-sheen\"></span><span class=\"sn-label\"><span class=\"sn-spin\"></span><svg class=\"sn-tick\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3.5 8.5l3 3 6-7\"/></svg><span class=\"sn-txt\">保存修改</span></span></button>\n\n<script type=\"module\">\n  import { busy, succeed } from \"satin-ui\";\n\n  const save = document.getElementById(\"save-project\");\n  // 换成真实的请求，比如 fetch(\"/api/projects/42\", { method: \"PUT\" })\n  const request = () => new Promise((done) => setTimeout(done, 1200));\n  save.addEventListener(\"click\", async () => {\n    await busy(save, request()); // 300ms 内回来不转圈；转圈出现后至少留 500ms\n    succeed(save); // 原地打勾 1.5 秒\n  });\n</script>\n",

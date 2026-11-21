@@ -48,7 +48,7 @@
 
 ### 最简单的用法
 
-复选框和开关就是原生的 <input>：React 里 defaultChecked，Vue 里 v-model。
+复选框和开关就是原生的 <input>：照原生的写法给初始状态、读写选中。
 
 ```html
 <div class="sn-stack sn-gap-8"><label class="sn-check"><input type="checkbox" checked><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>自动保存草稿</label><label class="sn-switch"><input type="checkbox" role="switch"><span class="sn-track"><span class="sn-knob"></span></span>生成完成后提醒我</label></div>
@@ -455,7 +455,7 @@ export default function PickShots() {
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `checked` | `boolean` | false | 否 | 勾上没有。<br>React、Preact：勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。<br>Vue：勾上没有：`v-model` 绑定。<br>Svelte：勾上没有：`bind:checked` 绑定。 | React：`checked / defaultChecked`；Preact：`checked / defaultChecked`；Vue：`v-model`；Svelte：`bind:checked`；Angular：`[checked]`；Solid：`checked`；纯 HTML：`checked` |
-| `label` | `string`（React：ReactNode \| string；Preact：ReactNode \| string） | — | 否 | 旁边的文字（也可以写在子元素、默认插槽里）。 | React：`label`；Preact：`label`；Vue：`label`；纯 HTML：`<label> 里 input 后面的文字` |
+| `label` | `string`（React：ReactNode \| string；Preact：ComponentChildren \| string） | — | 否 | 旁边的文字（也可以写在子元素、默认插槽里）。 | React：`label`；Preact：`label`；Vue：`label`；纯 HTML：`<label> 里 input 后面的文字` |
 | `indeterminate` | `boolean` | false | 否 | 半选（全选框下面只选了一部分）：方框里是一道横线。它没有对应的 HTML 属性，只能用 DOM 属性设。 | React：`indeterminate`；Preact：`indeterminate`；Vue：`indeterminate`；Angular：`[indeterminate]`；Solid：`prop:indeterminate`；纯 HTML：`input.indeterminate = true` |
 | `disabled` | `boolean` | false | 否 | 不可用：变灰、点不动，Tab 也跳过。 | React：`disabled`；Preact：`disabled`；Vue：`disabled`；纯 HTML：`disabled` |
 

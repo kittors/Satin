@@ -220,6 +220,7 @@
       },
       "types": {
         "react": "React.ReactNode",
+        "preact": "ComponentChildren",
         "vue": "string"
       }
     },
@@ -239,6 +240,7 @@
       },
       "types": {
         "react": "React.ReactNode",
+        "preact": "ComponentChildren",
         "vue": "string"
       }
     },
@@ -262,7 +264,7 @@
       "type": "标记（.sn-ft 里放按钮）",
       "typeBy": {
         "react": "React.ReactNode",
-        "preact": "React.ReactNode",
+        "preact": "ComponentChildren",
         "vue": "插槽 #footer",
         "svelte": "片段 footer"
       },
@@ -591,7 +593,14 @@
     {
       "slug": "dialog-events",
       "title": "关上以后做点什么",
-      "why": "关完（Esc、取消、程序关）会发 close：React `onClose`、Vue `@close`、Svelte `onclose`，手写标记听 `<dialog>` 的原生 close 事件——在这里同步你自己的状态。",
+      "why": "关完（Esc、取消、程序关）会发 close 事件——在这里同步你自己的状态。",
+      "whyBy": {
+        "react": "关完（Esc、取消、程序关）会调 `onClose`——在这里同步你自己的状态。",
+        "preact": "关完（Esc、取消、程序关）会调 `onClose`——在这里同步你自己的状态。",
+        "vue": "关完（Esc、取消、程序关）会发 `@close`——在这里同步你自己的状态。",
+        "svelte": "关完（Esc、取消、程序关）会调 `onclose`——在这里同步你自己的状态。",
+        "default": "关完（Esc、取消、程序关）`<dialog>` 会发原生的 close 事件——在这里同步你自己的状态。"
+      },
       "html": "<div class=\"sn-row\">\n  <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-ev-d\">导出设置</button>\n  <span class=\"sn-help\" id=\"dlg-ev-out\">还没打开过</span>\n</div>\n<dialog class=\"sn-dlg\" id=\"dlg-ev-d\" aria-labelledby=\"dlg-ev-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ev-t\">导出设置</h3><div class=\"sn-sub\">按 Esc 或点\"关闭\"，看下面那行字怎么变。</div></div></div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-primary\" data-cancel>关闭</button></div>\n  </form>\n</dialog>",
       "code": {
         "html": "<sn-enhance>\n  <div class=\"sn-row\">\n    <button type=\"button\" class=\"sn-btn sn-secondary\" data-dlg=\"dlg-ev-d\">导出设置</button>\n    <span class=\"sn-help\" id=\"dlg-ev-out\">还没打开过</span>\n  </div>\n  <dialog class=\"sn-dlg\" id=\"dlg-ev-d\" aria-labelledby=\"dlg-ev-t\">\n    <form method=\"dialog\">\n      <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ev-t\">导出设置</h3><div class=\"sn-sub\">按 Esc 或点\"关闭\"，看下面那行字怎么变。</div></div></div>\n      <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-primary\" data-cancel>关闭</button></div>\n    </form>\n  </dialog>\n</sn-enhance>\n\n<script type=\"module\">\n  // 关完（Esc、取消、closeDialog()）都会发原生的 close 事件：在这里同步自己的状态\n  document.getElementById(\"dlg-ev-d\").addEventListener(\"close\", () => {\n    document.getElementById(\"dlg-ev-out\").textContent = \"关上了：\" + new Date().toLocaleTimeString(\"zh-CN\");\n  });\n</script>\n",
@@ -606,7 +615,14 @@
     {
       "slug": "dialog-controlled",
       "title": "受控：开关放在自己的状态里",
-      "why": "React 用 open + onClose，Vue 用 v-model:open，Svelte 用 bind:open；手写标记自己调 `openDialog(弹窗, 按钮)` 打开（从按钮那里长出来，顺便接上 Esc、取消）、`closeDialog()` 关。",
+      "why": "开关由你自己的状态决定：打开时从按钮那里长出来，Esc、取消都接好了。",
+      "whyBy": {
+        "react": "用 `open` + `onClose` 受控：开关由你的状态决定，Esc、取消都接好了。",
+        "preact": "用 `open` + `onClose` 受控：开关由你的状态决定，Esc、取消都接好了。",
+        "vue": "用 `v-model:open` 绑开关，Esc、取消都接好了。",
+        "svelte": "用 `bind:open` 绑开关，Esc、取消都接好了。",
+        "default": "手写标记自己调 `openDialog(弹窗, 按钮)` 打开（从按钮那里长出来，顺便接上 Esc、取消）、`closeDialog()` 关。"
+      },
       "html": "<button type=\"button\" class=\"sn-btn sn-primary\" id=\"new-project\">新建项目</button>\n<dialog class=\"sn-dlg\" id=\"dlg-ctl\" aria-labelledby=\"dlg-ctl-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ctl-t\">新建项目</h3><div class=\"sn-sub\">名称之后随时可以改。</div></div></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-ctl-name\">项目名称</label><input class=\"sn-input\" id=\"dlg-ctl-name\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\"></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">创建项目</button></div>\n  </form>\n</dialog>",
       "code": {
         "html": "<button type=\"button\" class=\"sn-btn sn-primary\" id=\"new-project\">新建项目</button>\n<dialog class=\"sn-dlg\" id=\"dlg-ctl\" aria-labelledby=\"dlg-ctl-t\">\n  <form method=\"dialog\">\n    <div class=\"sn-hd\"><div style=\"flex:1\"><h3 id=\"dlg-ctl-t\">新建项目</h3><div class=\"sn-sub\">名称之后随时可以改。</div></div></div>\n    <div class=\"sn-bd\">\n      <div class=\"sn-field\"><label class=\"sn-lbl\" for=\"dlg-ctl-name\">项目名称</label><input class=\"sn-input\" id=\"dlg-ctl-name\" placeholder=\"比如：雨夜车站\" autocomplete=\"off\"></div>\n    </div>\n    <div class=\"sn-ft\"><button type=\"button\" class=\"sn-btn sn-ghost\" data-cancel>取消</button><button type=\"submit\" class=\"sn-btn sn-primary\">创建项目</button></div>\n  </form>\n</dialog>\n\n<script type=\"module\">\n  import { openDialog, closeDialog, toast } from \"satin-ui\";\n\n  const button = document.getElementById(\"new-project\"), dlg = document.getElementById(\"dlg-ctl\");\n  // 自己控制开关：openDialog 从按钮那里长出来（顺便接上 Esc、取消），closeDialog 原路缩回\n  button.addEventListener(\"click\", () => openDialog(dlg, button));\n  dlg.querySelector(\"form\").addEventListener(\"submit\", () => {\n    const name = dlg.querySelector(\"input\").value.trim() || \"未命名项目\";\n    closeDialog(dlg);\n    toast({ text: \"已创建：\" + name });\n  });\n</script>\n",

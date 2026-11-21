@@ -693,7 +693,7 @@ export default function ShippingRegion() {
 
 ### 拿到选中的值
 
-选好、清除时拿到 `{ text }`：组件是 `onChange`（Vue `@change`、Svelte `onchange`），手写标记听冒泡上来的 `pick`。text 是触发框里显示的文字，交给接口时按需要的格式自己转。
+选好、清除时拿到 `{ text }`；text 是触发框里显示的文字，交给接口时按需要的格式自己转。
 
 ```html
 <div class="sn-stack sn-gap-8" id="due-events">

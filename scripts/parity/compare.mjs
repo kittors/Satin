@@ -63,10 +63,13 @@ for (const f of files(A, ".json.gz")) {
   const pb = path.join(B, f); if (!fs.existsSync(pb)) { report.missing.push(f); continue; }
   const sa = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(A, f)))), sb = JSON.parse(zlib.gunzipSync(fs.readFileSync(pb)));
   const diffs = [], exds = expectAll("dom", f); let skipped = 0;
-  const exd = { id: [...new Set(exds.map((e) => e.id))].join("、"), paths: exds.flatMap((e) => e.paths || []), ids: exds.flatMap((e) => e.ids || []), classes: exds.flatMap((e) => e.classes || []) };
+  // 带 props 的登记（{ classes, props }）不整块放过：只不比这些元素（自己带这个类名）上的这几项计算样式，比如标签、徽标加了 white-space: nowrap
+  const whole = exds.filter((e) => !e.props), exd = { id: [...new Set(exds.map((e) => e.id))].join("、"), paths: whole.flatMap((e) => e.paths || []), ids: whole.flatMap((e) => e.ids || []), classes: whole.flatMap((e) => e.classes || []) };
+  const propEx = exds.filter((e) => e.props);
+  const exProps = (snap, p) => { const cls = String(snap[p]?.attrs?.class || "").split(/\s+/); return propEx.filter((e) => (e.classes || []).some((c) => cls.includes(c))).flatMap((e) => e.props); };
   // 登记过的元素（paths 路径前缀，或者 ids / classes：它自己或上级带这个 id、类名）上的差异不算
   const marked = (snap, p) => { const seg = p.split(">"); for (let i = seg.length; i > 0; i--) { const at = snap[seg.slice(0, i).join(">")]?.attrs; if (!at) continue; if (exd.ids.includes(at.id)) return true; if (exd.classes.some((c) => String(at.class || "").split(/\s+/).includes(c))) return true; } return false; };
-  const skip = (p) => exds.length > 0 && (exd.paths.some((pre) => p.startsWith(pre)) || marked(sa, p) || marked(sb, p));
+  const skip = (p) => whole.length > 0 && (exd.paths.some((pre) => p.startsWith(pre)) || marked(sa, p) || marked(sb, p));
   const appended = exds.map((e) => e.appended).filter(Boolean); // 新内容接在这些元素末尾：新节点、它自己变高不算
   const isNew = (p) => appended.some((pre) => p.startsWith(pre + ">")) && !sb[p];
   for (const p of Object.keys(sa)) {
@@ -90,7 +93,7 @@ for (const f of files(A, ".json.gz")) {
     if (String(a.rect[0]).startsWith("~") || String(b.rect[0]).startsWith("~") ? String(a.rect) !== String(b.rect) : a.rect.some((v, i) => Math.abs(v - b.rect[i]) > 0.01)) diffs.push(`${p}: 位置尺寸 ${a.rect} → ${b.rect}`);
     cmpObj(a.attrs, b.attrs, `${p} @`, diffs);
     if (!!a.nobox !== !!b.nobox) diffs.push(`${p}: ${a.nobox ? "不画" : "画出来"} → ${b.nobox ? "不画" : "画出来"}`);
-    else if (a.style || b.style) cmpObj(a.style, b.style, `${p} 样式 `, diffs);
+    else if (a.style || b.style) { const ex = exProps(sa, p); if (ex.length) { const st = []; cmpObj(a.style, b.style, "", st); const keep = st.filter((x) => !ex.includes(x.split(":")[0])); if (keep.length < st.length) skipped += st.length - keep.length; diffs.push(...keep.map((x) => `${p} 样式 ${x}`)); } else cmpObj(a.style, b.style, `${p} 样式 `, diffs); }
     for (const ps of ["before", "after"]) if (a[ps] || b[ps]) { if (!a[ps] || !b[ps]) diffs.push(`${p}::${ps}: ${a[ps] ? "有" : "无"} → ${b[ps] ? "有" : "无"}`); else cmpObj(a[ps], b[ps], `${p}::${ps} `, diffs); }
   }
   for (const p of Object.keys(sb)) if (!sa[p]) { if (skip(p)) skipped++; else diffs.push(`${p}: 只在 B 里有（${sb[p].tag}）`); }

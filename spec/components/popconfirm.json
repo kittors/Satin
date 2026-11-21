@@ -149,7 +149,7 @@
       "type": "string",
       "typeBy": {
         "react": "ReactNode | string",
-        "preact": "ReactNode | string"
+        "preact": "ComponentChildren | string"
       },
       "default": "—",
       "required": true,
@@ -166,7 +166,7 @@
       "type": "string",
       "typeBy": {
         "react": "ReactNode | string",
-        "preact": "ReactNode | string"
+        "preact": "ComponentChildren | string"
       },
       "default": "—",
       "required": false,
@@ -183,7 +183,7 @@
       "type": "string",
       "typeBy": {
         "react": "ReactNode | string",
-        "preact": "ReactNode | string"
+        "preact": "ComponentChildren | string"
       },
       "default": "\"确定\"",
       "required": false,
@@ -200,7 +200,7 @@
       "type": "string",
       "typeBy": {
         "react": "ReactNode | string",
-        "preact": "ReactNode | string"
+        "preact": "ComponentChildren | string"
       },
       "default": "\"取消\"",
       "required": false,

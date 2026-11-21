@@ -1092,7 +1092,13 @@
     {
       "slug": "table-tree",
       "title": "多级展开：树形数据",
-      "why": "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行受控：React 给 `expandedKeys` + `onExpandChange`，Vue 写 `v-model:expanded`；直接用 createTable 时给 `defaultExpandedKeys`、在 `onExpandChange` 里拿 `keys`。",
+      "why": "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开；展开着的行可以受控，也可以只给初始展开、在变化时拿新的。",
+      "whyBy": {
+        "react": "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行受控：给 `expandedKeys` + `onExpandChange`。",
+        "preact": "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行受控：给 `expandedKeys` + `onExpandChange`。",
+        "vue": "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。展开着的行用 `v-model:expanded` 绑。",
+        "default": "行里带 `children` 就是树：展开箭头、缩进、层级线表格自己画，展开时下面的行滑开。直接用 createTable 时给 `defaultExpandedKeys`、在 `onExpandChange` 里拿 `keys`。"
+      },
       "html": "<div class=\"sn-stack sn-gap-8\">\n  <div id=\"table-tree\"></div>\n  <span class=\"sn-help\" id=\"table-tree-note\">展开着 1 行</span>\n</div>",
       "code": {
         "html": "<div class=\"sn-stack sn-gap-8\">\n  <div id=\"table-tree\"></div>\n  <span class=\"sn-help\" id=\"table-tree-note\">展开着 1 行</span>\n</div>\n\n<script type=\"module\">\n  import { createTable } from \"satin-ui\";\n  const COLUMNS = [\n    { key: \"name\", title: \"项目\" },\n    { key: \"owner\", title: \"负责人\" },\n    { key: \"shots\", title: \"镜头\", align: \"right\" },\n  ];\n  // 行里的 children 是下级：项目 → 分集 → 场\n  const DATA = [\n    { id: \"p1\", name: \"雨夜车站\", owner: \"林夏\", shots: 48, children: [\n      { id: \"p1-e1\", name: \"第 1 集\", owner: \"林夏\", shots: 20, children: [\n        { id: \"p1-e1-s1\", name: \"第 1 场 · 车站外\", owner: \"林夏\", shots: 12 },\n        { id: \"p1-e1-s2\", name: \"第 2 场 · 候车厅\", owner: \"周屿\", shots: 8 },\n      ] },\n      { id: \"p1-e2\", name: \"第 2 集\", owner: \"林夏\", shots: 28 },\n    ] },\n    { id: \"p2\", name: \"海边的第七天\", owner: \"周屿\", shots: 32, children: [\n      { id: \"p2-e1\", name: \"第 1 集\", owner: \"周屿\", shots: 32 },\n    ] },\n    { id: \"p3\", name: \"长夜\", owner: \"陈默\", shots: 20 },\n  ];\n  const note = document.getElementById(\"table-tree-note\");\n  // defaultExpandedKeys：一开始展开哪几行；点箭头时 onExpandChange 给出现在展开着的所有行（e.keys）\n  createTable(document.getElementById(\"table-tree\"), {\n    columns: COLUMNS, data: DATA, defaultExpandedKeys: [\"p1\"], label: \"项目和分集\",\n    onExpandChange: (e) => (note.textContent = `展开着 ${e.keys.length} 行`),\n  });\n</script>\n",

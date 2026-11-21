@@ -50,7 +50,7 @@
 
 ### 基础用法
 
-给选项和当前值就行。React 只给 `defaultValue` 时组件自己管选中，Vue、Svelte 绑一个变量。
+给选项和当前值就行；不受控时组件自己管选中。
 
 ```html
 <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
@@ -496,7 +496,7 @@ export default function RatioField() {
 
 ### 监听选中
 
-选中一项时拿到选中的值：React `onChange`、Vue `@change`、Svelte `onchange`；自定义元素在自己身上发冒泡的 `sn-change`，`e.detail` 是值。
+选中一项时拿到选中的值。
 
 ```html
 <div class="sn-stack sn-gap-8" id="ratio-events">
@@ -649,7 +649,7 @@ export default function RatioEvents() {
 
 ### 受控：值放在自己的状态里
 
-React 用 value + onChange，Vue 用 v-model，Svelte 用 bind:value；自定义元素把值放在自己的状态里，`sn-change` 时写回 value 属性。
+值放在你自己的状态里，选了以后写回。
 
 ```html
 <div class="sn-stack sn-gap-8" id="ratio-controlled">
@@ -800,7 +800,7 @@ export default function RatioSelect() {
 
 ### 菜单按钮
 
-不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，包一层 `<sn-enhance>`（Vue 用 `v-enhance` 指令）接上交互；每一项后面留出对勾的位置。
+不带 `data-select` 就是菜单按钮：选了就收起，按钮文字换成 前缀 + 选中项（`data-prefix`）。标记照设计稿写，包一层 `<sn-enhance>` 接上交互；每一项后面留出对勾的位置。
 
 ```html
 <div class="sn-select">

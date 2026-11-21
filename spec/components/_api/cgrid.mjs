@@ -181,7 +181,7 @@ export default {
       html: `<div id="cshots-basic"></div>`, code: code("cgrid-basic") },
     { slug: "cgrid-million", title: "一百万行：dataSource", why: "`dataSource` 按块要（一块 200 行），一百万行滚起来也是满帧；还没到的行画占位条。这个假的服务端不会搜索、排序，所以关掉了工具条。",
       html: `<div id="cshots-million"></div>`, code: code("cgrid-million") },
-    { slug: "cgrid-controlled", title: "受控：勾选", why: "和数据表格一样：React 给 `selectedKeys` + `onSelectionChange`，Vue 写 `v-model:selected`；程序里改勾选调 `update({ selectedKeys })`。",
+    { slug: "cgrid-controlled", title: "受控：勾选", why: "和数据表格一样，勾选可以受控：给选中行的键、勾选变化时写回；程序里改勾选调 `update({ selectedKeys })`。", whyBy: { react: "和数据表格一样：给 `selectedKeys` + `onSelectionChange`；程序里改勾选调 `update({ selectedKeys })`。", preact: "和数据表格一样：给 `selectedKeys` + `onSelectionChange`；程序里改勾选调 `update({ selectedKeys })`。", vue: "和数据表格一样：写 `v-model:selected`；程序里改勾选调实例的 `update({ selectedKeys })`。", default: "和数据表格一样：选项里给 `selectedKeys`、在 `onSelectionChange` 里写回；程序里改勾选调 `update({ selectedKeys })`。" },
       html: `<div class="sn-stack sn-gap-8">
   <div id="cshots-controlled"></div>
   <div class="sn-row sn-gap-8">
@@ -189,7 +189,7 @@ export default {
     <button type="button" class="sn-textbtn sn-sm" id="cshots-controlled-clear">清空</button>
   </div>
 </div>`, code: code("cgrid-controlled") },
-    { slug: "cgrid-events", title: "事件：排序、勾选、改值", why: "选项、事件和数据表格一样：`onSortChange`、`onSelectionChange`、`onCellEdit`……（Vue 写 `@sort-change`；纯 JS 也可以 `grid.on(\"sortChange\", fn)`）。",
+    { slug: "cgrid-events", title: "事件：排序、勾选、改值", why: "选项、事件和数据表格一样：排序、勾选、改格子各有一个事件（sortChange、selectionChange、cellEdit……）。", whyBy: { react: "选项、事件和数据表格一样：`onSortChange`、`onSelectionChange`、`onCellEdit`……", preact: "选项、事件和数据表格一样：`onSortChange`、`onSelectionChange`、`onCellEdit`……", vue: "选项、事件和数据表格一样：`@sort-change`、`@selection-change`、`@cell-edit`……", default: "选项、事件和数据表格一样：选项里的 `onSortChange`、`onSelectionChange`、`onCellEdit`……，也可以 `grid.on(\"sortChange\", fn)`。" },
       html: `<div class="sn-stack sn-gap-8">
   <div id="cshots-events"></div>
   <span class="sn-help" id="cshots-events-note">点表头排序、勾选、双击格子改，这里显示最近一次的事件</span>

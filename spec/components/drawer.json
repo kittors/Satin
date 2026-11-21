@@ -195,7 +195,7 @@
       "type": "string",
       "typeBy": {
         "react": "ReactNode | string",
-        "preact": "ReactNode | string"
+        "preact": "ComponentChildren | string"
       },
       "default": "—",
       "required": false,
