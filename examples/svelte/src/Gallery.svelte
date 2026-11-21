@@ -58,6 +58,9 @@
   import ToastDemo0 from "./demos/toast-0.svelte";
   import NotifyDemo0 from "./demos/notify-0.svelte";
   import BannerDemo0 from "./demos/banner-0.svelte";
+  import EmptyError from "./demos/empty-error.svelte";
+  import EmptySearch from "./demos/empty-search.svelte";
+  import EmptyBasic from "./demos/empty-basic.svelte";
   import EmptyDemo0 from "./demos/empty-0.svelte";
   import LoadingDemo0 from "./demos/loading-0.svelte";
   import ProgressDemo0 from "./demos/progress-0.svelte";
@@ -297,6 +300,9 @@
   </section>
   <section id="empty">
     <h2>空状态</h2>
+    <div class="demo" data-demo="empty-error"><EmptyError /></div>
+    <div class="demo" data-demo="empty-search"><EmptySearch /></div>
+    <div class="demo" data-demo="empty-basic"><EmptyBasic /></div>
     <div class="demo" data-demo="empty-0"><EmptyDemo0 /></div>
   </section>
   <section id="loading">

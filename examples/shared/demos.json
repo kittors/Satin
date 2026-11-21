@@ -532,6 +532,36 @@
   "css": false
  },
  {
+  "slug": "empty-error",
+  "id": "empty",
+  "n": -1,
+  "name": "空状态",
+  "group": "反馈",
+  "cap": "加载失败",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "empty-search",
+  "id": "empty",
+  "n": -1,
+  "name": "空状态",
+  "group": "反馈",
+  "cap": "筛选没有结果",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "empty-basic",
+  "id": "empty",
+  "n": -1,
+  "name": "空状态",
+  "group": "反馈",
+  "cap": "第一次用",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "empty-0",
   "id": "empty",
   "n": 0,

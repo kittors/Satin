@@ -1,0 +1,14 @@
+<script setup>
+import { Button, Icon } from "satin-ui/vue";
+</script>
+
+<template>
+  <div class="sn-empty-state">
+    <span class="sn-art"><Icon name="wifi-off" /></span>
+    <h4>加载失败</h4>
+    <p>网络好像断了，恢复后会自动重试。</p>
+    <div class="sn-acts">
+      <Button variant="secondary">重试</Button>
+    </div>
+  </div>
+</template>
