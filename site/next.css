@@ -741,3 +741,103 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
   .n-docs .d-api .d-k-l { margin-right: var(--sn-sp-4); }
   .n-docs .d-api .d-k-dot { margin: 0 var(--sn-sp-6); font-style: normal; }
 }
+
+/* ———— 11. 手机设备框（device.js）：iframe 里跑真实页面，按屏幕的 CSS 尺寸；整体按可用宽高缩放（只动 transform），换机型 / 横竖屏淡出淡入（只动 opacity）
+   外观克制：中性深色细边框、阴影只用令牌层级；iPhone 灵动岛 + 底部横条、iPhone SE 听筒 + Home 键、安卓打孔屏，比例照真机，不画厂商渲染图那种高光 ———— */
+.s-devbox { display: grid; justify-items: center; gap: var(--sn-sp-16); }
+.s-devbar { display: flex; align-items: center; justify-content: center; gap: var(--sn-sp-8); flex-wrap: wrap; }
+.s-dev-btn { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: var(--sn-sp-6); height: 28px; padding: 0 var(--sn-sp-8) 0 var(--sn-sp-12); border-radius: var(--sn-r-md); box-shadow: inset 0 0 0 1px var(--sn-line);
+  font: 500 calc(13px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label); white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color .12s var(--sn-ease-out); }
+.s-dev-btn:hover, .s-dev-btn.sn-is-open { background: var(--sn-fill-hover); }
+.s-dev-btn:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
+.s-dev-caret { width: 12px; height: 12px; flex: none; color: var(--sn-label3); transition: rotate .2s var(--sn-ease-out-strong); }
+.s-dev-btn.sn-is-open .s-dev-caret { rotate: 180deg; }
+.sn-menu.s-dev-menu { width: 248px; min-width: 248px; max-width: 248px; padding: var(--sn-sp-6); }
+.s-dev-menu .sn-item.s-dev-item { height: 36px; padding: 0 var(--sn-sp-10); gap: var(--sn-sp-10); font: 500 calc(14px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label); }
+.s-dev-item .s-dev-n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.s-dev-item .s-dev-v { font: 400 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); font-variant-numeric: tabular-nums; }
+.s-dev-item .s-dev-ck { display: inline-flex; width: 16px; height: 16px; flex: none; opacity: 0; }
+.s-dev-item .s-dev-ck .sn-ic { width: 16px; height: 16px; color: var(--sn-label); }
+.s-dev-item.sn-sel .s-dev-ck { opacity: 1; }
+.s-devfit { position: relative; }
+.s-dev { position: absolute; left: 0; top: 0; transform-origin: 0 0; width: calc(var(--dw) + var(--bl) + var(--br)); height: calc(var(--dh) + var(--bt) + var(--bb));
+  border-radius: calc(var(--dr) + var(--bt)); background: #1c1c1e; box-shadow: var(--sn-e1); transition: opacity .14s var(--sn-ease-out); }
+.s-dev.s-dev-out { opacity: 0; }
+/* 屏幕：iframe 放在安全区以内，让出来的那一圈是页面自己的底色（--s-page，device.js 从页面里读） */
+.s-dev-screen { position: absolute; left: var(--bl); top: var(--bt); width: var(--dw); height: var(--dh); border-radius: var(--dr); overflow: hidden; background: var(--s-page, var(--sn-canvas)); }
+/* 安全区上下两条：页面边上贴着固定 / 吸附的栏时用栏的颜色（--s-band-t / -b，device.js 取），不然是页面底色；左右两侧（横屏）是页面底色 */
+.s-dev-screen::before, .s-dev-screen::after { content: ""; position: absolute; left: var(--sa-l, 0px); right: var(--sa-r, 0px); pointer-events: none; }
+.s-dev-screen::before { top: 0; height: var(--sa-t, 0px); background: var(--s-band-t, var(--s-page, var(--sn-canvas))); }
+.s-dev-screen::after { bottom: 0; height: var(--sa-b, 0px); background: var(--s-band-b, var(--s-page, var(--sn-canvas))); }
+.s-dev-screen iframe { position: absolute; display: block; left: var(--sa-l, 0px); top: var(--sa-t, 0px); width: calc(100% - var(--sa-l, 0px) - var(--sa-r, 0px)); height: calc(100% - var(--sa-t, 0px) - var(--sa-b, 0px)); border: 0; background: var(--s-page, var(--sn-canvas)); }
+/* 状态栏（竖屏）：时间、信号、Wi-Fi、电量，正文色，不加底；字号照真机 */
+.s-dev-sb { position: absolute; left: 0; right: 0; top: 0; height: var(--sb-h); display: none; align-items: center; color: var(--sn-label); pointer-events: none; user-select: none; font-variant-numeric: tabular-nums; }
+.s-dev.s-has-sb .s-dev-sb { display: grid; }
+.s-dev-sb svg { display: block; flex: none; }
+.s-sb-ic { display: flex; align-items: center; gap: 5px; }
+.s-dev[data-kind="island"] .s-dev-sb { top: 11px; height: 37px; grid-template-columns: minmax(0, 1fr) 126px minmax(0, 1fr); justify-items: center; font: 600 17px/1 var(--sn-sans); letter-spacing: -.01em; }
+.s-dev[data-kind="island"] .s-sb-ic { grid-column: 3; }
+.s-dev[data-kind="home"] .s-dev-sb { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding: 0 6px; font: 600 12px/1 var(--sn-sans); }
+.s-dev[data-kind="home"] .s-sb-ic { gap: 4px; }
+.s-dev[data-kind="home"] .s-sb-r { justify-self: end; }
+.s-dev[data-kind="punch"] .s-dev-sb { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 2px 20px 0; font: 500 14px/1 var(--sn-sans); }
+.s-dev[data-kind="punch"] .s-sb-ic { justify-self: end; gap: 6px; }
+.s-dev > i { position: absolute; display: none; pointer-events: none; }
+/* iPhone：灵动岛（126 × 37，离顶 11）、底部横条（134 × 5，离底 8）；横屏时岛在左边、横条变长 */
+.s-dev[data-kind="island"] .s-dev-cut { display: block; left: 50%; top: calc(var(--bt) + 11px); width: 126px; height: 37px; margin-left: -63px; border-radius: 19px; background: #000; }
+.s-dev[data-kind="island"].s-land .s-dev-cut { left: calc(var(--bl) + 11px); top: 50%; width: 37px; height: 126px; margin: -63px 0 0; }
+.s-dev[data-kind="island"] .s-dev-ind { display: block; left: 50%; bottom: calc(var(--bb) + 8px); width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(0, 0, 0, .8); }
+.s-dev[data-kind="island"].s-land .s-dev-ind { width: 220px; margin-left: -110px; }
+[data-theme="dark"] .s-dev[data-kind="island"] .s-dev-ind { background: rgba(255, 255, 255, .75); }
+/* 安卓打孔屏：前摄一个小圆孔（横屏时在左边）；底部一条手势条（比 iPhone 的横条短、细） */
+.s-dev[data-kind="punch"] .s-dev-cut { display: block; left: 50%; top: calc(var(--bt) + 12px); width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #000; }
+.s-dev[data-kind="punch"].s-land .s-dev-cut { left: calc(var(--bl) + 12px); top: 50%; margin: -6px 0 0; }
+.s-dev[data-kind="punch"] .s-dev-ind { display: block; left: 50%; bottom: calc(var(--bb) + 6px); width: 108px; height: 4px; margin-left: -54px; border-radius: 2px; background: rgba(0, 0, 0, .8); }
+[data-theme="dark"] .s-dev[data-kind="punch"] .s-dev-ind { background: rgba(255, 255, 255, .75); }
+/* iPhone SE：屏幕直角，上面听筒 + 前摄，下面 Home 键（细圈）；横屏时 Home 键在右边 */
+.s-dev[data-kind="home"] { border-radius: 44px; }
+.s-dev[data-kind="home"] .s-dev-spk { display: block; left: 50%; top: 34px; width: 52px; height: 5px; margin-left: -26px; border-radius: 3px; background: rgba(255, 255, 255, .14); }
+.s-dev[data-kind="home"] .s-dev-cut { display: block; left: calc(50% - 52px); top: 32px; width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, .12); }
+.s-dev[data-kind="home"] .s-dev-home { display: block; left: 50%; bottom: 13px; width: 46px; height: 46px; margin-left: -23px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .16); }
+.s-dev[data-kind="home"].s-land .s-dev-spk { left: 34px; top: 50%; width: 5px; height: 52px; margin: -26px 0 0; }
+.s-dev[data-kind="home"].s-land .s-dev-cut { left: 32px; top: calc(50% - 52px); }
+.s-dev[data-kind="home"].s-land .s-dev-home { left: auto; right: 13px; bottom: auto; top: 50%; margin: -23px 0 0; }
+@media (prefers-reduced-motion: reduce) { .s-dev { transition: none; } }
+
+/* "移动端与 H5"页：≥ 1081 左边标题和讲解、右边钉设备框（从标题那一行起，这一页不要本页目录那一列）；861–1080 设备框放在标题下面；手机上不放 */
+.d-devpage .d-devside { display: none; }
+.n-docs .d-main .d-devpage .d-devmain > h2:first-child { margin-top: 40px; } /* 标题区和正文分在两格里，第一个小节标题照样紧跟标题区 */
+@media (min-width: 861px) {
+  .d-devpage .d-devgrid { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "side" "main"; }
+  .d-devpage .d-devhead { grid-area: head; min-width: 0; }
+  .d-devpage .d-devmain { grid-area: main; min-width: 0; }
+  .d-devpage .d-devside { display: block; grid-area: side; margin: var(--sn-sp-24) 0 var(--sn-sp-8); }
+}
+@media (min-width: 1081px) {
+  .n-docs .d-layout:has(.d-devpage) { grid-template-columns: 240px minmax(0, 1fr); }
+  .n-docs .d-layout:has(.d-devpage) .d-toc { display: none; }
+  .n-docs .d-page.d-devpage { max-width: 1120px; }
+  .d-devpage .d-devgrid { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; grid-template-areas: "head side" "main side"; column-gap: var(--sn-sp-48); }
+  .d-devpage .d-devside { align-self: start; margin: 0; position: sticky; top: calc(var(--nav-h) + var(--sn-sp-24)); }
+  /* 右边放下设备框以后左栏不够 560（横屏、或者窄一点的桌面）：设备框挪到标题下面整行放，正文、设备框都不超过平常正文的宽度 */
+  .d-devpage .d-devgrid:has(.s-devbox[data-place="below"]) { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "head" "side" "main"; }
+  .d-devpage .d-devgrid:has(.s-devbox[data-place="below"]) .d-devside { position: static; margin: var(--sn-sp-24) 0 var(--sn-sp-8); }
+  .d-devpage .d-devgrid:has(.s-devbox[data-place="below"]) > * { max-width: 832px; }
+}
+/* 配方里的手机页面：桌面放设备框，原来的整宽预览只在手机上显示（还在页面里，示例生成器读它） */
+.d-rdev { margin-top: var(--sn-sp-16); }
+.d-rframe.d-rframe-m { display: none; }
+@media (max-width: 860px) { .d-rdev { display: none; } .d-rframe.d-rframe-m { display: block; } }
+/* 契约示例的"在手机上看"：开着时演示换成设备框 */
+.dx:not(.dx-phone) .dx-stage > .s-devbox { display: none; }
+.dx.dx-phone .dx-stage > .d-frame { display: none; }
+.dx.dx-phone .dx-stage > .s-devbox { padding: var(--sn-sp-24) 0; }
+.dx-phone-btn[aria-pressed="true"] { --sn-bg: var(--sn-fill-active); --sn-fg: var(--sn-label); }
+@media (max-width: 860px) { .dx-phone-btn { display: none; } .dx.dx-phone .dx-stage > .d-frame { display: block; } .dx.dx-phone .dx-stage > .s-devbox { display: none; } }
+.d-devpage .d-table td:first-child { white-space: normal; } /* 这一页正文那栏让出了设备框的位置，表格第一列也要能折行，不然"处理"那列被挤到要横滑 */
+/* 桌面配方的"在手机上看"：开关在预览上面一行；开着时整宽预览藏起来（还在页面里），换成设备框；手机上不出开关 */
+.d-rbar { display: flex; justify-content: flex-end; margin-top: var(--sn-sp-12); }
+.d-rwrap:not(.d-rphone) > .s-devbox { display: none; }
+.d-rwrap.d-rphone > .d-rframe { display: none; }
+.d-rwrap.d-rphone > .s-devbox { margin-top: var(--sn-sp-8); }
+@media (max-width: 860px) { .d-rbar { display: none; } .d-rwrap.d-rphone > .d-rframe { display: block; } .d-rwrap.d-rphone > .s-devbox { display: none; } }

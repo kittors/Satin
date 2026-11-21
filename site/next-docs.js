@@ -7,6 +7,7 @@ import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { bindOverlays } from "../packages/satin-ui/src/overlay.js";
 import { loadCatalog } from "./catalog.js";
 import { codePanel, mountCode, fmtHTML } from "./code.js";
+import { deviceHTML, mountDevices } from "./device.js";
 import { docPages, sectionsOf, NAV_OF, RECIPES } from "./nav-pages.js";
 import { mountMobileNav } from "./mnav.js";
 import { USAGE, TALL, EX, WIN } from "./usage.js";
@@ -640,9 +641,35 @@ window.__satinRecipeFiles = async () => {
 // 契约示例的演示框：现场演示就是纯 HTML 示例那份代码本身（examples/html/play.html?demo=<slug>），代码块读当前框架的同名文件
 function playBox(c, ex) {
   const frame = `<div class="d-frame" style="--sn-h:120px" data-min="0"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="${esc(ex.title)}演示" data-src="../examples/html/play.html?demo=${ex.slug}"></iframe></div>`;
-  return `<div class="dx" data-demo="${c.id}" data-play="${ex.slug}"><div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div><div class="dx-stage">${frame}</div><div class="dx-code" data-slug="${ex.slug}"><div class="dx-cx"></div></div></div>`;
+  return `<div class="dx" data-demo="${c.id}" data-play="${ex.slug}"${/手机/.test(ex.title) ? ` data-phone="${esc(ex.title)}"` : ""}><div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div><div class="dx-stage">${frame}</div><div class="dx-code" data-slug="${ex.slug}"><div class="dx-cx"></div></div></div>`;
 }
 const tbl = (head, rows) => BLOCK.table(head, rows);
+// 契约示例里带"手机"的（比如"手机上：底部操作栏"）：示例框顶上一个"在手机上看"开关，打开后同一份演示放进设备框（device.js）；手机上（≤ 860px）不出这个开关
+function mountPhoneToggles(scope) {
+  // 桌面配方：预览上面同样一个开关，打开后整宽预览藏起来（还在页面里，示例生成器读它），换成设备框
+  for (const wrap of $$(".d-rwrap[data-rphone]:not([data-phone-ready])", scope)) {
+    wrap.dataset.phoneReady = "";
+    const bar = $(".d-rbar", wrap); bar.innerHTML = '<button class="sn-btn sn-ghost sn-sm dx-phone-btn" type="button" aria-pressed="false" data-i="smartphone:before">在手机上看</button>'; injectIcons(bar);
+    const btn = $(".dx-phone-btn", bar);
+    btn.addEventListener("click", () => {
+      const on = !wrap.classList.contains("d-rphone");
+      wrap.classList.toggle("d-rphone", on); btn.setAttribute("aria-pressed", String(on));
+      if (on && !$(".s-devbox", wrap)) { bar.insertAdjacentHTML("afterend", deviceHTML({ src: `../tests/recipes/${wrap.dataset.rphone}.html`, title: `${wrap.dataset.title}（手机）`, fit: "block", maxH: 780 })); mountDevices(wrap); }
+    });
+  }
+  for (const box of $$(".dx[data-phone]:not([data-phone-ready])", scope)) {
+    box.dataset.phoneReady = "";
+    const ctl = $(".dx-ctl", box), stage = $(".dx-stage", box); if (!ctl || !stage) continue;
+    ctl.insertAdjacentHTML("beforeend", '<button class="sn-btn sn-ghost sn-sm dx-phone-btn" type="button" aria-pressed="false" data-i="smartphone:before">在手机上看</button>');
+    injectIcons(ctl);
+    const btn = $(".dx-phone-btn", ctl);
+    btn.addEventListener("click", () => {
+      const on = !box.classList.contains("dx-phone");
+      box.classList.toggle("dx-phone", on); btn.setAttribute("aria-pressed", String(on)); // 先显示出来再挂设备框（藏着的时候量不到宽度）
+      if (on && !$(".s-devbox", stage)) { stage.insertAdjacentHTML("beforeend", deviceHTML({ src: `../examples/html/play.html?demo=${box.dataset.play}`, title: box.dataset.phone, fit: "block", maxH: 700 })); mountDevices(stage); }
+    });
+  }
+}
 // 组件页的 API 表（属性、列定义、事件、插槽、方法、函数、样式定制、类名、键盘）：桌面照旧是表格；窄屏（< 640px）每一项一块——
 // 第一行名称，右边小字"类型 · 默认 … · 必填"（太长就整行放到名称下面），说明整行在下面（样式见 next.css 的 .d-api）。
 // cols 每列一个角色："n" 名称、"m" 小字信息（"m:默认" 带标签）、"r" 必填（"是" → 小字"必填"）、"d" 说明。空的（""、"—"）不进小字那一行
@@ -713,7 +740,10 @@ const ASYNC = {
   async recipe(id) {
     const r = RECIPES.find((x) => x.id === id), d = await loadRecipe(r);
     const lead = $("[data-async-lead]", main); if (lead) lead.outerHTML = md2html(d.lead.join(" "));
-    return anchor("preview", "预览") + `<div class="d-rframe"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>`
+    // 手机页面（mobile）：桌面上放进设备框；原来的整宽预览留着（手机上显示，示例生成器也读它），桌面上藏起来
+    // 桌面页面：预览上面一个"在手机上看"开关，打开后同一个页面放进设备框（mountPhoneToggles）
+    return anchor("preview", "预览") + (r.mobile ? `<div class="d-rdev">${deviceHTML({ src: `../tests/recipes/${id}.html`, title: `${r.title}预览`, fit: "block", maxH: 780 })}</div>` : `<div class="d-rwrap" data-rphone="${id}" data-title="${esc(r.title)}"><div class="d-rbar"></div>`)
+      + `<div class="d-rframe${r.mobile ? " d-rframe-m" : ""}"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>` + (r.mobile ? "" : "</div>")
       + anchor("code", "代码") + `<div class="dx-code d-rcode" data-recipe="${id}" data-fold="24"><div class="dx-cx"></div></div>`
       + (d.notes.length ? anchor("notes", "补充说明") + `<ul class="d-list">${d.notes.map((n) => `<li>${md2html(n)}</li>`).join("")}</ul>` : "");
   },
@@ -747,7 +777,7 @@ async function fillAsync(scope, base) {
     try { el.outerHTML = await ASYNC[k](arg); } catch (e) { el.outerHTML = `<p class="d-err">这一块没能载入：${esc(e.message)}</p>`; }
   }));
   if (curPage?.hash !== base) return; // 载入期间已经换页了
-  injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main);
+  injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main); mountDevices(main); mountPhoneToggles(main);
   for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
   for (const box of $$(".dx:not([data-wired])", main)) { box.dataset.wired = ""; wireDemo(box, cat.byId[box.dataset.demo]); }
   pump();
@@ -756,6 +786,9 @@ async function fillAsync(scope, base) {
 }
 function textPage(pg) {
   const p = pg.p, sec = p.rulesOf ? cat.byId[p.rulesOf] : null;
+  // "移动端与 H5"：左边标题和讲解，右边从标题那一行起钉一个设备框跑真实的手机页面（移动端下单）；中等宽度放在标题下面，手机上不放（样式见 next.css .d-devpage）
+  if (p.id === "mobile") return `<div class="d-devgrid"><div class="d-devhead">${head(pg, p.title, `${pg.group} <span>${esc(p.en)}</span>`, p.lead)}</div>`
+    + `<aside class="d-devside" aria-label="手机预览">${deviceHTML({ src: "../tests/recipes/mobile-order.html", title: "移动端下单页", fit: "sticky" })}</aside><div class="d-devmain">${blocks(p.body)}</div></div>`;
   return head(pg, p.title, `${pg.group} <span>${esc(p.en)}</span>`, p.lead)
     + (p.embed ? anchor("demo", "演示") + demoBox(p.embed, { code: false }) : "")
     + blocks(p.body) + (sec ? rulesHTML(sec.rules) : "");
@@ -830,8 +863,8 @@ function swapPage(pg, part) {
     tocVp.innerHTML = ""; document.title = "没有这一页 · Satin";
   } else {
     const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
-    main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}">${body}${pager(pg)}</article>`;
-    injectIcons(main); mountCode(main); mountFwButtons(main);
+    main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}${pg.p?.id === "mobile" ? " d-devpage" : ""}">${body}${pager(pg)}</article>`;
+    injectIcons(main); mountCode(main); mountFwButtons(main); mountDevices(main); mountPhoneToggles(main);
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     wireWalls(main);
     for (const box of $$(".dx", main)) { box.dataset.wired = ""; wireDemo(box, pg.c || cat.byId[box.dataset.demo]); }

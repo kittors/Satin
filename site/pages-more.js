@@ -455,4 +455,4 @@ export const OTHER_PAGES = [
 export const RECIPES = [
   ["admin-table", "01-admin-table.md", "后台列表"], ["settings", "02-settings.md", "设置页"], ["auth", "03-auth.md", "登录注册"], ["dashboard", "04-dashboard.md", "仪表盘"],
   ["chat", "05-chat.md", "AI 对话"], ["landing", "06-landing.md", "落地页"], ["mobile-order", "07-mobile-order.md", "移动端下单"], ["wizard", "08-wizard.md", "表单向导"],
-].map(([id, file, title]) => ({ id, file, title }));
+].map(([id, file, title]) => ({ id, file, title, mobile: id === "mobile-order" })); // mobile：手机页面，预览默认放进设备框（device.js）
