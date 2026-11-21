@@ -1288,6 +1288,36 @@
   "css": true
  },
  {
+  "slug": "table-states",
+  "id": "table",
+  "n": -1,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "加载中、空表",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "table-controlled",
+  "id": "table",
+  "n": -1,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "受控：勾选",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "table-basic",
+  "id": "table",
+  "n": -1,
+  "name": "表格",
+  "group": "数据展示",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "table-0",
   "id": "table",
   "n": 0,
@@ -1643,6 +1673,36 @@
   "css": false
  },
  {
+  "slug": "scrollarea-none",
+  "id": "scrollarea",
+  "n": -1,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "不要渐隐、滚到头停住",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "scrollarea-bar",
+  "id": "scrollarea",
+  "n": -1,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "滚动条一直在、四边渐隐",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "scrollarea-basic",
+  "id": "scrollarea",
+  "n": -1,
+  "name": "滚动区域",
+  "group": "数据展示",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "scrollarea-0",
   "id": "scrollarea",
   "n": 0,
@@ -1769,6 +1829,36 @@
   "css": false
  },
  {
+  "slug": "upload-single",
+  "id": "upload",
+  "n": -1,
+  "name": "上传",
+  "group": "媒体与上传",
+  "cap": "一次一个",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "upload-real",
+  "id": "upload",
+  "n": -1,
+  "name": "上传",
+  "group": "媒体与上传",
+  "cap": "真上传",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "upload-basic",
+  "id": "upload",
+  "n": -1,
+  "name": "上传",
+  "group": "媒体与上传",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "upload-0",
   "id": "upload",
   "n": 0,
@@ -1776,6 +1866,36 @@
   "group": "媒体与上传",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "sidebar-fx",
+  "id": "sidebar",
+  "n": -1,
+  "name": "侧栏与布局",
+  "group": "导航",
+  "cap": "换个切换样子：指示条",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "sidebar-controlled",
+  "id": "sidebar",
+  "n": -1,
+  "name": "侧栏与布局",
+  "group": "导航",
+  "cap": "受控：选中哪一项、显示哪一页",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "sidebar-basic",
+  "id": "sidebar",
+  "n": -1,
+  "name": "侧栏与布局",
+  "group": "导航",
+  "cap": "最简单的用法",
+  "css": false,
+  "contract": true
  },
  {
   "slug": "sidebar-0",

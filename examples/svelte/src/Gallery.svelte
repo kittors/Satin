@@ -134,6 +134,9 @@
   import NumflowCounter from "./demos/numflow-counter.svelte";
   import NumflowBasic from "./demos/numflow-basic.svelte";
   import NumflowDemo0 from "./demos/numflow-0.svelte";
+  import TableStates from "./demos/table-states.svelte";
+  import TableControlled from "./demos/table-controlled.svelte";
+  import TableBasic from "./demos/table-basic.svelte";
   import TableDemo0 from "./demos/table-0.svelte";
   import TableDemo1 from "./demos/table-1.svelte";
   import TableDemo2 from "./demos/table-2.svelte";
@@ -171,6 +174,9 @@
   import CollapseSingle from "./demos/collapse-single.svelte";
   import CollapseBasic from "./demos/collapse-basic.svelte";
   import CollapseDemo0 from "./demos/collapse-0.svelte";
+  import ScrollareaNone from "./demos/scrollarea-none.svelte";
+  import ScrollareaBar from "./demos/scrollarea-bar.svelte";
+  import ScrollareaBasic from "./demos/scrollarea-basic.svelte";
   import ScrollareaDemo0 from "./demos/scrollarea-0.svelte";
   import ScrollareaDemo1 from "./demos/scrollarea-1.svelte";
   import ScrollareaDemo2 from "./demos/scrollarea-2.svelte";
@@ -185,7 +191,13 @@
   import FlowstressDemo0 from "./demos/flowstress-0.svelte";
   import ImageDemo0 from "./demos/image-0.svelte";
   import MediaDemo0 from "./demos/media-0.svelte";
+  import UploadSingle from "./demos/upload-single.svelte";
+  import UploadReal from "./demos/upload-real.svelte";
+  import UploadBasic from "./demos/upload-basic.svelte";
   import UploadDemo0 from "./demos/upload-0.svelte";
+  import SidebarFx from "./demos/sidebar-fx.svelte";
+  import SidebarControlled from "./demos/sidebar-controlled.svelte";
+  import SidebarBasic from "./demos/sidebar-basic.svelte";
   import SidebarDemo0 from "./demos/sidebar-0.svelte";
   import TabsSteps from "./demos/tabs-steps.svelte";
   import TabsPager from "./demos/tabs-pager.svelte";
@@ -481,6 +493,9 @@
   </section>
   <section id="table">
     <h2>表格</h2>
+    <div class="demo" data-demo="table-states"><TableStates /></div>
+    <div class="demo" data-demo="table-controlled"><TableControlled /></div>
+    <div class="demo" data-demo="table-basic"><TableBasic /></div>
     <div class="demo" data-demo="table-0"><TableDemo0 /></div>
     <div class="demo" data-demo="table-1"><TableDemo1 /></div>
     <div class="demo" data-demo="table-2"><TableDemo2 /></div>
@@ -539,6 +554,9 @@
   </section>
   <section id="scrollarea">
     <h2>滚动区域</h2>
+    <div class="demo" data-demo="scrollarea-none"><ScrollareaNone /></div>
+    <div class="demo" data-demo="scrollarea-bar"><ScrollareaBar /></div>
+    <div class="demo" data-demo="scrollarea-basic"><ScrollareaBasic /></div>
     <div class="demo" data-demo="scrollarea-0"><ScrollareaDemo0 /></div>
     <div class="demo" data-demo="scrollarea-1"><ScrollareaDemo1 /></div>
     <div class="demo" data-demo="scrollarea-2"><ScrollareaDemo2 /></div>
@@ -577,10 +595,16 @@
   </section>
   <section id="upload">
     <h2>上传</h2>
+    <div class="demo" data-demo="upload-single"><UploadSingle /></div>
+    <div class="demo" data-demo="upload-real"><UploadReal /></div>
+    <div class="demo" data-demo="upload-basic"><UploadBasic /></div>
     <div class="demo" data-demo="upload-0"><UploadDemo0 /></div>
   </section>
   <section id="sidebar">
     <h2>侧栏与布局</h2>
+    <div class="demo" data-demo="sidebar-fx"><SidebarFx /></div>
+    <div class="demo" data-demo="sidebar-controlled"><SidebarControlled /></div>
+    <div class="demo" data-demo="sidebar-basic"><SidebarBasic /></div>
     <div class="demo" data-demo="sidebar-0"><SidebarDemo0 /></div>
   </section>
   <section id="tabs">

@@ -134,6 +134,9 @@ import NumflowStyles from "../demos/numflow-styles.jsx";
 import NumflowCounter from "../demos/numflow-counter.jsx";
 import NumflowBasic from "../demos/numflow-basic.jsx";
 import NumflowDemo0 from "../demos/numflow-0.jsx";
+import TableStates from "../demos/table-states.jsx";
+import TableControlled from "../demos/table-controlled.jsx";
+import TableBasic from "../demos/table-basic.jsx";
 import TableDemo0 from "../demos/table-0.jsx";
 import TableDemo1 from "../demos/table-1.jsx";
 import TableDemo2 from "../demos/table-2.jsx";
@@ -171,6 +174,9 @@ import CollapseControlled from "../demos/collapse-controlled.jsx";
 import CollapseSingle from "../demos/collapse-single.jsx";
 import CollapseBasic from "../demos/collapse-basic.jsx";
 import CollapseDemo0 from "../demos/collapse-0.jsx";
+import ScrollareaNone from "../demos/scrollarea-none.jsx";
+import ScrollareaBar from "../demos/scrollarea-bar.jsx";
+import ScrollareaBasic from "../demos/scrollarea-basic.jsx";
 import ScrollareaDemo0 from "../demos/scrollarea-0.jsx";
 import ScrollareaDemo1 from "../demos/scrollarea-1.jsx";
 import ScrollareaDemo2 from "../demos/scrollarea-2.jsx";
@@ -185,7 +191,13 @@ import FlowDemo0 from "../demos/flow-0.jsx";
 import FlowstressDemo0 from "../demos/flowstress-0.jsx";
 import ImageDemo0 from "../demos/image-0.jsx";
 import MediaDemo0 from "../demos/media-0.jsx";
+import UploadSingle from "../demos/upload-single.jsx";
+import UploadReal from "../demos/upload-real.jsx";
+import UploadBasic from "../demos/upload-basic.jsx";
 import UploadDemo0 from "../demos/upload-0.jsx";
+import SidebarFx from "../demos/sidebar-fx.jsx";
+import SidebarControlled from "../demos/sidebar-controlled.jsx";
+import SidebarBasic from "../demos/sidebar-basic.jsx";
 import SidebarDemo0 from "../demos/sidebar-0.jsx";
 import TabsSteps from "../demos/tabs-steps.jsx";
 import TabsPager from "../demos/tabs-pager.jsx";
@@ -482,6 +494,9 @@ export default function Gallery() {
       </section>
       <section id="table">
         <h2>表格</h2>
+        <div className="demo" data-demo="table-states"><TableStates /></div>
+        <div className="demo" data-demo="table-controlled"><TableControlled /></div>
+        <div className="demo" data-demo="table-basic"><TableBasic /></div>
         <div className="demo" data-demo="table-0"><TableDemo0 /></div>
         <div className="demo" data-demo="table-1"><TableDemo1 /></div>
         <div className="demo" data-demo="table-2"><TableDemo2 /></div>
@@ -540,6 +555,9 @@ export default function Gallery() {
       </section>
       <section id="scrollarea">
         <h2>滚动区域</h2>
+        <div className="demo" data-demo="scrollarea-none"><ScrollareaNone /></div>
+        <div className="demo" data-demo="scrollarea-bar"><ScrollareaBar /></div>
+        <div className="demo" data-demo="scrollarea-basic"><ScrollareaBasic /></div>
         <div className="demo" data-demo="scrollarea-0"><ScrollareaDemo0 /></div>
         <div className="demo" data-demo="scrollarea-1"><ScrollareaDemo1 /></div>
         <div className="demo" data-demo="scrollarea-2"><ScrollareaDemo2 /></div>
@@ -578,10 +596,16 @@ export default function Gallery() {
       </section>
       <section id="upload">
         <h2>上传</h2>
+        <div className="demo" data-demo="upload-single"><UploadSingle /></div>
+        <div className="demo" data-demo="upload-real"><UploadReal /></div>
+        <div className="demo" data-demo="upload-basic"><UploadBasic /></div>
         <div className="demo" data-demo="upload-0"><UploadDemo0 /></div>
       </section>
       <section id="sidebar">
         <h2>侧栏与布局</h2>
+        <div className="demo" data-demo="sidebar-fx"><SidebarFx /></div>
+        <div className="demo" data-demo="sidebar-controlled"><SidebarControlled /></div>
+        <div className="demo" data-demo="sidebar-basic"><SidebarBasic /></div>
         <div className="demo" data-demo="sidebar-0"><SidebarDemo0 /></div>
       </section>
       <section id="tabs">

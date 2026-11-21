@@ -134,6 +134,9 @@ import NumflowStyles from "./demos/numflow-styles.vue";
 import NumflowCounter from "./demos/numflow-counter.vue";
 import NumflowBasic from "./demos/numflow-basic.vue";
 import NumflowDemo0 from "./demos/numflow-0.vue";
+import TableStates from "./demos/table-states.vue";
+import TableControlled from "./demos/table-controlled.vue";
+import TableBasic from "./demos/table-basic.vue";
 import TableDemo0 from "./demos/table-0.vue";
 import TableDemo1 from "./demos/table-1.vue";
 import TableDemo2 from "./demos/table-2.vue";
@@ -171,6 +174,9 @@ import CollapseControlled from "./demos/collapse-controlled.vue";
 import CollapseSingle from "./demos/collapse-single.vue";
 import CollapseBasic from "./demos/collapse-basic.vue";
 import CollapseDemo0 from "./demos/collapse-0.vue";
+import ScrollareaNone from "./demos/scrollarea-none.vue";
+import ScrollareaBar from "./demos/scrollarea-bar.vue";
+import ScrollareaBasic from "./demos/scrollarea-basic.vue";
 import ScrollareaDemo0 from "./demos/scrollarea-0.vue";
 import ScrollareaDemo1 from "./demos/scrollarea-1.vue";
 import ScrollareaDemo2 from "./demos/scrollarea-2.vue";
@@ -185,7 +191,13 @@ import FlowDemo0 from "./demos/flow-0.vue";
 import FlowstressDemo0 from "./demos/flowstress-0.vue";
 import ImageDemo0 from "./demos/image-0.vue";
 import MediaDemo0 from "./demos/media-0.vue";
+import UploadSingle from "./demos/upload-single.vue";
+import UploadReal from "./demos/upload-real.vue";
+import UploadBasic from "./demos/upload-basic.vue";
 import UploadDemo0 from "./demos/upload-0.vue";
+import SidebarFx from "./demos/sidebar-fx.vue";
+import SidebarControlled from "./demos/sidebar-controlled.vue";
+import SidebarBasic from "./demos/sidebar-basic.vue";
 import SidebarDemo0 from "./demos/sidebar-0.vue";
 import TabsSteps from "./demos/tabs-steps.vue";
 import TabsPager from "./demos/tabs-pager.vue";
@@ -482,6 +494,9 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="table">
     <h2>表格</h2>
+    <div class="demo" data-demo="table-states"><TableStates /></div>
+    <div class="demo" data-demo="table-controlled"><TableControlled /></div>
+    <div class="demo" data-demo="table-basic"><TableBasic /></div>
     <div class="demo" data-demo="table-0"><TableDemo0 /></div>
     <div class="demo" data-demo="table-1"><TableDemo1 /></div>
     <div class="demo" data-demo="table-2"><TableDemo2 /></div>
@@ -540,6 +555,9 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="scrollarea">
     <h2>滚动区域</h2>
+    <div class="demo" data-demo="scrollarea-none"><ScrollareaNone /></div>
+    <div class="demo" data-demo="scrollarea-bar"><ScrollareaBar /></div>
+    <div class="demo" data-demo="scrollarea-basic"><ScrollareaBasic /></div>
     <div class="demo" data-demo="scrollarea-0"><ScrollareaDemo0 /></div>
     <div class="demo" data-demo="scrollarea-1"><ScrollareaDemo1 /></div>
     <div class="demo" data-demo="scrollarea-2"><ScrollareaDemo2 /></div>
@@ -578,10 +596,16 @@ import SelectMenu from "./demos/select-menu.vue";
   </section>
   <section id="upload">
     <h2>上传</h2>
+    <div class="demo" data-demo="upload-single"><UploadSingle /></div>
+    <div class="demo" data-demo="upload-real"><UploadReal /></div>
+    <div class="demo" data-demo="upload-basic"><UploadBasic /></div>
     <div class="demo" data-demo="upload-0"><UploadDemo0 /></div>
   </section>
   <section id="sidebar">
     <h2>侧栏与布局</h2>
+    <div class="demo" data-demo="sidebar-fx"><SidebarFx /></div>
+    <div class="demo" data-demo="sidebar-controlled"><SidebarControlled /></div>
+    <div class="demo" data-demo="sidebar-basic"><SidebarBasic /></div>
     <div class="demo" data-demo="sidebar-0"><SidebarDemo0 /></div>
   </section>
   <section id="tabs">
