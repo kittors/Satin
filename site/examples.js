@@ -972,24 +972,100 @@ const flow = createFlow(document.querySelector("#flow"), {
   },
   grid: {
     0: {
+      html: `<div id="grid"></div>`,
       js: `import { createDataGrid } from "satin-ui/grid";
 import "satin-ui/css/grid.css";
 import "satin-ui/css/data.css";
 
-// 虚拟滚动、按需取块（筛选排序在后台线程）、固定列、拖列、改列宽行高、框选合并单元格、树形、编辑、拖行
-// 空容器：工具条、表头、表体都由 createDataGrid 填好；卸载时调 grid.destroy()（后台线程、放进 <head> 的样式一起撤）
-const grid = createDataGrid(document.querySelector("#grid"), { rows: 100000 });
-// 列和数据现在是内置的演示项目表；接自己的列和数据的接口还在整理，暂时没有公开`,
+const STATUS = ["待开始", "生成中", "审核中", "已完成", "已暂停"];
+const OWNERS = ["林夏", "周屿", "沈一", "许棠", "陈默", "顾北"];
+const TAGS = ["电影感", "动画", "纪录", "广告", "MV", "短剧"];
+const SCENES = ["雨夜车站", "候车厅", "站台", "列车上", "终点站", "海边", "旧城区", "天台"];
+
+// 列：key 取行里的哪个字段；type 选内置的显示；pinned 固定在左 / 右；sortable 点表头排序；filter 列头筛选；editable 双击编辑
+const columns = [
+  { key: "sel", type: "sel", width: 64, pinned: "left" },
+  { key: "name", title: "名称", width: 200, pinned: "left", primary: true, sortable: true, editable: true },
+  { key: "status", title: "状态", type: "status", width: 116, options: STATUS, sortable: true, filter: "enum", editable: true },
+  { key: "owner", title: "负责人", type: "owner", width: 124, options: OWNERS, sortable: true, filter: "enum" },
+  { key: "tag", title: "类型", type: "tag", width: 100, options: TAGS, filter: "enum" },
+  { key: "shots", title: "镜头", type: "int", width: 88, sortable: true, editable: true, min: 1, max: 999 },
+  { key: "dur", title: "时长", type: "dur", width: 96, sortable: true, filter: "range" },
+  { key: "prog", title: "进度", type: "prog", width: 148, sortable: true },
+  { key: "act", type: "act", width: 80, pinned: "right" },
+];
+
+// 假的服务端：十万行，按搜索词、列头筛选、排序算好，切出 [start, end) 这一段（真的项目里换成 fetch）
+const all = Array.from({ length: 100000 }, (_, i) => {
+  const h = Math.imul(i + 1, 2654435761) >>> 0, s = h % 5; // 按行号算出看起来随机的值
+  return { id: i + 1, name: \`\${SCENES[i % 8]} \${i + 1}\`, status: STATUS[s], owner: OWNERS[(h >>> 4) % 6], tag: TAGS[(h >>> 8) % 6],
+    shots: 4 + ((h >>> 12) % 120), dur: 15 + ((h >>> 16) % 1800), prog: s === 3 ? 100 : s === 0 ? 0 : 1 + ((h >>> 20) % 98) };
+});
+let last = "", found = all;
+function query({ sort, filter }) {
+  const key = JSON.stringify([sort, filter]);
+  if (key === last) return found;
+  last = key;
+  const q = filter.q?.trim();
+  found = all.filter((r) => (!q || r.name.includes(q)) && Object.entries(filter).every(([k, v]) =>
+    k === "q" || v == null || (Array.isArray(v) ? !v.length || v.includes(r[k]) : (v.min == null || r[k] >= v.min) && (v.max == null || r[k] <= v.max))));
+  if (sort) found.sort((a, b) => (a[sort.key] > b[sort.key] ? 1 : a[sort.key] < b[sort.key] ? -1 : 0) * sort.dir);
+  return found;
+}
+
+// 空容器：工具条、表头、表体都由 createDataGrid 填好。表格按块要（一块 100 行），滚到哪要到哪，还没到的行显示占位条
+const grid = createDataGrid(document.querySelector("#grid"), {
+  columns, rowKey: "id", label: "项目列表，十万行",
+  dataSource: {
+    total: all.length,
+    async load({ start, end, sort, filter }) {
+      await new Promise((r) => setTimeout(r, 200)); // 模拟网络
+      const rows = query({ sort, filter });
+      return { rows: rows.slice(start, end), total: rows.length };
+    },
+  },
+  onCellEdit: ({ rowKey, key, value }) => { all[rowKey - 1][key] = value; }, // 存到服务端
+  onRowAction: ({ action, row }) => console.log(action, row.name), // 行末的"更多"
+});
+// 卸载时调 grid.destroy()`,
     },
   },
   cgrid: {
     0: {
+      html: `<div id="grid"></div>`,
       js: `import { createCanvasGrid } from "satin-ui/canvas-grid";
 import "satin-ui/css/grid.css";
 import "satin-ui/css/data.css";
 
-// 整张表画在一块画布上：百万行照样流畅；交互和 DOM 版一致
-const grid = createCanvasGrid(document.querySelector("#grid"), { rows: 1000000 }); // 卸载时 grid.destroy()`,
+const STATUS = ["待开始", "生成中", "审核中", "已完成", "已暂停"];
+const SCENES = ["雨夜车站", "候车厅", "站台", "列车上", "终点站", "海边", "旧城区", "天台"];
+// 第 i 行：假的服务端按行号算出来（真的项目里换成 fetch，按 start、end 返回这一段）
+const rowAt = (i) => {
+  const h = Math.imul(i + 1, 2654435761) >>> 0; // 按行号算出看起来随机的值
+  return { id: i + 1, name: \`\${SCENES[i % 8]} \${i + 1}\`, status: STATUS[h % 5], shots: 4 + ((h >>> 12) % 120), dur: 15 + ((h >>> 16) % 1800), prog: (h >>> 20) % 101 };
+};
+
+const columns = [
+  { key: "name", title: "名称", width: 200, primary: true },
+  { key: "status", title: "状态", type: "status", width: 116, options: STATUS },
+  { key: "shots", title: "镜头", type: "int", width: 88 },
+  { key: "dur", title: "时长", type: "dur", width: 96 },
+  { key: "prog", title: "进度", type: "prog", width: 148 },
+];
+
+// 整张表画在一块画布上：一百万行在服务端，按块要（一块 200 行），滚到哪要到哪，还没到的行画占位条。
+// 这个假的服务端不会搜索、排序：不要工具条（toolbar: false），列也不写 sortable
+const grid = createCanvasGrid(document.querySelector("#grid"), {
+  columns, rowKey: "id", toolbar: false, label: "一百万个镜头",
+  dataSource: {
+    total: 1000000,
+    async load({ start, end }) {
+      await new Promise((r) => setTimeout(r, 200)); // 模拟网络
+      return Array.from({ length: end - start }, (_, k) => rowAt(start + k));
+    },
+  },
+});
+// 卸载时调 grid.destroy()`,
     },
   },
   picker: {
@@ -1106,11 +1182,24 @@ export const API = {
     ["标记", ["写法", "说明"], [[".sn-flow > .sn-flow-world > svg.sn-flow-edges + .flow-nodes", "画布：节点用 HTML、连线用 SVG，同一层平移缩放"], ["[data-fz]、[data-flow-run]、.sn-flow-mini", "缩放按钮、运行、小地图（可选）"]]],
   ],
   grid: [
-    ["createDataGrid(空容器或 .sn-grid, 选项)（satin-ui/grid）；旧写法 mountDataGrid 仍可用", ["选项", "说明"], [["rows", "行数（演示数据，默认 10 万）"], ["seed", "生成演示数据的种子"], ["返回", "{ update, destroy, on, off }；destroy 撤掉监听、后台线程、放进 <head> 的样式，清空容器"]]],
-    ["现在的限制", ["项目", "说明"], [["列和数据", "内置的演示项目表（列定义、数据生成和“服务端”都在库里）"], ["接自己的数据", "列定义、按块取数据、筛选、排序、树形的接口还在整理，暂时没有公开"]]],
+    ["createDataGrid(空容器或 .sn-grid, 选项)（satin-ui/grid；React / Vue 用 satin-ui/react/grid、satin-ui/vue/grid 的 DataGrid）", ["选项", "说明"], [
+      ["columns（必填）", "列定义：key 取行里的哪个字段；type 选内置的显示（text / int / dur / money / time / status / owner / tag / prog / sel / act）；sortable、filter（enum / range）、editable、pinned、width……，完整字段见组件页“列定义”"],
+      ["data / dataSource", "数组（筛选、排序在页面里算；行里带 children 能切树形）/ 服务端按块给：{ total, load({ start, end, sort, filter }) → 行数组或 { rows, total } }"],
+      ["rowKey", "每行唯一的字段名或 (row) => key，默认 \"id\"；勾选、换数据时按它认行"],
+      ["selection、selectedKeys / defaultSelectedKeys", "\"multiple\" / \"single\" / \"none\"；受控 / 一开始的勾选"],
+      ["sort / defaultSort", "{ key, dir: 1 | -1 } | null，受控 / 一开始的排序"],
+      ["rowDraggable、detail、treeCount、merges", "拖行；行详情；树形下级数量的文字；一开始合并的格子"],
+      ["loading、error、emptyText、noMatchText", "加载中、出错（load 抛错自动进出错状态，“重试”发 retry）、没有数据、筛不到"],
+      ["lines、height、label、toolbar", "行线 / 网格；表格框高度（默认 480）；读屏名；工具条（搜索框、计数）"],
+      ["事件", "rowClick、sortChange、filterChange、selectionChange、columnResize、columnReorder、cellEdit、scrollEnd、rowAction、retry：写成选项 onXxx，或 grid.on(\"sortChange\", fn)"],
+      ["返回", "{ update, destroy, on, off, sort, filter, selectedKeys, merge, reload, ready }；update({ data }) 换数据时滚动位置留着、勾选按 rowKey 带过去；destroy 撤掉监听、放进 <head> 的样式，清空容器"],
+    ]],
   ],
   cgrid: [
-    ["createCanvasGrid(空容器或 .sn-grid, 选项)（satin-ui/canvas-grid）；旧写法 mountCanvasGrid 仍可用", ["选项", "说明"], [["rows", "行数（演示数据，默认 100 万）"], ["seed", "生成演示数据的种子"]]],
+    ["createCanvasGrid(空容器或 .sn-grid, 选项)（satin-ui/canvas-grid；React / Vue 用 satin-ui/react/canvas-grid、satin-ui/vue/canvas-grid 的 CanvasGrid）", ["选项", "说明"], [
+      ["columns、data / dataSource、rowKey……", "和数据表格一样（列定义、数据、勾选、排序、事件、返回值都相同）；服务端按块给时一块 200 行"],
+      ["detail", "行详情画在画布上：{ draw(ctx) }（DOM 版的 render、detail 函数在这里不能用）"],
+    ]],
   ],
   picker: [
     ["bindPickers(root, 选项)", ["选项 / 事件", "说明"], [

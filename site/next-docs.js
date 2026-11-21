@@ -649,6 +649,8 @@ function contractHTML(c, k) {
   // 4. API（按当前框架的叫法）
   out.push(anchor("api", "API"));
   if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => tbl(["名称", "类型", "默认值", "必填", "说明"], k.props.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", x.required ? "是" : "", md(x.desc) + (x.example ? `<br><code>${esc(x.example)}</code>` : "")]))));
+  // 列定义（数据表格、Canvas 表格契约里的 columnProps）：columns 里每一项的字段，各框架写法一样
+  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 里每一项的字段（各框架写法一样）。</p>`, tbl(["字段", "类型", "默认值", "说明"], k.columnProps.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(x.type || "")}</code>`, x.default != null ? `<code>${esc(x.default)}</code>` : "—", md(x.desc)])));
   if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => tbl(["名称", "参数", "什么时候触发"], k.events.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(x.payload || "")}</code>`, md(x.when)]))));
   if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => tbl(["名称", "说明"], k.slots.map((x) => [`<code>${esc(nameOf(x))}</code>`, md(x.desc)]))));
   if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, tbl(["名称", "签名", "说明"], k.methods.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(x.signature || "")}</code>`, md(x.desc)])));
