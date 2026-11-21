@@ -1,6 +1,6 @@
 # 组件清单
 
-每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`table`、`grid`、`cgrid`、`list`、`card`、`tags`、`collapse`、`scrollarea`、`upload`、`sidebar`、`tabs`。
+每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`popconfirm`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`table`、`grid`、`cgrid`、`list`、`card`、`tags`、`collapse`、`scrollarea`、`vlist`、`chat`、`md`、`flow`、`flowstress`、`image`、`media`、`upload`、`sidebar`、`tabs`、`reorder`、`addremove`、`optimistic`。
 
 ## 契约格式（手写的 API 契约）
 
@@ -16,7 +16,7 @@
 | `related` | 相近的组件：`{ id, diff }`，`diff` 一句话说清区别 |
 | `import` | 每个框架引入的那一行：`html`、`react`、`vue`、`svelte`、`angular`、`solid`、`preact`（Next.js 看 `react`，Nuxt 看 `vue`）；`importNote` 按框架分开写 `{ react, vue, svelte, angular, solid, preact, html }`（官网只显示当前框架那一句，别把几个框架混在一段里讲） |
 | `dts` | 契约测试去 `.d.ts` 里找哪些声明：`factory`（createXxx）或 `options`（选项接口名）、`functions`、`react`、`vue`、`svelte`（组件名；重组件在子路径的类型文件里，比如 `react-grid.d.ts`、`vue-grid.d.ts`、`svelte-DataGrid.d.ts`，按名字自动找）、`element`（`<sn-xxx>` 的名字） |
-| `props` | 属性：`name`、`type`（TS 写法）、`default`、`required`（React / Vue 组件里必填；没有组件的看 createXxx 的选项）、`desc`、`example?`；`names` 写每种写法里的叫法：`js`（createXxx 的选项 / 标记函数的参数）、`react`、`vue`（`v-model` 算 modelValue，`v-model:x` 算 x）、`svelte`（`bind:x` 算 x）、`preact`（经 preact/compat 用 React 的组件，和 `react` 一样）、`angular`、`solid`、`element`（自定义元素的属性）、`html`（手写标记里的类名、data 属性；官网上 Svelte、Angular、Solid、纯 HTML 没写自己那一项时看 `element`，再看它）、`markup`（同 `html`，旧写法）——没写的那种写法就是没有这个属性；`native: ["react"]`（或 `"vue"`、`"svelte"`）表示这个属性在那种写法里来自原生 HTML 属性、透传下去（类型里不单独声明）；`types: { react, vue }` 写各框架类型不同的地方 |
+| `props` | 属性：`name`、`type`（TS 写法；React / 选项的类型）、`typeBy?`（某种写法的类型不一样时按写法给：`{ vue: "string" }`，键和 `names` 一样；没写的写法用 `type`）、`descBy?`（说明按写法给：`desc` 写通用的意思，各写法自己的受控方式、叫法写进 `descBy[写法]`，比如 React 写"在 onChange 里更新"、Vue 写"`v-model` 绑定"；官网按当前写法取，没写的用 `desc`）、`default`、`required`（React / Vue 组件里必填；没有组件的看 createXxx 的选项）、`desc`、`example?`；`names` 写每种写法里的叫法：`js`（createXxx 的选项 / 标记函数的参数）、`react`、`vue`（`v-model` 算 modelValue，`v-model:x` 算 x）、`svelte`（`bind:x` 算 x）、`preact`（经 preact/compat 用 React 的组件，和 `react` 一样）、`angular`、`solid`、`element`（自定义元素的属性）、`html`（手写标记里的类名、data 属性；官网上 Svelte、Angular、Solid、纯 HTML 没写自己那一项时看 `element`，再看它）、`markup`（同 `html`，旧写法）——没写的那种写法就是没有这个属性；`native: ["react"]`（或 `"vue"`、`"svelte"`）表示这个属性在那种写法里来自原生 HTML 属性、透传下去（类型里不单独声明）；`types: { react, vue }` 写各框架类型不同的地方 |
 | `columnProps` | 可选：某个属性是一组对象时（数据表格、Canvas 表格的 `columns`），对象里有哪些字段，另画一张子表："列定义"。每项 `{ name, type, default, desc }`，`name` 可以合写（`"width / minWidth"`）；不和 `.d.ts` 比对（类型在 `GridColumn` 里） |
 | `events` | 事件：`name`、`payload`（参数类型）、`when`（什么时候触发）；`names` 写各框架的写法（`js` 选项里的 onXxx、`react` onXxx、`vue` @xxx、`angular` (xxx)、`svelte`、`solid`、`preact`、`element`、`html`）；`native: true` 是原生 DOM 事件；`markupOnly: true` 只在手写标记的接法里有 |
 | `slots` | 插槽 / 子元素：`name`、`desc`、`names`（React 的 children / 某个属性，Vue 的插槽名）；`native: ["react"]` 表示 React 里来自原生属性（比如按钮的 children） |
@@ -106,7 +106,7 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | --- | --- | --- | --- |
 | `tooltip` | 文字提示（Tooltip） | ✓ | 只放一句文字：名称、快捷键，或者为什么不能点。不放按钮和链接，要操作就用弹出面板。第一次悬停 500ms 后出现，在一组按钮之间移动时立即切换；键盘聚焦时同样出… |
 | `popover` | 弹出面板（Popover） | ✓ | 点一下才出现，里面可以放少量操作，改动立即生效，不需要"保存"。从按钮那一侧长出来，下方放不下就翻到上方；点外面或按 Esc 关闭，焦点回到按钮。 |
-| `popconfirm` | 气泡确认（Popconfirm） |  | 能撤销的操作不确认：直接做，再用 Toast 给"撤销"。只有单条、属于自己、不能撤销的操作才确认，锚在按钮上，从按钮那里展开，默认焦点在"取消"。 |
+| `popconfirm` | 气泡确认（Popconfirm） | ✓ | 能撤销的操作不确认：直接做，再用 Toast 给"撤销"。只有单条、属于自己、不能撤销的操作才确认，锚在按钮上，从按钮那里展开，默认焦点在"取消"。 |
 | `ctxmenu` | 右键菜单与子菜单（Context menu · Submenu） | ✓ | 右键菜单出现在指针处，靠边时向内翻。子菜单与父层重叠 8px、首行对齐，右边放不下就翻到左边，一旦往左开，再往下的层也往左。斜着移向子菜单时，途经的行不会抢走高… |
 | `dialog` | 弹窗（Dialog） | ✓ | 只在必须停下来时用：短表单、影响大或不能撤销的确认、要先做另一个决定。从按钮那里长出来，关闭时原路缩回；焦点限制在弹窗里，Esc 取消，关闭后焦点回到按钮。点背… |
 | `drawer` | 抽屉（Drawer） | ✓ | 长表单、要对照页面编辑时用。从右边滑进来，背后的页面保持可见；改动即时反映到背后的页面，自动保存。抽屉不用来做确认。 |
@@ -136,18 +136,18 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | `tags` | 标签、徽标与头像（Tag · Badge · Avatar） | ✓ | 标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块。头像没有照片时用名字的第一个字，底色从几种低饱和色里按名字固定取一种。 |
 | `collapse` | 折叠面板（Collapse） | ✓ | 高度用 0fr → 1fr 过渡，内容在展开过半时淡入；箭头跟着转 90°。可以同时展开多个，也可以只开一个（手风琴）。 |
 | `scrollarea` | 滚动区域（ScrollArea） | ✓ | 所有会溢出滚动的地方都用它：原生滚动（惯性、键盘、读屏都在），系统滚动条换成一根细的悬浮滚动条，不滚动 0.7 秒后淡出，悬停或拖动时变粗；边缘渐隐只在那个方向… |
-| `vlist` | 无限列表（VirtualList · InfiniteList） |  | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置。滚到离底部 400px 时自动加载下一页，底部先出骨架行（300ms 内回来就不出）；加载失… |
-| `chat` | 聊天与 AI 对话（Chat） |  | 超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条；已经载入的消息滚得再快、拖滚动条拖得再猛，都直接显示真内容，不换骨架，也不露白。发送时，输入框里… |
-| `md` | Markdown 文档（Markdown） |  | AI 的回复、说明文档都用它渲染：标题、列表和任务、引用和提示块、表格、代码（高亮、行号、复制、自动换行、超高折叠）、图片（定高、定宽、定比例、加载占位、失败提… |
-| `flow` | 流程图（FlowCanvas） |  | 做视频的流水线：原文 → 拆分 → 分镜；分镜一张卡连出五条线，画面、配音、配乐、音效、字幕并行做，再五条线汇到合成，最后分出横屏、竖屏两个导出。点"运行"按依… |
-| `flowstress` | 流程图 · 万级节点压测（Canvas · 神经网络 · 视口裁剪 · 细节分级） |  | 节点多到几百个以上，就不能每个节点一个 DOM 了：换成一块画布，只画看得见的，越远画得越省。数据像神经网络：每张卡右边扇出 3～12 条线，约 3% 是枢纽、… |
+| `vlist` | 无限列表（VirtualList · InfiniteList） | ✓ | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置。滚到离底部 400px 时自动加载下一页，底部先出骨架行（300ms 内回来就不出）；加载失… |
+| `chat` | 聊天与 AI 对话（Chat） | ✓ | 超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条；已经载入的消息滚得再快、拖滚动条拖得再猛，都直接显示真内容，不换骨架，也不露白。发送时，输入框里… |
+| `md` | Markdown 文档（Markdown） | ✓ | AI 的回复、说明文档都用它渲染：标题、列表和任务、引用和提示块、表格、代码（高亮、行号、复制、自动换行、超高折叠）、图片（定高、定宽、定比例、加载占位、失败提… |
+| `flow` | 流程图（FlowCanvas） | ✓ | 做视频的流水线：原文 → 拆分 → 分镜；分镜一张卡连出五条线，画面、配音、配乐、音效、字幕并行做，再五条线汇到合成，最后分出横屏、竖屏两个导出。点"运行"按依… |
+| `flowstress` | 流程图 · 万级节点压测（Canvas · 神经网络 · 视口裁剪 · 细节分级） | ✓ | 节点多到几百个以上，就不能每个节点一个 DOM 了：换成一块画布，只画看得见的，越远画得越省。数据像神经网络：每张卡右边扇出 3～12 条线，约 3% 是枢纽、… |
 
 ## 媒体与上传
 
 | id | 组件 | 契约 | 说明 |
 | --- | --- | --- | --- |
-| `image` | 图片（Image） |  | 先占位再淡入，不让图片一块块刷出来；加载失败给图标和"重试"。点缩略图放大：图片从缩略图的位置长到铺满窗口的看图层，关闭时沿原路缩回。看图层里能放大缩小（滚轮、… |
-| `media` | 视频与音频（Player） |  | 控制条叠在画面上，用玻璃材质（09 号 §10）；播放时指针停 2 秒不动，控制条和指针一起淡出，一动就回来（指针停在控制条上时不淡出）。进度每帧连续往前走；点… |
+| `image` | 图片（Image） | ✓ | 先占位再淡入，不让图片一块块刷出来；加载失败给图标和"重试"。点缩略图放大：图片从缩略图的位置长到铺满窗口的看图层，关闭时沿原路缩回。看图层里能放大缩小（滚轮、… |
+| `media` | 视频与音频（Player） | ✓ | 控制条叠在画面上，用玻璃材质（09 号 §10）；播放时指针停 2 秒不动，控制条和指针一起淡出，一动就回来（指针停在控制条上时不淡出）。进度每帧连续往前走；点… |
 | `upload` | 上传（Upload） | ✓ | 拖进来时整块高亮，图标往上抬一点；松手后文件进列表，各自显示进度，可以单独取消或重试。支持的格式和大小写在框里，不等用户拖错了才说。 |
 
 ## 导航
@@ -161,6 +161,6 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 
 | id | 组件 | 契约 | 说明 |
 | --- | --- | --- | --- |
-| `reorder` | 拖拽重排（Reorder） |  | 按住左边的把手拖（移动 4px 才算拿起，只点一下什么都不动）。被拖的行浮起来、向一侧拉开并缩到 95%，原位的空缺立刻收拢；落点出现一条从中间往两边长出的细线… |
-| `addremove` | 新增与删除（Add · Remove） |  | 新的一项从它该在的位置出现（位移 8px、从 96% 放大），其他项平滑让位；删除时数据立刻删掉，离场的元素马上脱离布局淡出，剩下的用弹簧补位；撤销后元素按"新… |
-| `optimistic` | 乐观更新（Optimistic） |  | 几乎一定成功、能撤回的操作（收藏、重命名、排序）先显示结果再保存；保存失败时这一行左右抖两下、恢复原样，并给出重试。付款、永久删除、发给别人的操作不用乐观更新。 |
+| `reorder` | 拖拽重排（Reorder） | ✓ | 按住左边的把手拖（移动 4px 才算拿起，只点一下什么都不动）。被拖的行浮起来、向一侧拉开并缩到 95%，原位的空缺立刻收拢；落点出现一条从中间往两边长出的细线… |
+| `addremove` | 新增与删除（Add · Remove） | ✓ | 新的一项从它该在的位置出现（位移 8px、从 96% 放大），其他项平滑让位；删除时数据立刻删掉，离场的元素马上脱离布局淡出，剩下的用弹簧补位；撤销后元素按"新… |
+| `optimistic` | 乐观更新（Optimistic） | ✓ | 几乎一定成功、能撤回的操作（收藏、重命名、排序）先显示结果再保存；保存失败时这一行左右抖两下、恢复原样，并给出重试。付款、永久删除、发给别人的操作不用乐观更新。 |

@@ -65,7 +65,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createFlow } from \"satin-ui/flow\";\nimport \"satin-ui/css/content.css\";\n\n// 空容器：画布、工具条、小地图都由 createFlow 填好（设计稿里的 .sn-flow 标记也可以直接传）；卸载时调 flow.destroy()\nconst flow = createFlow(document.querySelector(\"#flow\"), {\n  // 节点：位置、标题、图标、说明、类型（类型决定线和端口的色相：text | board | image | audio | video | out）\n  nodes: [\n    { id: \"src\",   x: 0,   y: 0, t: \"导入原文\", ic: \"book-open\",    d: \"雨夜车站.docx\", k: \"text\" },\n    { id: \"board\", x: 270, y: 0, t: \"生成分镜\", ic: \"clapperboard\", d: \"48 个镜头\",     k: \"board\" },\n    { id: \"out\",   x: 540, y: 0, t: \"导出\",     ic: \"download\",     d: \"第三集.mp4\",    k: \"out\" },\n  ],\n  edges: [[\"src\", \"board\"], [\"board\", \"out\"]],\n});"
+      "js": "import { createFlow } from \"satin-ui/flow\";\nimport \"satin-ui/css/content.css\";\n\n// 设计稿里的 .sn-flow 标记直接传（空容器也行：画布、工具条、小地图都由 createFlow 填好）；卸载时调 flow.destroy()\nconst flow = createFlow(document.querySelector(\".sn-flow\"), {\n  // 节点：位置、标题、图标、说明、类型（类型决定线和端口的色相：text | board | image | audio | video | out）\n  nodes: [\n    { id: \"src\",   x: 0,   y: 0, t: \"导入原文\", ic: \"book-open\",    d: \"雨夜车站.docx\", k: \"text\" },\n    { id: \"board\", x: 270, y: 0, t: \"生成分镜\", ic: \"clapperboard\", d: \"48 个镜头\",     k: \"board\" },\n    { id: \"out\",   x: 540, y: 0, t: \"导出\",     ic: \"download\",     d: \"第三集.mp4\",    k: \"out\" },\n  ],\n  edges: [[\"src\", \"board\"], [\"board\", \"out\"]],\n});"
     }
   },
   "demos": [
@@ -79,6 +79,260 @@
   "sizes": [],
   "interactions": [],
   "motion": [],
-  "a11y": [],
-  "mobile": []
+  "a11y": {
+    "roles": [
+      "画布能聚焦（`tabindex=\"0\"`、`aria-label`），快捷键在它聚焦时生效；工具条的按钮都写了提示。"
+    ],
+    "focus": [
+      "节点、连线的选中靠鼠标；键盘能做的是缩放、适配、居中、整理、删除选中的。"
+    ],
+    "notes": [
+      "读屏读不出图的结构：重要的流程另外用列表写一遍。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "流程图",
+  "lead": "节点用 HTML，连线用 SVG，放在同一层里一起平移缩放，缩放时线和节点不会脱开。连线屏幕上始终 1px，两端颜色按节点类型渐变，中间微微下垂；拖动节点时线有惯性，会自然晃两下再停。悬停节点：它的整条上下游链路变实，其余淡下去。\"整理\"自动分层排版，节点按弹簧曲线移到新位置；右下角小地图。点选节点或连线按 Delete 删掉（给\"撤销\"）；从端口拉线连到别的节点。",
+  "whenToUse": [
+    "几十到几百个节点的流水线、工作流、依赖关系。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "上千个节点：一个节点一个 DOM 撑不住，要换画布绘制。",
+      "use": "flowstress"
+    },
+    {
+      "text": "只是线性的几步：用步骤条。",
+      "use": "tabs"
+    }
+  ],
+  "related": [
+    {
+      "id": "flowstress",
+      "diff": "万级节点的压测演示用画布绘制；这里是 DOM 节点 + SVG 连线，几百个以内。"
+    }
+  ],
+  "import": {
+    "html": "import { createFlow } from \"satin-ui/flow\";",
+    "react": "import { Flow } from \"satin-ui/react/flow\";",
+    "vue": "import { Flow } from \"satin-ui/vue/flow\";",
+    "svelte": "import { createFlow } from \"satin-ui/flow\";",
+    "angular": "import { createFlow } from \"satin-ui/flow\";",
+    "solid": "import { createFlow } from \"satin-ui/flow\";",
+    "preact": "import { Flow } from \"satin-ui/react/flow\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`<Flow nodes edges />`：节点、连线只在创建时用（之后用户在画布上拖、连、删）；要换一整张图就换 key。重组件，从 `satin-ui/react/flow` 引。",
+    "preact": "经 preact/compat 用 `satin-ui/react/flow` 的 `Flow`。",
+    "vue": "`<Flow :nodes :edges />`，从 `satin-ui/vue/flow` 引；换一整张图就换 `:key`。",
+    "svelte": "没有专门的 Svelte 组件：`$effect` 里 `createFlow(元素, { nodes, edges })`（从 satin-ui/flow 引），返回的函数里 `destroy()`。",
+    "angular": "没有专门的组件：`afterNextRender` 里 `createFlow(元素, { nodes, edges })`，`DestroyRef.onDestroy` 里 `destroy()`。",
+    "solid": "没有专门的组件：`onSettled` 里 `createFlow(元素, { nodes, edges })`，返回的函数里 `destroy()`。",
+    "html": "给空容器 `createFlow(容器, { nodes, edges })`：工具条（缩放、适配、居中、整理）、\"运行\"、小地图自己画好。老写法 `mountFlow` 照样能用。"
+  },
+  "dts": {
+    "factory": "createFlow",
+    "react": "Flow",
+    "vue": "Flow"
+  },
+  "props": [
+    {
+      "name": "nodes",
+      "type": "FlowNode[]",
+      "default": "[]",
+      "required": false,
+      "desc": "节点：`id`、`x` / `y`（画布坐标）、`title` 标题、`icon` 图标名、`detail` 一行说明、`kind` 类型（text / board / image / audio / video / out，决定颜色和能连到哪）、`bg` 缩略图（CSS 背景）。短名 t / ic / d / k 也认。只在创建时用。",
+      "names": {
+        "js": "nodes",
+        "react": "nodes",
+        "preact": "nodes",
+        "vue": "nodes"
+      }
+    },
+    {
+      "name": "edges",
+      "type": "[string, string][]",
+      "default": "[]",
+      "required": false,
+      "desc": "连线：`[从哪个 id, 到哪个 id]`。只在创建时用。",
+      "names": {
+        "js": "edges",
+        "react": "edges",
+        "preact": "edges",
+        "vue": "edges"
+      }
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": "\"流程图画布\"",
+      "required": false,
+      "desc": "画布的读屏名。",
+      "names": {
+        "js": "label",
+        "react": "label",
+        "preact": "label",
+        "vue": "label"
+      }
+    },
+    {
+      "name": "className / style / id",
+      "type": "string / CSSProperties / string",
+      "default": "—",
+      "required": false,
+      "desc": "加在画布容器上（默认高 560）。",
+      "names": {
+        "react": "className / style / id",
+        "preact": "class / style / id"
+      }
+    }
+  ],
+  "events": [],
+  "slots": [],
+  "methods": [
+    {
+      "name": "nodes",
+      "kind": "property",
+      "signature": "readonly nodes: Map<string, unknown>",
+      "returns": "Map<string, unknown>",
+      "desc": "现在的节点（用户拖动、删掉以后跟着变）。"
+    },
+    {
+      "name": "edges",
+      "kind": "property",
+      "signature": "readonly edges: unknown[]",
+      "returns": "unknown[]",
+      "desc": "现在的连线（用户连上、删掉以后跟着变）。"
+    }
+  ],
+  "functions": [],
+  "cssVars": [
+    {
+      "name": "--sn-raised",
+      "desc": "节点卡片的底色",
+      "default": "白（深色主题 #1c1c1e）",
+      "token": true
+    },
+    {
+      "name": "--sn-r-lg",
+      "desc": "画布圆角",
+      "default": "12px",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-flow / .sn-flow-world / .sn-flow-nodes / .sn-flow-edges",
+      "desc": "画布 / 一起平移缩放的那层 / 节点 / 连线（SVG）"
+    },
+    {
+      "name": ".sn-flow-tools / .sn-flow-run / .sn-flow-mini",
+      "desc": "工具条 / 运行 / 小地图"
+    }
+  ],
+  "types": [
+    "FlowOptions",
+    "FlowNode"
+  ],
+  "keyboard": [
+    {
+      "keys": "⌘ / Ctrl + = / -",
+      "does": "放大 / 缩小。"
+    },
+    {
+      "keys": "⇧1 / ⇧2",
+      "does": "适配整张图 / 把选中的节点（没选就整张图）移到中间。"
+    },
+    {
+      "keys": "⇧L",
+      "does": "整理（自动分层排版）。"
+    },
+    {
+      "keys": "Delete / Backspace",
+      "does": "删掉选中的节点或连线（给\"撤销\"）。"
+    },
+    {
+      "keys": "Esc",
+      "does": "拖动、拉线时取消。"
+    }
+  ],
+  "design": {
+    "do": [
+      "节点标题写动作（\"生成分镜\"），说明写具体的东西（\"第三集 · 48 个镜头\"）。",
+      "坐标给个大概，交给\"整理\"排。"
+    ],
+    "dont": [
+      {
+        "text": "连线加光晕、发光。",
+        "rule": "no-colored-shadow"
+      },
+      {
+        "text": "节点堆渐变底色。",
+        "rule": "no-gradient"
+      }
+    ],
+    "copy": [
+      "节点标题 2～6 个字。"
+    ],
+    "motion": [
+      {
+        "what": "整理：节点移到新位置",
+        "easing": "spring",
+        "duration": "520ms"
+      },
+      {
+        "what": "拖完连线晃两下再停",
+        "easing": "spring",
+        "duration": "物理模拟"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "flow-basic",
+      "title": "最简单的用法",
+      "why": "给节点和连线：拖空白处平移、滚轮缩放、拖节点，悬停高亮上下游。",
+      "html": "<div id=\"flow-basic\"></div>",
+      "code": {
+        "html": "<div id=\"flow-basic\"></div>\n\n<script type=\"module\">\n  import { createFlow } from \"satin-ui/flow\";\n  const nodes = [\n    { id: \"src\", x: 0, y: 40, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n    { id: \"board\", x: 270, y: 40, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n    { id: \"img\", x: 540, y: 40, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\" },\n    { id: \"out\", x: 810, y: 40, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n  ];\n  const edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"img\", \"out\"]];\n  // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游\n  createFlow(document.getElementById(\"flow-basic\"), { nodes, edges });\n</script>\n",
+        "react": "import { Flow } from \"satin-ui/react/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 0, y: 40, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"board\", x: 270, y: 40, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 540, y: 40, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\" },\n  { id: \"out\", x: 810, y: 40, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"img\", \"out\"]];\n\nexport default function Pipeline() {\n  // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；节点、连线只在创建时用（之后用户在画布上拖、连、删）\n  return <Flow nodes={nodes} edges={edges} />;\n}\n",
+        "vue": "<script setup>\nimport { Flow } from \"satin-ui/vue/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 0, y: 40, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"board\", x: 270, y: 40, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 540, y: 40, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\" },\n  { id: \"out\", x: 810, y: 40, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"img\", \"out\"]];\n</script>\n\n<template>\n  <!-- 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；节点、连线只在创建时用（之后用户在画布上拖、连、删） -->\n  <Flow :nodes=\"nodes\" :edges=\"edges\" />\n</template>\n",
+        "svelte": "<script>\n  import { createFlow } from \"satin-ui/flow\";\n  const nodes = [\n    { id: \"src\", x: 0, y: 40, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n    { id: \"board\", x: 270, y: 40, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n    { id: \"img\", x: 540, y: 40, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\" },\n    { id: \"out\", x: 810, y: 40, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n  ];\n  const edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"img\", \"out\"]];\n\n  // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；挂上以后建，卸载时 destroy()\n  let host;\n  $effect(() => {\n    const it = createFlow(host, { nodes, edges });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createFlow, type FlowNode } from \"satin-ui/flow\";\n\nconst nodes: FlowNode[] = [\n  { id: \"src\", x: 0, y: 40, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"board\", x: 270, y: 40, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 540, y: 40, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\" },\n  { id: \"out\", x: 810, y: 40, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges: [string, string][] = [[\"src\", \"board\"], [\"board\", \"img\"], [\"img\", \"out\"]];\n\n@Component({\n  selector: \"demo-flow-basic\",\n  template: `<div #host></div>`,\n})\nexport class FlowBasicComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createFlow(this.host().nativeElement, { nodes, edges });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createFlow } from \"satin-ui/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 0, y: 40, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"board\", x: 270, y: 40, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 540, y: 40, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\" },\n  { id: \"out\", x: 810, y: 40, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"img\", \"out\"]];\n\nexport default function Pipeline() {\n  let host;\n  // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createFlow(host, { nodes, edges });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Flow } from \"satin-ui/react/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 0, y: 40, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"board\", x: 270, y: 40, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 540, y: 40, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\" },\n  { id: \"out\", x: 810, y: 40, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"img\", \"out\"]];\n\nexport default function Pipeline() {\n  // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；节点、连线只在创建时用（之后用户在画布上拖、连、删）\n  return <Flow nodes={nodes} edges={edges} />;\n}\n"
+      }
+    },
+    {
+      "slug": "flow-branch",
+      "title": "分叉和汇合",
+      "why": "一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图。",
+      "html": "<div id=\"flow-branch\"></div>",
+      "code": {
+        "html": "<div id=\"flow-branch\"></div>\n\n<script type=\"module\">\n  import { createFlow } from \"satin-ui/flow\";\n  const nodes = [\n    { id: \"src\", x: 0, y: 243, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n    { id: \"split\", x: 270, y: 243, title: \"拆分章节\", icon: \"list\", detail: \"12 集 · 每集约 2700 字\", kind: \"text\" },\n    { id: \"board\", x: 540, y: 243, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n    { id: \"img\", x: 890, y: 0, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\", bg: \"url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&q=72) center / cover\" },\n    { id: \"voice\", x: 890, y: 187, title: \"配音\", icon: \"headphones\", detail: \"林夏 · 温柔女声\", kind: \"audio\" },\n    { id: \"bgm\", x: 890, y: 287, title: \"配乐\", icon: \"music\", detail: \"钢琴 · 雨夜氛围\", kind: \"audio\" },\n    { id: \"sfx\", x: 890, y: 387, title: \"音效\", icon: \"audio-lines\", detail: \"雨声、列车进站\", kind: \"audio\" },\n    { id: \"sub\", x: 890, y: 487, title: \"字幕\", icon: \"file-text\", detail: \"中英双语 · 自动对齐\", kind: \"text\" },\n    { id: \"mix\", x: 1240, y: 243, title: \"合成视频\", icon: \"film\", detail: \"1080p · 24 帧\", kind: \"video\" },\n    { id: \"out\", x: 1510, y: 193, title: \"导出横屏\", icon: \"download\", detail: \"第三集.mp4 · 16:9\", kind: \"out\" },\n    { id: \"outV\", x: 1510, y: 293, title: \"导出竖屏\", icon: \"download\", detail: \"第三集-竖屏.mp4 · 9:16\", kind: \"out\" },\n  ];\n  const edges = [[\"src\", \"split\"], [\"split\", \"board\"], ...[\"img\", \"voice\", \"bgm\", \"sfx\", \"sub\"].flatMap((k) => [[\"board\", k], [k, \"mix\"]]), [\"mix\", \"out\"], [\"mix\", \"outV\"]];\n  // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点\"运行\"按依赖一层层点亮（演示用的进度）\n  createFlow(document.getElementById(\"flow-branch\"), { nodes, edges });\n</script>\n",
+        "react": "import { Flow } from \"satin-ui/react/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 0, y: 243, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"split\", x: 270, y: 243, title: \"拆分章节\", icon: \"list\", detail: \"12 集 · 每集约 2700 字\", kind: \"text\" },\n  { id: \"board\", x: 540, y: 243, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 890, y: 0, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\", bg: \"url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&q=72) center / cover\" },\n  { id: \"voice\", x: 890, y: 187, title: \"配音\", icon: \"headphones\", detail: \"林夏 · 温柔女声\", kind: \"audio\" },\n  { id: \"bgm\", x: 890, y: 287, title: \"配乐\", icon: \"music\", detail: \"钢琴 · 雨夜氛围\", kind: \"audio\" },\n  { id: \"sfx\", x: 890, y: 387, title: \"音效\", icon: \"audio-lines\", detail: \"雨声、列车进站\", kind: \"audio\" },\n  { id: \"sub\", x: 890, y: 487, title: \"字幕\", icon: \"file-text\", detail: \"中英双语 · 自动对齐\", kind: \"text\" },\n  { id: \"mix\", x: 1240, y: 243, title: \"合成视频\", icon: \"film\", detail: \"1080p · 24 帧\", kind: \"video\" },\n  { id: \"out\", x: 1510, y: 193, title: \"导出横屏\", icon: \"download\", detail: \"第三集.mp4 · 16:9\", kind: \"out\" },\n  { id: \"outV\", x: 1510, y: 293, title: \"导出竖屏\", icon: \"download\", detail: \"第三集-竖屏.mp4 · 9:16\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"split\"], [\"split\", \"board\"], ...[\"img\", \"voice\", \"bgm\", \"sfx\", \"sub\"].flatMap((k) => [[\"board\", k], [k, \"mix\"]]), [\"mix\", \"out\"], [\"mix\", \"outV\"]];\n\nexport default function FullPipeline() {\n  // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点\"运行\"按依赖一层层点亮（演示用的进度）；节点、连线只在创建时用（之后用户在画布上拖、连、删）\n  return <Flow nodes={nodes} edges={edges} />;\n}\n",
+        "vue": "<script setup>\nimport { Flow } from \"satin-ui/vue/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 0, y: 243, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"split\", x: 270, y: 243, title: \"拆分章节\", icon: \"list\", detail: \"12 集 · 每集约 2700 字\", kind: \"text\" },\n  { id: \"board\", x: 540, y: 243, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 890, y: 0, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\", bg: \"url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&q=72) center / cover\" },\n  { id: \"voice\", x: 890, y: 187, title: \"配音\", icon: \"headphones\", detail: \"林夏 · 温柔女声\", kind: \"audio\" },\n  { id: \"bgm\", x: 890, y: 287, title: \"配乐\", icon: \"music\", detail: \"钢琴 · 雨夜氛围\", kind: \"audio\" },\n  { id: \"sfx\", x: 890, y: 387, title: \"音效\", icon: \"audio-lines\", detail: \"雨声、列车进站\", kind: \"audio\" },\n  { id: \"sub\", x: 890, y: 487, title: \"字幕\", icon: \"file-text\", detail: \"中英双语 · 自动对齐\", kind: \"text\" },\n  { id: \"mix\", x: 1240, y: 243, title: \"合成视频\", icon: \"film\", detail: \"1080p · 24 帧\", kind: \"video\" },\n  { id: \"out\", x: 1510, y: 193, title: \"导出横屏\", icon: \"download\", detail: \"第三集.mp4 · 16:9\", kind: \"out\" },\n  { id: \"outV\", x: 1510, y: 293, title: \"导出竖屏\", icon: \"download\", detail: \"第三集-竖屏.mp4 · 9:16\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"split\"], [\"split\", \"board\"], ...[\"img\", \"voice\", \"bgm\", \"sfx\", \"sub\"].flatMap((k) => [[\"board\", k], [k, \"mix\"]]), [\"mix\", \"out\"], [\"mix\", \"outV\"]];\n</script>\n\n<template>\n  <!-- 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点\"运行\"按依赖一层层点亮（演示用的进度）；节点、连线只在创建时用（之后用户在画布上拖、连、删） -->\n  <Flow :nodes=\"nodes\" :edges=\"edges\" />\n</template>\n",
+        "svelte": "<script>\n  import { createFlow } from \"satin-ui/flow\";\n  const nodes = [\n    { id: \"src\", x: 0, y: 243, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n    { id: \"split\", x: 270, y: 243, title: \"拆分章节\", icon: \"list\", detail: \"12 集 · 每集约 2700 字\", kind: \"text\" },\n    { id: \"board\", x: 540, y: 243, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n    { id: \"img\", x: 890, y: 0, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\", bg: \"url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&q=72) center / cover\" },\n    { id: \"voice\", x: 890, y: 187, title: \"配音\", icon: \"headphones\", detail: \"林夏 · 温柔女声\", kind: \"audio\" },\n    { id: \"bgm\", x: 890, y: 287, title: \"配乐\", icon: \"music\", detail: \"钢琴 · 雨夜氛围\", kind: \"audio\" },\n    { id: \"sfx\", x: 890, y: 387, title: \"音效\", icon: \"audio-lines\", detail: \"雨声、列车进站\", kind: \"audio\" },\n    { id: \"sub\", x: 890, y: 487, title: \"字幕\", icon: \"file-text\", detail: \"中英双语 · 自动对齐\", kind: \"text\" },\n    { id: \"mix\", x: 1240, y: 243, title: \"合成视频\", icon: \"film\", detail: \"1080p · 24 帧\", kind: \"video\" },\n    { id: \"out\", x: 1510, y: 193, title: \"导出横屏\", icon: \"download\", detail: \"第三集.mp4 · 16:9\", kind: \"out\" },\n    { id: \"outV\", x: 1510, y: 293, title: \"导出竖屏\", icon: \"download\", detail: \"第三集-竖屏.mp4 · 9:16\", kind: \"out\" },\n  ];\n  const edges = [[\"src\", \"split\"], [\"split\", \"board\"], ...[\"img\", \"voice\", \"bgm\", \"sfx\", \"sub\"].flatMap((k) => [[\"board\", k], [k, \"mix\"]]), [\"mix\", \"out\"], [\"mix\", \"outV\"]];\n\n  // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点\"运行\"按依赖一层层点亮（演示用的进度）；挂上以后建，卸载时 destroy()\n  let host;\n  $effect(() => {\n    const it = createFlow(host, { nodes, edges });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createFlow, type FlowNode } from \"satin-ui/flow\";\n\nconst nodes: FlowNode[] = [\n  { id: \"src\", x: 0, y: 243, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"split\", x: 270, y: 243, title: \"拆分章节\", icon: \"list\", detail: \"12 集 · 每集约 2700 字\", kind: \"text\" },\n  { id: \"board\", x: 540, y: 243, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 890, y: 0, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\", bg: \"url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&q=72) center / cover\" },\n  { id: \"voice\", x: 890, y: 187, title: \"配音\", icon: \"headphones\", detail: \"林夏 · 温柔女声\", kind: \"audio\" },\n  { id: \"bgm\", x: 890, y: 287, title: \"配乐\", icon: \"music\", detail: \"钢琴 · 雨夜氛围\", kind: \"audio\" },\n  { id: \"sfx\", x: 890, y: 387, title: \"音效\", icon: \"audio-lines\", detail: \"雨声、列车进站\", kind: \"audio\" },\n  { id: \"sub\", x: 890, y: 487, title: \"字幕\", icon: \"file-text\", detail: \"中英双语 · 自动对齐\", kind: \"text\" },\n  { id: \"mix\", x: 1240, y: 243, title: \"合成视频\", icon: \"film\", detail: \"1080p · 24 帧\", kind: \"video\" },\n  { id: \"out\", x: 1510, y: 193, title: \"导出横屏\", icon: \"download\", detail: \"第三集.mp4 · 16:9\", kind: \"out\" },\n  { id: \"outV\", x: 1510, y: 293, title: \"导出竖屏\", icon: \"download\", detail: \"第三集-竖屏.mp4 · 9:16\", kind: \"out\" },\n];\nconst edges: [string, string][] = [[\"src\", \"split\"], [\"split\", \"board\"], ...[\"img\", \"voice\", \"bgm\", \"sfx\", \"sub\"].flatMap((k): [string, string][] => [[\"board\", k], [k, \"mix\"]]), [\"mix\", \"out\"], [\"mix\", \"outV\"]];\n\n@Component({\n  selector: \"demo-flow-branch\",\n  template: `<div #host></div>`,\n})\nexport class FlowBranchComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点\"运行\"按依赖一层层点亮（演示用的进度）；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createFlow(this.host().nativeElement, { nodes, edges });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createFlow } from \"satin-ui/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 0, y: 243, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"split\", x: 270, y: 243, title: \"拆分章节\", icon: \"list\", detail: \"12 集 · 每集约 2700 字\", kind: \"text\" },\n  { id: \"board\", x: 540, y: 243, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 890, y: 0, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\", bg: \"url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&q=72) center / cover\" },\n  { id: \"voice\", x: 890, y: 187, title: \"配音\", icon: \"headphones\", detail: \"林夏 · 温柔女声\", kind: \"audio\" },\n  { id: \"bgm\", x: 890, y: 287, title: \"配乐\", icon: \"music\", detail: \"钢琴 · 雨夜氛围\", kind: \"audio\" },\n  { id: \"sfx\", x: 890, y: 387, title: \"音效\", icon: \"audio-lines\", detail: \"雨声、列车进站\", kind: \"audio\" },\n  { id: \"sub\", x: 890, y: 487, title: \"字幕\", icon: \"file-text\", detail: \"中英双语 · 自动对齐\", kind: \"text\" },\n  { id: \"mix\", x: 1240, y: 243, title: \"合成视频\", icon: \"film\", detail: \"1080p · 24 帧\", kind: \"video\" },\n  { id: \"out\", x: 1510, y: 193, title: \"导出横屏\", icon: \"download\", detail: \"第三集.mp4 · 16:9\", kind: \"out\" },\n  { id: \"outV\", x: 1510, y: 293, title: \"导出竖屏\", icon: \"download\", detail: \"第三集-竖屏.mp4 · 9:16\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"split\"], [\"split\", \"board\"], ...[\"img\", \"voice\", \"bgm\", \"sfx\", \"sub\"].flatMap((k) => [[\"board\", k], [k, \"mix\"]]), [\"mix\", \"out\"], [\"mix\", \"outV\"]];\n\nexport default function FullPipeline() {\n  let host;\n  // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点\"运行\"按依赖一层层点亮（演示用的进度）；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createFlow(host, { nodes, edges });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Flow } from \"satin-ui/react/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 0, y: 243, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx · 3.2 万字\", kind: \"text\" },\n  { id: \"split\", x: 270, y: 243, title: \"拆分章节\", icon: \"list\", detail: \"12 集 · 每集约 2700 字\", kind: \"text\" },\n  { id: \"board\", x: 540, y: 243, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集 · 48 个镜头\", kind: \"board\" },\n  { id: \"img\", x: 890, y: 0, title: \"生成画面\", icon: \"image\", detail: \"电影感 · 16:9\", kind: \"image\", bg: \"url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&q=72) center / cover\" },\n  { id: \"voice\", x: 890, y: 187, title: \"配音\", icon: \"headphones\", detail: \"林夏 · 温柔女声\", kind: \"audio\" },\n  { id: \"bgm\", x: 890, y: 287, title: \"配乐\", icon: \"music\", detail: \"钢琴 · 雨夜氛围\", kind: \"audio\" },\n  { id: \"sfx\", x: 890, y: 387, title: \"音效\", icon: \"audio-lines\", detail: \"雨声、列车进站\", kind: \"audio\" },\n  { id: \"sub\", x: 890, y: 487, title: \"字幕\", icon: \"file-text\", detail: \"中英双语 · 自动对齐\", kind: \"text\" },\n  { id: \"mix\", x: 1240, y: 243, title: \"合成视频\", icon: \"film\", detail: \"1080p · 24 帧\", kind: \"video\" },\n  { id: \"out\", x: 1510, y: 193, title: \"导出横屏\", icon: \"download\", detail: \"第三集.mp4 · 16:9\", kind: \"out\" },\n  { id: \"outV\", x: 1510, y: 293, title: \"导出竖屏\", icon: \"download\", detail: \"第三集-竖屏.mp4 · 9:16\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"split\"], [\"split\", \"board\"], ...[\"img\", \"voice\", \"bgm\", \"sfx\", \"sub\"].flatMap((k) => [[\"board\", k], [k, \"mix\"]]), [\"mix\", \"out\"], [\"mix\", \"outV\"]];\n\nexport default function FullPipeline() {\n  // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点\"运行\"按依赖一层层点亮（演示用的进度）；节点、连线只在创建时用（之后用户在画布上拖、连、删）\n  return <Flow nodes={nodes} edges={edges} />;\n}\n"
+      }
+    },
+    {
+      "slug": "flow-tidy",
+      "title": "自动整理",
+      "why": "坐标给个大概，点\"整理\"（⇧L）自动分层排版。",
+      "html": "<div id=\"flow-tidy\"></div>",
+      "code": {
+        "html": "<div id=\"flow-tidy\"></div>\n\n<script type=\"module\">\n  import { createFlow } from \"satin-ui/flow\";\n  const nodes = [\n    { id: \"src\", x: 120, y: 300, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx\", kind: \"text\" },\n    { id: \"board\", x: 30, y: 60, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集\", kind: \"board\" },\n    { id: \"img\", x: 420, y: 380, title: \"生成画面\", icon: \"image\", detail: \"16:9\", kind: \"image\" },\n    { id: \"voice\", x: 520, y: 40, title: \"配音\", icon: \"headphones\", detail: \"林夏\", kind: \"audio\" },\n    { id: \"mix\", x: 260, y: 180, title: \"合成视频\", icon: \"film\", detail: \"1080p\", kind: \"video\" },\n    { id: \"out\", x: 640, y: 220, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n  ];\n  const edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"board\", \"voice\"], [\"img\", \"mix\"], [\"voice\", \"mix\"], [\"mix\", \"out\"]];\n  // 坐标不用算准：点工具条上的\"整理\"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中\n  createFlow(document.getElementById(\"flow-tidy\"), { nodes, edges });\n</script>\n",
+        "react": "import { Flow } from \"satin-ui/react/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 120, y: 300, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx\", kind: \"text\" },\n  { id: \"board\", x: 30, y: 60, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集\", kind: \"board\" },\n  { id: \"img\", x: 420, y: 380, title: \"生成画面\", icon: \"image\", detail: \"16:9\", kind: \"image\" },\n  { id: \"voice\", x: 520, y: 40, title: \"配音\", icon: \"headphones\", detail: \"林夏\", kind: \"audio\" },\n  { id: \"mix\", x: 260, y: 180, title: \"合成视频\", icon: \"film\", detail: \"1080p\", kind: \"video\" },\n  { id: \"out\", x: 640, y: 220, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"board\", \"voice\"], [\"img\", \"mix\"], [\"voice\", \"mix\"], [\"mix\", \"out\"]];\n\nexport default function MessyPipeline() {\n  // 坐标不用算准：点工具条上的\"整理\"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；节点、连线只在创建时用（之后用户在画布上拖、连、删）\n  return <Flow nodes={nodes} edges={edges} />;\n}\n",
+        "vue": "<script setup>\nimport { Flow } from \"satin-ui/vue/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 120, y: 300, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx\", kind: \"text\" },\n  { id: \"board\", x: 30, y: 60, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集\", kind: \"board\" },\n  { id: \"img\", x: 420, y: 380, title: \"生成画面\", icon: \"image\", detail: \"16:9\", kind: \"image\" },\n  { id: \"voice\", x: 520, y: 40, title: \"配音\", icon: \"headphones\", detail: \"林夏\", kind: \"audio\" },\n  { id: \"mix\", x: 260, y: 180, title: \"合成视频\", icon: \"film\", detail: \"1080p\", kind: \"video\" },\n  { id: \"out\", x: 640, y: 220, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"board\", \"voice\"], [\"img\", \"mix\"], [\"voice\", \"mix\"], [\"mix\", \"out\"]];\n</script>\n\n<template>\n  <!-- 坐标不用算准：点工具条上的\"整理\"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；节点、连线只在创建时用（之后用户在画布上拖、连、删） -->\n  <Flow :nodes=\"nodes\" :edges=\"edges\" />\n</template>\n",
+        "svelte": "<script>\n  import { createFlow } from \"satin-ui/flow\";\n  const nodes = [\n    { id: \"src\", x: 120, y: 300, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx\", kind: \"text\" },\n    { id: \"board\", x: 30, y: 60, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集\", kind: \"board\" },\n    { id: \"img\", x: 420, y: 380, title: \"生成画面\", icon: \"image\", detail: \"16:9\", kind: \"image\" },\n    { id: \"voice\", x: 520, y: 40, title: \"配音\", icon: \"headphones\", detail: \"林夏\", kind: \"audio\" },\n    { id: \"mix\", x: 260, y: 180, title: \"合成视频\", icon: \"film\", detail: \"1080p\", kind: \"video\" },\n    { id: \"out\", x: 640, y: 220, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n  ];\n  const edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"board\", \"voice\"], [\"img\", \"mix\"], [\"voice\", \"mix\"], [\"mix\", \"out\"]];\n\n  // 坐标不用算准：点工具条上的\"整理\"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；挂上以后建，卸载时 destroy()\n  let host;\n  $effect(() => {\n    const it = createFlow(host, { nodes, edges });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createFlow, type FlowNode } from \"satin-ui/flow\";\n\nconst nodes: FlowNode[] = [\n  { id: \"src\", x: 120, y: 300, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx\", kind: \"text\" },\n  { id: \"board\", x: 30, y: 60, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集\", kind: \"board\" },\n  { id: \"img\", x: 420, y: 380, title: \"生成画面\", icon: \"image\", detail: \"16:9\", kind: \"image\" },\n  { id: \"voice\", x: 520, y: 40, title: \"配音\", icon: \"headphones\", detail: \"林夏\", kind: \"audio\" },\n  { id: \"mix\", x: 260, y: 180, title: \"合成视频\", icon: \"film\", detail: \"1080p\", kind: \"video\" },\n  { id: \"out\", x: 640, y: 220, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges: [string, string][] = [[\"src\", \"board\"], [\"board\", \"img\"], [\"board\", \"voice\"], [\"img\", \"mix\"], [\"voice\", \"mix\"], [\"mix\", \"out\"]];\n\n@Component({\n  selector: \"demo-flow-tidy\",\n  template: `<div #host></div>`,\n})\nexport class FlowTidyComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 坐标不用算准：点工具条上的\"整理\"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createFlow(this.host().nativeElement, { nodes, edges });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createFlow } from \"satin-ui/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 120, y: 300, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx\", kind: \"text\" },\n  { id: \"board\", x: 30, y: 60, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集\", kind: \"board\" },\n  { id: \"img\", x: 420, y: 380, title: \"生成画面\", icon: \"image\", detail: \"16:9\", kind: \"image\" },\n  { id: \"voice\", x: 520, y: 40, title: \"配音\", icon: \"headphones\", detail: \"林夏\", kind: \"audio\" },\n  { id: \"mix\", x: 260, y: 180, title: \"合成视频\", icon: \"film\", detail: \"1080p\", kind: \"video\" },\n  { id: \"out\", x: 640, y: 220, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"board\", \"voice\"], [\"img\", \"mix\"], [\"voice\", \"mix\"], [\"mix\", \"out\"]];\n\nexport default function MessyPipeline() {\n  let host;\n  // 坐标不用算准：点工具条上的\"整理\"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createFlow(host, { nodes, edges });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Flow } from \"satin-ui/react/flow\";\n\nconst nodes = [\n  { id: \"src\", x: 120, y: 300, title: \"导入原文\", icon: \"book-open\", detail: \"雨夜车站.docx\", kind: \"text\" },\n  { id: \"board\", x: 30, y: 60, title: \"生成分镜\", icon: \"clapperboard\", detail: \"第三集\", kind: \"board\" },\n  { id: \"img\", x: 420, y: 380, title: \"生成画面\", icon: \"image\", detail: \"16:9\", kind: \"image\" },\n  { id: \"voice\", x: 520, y: 40, title: \"配音\", icon: \"headphones\", detail: \"林夏\", kind: \"audio\" },\n  { id: \"mix\", x: 260, y: 180, title: \"合成视频\", icon: \"film\", detail: \"1080p\", kind: \"video\" },\n  { id: \"out\", x: 640, y: 220, title: \"导出\", icon: \"download\", detail: \"第三集.mp4\", kind: \"out\" },\n];\nconst edges = [[\"src\", \"board\"], [\"board\", \"img\"], [\"board\", \"voice\"], [\"img\", \"mix\"], [\"voice\", \"mix\"], [\"mix\", \"out\"]];\n\nexport default function MessyPipeline() {\n  // 坐标不用算准：点工具条上的\"整理\"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；节点、连线只在创建时用（之后用户在画布上拖、连、删）\n  return <Flow nodes={nodes} edges={edges} />;\n}\n"
+      }
+    }
+  ]
 }
