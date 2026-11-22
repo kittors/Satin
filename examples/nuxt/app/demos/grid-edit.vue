@@ -26,7 +26,7 @@ const save = (e) => (note.value = savedText(e));
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <DataGrid :columns="columns" :data="rows" :height="280" label="镜头清单" @cell-edit="save" />
+    <DataGrid :columns="columns" :data="rows" :height="320" label="镜头清单" @cell-edit="save" />
     <span class="sn-help">{{ note }}</span>
   </div>
 </template>

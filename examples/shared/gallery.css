@@ -86,6 +86,8 @@ code.k { font: calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-sc
 .sp-ctl th { padding: 0 24px 8px 0; text-align: left; font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sp-ctl td { padding: 8px 24px 8px 0; }
 .sp-ctl td.sn-num { font-variant-numeric: tabular-nums; }
+/* 表头、数字格不折行（"列间距""720～1199""12 列"折成两行是乱换行）；长说明照常折行，整张表放不下就在外面那层横着滑 */
+.sp-ctl th, .sp-ctl td.sn-num { white-space: nowrap; }
 /* ———— 放不下时怎么办（统一规则） ————
    演示框是尺寸容器：里面的排版按演示框自己的宽度变（窗口宽不代表演示框宽）。容器查询不会改变弹层的定位（已验证 fixed / absolute 仍按视口和定位祖先）。 */
 .demo { container: demo / inline-size; }
@@ -100,6 +102,8 @@ code.k { font: calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-sc
 .mx.stack .mx-r { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; grid-column: auto; }
 .mx.stack .mx-r > .sn-cap { flex-basis: 100%; margin-bottom: -2px; }
 .mx.stack .mx-c { justify-items: center; gap: 6px; }
+/* 很窄的演示框（手机）：格子两个一行——一排只放得下 3 个时，7 个状态会排成 3 + 3 + 1 */
+@container demo (max-width: 439.98px) { .mx.stack .mx-r { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .mx.stack .mx-r > .sn-cap { grid-column: 1 / -1; } }
 .mx.stack .mx-c > small:not(:empty) { display: block; font: 400 calc(11px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
 /* 标签 + 内容两栏：演示框窄于 520 时叠起来（标签在上） */
 .grid-m.lc { grid-template-columns: var(--lc, 112px) minmax(0, 1fr); }

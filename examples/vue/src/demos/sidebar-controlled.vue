@@ -17,7 +17,7 @@ const page = ref("all");
 
 <template>
   <div style="height: 320px">
-    <Sidebar v-model="page" title="Satin" :items="NAV" :footer="FOOTER">
+    <Sidebar style="height: 100%" v-model="page" title="Satin" :items="NAV" :footer="FOOTER">
       <div class="sn-app-head"><b>{{ TITLE[page] }}</b></div>
     </Sidebar>
   </div>

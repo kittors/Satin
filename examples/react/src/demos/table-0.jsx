@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
+import { Avatar } from "satin-ui/react";
 
 export default function TableDemo0() {
   const ref = useRef(null);
@@ -28,7 +29,7 @@ export default function TableDemo0() {
                   <b>雨夜车站</b>
                 </td>
                 <td>
-                  <span className="sn-name"><span className="sn-av sn-xs" style={{ "--sn-h": "210" }}>林</span>林夏</span>
+                  <span className="sn-name"><Avatar seed="u3" name="林夏" size={20} decorative />林夏</span>
                 </td>
                 <td>
                   <span className="sn-tag sn-ok"><i></i>已完成</span>
@@ -41,7 +42,7 @@ export default function TableDemo0() {
                   <b>海边的第七天</b>
                 </td>
                 <td>
-                  <span className="sn-name"><span className="sn-av sn-xs" style={{ "--sn-h": "30" }}>周</span>周屿</span>
+                  <span className="sn-name"><Avatar seed="u4" name="周屿" size={20} decorative />周屿</span>
                 </td>
                 <td>
                   <span className="sn-tag sn-run"><i></i>生成中</span>
@@ -54,7 +55,7 @@ export default function TableDemo0() {
                   <b>城南旧事（第二版）</b>
                 </td>
                 <td>
-                  <span className="sn-name"><span className="sn-av sn-xs" style={{ "--sn-h": "150" }}>陈</span>陈默</span>
+                  <span className="sn-name"><Avatar seed="u8" name="陈默" size={20} decorative />陈默</span>
                 </td>
                 <td>
                   <span className="sn-tag "><i></i>草稿</span>
@@ -67,7 +68,7 @@ export default function TableDemo0() {
                   <b>长夜</b>
                 </td>
                 <td>
-                  <span className="sn-name"><span className="sn-av sn-xs" style={{ "--sn-h": "280" }}>许</span>许诺</span>
+                  <span className="sn-name"><Avatar seed="u11" name="许诺" size={20} decorative />许诺</span>
                 </td>
                 <td>
                   <span className="sn-tag sn-bad"><i></i>失败</span>

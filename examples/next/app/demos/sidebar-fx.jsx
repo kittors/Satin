@@ -14,7 +14,7 @@ export default function AppBar() {
   // fx 选中的切换样子：slide 底色滑过去（默认）/ bar 左边指示条 / fade 原地淡入 / text 只换文字颜色
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} defaultValue="assets" fx="bar">
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} defaultValue="assets" fx="bar">
         <div className="sn-app-head"><b>素材库</b></div>
       </Sidebar>
     </div>

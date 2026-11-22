@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
+import { Avatar as SnAvatar } from "satin-ui/vue";
 
 const root = ref(null);
 let off = () => {};
@@ -32,7 +33,7 @@ onBeforeUnmount(() => off());
                 <b>雨夜车站</b>
               </td>
               <td>
-                <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:210">林</span>林夏</span>
+                <span class="sn-name"><SnAvatar seed="u3" name="林夏" :size='20' decorative />林夏</span>
               </td>
               <td>
                 <span class="sn-tag sn-ok"><i></i>已完成</span>
@@ -45,7 +46,7 @@ onBeforeUnmount(() => off());
                 <b>海边的第七天</b>
               </td>
               <td>
-                <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:30">周</span>周屿</span>
+                <span class="sn-name"><SnAvatar seed="u4" name="周屿" :size='20' decorative />周屿</span>
               </td>
               <td>
                 <span class="sn-tag sn-run"><i></i>生成中</span>
@@ -58,7 +59,7 @@ onBeforeUnmount(() => off());
                 <b>城南旧事（第二版）</b>
               </td>
               <td>
-                <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:150">陈</span>陈默</span>
+                <span class="sn-name"><SnAvatar seed="u8" name="陈默" :size='20' decorative />陈默</span>
               </td>
               <td>
                 <span class="sn-tag "><i></i>草稿</span>
@@ -71,7 +72,7 @@ onBeforeUnmount(() => off());
                 <b>长夜</b>
               </td>
               <td>
-                <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:280">许</span>许诺</span>
+                <span class="sn-name"><SnAvatar seed="u11" name="许诺" :size='20' decorative />许诺</span>
               </td>
               <td>
                 <span class="sn-tag sn-bad"><i></i>失败</span>
@@ -84,7 +85,7 @@ onBeforeUnmount(() => off());
                 <b>山那边的学校</b>
               </td>
               <td>
-                <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:340">李</span>李然</span>
+                <span class="sn-name"><SnAvatar seed="u5" name="李然" :size='20' decorative />李然</span>
               </td>
               <td>
                 <span class="sn-tag sn-warn"><i></i>待审核</span>

@@ -29,7 +29,7 @@
   const show = (keys) => { note.textContent = noteOf(keys); clear.disabled = !keys.length; };
   // defaultSelectedKeys：一开始勾上的行（rowKey，这里是 id）；用户勾选时 onSelectionChange 给出新的
   const grid = createCanvasGrid(document.getElementById("cshots-controlled"), {
-    columns, data: rows, selection: "multiple", defaultSelectedKeys: [1, 4], height: 280, label: "镜头清单",
+    columns, data: rows, selection: "multiple", defaultSelectedKeys: [1, 4], height: 320, label: "镜头清单",
     onSelectionChange: (e) => show(e.keys ?? []),
   });
   // 程序里改勾选：update({ selectedKeys })

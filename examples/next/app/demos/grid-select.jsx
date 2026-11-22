@@ -24,7 +24,7 @@ export default function PickShots() {
   const [keys, setKeys] = useState([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>

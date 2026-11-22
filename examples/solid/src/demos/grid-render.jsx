@@ -27,7 +27,7 @@ const rows = [
 export default function ShotTags() {
   let host;
   onSettled(() => {
-    const grid = createDataGrid(host, { columns, data: rows, height: 280, label: "镜头预算" });
+    const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头预算" });
     return () => grid.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;

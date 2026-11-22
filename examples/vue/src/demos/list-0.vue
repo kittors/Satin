@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
+import { Avatar as SnAvatar } from "satin-ui/vue";
 import "./list-0.css";
 
 const root = ref(null);
@@ -64,7 +65,7 @@ onBeforeUnmount(() => off());
         <dt>项目</dt>
         <dd>雨夜车站</dd>
         <dt>负责人</dt>
-        <dd><span class="sn-av sn-xs" style="--sn-h:210">林</span>林夏</dd>
+        <dd><SnAvatar seed="u3" name="林夏" :size='20' decorative />林夏</dd>
         <dt>状态</dt>
         <dd>
           <span class="sn-tag sn-ok"><i></i>已完成</span>

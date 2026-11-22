@@ -279,16 +279,6 @@
   "css": true
  },
  {
-  "slug": "prompt-parts",
-  "id": "prompt",
-  "n": -1,
-  "name": "提示词输入框",
-  "group": "表单",
-  "cap": "上下文、权限、模型（模型受控）",
-  "css": false,
-  "contract": true
- },
- {
   "slug": "prompt-0",
   "id": "prompt",
   "n": 0,
@@ -550,15 +540,6 @@
   "css": false
  },
  {
-  "slug": "table-8",
-  "id": "table",
-  "n": 8,
-  "name": "表格",
-  "group": "数据展示",
-  "cap": "完整示例：搜索、排序、勾选批量、多级展开、合并、拖动换行列、改列宽行高",
-  "css": false
- },
- {
   "slug": "grid-0",
   "id": "grid",
   "n": 0,
@@ -602,6 +583,33 @@
   "group": "数据展示",
   "cap": "",
   "css": true
+ },
+ {
+  "slug": "avatar-0",
+  "id": "avatar",
+  "n": 0,
+  "name": "头像",
+  "group": "数据展示",
+  "cap": "六种尺寸",
+  "css": true
+ },
+ {
+  "slug": "avatar-1",
+  "id": "avatar",
+  "n": 1,
+  "name": "头像",
+  "group": "数据展示",
+  "cap": "12 张预设",
+  "css": true
+ },
+ {
+  "slug": "avatar-2",
+  "id": "avatar",
+  "n": 2,
+  "name": "头像",
+  "group": "数据展示",
+  "cap": "列表里",
+  "css": false
  },
  {
   "slug": "collapse-0",
@@ -685,22 +693,21 @@
   "css": true
  },
  {
-  "slug": "chat-new",
-  "id": "chat",
-  "n": -1,
-  "name": "聊天与 AI 对话",
-  "group": "数据展示",
-  "cap": "新对话：空状态、上下文、权限、模型",
-  "css": false,
-  "contract": true
- },
- {
   "slug": "chat-0",
   "id": "chat",
   "n": 0,
   "name": "聊天与 AI 对话",
   "group": "数据展示",
   "cap": "",
+  "css": false
+ },
+ {
+  "slug": "chat-1",
+  "id": "chat",
+  "n": 1,
+  "name": "聊天与 AI 对话",
+  "group": "数据展示",
+  "cap": "新对话",
   "css": false
  },
  {
@@ -820,6 +827,26 @@
   "name": "新增与删除",
   "group": "行为",
   "cap": "列表行",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "avatar-basic",
+  "id": "avatar",
+  "n": -1,
+  "name": "头像",
+  "group": "数据展示",
+  "cap": "六种尺寸",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "avatar-list",
+  "id": "avatar",
+  "n": -1,
+  "name": "头像",
+  "group": "数据展示",
+  "cap": "列表里：头像加名字",
   "css": false,
   "contract": true
  },
@@ -1010,6 +1037,16 @@
   "name": "聊天与 AI 对话",
   "group": "数据展示",
   "cap": "最简单的用法：接一个模型",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "chat-new",
+  "id": "chat",
+  "n": -1,
+  "name": "聊天与 AI 对话",
+  "group": "数据展示",
+  "cap": "新对话：空状态、上下文、权限，模型受控",
   "css": false,
   "contract": true
  },
@@ -2070,6 +2107,16 @@
   "name": "提示词输入框",
   "group": "表单",
   "cap": "附件真上传",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "prompt-parts",
+  "id": "prompt",
+  "n": -1,
+  "name": "提示词输入框",
+  "group": "表单",
+  "cap": "上下文、权限、模型（模型受控）",
   "css": false,
   "contract": true
  },

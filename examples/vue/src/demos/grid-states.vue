@@ -27,6 +27,6 @@ const state = ref("空");
     <Segmented v-model="state" :items="STATES" size="sm" label="表格状态" />
     <!-- loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText -->
     <DataGrid :columns="columns" :data="state === '空' ? EMPTY : rows" :loading="state === '加载中'" :error="state === '出错' ? '网络断了，没拿到镜头' : null"
-      empty-text="还没有镜头，先从剧本里拆一批" :height="280" label="镜头清单" @retry="state = '有数据'" />
+      empty-text="还没有镜头，先从剧本里拆一批" :height="320" label="镜头清单" @retry="state = '有数据'" />
   </div>
 </template>

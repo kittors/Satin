@@ -17,7 +17,7 @@ export default function AppPages() {
   const [page, setPage] = useState("all");
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} value={page} onNavigate={setPage}>
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} value={page} onNavigate={setPage}>
         <div className="sn-app-head"><b>{TITLE[page]}</b></div>
       </Sidebar>
     </div>

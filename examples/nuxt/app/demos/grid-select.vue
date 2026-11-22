@@ -25,7 +25,7 @@ const note = computed(() => noteOf(keys.value));
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <DataGrid v-model:selected="keys" :columns="columns" :data="rows" selection="multiple" :height="280" label="镜头清单" />
+    <DataGrid v-model:selected="keys" :columns="columns" :data="rows" selection="multiple" :height="320" label="镜头清单" />
     <div class="sn-row sn-gap-8">
       <span class="sn-help">{{ note }}</span>
       <button type="button" class="sn-textbtn sn-sm" :disabled="!keys.length" @click="keys = []">清空</button>

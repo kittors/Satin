@@ -5,6 +5,7 @@
 .sp-ctl th { padding: 0 24px 8px 0; text-align: left; font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sp-ctl td { padding: 8px 24px 8px 0; }
 .sp-ctl td.sn-num { font-variant-numeric: tabular-nums; }
+.sp-ctl th, .sp-ctl td.sn-num { white-space: nowrap; }
 .demo { container: demo / inline-size; }
 .demo > .sn-app { height: 420px; }
 .demo > .sn-app .sn-app-main { overflow: hidden; }

@@ -26,7 +26,7 @@ const note = computed(() => describe(sort.value));
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <DataGrid v-model:sort="sort" :columns="columns" :data="rows" :height="280" label="镜头清单" />
+    <DataGrid v-model:sort="sort" :columns="columns" :data="rows" :height="320" label="镜头清单" />
     <span class="sn-help">{{ note }}</span>
   </div>
 </template>

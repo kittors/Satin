@@ -11,11 +11,11 @@ export default function Wizard() {
   }, []);
   return (
     <div ref={ref}>
-      <div className="sn-page sn-narrow">
+      <div className="sn-page sn-narrow sn-screen">
         <header className="sn-page-hd">
+          <a className="sn-nav-back" href="/projects" data-i="chevron-left:before">全部项目</a>
           <div>
             <h1>新建项目</h1>
-            <p>三步：基本信息、导入原文、生成设置</p>
           </div>
         </header>
         <div className="sn-steps" style={{ marginBottom: "var(--sn-sp-24)" }}>
@@ -29,7 +29,7 @@ export default function Wizard() {
           </span>
           <span className="sn-st"><span className="sn-n">3</span>生成设置</span>
         </div>
-        <form className="sn-panel" noValidate>
+        <form className="sn-panel sn-grow" noValidate>
           <div className="sn-form" style={{ maxWidth: "none" }}>
             <div className="sn-field" data-f="src">
               <span className="sn-lbl">从哪里开始</span>
@@ -37,16 +37,16 @@ export default function Wizard() {
             </div>
             <div className="sn-field" data-f="text">
               <label className="sn-lbl" htmlFor="w-text">粘贴原文</label>
-              <textarea className="sn-input" id="w-text" rows="8" placeholder="把第一集的原文贴在这里" />
-              <div className="sn-help">最多 2 万字；更长的分几集导入。</div>
+              <textarea className="sn-input" id="w-text" rows="5" placeholder="把第一集的原文贴在这里" />
+              <div className="sn-help">最多 2&nbsp;万字；更长的分几集导入。</div>
               <div className="sn-err">
                 <span></span>
               </div>
             </div>
           </div>
-          <div className="sn-panel-ft" style={{ justifyContent: "space-between" }}>
-            <button type="button" className="sn-btn sn-ghost" data-i="arrow-left:before">上一步</button>
-            <button type="submit" className="sn-btn sn-primary">下一步</button>
+          <div className="sn-bottom-bar" style={{ justifyContent: "space-between" }}>
+            <button type="button" className="sn-btn sn-ghost sn-lg" data-i="arrow-left:before">上一步</button>
+            <button type="submit" className="sn-btn sn-primary sn-lg">下一步</button>
           </div>
         </form>
       </div>

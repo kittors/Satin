@@ -15,7 +15,7 @@
     <div class="sn-panel">
       <h1>登录分镜工作台</h1>
       <p>用工作邮箱登录，团队成员会自动加入你的空间。</p>
-      <form class="sn-form" style="margin-top: var(--sn-sp-24)" novalidate>
+      <form class="sn-form" novalidate>
         <div class="sn-field" data-f="mail">
           <label class="sn-lbl" for="l-mail">邮箱</label>
           <input class="sn-input sn-lg" id="l-mail" type="email" autocomplete="email" placeholder="name@company.com">
@@ -45,10 +45,10 @@
     <path d="M2.5 6.2l2.4 2.4 4.6-5"></path>
   </svg>
   <span class="sn-bar"></span>
-</span>30 天内保持登录</label>
+</span>30&nbsp;天内保持登录</label>
         <button class="sn-btn sn-primary sn-lg" type="submit" style="width: 100%">登录</button>
       </form>
-      <p class="sn-t-callout sn-c-tertiary" style="margin-top: var(--sn-sp-20); text-align: center">还没有账号？<a class="sn-link" href="/signup">注册</a></p>
+      <p class="sn-auth-ft">还没有账号？<a class="sn-link" href="/signup">注册</a></p>
     </div>
   </main>
 </div>

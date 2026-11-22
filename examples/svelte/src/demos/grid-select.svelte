@@ -22,7 +22,7 @@
 </script>
 
 <div class="sn-stack sn-gap-8">
-  <DataGrid {columns} data={rows} selection="multiple" bind:selectedKeys={keys} height={280} label="镜头清单" />
+  <DataGrid {columns} data={rows} selection="multiple" bind:selectedKeys={keys} height={320} label="镜头清单" />
   <div class="sn-row sn-gap-8">
     <span class="sn-help">{noteOf(keys)}</span>
     <button type="button" class="sn-textbtn sn-sm" disabled={!keys.length} onclick={() => (keys = [])}>清空</button>

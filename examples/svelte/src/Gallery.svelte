@@ -31,7 +31,6 @@
   import CountDemo0 from "./demos/count-0.svelte";
   import TaginputDemo0 from "./demos/taginput-0.svelte";
   import NumberDemo0 from "./demos/number-0.svelte";
-  import PromptParts from "./demos/prompt-parts.svelte";
   import PromptDemo0 from "./demos/prompt-0.svelte";
   import SelectDemo0 from "./demos/select-0.svelte";
   import PickerDemo0 from "./demos/picker-0.svelte";
@@ -61,12 +60,14 @@
   import TableDemo5 from "./demos/table-5.svelte";
   import TableDemo6 from "./demos/table-6.svelte";
   import TableDemo7 from "./demos/table-7.svelte";
-  import TableDemo8 from "./demos/table-8.svelte";
   import GridDemo0 from "./demos/grid-0.svelte";
   import CgridDemo0 from "./demos/cgrid-0.svelte";
   import ListDemo0 from "./demos/list-0.svelte";
   import CardDemo0 from "./demos/card-0.svelte";
   import TagsDemo0 from "./demos/tags-0.svelte";
+  import AvatarDemo0 from "./demos/avatar-0.svelte";
+  import AvatarDemo1 from "./demos/avatar-1.svelte";
+  import AvatarDemo2 from "./demos/avatar-2.svelte";
   import CollapseDemo0 from "./demos/collapse-0.svelte";
   import ScrollareaDemo0 from "./demos/scrollarea-0.svelte";
   import ScrollareaDemo1 from "./demos/scrollarea-1.svelte";
@@ -76,8 +77,8 @@
   import ScrollareaDemo5 from "./demos/scrollarea-5.svelte";
   import ScrollareaDemo6 from "./demos/scrollarea-6.svelte";
   import VlistDemo0 from "./demos/vlist-0.svelte";
-  import ChatNew from "./demos/chat-new.svelte";
   import ChatDemo0 from "./demos/chat-0.svelte";
+  import ChatDemo1 from "./demos/chat-1.svelte";
   import MdDemo0 from "./demos/md-0.svelte";
   import FlowDemo0 from "./demos/flow-0.svelte";
   import ImageDemo0 from "./demos/image-0.svelte";
@@ -91,6 +92,8 @@
   import AddremoveBasic from "./demos/addremove-basic.svelte";
   import AddremoveUndo from "./demos/addremove-undo.svelte";
   import AddremoveRows from "./demos/addremove-rows.svelte";
+  import AvatarBasic from "./demos/avatar-basic.svelte";
+  import AvatarList from "./demos/avatar-list.svelte";
   import BannerBasic from "./demos/banner-basic.svelte";
   import BannerDismiss from "./demos/banner-dismiss.svelte";
   import BannerError from "./demos/banner-error.svelte";
@@ -110,6 +113,7 @@
   import CgridControlled from "./demos/cgrid-controlled.svelte";
   import CgridEvents from "./demos/cgrid-events.svelte";
   import ChatBasic from "./demos/chat-basic.svelte";
+  import ChatNew from "./demos/chat-new.svelte";
   import ChatHistory from "./demos/chat-history.svelte";
   import ChatRich from "./demos/chat-rich.svelte";
   import ChipBasic from "./demos/chip-basic.svelte";
@@ -216,6 +220,7 @@
   import PromptBasic from "./demos/prompt-basic.svelte";
   import PromptStop from "./demos/prompt-stop.svelte";
   import PromptUpload from "./demos/prompt-upload.svelte";
+  import PromptParts from "./demos/prompt-parts.svelte";
   import ReorderBasic from "./demos/reorder-basic.svelte";
   import ReorderOrder from "./demos/reorder-order.svelte";
   import ReorderSave from "./demos/reorder-save.svelte";
@@ -362,7 +367,6 @@
   </section>
   <section id="prompt">
     <h2>提示词输入框</h2>
-    <div class="demo" data-demo="prompt-parts"><svelte:boundary onerror={(e) => console.error("演示 prompt-parts 出错：", e)}><PromptParts />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="prompt-0"><svelte:boundary onerror={(e) => console.error("演示 prompt-0 出错：", e)}><PromptDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="select">
@@ -455,7 +459,6 @@
     <div class="demo" data-demo="table-5"><svelte:boundary onerror={(e) => console.error("演示 table-5 出错：", e)}><TableDemo5 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="table-6"><svelte:boundary onerror={(e) => console.error("演示 table-6 出错：", e)}><TableDemo6 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="table-7"><svelte:boundary onerror={(e) => console.error("演示 table-7 出错：", e)}><TableDemo7 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
-    <div class="demo" data-demo="table-8"><svelte:boundary onerror={(e) => console.error("演示 table-8 出错：", e)}><TableDemo8 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="grid">
     <h2>数据表格</h2>
@@ -477,6 +480,12 @@
     <h2>标签、徽标与头像</h2>
     <div class="demo" data-demo="tags-0"><svelte:boundary onerror={(e) => console.error("演示 tags-0 出错：", e)}><TagsDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
+  <section id="avatar">
+    <h2>头像</h2>
+    <div class="demo" data-demo="avatar-0"><svelte:boundary onerror={(e) => console.error("演示 avatar-0 出错：", e)}><AvatarDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="avatar-1"><svelte:boundary onerror={(e) => console.error("演示 avatar-1 出错：", e)}><AvatarDemo1 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="avatar-2"><svelte:boundary onerror={(e) => console.error("演示 avatar-2 出错：", e)}><AvatarDemo2 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+  </section>
   <section id="collapse">
     <h2>折叠面板</h2>
     <div class="demo" data-demo="collapse-0"><svelte:boundary onerror={(e) => console.error("演示 collapse-0 出错：", e)}><CollapseDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
@@ -497,8 +506,8 @@
   </section>
   <section id="chat">
     <h2>聊天与 AI 对话</h2>
-    <div class="demo" data-demo="chat-new"><svelte:boundary onerror={(e) => console.error("演示 chat-new 出错：", e)}><ChatNew />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="chat-0"><svelte:boundary onerror={(e) => console.error("演示 chat-0 出错：", e)}><ChatDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="chat-1"><svelte:boundary onerror={(e) => console.error("演示 chat-1 出错：", e)}><ChatDemo1 />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="md">
     <h2>Markdown 文档</h2>
@@ -546,6 +555,11 @@
     <div class="demo" data-demo="addremove-undo"><svelte:boundary onerror={(e) => console.error("演示 addremove-undo 出错：", e)}><AddremoveUndo />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="addremove-rows"><svelte:boundary onerror={(e) => console.error("演示 addremove-rows 出错：", e)}><AddremoveRows />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
+  <section id="avatar">
+    <h2>头像</h2>
+    <div class="demo" data-demo="avatar-basic"><svelte:boundary onerror={(e) => console.error("演示 avatar-basic 出错：", e)}><AvatarBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="avatar-list"><svelte:boundary onerror={(e) => console.error("演示 avatar-list 出错：", e)}><AvatarList />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+  </section>
   <section id="banner">
     <h2>横幅与条目上的失败</h2>
     <div class="demo" data-demo="banner-basic"><svelte:boundary onerror={(e) => console.error("演示 banner-basic 出错：", e)}><BannerBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
@@ -579,6 +593,7 @@
   <section id="chat">
     <h2>聊天与 AI 对话</h2>
     <div class="demo" data-demo="chat-basic"><svelte:boundary onerror={(e) => console.error("演示 chat-basic 出错：", e)}><ChatBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="chat-new"><svelte:boundary onerror={(e) => console.error("演示 chat-new 出错：", e)}><ChatNew />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="chat-history"><svelte:boundary onerror={(e) => console.error("演示 chat-history 出错：", e)}><ChatHistory />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="chat-rich"><svelte:boundary onerror={(e) => console.error("演示 chat-rich 出错：", e)}><ChatRich />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
@@ -781,6 +796,7 @@
     <div class="demo" data-demo="prompt-basic"><svelte:boundary onerror={(e) => console.error("演示 prompt-basic 出错：", e)}><PromptBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="prompt-stop"><svelte:boundary onerror={(e) => console.error("演示 prompt-stop 出错：", e)}><PromptStop />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="prompt-upload"><svelte:boundary onerror={(e) => console.error("演示 prompt-upload 出错：", e)}><PromptUpload />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="prompt-parts"><svelte:boundary onerror={(e) => console.error("演示 prompt-parts 出错：", e)}><PromptParts />{#snippet failed(e)}<p class="demo-err">演示出错：{e?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="reorder">
     <h2>拖拽重排</h2>

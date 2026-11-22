@@ -32,7 +32,6 @@ import SpecialDemo0 from "./demos/special-0.vue";
 import CountDemo0 from "./demos/count-0.vue";
 import TaginputDemo0 from "./demos/taginput-0.vue";
 import NumberDemo0 from "./demos/number-0.vue";
-import PromptParts from "./demos/prompt-parts.vue";
 import PromptDemo0 from "./demos/prompt-0.vue";
 import SelectDemo0 from "./demos/select-0.vue";
 import PickerDemo0 from "./demos/picker-0.vue";
@@ -62,12 +61,14 @@ import TableDemo4 from "./demos/table-4.vue";
 import TableDemo5 from "./demos/table-5.vue";
 import TableDemo6 from "./demos/table-6.vue";
 import TableDemo7 from "./demos/table-7.vue";
-import TableDemo8 from "./demos/table-8.vue";
 import GridDemo0 from "./demos/grid-0.vue";
 import CgridDemo0 from "./demos/cgrid-0.vue";
 import ListDemo0 from "./demos/list-0.vue";
 import CardDemo0 from "./demos/card-0.vue";
 import TagsDemo0 from "./demos/tags-0.vue";
+import AvatarDemo0 from "./demos/avatar-0.vue";
+import AvatarDemo1 from "./demos/avatar-1.vue";
+import AvatarDemo2 from "./demos/avatar-2.vue";
 import CollapseDemo0 from "./demos/collapse-0.vue";
 import ScrollareaDemo0 from "./demos/scrollarea-0.vue";
 import ScrollareaDemo1 from "./demos/scrollarea-1.vue";
@@ -77,8 +78,8 @@ import ScrollareaDemo4 from "./demos/scrollarea-4.vue";
 import ScrollareaDemo5 from "./demos/scrollarea-5.vue";
 import ScrollareaDemo6 from "./demos/scrollarea-6.vue";
 import VlistDemo0 from "./demos/vlist-0.vue";
-import ChatNew from "./demos/chat-new.vue";
 import ChatDemo0 from "./demos/chat-0.vue";
+import ChatDemo1 from "./demos/chat-1.vue";
 import MdDemo0 from "./demos/md-0.vue";
 import FlowDemo0 from "./demos/flow-0.vue";
 import ImageDemo0 from "./demos/image-0.vue";
@@ -92,6 +93,8 @@ import OptimisticDemo0 from "./demos/optimistic-0.vue";
 import AddremoveBasic from "./demos/addremove-basic.vue";
 import AddremoveUndo from "./demos/addremove-undo.vue";
 import AddremoveRows from "./demos/addremove-rows.vue";
+import AvatarBasic from "./demos/avatar-basic.vue";
+import AvatarList from "./demos/avatar-list.vue";
 import BannerBasic from "./demos/banner-basic.vue";
 import BannerDismiss from "./demos/banner-dismiss.vue";
 import BannerError from "./demos/banner-error.vue";
@@ -111,6 +114,7 @@ import CgridMillion from "./demos/cgrid-million.vue";
 import CgridControlled from "./demos/cgrid-controlled.vue";
 import CgridEvents from "./demos/cgrid-events.vue";
 import ChatBasic from "./demos/chat-basic.vue";
+import ChatNew from "./demos/chat-new.vue";
 import ChatHistory from "./demos/chat-history.vue";
 import ChatRich from "./demos/chat-rich.vue";
 import ChipBasic from "./demos/chip-basic.vue";
@@ -217,6 +221,7 @@ import ProgressControlled from "./demos/progress-controlled.vue";
 import PromptBasic from "./demos/prompt-basic.vue";
 import PromptStop from "./demos/prompt-stop.vue";
 import PromptUpload from "./demos/prompt-upload.vue";
+import PromptParts from "./demos/prompt-parts.vue";
 import ReorderBasic from "./demos/reorder-basic.vue";
 import ReorderOrder from "./demos/reorder-order.vue";
 import ReorderSave from "./demos/reorder-save.vue";
@@ -364,7 +369,6 @@ import VlistRetry from "./demos/vlist-retry.vue";
   </section>
   <section id="prompt">
     <h2>提示词输入框</h2>
-    <div class="demo" data-demo="prompt-parts"><DemoGuard slug="prompt-parts"><PromptParts /></DemoGuard></div>
     <div class="demo" data-demo="prompt-0"><DemoGuard slug="prompt-0"><PromptDemo0 /></DemoGuard></div>
   </section>
   <section id="select">
@@ -457,7 +461,6 @@ import VlistRetry from "./demos/vlist-retry.vue";
     <div class="demo" data-demo="table-5"><DemoGuard slug="table-5"><TableDemo5 /></DemoGuard></div>
     <div class="demo" data-demo="table-6"><DemoGuard slug="table-6"><TableDemo6 /></DemoGuard></div>
     <div class="demo" data-demo="table-7"><DemoGuard slug="table-7"><TableDemo7 /></DemoGuard></div>
-    <div class="demo" data-demo="table-8"><DemoGuard slug="table-8"><TableDemo8 /></DemoGuard></div>
   </section>
   <section id="grid">
     <h2>数据表格</h2>
@@ -479,6 +482,12 @@ import VlistRetry from "./demos/vlist-retry.vue";
     <h2>标签、徽标与头像</h2>
     <div class="demo" data-demo="tags-0"><DemoGuard slug="tags-0"><TagsDemo0 /></DemoGuard></div>
   </section>
+  <section id="avatar">
+    <h2>头像</h2>
+    <div class="demo" data-demo="avatar-0"><DemoGuard slug="avatar-0"><AvatarDemo0 /></DemoGuard></div>
+    <div class="demo" data-demo="avatar-1"><DemoGuard slug="avatar-1"><AvatarDemo1 /></DemoGuard></div>
+    <div class="demo" data-demo="avatar-2"><DemoGuard slug="avatar-2"><AvatarDemo2 /></DemoGuard></div>
+  </section>
   <section id="collapse">
     <h2>折叠面板</h2>
     <div class="demo" data-demo="collapse-0"><DemoGuard slug="collapse-0"><CollapseDemo0 /></DemoGuard></div>
@@ -499,8 +508,8 @@ import VlistRetry from "./demos/vlist-retry.vue";
   </section>
   <section id="chat">
     <h2>聊天与 AI 对话</h2>
-    <div class="demo" data-demo="chat-new"><DemoGuard slug="chat-new"><ChatNew /></DemoGuard></div>
     <div class="demo" data-demo="chat-0"><DemoGuard slug="chat-0"><ChatDemo0 /></DemoGuard></div>
+    <div class="demo" data-demo="chat-1"><DemoGuard slug="chat-1"><ChatDemo1 /></DemoGuard></div>
   </section>
   <section id="md">
     <h2>Markdown 文档</h2>
@@ -548,6 +557,11 @@ import VlistRetry from "./demos/vlist-retry.vue";
     <div class="demo" data-demo="addremove-undo"><DemoGuard slug="addremove-undo"><AddremoveUndo /></DemoGuard></div>
     <div class="demo" data-demo="addremove-rows"><DemoGuard slug="addremove-rows"><AddremoveRows /></DemoGuard></div>
   </section>
+  <section id="avatar">
+    <h2>头像</h2>
+    <div class="demo" data-demo="avatar-basic"><DemoGuard slug="avatar-basic"><AvatarBasic /></DemoGuard></div>
+    <div class="demo" data-demo="avatar-list"><DemoGuard slug="avatar-list"><AvatarList /></DemoGuard></div>
+  </section>
   <section id="banner">
     <h2>横幅与条目上的失败</h2>
     <div class="demo" data-demo="banner-basic"><DemoGuard slug="banner-basic"><BannerBasic /></DemoGuard></div>
@@ -581,6 +595,7 @@ import VlistRetry from "./demos/vlist-retry.vue";
   <section id="chat">
     <h2>聊天与 AI 对话</h2>
     <div class="demo" data-demo="chat-basic"><DemoGuard slug="chat-basic"><ChatBasic /></DemoGuard></div>
+    <div class="demo" data-demo="chat-new"><DemoGuard slug="chat-new"><ChatNew /></DemoGuard></div>
     <div class="demo" data-demo="chat-history"><DemoGuard slug="chat-history"><ChatHistory /></DemoGuard></div>
     <div class="demo" data-demo="chat-rich"><DemoGuard slug="chat-rich"><ChatRich /></DemoGuard></div>
   </section>
@@ -783,6 +798,7 @@ import VlistRetry from "./demos/vlist-retry.vue";
     <div class="demo" data-demo="prompt-basic"><DemoGuard slug="prompt-basic"><PromptBasic /></DemoGuard></div>
     <div class="demo" data-demo="prompt-stop"><DemoGuard slug="prompt-stop"><PromptStop /></DemoGuard></div>
     <div class="demo" data-demo="prompt-upload"><DemoGuard slug="prompt-upload"><PromptUpload /></DemoGuard></div>
+    <div class="demo" data-demo="prompt-parts"><DemoGuard slug="prompt-parts"><PromptParts /></DemoGuard></div>
   </section>
   <section id="reorder">
     <h2>拖拽重排</h2>

@@ -19,7 +19,7 @@ const rows = [
 </script>
 
 <template>
-  <DataGrid :columns="columns" :data="rows" :height="280" label="镜头预算">
+  <DataGrid :columns="columns" :data="rows" :height="320" label="镜头预算">
     <!-- 插槽拿到 { value, row, index } -->
     <template #cell-tags="{ value }">
       <span class="sn-row sn-gap-4">

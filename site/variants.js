@@ -19,6 +19,7 @@ const INLINE_TAGS = new Set(["a", "abbr", "b", "bdi", "bdo", "br", "button", "ci
 const camel = (s) => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 // 标记里的组件元素 <sn-xxx> 在 React、Vue 里换成现成的组件（satin-ui/react、satin-ui/vue）；vk：受控的那一项（React 里写 defaultXxx 当初始值，不锁死）
 export const ELEMS = {
+  "sn-avatar": { react: "Avatar", vue: "SnAvatar", vk: "", bools: ["decorative", "online"] },
   "sn-segmented": { react: "Segmented", vue: "SnSegmented", vk: "value" }, "sn-slider": { react: "Slider", vue: "SnSlider", vk: "value" },
   "sn-select": { react: "Select", vue: "SnSelect", vk: "value" }, "sn-otp": { react: "Otp", vue: "SnOtp", vk: "code" }, "sn-tabs": { react: "Tabs", vue: "SnTabs", vk: "value" },
   "sn-pager": { react: "Pager", vue: "SnPager", vk: "page" }, "sn-collapse": { react: "Collapse", vue: "SnCollapse", vk: "open" }, "sn-tag-input": { react: "TagInput", vue: "SnTagInput", vk: "tags" },
@@ -97,7 +98,10 @@ export function toJSX(node, { inline = guessInline, flex = guessFlex, indent = "
     if (E && used) {
       used.add(E.react);
       const ps = [...n.attributes].filter((x) => x.name !== "style" && x.name !== "class").map(({ name, value }) => {
-        const k = camel(name) === E.vk && E.vk ? "default" + E.vk[0].toUpperCase() + E.vk.slice(1) : camel(name), j = parseAttr(value);
+        if (n.localName === "sn-avatar" && name === "status" && value === "online") return "online";
+        const k = camel(name) === E.vk && E.vk ? "default" + E.vk[0].toUpperCase() + E.vk.slice(1) : camel(name);
+        if (value === "" && E.bools?.includes(name)) return k;
+        const j = parseAttr(value);
         return j !== null ? `${k}={${JSON.stringify(j)}}` : /["\n\\]/.test(value) ? `${k}={${JSON.stringify(value)}}` : `${k}="${value}"`;
       });
       return `${ind}<${E.react}${ps.length ? " " + ps.join(" ") : ""} />`;
@@ -122,7 +126,12 @@ export function toHTML(node, { inline = guessInline, flex = guessFlex, indent = 
     const E = vue && ELEMS[n.localName];
     if (E && used) {
       used.add(E.vue);
-      const ps = [...n.attributes].filter((x) => x.name !== "style" && x.name !== "class").map(({ name, value }) => { const j = parseAttr(value); return j !== null ? `:${name}='${JSON.stringify(j).replace(/'/g, "&#39;")}'` : `${name}="${escAttr(value)}"`; });
+      const ps = [...n.attributes].filter((x) => x.name !== "style" && x.name !== "class").map(({ name, value }) => {
+        if (n.localName === "sn-avatar" && name === "status" && value === "online") return "online";
+        if (value === "" && E.bools?.includes(name)) return name;
+        const j = parseAttr(value);
+        return j !== null ? `:${name}='${JSON.stringify(j).replace(/'/g, "&#39;")}'` : `${name}="${escAttr(value)}"`;
+      });
       return `${ind}<${E.vue}${ps.length ? " " + ps.join(" ") : ""} />`;
     }
     const tag = n.localName, a = htmlAttrs(n);
@@ -215,7 +224,7 @@ export function variants({ node, js = "", css = "", name, slug, htmlCode, inline
   const comp = compOf(slug), cssName = slug + ".css", hasBody = !!body;
   const cssFile = css ? [{ name: cssName, lang: "css", code: css }] : [];
   const cssImport = css ? [`import "./${cssName}";`] : [];
-  const usesElems = !!node.querySelector?.("sn-segmented, sn-slider, sn-select, sn-otp, sn-tabs, sn-pager, sn-collapse, sn-tag-input, sn-stepper, sn-number-flow");
+  const usesElems = !!node.querySelector?.("sn-avatar, sn-segmented, sn-slider, sn-select, sn-otp, sn-tabs, sn-pager, sn-collapse, sn-tag-input, sn-stepper, sn-number-flow");
   const elemsImport = usesElems ? ['import { defineElements } from "satin-ui/elements";'] : [];
   const wire = (pre, rootExpr, param = "root") => `enhance(${rootExpr}${hasBody ? `, (${param}) => {\n${ind(body, pre + "  ")}\n${pre}}` : ""})`;
 

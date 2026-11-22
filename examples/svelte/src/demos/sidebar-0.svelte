@@ -61,7 +61,7 @@
     <main class="sn-app-main">
       <div class="sn-app-head">
         <b>全部项目</b>
-        <span class="sn-note">8 个</span>
+        <span class="sn-note">8&nbsp;个</span>
       </div>
       <div class="sn-app-grid" id="appGrid">
         <div class="sn-gc">

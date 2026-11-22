@@ -14,33 +14,48 @@ export default function MobileOrder() {
   onCleanup(() => off());
   return (
     <div ref={(el) => (root = el)}>
-      <main class="sn-page sn-narrow" style="padding-bottom: calc(var(--sn-sp-80) + env(safe-area-inset-bottom))">
+      <main class="sn-page sn-narrow sn-screen">
         <header class="sn-page-hd">
+          <a class="sn-nav-back" href="/cart" data-i="chevron-left:before">购物车</a>
           <div>
             <h1>确认订单</h1>
           </div>
         </header>
-        <div class="sn-stack sn-gap-16">
-          <section class="sn-panel">
-            <div class="sn-row sn-gap-12">
-              <img src="/p/lamp.jpg" alt="" width="64" height="64" style="border-radius: var(--sn-r-md); object-fit: cover" />
-              <div class="sn-grow">
-                <b>折叠台灯 · 暖白</b>
-                <div class="sn-t-caption sn-c-tertiary">三档亮度 · USB-C 充电</div>
-              </div>
-              <b class="sn-num">¥189.00</b>
-            </div>
-          </section>
+        <div class="sn-stack sn-gap-12">
           <section class="sn-panel sn-flush">
             <div class="sn-set-list" style="border: 0; border-radius: 0">
               <div class="sn-set-row" tabindex="0">
                 <span class="sn-ico" data-i="map-pin"></span>
                 <div class="sn-tx">
                   <b>林夏 138 0000 1234</b>
-                  <span>上海市徐汇区漕溪北路 88 号 12 楼</span>
+                  <span>上海市徐汇区漕溪北路 88&nbsp;号 12&nbsp;楼</span>
                 </div>
                 <span class="sn-end" data-i="chevron-right"></span>
               </div>
+            </div>
+          </section>
+          <section class="sn-panel">
+            <div class="sn-row sn-gap-12">
+              <img src="https://images.unsplash.com/photo-1534105615256-13940a56ff44?auto=format&fit=crop&w=160&h=160&q=80" alt="" width="64" height="64" style="border-radius: var(--sn-r-md); object-fit: cover" />
+              <div class="sn-grow">
+                <b>折叠台灯</b>
+                <div class="sn-t-caption sn-c-tertiary">三档亮度 · USB-C 充电</div>
+              </div>
+              <b class="sn-num">¥189.00</b>
+            </div>
+            <div class="sn-form" style="max-width: none; margin-top: var(--sn-sp-20)">
+              <div class="sn-field">
+                <span class="sn-lbl">颜色</span>
+                <sn-segmented items='["暖白","冷白","木纹"]' value="暖白"></sn-segmented>
+              </div>
+              <div class="sn-row sn-between">
+                <span class="sn-lbl">数量</span>
+                <sn-stepper value="1" min="1" max="9" unit="件"></sn-stepper>
+              </div>
+            </div>
+          </section>
+          <section class="sn-panel sn-flush">
+            <div class="sn-set-list" style="border: 0; border-radius: 0">
               <div class="sn-set-row" tabindex="0">
                 <span class="sn-ico" data-i="clock"></span>
                 <div class="sn-tx">
@@ -49,44 +64,72 @@ export default function MobileOrder() {
                 <span class="sn-val">明天 9:00–12:00</span>
                 <span class="sn-end" data-i="chevron-right"></span>
               </div>
-            </div>
-          </section>
-          <section class="sn-panel">
-            <div class="sn-form" style="max-width: none">
-              <div class="sn-field">
-                <span class="sn-lbl">颜色</span>
-                <sn-segmented items='["暖白","冷白","木纹"]' value="暖白"></sn-segmented>
-              </div>
-              <div class="sn-field">
-                <span class="sn-lbl">数量</span>
-                <sn-stepper value="1" min="1" max="9" unit="件"></sn-stepper>
-              </div>
-              <div class="sn-field">
-                <label class="sn-lbl" for="o-note">备注 <span class="sn-opt">可选</span></label>
-                <textarea class="sn-input" id="o-note" rows="2" placeholder="比如：放门口，不用打电话"></textarea>
+              <div class="sn-set-row" tabindex="0">
+                <span class="sn-ico" data-i="tag"></span>
+                <div class="sn-tx">
+                  <b>优惠券</b>
+                </div>
+                <span class="sn-val">满 150 减 20</span>
+                <span class="sn-end" data-i="chevron-right"></span>
               </div>
             </div>
           </section>
           <section class="sn-panel">
-            <dl class="sn-kv">
-              <dt>商品</dt>
-              <dd class="sn-num">¥189.00</dd>
-              <dt>运费</dt>
-              <dd class="sn-num">¥0.00</dd>
-              <dt>优惠</dt>
-              <dd class="sn-num sn-c-success">−¥20.00</dd>
-            </dl>
+            <div class="sn-field">
+              <label class="sn-lbl" for="o-note">备注 <span class="sn-opt">可选</span></label>
+              <textarea class="sn-input" id="o-note" rows="2" placeholder="比如：放门口，不用打电话"></textarea>
+            </div>
           </section>
+          <section class="sn-panel sn-flush">
+            <div class="sn-set-list" role="radiogroup" aria-label="支付方式" style="border: 0; border-radius: 0">
+              <label class="sn-set-row">
+                <span class="sn-ico" data-i="credit-card"></span>
+                <div class="sn-tx">
+                  <b>微信支付</b>
+                </div>
+                <span class="sn-radio">
+                  <input type="radio" name="pay" checked />
+                  <span class="sn-box"></span>
+                </span>
+              </label>
+              <label class="sn-set-row">
+                <span class="sn-ico" data-i="credit-card"></span>
+                <div class="sn-tx">
+                  <b>支付宝</b>
+                </div>
+                <span class="sn-radio">
+                  <input type="radio" name="pay" />
+                  <span class="sn-box"></span>
+                </span>
+              </label>
+            </div>
+          </section>
+          <section class="sn-panel">
+            <div class="sn-stack sn-gap-8">
+              <div class="sn-row sn-between">
+                <span class="sn-c-secondary">商品</span>
+                <span class="sn-num">¥189.00</span>
+              </div>
+              <div class="sn-row sn-between">
+                <span class="sn-c-secondary">运费</span>
+                <span class="sn-num">¥0.00</span>
+              </div>
+              <div class="sn-row sn-between">
+                <span class="sn-c-secondary">优惠</span>
+                <span class="sn-num sn-c-success">−¥20.00</span>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="sn-bottom-bar">
+          <div class="sn-grow">
+            <span class="sn-t-caption sn-c-tertiary">合计</span>
+            {" "}
+            <b class="sn-t-title2 sn-num">¥169.00</b>
+          </div>
+          <button class="sn-btn sn-primary sn-lg">提交订单</button>
         </div>
       </main>
-      <div class="sn-bottom-bar" style="position: fixed; left: 0; right: 0">
-        <div class="sn-grow">
-          <span class="sn-t-caption sn-c-tertiary">合计</span>
-          {" "}
-          <b class="sn-t-title2 sn-num">¥169.00</b>
-        </div>
-        <button class="sn-btn sn-primary sn-lg">提交订单</button>
-      </div>
     </div>
   );
 }

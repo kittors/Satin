@@ -24,7 +24,7 @@ export default function PickShots() {
   const [keys, setKeys] = createSignal(first);
   onSettled(() => {
     // selectedKeys：勾上的行的 rowKey（这里是 id）；用户勾选时 onSelectionChange 给出新的
-    grid = createCanvasGrid(host, { columns, data: rows, selection: "multiple", selectedKeys: first, height: 280, label: "镜头清单", onSelectionChange: (e) => setKeys(e.keys ?? []) });
+    grid = createCanvasGrid(host, { columns, data: rows, selection: "multiple", selectedKeys: first, height: 320, label: "镜头清单", onSelectionChange: (e) => setKeys(e.keys ?? []) });
     return () => grid.destroy();
   });
   // 程序里改勾选：update({ selectedKeys })

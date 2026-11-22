@@ -13,7 +13,7 @@ export default function AppShell() {
   // children 是右边的主区；收起按钮、⌘\ 收起和展开，主区宽度跟着连续变化
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} defaultValue="all">
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} defaultValue="all">
         <div class="sn-app-head"><b>全部项目</b></div>
       </Sidebar>
     </div>

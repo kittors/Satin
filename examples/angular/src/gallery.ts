@@ -31,7 +31,6 @@ import { SpecialDemo0Component } from "./demos/special-0";
 import { CountDemo0Component } from "./demos/count-0";
 import { TaginputDemo0Component } from "./demos/taginput-0";
 import { NumberDemo0Component } from "./demos/number-0";
-import { PromptPartsComponent } from "./demos/prompt-parts";
 import { PromptDemo0Component } from "./demos/prompt-0";
 import { SelectDemo0Component } from "./demos/select-0";
 import { PickerDemo0Component } from "./demos/picker-0";
@@ -61,12 +60,14 @@ import { TableDemo4Component } from "./demos/table-4";
 import { TableDemo5Component } from "./demos/table-5";
 import { TableDemo6Component } from "./demos/table-6";
 import { TableDemo7Component } from "./demos/table-7";
-import { TableDemo8Component } from "./demos/table-8";
 import { GridDemo0Component } from "./demos/grid-0";
 import { CgridDemo0Component } from "./demos/cgrid-0";
 import { ListDemo0Component } from "./demos/list-0";
 import { CardDemo0Component } from "./demos/card-0";
 import { TagsDemo0Component } from "./demos/tags-0";
+import { AvatarDemo0Component } from "./demos/avatar-0";
+import { AvatarDemo1Component } from "./demos/avatar-1";
+import { AvatarDemo2Component } from "./demos/avatar-2";
 import { CollapseDemo0Component } from "./demos/collapse-0";
 import { ScrollareaDemo0Component } from "./demos/scrollarea-0";
 import { ScrollareaDemo1Component } from "./demos/scrollarea-1";
@@ -76,8 +77,8 @@ import { ScrollareaDemo4Component } from "./demos/scrollarea-4";
 import { ScrollareaDemo5Component } from "./demos/scrollarea-5";
 import { ScrollareaDemo6Component } from "./demos/scrollarea-6";
 import { VlistDemo0Component } from "./demos/vlist-0";
-import { ChatNewComponent } from "./demos/chat-new";
 import { ChatDemo0Component } from "./demos/chat-0";
+import { ChatDemo1Component } from "./demos/chat-1";
 import { MdDemo0Component } from "./demos/md-0";
 import { FlowDemo0Component } from "./demos/flow-0";
 import { ImageDemo0Component } from "./demos/image-0";
@@ -91,6 +92,8 @@ import { OptimisticDemo0Component } from "./demos/optimistic-0";
 import { AddremoveBasicComponent } from "./demos/addremove-basic";
 import { AddremoveUndoComponent } from "./demos/addremove-undo";
 import { AddremoveRowsComponent } from "./demos/addremove-rows";
+import { AvatarBasicComponent } from "./demos/avatar-basic";
+import { AvatarListComponent } from "./demos/avatar-list";
 import { BannerBasicComponent } from "./demos/banner-basic";
 import { BannerDismissComponent } from "./demos/banner-dismiss";
 import { BannerErrorComponent } from "./demos/banner-error";
@@ -110,6 +113,7 @@ import { CgridMillionComponent } from "./demos/cgrid-million";
 import { CgridControlledComponent } from "./demos/cgrid-controlled";
 import { CgridEventsComponent } from "./demos/cgrid-events";
 import { ChatBasicComponent } from "./demos/chat-basic";
+import { ChatNewComponent } from "./demos/chat-new";
 import { ChatHistoryComponent } from "./demos/chat-history";
 import { ChatRichComponent } from "./demos/chat-rich";
 import { ChipBasicComponent } from "./demos/chip-basic";
@@ -216,6 +220,7 @@ import { ProgressControlledComponent } from "./demos/progress-controlled";
 import { PromptBasicComponent } from "./demos/prompt-basic";
 import { PromptStopComponent } from "./demos/prompt-stop";
 import { PromptUploadComponent } from "./demos/prompt-upload";
+import { PromptPartsComponent } from "./demos/prompt-parts";
 import { ReorderBasicComponent } from "./demos/reorder-basic";
 import { ReorderOrderComponent } from "./demos/reorder-order";
 import { ReorderSaveComponent } from "./demos/reorder-save";
@@ -272,7 +277,7 @@ import { VlistRetryComponent } from "./demos/vlist-retry";
 
 @Component({
   selector: "app-root",
-  imports: [ColorDemo0Component, TypeDemo0Component, TypeDemo1Component, TypeDemo2Component, SpacingDemo0Component, SpacingDemo1Component, SpacingDemo2Component, SpacingDemo3Component, LayoutDemo0Component, LayoutDemo1Component, SpaceDemo0Component, SpaceDemo1Component, ElevationDemo0Component, MotionDemo0Component, IconsDemo0Component, ButtonDemo0Component, ButtonDemo1Component, ButtonDemo2Component, ButtonDemo3Component, IconbuttonDemo0Component, LinkDemo0Component, CompoundDemo0Component, ChipDemo0Component, FieldDemo0Component, InputDemo0Component, InputDemo1Component, InputDemo2Component, SpecialDemo0Component, CountDemo0Component, TaginputDemo0Component, NumberDemo0Component, PromptPartsComponent, PromptDemo0Component, SelectDemo0Component, PickerDemo0Component, ChoiceDemo0Component, SegmentedDemo0Component, SliderDemo0Component, OtpDemo0Component, TooltipDemo0Component, PopoverDemo0Component, PopconfirmDemo0Component, CtxmenuDemo0Component, DialogDemo0Component, DrawerDemo0Component, CmdkDemo0Component, ToastDemo0Component, NotifyDemo0Component, BannerDemo0Component, EmptyDemo0Component, LoadingDemo0Component, ProgressDemo0Component, NumflowDemo0Component, TableDemo0Component, TableDemo1Component, TableDemo2Component, TableDemo3Component, TableDemo4Component, TableDemo5Component, TableDemo6Component, TableDemo7Component, TableDemo8Component, GridDemo0Component, CgridDemo0Component, ListDemo0Component, CardDemo0Component, TagsDemo0Component, CollapseDemo0Component, ScrollareaDemo0Component, ScrollareaDemo1Component, ScrollareaDemo2Component, ScrollareaDemo3Component, ScrollareaDemo4Component, ScrollareaDemo5Component, ScrollareaDemo6Component, VlistDemo0Component, ChatNewComponent, ChatDemo0Component, MdDemo0Component, FlowDemo0Component, ImageDemo0Component, MediaDemo0Component, UploadDemo0Component, SidebarDemo0Component, TabsDemo0Component, ReorderDemo0Component, AddremoveDemo0Component, OptimisticDemo0Component, AddremoveBasicComponent, AddremoveUndoComponent, AddremoveRowsComponent, BannerBasicComponent, BannerDismissComponent, BannerErrorComponent, ButtonBasicComponent, ButtonVariantsComponent, ButtonSizesComponent, ButtonIconsComponent, ButtonStatesComponent, ButtonBusyComponent, ButtonActionsComponent, ButtonMobileComponent, CardBasicComponent, CardGridComponent, CardSelectComponent, CgridBasicComponent, CgridMillionComponent, CgridControlledComponent, CgridEventsComponent, ChatBasicComponent, ChatHistoryComponent, ChatRichComponent, ChipBasicComponent, ChipControlledComponent, ChipRemovableComponent, ChoiceBasicComponent, ChoiceRadioComponent, ChoiceControlledComponent, CmdkBasicComponent, CmdkEmptyComponent, CmdkHotkeyComponent, CollapseBasicComponent, CollapseSingleComponent, CollapseControlledComponent, CompoundBasicComponent, CompoundSplitComponent, CompoundCopyComponent, CountBasicComponent, CountControlledComponent, CountLongtextComponent, CtxmenuBasicComponent, CtxmenuContextComponent, CtxmenuSubmenuComponent, DialogBasicComponent, DialogDangerComponent, DialogGuardComponent, DialogEventsComponent, DialogControlledComponent, DrawerBasicComponent, DrawerControlledComponent, DrawerFooterComponent, EmptyBasicComponent, EmptySearchComponent, EmptyErrorComponent, FieldBasicComponent, FieldErrorComponent, FieldOptionalComponent, FlowBasicComponent, FlowBranchComponent, FlowTidyComponent, FlowstressManyComponent, GridBasicComponent, GridSortComponent, GridSelectComponent, GridRenderComponent, GridRemoteComponent, GridEditComponent, GridStatesComponent, IconbuttonBasicComponent, IconbuttonVariantsComponent, IconbuttonStatesComponent, IconbuttonControlledComponent, ImageBasicComponent, ImageControlledComponent, ImageFailedComponent, InputBasicComponent, InputSizesComponent, InputControlledComponent, LinkBasicComponent, LinkTextbtnComponent, LinkArrowComponent, ListBasicComponent, ListKvComponent, ListSwitchComponent, LoadingBasicComponent, LoadingListComponent, LoadingQuietComponent, MdBasicComponent, MdStreamComponent, MdHeightsComponent, MediaBasicComponent, MediaAudioComponent, MediaMethodsComponent, NotifyBasicComponent, NotifyActionsComponent, NotifyFailComponent, NumberBasicComponent, NumberControlledComponent, NumberRangeComponent, NumflowBasicComponent, NumflowCounterComponent, NumflowStylesComponent, OptimisticBasicComponent, OptimisticSwitchComponent, OptimisticPendingComponent, OtpBasicComponent, OtpCompleteComponent, OtpLengthComponent, PickerBasicComponent, PickerRangeComponent, PickerTimeComponent, PickerDatetimeComponent, PickerRegionComponent, PickerEventsComponent, PopconfirmBasicComponent, PopconfirmUndoComponent, PopconfirmSubmitComponent, PopoverBasicComponent, PopoverControlledComponent, PopoverAlignComponent, ProgressBasicComponent, ProgressRingComponent, ProgressControlledComponent, PromptBasicComponent, PromptStopComponent, PromptUploadComponent, ReorderBasicComponent, ReorderOrderComponent, ReorderSaveComponent, ScrollareaBasicComponent, ScrollareaBarComponent, ScrollareaNoneComponent, SegmentedBasicComponent, SegmentedControlledComponent, SegmentedSizesComponent, SelectBasicComponent, SelectPlaceholderComponent, SelectOptionsComponent, SelectFieldComponent, SelectEventsComponent, SelectControlledComponent, SelectMenuComponent, SidebarBasicComponent, SidebarControlledComponent, SidebarFxComponent, SliderBasicComponent, SliderControlledComponent, SliderMaxComponent, SpecialBasicComponent, SpecialPasswordComponent, SpecialEmailComponent, TableBasicComponent, TableControlledComponent, TableStatesComponent, TableTreeComponent, TableMergeComponent, TableDragComponent, TabsBasicComponent, TabsControlledComponent, TabsPagerComponent, TabsStepsComponent, TaginputBasicComponent, TaginputControlledComponent, TaginputHintComponent, TagsBasicComponent, TagsBadgeComponent, TagsAvatarComponent, ToastBasicComponent, ToastActionComponent, ToastProgressComponent, TooltipBasicComponent, TooltipKbdComponent, TooltipTruncateComponent, UploadBasicComponent, UploadRealComponent, UploadSingleComponent, VlistBasicComponent, VlistTotalComponent, VlistRetryComponent],
+  imports: [ColorDemo0Component, TypeDemo0Component, TypeDemo1Component, TypeDemo2Component, SpacingDemo0Component, SpacingDemo1Component, SpacingDemo2Component, SpacingDemo3Component, LayoutDemo0Component, LayoutDemo1Component, SpaceDemo0Component, SpaceDemo1Component, ElevationDemo0Component, MotionDemo0Component, IconsDemo0Component, ButtonDemo0Component, ButtonDemo1Component, ButtonDemo2Component, ButtonDemo3Component, IconbuttonDemo0Component, LinkDemo0Component, CompoundDemo0Component, ChipDemo0Component, FieldDemo0Component, InputDemo0Component, InputDemo1Component, InputDemo2Component, SpecialDemo0Component, CountDemo0Component, TaginputDemo0Component, NumberDemo0Component, PromptDemo0Component, SelectDemo0Component, PickerDemo0Component, ChoiceDemo0Component, SegmentedDemo0Component, SliderDemo0Component, OtpDemo0Component, TooltipDemo0Component, PopoverDemo0Component, PopconfirmDemo0Component, CtxmenuDemo0Component, DialogDemo0Component, DrawerDemo0Component, CmdkDemo0Component, ToastDemo0Component, NotifyDemo0Component, BannerDemo0Component, EmptyDemo0Component, LoadingDemo0Component, ProgressDemo0Component, NumflowDemo0Component, TableDemo0Component, TableDemo1Component, TableDemo2Component, TableDemo3Component, TableDemo4Component, TableDemo5Component, TableDemo6Component, TableDemo7Component, GridDemo0Component, CgridDemo0Component, ListDemo0Component, CardDemo0Component, TagsDemo0Component, AvatarDemo0Component, AvatarDemo1Component, AvatarDemo2Component, CollapseDemo0Component, ScrollareaDemo0Component, ScrollareaDemo1Component, ScrollareaDemo2Component, ScrollareaDemo3Component, ScrollareaDemo4Component, ScrollareaDemo5Component, ScrollareaDemo6Component, VlistDemo0Component, ChatDemo0Component, ChatDemo1Component, MdDemo0Component, FlowDemo0Component, ImageDemo0Component, MediaDemo0Component, UploadDemo0Component, SidebarDemo0Component, TabsDemo0Component, ReorderDemo0Component, AddremoveDemo0Component, OptimisticDemo0Component, AddremoveBasicComponent, AddremoveUndoComponent, AddremoveRowsComponent, AvatarBasicComponent, AvatarListComponent, BannerBasicComponent, BannerDismissComponent, BannerErrorComponent, ButtonBasicComponent, ButtonVariantsComponent, ButtonSizesComponent, ButtonIconsComponent, ButtonStatesComponent, ButtonBusyComponent, ButtonActionsComponent, ButtonMobileComponent, CardBasicComponent, CardGridComponent, CardSelectComponent, CgridBasicComponent, CgridMillionComponent, CgridControlledComponent, CgridEventsComponent, ChatBasicComponent, ChatNewComponent, ChatHistoryComponent, ChatRichComponent, ChipBasicComponent, ChipControlledComponent, ChipRemovableComponent, ChoiceBasicComponent, ChoiceRadioComponent, ChoiceControlledComponent, CmdkBasicComponent, CmdkEmptyComponent, CmdkHotkeyComponent, CollapseBasicComponent, CollapseSingleComponent, CollapseControlledComponent, CompoundBasicComponent, CompoundSplitComponent, CompoundCopyComponent, CountBasicComponent, CountControlledComponent, CountLongtextComponent, CtxmenuBasicComponent, CtxmenuContextComponent, CtxmenuSubmenuComponent, DialogBasicComponent, DialogDangerComponent, DialogGuardComponent, DialogEventsComponent, DialogControlledComponent, DrawerBasicComponent, DrawerControlledComponent, DrawerFooterComponent, EmptyBasicComponent, EmptySearchComponent, EmptyErrorComponent, FieldBasicComponent, FieldErrorComponent, FieldOptionalComponent, FlowBasicComponent, FlowBranchComponent, FlowTidyComponent, FlowstressManyComponent, GridBasicComponent, GridSortComponent, GridSelectComponent, GridRenderComponent, GridRemoteComponent, GridEditComponent, GridStatesComponent, IconbuttonBasicComponent, IconbuttonVariantsComponent, IconbuttonStatesComponent, IconbuttonControlledComponent, ImageBasicComponent, ImageControlledComponent, ImageFailedComponent, InputBasicComponent, InputSizesComponent, InputControlledComponent, LinkBasicComponent, LinkTextbtnComponent, LinkArrowComponent, ListBasicComponent, ListKvComponent, ListSwitchComponent, LoadingBasicComponent, LoadingListComponent, LoadingQuietComponent, MdBasicComponent, MdStreamComponent, MdHeightsComponent, MediaBasicComponent, MediaAudioComponent, MediaMethodsComponent, NotifyBasicComponent, NotifyActionsComponent, NotifyFailComponent, NumberBasicComponent, NumberControlledComponent, NumberRangeComponent, NumflowBasicComponent, NumflowCounterComponent, NumflowStylesComponent, OptimisticBasicComponent, OptimisticSwitchComponent, OptimisticPendingComponent, OtpBasicComponent, OtpCompleteComponent, OtpLengthComponent, PickerBasicComponent, PickerRangeComponent, PickerTimeComponent, PickerDatetimeComponent, PickerRegionComponent, PickerEventsComponent, PopconfirmBasicComponent, PopconfirmUndoComponent, PopconfirmSubmitComponent, PopoverBasicComponent, PopoverControlledComponent, PopoverAlignComponent, ProgressBasicComponent, ProgressRingComponent, ProgressControlledComponent, PromptBasicComponent, PromptStopComponent, PromptUploadComponent, PromptPartsComponent, ReorderBasicComponent, ReorderOrderComponent, ReorderSaveComponent, ScrollareaBasicComponent, ScrollareaBarComponent, ScrollareaNoneComponent, SegmentedBasicComponent, SegmentedControlledComponent, SegmentedSizesComponent, SelectBasicComponent, SelectPlaceholderComponent, SelectOptionsComponent, SelectFieldComponent, SelectEventsComponent, SelectControlledComponent, SelectMenuComponent, SidebarBasicComponent, SidebarControlledComponent, SidebarFxComponent, SliderBasicComponent, SliderControlledComponent, SliderMaxComponent, SpecialBasicComponent, SpecialPasswordComponent, SpecialEmailComponent, TableBasicComponent, TableControlledComponent, TableStatesComponent, TableTreeComponent, TableMergeComponent, TableDragComponent, TabsBasicComponent, TabsControlledComponent, TabsPagerComponent, TabsStepsComponent, TaginputBasicComponent, TaginputControlledComponent, TaginputHintComponent, TagsBasicComponent, TagsBadgeComponent, TagsAvatarComponent, ToastBasicComponent, ToastActionComponent, ToastProgressComponent, TooltipBasicComponent, TooltipKbdComponent, TooltipTruncateComponent, UploadBasicComponent, UploadRealComponent, UploadSingleComponent, VlistBasicComponent, VlistTotalComponent, VlistRetryComponent],
   encapsulation: ViewEncapsulation.None,
   styleUrl: "../../shared/gallery.css",
   template: `
@@ -367,7 +372,6 @@ import { VlistRetryComponent } from "./demos/vlist-retry";
   </section>
   <section id="prompt">
     <h2>提示词输入框</h2>
-    <div class="demo" data-demo="prompt-parts"><demo-prompt-parts /></div>
     <div class="demo" data-demo="prompt-0"><demo-prompt-0 /></div>
   </section>
   <section id="select">
@@ -460,7 +464,6 @@ import { VlistRetryComponent } from "./demos/vlist-retry";
     <div class="demo" data-demo="table-5"><demo-table-5 /></div>
     <div class="demo" data-demo="table-6"><demo-table-6 /></div>
     <div class="demo" data-demo="table-7"><demo-table-7 /></div>
-    <div class="demo" data-demo="table-8"><demo-table-8 /></div>
   </section>
   <section id="grid">
     <h2>数据表格</h2>
@@ -482,6 +485,12 @@ import { VlistRetryComponent } from "./demos/vlist-retry";
     <h2>标签、徽标与头像</h2>
     <div class="demo" data-demo="tags-0"><demo-tags-0 /></div>
   </section>
+  <section id="avatar">
+    <h2>头像</h2>
+    <div class="demo" data-demo="avatar-0"><demo-avatar-0 /></div>
+    <div class="demo" data-demo="avatar-1"><demo-avatar-1 /></div>
+    <div class="demo" data-demo="avatar-2"><demo-avatar-2 /></div>
+  </section>
   <section id="collapse">
     <h2>折叠面板</h2>
     <div class="demo" data-demo="collapse-0"><demo-collapse-0 /></div>
@@ -502,8 +511,8 @@ import { VlistRetryComponent } from "./demos/vlist-retry";
   </section>
   <section id="chat">
     <h2>聊天与 AI 对话</h2>
-    <div class="demo" data-demo="chat-new"><demo-chat-new /></div>
     <div class="demo" data-demo="chat-0"><demo-chat-0 /></div>
+    <div class="demo" data-demo="chat-1"><demo-chat-1 /></div>
   </section>
   <section id="md">
     <h2>Markdown 文档</h2>
@@ -551,6 +560,11 @@ import { VlistRetryComponent } from "./demos/vlist-retry";
     <div class="demo" data-demo="addremove-undo"><demo-addremove-undo /></div>
     <div class="demo" data-demo="addremove-rows"><demo-addremove-rows /></div>
   </section>
+  <section id="avatar">
+    <h2>头像</h2>
+    <div class="demo" data-demo="avatar-basic"><demo-avatar-basic /></div>
+    <div class="demo" data-demo="avatar-list"><demo-avatar-list /></div>
+  </section>
   <section id="banner">
     <h2>横幅与条目上的失败</h2>
     <div class="demo" data-demo="banner-basic"><demo-banner-basic /></div>
@@ -584,6 +598,7 @@ import { VlistRetryComponent } from "./demos/vlist-retry";
   <section id="chat">
     <h2>聊天与 AI 对话</h2>
     <div class="demo" data-demo="chat-basic"><demo-chat-basic /></div>
+    <div class="demo" data-demo="chat-new"><demo-chat-new /></div>
     <div class="demo" data-demo="chat-history"><demo-chat-history /></div>
     <div class="demo" data-demo="chat-rich"><demo-chat-rich /></div>
   </section>
@@ -786,6 +801,7 @@ import { VlistRetryComponent } from "./demos/vlist-retry";
     <div class="demo" data-demo="prompt-basic"><demo-prompt-basic /></div>
     <div class="demo" data-demo="prompt-stop"><demo-prompt-stop /></div>
     <div class="demo" data-demo="prompt-upload"><demo-prompt-upload /></div>
+    <div class="demo" data-demo="prompt-parts"><demo-prompt-parts /></div>
   </section>
   <section id="reorder">
     <h2>拖拽重排</h2>

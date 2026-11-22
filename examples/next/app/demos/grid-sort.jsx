@@ -25,7 +25,7 @@ export default function SortedShots() {
   const [sort, setSort] = useState({ key: "shots", dir: -1 });
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} sort={sort} onSortChange={setSort} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} sort={sort} onSortChange={setSort} height={320} label="镜头清单" />
       <span className="sn-help">{describe(sort)}</span>
     </div>
   );

@@ -25,7 +25,7 @@ export default function SortedShots() {
   const [note, setNote] = createSignal(describe(first));
   onSettled(() => {
     // defaultSort：一开始的排序；点表头时 onSortChange 给出 { key, dir } 或 null
-    const grid = createDataGrid(host, { columns, data: rows, height: 280, label: "镜头清单", defaultSort: first, onSortChange: (s) => setNote(describe(s)) });
+    const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头清单", defaultSort: first, onSortChange: (s) => setNote(describe(s)) });
     return () => grid.destroy();
   });
   return (

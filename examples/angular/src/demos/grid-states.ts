@@ -39,7 +39,7 @@ export class GridStatesComponent {
     afterNextRender(() => {
       // loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText
       const grid = (this.grid = createDataGrid(this.host().nativeElement, {
-        columns, data: [], height: 280, label: "镜头清单", emptyText: "还没有镜头，先从剧本里拆一批",
+        columns, data: [], height: 320, label: "镜头清单", emptyText: "还没有镜头，先从剧本里拆一批",
         onRetry: () => this.show("有数据"),
       }));
       destroyRef.onDestroy(() => grid.destroy());

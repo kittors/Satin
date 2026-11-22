@@ -26,7 +26,7 @@
   const note = document.getElementById("shots-edit-note");
   // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
   createDataGrid(document.getElementById("shots-edit"), {
-    columns, data: rows, height: 280, label: "镜头清单",
+    columns, data: rows, height: 320, label: "镜头清单",
     onCellEdit: (e) => (note.textContent = savedText(e)),
   });
 </script>

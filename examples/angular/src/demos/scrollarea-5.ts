@@ -1,6 +1,9 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
 import { setup, enhance } from "satin-ui";
+import { defineElements } from "satin-ui/elements";
 import { createScrollArea } from "satin-ui/components";
+
+defineElements();
 
 @Component({
   selector: "demo-scrollarea-5",
@@ -25,7 +28,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>雨夜车站</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:210">林</span>林夏</span>
+                  <span class="sn-name"><sn-avatar seed="u3" name="林夏" size="20" decorative=""></sn-avatar>林夏</span>
                 </td>
                 <td>
                   <span class="sn-tag sn-ok"><i></i>已完成</span>
@@ -37,7 +40,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>海边的第七天</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:30">周</span>周屿</span>
+                  <span class="sn-name"><sn-avatar seed="u4" name="周屿" size="20" decorative=""></sn-avatar>周屿</span>
                 </td>
                 <td>
                   <span class="sn-tag sn-run"><i></i>生成中</span>
@@ -49,7 +52,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>城南旧事（第二版）</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:150">陈</span>陈默</span>
+                  <span class="sn-name"><sn-avatar seed="u8" name="陈默" size="20" decorative=""></sn-avatar>陈默</span>
                 </td>
                 <td>
                   <span class="sn-tag "><i></i>草稿</span>
@@ -61,7 +64,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>长夜</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:280">许</span>许诺</span>
+                  <span class="sn-name"><sn-avatar seed="u11" name="许诺" size="20" decorative=""></sn-avatar>许诺</span>
                 </td>
                 <td>
                   <span class="sn-tag sn-bad"><i></i>失败</span>
@@ -73,7 +76,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>山那边的学校</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:340">李</span>李然</span>
+                  <span class="sn-name"><sn-avatar seed="u5" name="李然" size="20" decorative=""></sn-avatar>李然</span>
                 </td>
                 <td>
                   <span class="sn-tag sn-warn"><i></i>待审核</span>
@@ -85,7 +88,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>最后一班地铁</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:210">林</span>林夏</span>
+                  <span class="sn-name"><sn-avatar seed="u3" name="林夏" size="20" decorative=""></sn-avatar>林夏</span>
                 </td>
                 <td>
                   <span class="sn-tag sn-ok"><i></i>已完成</span>
@@ -97,7 +100,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>雾港</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:30">周</span>周屿</span>
+                  <span class="sn-name"><sn-avatar seed="u4" name="周屿" size="20" decorative=""></sn-avatar>周屿</span>
                 </td>
                 <td>
                   <span class="sn-tag sn-ok"><i></i>已完成</span>
@@ -109,7 +112,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>春天的信</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:150">陈</span>陈默</span>
+                  <span class="sn-name"><sn-avatar seed="u8" name="陈默" size="20" decorative=""></sn-avatar>陈默</span>
                 </td>
                 <td>
                   <span class="sn-tag "><i></i>草稿</span>
@@ -121,7 +124,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>旧城区</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:280">许</span>许诺</span>
+                  <span class="sn-name"><sn-avatar seed="u11" name="许诺" size="20" decorative=""></sn-avatar>许诺</span>
                 </td>
                 <td>
                   <span class="sn-tag sn-run"><i></i>生成中</span>
@@ -133,7 +136,7 @@ import { createScrollArea } from "satin-ui/components";
                   <b>天台</b>
                 </td>
                 <td>
-                  <span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:340">李</span>李然</span>
+                  <span class="sn-name"><sn-avatar seed="u5" name="李然" size="20" decorative=""></sn-avatar>李然</span>
                 </td>
                 <td>
                   <span class="sn-tag sn-ok"><i></i>已完成</span>

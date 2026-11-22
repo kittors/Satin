@@ -9,9 +9,9 @@
 <script type="importmap">{"imports":{"satin-ui":"/node_modules/satin-ui/src/index.js","satin-ui/components":"/node_modules/satin-ui/src/components.js","satin-ui/elements":"/node_modules/satin-ui/elements/index.js","satin-ui/theme":"/node_modules/satin-ui/src/theme.js","satin-ui/chat":"/node_modules/satin-ui/src/chat.js","satin-ui/markdown":"/node_modules/satin-ui/src/markdown.js"}}</script>
 </head>
 <body>
-<!-- 对话框自己带顶栏（名字、状态、条数）：外面不要再放一个写着同样名字的页头 -->
-<div class="sn-page sn-wide" style="height: 100dvh; padding-block: var(--sn-sp-16)">
-  <div id="chat" style="height: 100%"></div>
+<!-- 对话框自己带顶栏（会话列表、标题、新对话）：外面不要再放一个写着同样名字的页头 -->
+<div class="sn-page sn-wide sn-screen">
+  <div id="chat"></div>
 </div>
 <script type="module">
   import { setup } from "satin-ui";
@@ -20,6 +20,9 @@
   // 空容器：createChat 按选项填好标记（顶栏、消息区、底部输入框都接好了）。respond 返回异步迭代的文字片段（流式），或者直接返回一整段
   createChat(document.getElementById("chat"), {
     title: "分镜助手", placeholder: "和分镜助手一起改这一集",
+    menu: true, newChat: true, // 顶栏左边"会话列表"、右边"新对话"（单色细线图标）
+    onMenu() { /* 自己接：打开会话列表（手机上用 openDrawer 从左边拉出来） */ },
+    onNewChat() { /* 自己接：开一段新对话（换一个会话、清空消息） */ },
     respond: (() => {
       // 演示用的回答（真用时换成你的接口）：按说的事给不同的回答；说的和分镜无关就问要改哪一场；同一句不连着说两遍，不用客套开头
       const TOPICS = [

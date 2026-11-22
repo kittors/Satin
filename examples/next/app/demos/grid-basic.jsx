@@ -20,5 +20,5 @@ const rows = [
 ];
 
 export default function ShotList() {
-  return <DataGrid columns={columns} data={rows} height={280} label="镜头清单" />;
+  return <DataGrid columns={columns} data={rows} height={320} label="镜头清单" />;
 }

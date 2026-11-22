@@ -692,6 +692,14 @@ import { setup, enhance } from "satin-ui";
           <span>maximize-2</span>
         </div>
         <div class="icon-cell">
+          <svg class="sn-ic" data-icon="menu" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 12h16"></path>
+            <path d="M4 18h16"></path>
+            <path d="M4 6h16"></path>
+          </svg>
+          <span>menu</span>
+        </div>
+        <div class="icon-cell">
           <svg class="sn-ic" data-icon="message-circle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path>
           </svg>
@@ -1002,6 +1010,13 @@ import { setup, enhance } from "satin-ui";
             <path d="m9 11 3 3L22 4"></path>
           </svg>
           <span>square-check-big</span>
+        </div>
+        <div class="icon-cell">
+          <svg class="sn-ic" data-icon="square-pen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"></path>
+          </svg>
+          <span>square-pen</span>
         </div>
         <div class="icon-cell">
           <svg class="sn-ic" data-icon="star" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

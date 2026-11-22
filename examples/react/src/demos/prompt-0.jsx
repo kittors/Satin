@@ -46,9 +46,6 @@ export default function PromptDemo0() {
             </svg>
           </span>
           <button className="sn-cm-send" aria-label="生成" data-tip="生成" data-kbd="⌘↵">
-            <svg className="sn-orbit" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="19"></circle>
-            </svg>
             <span className="sn-swap">
               <span className="sn-a" data-i="arrow-up"></span>
               <span className="sn-b">

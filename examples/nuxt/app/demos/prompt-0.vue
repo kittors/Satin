@@ -50,9 +50,6 @@ onBeforeUnmount(() => off());
           </svg>
         </span>
         <button class="sn-cm-send" aria-label="生成" data-tip="生成" data-kbd="⌘↵">
-          <svg class="sn-orbit" viewBox="0 0 40 40">
-            <circle cx="20" cy="20" r="19"></circle>
-          </svg>
           <span class="sn-swap">
             <span class="sn-a" data-i="arrow-up"></span>
             <span class="sn-b">

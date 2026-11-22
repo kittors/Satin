@@ -14,7 +14,7 @@ export default function Auth() {
         <div className="sn-panel">
           <h1>登录分镜工作台</h1>
           <p>用工作邮箱登录，团队成员会自动加入你的空间。</p>
-          <form className="sn-form" style={{ marginTop: "var(--sn-sp-24)" }} noValidate>
+          <form className="sn-form" noValidate>
             <div className="sn-field" data-f="mail">
               <label className="sn-lbl" htmlFor="l-mail">邮箱</label>
               <input className="sn-input sn-lg" id="l-mail" type="email" autoComplete="email" placeholder="name@company.com" />
@@ -44,10 +44,10 @@ export default function Auth() {
     <path d="M2.5 6.2l2.4 2.4 4.6-5"></path>
   </svg>
   <span className="sn-bar"></span>
-</span>30 天内保持登录</label>
+</span>30&nbsp;天内保持登录</label>
             <button className="sn-btn sn-primary sn-lg" type="submit" style={{ width: "100%" }}>登录</button>
           </form>
-          <p className="sn-t-callout sn-c-tertiary" style={{ marginTop: "var(--sn-sp-20)", textAlign: "center" }}>还没有账号？<a className="sn-link" href="/signup">注册</a></p>
+          <p className="sn-auth-ft">还没有账号？<a className="sn-link" href="/signup">注册</a></p>
         </div>
       </main>
     </div>

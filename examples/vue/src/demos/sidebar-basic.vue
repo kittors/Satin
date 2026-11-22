@@ -14,7 +14,7 @@ const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
 <template>
   <!-- 默认插槽是右边的主区；收起按钮、⌘\ 收起和展开，主区宽度跟着连续变化 -->
   <div style="height: 320px">
-    <Sidebar title="Satin" :items="NAV" :footer="FOOTER" model-value="all">
+    <Sidebar style="height: 100%" title="Satin" :items="NAV" :footer="FOOTER" model-value="all">
       <div class="sn-app-head"><b>全部项目</b></div>
     </Sidebar>
   </div>

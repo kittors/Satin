@@ -11,6 +11,9 @@ export default function Chat() {
         // 空容器：createChat 按选项填好标记（顶栏、消息区、底部输入框都接好了）。respond 返回异步迭代的文字片段（流式），或者直接返回一整段
         createChat(root.querySelector("#chat"), {
           title: "分镜助手", placeholder: "和分镜助手一起改这一集",
+          menu: true, newChat: true, // 顶栏左边"会话列表"、右边"新对话"（单色细线图标）
+          onMenu() { /* 自己接：打开会话列表（手机上用 openDrawer 从左边拉出来） */ },
+          onNewChat() { /* 自己接：开一段新对话（换一个会话、清空消息） */ },
           async *respond(text) {
             const res = await fetch("/api/chat", { method: "POST", body: JSON.stringify({ text }) });
             const reader = res.body.getReader(), dec = new TextDecoder();
@@ -24,8 +27,8 @@ export default function Chat() {
   onCleanup(() => off());
   return (
     <div ref={(el) => (root = el)}>
-      <div class="sn-page sn-wide" style="height: 100dvh; padding-block: var(--sn-sp-16)">
-        <div id="chat" style="height: 100%"></div>
+      <div class="sn-page sn-wide sn-screen">
+        <div id="chat"></div>
       </div>
     </div>
   );

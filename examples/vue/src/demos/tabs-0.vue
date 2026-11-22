@@ -37,9 +37,9 @@ onBeforeUnmount(() => off());
         <span class="sn-ink"></span>
       </div>
       <div class="sn-tab-panels">
-        <div class="sn-tab-panel">项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。</div>
+        <div class="sn-tab-panel">项目概览：48&nbsp;个镜头，12&nbsp;分 36&nbsp;秒，最后更新 3&nbsp;分钟前。</div>
         <div class="sn-tab-panel" hidden>镜头列表：按集分组，可以拖动排序。</div>
-        <div class="sn-tab-panel" hidden>配音：林夏、周屿两个角色，6 段。</div>
+        <div class="sn-tab-panel" hidden>配音：林夏、周屿两个角色，6&nbsp;段。</div>
         <div class="sn-tab-panel" hidden>导出记录：最近一次导出是第三集，1080p。</div>
         <div class="sn-tab-panel" hidden>项目设置：画面比例、默认景别、协作者。</div>
       </div>

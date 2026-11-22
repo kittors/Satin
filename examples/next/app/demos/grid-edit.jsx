@@ -26,7 +26,7 @@ export default function EditShots() {
   const save = (e) => setNote(savedText(e));
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} onCellEdit={save} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} onCellEdit={save} height={320} label="镜头清单" />
       <span className="sn-help">{note}</span>
     </div>
   );

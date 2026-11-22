@@ -1,5 +1,8 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
 import { setup, enhance } from "satin-ui";
+import { defineElements } from "satin-ui/elements";
+
+defineElements();
 
 @Component({
   selector: "demo-list-0",
@@ -59,7 +62,7 @@ import { setup, enhance } from "satin-ui";
           <dt>项目</dt>
           <dd>雨夜车站</dd>
           <dt>负责人</dt>
-          <dd><span class="sn-av sn-xs" style="--sn-h:210">林</span>林夏</dd>
+          <dd><sn-avatar seed="u3" name="林夏" size="20" decorative=""></sn-avatar>林夏</dd>
           <dt>状态</dt>
           <dd>
             <span class="sn-tag sn-ok"><i></i>已完成</span>

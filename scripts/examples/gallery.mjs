@@ -20,7 +20,7 @@ const write = (f, s) => { fs.mkdirSync(path.dirname(f), { recursive: true }); if
 const idx = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
 const nav = idx.slice(idx.indexOf('class="doc-nav"'), idx.indexOf("</nav>", idx.indexOf('class="doc-nav"')));
 const SECTIONS = []; let group = "";
-for (const m of nav.matchAll(/<p>([^<]+)<\/p>|<a href="#([a-z0-9-]+)">([^<]+)<\/a>/g)) { if (m[1]) group = m[1].trim(); else SECTIONS.push({ id: m[2], name: m[3].trim(), group }); }
+for (const m of nav.matchAll(/<p>([^<]+)<\/p>|<a href="#([a-z0-9-]+)"[^>]*>([^<]+)<\/a>/g)) { if (m[1]) group = m[1].trim(); else SECTIONS.push({ id: m[2], name: m[3].trim(), group }); }
 const FOUNDATION = "基础";
 // 基础几块（颜色、排版……）是展示令牌的，没有组件页：标记直接取设计稿里生成好的；动效曲线那块带一段点击动画的接线
 const FOUNDATION_JS = { motion: 'for (const c of document.querySelectorAll(".curve")) c.addEventListener("click", () => {\n  const lane = c.querySelector(".lane"), ball = c.querySelector(".ball"), on = !c.classList.contains("sn-on");\n  c.classList.toggle("sn-on", on);\n  ball.style.transition = `transform 800ms ${c.dataset.ease}`;\n  ball.style.transform = on ? `translateX(${lane.clientWidth - 12}px)` : "none";\n});' };
@@ -131,7 +131,7 @@ for (const fw of FRAMEWORKS) {
   for (const env of fw.envs || []) for (const d of demos) {
     const files = d.files[fw.id]; if (!files) continue;
     const sub = env.id === "next" ? "app/demos" : "app/demos", dir = path.join(ROOT, env.dir, sub);
-    for (const f of files) { write(path.join(dir, f.name), env.id === "next" && f === files[0] && /\b(useState|useEffect|useRef|useLayoutEffect|useReducer)\b/.test(f.code) && !/^["']use client["']/.test(f.code.trim()) ? `"use client";\n${f.code}` : f.code); nFiles++; }
+    for (const f of files) { write(path.join(dir, f.name), env.id === "next" && f === files[0] && !/^["']use client["']/.test(f.code.trim()) ? `"use client";\n${f.code}` : f.code); nFiles++; }
   }
 }
 // 配方：每个框架 fw.recipe(id) 一份（+ 样式）；CLI 的 satin add 也读这一份（packages/satin-cli/templates/recipes/<id>/<写法>/）

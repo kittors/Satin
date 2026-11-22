@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
+import { Avatar as SnAvatar } from "satin-ui/vue";
 import "./tags-0.css";
 
 const root = ref(null);
@@ -37,19 +38,19 @@ onBeforeUnmount(() => off());
       </div>
       <span class="sn-cap">头像</span>
       <div class="row" style="gap:14px">
-        <span class="sn-av sn-xs" style="--sn-h:210">林</span>
-        <span class="sn-av sn-sm" style="--sn-h:30">周</span>
-        <span class="sn-av" style="--sn-h:150">陈</span>
-        <span class="sn-av sn-lg" style="--sn-h:280">许</span>
-        <span class="sn-av sn-lg sn-online" style="--sn-h:340">李<i></i></span>
+        <SnAvatar seed="u3" name="林夏" :size='20' />
+        <SnAvatar seed="u4" name="周屿" :size='24' />
+        <SnAvatar seed="u8" name="陈默" />
+        <SnAvatar seed="u11" name="许诺" :size='40' />
+        <SnAvatar seed="u5" name="李然" :size='40' online />
       </div>
       <span class="sn-cap">头像组</span>
       <div class="row">
         <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默、许诺 等 7 人">
-          <span class="sn-av sn-sm" style="--sn-h:210">林</span>
-          <span class="sn-av sn-sm" style="--sn-h:30">周</span>
-          <span class="sn-av sn-sm" style="--sn-h:150">陈</span>
-          <span class="sn-av sn-sm" style="--sn-h:280">许</span>
+          <SnAvatar seed="u3" name="林夏" :size='24' decorative />
+          <SnAvatar seed="u4" name="周屿" :size='24' decorative />
+          <SnAvatar seed="u8" name="陈默" :size='24' decorative />
+          <SnAvatar seed="u11" name="许诺" :size='24' decorative />
           <span class="sn-av sn-sm sn-more">+3</span>
         </div>
         <span class="sn-note">悬停时散开，能看清每一个</span>

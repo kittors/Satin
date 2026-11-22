@@ -14,7 +14,7 @@
         createChat(root.querySelector("#chatBox"), {
           respond: async function* (question, state) {
             for (const piece of ["先看这一场的节奏：", "雨夜、车站、", "等最后一班车的人。"]) { if (state.stopped) return; yield { think: piece }; await wait(120); }
-            const text = `好的。"${question}"可以拆成三个镜头：远景站台、林夏的中景、车灯穿过雨幕的特写。`;
+            const text = "这一场可以拆成三个镜头：远景站台、林夏的中景、车灯穿过雨幕的特写。";
             for (const ch of text) { if (state.stopped) return; yield ch; await wait(16); } // 换成你的模型流式输出
           },
         });
@@ -29,7 +29,9 @@
     <div class="sn-chat-hd">
       <div class="sn-tx">
         <b>分镜助手</b>
-        <span class="sn-sub"><span data-chat-status="">在线</span>·<span data-chat-count="" class="sn-num"></span></span>
+        <span class="sn-sub">
+          <span data-chat-status=""></span>
+        </span>
       </div>
     </div>
     <div class="sn-chat-body">
@@ -71,9 +73,6 @@
             </svg>
           </span>
           <button class="sn-cm-send" aria-label="发送" data-tip="发送" data-kbd="⌘↵">
-            <svg class="sn-orbit" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="19"></circle>
-            </svg>
             <span class="sn-swap">
               <span class="sn-a" data-i="arrow-up"></span>
               <span class="sn-b">

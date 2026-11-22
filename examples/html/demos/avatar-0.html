@@ -1,0 +1,22 @@
+<sn-enhance id="demo-avatar-0">
+  <div class="row" style="gap:14px">
+    <sn-avatar seed="u4" name="周屿" size="16"></sn-avatar>
+    <sn-avatar seed="u4" name="周屿" size="20"></sn-avatar>
+    <sn-avatar seed="u4" name="周屿" size="24"></sn-avatar>
+    <sn-avatar seed="u4" name="周屿"></sn-avatar>
+    <sn-avatar seed="u4" name="周屿" size="40"></sn-avatar>
+    <sn-avatar seed="u4" name="周屿" size="64"></sn-avatar>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+</script>
+
+<style>
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .row + .row { margin-top: 16px; }
+  .sn-nf-card .row { display: flex; flex-wrap: wrap; gap: 6px; }
+</style>

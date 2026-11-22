@@ -25,4 +25,4 @@
   ];
 </script>
 
-<DataGrid {columns} data={rows} height={280} label="镜头预算" />
+<DataGrid {columns} data={rows} height={320} label="镜头预算" />

@@ -1,16 +1,17 @@
-import { Component } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 
 @Component({
   selector: "demo-tags-avatar",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-avatar>
   template: `
     <div class="sn-row">
-      <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-      <span class="sn-av" style="--sn-h: 150">陈</span>
-      <span class="sn-av sn-lg sn-online" style="--sn-h: 340">李<i></i></span>
+      <sn-avatar seed="u4" name="周屿" size="24"></sn-avatar>
+      <sn-avatar seed="u8" name="陈默"></sn-avatar>
+      <sn-avatar seed="u5" name="李然" size="40" status="online"></sn-avatar>
       <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人">
-        <span class="sn-av sn-sm" style="--sn-h: 210">林</span>
-        <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-        <span class="sn-av sn-sm" style="--sn-h: 150">陈</span>
+        <sn-avatar seed="u3" name="林夏" size="24" decorative></sn-avatar>
+        <sn-avatar seed="u4" name="周屿" size="24" decorative></sn-avatar>
+        <sn-avatar seed="u8" name="陈默" size="24" decorative></sn-avatar>
       </div>
     </div>
   `,

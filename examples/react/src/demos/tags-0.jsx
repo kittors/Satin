@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
+import { Avatar } from "satin-ui/react";
 import "./tags-0.css";
 
 export default function TagsDemo0() {
@@ -33,19 +34,19 @@ export default function TagsDemo0() {
         </div>
         <span className="sn-cap">头像</span>
         <div className="row" style={{ gap: "14px" }}>
-          <span className="sn-av sn-xs" style={{ "--sn-h": "210" }}>林</span>
-          <span className="sn-av sn-sm" style={{ "--sn-h": "30" }}>周</span>
-          <span className="sn-av" style={{ "--sn-h": "150" }}>陈</span>
-          <span className="sn-av sn-lg" style={{ "--sn-h": "280" }}>许</span>
-          <span className="sn-av sn-lg sn-online" style={{ "--sn-h": "340" }}>李<i></i></span>
+          <Avatar seed="u3" name="林夏" size={20} />
+          <Avatar seed="u4" name="周屿" size={24} />
+          <Avatar seed="u8" name="陈默" />
+          <Avatar seed="u11" name="许诺" size={40} />
+          <Avatar seed="u5" name="李然" size={40} online />
         </div>
         <span className="sn-cap">头像组</span>
         <div className="row">
           <div className="sn-av-group" tabIndex="0" data-tip="林夏、周屿、陈默、许诺 等 7 人">
-            <span className="sn-av sn-sm" style={{ "--sn-h": "210" }}>林</span>
-            <span className="sn-av sn-sm" style={{ "--sn-h": "30" }}>周</span>
-            <span className="sn-av sn-sm" style={{ "--sn-h": "150" }}>陈</span>
-            <span className="sn-av sn-sm" style={{ "--sn-h": "280" }}>许</span>
+            <Avatar seed="u3" name="林夏" size={24} decorative />
+            <Avatar seed="u4" name="周屿" size={24} decorative />
+            <Avatar seed="u8" name="陈默" size={24} decorative />
+            <Avatar seed="u11" name="许诺" size={24} decorative />
             <span className="sn-av sn-sm sn-more">+3</span>
           </div>
           <span className="sn-note">悬停时散开，能看清每一个</span>

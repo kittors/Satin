@@ -61,7 +61,7 @@ export default function SidebarDemo0() {
         <main className="sn-app-main">
           <div className="sn-app-head">
             <b>全部项目</b>
-            <span className="sn-note">8 个</span>
+            <span className="sn-note">8&nbsp;个</span>
           </div>
           <div className="sn-app-grid" id="appGrid">
             <div className="sn-gc">

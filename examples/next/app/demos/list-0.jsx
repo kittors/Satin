@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
+import { Avatar } from "satin-ui/react";
 import "./list-0.css";
 
 export default function ListDemo0() {
@@ -61,7 +62,7 @@ export default function ListDemo0() {
           <dt>项目</dt>
           <dd>雨夜车站</dd>
           <dt>负责人</dt>
-          <dd><span className="sn-av sn-xs" style={{ "--sn-h": "210" }}>林</span>林夏</dd>
+          <dd><Avatar seed="u3" name="林夏" size={20} decorative />林夏</dd>
           <dt>状态</dt>
           <dd>
             <span className="sn-tag sn-ok"><i></i>已完成</span>

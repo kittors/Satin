@@ -18,5 +18,5 @@ const rows = [
 
 export default function ShotTags() {
   // render 返回 React 节点：每个格子画进一个小的 React 根（拿不到外面的 Context，要用就把值从 row 里传进去）
-  return <DataGrid columns={columns} data={rows} height={280} label="镜头预算" />;
+  return <DataGrid columns={columns} data={rows} height={320} label="镜头预算" />;
 }

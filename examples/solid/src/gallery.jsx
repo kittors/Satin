@@ -36,7 +36,6 @@ import SpecialDemo0 from "./demos/special-0.jsx";
 import CountDemo0 from "./demos/count-0.jsx";
 import TaginputDemo0 from "./demos/taginput-0.jsx";
 import NumberDemo0 from "./demos/number-0.jsx";
-import PromptParts from "./demos/prompt-parts.jsx";
 import PromptDemo0 from "./demos/prompt-0.jsx";
 import SelectDemo0 from "./demos/select-0.jsx";
 import PickerDemo0 from "./demos/picker-0.jsx";
@@ -66,12 +65,14 @@ import TableDemo4 from "./demos/table-4.jsx";
 import TableDemo5 from "./demos/table-5.jsx";
 import TableDemo6 from "./demos/table-6.jsx";
 import TableDemo7 from "./demos/table-7.jsx";
-import TableDemo8 from "./demos/table-8.jsx";
 import GridDemo0 from "./demos/grid-0.jsx";
 import CgridDemo0 from "./demos/cgrid-0.jsx";
 import ListDemo0 from "./demos/list-0.jsx";
 import CardDemo0 from "./demos/card-0.jsx";
 import TagsDemo0 from "./demos/tags-0.jsx";
+import AvatarDemo0 from "./demos/avatar-0.jsx";
+import AvatarDemo1 from "./demos/avatar-1.jsx";
+import AvatarDemo2 from "./demos/avatar-2.jsx";
 import CollapseDemo0 from "./demos/collapse-0.jsx";
 import ScrollareaDemo0 from "./demos/scrollarea-0.jsx";
 import ScrollareaDemo1 from "./demos/scrollarea-1.jsx";
@@ -81,8 +82,8 @@ import ScrollareaDemo4 from "./demos/scrollarea-4.jsx";
 import ScrollareaDemo5 from "./demos/scrollarea-5.jsx";
 import ScrollareaDemo6 from "./demos/scrollarea-6.jsx";
 import VlistDemo0 from "./demos/vlist-0.jsx";
-import ChatNew from "./demos/chat-new.jsx";
 import ChatDemo0 from "./demos/chat-0.jsx";
+import ChatDemo1 from "./demos/chat-1.jsx";
 import MdDemo0 from "./demos/md-0.jsx";
 import FlowDemo0 from "./demos/flow-0.jsx";
 import ImageDemo0 from "./demos/image-0.jsx";
@@ -96,6 +97,8 @@ import OptimisticDemo0 from "./demos/optimistic-0.jsx";
 import AddremoveBasic from "./demos/addremove-basic.jsx";
 import AddremoveUndo from "./demos/addremove-undo.jsx";
 import AddremoveRows from "./demos/addremove-rows.jsx";
+import AvatarBasic from "./demos/avatar-basic.jsx";
+import AvatarList from "./demos/avatar-list.jsx";
 import BannerBasic from "./demos/banner-basic.jsx";
 import BannerDismiss from "./demos/banner-dismiss.jsx";
 import BannerError from "./demos/banner-error.jsx";
@@ -115,6 +118,7 @@ import CgridMillion from "./demos/cgrid-million.jsx";
 import CgridControlled from "./demos/cgrid-controlled.jsx";
 import CgridEvents from "./demos/cgrid-events.jsx";
 import ChatBasic from "./demos/chat-basic.jsx";
+import ChatNew from "./demos/chat-new.jsx";
 import ChatHistory from "./demos/chat-history.jsx";
 import ChatRich from "./demos/chat-rich.jsx";
 import ChipBasic from "./demos/chip-basic.jsx";
@@ -221,6 +225,7 @@ import ProgressControlled from "./demos/progress-controlled.jsx";
 import PromptBasic from "./demos/prompt-basic.jsx";
 import PromptStop from "./demos/prompt-stop.jsx";
 import PromptUpload from "./demos/prompt-upload.jsx";
+import PromptParts from "./demos/prompt-parts.jsx";
 import ReorderBasic from "./demos/reorder-basic.jsx";
 import ReorderOrder from "./demos/reorder-order.jsx";
 import ReorderSave from "./demos/reorder-save.jsx";
@@ -368,7 +373,6 @@ function Gallery() {
       </section>
       <section id="prompt">
         <h2>提示词输入框</h2>
-        <div class="demo" data-demo="prompt-parts"><Errored fallback={(err) => { console.error("演示 prompt-parts 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><PromptParts /></Errored></div>
         <div class="demo" data-demo="prompt-0"><Errored fallback={(err) => { console.error("演示 prompt-0 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><PromptDemo0 /></Errored></div>
       </section>
       <section id="select">
@@ -461,7 +465,6 @@ function Gallery() {
         <div class="demo" data-demo="table-5"><Errored fallback={(err) => { console.error("演示 table-5 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><TableDemo5 /></Errored></div>
         <div class="demo" data-demo="table-6"><Errored fallback={(err) => { console.error("演示 table-6 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><TableDemo6 /></Errored></div>
         <div class="demo" data-demo="table-7"><Errored fallback={(err) => { console.error("演示 table-7 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><TableDemo7 /></Errored></div>
-        <div class="demo" data-demo="table-8"><Errored fallback={(err) => { console.error("演示 table-8 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><TableDemo8 /></Errored></div>
       </section>
       <section id="grid">
         <h2>数据表格</h2>
@@ -483,6 +486,12 @@ function Gallery() {
         <h2>标签、徽标与头像</h2>
         <div class="demo" data-demo="tags-0"><Errored fallback={(err) => { console.error("演示 tags-0 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><TagsDemo0 /></Errored></div>
       </section>
+      <section id="avatar">
+        <h2>头像</h2>
+        <div class="demo" data-demo="avatar-0"><Errored fallback={(err) => { console.error("演示 avatar-0 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><AvatarDemo0 /></Errored></div>
+        <div class="demo" data-demo="avatar-1"><Errored fallback={(err) => { console.error("演示 avatar-1 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><AvatarDemo1 /></Errored></div>
+        <div class="demo" data-demo="avatar-2"><Errored fallback={(err) => { console.error("演示 avatar-2 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><AvatarDemo2 /></Errored></div>
+      </section>
       <section id="collapse">
         <h2>折叠面板</h2>
         <div class="demo" data-demo="collapse-0"><Errored fallback={(err) => { console.error("演示 collapse-0 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><CollapseDemo0 /></Errored></div>
@@ -503,8 +512,8 @@ function Gallery() {
       </section>
       <section id="chat">
         <h2>聊天与 AI 对话</h2>
-        <div class="demo" data-demo="chat-new"><Errored fallback={(err) => { console.error("演示 chat-new 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><ChatNew /></Errored></div>
         <div class="demo" data-demo="chat-0"><Errored fallback={(err) => { console.error("演示 chat-0 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><ChatDemo0 /></Errored></div>
+        <div class="demo" data-demo="chat-1"><Errored fallback={(err) => { console.error("演示 chat-1 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><ChatDemo1 /></Errored></div>
       </section>
       <section id="md">
         <h2>Markdown 文档</h2>
@@ -552,6 +561,11 @@ function Gallery() {
         <div class="demo" data-demo="addremove-undo"><Errored fallback={(err) => { console.error("演示 addremove-undo 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><AddremoveUndo /></Errored></div>
         <div class="demo" data-demo="addremove-rows"><Errored fallback={(err) => { console.error("演示 addremove-rows 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><AddremoveRows /></Errored></div>
       </section>
+      <section id="avatar">
+        <h2>头像</h2>
+        <div class="demo" data-demo="avatar-basic"><Errored fallback={(err) => { console.error("演示 avatar-basic 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><AvatarBasic /></Errored></div>
+        <div class="demo" data-demo="avatar-list"><Errored fallback={(err) => { console.error("演示 avatar-list 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><AvatarList /></Errored></div>
+      </section>
       <section id="banner">
         <h2>横幅与条目上的失败</h2>
         <div class="demo" data-demo="banner-basic"><Errored fallback={(err) => { console.error("演示 banner-basic 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><BannerBasic /></Errored></div>
@@ -585,6 +599,7 @@ function Gallery() {
       <section id="chat">
         <h2>聊天与 AI 对话</h2>
         <div class="demo" data-demo="chat-basic"><Errored fallback={(err) => { console.error("演示 chat-basic 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><ChatBasic /></Errored></div>
+        <div class="demo" data-demo="chat-new"><Errored fallback={(err) => { console.error("演示 chat-new 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><ChatNew /></Errored></div>
         <div class="demo" data-demo="chat-history"><Errored fallback={(err) => { console.error("演示 chat-history 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><ChatHistory /></Errored></div>
         <div class="demo" data-demo="chat-rich"><Errored fallback={(err) => { console.error("演示 chat-rich 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><ChatRich /></Errored></div>
       </section>
@@ -787,6 +802,7 @@ function Gallery() {
         <div class="demo" data-demo="prompt-basic"><Errored fallback={(err) => { console.error("演示 prompt-basic 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><PromptBasic /></Errored></div>
         <div class="demo" data-demo="prompt-stop"><Errored fallback={(err) => { console.error("演示 prompt-stop 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><PromptStop /></Errored></div>
         <div class="demo" data-demo="prompt-upload"><Errored fallback={(err) => { console.error("演示 prompt-upload 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><PromptUpload /></Errored></div>
+        <div class="demo" data-demo="prompt-parts"><Errored fallback={(err) => { console.error("演示 prompt-parts 出错：", err()); return <p class="demo-err">演示出错：{String(err()?.message ?? err())}</p>; }}><PromptParts /></Errored></div>
       </section>
       <section id="reorder">
         <h2>拖拽重排</h2>
