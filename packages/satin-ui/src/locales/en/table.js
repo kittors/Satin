@@ -10,5 +10,11 @@ export default {
   "table.rowHeight": "Height {p0}",
   "table.error": "Couldn't load",
   "table.errorHint": "Check your connection and try again.",
-  "table.retry": "Retry"
+  "table.retry": "Retry",
+  "table.total": "{p0} items",
+  "table.selected": "{p0} selected",
+  "table.perPage": "{p0} / page",
+  "table.pageSize": "Rows per page",
+  "table.prev": "Previous page",
+  "table.next": "Next page"
 };

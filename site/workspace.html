@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>分镜工作台 · Satin UI</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%231d1d1f'/%3E%3Cpath d='M7 8h10v8H7z' fill='none' stroke='%23fff' stroke-width='1.8'/%3E%3C/svg%3E">
+<script src="../packages/satin-ui/src/theme-boot.js"></script>
+<link rel="stylesheet" href="../packages/satin-ui/css/page.css">
+<script type="importmap">{
+  "imports": {
+    "satin-ui": "../packages/satin-ui/src/index.js",
+    "satin-ui/components": "../packages/satin-ui/src/components.js",
+    "satin-ui/elements": "../packages/satin-ui/elements/index.js",
+    "satin-ui/theme": "../packages/satin-ui/src/theme.js"
+  }
+}</script>
+<style>
+/* 工作台演示页极少量辅助排版（100% 只用 Satin 令牌，零写死色值、零渐变） */
+.ws-view { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.ws-view[hidden] { display: none; }
+.ws-tbl-host { flex: 1 1 0; min-height: 260px; display: flex; flex-direction: column; position: relative; }
+.ws-tbl-host > .sn-tbl-wrap { flex: 1 1 0; min-height: 0; --sn-rh: 56px; }
+.ws-tbl-host > .sn-tbl-wrap.sn-compact { --sn-rh: 40px; }
+.ws-tbl-host > .sn-tbl-wrap.sn-compact .ws-proj-txt span { display: none; }
+.ws-proj { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ws-proj-ic { width: 28px; height: 28px; flex: none; border-radius: var(--sn-r-sm); display: inline-flex; align-items: center; justify-content: center; background: var(--sn-fill-subtle); color: var(--sn-label2); }
+.ws-proj-ic .sn-ic { width: 15px; height: 15px; }
+.ws-proj-txt { display: flex; flex-direction: column; justify-content: center; gap: 1px; min-width: 0; }
+.ws-proj-txt b { font-weight: 500; line-height: 19px; color: var(--sn-label); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-proj-txt span { font-size: calc(11.5px * var(--sn-font-scale, 1)); line-height: 16px; color: var(--sn-label3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-prog { display: flex; align-items: center; gap: 8px; min-width: 100px; }
+.ws-prog .sn-pbar { flex: 1; height: 4px; }
+.ws-prog .sn-num { min-width: 34px; text-align: right; font-size: calc(12px * var(--sn-font-scale, 1)); line-height: 1; color: var(--sn-label2); }
+.ws-brand-dot { width: 20px; height: 20px; flex: none; border-radius: var(--sn-r-sm); display: inline-flex; align-items: center; justify-content: center; background: var(--sn-accent); color: var(--sn-on-primary); }
+.ws-brand-dot .sn-ic { width: 12px; height: 12px; }
+.ws-asset-card { display: grid; gap: 10px; padding: var(--sn-sp-12); border-radius: var(--sn-r-lg); border: 1px solid var(--sn-line); background: var(--sn-raised); }
+.ws-asset-thumb { aspect-ratio: 16 / 9; border-radius: var(--sn-r-md); background: var(--sn-sunken); border: 1px solid var(--sn-line); display: grid; place-items: center; color: var(--sn-label3); }
+.ws-asset-thumb .sn-ic { width: 24px; height: 24px; }
+.ws-asset-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.ws-asset-meta b { font: 500 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-scroll-view { flex: 1 1 0; min-height: 0; overflow: auto; }
+.ws-theme-btn { width: 28px; height: 28px; border-radius: 50%; }
+.ws-mode-select { appearance: none; -webkit-appearance: none; height: 32px; padding: 0 28px 0 12px; border-radius: var(--sn-btn-r); border: 1px solid var(--sn-line-control); background: var(--sn-field); color: var(--sn-label2);
+  font: 400 calc(12.5px * var(--sn-font-scale, 1))/1 var(--sn-sans); cursor: pointer; transition: border-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; }
+@media (hover: hover) { .ws-mode-select:hover { border-color: var(--sn-line-control-hover); color: var(--sn-label); } }
+.ws-mode-select:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 1px; }
+.ws-acts-cell { display: inline-flex; align-items: center; justify-content: flex-end; gap: 2px; }
+</style>
+</head>
+<body>
+<div class="sn-app sn-workbench" id="ws-app" data-navfx="slide">
+  <!-- Layer 1：侧边栏（标配顶部收起/展开按钮与 ⌘\ 快捷键） -->
+  <aside class="sn-side">
+    <div class="sn-side-top">
+      <span class="ws-brand-dot sn-logo" data-i="clapperboard"></span>
+      <b>分镜工作台</b>
+      <button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" data-i="panel-left" aria-label="收起侧栏"></button>
+    </div>
+    <nav class="sn-side-nav" id="ws-side-nav" aria-label="工作台导航">
+      <span class="sn-hl-bar" aria-hidden="true"></span>
+      <a class="sn-on" href="#projects" data-tab="projects" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a>
+      <a href="#assets" data-tab="assets" data-i="image:before"><span class="sn-lbl">素材库</span></a>
+      <a href="#tasks" data-tab="tasks" data-i="clock:before"><span class="sn-lbl">渲染任务</span><span class="sn-badge sn-soft">3</span></a>
+      <a href="#team" data-tab="team" data-i="users:before"><span class="sn-lbl">团队成员</span></a>
+      <p>最近打开</p>
+      <a href="#station" data-tab="station" data-i="film:before"><span class="sn-lbl">雨夜车站 · 分镜</span></a>
+      <a href="#day7" data-tab="day7" data-i="file-text:before"><span class="sn-lbl">海边的第七天</span></a>
+    </nav>
+    <div class="sn-side-foot">
+      <a href="#settings" id="ws-open-settings" data-i="settings:before"><span class="sn-lbl">工作台设置</span></a>
+    </div>
+  </aside>
+
+  <!-- Layer 0 壳层 + 顶部 Chrome 弧形多页签 + Layer 2 圆角主工作板 -->
+  <div class="sn-app-shell">
+    <div id="ws-btabs"></div>
+    <main class="sn-work-body">
+      <!-- 视图 1：全部项目（一屏锁高，主角表格占满剩余视口高度，支持复选框、左右固定列、贴底分页与批量条） -->
+      <section class="sn-page sn-work ws-view" data-view="projects">
+        <header class="sn-page-hd">
+          <div>
+            <h1>全部项目</h1>
+            <p id="ws-proj-summary">共 42&nbsp;个项目，本周新增 6&nbsp;个</p>
+          </div>
+          <div class="sn-acts">
+            <button type="button" class="sn-btn sn-secondary" id="ws-export-btn" data-i="download:before">导出</button>
+            <button type="button" class="sn-btn sn-primary sn-tap" id="ws-new-btn" data-i="plus:before">新建项目</button>
+          </div>
+        </header>
+        <div class="sn-filters">
+          <span class="sn-ib sn-has-pre">
+            <span class="sn-pre" data-i="search"></span>
+            <input class="sn-input" id="ws-search" placeholder="搜索项目名、编号或负责人" aria-label="搜索项目">
+          </span>
+          <div id="ws-status-seg"></div>
+          <div class="sn-end sn-row sn-gap-8">
+            <select class="ws-mode-select" id="ws-mode-select" aria-label="切换演示数据量">
+              <option value="42 条多量" selected>演示：42 条多量</option>
+              <option value="5 条少量">演示：5 条少量（测占满高度）</option>
+              <option value="空态">演示：空数据</option>
+              <option value="加载中">演示：加载骨架</option>
+            </select>
+            <button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" id="ws-compact-btn" data-tip="切换紧凑行高" aria-label="切换紧凑行高" data-i="rows-3"></button>
+          </div>
+        </div>
+        <div class="ws-tbl-host">
+          <div id="ws-projects-table"></div>
+        </div>
+      </section>
+
+      <!-- 视图 2：雨夜车站 · 分镜表（多级树 + 网格合并 + 占满剩余高度） -->
+      <section class="sn-page sn-work ws-view" data-view="station" hidden>
+        <header class="sn-page-hd">
+          <div>
+            <h1>雨夜车站 · 分镜表</h1>
+            <p>3&nbsp;个场次，共 48&nbsp;个镜头 · 4K 宽屏</p>
+          </div>
+          <div class="sn-acts">
+            <button type="button" class="sn-btn sn-secondary" id="ws-expand-all" data-i="layers:before">全部展开</button>
+            <button type="button" class="sn-btn sn-primary" id="ws-add-shot" data-i="plus:before">新增镜头</button>
+          </div>
+        </header>
+        <div class="ws-tbl-host">
+          <div id="ws-station-table"></div>
+        </div>
+      </section>
+
+      <!-- 视图 3：素材库 -->
+      <section class="sn-page ws-view ws-scroll-view" data-view="assets" hidden>
+        <header class="sn-page-hd">
+          <div>
+            <h1>素材库</h1>
+            <p>共 248&nbsp;份分镜参考与音画资产</p>
+          </div>
+          <div class="sn-acts">
+            <button type="button" class="sn-btn sn-primary" id="ws-upload-asset" data-i="upload:before">上传素材</button>
+          </div>
+        </header>
+        <div class="sn-cols sn-gap-16" style="--sn-min: 220px" id="ws-assets-grid"></div>
+      </section>
+
+      <!-- 视图 4：渲染任务队列（占满剩余高度表格） -->
+      <section class="sn-page sn-work ws-view" data-view="tasks" hidden>
+        <header class="sn-page-hd">
+          <div>
+            <h1>渲染任务队列</h1>
+            <p>3&nbsp;个任务正在渲染，今日已完成 18&nbsp;项</p>
+          </div>
+          <div class="sn-acts">
+            <button type="button" class="sn-btn sn-secondary" id="ws-refresh-tasks" data-i="refresh-cw:before">刷新状态</button>
+          </div>
+        </header>
+        <div class="ws-tbl-host">
+          <div id="ws-tasks-table"></div>
+        </div>
+      </section>
+
+      <!-- 视图 5：团队成员（占满剩余高度表格） -->
+      <section class="sn-page sn-work ws-view" data-view="team" hidden>
+        <header class="sn-page-hd">
+          <div>
+            <h1>团队成员</h1>
+            <p>共 8&nbsp;位创作者与制片成员</p>
+          </div>
+          <div class="sn-acts">
+            <button type="button" class="sn-btn sn-primary" id="ws-invite-btn" data-i="user-plus:before">邀请成员</button>
+          </div>
+        </header>
+        <div class="ws-tbl-host">
+          <div id="ws-team-table"></div>
+        </div>
+      </section>
+
+      <!-- 视图 6：动态新建页签占位工作页 -->
+      <section class="sn-page ws-view ws-scroll-view" data-view="blank" hidden>
+        <header class="sn-page-hd">
+          <div>
+            <h1 id="ws-blank-title">未命名分镜</h1>
+            <p>新建空白工作页签，可直接导入剧本或从模板开始</p>
+          </div>
+          <div class="sn-acts">
+            <button type="button" class="sn-btn sn-primary" id="ws-blank-create" data-i="plus:before">转为正式项目</button>
+          </div>
+        </header>
+        <div class="sn-panel">
+          <div class="sn-empty-state">
+            <span class="sn-art" data-i="file-text"></span>
+            <h4>空白分镜草稿</h4>
+            <p>点击顶部 + 号可继续打开更多并行标签，悬停或中键点击可快速关闭。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 手机端底部标签栏 -->
+  <nav class="sn-tabbar" aria-label="主导航">
+    <a class="sn-nav-item sn-on" href="#projects" data-tab="projects" aria-current="page" data-i="layout-grid:before">项目</a>
+    <a class="sn-nav-item" href="#assets" data-tab="assets" data-i="image:before">素材</a>
+    <a class="sn-nav-item" href="#tasks" data-tab="tasks" data-i="clock:before">任务<span class="sn-badge sn-soft">3</span></a>
+    <a class="sn-nav-item" href="#team" data-tab="team" data-i="users:before">团队</a>
+  </nav>
+</div>
+
+<!-- 新建项目弹窗 -->
+<dialog class="sn-dlg" id="ws-new-dlg" aria-labelledby="ws-new-dlg-t">
+  <div class="sn-hd">
+    <h3 id="ws-new-dlg-t">新建分镜项目</h3>
+    <button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-x aria-label="关闭" data-i="x"></button>
+  </div>
+  <form class="sn-form" id="ws-new-form" novalidate>
+    <div class="sn-bd">
+      <div class="sn-field" data-f="name">
+        <label class="sn-lbl" for="f-proj-name">项目名称</label>
+        <input class="sn-input" id="f-proj-name" placeholder="例如：末班电车 · 序章" required>
+        <div class="sn-err"><span></span></div>
+      </div>
+      <div class="sn-form-row">
+        <div class="sn-field" data-f="owner">
+          <label class="sn-lbl" for="f-proj-owner">负责人</label>
+          <input class="sn-input" id="f-proj-owner" value="林夏">
+          <div class="sn-err"><span></span></div>
+        </div>
+        <div class="sn-field" data-f="res">
+          <label class="sn-lbl" for="f-proj-res">画幅规格</label>
+          <input class="sn-input" id="f-proj-res" value="4K 宽屏">
+          <div class="sn-err"><span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sn-ft">
+      <button type="button" class="sn-btn sn-ghost" data-cancel>取消</button>
+      <button type="submit" class="sn-btn sn-primary">创建项目</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="./workspace.js"></script>
+</body>
+</html>

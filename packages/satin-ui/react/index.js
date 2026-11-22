@@ -51,7 +51,7 @@ export const Composer = /* @__PURE__ */ wrap(S.createComposer, { events: ["send"
 // sort + onSort（defaultSort）；拖行、拖列、改宽、改行高、改格子、重试：onRowReorder、onColumnReorder、onColumnResize、onRowResize、onCellEdit、onRetry。
 // 受控的值"传进来的值换了（按值比）"才跟过去；ref 拿到实例（expand、expandAll、select、refresh、edit……）。
 // 列的 render 可以返回 React 节点：每个格子一个小的 React 根（拿不到外面的 Context，要用就把值放进行数据里）；服务端和第一帧先空着，挂上以后画
-const TABLE_EVENTS = ["sort", "select", "rowClick", "expandChange", "rowReorder", "columnReorder", "columnResize", "rowResize", "cellEdit", "retry", "layout"];
+const TABLE_EVENTS = ["sort", "select", "rowClick", "expandChange", "rowReorder", "columnReorder", "columnResize", "rowResize", "cellEdit", "pageChange", "retry", "layout"];
 const TableInstance = /* @__PURE__ */ wrap(S.createTable, { valueKey: "selected", events: TABLE_EVENTS, displayName: "TableInstance" });
 // 格子 → React 根记在这里（不挂在格子元素上：StrictMode 里表格销毁再挂时会清掉元素上的 _xxx）；模拟卸载后马上又挂上时不卸，
 // 真卸载了才在微任务里统一卸；整表重画换下来的格子，在微任务里卸掉它们的根

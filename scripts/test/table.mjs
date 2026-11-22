@@ -29,7 +29,7 @@ Object.assign(globalThis, {
 });
 for (const k of ["addEventListener", "removeEventListener"]) globalThis[k] ??= window[k]?.bind(window) ?? noop;
 const imp = (p) => import(pathToFileURL(path.join(ROOT, "packages/satin-ui/src", p)).href);
-const { createTable, tableHTML } = await imp("components.js");
+const { createTable, tableHTML, createBrowserTabs } = await imp("components.js");
 
 let fail = 0, n = 0; const ok = (c, msg, extra = "") => { n++; if (!c) { fail++; console.log("  ✗ " + msg + (extra ? "：" + extra : "")); } else console.log("  ✓ " + msg); };
 const fire = (el, type, init = {}) => { const e = new window.Event(type, { bubbles: true, cancelable: true }); Object.assign(e, { button: 0, detail: 1, ...init }); el.dispatchEvent(e); return e; };
@@ -195,6 +195,55 @@ console.log("改格子、render、出错重试、换数据");
   tb.update({ error: false }); ok(host.querySelectorAll("tbody tr[data-id]").length === 2 && !host.querySelector("tr.sn-tbl-err"), "出错清掉：行回来");
   tb.update({ compact: true, plain: true }); ok(host.querySelector(".sn-tbl-wrap").classList.contains("sn-compact") && host.querySelector('tr[data-id="a"]') !== null, "外观：切类名");
   tb.destroy(); ok(!host.firstElementChild, "销毁：渲染进去的标记清掉");
+}
+
+console.log("占满高度、左右固定列、贴底分页、Chrome 弧形页标签");
+{
+  const host = document.getElementById("host"); host.replaceChildren();
+  const rows = Array.from({ length: 25 }, (_, i) => ({ id: i + 1, name: `项目 ${i + 1}`, owner: "林夏", shots: (i + 1) * 4 }));
+  const cols = [
+    { key: "name", title: "项目", fixed: "left", width: 180, sortable: true },
+    { key: "owner", title: "负责人", width: 120 },
+    { key: "shots", title: "镜头", align: "right", width: 100, sortable: true },
+    { key: "acts", type: "actions", fixed: "right", width: 84, html: () => `<button class="sn-btn sn-ghost sn-sm sn-ibtn">…</button>` },
+  ];
+  const pgEv = [];
+  const tb = createTable(host, { columns: cols, data: rows, selectable: true, fill: true, pagination: { pageSize: 10, pageSizes: [10, 20] }, onPageChange: (e) => pgEv.push(e) });
+  const wrap = host.querySelector(".sn-tbl-wrap");
+  const visCount = () => [...host.querySelectorAll("tbody tr[data-id]")].filter((tr) => !tr.hidden).length;
+  ok(wrap.classList.contains("sn-tbl-fill") && wrap.classList.contains("sn-has-pin") && wrap.classList.contains("sn-has-foot"), "fill + fixed + pagination 外框类名齐全");
+  ok(host.querySelector("thead th.sn-tbl-pick.sn-pin-l") && host.querySelector('thead th[data-c="name"].sn-pin-l.sn-pin-l-end') && host.querySelector("thead th.sn-acts.sn-pin-r.sn-pin-r-start"), "勾选列自动跟左固定，数据列左固定，操作列右固定");
+  ok(visCount() === 10 && host.querySelector("[data-tbl-total]")?.textContent === "共 25 条", "本地分页：第 1 页显示 10 条，左下角共 25 条");
+  click(host.querySelector('.sn-pager .sn-pg[data-p="3"]'));
+  ok(visCount() === 5 && pgEv.at(-1)?.page === 3 && pgEv.at(-1)?.pageSize === 10, "翻到第 3 页：显示最后 5 条并发 pageChange");
+  tb.update({ filter: (r) => r.shots <= 24 });
+  ok(visCount() === 6 && host.querySelector("[data-tbl-total]")?.textContent === "共 6 条", "筛选后条数减少：自动回合法页并更新总条数");
+  tb.destroy();
+
+  const bHost = document.getElementById("h2"); bHost.replaceChildren();
+  const btEv = { change: [], close: [], add: 0 };
+  const bt = createBrowserTabs(bHost, {
+    tabs: [
+      { id: "all", title: "全部项目", icon: "layout-grid", pinned: true },
+      { id: "s1", title: "雨夜车站", icon: "film" },
+      { id: "s2", title: "素材库", icon: "image" },
+    ],
+    active: "all",
+    onChange: (e) => btEv.change.push(e.id),
+    onClose: (e) => btEv.close.push(e.id),
+    onAdd: () => btEv.add++,
+  });
+  ok(bHost.querySelectorAll(".sn-btab").length === 3 && bHost.querySelector('.sn-btab[data-btab-id="all"]').classList.contains("sn-on"), "Chrome 弧形页标签初始激活正确");
+  ok(!bHost.querySelector('.sn-btab[data-btab-id="all"] [data-btab-close]') && bHost.querySelector('.sn-btab[data-btab-id="s1"] [data-btab-close]'), "pinned 固定页签不显示关闭按钮");
+  click(bHost.querySelector('.sn-btab[data-btab-id="s1"]'));
+  ok(bt.active === "s1" && btEv.change.at(-1) === "s1", "点击切换页签发 change");
+  click(bHost.querySelector('.sn-btab[data-btab-id="s1"] [data-btab-close]'));
+  ok(bt.tabs.length === 2 && bt.active === "s2" && btEv.close.at(-1) === "s1", "关闭当前页签自动切到邻近页签");
+  click(bHost.querySelector("[data-btab-add]"));
+  ok(btEv.add === 1, "点右侧 + 号发 add 事件");
+  bt.add({ id: "s3", title: "新分镜" });
+  ok(bt.tabs.length === 3 && bt.active === "s3", "add() 动态新增并激活页签");
+  bt.destroy();
 }
 console.log(fail ? `表格测试：${fail} / ${n} 项不通过` : `表格测试：${n} 项全部通过`);
 process.exitCode = fail ? 1 : 0;

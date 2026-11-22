@@ -127,7 +127,7 @@ Svelte、Solid、Preact、Angular：样式同上（入口里 `import "satin-ui/c
 
 | 页面 | 骨架 |
 |---|---|
-| 后台列表（项目、订单、用户） | 侧栏 `.sn-app` + 主区 `.sn-page`：页头（标题 + 一句说明 + 右侧主按钮）→ 工具条（搜索框 + 筛选芯片/分段 + 右侧次要按钮）→ 表格 `.sn-tbl-wrap` → 分页 `Pager` |
+| 后台列表工作台（项目、订单、用户） | 三层表面配色外壳 `.sn-app.sn-workbench` + 可收起展开侧栏（顶部必配 `[data-collapse]`）+ 顶部 Chrome 弧形多页签 `createBrowserTabs` + 圆角工作板 `.sn-work-body` + 一屏工作页 `.sn-page.sn-work`：页头 → 工具条 `.sn-filters` → **占满剩余高度的主角表格** `createTable(..., { fill: true, selectable: true, pagination: ... })`（标配复选框 + 左右固定列 + 贴底分页栏 + 勾选批量操作条） |
 | 设置页 | `.sn-page.sn-narrow`：页头 → 若干 `.sn-setting`（左：标题 + 说明，右：字段）→ 底部保存按钮；或设置列表 `.sn-set-list` |
 | 登录 / 注册 | `.sn-auth > .sn-panel`：标题 + 一句说明 → 字段 → 主按钮（撑满）→ 次要链接；不要插画、不要渐变背景 |
 | 仪表盘 | 页头 → 一排 3～4 个 `.sn-stat`（放在一个 `.sn-panel` 里，不是每个一张卡）→ 两栏 `.sn-with-aside`：主图表/表格 + 右侧最近动态列表 |
@@ -159,11 +159,12 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 标签输入 | `<TagInput tags>` | `<sn-tag-input>` | |
 | 日期 / 时间 | | `createPicker`，标记见 `picker.md` | |
 | 验证码 | `<Otp length={6}>` | `<sn-otp>` | |
-| 标签页 | `<Tabs tabs value>` | `<sn-tabs>` | |
-| 分页 | `<Pager total page onChange>` | `<sn-pager>` | |
+| 标签页 | `<Tabs tabs value>` | `<sn-tabs>` | 内容区内部下划线切换 |
+| Chrome 弧形工作台页签 | | `createBrowserTabs(el, { tabs, active, onChange, onClose, onAdd })` | 位于 `.sn-app-shell` 顶部、紧贴 `.sn-work-body`；激活页签平滑反向外弧与主工作板无缝同色融合；支持 `pinned` 固定不可关、关闭、中键关与 `+` 新建 |
+| 分页 | `<Pager total page onChange>` | `<sn-pager>` | 后台主表格推荐直接用 `createTable` 的 `pagination` 选项内置贴底分页 |
 | 步骤条 | `<Steps steps current>` | `stepsHTML({ steps, current })` | |
 | 折叠面板 | `<Collapse items open>` | `<sn-collapse>` | |
-| 表格 | `<Table columns rows selectable onSelect onSort>`（Vue `<SnTable v-model="选中的键">`） | `createTable(el, { columns, rows })`，或照抄下面的 `.sn-tbl` 标记 | 排序时行平滑移到新位置；数字列 `align: "right"`；斑马纹 `striped`、紧凑 `compact`、限高 `maxHeight` |
+| 表格 | `<Table columns data selectable fill pagination onSelect onSort>`（Vue `<SnTable v-model="选中的键">`） | `createTable(el, { columns, data, selectable: true, fill: true, pagination: true })` | **默认深度思考业务需求**：列表页标配勾选（表头三态全选+批量条）、宽表左固定主键列 `fixed: "left"` & 右固定操作列 `fixed: "right"`、贴底分页 `pagination`；底部无其他占位区块时开启 `fill: true` + `.sn-page.sn-work` 占满剩余视口高度（少行白卡延展到底不画假空行，多行表头吸顶内部滚） |
 | 十万行数据表格 | `<DataGrid columns data rowKey>`（`satin-ui/react/grid`、`satin-ui/vue/grid`、`satin-ui/svelte/DataGrid.svelte`） | `createDataGrid(el, { columns, data })`（`satin-ui/grid`）；服务端的数据给 `dataSource: { total, load }` | 只在行数真的很多（上千）或要编辑、拖列、树形时用；几十行的表用上面的 `Table`。列定义见 `components/grid.md` |
 | 百万行画布表格 | `<CanvasGrid columns dataSource>`（`satin-ui/react/canvas-grid`、`satin-ui/vue/canvas-grid`） | `createCanvasGrid(el, { columns, dataSource })`（`satin-ui/canvas-grid`） | 表体画在画布上：格子只能写文字（`format`），要放自己的标记用 DataGrid |
 | 状态标签 | | `<span class="sn-tag sn-ok"><i></i>已完成</span>` | `sn-run` 进行中、`sn-ok` 完成、`sn-warn` 待处理、`sn-bad` 失败、不加是草稿 |
@@ -181,7 +182,7 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 抽屉 | `<Drawer open onClose title footer>` | `openDrawer()` | 编辑一条记录 |
 | 菜单 / 右键菜单 | | `openMenu()`，标记见 `select.md`、`ctxmenu.md` | |
 | 命令面板 | | `createCommandPalette()` | |
-| 侧栏导航 | | `.sn-app > aside.sn-side + main.sn-app-main`：纯 HTML 的 `enhance()` 已经接好（窄于 720 自动收成图标栏）；框架里 `createSidebar(el, { collapseBelow: 720 })` | 选中项 `a.sn-on` |
+| 侧栏导航 | | `.sn-app.sn-workbench > aside.sn-side + .sn-app-shell`（或简版 `.sn-app > aside.sn-side + main.sn-app-main`）：纯 HTML 的 `enhance()` 自动接好收起展开与 `⌘\`；框架里 `createSidebar(el, { collapseBelow: 720 })` | **后台工作台必配顶部折叠按钮 `[data-collapse]`**（`220px ↔ 56px` 平滑切换，收起态图标居中+反色 Tooltip+待办圆点）；选中项 `a.sn-on` |
 | 提示词输入框 / 附件 | | `createComposer()` | |
 | 对话 | `wrapSatin(createChat, { events: [] })` | `satin-ui/chat` 的 `createChat(空容器, { title, respond })` | 卸载时 `destroy()` |
 | Markdown | `wrapSatin(createMarkdown, { events: [] })` | `satin-ui/markdown` 的 `createMarkdown(空容器, { source })` | 自带 XSS 过滤；换内容 `update({ source })` |
@@ -236,6 +237,7 @@ createTable(document.getElementById("projects"), {
 | 用途 | 令牌 |
 |---|---|
 | 页面底色 / 卡片、面板底色 / 浮层底色 / 凹下去的底 | `--sn-canvas` / `--sn-raised` / `--sn-overlay` / `--sn-sunken` |
+| 工作台三层表面：壳层与弧形页签槽 / 侧栏 / 圆角主工作板（及细边） | `--sn-shell` / `--sn-side-bg` / `--sn-workspace`（`--sn-workspace-line`） |
 | 悬停、按下、很淡的底 | `--sn-fill-hover` / `--sn-fill-active` / `--sn-fill-subtle` |
 | 文字：主 / 次 / 第三级 / 禁用 | `--sn-label` / `--sn-label2` / `--sn-label3` / `--sn-label-off` |
 | 线：分隔、卡片描边 / 输入框描边 | `--sn-line` / `--sn-line-control` |
@@ -280,6 +282,11 @@ createTable(document.getElementById("projects"), {
 - **网格不留孤儿**：指标桌面一行 4 个、手机 2 × 2；不要中等宽度下排成 3 + 1。按断点写死列数。
 - **手机上铺满屏幕**：窄于 640 时不要四周留白的圆角卡片；顶上一条导航栏，主按钮放 `.sn-bottom-bar` 贴底并留出 `env(safe-area-inset-bottom)`，整页高度用 `100dvh`。对话组件在手机上自己会铺满。
 - **容器不写死高度**：组件填满容器（对话 `.sn-chat` 是 `height: 100%`），高度由页面布局给：整页 `100dvh`，面板 `flex: 1`。写死 680px 放进矮一点的框就多出滚动条，放进手机又填不满。
+- **后台工作台产品级交付清单（站在真实业务视角自检）**：
+  1. **主角表格占满剩余高度**：当表格下方没有其他内容区块时，用 `.sn-page.sn-work` + `fill: true`，让数据少时表格白卡自然延展到底（不拉高行高、不画假空行、分页栏稳稳贴底），数据多时表头吸顶、表体内部滚。
+  2. **完整表格交互**：后台列表表默认考虑复选框（表头三态全选 + 勾选浮出批量操作条）、宽表固定列（主键列 `fixed: "left"` 自动带动勾选列左固定，操作列 `fixed: "right"` 离边浮现投影）、内置贴底分页（总条数 + 每页条数 + 页码）与排序/筛选/空态/加载骨架/出错重试。
+  3. **可收起展开侧栏**：后台侧栏 `.sn-side-top` 必须放 `[data-collapse]` 折叠按钮（配合 `⌘\` 快捷键与收起态 Tooltip），不要做死板无法收起的侧栏。
+  4. **三层表面层次 + 多页签工作台**：多文档/多任务工作台采用 `.sn-app.sn-workbench` 三层配色（`--sn-shell` 壳层 → `--sn-side-bg` 侧栏 → `--sn-workspace` 圆角工作板），并在工作板顶部搭配 `createBrowserTabs` Chrome 平滑弧形页签。
 - **不处处加粗、处处徽标**：正文 400，一屏只有标题和最要紧的那一个数是 600；徽标只给需要处理的状态。
 - 渐变色块当图片占位、emoji 当图标、卡片套卡片、一墙 KPI 大字卡、英文眉题：见上面硬规则 2、6、8、16。
 

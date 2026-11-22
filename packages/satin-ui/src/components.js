@@ -22,6 +22,7 @@ import { mountPlayer, mountAudio, playerHTML, audioHTML } from "./media.js";
 import { openPopover, popoverOf, openDialog, closeDialog, openDrawer, closeDrawer, mountCmdk, openMenu, closeMenu } from "./overlay.js";
 import { openLightbox, closeLightbox } from "./lightbox.js";
 import { tableHTML, mountTable, sortRows } from "./table.js";
+import { browserTabsHTML, mountBrowserTabs } from "./browser-tabs.js";
 import { presetAvatar } from "./avatar-presets.js";
 export { presetAvatar, avatarSvg, AVATAR_IDS } from "./avatar-presets.js";
 
@@ -362,7 +363,16 @@ export { bindCollapses } from "./data.js";
 export { bindInputs } from "./input.js";
 export { bindPickers } from "./picker.js";
 
-// ———— 表格（真数据）：列定义 + 数据 → 设计稿里的 .sn-tbl；排序（行移到位）、勾选、多级展开、合并、拖行拖列、改列宽行高、空 / 加载 / 出错 ————
+// ———— Chrome 浏览器式平滑弧形页标签（工作台顶栏） ————
+export const createBrowserTabs = /* @__PURE__ */ defineComponent({
+  name: "browsertabs",
+  defaults: { tabs: [], addable: true },
+  html: (o) => browserTabsHTML(o),
+  mount: (el, o, api) => mountBrowserTabs(el, o, api.emit),
+});
+export { browserTabsHTML, mountBrowserTabs };
+
+// ———— 表格（真数据）：列定义 + 数据 → 设计稿里的 .sn-tbl；排序（行移到位）、勾选、多级展开、合并、拖行拖列、改列宽行高、固定列、占满剩余高度、贴底分页、空 / 加载 / 出错 ————
 // 事件：sort、select、rowClick、expandChange、rowReorder、columnReorder、columnResize、rowResize、cellEdit、retry、layout（看得见的行定了）
 export const createTable = /* @__PURE__ */ defineComponent({
   name: "table",

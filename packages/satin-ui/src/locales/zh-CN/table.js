@@ -10,5 +10,11 @@ export default {
   "table.rowHeight": "行高 {p0}",
   "table.error": "加载失败",
   "table.errorHint": "检查网络以后再试一次。",
-  "table.retry": "重试"
+  "table.retry": "重试",
+  "table.total": "共 {p0} 条",
+  "table.selected": "已选 {p0} 项",
+  "table.perPage": "{p0} 条 / 页",
+  "table.pageSize": "每页条数",
+  "table.prev": "上一页",
+  "table.next": "下一页"
 };

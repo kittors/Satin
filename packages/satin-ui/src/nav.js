@@ -199,10 +199,17 @@ const seq = (p) => { const s = new Set([1, TOTAL, p - 1, p, p + 1].filter((x) =>
 function renderPager(animate) {
   const curEl = $(".sn-cur", pages), oldLeft = curEl ? curEl.getBoundingClientRect().left : null;
   pages.innerHTML = '<span class="sn-cur"></span>' + seq(page).map((x) => x === "…" ? '<span class="sn-pg sn-gap">…</span>' : `<button class="sn-pg${x === page ? " sn-on" : ""}" data-p="${x}" aria-current="${x === page ? "page" : "false"}">${x}</button>`).join("");
-  const on = $(".sn-pg.sn-on", pages), c = $(".sn-cur", pages); c.style.width = on.offsetWidth + "px"; c.style.translate = `${on.offsetLeft}px 0`;
+  const on = $(".sn-pg.sn-on", pages), c = $(".sn-cur", pages);
+  if (on && c && on.offsetWidth > 0) { c.style.width = on.offsetWidth + "px"; c.style.translate = `${on.offsetLeft}px 0`; }
   if (animate && oldLeft != null && !reduced()) { const dx = oldLeft - c.getBoundingClientRect().left; c.animate([{ transform: `translateX(${dx}px)` }, { transform: "none" }], { duration: 270, easing: IN_OUT }); }
 }
 renderPager(false);
+if (typeof ResizeObserver !== "undefined") {
+  new ResizeObserver(() => {
+    const on = $(".sn-pg.sn-on", pages), c = $(".sn-cur", pages);
+    if (on && c && on.offsetWidth > 0) { c.style.width = on.offsetWidth + "px"; c.style.translate = `${on.offsetLeft}px 0`; }
+  }).observe(pages);
+}
 pager.addEventListener("click", (e) => {
   const b = e.target.closest("[data-p],[data-pg]"); if (!b) return;
   const np = b.dataset.p ? Number(b.dataset.p) : Math.max(1, Math.min(TOTAL, page + (b.dataset.pg === "next" ? 1 : -1)));

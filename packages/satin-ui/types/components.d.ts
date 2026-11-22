@@ -50,6 +50,29 @@ export interface OtpOptions { length?: number; onComplete?(code: string): void }
 export const createOtp: SatinFactory<OtpOptions, { readonly value: string; clear(): void }>;
 export interface TabsOptions { tabs?: { label: string; badge?: string | number; content?: string; html?: string }[]; value?: number; onChange?(index: number): void }
 export const createTabs: SatinFactory<TabsOptions, { readonly value: number; select(index: number): void }>;
+/** Chrome 浏览器式平滑弧形页标签的一项 */
+export interface BrowserTabItem { id: string | number; title: string; icon?: string; dot?: "ok" | "warn" | "bad" | "need" | true; pinned?: boolean; closable?: boolean }
+export interface BrowserTabsOptions {
+  tabs?: BrowserTabItem[];
+  active?: string | number;
+  addable?: boolean;
+  addLabel?: string;
+  label?: string;
+  extraHTML?: string;
+  onChange?(e: { id: string; tab?: BrowserTabItem }): void;
+  onClose?(e: { id: string; tab: BrowserTabItem; active: string | null }): void;
+  onAdd?(e: { tabs: BrowserTabItem[] }): void;
+}
+export interface BrowserTabsApi {
+  readonly active: string | null;
+  readonly tabs: BrowserTabItem[];
+  activate(id: string | number): void;
+  add(tab: BrowserTabItem, activate?: boolean): void;
+  close(id: string | number): void;
+}
+export const createBrowserTabs: SatinFactory<BrowserTabsOptions, BrowserTabsApi>;
+export function browserTabsHTML(o?: BrowserTabsOptions): string;
+export function mountBrowserTabs(root: HTMLElement, o?: BrowserTabsOptions): BrowserTabsApi & { update(next?: Partial<BrowserTabsOptions>, prev?: BrowserTabsOptions): void; destroy(): void };
 export interface PagerOptions { total?: number; page?: number; count?: number; onChange?(page: number): void }
 /** 分页：update({ total }) 总页数可以变（筛选以后），当前页超出就停在最后一页；update({ page }) 改页码不触发 onChange */
 export const createPager: SatinFactory<PagerOptions, { readonly page: number; readonly total: number; go(page: number, silent?: boolean): void }>;
@@ -260,7 +283,7 @@ export interface TableColumn<R = any> {
   /** 第一次点按哪个方向排（时间列常用 "desc"：先看最新的） */ sortFirst?: "asc" | "desc";
   /** 自定义排序（升序时 a 在 b 前面返回负数） */ sort?(a: R, b: R): number;
   /** 拖表头右边缘改宽（双击按内容定宽）：左边这列宽多少，右边那列就窄多少 */ resizable?: boolean;
-  /** 开了 draggableColumns 时这一列不能拖 */ fixed?: boolean;
+  /** 开了 draggableColumns 时这一列不能拖；传 "left" / "right" 还可横向滚动固定到左 / 右边缘（带自动边缘投影） */ fixed?: boolean | "left" | "right";
   /** 树形时展开箭头放在这一列（默认第一列） */ primary?: boolean;
   /** 双击（或选中后回车）改这一格，改完发 onCellEdit */ editable?: boolean;
   /** 连续相同的值合成一格：true 按这一列的值比，或者给"算不算相同"的函数；只在网格线下合并 */ merge?: boolean | ((a: R, b: R) => boolean);
@@ -278,6 +301,17 @@ export interface TableExpandEvent { keys: string[]; key: string; expanded: boole
 export interface TableRowReorderEvent { key: string; parentKey: string | null; from: number; to: number; keys: string[] }
 /** 改完一格：表格已经把新值写进行里（row[key]），再发这个 */
 export interface TableCellEditEvent<R = any> { row: R; key: string; value: unknown; oldValue: unknown }
+/** 表格翻页或改每页条数事件 */
+export interface TablePageEvent { page: number; pageSize: number }
+/** 表格内置贴底分页配置（传 true 启用默认每页 10 条的本地分页） */
+export interface TablePagination {
+  page?: number;
+  pageSize?: number;
+  total?: number;
+  pageSizes?: number[] | false;
+  local?: boolean;
+  onChange?(e: TablePageEvent): void;
+}
 export interface TableOptions<R = any> {
   columns: TableColumn<R>[];
   /** 数据：一行一个对象；行里带 children 就是多级树 */ data?: R[];
@@ -298,7 +332,7 @@ export interface TableOptions<R = any> {
   /** 没有数据时那一行：字符串按文字放；函数返回 HTML（filtered：是筛选以后没有结果） */ empty?: string | ((ctx: { filtered: boolean }) => string);
   loading?: boolean; skeleton?: number;
   /** 出错：true 或说明文字；那一行带"重试"（发 onRetry） */ error?: boolean | string;
-  label?: string; striped?: boolean; compact?: boolean; plain?: boolean; lines?: "row" | "grid"; maxHeight?: number | string;
+  label?: string; striped?: boolean; compact?: boolean; plain?: boolean; fill?: boolean; lines?: "row" | "grid"; maxHeight?: number | string; pagination?: boolean | TablePagination;
   onSort?(sort: TableSort | null): void;
   onSelect?(keys: string[]): void;
   onRowClick?(row: R): void;
@@ -308,6 +342,7 @@ export interface TableOptions<R = any> {
   onColumnResize?(e: { key: string; width: number; widths: Record<string, number> }): void;
   onRowResize?(e: { key: string; height: number | null }): void;
   onCellEdit?(e: TableCellEditEvent<R>): void;
+  onPageChange?(e: TablePageEvent): void;
   onRetry?(): void;
   onLayout?(e: { rows: R[] }): void;
 }

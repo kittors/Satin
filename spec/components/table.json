@@ -506,6 +506,19 @@
       }
     },
     {
+      "name": "fill",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "占满工作台底部剩余视口高度（配合 `.sn-page.sn-work`）：数据少时白卡延展到底不拉伸行高、不画假空行；数据多时表头吸顶、表体内部滚、分页栏稳稳贴底。",
+      "names": {
+        "js": "fill",
+        "react": "fill",
+        "preact": "fill",
+        "vue": "fill"
+      }
+    },
+    {
       "name": "lines",
       "type": "\"row\" | \"grid\"",
       "default": "\"row\"",
@@ -529,6 +542,19 @@
         "react": "maxHeight",
         "preact": "maxHeight",
         "vue": "maxHeight（模板里写 max-height）"
+      }
+    },
+    {
+      "name": "pagination",
+      "type": "boolean | TablePagination",
+      "default": "false",
+      "required": false,
+      "desc": "内置贴底分页栏：传 `true` 默认每页 10 条本地分页；传对象可设 `page`、`pageSize`、`total`、`pageSizes`、`local` 与 `onChange`。",
+      "names": {
+        "js": "pagination",
+        "react": "pagination",
+        "preact": "pagination",
+        "vue": "pagination"
       }
     }
   ],
@@ -589,9 +615,9 @@
     },
     {
       "name": "fixed",
-      "type": "boolean",
+      "type": "boolean | \"left\" | \"right\"",
       "default": "false",
-      "desc": "开了 `draggableColumns` 时这一列不能拖（别的列照样能挪到它两边）。"
+      "desc": "开了 `draggableColumns` 时这一列不能拖；传 `\"left\"` / `\"right\"` 可横向滚动固定到左 / 右边缘（有左固定列时勾选列自动跟左固定，操作列自动跟右固定，离边时浮现柔和边缘投影）。"
     },
     {
       "name": "primary",
@@ -770,6 +796,21 @@
         "solid": "onCellEdit（选项）",
         "svelte": "onCellEdit（选项）",
         "html": "onCellEdit（选项），或 table.on(\"cellEdit\", fn)"
+      }
+    },
+    {
+      "name": "pageChange",
+      "payload": "TablePageEvent",
+      "when": "翻页或切换每页条数以后：`{ page, pageSize }`。",
+      "names": {
+        "js": "onPageChange",
+        "react": "onPageChange",
+        "preact": "onPageChange",
+        "vue": "@page-change",
+        "angular": "onPageChange（createTable 的选项）",
+        "solid": "onPageChange（选项）",
+        "svelte": "onPageChange（选项）",
+        "html": "onPageChange（选项），或 table.on(\"pageChange\", fn)"
       }
     },
     {
@@ -969,6 +1010,8 @@
     "TableExpandEvent",
     "TableRowReorderEvent",
     "TableCellEditEvent",
+    "TablePageEvent",
+    "TablePagination",
     "TableApi",
     "TableProps",
     "TableColumnReact"

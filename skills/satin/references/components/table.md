@@ -1460,8 +1460,10 @@ export default function ShotOrder() {
 | `striped` | `boolean` | false | 否 | 斑马纹。 | createXxx 选项：`striped`；React：`striped`；Preact：`striped`；Vue：`striped` |
 | `compact` | `boolean` | false | 否 | 紧凑：行高 36（切换时行高过渡，不重画）。 | createXxx 选项：`compact`；React：`compact`；Preact：`compact`；Vue：`compact` |
 | `plain` | `boolean` | false | 否 | 不要外框（放进卡片、面板里时）。 | createXxx 选项：`plain`；React：`plain`；Preact：`plain`；Vue：`plain` |
+| `fill` | `boolean` | false | 否 | 占满工作台底部剩余视口高度（配合 `.sn-page.sn-work`）：数据少时白卡延展到底不拉伸行高、不画假空行；数据多时表头吸顶、表体内部滚、分页栏稳稳贴底。 | createXxx 选项：`fill`；React：`fill`；Preact：`fill`；Vue：`fill` |
 | `lines` | `"row" \| "grid"` | "row" | 否 | 行线 / 网格线；合并单元格只在网格线下显示（只有行线时合并块看不出边界）。 | createXxx 选项：`lines`；React：`lines`；Preact：`lines`；Vue：`lines` |
 | `maxHeight` | `number \| string` | — | 否 | 限高：超出在表里滚（滚动条用组件库的），表头、合计行吸附。 | createXxx 选项：`maxHeight`；React：`maxHeight`；Preact：`maxHeight`；Vue：`maxHeight（模板里写 max-height）` |
+| `pagination` | `boolean \| TablePagination` | false | 否 | 内置贴底分页栏：传 `true` 默认每页 10 条本地分页；传对象可设 `page`、`pageSize`、`total`、`pageSizes`、`local` 与 `onChange`。 | createXxx 选项：`pagination`；React：`pagination`；Preact：`pagination`；Vue：`pagination` |
 
 ## 列定义（columns 的每一项）
 
@@ -1476,7 +1478,7 @@ export default function ShotOrder() {
 | `sortFirst` | `"asc" \| "desc"` | "asc" | 第一次点按哪个方向排（"更新时间"这类常用 `"desc"`：先看最新的）。 |
 | `sort` | `(a: R, b: R) => number` | 数字按大小、文字按中文顺序 | 自定义排序（升序时 a 在 b 前面返回负数）。 |
 | `resizable` | `boolean` | false | 拖表头右边缘改宽：挪的是两列之间的边线，左边这列宽多少、右边那列就窄多少（弹性列自己补），两边都不小于 `minWidth`；Esc 恢复，双击按内容定宽。最后一个数据列没有右边的列，不改宽。 |
-| `fixed` | `boolean` | false | 开了 `draggableColumns` 时这一列不能拖（别的列照样能挪到它两边）。 |
+| `fixed` | `boolean \| "left" \| "right"` | false | 开了 `draggableColumns` 时这一列不能拖；传 `"left"` / `"right"` 可横向滚动固定到左 / 右边缘（有左固定列时勾选列自动跟左固定，操作列自动跟右固定，离边时浮现柔和边缘投影）。 |
 | `primary` | `boolean` | 第一个数据列 | 树形时展开箭头、缩进、层级线放在这一列；勾选框读屏读的"选择 xxx"也用这一列的值。 |
 | `editable` | `boolean` | false | 双击（或 `cellSelect` 选中后回车）改这一格：白底输入框，回车保存、Esc 取消。表格先把新值写进行里（`row[key]`），格子只换变了的那一段字，再发 `cellEdit`。 |
 | `merge` | `boolean \| ((a: R, b: R) => boolean)` | — | 连续相同的值合成一格（跨级也合）：`true` 按这一列的值比，或者给"算不算相同"的函数。排序、展开、筛选、拖行时合并块先拆开过渡，到位再合上；只在网格线下合并。写了 `merge: false` 也算"可合并的列"（从合并过渡回不合并时内容滑回自己那一行），开关就改这一项。 |
@@ -1498,6 +1500,7 @@ export default function ShotOrder() {
 | `columnResize` | `{ key: string; width: number; widths: Record<string, number> }` | 拖完列的右边缘（或双击按内容定宽）：拖的那一列现在多宽，`widths` 是所有固定宽度列的宽度（右边那列跟着变了），存下来下次当 `width` 传。 | createXxx 选项：`onColumnResize`；React：`onColumnResize`；Preact：`onColumnResize`；Vue：`@column-resize`；Angular：`onColumnResize（createTable 的选项）`；Solid：`onColumnResize（选项）`；Svelte：`onColumnResize（选项）`；纯 HTML：`onColumnResize（选项），或 table.on("columnResize", fn)` |
 | `rowResize` | `{ key: string; height: number \| null }` | 拖完一行的下边线（`height` 是新行高），或双击恢复（null）。 | createXxx 选项：`onRowResize`；React：`onRowResize`；Preact：`onRowResize`；Vue：`@row-resize`；Angular：`onRowResize（createTable 的选项）`；Solid：`onRowResize（选项）`；Svelte：`onRowResize（选项）`；纯 HTML：`onRowResize（选项），或 table.on("rowResize", fn)` |
 | `cellEdit` | `TableCellEditEvent<R>` | 改完一格（`editable` 的列）：表格已经把新值写进行里，参数 `{ row, key, value, oldValue }`，在这里交给服务端。 | createXxx 选项：`onCellEdit`；React：`onCellEdit`；Preact：`onCellEdit`；Vue：`@cell-edit`；Angular：`onCellEdit（createTable 的选项）`；Solid：`onCellEdit（选项）`；Svelte：`onCellEdit（选项）`；纯 HTML：`onCellEdit（选项），或 table.on("cellEdit", fn)` |
+| `pageChange` | `TablePageEvent` | 翻页或切换每页条数以后：`{ page, pageSize }`。 | createXxx 选项：`onPageChange`；React：`onPageChange`；Preact：`onPageChange`；Vue：`@page-change`；Angular：`onPageChange（createTable 的选项）`；Solid：`onPageChange（选项）`；Svelte：`onPageChange（选项）`；纯 HTML：`onPageChange（选项），或 table.on("pageChange", fn)` |
 | `retry` | `—` | 出错状态里点了"重试"。 | createXxx 选项：`onRetry`；React：`onRetry`；Preact：`onRetry`；Vue：`@retry`；Angular：`onRetry（createTable 的选项）`；Solid：`onRetry（选项）`；Svelte：`onRetry（选项）`；纯 HTML：`onRetry（选项），或 table.on("retry", fn)` |
 | `layout` | `{ rows: R[] }` | 看得见的行定了（挂上、展开收起、排序、筛选、拖行、换数据以后，过渡开始前）：参数是看得见的行，合计、"共 N 项"这类跟着它算。 | createXxx 选项：`onLayout`；React：`onLayout`；Preact：`onLayout`；Vue：`@layout`；Angular：`onLayout（createTable 的选项）`；Solid：`onLayout（选项）`；Svelte：`onLayout（选项）`；纯 HTML：`onLayout（选项），或 table.on("layout", fn)` |
 
@@ -1553,7 +1556,7 @@ export default function ShotOrder() {
 
 ## 导出的类型
 
-`TableOptions`、`TableColumn`、`TableCellContext`、`TableSpan`、`TableSort`、`TableExpandEvent`、`TableRowReorderEvent`、`TableCellEditEvent`、`TableApi`、`TableProps`、`TableColumnReact`
+`TableOptions`、`TableColumn`、`TableCellContext`、`TableSpan`、`TableSort`、`TableExpandEvent`、`TableRowReorderEvent`、`TableCellEditEvent`、`TablePageEvent`、`TablePagination`、`TableApi`、`TableProps`、`TableColumnReact`
 
 ## 键盘
 
