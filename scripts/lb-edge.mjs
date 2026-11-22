@@ -141,7 +141,13 @@ try {
       const txt = [...sec.querySelectorAll("*")].filter((e) => !e.contains(el) && !el.contains(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && !e.closest(".sn-tip, .sn-menu, .sn-pop, .sn-popover, [role=tooltip], [role=menu], .cx") && shown(e)).map((e) => ({ e, r: e.getBoundingClientRect() }))
         .filter(({ r }) => r.width > 8 && r.height > 6 && fr.left + r.left >= vis.l && fr.top + r.top >= vis.t && fr.left + r.right <= vis.r && fr.top + r.bottom <= vis.b);
       txt.sort((a, b) => a.r.top - b.r.top);
-      const refs = txt.length ? [txt[0], txt[txt.length >> 1], txt[txt.length - 1]].map((x) => x.e) : [];
+      let refs = txt.length ? [txt[0], txt[txt.length >> 1], txt[txt.length - 1]].map((x) => x.e) : [];
+      // 缩略图在演示顶部且被滚到窗口下沿外（如图片网格，文字在网格下方）时，改用同演示里其他可见的兄弟元素作位置参照
+      if (!refs.length) {
+        const sibs = [...sec.querySelectorAll(".sn-im, .demo > *, button, img")].filter((e) => e !== el && !e.contains(el) && !el.contains(e) && shown(e)).map((e) => ({ e, r: e.getBoundingClientRect() }))
+          .filter(({ r }) => r.width > 16 && r.height > 16 && fr.left + r.right > vis.l && fr.left + r.left < vis.r && fr.top + r.bottom > vis.t && fr.top + r.top < vis.b);
+        if (sibs.length) refs = [sibs[0].e];
+      }
       w.__lbRefs = refs;
       const side = document.querySelector("[data-side] a"), h1 = document.querySelector("main h1, .d-main h1, h1");
       window.__lbFix = [side, h1].filter(Boolean);
@@ -236,10 +242,11 @@ try {
       // 关上后和打开前：整帧平均差（缩略图那块拿到焦点会有焦点框，不比）
       let s = 0, n = 0; const a = L[0], z = L[L.length - 1];
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { if (inR(x, y, frames[0].cap) || inR(x, y, seen)) continue; s += Math.abs(a[y * w + x] - z[y * w + x]); n++; }
-      // 闪白：图本身（和它的阴影）以外的地方，平均亮度不能比打开前、关上后都亮（深色主题下大图本身就比页面亮，不能算进去）
+      // 闪白：图本身（和它的阴影）以外的地方，同一块区域在第 j 帧的平均亮度不能比打开前、关上后都亮
+      // （必须用同一帧的排除区 ex[j] 去量 L[0] 和 L[-1]：如果 L[0] 没排除暗色缩略图、L[j] 排除了，浅色页挖掉暗图后均值必然升高，会造成假阳性）
       const mean = (d, j) => { let s2 = 0, n2 = 0; for (let y = 0; y < h; y += 3) for (let x = 0; x < w; x += 3) { if (inR(x, y, ex[j]) || inR(x, y, frames[j].cap)) continue; s2 += d[y * w + x]; n2++; } return n2 ? s2 / n2 : 0; };
-      const lum = L.map((d, j) => mean(d, j));
-      return { navMin: Math.min(...navC), navAt: navC.indexOf(Math.min(...navC)), endDiff: s / n, flash: Math.max(...lum) - Math.max(lum[0], lum.at(-1)) };
+      const flash = Math.max(0, ...L.map((d, j) => mean(d, j) - Math.max(mean(L[0], j), mean(L[L.length - 1], j))));
+      return { navMin: Math.min(...navC), navAt: navC.indexOf(Math.min(...navC)), endDiff: s / n, flash };
     }, { cw: pre.cw, frames: pick.map((f) => ({ d: f.d, cap: caption })), ex: pick.map((f) => { const qs = S.filter((x) => Math.abs(x.t - f.t) <= 50 && x.box && x.box.o > .01).map((x) => x.box); return qs.length ? { l: Math.min(...qs.map((q) => q.l)) - 130, t: Math.min(...qs.map((q) => q.t)) - 130, r: Math.max(...qs.map((q) => q.r)) + 130, b: Math.max(...qs.map((q) => q.b)) + 170 } : null; }), nav: pre.navB, seen: { l: s.l - 10, t: s.t - 10, r: s.r + 10, b: s.b + 10 }, W });
     if (px.navMin < .97) {
       const fa = pick[px.navAt], near0 = S.reduce((b, x) => Math.min(b, Math.abs(x.t - fa.t)), 1e9), wb = S.filter((x) => Math.abs(x.t - fa.t) <= 50 && x.box);

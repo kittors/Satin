@@ -35,6 +35,8 @@ for (const f of files(A, ".png")) {
       if (!n) { report.expected.push({ f, id: ap.id, n: 0, note: `只比到 y=${lim}（下面是新加的内容）` }); report.ok++; continue; }
       report.pixels.push({ f, n, note: `原有部分（y < ${lim}）就有 ${n} 个像素不同` }); continue;
     }
+    const rs = expectAll("shots", f).find((e) => e.resize);
+    if (rs && ia.width === ib.width) { report.expected.push({ f, id: rs.id, n: 0, note: `有意改排高度变化（${ib.height} → ${ia.height}）` }); report.ok++; continue; }
     report.pixels.push({ f, size: `${ia.width}×${ia.height} → ${ib.width}×${ib.height}` }); continue;
   }
   const diff = new PNG({ width: ia.width, height: ia.height });
@@ -66,19 +68,27 @@ for (const f of files(A, ".json.gz")) {
   // 带 props 的登记（{ classes, props }）不整块放过：只不比这些元素（自己带这个类名）上的这几项计算样式，比如标签、徽标加了 white-space: nowrap
   const whole = exds.filter((e) => !e.props), exd = { id: [...new Set(exds.map((e) => e.id))].join("、"), paths: whole.flatMap((e) => e.paths || []), ids: whole.flatMap((e) => e.ids || []), classes: whole.flatMap((e) => e.classes || []) };
   const propEx = exds.filter((e) => e.props);
-  const exProps = (snap, p) => { const cls = String(snap[p]?.attrs?.class || "").split(/\s+/); return propEx.filter((e) => (e.classes || []).some((c) => cls.includes(c))).flatMap((e) => e.props); };
+  const exProps = (snap, p) => {
+    const seg = p.split(">"), out = [];
+    for (let i = seg.length; i > 0; i--) {
+      const cls = String(snap[seg.slice(0, i).join(">")]?.attrs?.class || "").split(/\s+/);
+      for (const e of propEx) if ((e.classes || []).some((c) => cls.includes(c))) out.push(...e.props);
+    }
+    return out;
+  };
   // 登记过的元素（paths 路径前缀，或者 ids / classes：它自己或上级带这个 id、类名）上的差异不算
   const marked = (snap, p) => { const seg = p.split(">"); for (let i = seg.length; i > 0; i--) { const at = snap[seg.slice(0, i).join(">")]?.attrs; if (!at) continue; if (exd.ids.includes(at.id)) return true; if (exd.classes.some((c) => String(at.class || "").split(/\s+/).includes(c))) return true; } return false; };
   const skip = (p) => whole.length > 0 && (exd.paths.some((pre) => p.startsWith(pre)) || marked(sa, p) || marked(sb, p));
   const appended = exds.map((e) => e.appended).filter(Boolean); // 新内容接在这些元素末尾：新节点、它自己变高不算
+  const resized = exds.some((e) => e.resize); // 有意改排导致整页高度变化：挂在页面末尾的隐藏浮层只跟着竖直平移
   const isNew = (p) => appended.some((pre) => p.startsWith(pre + ">")) && !sb[p];
   for (const p of Object.keys(sa)) {
     const a = sa[p], b = sb[p];
     if (isNew(p)) { skipped++; continue; }
     // 新内容自己挂到 body 上的辅助节点（输入框自动长高用的量字节点这类）：只在新的一边有、挂在 body 下面的不算
     if (appended.length && !b && p.startsWith("html>body>") && !sb[p.split(">").slice(0, 3).join(">")] && !appended.some((pre) => p.startsWith(pre))) { skipped++; continue; }
-    // 新内容接在页面中间、页面变高：挂在页面末尾的浮层实体（提示、弹层，平时停在文档底下）只是跟着往下挪——只差竖直位置的不算
-    if (appended.length && b && !appended.some((pre) => p.startsWith(pre)) && a.tag === b.tag && a.text === b.text && Array.isArray(a.rect) && Array.isArray(b.rect) && !String(a.rect[0]).startsWith("~")
+    // 新内容接在页面中间或有意改排使页面变高：挂在页面末尾的浮层实体（提示、弹层，平时停在文档底下）只是跟着往下挪——只差竖直位置的不算
+    if ((appended.length || resized) && b && !appended.some((pre) => p.startsWith(pre)) && a.tag === b.tag && a.text === b.text && Array.isArray(a.rect) && Array.isArray(b.rect) && !String(a.rect[0]).startsWith("~")
       && [0, 2, 3].every((i) => Math.abs(a.rect[i] - b.rect[i]) <= 0.02) && Math.abs(a.rect[1] - b.rect[1]) > 0.01) {
       const st = []; cmpObj(a.style, b.style, "", st); const at = []; cmpObj(a.attrs, b.attrs, "", at);
       if (!at.length && st.every((x) => /^(top|bottom):/.test(x))) { skipped++; continue; }

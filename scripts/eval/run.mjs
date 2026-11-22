@@ -130,7 +130,7 @@ function runOne(task, fw, cond) {
 const queue = [];
 for (const task of TASKS) for (const fw of FWS) for (const cond of CONDS) queue.push([task, fw, cond]);
 // 模板先串行装好（装依赖别并发）
-for (const fw of FWS) for (const cond of CONDS) template(fw, cond === "with");
+for (const fw of FWS) for (const cond of CONDS) template(fw, cond === "cli" ? "cli" : cond === "with");
 console.log(`评测 ${BATCH} · ${MODEL}：${queue.length} 份，同时 ${JOBS} 份 → ${OUT}`);
 let done = 0; const results = [];
 async function worker() {

@@ -16,12 +16,24 @@ const avg = (xs) => { const v = xs.filter((x) => x != null); return v.length ? (
 const f1 = (v) => (v == null ? "—" : (Math.round(v * 10) / 10).toString());
 const pct = (a, b) => (b ? Math.round((a / b) * 100) + "%" : "—");
 
+const ROOTS = [
+  ["self-talk", "自说自话"],
+  ["fake", "假"],
+  ["misfit", "照搬"],
+  ["noise", "堆信号"],
+  ["semantics", "语义错位"],
+  ["ideal", "只在理想条件下成立"],
+  ["abrupt", "生硬"],
+];
+const rootSum = (m) => (m?.roots ? ROOTS.reduce((acc, [id]) => acc + (typeof m.roots[id] === "number" ? m.roots[id] : 0), 0) : null);
+
 let md = `\n## ${TITLE}\n\n`;
 const models = [...new Set(scores.map((s) => s.model))];
 for (const model of models) {
   const S = scores.filter((s) => s.model === model);
   // 有 CLI 那一组（先 satin init 起项目）就多一列
   const hasCli = S.some((s) => s.cond === "cli"), conds = hasCli ? ["without", "with", "cli"] : ["without", "with"];
+  const hasRoots = S.some((s) => manual[key(s)]?.roots);
   md += `### ${model.replace(/_/g, "/")}\n\n| 指标 | 没有技能 | 有 Satin 技能 |${hasCli ? " 用 CLI 起项目 |" : ""}\n|---|---|---|${hasCli ? "---|" : ""}\n`;
   const by = (cond) => S.filter((s) => s.cond === cond);
   const row = (label, fn) => (md += `| ${label} | ${conds.map((c) => fn(by(c))).join(" | ")} |\n`);
@@ -35,13 +47,26 @@ for (const model of models) {
   row("检查器 · 页面 warn（平均）", (x) => f1(avg(x.map((s) => n(s.check?.dom?.warn)))));
   row("检查器 error 为 0 的份数", (x) => pct(x.filter((s) => s.build?.ok && n(s.check?.static?.error) === 0 && n(s.check?.dom?.error) === 0).length, x.length));
   row("人工看图（1–5，浅 / 深 / 手机）", (x) => f1(avg(x.map((s) => manual[key(s)]?.score ?? null))));
+  if (hasRoots) row("AI 味七问总分（0–14，越高越无 AI 味）", (x) => f1(avg(x.map((s) => rootSum(manual[key(s)])))));
   row("平均用时（分钟）", (x) => f1(avg(x.map((s) => (s.done?.ms ? s.done.ms / 60000 : null)))));
-  md += `\n| 需求 | 框架 | 没有技能：构建 / 报错 / 检查器 src·页面 / 看图 | 有技能：构建 / 报错 / 检查器 src·页面 / 看图 |\n|---|---|---|---|\n`;
-  const cell = (s) => (!s ? "没做" : `${s.build?.ok ? "✓" : "✗"} / ${s.build?.ok ? s.errors.length + s.interact.length : "—"} / ${s.check?.static?.error ?? "—"}·${s.check?.dom?.error ?? "—"} / ${manual[key(s)]?.score ?? "—"}`);
+  if (hasRoots) {
+    md += `\n#### AI 味七个根源分项均分（每项 0–2 分，2 = 无此毛病）\n\n| 根源 | 没有技能 | 有 Satin 技能 |${hasCli ? " 用 CLI 起项目 |" : ""}\n|---|---|---|${hasCli ? "---|" : ""}\n`;
+    for (const [id, label] of ROOTS) {
+      md += `| ${label}（\`${id}\`） | ${conds.map((c) => f1(avg(by(c).map((s) => manual[key(s)]?.roots?.[id] ?? null)))).join(" | ")} |\n`;
+    }
+  }
+  md += `\n| 需求 | 框架 | 没有技能：构建 / 报错 / 检查器 src·页面 / 看图 | 有技能：构建 / 报错 / 检查器 src·页面 / 看图 |${hasCli ? " CLI 起项目：构建 / 报错 / 检查器 src·页面 / 看图 |" : ""}\n|---|---|---|---|${hasCli ? "---|" : ""}\n`;
+  const cell = (s) => {
+    if (!s) return "没做";
+    const m = manual[key(s)];
+    const rs = rootSum(m);
+    const sc = m?.score != null ? (rs != null ? `${m.score}（${rs}/14）` : `${m.score}`) : "—";
+    return `${s.build?.ok ? "✓" : "✗"} / ${s.build?.ok ? s.errors.length + s.interact.length : "—"} / ${s.check?.static?.error ?? "—"}·${s.check?.dom?.error ?? "—"} / ${sc}`;
+  };
   for (const t of TASKS) for (const fw of ["react", "vue", "html"]) {
-    const a = S.find((s) => s.task === t.id && s.fw === fw && s.cond === "without"), b = S.find((s) => s.task === t.id && s.fw === fw && s.cond === "with");
-    if (!a && !b) continue;
-    md += `| ${t.title} | ${fw} | ${cell(a)} | ${cell(b)} |\n`;
+    const a = S.find((s) => s.task === t.id && s.fw === fw && s.cond === "without"), b = S.find((s) => s.task === t.id && s.fw === fw && s.cond === "with"), c = S.find((s) => s.task === t.id && s.fw === fw && s.cond === "cli");
+    if (!a && !b && !c) continue;
+    md += `| ${t.title} | ${fw} | ${cell(a)} | ${cell(b)} |${hasCli ? ` ${cell(c)} |` : ""}\n`;
   }
   const notes = S.map((s) => manual[key(s)]?.note && `- ${s.cond === "with" ? "有技能" : s.cond === "cli" ? "CLI 起项目" : "没有技能"} · ${s.fw} · ${s.task}：${manual[key(s)].note}`).filter(Boolean);
   if (notes.length) md += `\n看图记录：\n${notes.join("\n")}\n`;

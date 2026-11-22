@@ -125,17 +125,23 @@ for (const r of runs) {
   console.log(`  ${s.build?.ok ? "✓" : "✗"} ${r.model} ${r.cond.padEnd(7)} ${r.fw.padEnd(5)} ${r.task.padEnd(13)} 报错 ${s.errors.length}+${s.interact.length}  检查器 静态 ${s.check.static?.error ?? "—"}/${s.check.static?.warn ?? "—"}  页面 ${s.check.dom?.error ?? "—"}/${s.check.dom?.warn ?? "—"}`);
 }
 
-// 5. 拼图：每个需求一张（行：框架；列：没有技能 浅色桌面、没有技能 深色手机、有技能 浅色桌面、有技能 深色手机）
+// 5. 拼图：每个需求一张（行：框架；列：各 cond 的浅色桌面 + 深色手机；有 cli 组时一并画出）
 const sheets = path.join(BASE, "_sheets"); fs.mkdirSync(sheets, { recursive: true });
-for (const model of [...new Set(all.map((s) => s.model))]) for (const task of TASKS) {
-  const rows = ["react", "vue", "html"].map((fw) => ["without", "with"].map((cond) => all.find((s) => s.model === model && s.task === task.id && s.fw === fw && s.cond === cond)));
-  if (!rows.flat().some(Boolean)) continue;
-  const cell = (s, k) => (s && s.shots?.[k] ? `<img src="file://${path.join(s.dir, s.shots[k])}">` : `<div class="miss">${s ? (s.build?.ok ? "没截到" : "构建失败") : "没做"}</div>`);
-  const html = `<html><head><style>body{margin:0;background:#888;font:14px -apple-system,sans-serif}table{border-collapse:collapse}td{padding:6px;vertical-align:top}th{color:#fff;padding:6px;text-align:left}img{display:block;object-fit:cover;object-position:top}td.d img{width:520px;height:420px}td.p img{width:180px;height:420px}.miss{width:180px;height:420px;display:grid;place-items:center;background:#ccc}</style></head><body><table><tr><th></th><th>没有技能 · 浅色桌面</th><th>深色手机</th><th>有技能 · 浅色桌面</th><th>深色手机</th></tr>${rows.map((pair, i) => `<tr><th>${["React", "Vue", "HTML"][i]}</th>${pair.map((s) => `<td class="d">${cell(s, "light-desktop")}</td><td class="p">${cell(s, "dark-phone")}</td>`).join("")}</tr>`).join("")}</table></body></html>`;
-  const hf = path.join(sheets, `${model}-${task.id}.html`); fs.writeFileSync(hf, html);
-  const ctx = await browser.newContext({ viewport: { width: 1500, height: 900 } }), page = await ctx.newPage();
-  await page.goto("file://" + hf); await page.waitForTimeout(500);
-  await page.screenshot({ path: hf.replace(/\.html$/, ".png"), fullPage: true }); await ctx.close();
+for (const model of [...new Set(all.map((s) => s.model))]) {
+  const hasCli = all.some((s) => s.model === model && s.cond === "cli");
+  const conds = hasCli ? ["without", "with", "cli"] : ["without", "with"];
+  const titles = { without: "没有技能", with: "有技能", cli: "CLI 起项目" };
+  for (const task of TASKS) {
+    const rows = ["react", "vue", "html"].map((fw) => conds.map((cond) => all.find((s) => s.model === model && s.task === task.id && s.fw === fw && s.cond === cond)));
+    if (!rows.flat().some(Boolean)) continue;
+    const cell = (s, k) => (s && s.shots?.[k] ? `<img src="file://${path.join(s.dir, s.shots[k])}">` : `<div class="miss">${s ? (s.build?.ok ? "没截到" : "构建失败") : "没做"}</div>`);
+    const ths = conds.map((c) => `<th>${titles[c]} · 浅色桌面</th><th>深色手机</th>`).join("");
+    const html = `<html><head><style>body{margin:0;background:#888;font:14px -apple-system,sans-serif}table{border-collapse:collapse}td{padding:6px;vertical-align:top}th{color:#fff;padding:6px;text-align:left}img{display:block;object-fit:cover;object-position:top}td.d img{width:460px;height:380px}td.p img{width:170px;height:380px}.miss{width:170px;height:380px;display:grid;place-items:center;background:#ccc}</style></head><body><table><tr><th></th>${ths}</tr>${rows.map((pair, i) => `<tr><th>${["React", "Vue", "HTML"][i]}</th>${pair.map((s) => `<td class="d">${cell(s, "light-desktop")}</td><td class="p">${cell(s, "dark-phone")}</td>`).join("")}</tr>`).join("")}</table></body></html>`;
+    const hf = path.join(sheets, `${model}-${task.id}.html`); fs.writeFileSync(hf, html);
+    const ctx = await browser.newContext({ viewport: { width: hasCli ? 2100 : 1500, height: 900 } }), page = await ctx.newPage();
+    await page.goto("file://" + hf); await page.waitForTimeout(500);
+    await page.screenshot({ path: hf.replace(/\.html$/, ".png"), fullPage: true }); await ctx.close();
+  }
 }
 await browser.close();
 fs.writeFileSync(path.join(BASE, "_scores.json"), JSON.stringify(all, null, 2));

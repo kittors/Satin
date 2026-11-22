@@ -86,6 +86,17 @@
  {
   "id": "differences-3",
   "reason": "Markdown \"能动的 HTML\"预览的 iframe 在外面问的时候再报一次高度（改造前的高度竞态修掉了）：docs/differences.md 第 3 条",
+  "dom": [
+   {
+    "match": "embed/*/md.json.gz",
+    "classes": [
+     "md-live"
+    ],
+    "paths": [
+     "html>body>div:1>main>section>div>div:1>div>div:1"
+    ]
+   }
+  ],
   "trace": {
    "final": [
     {
@@ -120,6 +131,17 @@
  {
   "id": "differences-1",
   "reason": "Markdown\"能动的 HTML\"那段示例代码里的 var(--label) 变成 var(--sn-label)，代码高亮分词跟着变：docs/differences.md 第 1 条",
+  "dom": [
+   {
+    "match": "embed/*/md.json.gz",
+    "classes": [
+     "md-live-code"
+    ],
+    "paths": [
+     "html>body>div:1>main>section>div>div:1>div:1>textarea"
+    ]
+   }
+  ],
   "trace": {
    "final": [
     {
@@ -130,5 +152,543 @@
     }
    ]
   }
+ },
+ {
+  "id": "differences-28-37",
+  "reason": "去 AI 腔显示内容、对话铺满与真实历史数据、长文本占位、画布表格读屏名：docs/differences.md 第 28、30、31、34、37 条",
+  "shots": [
+   {
+    "match": "embed/*/chat.png",
+    "box": [
+     20,
+     64,
+     870,
+     752
+    ]
+   },
+   {
+    "match": "embed/*-desktop/count.png",
+    "box": [
+     970,
+     58,
+     1175,
+     82
+    ]
+   },
+   {
+    "match": "embed/*-tablet/count.png",
+    "box": [
+     400,
+     58,
+     730,
+     102
+    ]
+   },
+   {
+    "match": "embed/*-phone/count.png",
+    "box": [
+     32,
+     215,
+     356,
+     260
+    ]
+   }
+  ],
+  "dom": [
+   {
+    "match": "embed/*/chat.json.gz",
+    "classes": [
+     "chat"
+    ]
+   },
+   {
+    "match": "embed/*/count.json.gz",
+    "paths": [
+     "html>body>div:1>main>section>div>div>div:1>div>div>textarea"
+    ]
+   },
+   {
+    "match": "embed/*/cgrid.json.gz",
+    "classes": [
+     "g-vp"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "differences-29",
+  "reason": "视频播放器音量条改在静音按钮左侧展开（flex-direction: row-reverse），悬停静音不再把按钮推走：docs/differences.md 第 29 条",
+  "dom": [
+   {
+    "match": "embed/*/media.json.gz",
+    "classes": [
+     "vol"
+    ]
+   },
+   {
+    "match": "embed/*/md.json.gz",
+    "classes": [
+     "vol"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "differences-31",
+  "reason": "提示词输入框底部一行不折行（flex-wrap: nowrap）：docs/differences.md 第 31 条",
+  "dom": [
+   {
+    "match": "embed/*/prompt.json.gz",
+    "classes": [
+     "cm-bar",
+     "cm-mode",
+     "cm-model"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "differences-35",
+  "reason": "标签、徽标不折行（white-space: nowrap）：docs/differences.md 第 35 条",
+  "dom": [
+   {
+    "match": "embed/*/chip.json.gz",
+    "classes": [
+     "chip"
+    ],
+    "props": [
+     "white-space"
+    ]
+   },
+   {
+    "match": "embed/*/tabs.json.gz",
+    "classes": [
+     "badge"
+    ],
+    "props": [
+     "white-space"
+    ]
+   },
+   {
+    "match": "embed/*/tags.json.gz",
+    "classes": [
+     "badge",
+     "chip"
+    ],
+    "props": [
+     "white-space"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "differences-38",
+  "reason": "浅红底危险按钮（.sn-danger-soft）在浅色主题下字色深一档（对比度 4.28 → ~5.7）：docs/differences.md 第 38 条",
+  "shots": [
+   {
+    "match": "embed/light-desktop/button.png",
+    "box": [
+     154,
+     355,
+     740,
+     736
+    ]
+   },
+   {
+    "match": "embed/light-tablet/button.png",
+    "box": [
+     30,
+     355,
+     435,
+     995
+    ]
+   },
+   {
+    "match": "embed/light-desktop/dialog.png",
+    "box": [
+     676,
+     26,
+     772,
+     54
+    ]
+   },
+   {
+    "match": "embed/light-tablet/dialog.png",
+    "box": [
+     340,
+     26,
+     436,
+     54
+    ]
+   },
+   {
+    "match": "embed/light-phone/dialog.png",
+    "box": [
+     152,
+     26,
+     248,
+     54
+    ]
+   },
+   {
+    "match": "embed/light-desktop/popconfirm.png",
+    "box": [
+     1360,
+     20,
+     1420,
+     235
+    ]
+   },
+   {
+    "match": "embed/light-tablet/popconfirm.png",
+    "box": [
+     680,
+     20,
+     750,
+     235
+    ]
+   },
+   {
+    "match": "embed/light-phone/popconfirm.png",
+    "box": [
+     310,
+     20,
+     370,
+     235
+    ]
+   }
+  ],
+  "dom": [
+   {
+    "match": "embed/light-*/button.json.gz",
+    "classes": [
+     "danger-soft"
+    ]
+   },
+   {
+    "match": "embed/light-*/dialog.json.gz",
+    "classes": [
+     "danger-soft"
+    ]
+   },
+   {
+    "match": "embed/light-*/popconfirm.json.gz",
+    "classes": [
+     "danger-soft"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "differences-39",
+  "reason": "成功色小字（.sn-c-success）在浅色主题下混 14% 黑满足 WCAG 4.5:1：docs/differences.md 第 39 条",
+  "shots": [
+   {
+    "match": "embed/light-desktop/type.png",
+    "box": [
+     780,
+     542,
+     895,
+     568
+    ]
+   },
+   {
+    "match": "embed/light-tablet/type.png",
+    "box": [
+     400,
+     542,
+     620,
+     590
+    ]
+   },
+   {
+    "match": "embed/light-phone/type.png",
+    "box": [
+     100,
+     576,
+     215,
+     602
+    ]
+   }
+  ],
+  "dom": [
+   {
+    "match": "embed/light-*/type.json.gz",
+    "classes": [
+     "c-success"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "differences-42",
+  "reason": "严禁文字头像，全量改用 C 方向预设头像（12 张头肩像）：docs/differences.md 第 42 条",
+  "shots": [
+   {
+    "match": "embed/*/card.png",
+    "box": [
+     215,
+     178,
+     1415,
+     1625
+    ]
+   },
+   {
+    "match": "embed/*/cgrid.png",
+    "box": [
+     410,
+     140,
+     475,
+     610
+    ]
+   },
+   {
+    "match": "embed/*/grid.png",
+    "box": [
+     410,
+     180,
+     480,
+     610
+    ]
+   },
+   {
+    "match": "embed/*-desktop/list.png",
+    "box": [
+     842,
+     68,
+     874,
+     100
+    ]
+   },
+   {
+    "match": "embed/*-tablet/list.png",
+    "box": [
+     506,
+     68,
+     538,
+     100
+    ]
+   },
+   {
+    "match": "embed/*-phone/list.png",
+    "box": [
+     130,
+     366,
+     162,
+     398
+    ]
+   },
+   {
+    "match": "embed/*-desktop/scrollarea.png",
+    "box": [
+     580,
+     1645,
+     610,
+     1772
+    ]
+   },
+   {
+    "match": "embed/*-phone/scrollarea.png",
+    "box": [
+     172,
+     5283,
+     204,
+     5410
+    ]
+   },
+   {
+    "match": "embed/*/table.png",
+    "box": [
+     160,
+     98,
+     870,
+     2980
+    ]
+   },
+   {
+    "match": "embed/*/tags.png",
+    "box": [
+     20,
+     102,
+     370,
+     345
+    ]
+   }
+  ],
+  "dom": [
+   {
+    "match": "embed/*/card.json.gz",
+    "classes": [
+     "av",
+     "avs"
+    ]
+   },
+   {
+    "match": "embed/*/grid.json.gz",
+    "classes": [
+     "g-ow",
+     "av"
+    ]
+   },
+   {
+    "match": "embed/*/list.json.gz",
+    "classes": [
+     "name",
+     "av"
+    ],
+    "paths": [
+     "html>body>div:1>main>section>div>div>dl>dd:1>sn-avatar"
+    ]
+   },
+   {
+    "match": "embed/*/scrollarea.json.gz",
+    "classes": [
+     "name",
+     "av"
+    ]
+   },
+   {
+    "match": "embed/*/table.json.gz",
+    "classes": [
+     "name",
+     "av"
+    ]
+   },
+   {
+    "match": "embed/*/tags.json.gz",
+    "ids": [
+     "tags"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "differences-43",
+  "reason": "图标库新增 menu、square-pen 两个线性图标供对话顶栏按钮使用（144 → 146）：docs/differences.md 第 43 条",
+  "shots": [
+   {
+    "match": "embed/*/icons.png",
+    "resize": true
+   }
+  ],
+  "dom": [
+   {
+    "match": "embed/*/icons.json.gz",
+    "ids": [
+     "icons"
+    ],
+    "resize": true
+   }
+  ]
+ },
+ {
+  "id": "differences-44",
+  "reason": "平板 4 格卡片 2×2 防 3+1 孤儿（scrollarea、numflow）、手机状态矩阵 2 列（button、iconbutton）与设计稿规范表表头不折行（layout、spacing）：docs/differences.md 第 44 条",
+  "shots": [
+   {
+    "match": "embed/*-phone/button.png",
+    "resize": true
+   },
+   {
+    "match": "embed/*-phone/iconbutton.png",
+    "resize": true
+   },
+   {
+    "match": "embed/*-tablet/numflow.png",
+    "box": [
+     20,
+     62,
+     750,
+     360
+    ]
+   },
+   {
+    "match": "embed/*-tablet/scrollarea.png",
+    "box": [
+     20,
+     650,
+     750,
+     2855
+    ]
+   },
+   {
+    "match": "embed/*-tablet/layout.png",
+    "box": [
+     20,
+     535,
+     725,
+     745
+    ]
+   },
+   {
+    "match": "embed/*-phone/layout.png",
+    "resize": true
+   },
+   {
+    "match": "embed/*-phone/spacing.png",
+    "resize": true
+   }
+  ],
+  "dom": [
+   {
+    "match": "embed/*-phone/button.json.gz",
+    "ids": [
+     "button"
+    ],
+    "resize": true
+   },
+   {
+    "match": "embed/*-phone/iconbutton.json.gz",
+    "ids": [
+     "iconbutton"
+    ],
+    "resize": true
+   },
+   {
+    "match": "embed/*/numflow.json.gz",
+    "ids": [
+     "numflow"
+    ]
+   },
+   {
+    "match": "embed/*-tablet/scrollarea.json.gz",
+    "ids": [
+     "scrollarea"
+    ]
+   },
+   {
+    "match": "embed/*/layout.json.gz",
+    "classes": [
+     "sp-ctl"
+    ]
+   },
+   {
+    "match": "embed/*-tablet/layout.json.gz",
+    "ids": [
+     "layout"
+    ],
+    "resize": true
+   },
+   {
+    "match": "embed/*-phone/layout.json.gz",
+    "ids": [
+     "layout"
+    ],
+    "resize": true
+   },
+   {
+    "match": "embed/*/spacing.json.gz",
+    "classes": [
+     "sp-ctl"
+    ]
+   },
+   {
+    "match": "embed/*-phone/spacing.json.gz",
+    "ids": [
+     "spacing"
+    ],
+    "resize": true
+   }
+  ]
  }
 ]

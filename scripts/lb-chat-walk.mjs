@@ -48,20 +48,27 @@ try {
     let top = v.top, bot = v.bottom; if (r) { const x = (r.left + r.right) / 2; const inV = (y) => { const e = d.elementFromPoint(x, y); return !!e && vp.contains(e); }; let a = Math.ceil(v.top) + .5; while (a < v.bottom && !inV(a)) a++; let best = null, s0 = null; for (let y = a; y < v.bottom; y++) { const h = inV(y); if (h && s0 == null) s0 = y; if ((!h || y + 1 >= v.bottom) && s0 != null) { const e = h ? y : y - 1; if (!best || e - s0 > best[1] - best[0]) best = [s0, e]; s0 = null; } } if (best) { top = best[0]; bot = best[1]; } }
     return { fr: { l: fr.left, t: fr.top }, th: r ? { l: fr.left + r.left, t: fr.top + r.top, r: fr.left + r.right, b: fr.top + r.bottom } : null, vpT: fr.top + top, vpB: fr.top + bot, nav };
   }, [sel]);
-  // 缩略图在屏幕上露出来的那块（文档页顶栏、窗口、对话列表、输入框都算上）
+  // 缩略图在屏幕上露出来的那块（文档页顶栏、窗口、对话列表、输入框都算上）：找所有匹配里露出面积最大且 >=16×16 的那一个（避免抓到刚在顶栏下面露个细边的更早一条）
   const seen = (sel) => page.evaluate(([sel]) => {
     const f = document.querySelector(".dx:not([data-play]) .d-frame iframe"), d = f.contentDocument, fr = f.getBoundingClientRect();
-    const el = [...d.querySelectorAll(sel)].find((e) => { const r = e.getBoundingClientRect(); return fr.top + r.bottom > 0 && fr.top + r.top < innerHeight && r.bottom > 0; }); if (!el) return null;
-    d.querySelectorAll("[data-wt]").forEach((e) => e.removeAttribute("data-wt")); el.dataset.wt = "1";
-    const r = el.getBoundingClientRect(); let q = { l: fr.left + r.left, t: fr.top + r.top, r: fr.left + r.right, b: fr.top + r.bottom };
-    const own = (x, y) => { if (document.elementFromPoint(x, y) !== f) return false; const e = d.elementFromPoint(x - fr.left, y - fr.top); return !!e && (e === el || el.contains(e) || e.contains(el)); };
+    const els = [...d.querySelectorAll(sel)].filter((e) => { const r = e.getBoundingClientRect(); return fr.top + r.bottom > 0 && fr.top + r.top < innerHeight && r.bottom > 0; }); if (!els.length) return null;
     const run = (a, z, hit) => { let best = null, s0 = null; for (let p = a; p <= z; p++) { const h = hit(p); if (h && s0 == null) s0 = p; if ((!h || p + 1 > z) && s0 != null) { const e = h ? p : p - 1; if (!best || e - s0 > best[1] - best[0]) best = [s0, e]; s0 = null; } } return best && [best[0] - .5, best[1] + .5]; };
-    q = { l: Math.max(q.l, 0), t: Math.max(q.t, 0), r: Math.min(q.r, innerWidth), b: Math.min(q.b, innerHeight) };
-    const span = (a, z) => [.25, .5, .75].map((k) => a + (z - a) * k), ys = [], xs = [];
-    for (const x of span(q.l, q.r)) { const v = run(Math.ceil(q.t) + .5, Math.floor(q.b) - .5, (y) => own(x, y)); if (v) ys.push(v); }
-    for (const y of ys.length ? span(Math.min(...ys.map((v) => v[0])), Math.max(...ys.map((v) => v[1]))) : []) { const v = run(Math.ceil(q.l) + .5, Math.floor(q.r) - .5, (x) => own(x, y)); if (v) xs.push(v); }
-    q = ys.length && xs.length ? { l: Math.max(q.l, Math.min(...xs.map((v) => v[0]))), t: Math.max(q.t, Math.min(...ys.map((v) => v[0]))), r: Math.min(q.r, Math.max(...xs.map((v) => v[1]))), b: Math.min(q.b, Math.max(...ys.map((v) => v[1]))) } : { l: 0, t: 0, r: 0, b: 0 };
-    return q.r - q.l >= 16 && q.b - q.t >= 16 ? q : null;
+    const span = (a, z) => [.25, .5, .75].map((k) => a + (z - a) * k);
+    let bestEl = null, bestQ = null, bestArea = 0;
+    for (const el of els) {
+      const r = el.getBoundingClientRect(); let q = { l: fr.left + r.left, t: fr.top + r.top, r: fr.left + r.right, b: fr.top + r.bottom };
+      const own = (x, y) => { if (document.elementFromPoint(x, y) !== f) return false; const e = d.elementFromPoint(x - fr.left, y - fr.top); return !!e && (e === el || el.contains(e) || e.contains(el)); };
+      q = { l: Math.max(q.l, 0), t: Math.max(q.t, 0), r: Math.min(q.r, innerWidth), b: Math.min(q.b, innerHeight) };
+      const ys = [], xs = [];
+      for (const x of span(q.l, q.r)) { const v = run(Math.ceil(q.t) + .5, Math.floor(q.b) - .5, (y) => own(x, y)); if (v) ys.push(v); }
+      for (const y of ys.length ? span(Math.min(...ys.map((v) => v[0])), Math.max(...ys.map((v) => v[1]))) : []) { const v = run(Math.ceil(q.l) + .5, Math.floor(q.r) - .5, (x) => own(x, y)); if (v) xs.push(v); }
+      q = ys.length && xs.length ? { l: Math.max(q.l, Math.min(...xs.map((v) => v[0]))), t: Math.max(q.t, Math.min(...ys.map((v) => v[0]))), r: Math.min(q.r, Math.max(...xs.map((v) => v[1]))), b: Math.min(q.b, Math.max(...ys.map((v) => v[1]))) } : { l: 0, t: 0, r: 0, b: 0 };
+      const w = q.r - q.l, h = q.b - q.t;
+      if (w >= 16 && h >= 16 && w * h > bestArea) { bestArea = w * h; bestEl = el; bestQ = q; }
+    }
+    if (!bestEl) return null;
+    d.querySelectorAll("[data-wt]").forEach((e) => e.removeAttribute("data-wt")); bestEl.dataset.wt = "1";
+    return bestQ;
   }, [sel]);
   // 逐帧取样：演示里的参照文字（缩略图以外）、文档页目录、看图框露出来的那块、演示有没有画到顶栏上
   const startSample = () => page.evaluate(() => {
@@ -146,8 +153,14 @@ try {
   };
   // 把缩略图挪到某个位置：先滚对话（滚轮），再滚文档页（滚轮）
   const chatTo = async (sel, where) => {
-    for (let k = 0; k < 4; k++) {
-      const g = await geo(sel); if (!g.th) { await wheel(-500, g.fr.l + 300, Math.max(g.vpT + 60, 140)); continue; }
+    for (let s = 0; s < 14; s++) {
+      const g = await geo(sel);
+      if (g.th) break;
+      const dy = s < 4 ? 600 : -800;
+      await wheel(dy, g.fr.l + 300, Math.max(g.vpT + 60, 140));
+    }
+    for (let k = 0; k < 5; k++) {
+      const g = await geo(sel); if (!g.th) return;
       const top = Math.max(g.vpT, g.nav), mid = (g.th.t + g.th.b) / 2, target = where === "mid" ? (top + g.vpB) / 2 : where === "top" ? top : g.vpB;
       if (Math.abs(mid - target) < 2) return; await wheel(mid - target, Math.max(g.fr.l + 60, (g.th.l + g.th.r) / 2), Math.min(Math.max((g.vpT + g.vpB) / 2, 120), H - 120));
     }
