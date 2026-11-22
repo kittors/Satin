@@ -26,7 +26,7 @@ export default function CanvasEvents() {
   const [note, setNote] = createSignal("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
   onSettled(() => {
     const grid = createCanvasGrid(host, {
-      columns, data: rows, selection: "multiple", height: 232, label: "镜头清单",
+      columns, data: rows, selection: "multiple", height: 260, label: "镜头清单",
       onSortChange: (s) => setNote(sortText(s)), onSelectionChange: (e) => setNote(selText(e)), onCellEdit: (e) => setNote(editText(e)),
     });
     return () => grid.destroy();

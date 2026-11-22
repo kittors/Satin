@@ -76,7 +76,7 @@
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
   // 给一个空容器：工具条、表头、画布都由 createCanvasGrid 填好；不用了调 grid.destroy()
-  const grid = createCanvasGrid(document.getElementById("cshots-basic"), { columns, data: rows, height: 232, label: "镜头清单" });
+  const grid = createCanvasGrid(document.getElementById("cshots-basic"), { columns, data: rows, height: 260, label: "镜头清单" });
 </script>
 ```
 
@@ -103,7 +103,7 @@ const rows = [
 ];
 
 export default function ShotCanvas() {
-  return <CanvasGrid columns={columns} data={rows} height={232} label="镜头清单" />;
+  return <CanvasGrid columns={columns} data={rows} height={260} label="镜头清单" />;
 }
 ```
 
@@ -132,7 +132,7 @@ const rows = [
 </script>
 
 <template>
-  <CanvasGrid :columns="columns" :data="rows" :height="232" label="镜头清单" />
+  <CanvasGrid :columns="columns" :data="rows" :height="260" label="镜头清单" />
 </template>
 ```
 
@@ -162,7 +162,7 @@ Svelte 的写法：
 </script>
 
 <!-- 画布表格没有单独的 Svelte 组件：用 Satin 包 createCanvasGrid，选项写在 options 里 -->
-<Satin create={createCanvasGrid} options={{ columns, data: rows, height: 232, label: "镜头清单" }} />
+<Satin create={createCanvasGrid} options={{ columns, data: rows, height: 260, label: "镜头清单" }} />
 ```
 
 Angular 的写法：
@@ -198,7 +198,7 @@ export class CgridBasicComponent {
     const destroyRef = inject(DestroyRef);
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
-      const grid = createCanvasGrid(this.host().nativeElement, { columns, data: rows, height: 232, label: "镜头清单" });
+      const grid = createCanvasGrid(this.host().nativeElement, { columns, data: rows, height: 260, label: "镜头清单" });
       destroyRef.onDestroy(() => grid.destroy());
     });
   }
@@ -232,7 +232,7 @@ export default function ShotCanvas() {
   let host;
   // 挂上以后建表格；卸载时 destroy() 撤掉监听和放进 <head> 的样式
   onSettled(() => {
-    const grid = createCanvasGrid(host, { columns, data: rows, height: 232, label: "镜头清单" });
+    const grid = createCanvasGrid(host, { columns, data: rows, height: 260, label: "镜头清单" });
     return () => grid.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;
@@ -262,7 +262,7 @@ const rows = [
 ];
 
 export default function ShotCanvas() {
-  return <CanvasGrid columns={columns} data={rows} height={232} label="镜头清单" />;
+  return <CanvasGrid columns={columns} data={rows} height={260} label="镜头清单" />;
 }
 ```
 
@@ -850,7 +850,7 @@ export default function PickShots() {
   const editText = (e) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
   const note = document.getElementById("cshots-events-note"), show = (t) => (note.textContent = t);
   const grid = createCanvasGrid(document.getElementById("cshots-events"), {
-    columns, data: rows, selection: "multiple", height: 232, label: "镜头清单",
+    columns, data: rows, selection: "multiple", height: 260, label: "镜头清单",
     onSortChange: (s) => show(sortText(s)), onSelectionChange: (e) => show(selText(e)), onCellEdit: (e) => show(editText(e)),
   });
   // 也可以 grid.on("sortChange", fn)：和选项里的回调一样
@@ -887,7 +887,7 @@ export default function CanvasEvents() {
   const [note, setNote] = useState("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
   return (
     <div className="sn-stack sn-gap-8">
-      <CanvasGrid columns={columns} data={rows} selection="multiple" height={232} label="镜头清单"
+      <CanvasGrid columns={columns} data={rows} selection="multiple" height={260} label="镜头清单"
         onSortChange={(s) => setNote(sortText(s))} onSelectionChange={(e) => setNote(selText(e))} onCellEdit={(e) => setNote(editText(e))} />
       <span className="sn-help">{note}</span>
     </div>
@@ -926,7 +926,7 @@ const note = ref("点表头排序、勾选、双击格子改，这里显示最�
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <CanvasGrid :columns="columns" :data="rows" selection="multiple" :height="232" label="镜头清单"
+    <CanvasGrid :columns="columns" :data="rows" selection="multiple" :height="260" label="镜头清单"
       @sort-change="(s) => (note = sortText(s))" @selection-change="(e) => (note = selText(e))" @cell-edit="(e) => (note = editText(e))" />
     <span class="sn-help">{{ note }}</span>
   </div>
@@ -964,7 +964,7 @@ Svelte 的写法：
 
 <div class="sn-stack sn-gap-8">
   <!-- 事件写成选项里的回调 onXxx -->
-  <Satin create={createCanvasGrid} options={{ columns, data: rows, selection: "multiple", height: 232, label: "镜头清单",
+  <Satin create={createCanvasGrid} options={{ columns, data: rows, selection: "multiple", height: 260, label: "镜头清单",
     onSortChange: (s) => (note = sortText(s)), onSelectionChange: (e) => (note = selText(e)), onCellEdit: (e) => (note = editText(e)) }} />
   <span class="sn-help">{note}</span>
 </div>
@@ -1013,7 +1013,7 @@ export class CgridEventsComponent {
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
       const grid = createCanvasGrid(this.host().nativeElement, {
-        columns, data: rows, selection: "multiple", height: 232, label: "镜头清单",
+        columns, data: rows, selection: "multiple", height: 260, label: "镜头清单",
         onSortChange: (s) => this.note.set(sortText(s)), onSelectionChange: (e) => this.note.set(selText(e)), onCellEdit: (e) => this.note.set(editText(e)),
       });
       destroyRef.onDestroy(() => grid.destroy());
@@ -1053,7 +1053,7 @@ export default function CanvasEvents() {
   const [note, setNote] = createSignal("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
   onSettled(() => {
     const grid = createCanvasGrid(host, {
-      columns, data: rows, selection: "multiple", height: 232, label: "镜头清单",
+      columns, data: rows, selection: "multiple", height: 260, label: "镜头清单",
       onSortChange: (s) => setNote(sortText(s)), onSelectionChange: (e) => setNote(selText(e)), onCellEdit: (e) => setNote(editText(e)),
     });
     return () => grid.destroy();
@@ -1097,7 +1097,7 @@ export default function CanvasEvents() {
   const [note, setNote] = useState("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
   return (
     <div className="sn-stack sn-gap-8">
-      <CanvasGrid columns={columns} data={rows} selection="multiple" height={232} label="镜头清单"
+      <CanvasGrid columns={columns} data={rows} selection="multiple" height={260} label="镜头清单"
         onSortChange={(s) => setNote(sortText(s))} onSelectionChange={(e) => setNote(selText(e))} onCellEdit={(e) => setNote(editText(e))} />
       <span className="sn-help">{note}</span>
     </div>

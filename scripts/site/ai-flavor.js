@@ -162,9 +162,9 @@ export function AI_PROBE() {
     // ———— 文字头像 ————
     const avs = new Set(root.querySelectorAll(".sn-av, .sn-avatar, [class*=avatar]"));
     for (const el of avs) {
-      if (el.querySelector("img, svg, picture, canvas, video")) continue;
+      if (el.classList.contains("sn-more") || el.querySelector("img, svg, picture, canvas, video")) continue;
       const t = el.textContent.replace(/\s+/g, "").trim();
-      if (t && t.length <= 3 && shown(el)) add("text-avatar", el, `头像里放了字「${t}」`);
+      if (t && !/^\+\d+$/.test(t) && t.length <= 3 && shown(el)) add("text-avatar", el, `头像里放了字「${t}」`);
     }
     for (const el of root.querySelectorAll("*")) {
       if (el.children.length > 1 || avs.has(el) || el.closest(".sn-av, .sn-avatar, [class*=avatar]")) continue;
@@ -183,7 +183,7 @@ export function AI_PROBE() {
       if (kids.length < 4) continue;
       const sig = (k) => k.tagName + "." + (k.classList[0] || ""), cnt = {}; for (const k of kids) cnt[sig(k)] = (cnt[sig(k)] || 0) + 1;
       const main = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0], same = kids.filter((k) => sig(k) === main);
-      if (same.length < 4 || same.length < kids.length * .8) continue;
+      if (same.length < 4 || same.length > 36 || same.length < kids.length * .8) continue; // 大目录（图标全览等 > 36 项）是完整清单，不是卡片孤儿
       const ws = same.map((k) => k.getBoundingClientRect().width);
       if (flex && Math.max(...ws) / Math.min(...ws) > 1.15) continue; // 弹性换行：只管等宽卡片那种，长短不一的标签云不算
       const rows = []; for (const k of same) { const r = k.getBoundingClientRect(); let row = rows.find((x) => Math.abs(x.t - r.top) < 4); if (!row) rows.push((row = { t: r.top, n: 0, w: 0 })); row.n++; row.w = r.width; }

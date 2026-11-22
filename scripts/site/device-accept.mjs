@@ -26,7 +26,7 @@ const devInfo = (p, sel = "[data-devbox]") => p.evaluate((sel) => {
   const cut = dev.querySelector(".s-dev-cut").getBoundingClientRect(), ind = dev.querySelector(".s-dev-ind").getBoundingClientRect(), sb = dev.querySelector(".s-dev-sb");
   const cs = getComputedStyle(dev), px = (k) => parseFloat(cs.getPropertyValue(k)) || 0;
   let ready = false, h1 = null, pageBottom = null;
-  try { const d = f.contentDocument; ready = d?.readyState === "complete" && d.URL !== "about:blank"; const t = d.querySelector("h1"); if (t) h1 = fr.top + t.getBoundingClientRect().top * s; pageBottom = fr.top + d.documentElement.clientHeight * s; } catch {}
+  try { const d = f.contentDocument; ready = (d?.readyState === "complete" || d?.readyState === "interactive") && d.URL !== "about:blank" && !!d.body?.children.length; const t = d.querySelector("h1"); if (t) h1 = fr.top + t.getBoundingClientRect().top * s; pageBottom = fr.top + d.documentElement.clientHeight * s; } catch {}
   return { name: box.querySelector(".s-dev-name").textContent, kind: dev.dataset.kind, land: dev.classList.contains("s-land"), src: f.getAttribute("src"), scale: s,
     rect: [r.left, r.top, r.right, r.bottom].map(Math.round), dev: [dr.left, dr.top, dr.right, dr.bottom].map(Math.round), vh: innerHeight, vw: innerWidth, ready,
     frame: [f.clientWidth, f.clientHeight], want: [px("--dw") - px("--sa-l") - px("--sa-r"), px("--dh") - (cs.getPropertyValue("--fr-t") ? px("--fr-t") : px("--sa-t")) - px("--sa-b")],

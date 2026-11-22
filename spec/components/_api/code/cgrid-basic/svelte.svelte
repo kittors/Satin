@@ -21,4 +21,4 @@
 </script>
 
 <!-- 画布表格没有单独的 Svelte 组件：用 Satin 包 createCanvasGrid，选项写在 options 里 -->
-<Satin create={createCanvasGrid} options={{ columns, data: rows, height: 232, label: "镜头清单" }} />
+<Satin create={createCanvasGrid} options={{ columns, data: rows, height: 260, label: "镜头清单" }} />

@@ -38,7 +38,7 @@ export class CgridEventsComponent {
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
       const grid = createCanvasGrid(this.host().nativeElement, {
-        columns, data: rows, selection: "multiple", height: 232, label: "镜头清单",
+        columns, data: rows, selection: "multiple", height: 260, label: "镜头清单",
         onSortChange: (s) => this.note.set(sortText(s)), onSelectionChange: (e) => this.note.set(selText(e)), onCellEdit: (e) => this.note.set(editText(e)),
       });
       destroyRef.onDestroy(() => grid.destroy());

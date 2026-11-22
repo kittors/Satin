@@ -18,5 +18,5 @@ const rows = [
 ];
 
 export default function ShotCanvas() {
-  return <CanvasGrid columns={columns} data={rows} height={232} label="镜头清单" />;
+  return <CanvasGrid columns={columns} data={rows} height={260} label="镜头清单" />;
 }

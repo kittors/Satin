@@ -82,7 +82,7 @@ function paint(box, { fade = false } = {}) {
     inset(box);
     box.dataset.ow = OW; box.dataset.oh = OH; fit(box);
     const src = box.dataset.src;
-    if (f.getAttribute("src") !== src) f.setAttribute("src", src);
+    if (f.getAttribute("src") !== src) { f.setAttribute("src", src); box.__pollFrame?.(); }
     $(".s-dev-name", box).textContent = d.name; $(".s-dev-btn", box).setAttribute("aria-label", "换机型：" + d.name);
     for (const it of $$(".s-dev-item", box.__menu || box)) { const on = it.dataset.devId === d.id; it.classList.toggle("sn-sel", on); it.setAttribute("aria-checked", String(on)); }
   };
@@ -163,12 +163,27 @@ function inset(box) {
 }
 // iframe 里滚动、改尺寸、内容换了（play.html 是 load 以后才把示例插进来的）时重新取上下两条的颜色（一帧最多一次）
 function watchFrame(box) {
-  const f = $("iframe", box); let raf = 0, mo = null;
+  const f = $("iframe", box); let raf = 0, mo = null, timer = 0;
   const again = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; syncBg(box); }); };
-  f.addEventListener("load", () => {
-    inset(box); syncBg(box); mo?.disconnect();
-    try { const w = f.contentWindow, d = f.contentDocument; w.addEventListener("scroll", again, { passive: true }); w.addEventListener("resize", again); mo = new MutationObserver(again); mo.observe(d.body, { childList: true, subtree: true }); } catch {}
-  });
+  const hook = () => {
+    try {
+      const w = f.contentWindow, d = f.contentDocument;
+      if (!d || d.URL === "about:blank" || !d.body || !d.head) return false;
+      inset(box); syncBg(box);
+      if (d.__sDevWatched) return true;
+      d.__sDevWatched = true;
+      mo?.disconnect();
+      w.addEventListener("scroll", again, { passive: true });
+      w.addEventListener("resize", again);
+      mo = new MutationObserver(again);
+      mo.observe(d.body, { childList: true, subtree: true });
+      return true;
+    } catch { return false; }
+  };
+  // 第三方外网照片慢时会拖住 iframe load：文档一解析好就先注入安全区和同步底色，避免首帧压岛或露缝
+  const poll = () => { clearInterval(timer); let k = 0; timer = setInterval(() => { if (hook() || ++k > 60) clearInterval(timer); }, 100); };
+  box.__pollFrame = poll;
+  f.addEventListener("load", () => { clearInterval(timer); hook(); });
 }
 export function mountDevices(scope = document) {
   for (const box of $$("[data-devbox]:not([data-ready])", scope)) {

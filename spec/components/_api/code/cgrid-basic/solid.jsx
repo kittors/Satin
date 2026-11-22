@@ -22,7 +22,7 @@ export default function ShotCanvas() {
   let host;
   // 挂上以后建表格；卸载时 destroy() 撤掉监听和放进 <head> 的样式
   onSettled(() => {
-    const grid = createCanvasGrid(host, { columns, data: rows, height: 232, label: "镜头清单" });
+    const grid = createCanvasGrid(host, { columns, data: rows, height: 260, label: "镜头清单" });
     return () => grid.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;

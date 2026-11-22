@@ -20,5 +20,5 @@ const rows = [
 </script>
 
 <template>
-  <CanvasGrid :columns="columns" :data="rows" :height="232" label="镜头清单" />
+  <CanvasGrid :columns="columns" :data="rows" :height="260" label="镜头清单" />
 </template>

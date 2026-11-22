@@ -16,7 +16,7 @@ fs.mkdirSync(OUT, { recursive: true });
 // 专有词 → 允许出现的写法
 const RULES = [
   { re: /ReactNode|React\.[A-Z]\w*|JSX\.Element/g, ok: ["react", "next"], who: "React" },
-  { re: /v-model|v-bind|defineProps|(?<![\w#{])#(?:default|footer|header|empty|row|cell|item|title|description|icon|actions?|[a-z][\w-]*)(?=[\s，。、；）)]|$)/g, ok: ["vue", "nuxt"], who: "Vue" },
+  { re: /v-model|v-bind|defineProps|(?<![\w#{])#(?!(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})(?=[\s，。、；）)]|$))(?:default|footer|header|empty|row|cell|item|title|description|icon|actions?|[a-z][\w-]*)(?=[\s，。、；）)]|$)/g, ok: ["vue", "nuxt"], who: "Vue" },
   { re: /bind:\w+|\{#snippet|\{@render|片段/g, ok: ["svelte"], who: "Svelte" },
   { re: /ngModel|\[\([\w.]+\)\]|\[attr\./g, ok: ["angular"], who: "Angular" },
 ];
@@ -38,6 +38,7 @@ for (const w of WS) {
       // "列定义"（各框架写法一样）、"纯 HTML 写法的类名、data 属性"（本来就是标记里的 #id、.class）两节跳过
       const skip = [clone.querySelector("#api-columns"), ...[...clone.querySelectorAll("h3")].filter((x) => x.textContent.trim().startsWith("纯 HTML 写法的类名"))].filter(Boolean);
       for (const h of skip) { let n = h.nextElementSibling; while (n && !/^H[23]$/.test(n.tagName)) { const x = n.nextElementSibling; n.remove(); n = x; } h.remove(); }
+      clone.querySelectorAll("td, th, li, p, h1, h2, h3, h4, div").forEach((e) => e.append(" "));
       return clone.textContent;
     });
     for (const r of RULES) {

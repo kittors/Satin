@@ -25,7 +25,7 @@ export default function CanvasEvents() {
   const [note, setNote] = useState("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
   return (
     <div className="sn-stack sn-gap-8">
-      <CanvasGrid columns={columns} data={rows} selection="multiple" height={232} label="镜头清单"
+      <CanvasGrid columns={columns} data={rows} selection="multiple" height={260} label="镜头清单"
         onSortChange={(s) => setNote(sortText(s))} onSelectionChange={(e) => setNote(selText(e))} onCellEdit={(e) => setNote(editText(e))} />
       <span className="sn-help">{note}</span>
     </div>

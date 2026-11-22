@@ -128,10 +128,9 @@
 /* 手机上藏起来：只在宽屏上需要的东西——表格里次要的列、落地页顶栏的锚点链接 */
 @media (max-width: 640px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) { .sn-hide-phone { display: none !important; } }
 
-/* ———— 手机（窄于 640，或者横着拿的手机）：像应用的一屏，不是桌面页面缩小 ————
-   不出现"页面边距一圈灰 + 中间一块白卡片"：面板铺满左右，导航栏、底部操作栏贴到屏幕边上，留出状态栏和底部横条（要写 viewport-fit=cover）。
-   左右留白取 16 和左右安全区里大的那个：横屏时内容让开刘海，底色照样铺到屏幕边上 */
-@media (max-width: 640px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+/* ———— 竖屏手机（窄于 640）：像应用的一屏，不是桌面页面缩小 ————
+   不出现"页面边距一圈灰 + 中间一块白卡片"：面板铺满左右，导航栏、底部操作栏贴到屏幕边上，留出状态栏和底部横条（要写 viewport-fit=cover） */
+@media (max-width: 640px) {
   .sn-page, .sn-page.sn-narrow, .sn-page.sn-wide { --sn-page-x: max(var(--sn-sp-16), env(safe-area-inset-left), env(safe-area-inset-right)); max-width: none; padding-inline: var(--sn-page-x); padding-bottom: calc(var(--sn-sp-40) + env(safe-area-inset-bottom)); }
   /* 侧栏布局的主区自带 20 内边距：页面往外撑回去，导航栏、面板铺到主区边上 */
   .sn-app-main > .sn-page { --sn-page-x: max(var(--sn-sp-16), env(safe-area-inset-left), env(safe-area-inset-right)); --sn-page-t: 0px; width: auto; max-width: none; margin: calc(-1 * var(--sn-sp-20)); padding: 0 var(--sn-page-x) calc(var(--sn-sp-40) + env(safe-area-inset-bottom)); }
@@ -157,7 +156,7 @@
   /* 面板、表格铺满左右：去掉外圈边距、圆角和描边，白底一整条放在页面底色上（像 iOS 设置的分组）；面板内边距和页面左右边距对齐 */
   :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > :is(.sn-panel, .sn-tbl-wrap) { margin-inline: calc(-1 * var(--sn-page-x, 0px)); border-radius: 0; border-inline-width: 0; }
   :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > .sn-panel { padding: var(--sn-sp-16) var(--sn-page-x, var(--sn-sp-16)); border-block-width: 0; }
-  /* 表格铺满左右时：横屏有刘海就让开安全区（底色照样铺到边上） */
+  /* 表格铺满左右时：让开左右安全区（底色照样铺到边上） */
   :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > .sn-tbl-wrap { padding-inline: env(safe-area-inset-left) env(safe-area-inset-right); background: var(--sn-raised); }
   .sn-with-aside { gap: var(--sn-sp-16); }
 
@@ -186,7 +185,12 @@
   .sn-page.sn-screen > .sn-bottom-bar { margin-inline: calc(-1 * var(--sn-page-x)); }
   .sn-screen .sn-panel > .sn-bottom-bar { margin-inline: calc(-1 * var(--sn-page-x, var(--sn-sp-16))); margin-bottom: calc(-1 * var(--sn-sp-16)); }
   .sn-screen :has(+ .sn-bottom-bar) { margin-bottom: var(--sn-sp-16); }
-
+}
+/* 横屏手机（高不到 500、宽不到 960）：分组内容页保持 iOS 横屏 Inset Grouped（左右留出画布底色与安全区，不吸顶也不贴底以免压扁 372px 矮屏），整屏对话（上文）与登录页照样整屏单色铺满 */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .sn-page, .sn-page.sn-narrow, .sn-page.sn-wide { --sn-page-x: max(var(--sn-sp-16), env(safe-area-inset-left), env(safe-area-inset-right)); --sn-page-t: var(--sn-sp-16); padding: var(--sn-page-t) var(--sn-page-x) calc(var(--sn-sp-24) + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 640px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
   /* 登录页：不是居中的卡片——整屏就是这一页：底色铺满，标题在上面，"还没有账号"贴底；html、body 也换成同一个底色，四周不露灰 */
   .sn-auth { display: flex; flex-direction: column; padding: 0; }
   .sn-auth > .sn-panel { flex: 1 0 auto; display: flex; flex-direction: column; width: 100%; padding: calc(var(--sn-sp-48) + env(safe-area-inset-top)) max(var(--sn-sp-20), env(safe-area-inset-right)) calc(var(--sn-sp-16) + env(safe-area-inset-bottom)) max(var(--sn-sp-20), env(safe-area-inset-left)); border: 0; border-radius: 0; }

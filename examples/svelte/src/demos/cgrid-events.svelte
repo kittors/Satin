@@ -26,7 +26,7 @@
 
 <div class="sn-stack sn-gap-8">
   <!-- 事件写成选项里的回调 onXxx -->
-  <Satin create={createCanvasGrid} options={{ columns, data: rows, selection: "multiple", height: 232, label: "镜头清单",
+  <Satin create={createCanvasGrid} options={{ columns, data: rows, selection: "multiple", height: 260, label: "镜头清单",
     onSortChange: (s) => (note = sortText(s)), onSelectionChange: (e) => (note = selText(e)), onCellEdit: (e) => (note = editText(e)) }} />
   <span class="sn-help">{note}</span>
 </div>

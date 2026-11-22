@@ -27,7 +27,7 @@
   const editText = (e) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
   const note = document.getElementById("cshots-events-note"), show = (t) => (note.textContent = t);
   const grid = createCanvasGrid(document.getElementById("cshots-events"), {
-    columns, data: rows, selection: "multiple", height: 232, label: "镜头清单",
+    columns, data: rows, selection: "multiple", height: 260, label: "镜头清单",
     onSortChange: (s) => show(sortText(s)), onSelectionChange: (e) => show(selText(e)), onCellEdit: (e) => show(editText(e)),
   });
   // 也可以 grid.on("sortChange", fn)：和选项里的回调一样
