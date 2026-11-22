@@ -14,7 +14,7 @@
 // 单元格的内容：format(值, 行) 返回文字（会转义）；html(值, 行) 返回 HTML（自己保证安全）；render(值, 行, { cell, key, index, level }) 返回 HTML 字符串、
 // 节点，或者自己改好 cell 返回 undefined（React 封装让它能返回 JSX，Vue 封装让它能返回 VNode、写插槽 #cell-<key>）。
 import { icon } from "./icons.js";
-import { BOX, EASE, EASE_CSS, bezier, contentW, liftIn, tween } from "./form.js";
+import { BOX, EASE, EASE_CSS, bezier, contentW, liftIn, mountSelect, tween } from "./form.js";
 import { mountPager } from "./nav.js";
 import { scrollArea } from "./scroll.js";
 import { reduced } from "./core.js";
@@ -250,7 +250,14 @@ function tableInner(M, CW, MINW) {
 }
 function footHTML(cfg, totalItems, selectedCount) {
   if (!cfg) return "";
-  const sizes = cfg.pageSizes ? `<label class="sn-tbl-ps"><select data-tbl-ps aria-label="${esc(tt("table.pageSize"))}">${cfg.pageSizes.map((n) => `<option value="${n}"${n === cfg.pageSize ? " selected" : ""}>${esc(tt("table.perPage", { p0: n }))}</option>`).join("")}</select></label>` : "";
+  const sizes = cfg.pageSizes
+    ? `<div class="sn-select sn-tbl-ps" data-select data-tbl-ps>`
+      + `<button type="button" class="sn-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(tt("table.pageSize"))}">`
+      + `<span class="sn-val">${esc(tt("table.perPage", { p0: cfg.pageSize }))}</span>${icon("chevron-down", 14)}`
+      + `</button>`
+      + `<div class="sn-menu sn-up" role="listbox">${cfg.pageSizes.map((n) => `<div class="${cx("sn-item", n === cfg.pageSize && "sn-sel")}" role="option" aria-selected="${n === cfg.pageSize}" data-v="${n}">${esc(tt("table.perPage", { p0: n }))}<span class="sn-chk">${icon("check", 14)}</span></div>`).join("")}</div>`
+      + `</div>`
+    : "";
   const sel = selectedCount > 0 ? `<span class="sn-tbl-foot-sel">· ${esc(tt("table.selected", { p0: selectedCount }))}</span>` : "";
   return `<div class="sn-tbl-foot"><div class="sn-tbl-foot-l"><span data-tbl-total>${esc(tt("table.total", { p0: totalItems }))}</span>${sel}${sizes}</div><div class="sn-pager"><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-pg="prev" aria-label="${esc(tt("table.prev"))}">${icon("chevron-left", 16)}</button><div class="sn-pages"></div><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-pg="next" aria-label="${esc(tt("table.next"))}">${icon("chevron-right", 16)}</button></div></div>`;
 }
@@ -295,7 +302,7 @@ export function mountTable(wrap, o0 = {}, emit) {
   // 限高以后在框里滚：表头吸附在上面，滚动条用组件库的（悬停、滚动时出现，不占位置；不加边缘渐隐，免得表头被淡掉）；fill / 固定列走原生滚动区保证 sticky 贴边零抖动
   if (o.maxHeight != null && !o.fill && !M.hasPin) scrollArea($(".sn-tbl-sc", wrap), { fade: "none" });
   const scEl = $(".sn-tbl-sc", wrap);
-  let pgCfg = normPageCfg(o.pagination), pgPage = pgCfg?.page ?? 1, pgSize = pgCfg?.pageSize ?? 10, pgInst = null, footEl = $(":scope > .sn-tbl-foot", wrap), pgTotalItems = 0;
+  let pgCfg = normPageCfg(o.pagination), pgPage = pgCfg?.page ?? 1, pgSize = pgCfg?.pageSize ?? 10, pgInst = null, psInst = null, footEl = $(":scope > .sn-tbl-foot", wrap), pgTotalItems = 0;
   let table, thead, tbody, emptyRow, all, TR = new Map();
   const refs = () => {
     table ??= $("table.sn-tbl", wrap); thead = $(":scope > thead", table); tbody = $(":scope > tbody", table);
@@ -538,7 +545,7 @@ export function mountTable(wrap, o0 = {}, emit) {
   // ———— 贴底分页栏（.sn-tbl-foot） ————
   const syncFooter = () => {
     wrap.classList.toggle("sn-has-foot", !!pgCfg);
-    if (!pgCfg) { if (footEl) { footEl.remove(); footEl = null; pgInst = null; } return; }
+    if (!pgCfg) { psInst?.dispose(); psInst = null; if (footEl) { footEl.remove(); footEl = null; pgInst = null; } return; }
     const total = pgTotalItems, pages = Math.max(1, Math.ceil(total / pgSize));
     if (pgPage > pages) pgPage = pages;
     if (!footEl) {
@@ -559,13 +566,17 @@ export function mountTable(wrap, o0 = {}, emit) {
         },
       });
       const psEl = $("[data-tbl-ps]", footEl);
-      psEl?.addEventListener("change", () => {
-        pgSize = Math.max(1, Number(psEl.value) || 10);
-        pgPage = 1;
-        if (isLocalPage()) { relayout(() => { applyVis(); syncEmpty(); }, { instant: true }); syncSel(); if (scEl) scEl.scrollTop = 0; }
-        pgCfg.onChange?.({ page: pgPage, pageSize: pgSize });
-        fire("pageChange", { page: pgPage, pageSize: pgSize });
-      });
+      if (psEl) {
+        psInst = mountSelect(psEl, {
+          onChange: (val) => {
+            pgSize = Math.max(1, Number(val) || 10);
+            pgPage = 1;
+            if (isLocalPage()) { relayout(() => { applyVis(); syncEmpty(); }, { instant: true }); syncSel(); if (scEl) scEl.scrollTop = 0; }
+            pgCfg.onChange?.({ page: pgPage, pageSize: pgSize });
+            fire("pageChange", { page: pgPage, pageSize: pgSize });
+          },
+        });
+      }
     }
     const tEl = $("[data-tbl-total]", footEl);
     if (tEl) tEl.textContent = tt("table.total", { p0: total });
@@ -574,8 +585,7 @@ export function mountTable(wrap, o0 = {}, emit) {
       if (!selEl) { selEl = document.createElement("span"); selEl.className = "sn-tbl-foot-sel"; tEl?.after(selEl); }
       selEl.textContent = "· " + tt("table.selected", { p0: picked.size });
     } else selEl?.remove();
-    const psEl = $("[data-tbl-ps]", footEl);
-    if (psEl && Number(psEl.value) !== pgSize) psEl.value = String(pgSize);
+    if (psInst && Number(psInst.value) !== pgSize) psInst.set(String(pgSize));
     if (pgInst) { pgInst.setTotal(pages); if (pgInst.page !== pgPage) pgInst.go(pgPage, true); }
   };
   // 空：第一级一行都看不见时显示空状态那一行（筛选的结果也在同一次变化里：外框高度一起过渡）
@@ -1035,6 +1045,7 @@ export function mountTable(wrap, o0 = {}, emit) {
       if (M.hasPin) syncPinned();
     },
     destroy() {
+      psInst?.dispose(); psInst = null;
       if (lay) { clearLay(lay); lay = null; } dragNow?.flush(); colLand?.(); stopCW?.(); cancelAnimationFrame(colRaf); ro?.disconnect(); unbind();
     },
   };

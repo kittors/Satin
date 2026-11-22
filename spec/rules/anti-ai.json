@@ -174,15 +174,15 @@
     {
       "id": "browser-default",
       "group": "界面",
-      "title": "浏览器默认样式不能漏出来",
-      "why": "亮蓝色带下划线的链接、灰底凸边的默认按钮、系统自带的复选框和下拉框、浏览器默认的焦点框，一眼就是没做完的页面。",
-      "do": "文字链接 <a class=\"sn-link\">；按钮 <button class=\"sn-btn sn-secondary\">；表单控件用 Satin 的标记（sn-check、sn-select、sn-input）",
-      "dont": "<a href=\"/all\" class=\"sn-t-callout\">全部项目</a>（排版类不管链接颜色，还是蓝色下划线）；<button>导出</button>；<select> 不加任何类",
+      "title": "严禁使用系统自带原生控件（必须用 Satin 组件）",
+      "why": "AI 写界面最高频的穿帮点之一：明明组件库有自研的下拉菜单、输入框、日期选择器、滑块、复选框与按钮，却为了省事直接写原生 <select>、裸 <input> / <textarea> / <checkbox> / <input type=\"date|range\">。哪怕给原生 <select> 写了 appearance: none，点开弹出的依然是风格完全割裂的系统原生蓝框菜单，瞬间暴露半成品感。",
+      "do": "下拉一律用 Satin 的 createSelect / <sn-select> / <Select>；输入框一律用 .sn-input / <Input> / <Textarea>；日期时间用 createPicker；滑块用 createSlider / <sn-slider>；复选/开关/单选用 .sn-check / .sn-switch / .sn-radio；按钮用 .sn-btn；文字链接用 .sn-link",
+      "dont": "在任何页面或组件里手写原生 <select>（哪怕加了自定义 class 或 appearance: none）；写裸 <input> / <textarea> / <input type=\"date|time|range|checkbox|radio\">；写裸 <button>导出</button>；写 <a href=\"/all\" class=\"sn-t-callout\">（排版类不管链接颜色，还是蓝色下划线）",
       "check": {
         "kind": "static+dom",
-        "how": "标记里 `<button>`、`<select>`、`<input>`（checkbox / radio / text）一个 Satin 类都没有就报；页面上量：链接的计算颜色还是浏览器默认的 rgb(0, 0, 238) 或带下划线、按钮还是默认的灰底凸边，就报。链接本身见 `link-style`。"
+        "how": "源码或页面中只要出现可见的原生 `<select>`、`<input type=\"date|time|datetime-local|month|week|range\">`，或者不在 Satin 控件封装内的裸 `<input>` / `<textarea>` / `<checkbox>` / `<radio>` / `<button>`（即使外层套了 `.sn-page` / `.sn-form` / `.sn-panel` 也不豁免），一律报 error；页面链接仍是默认蓝/紫也报。链接本身另见 `link-style`。"
       },
-      "fix": "套上 Satin 的类（`sn-link`、`sn-btn`、`sn-input`……）；组件库里有的控件直接用组件。",
+      "fix": "原生 `<select>` → 改用 `createSelect` / `<sn-select>` / `<Select>`；`<input type=\"date|time\">` → `createPicker`；`<input type=\"range\">` → `createSlider`；复选/开关/单选 → `.sn-check` / `.sn-switch` / `.sn-radio`；输入/多行 → `.sn-input`；按钮 → `.sn-btn`；链接 → `.sn-link`。",
       "severity": "error",
       "root": "misfit"
     },

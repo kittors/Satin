@@ -154,7 +154,16 @@ function pageChecks({ theme, width, want }) {
   if (want.includes("layout")) {
     for (const el of vis.filter((x) => x.matches(".sn-av:not(.sn-more)"))) { const txt = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join(""); if (txt) add("text-avatar", el, `头像里放了字"${txt.slice(0, 4)}"`); }
     for (const el of vis.filter((x) => x.matches("a[href]"))) { const s = cs(el); if (/^rgb\((0, 0, 238|85, 26, 139)\)$/.test(s.color)) { add("browser-default", el, `链接还是浏览器默认的颜色 ${s.color}`); break; } }
-    for (const el of vis.filter((x) => x.matches("button, select, input[type=checkbox], input[type=radio], input[type=text], input:not([type])"))) { const s = cs(el); if (s.appearance === "auto" && !el.closest("[class*='sn-']") && !/(^|\s)sn-/.test(el.className)) { add("browser-default", el, `${el.tagName.toLowerCase()} 还是浏览器默认的样子`); break; } }
+    for (const el of vis.filter((x) => x.matches("select"))) { add("browser-default", el, "使用了系统原生 <select>（点开会弹出系统自带下拉菜单）", "改用 Satin 的下拉组件（createSelect / <sn-select> / <Select>）"); break; }
+    for (const el of vis.filter((x) => x.matches("input[type=date], input[type=time], input[type=datetime-local], input[type=month], input[type=week], input[type=range]"))) { add("browser-default", el, `使用了系统原生 <input type="${el.type}">`, el.type === "range" ? "改用 Satin 的滑块（createSlider / <sn-slider>）" : "改用 Satin 的日期时间选择器（createPicker）"); break; }
+    for (const el of vis.filter((x) => x.matches("input[type=checkbox], input[type=radio]"))) { if (!el.closest(".sn-check, .sn-radio, .sn-switch")) { add("browser-default", el, `使用了系统原生 <input type="${el.type}">`, "改用 Satin 的 .sn-check / .sn-switch / .sn-radio 标记"); break; } }
+    for (const el of vis.filter((x) => x.matches("textarea, input[type=text], input[type=search], input[type=email], input[type=password], input[type=tel], input[type=url], input[type=number], input:not([type])"))) {
+      if (!/(^|\s)sn-/.test(el.className) && !el.closest(".sn-ib, .sn-ta, .sn-tagin, .sn-otp, .sn-cm, .sn-q, .sn-box-in, .sn-tbl, .sn-grid")) { add("browser-default", el, `${el.tagName.toLowerCase()} 使用了系统默认输入框样式`, "加 class=\"sn-input\" 或改用 Satin 表单组件"); break; }
+    }
+    for (const el of vis.filter((x) => x.matches("button"))) {
+      const s = cs(el);
+      if (s.appearance === "auto" && !/(^|\s)sn-/.test(el.className) && !el.closest(".sn-seg, .sn-tab-list, .sn-pages, .sn-cal, .sn-pk, .sn-menu, .sn-bulk")) { add("browser-default", el, "button 还是浏览器默认的样子", "加 class=\"sn-btn sn-secondary\"（或 sn-primary、sn-ghost）"); break; }
+    }
     const blocks = vis.filter((x) => x.matches("p, li, td, dd, .sn-msg") && x.textContent.trim().length > 8 && !x.closest("nav, .sn-side, header"));
     const bold = blocks.filter((x) => +cs(x).fontWeight >= 600 || x.firstElementChild?.matches("b, strong"));
     if (blocks.length >= 6 && bold.length / blocks.length >= .5) add("heavy-emphasis", bold[0], `正文段落、列表项里 ${bold.length}/${blocks.length} 是加粗的或者加粗开头`);

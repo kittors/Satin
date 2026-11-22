@@ -158,6 +158,18 @@ export function AI_PROBE() {
       const c = css(b);
       if ((c.borderTopStyle === "outset" || /^rgb\((239, 239, 239|240, 240, 240|107, 107, 107)\)$/.test(c.backgroundColor)) && shown(b)) add("browser-default", b, `按钮是浏览器默认样式（底色 ${c.backgroundColor}，边框 ${c.borderTopStyle}）`);
     }
+    for (const s of root.querySelectorAll("select")) {
+      if (shown(s)) { add("browser-default", s, "使用了系统原生 <select>（点开会弹出系统自带下拉菜单，应改用 Satin 的 createSelect / <sn-select>）"); break; }
+    }
+    for (const inp of root.querySelectorAll("input[type=date], input[type=time], input[type=datetime-local], input[type=month], input[type=week], input[type=range]")) {
+      if (shown(inp)) { add("browser-default", inp, `使用了系统原生 <input type="${inp.type}">（应改用 Satin 的 createPicker / createSlider）`); break; }
+    }
+    for (const ck of root.querySelectorAll("input[type=checkbox], input[type=radio]")) {
+      if (shown(ck) && !ck.closest(".sn-check, .sn-radio, .sn-switch")) { add("browser-default", ck, `使用了系统原生 <input type="${ck.type}">（应改用 Satin 的 .sn-check / .sn-switch / .sn-radio）`); break; }
+    }
+    for (const inp of root.querySelectorAll("textarea, input[type=text], input[type=search], input[type=email], input[type=password], input[type=tel], input[type=url], input[type=number], input:not([type])")) {
+      if (shown(inp) && !/(^|\s)sn-/.test(inp.className) && !inp.closest(".sn-ib, .sn-ta, .sn-tagin, .sn-otp, .sn-cm, .sn-q, .sn-box-in, .sn-tbl, .sn-grid")) { add("browser-default", inp, `${inp.tagName.toLowerCase()} 使用了系统默认输入框样式（缺少 .sn-input）`); break; }
+    }
 
     // ———— 文字头像 ————
     const avs = new Set(root.querySelectorAll(".sn-av, .sn-avatar, [class*=avatar]"));

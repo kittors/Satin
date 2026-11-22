@@ -46,12 +46,7 @@
 @keyframes ws-view-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .ws-view.ws-enter { animation: ws-view-in .18s var(--sn-ease-out); }
 @media (prefers-reduced-motion: reduce) { .ws-view.ws-enter { animation: none; } .ws-theme-btn .sn-ic { transition: none; } }
-.ws-mode-select { appearance: none; -webkit-appearance: none; height: 32px; padding: 0 28px 0 12px; border-radius: var(--sn-btn-r); border: 1px solid var(--sn-line-control); background: var(--sn-field); color: var(--sn-label2);
-  font: 400 calc(12.5px * var(--sn-font-scale, 1))/1 var(--sn-sans); cursor: pointer; transition: border-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 10px center; }
-@media (hover: hover) { .ws-mode-select:hover { border-color: var(--sn-line-control-hover); color: var(--sn-label); } }
-.ws-mode-select:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 1px; }
+.ws-mode-sel { min-width: 172px; }
 .ws-acts-cell { display: inline-flex; align-items: center; justify-content: flex-end; gap: 2px; }
 </style>
 </head>
@@ -102,12 +97,7 @@
           </span>
           <div id="ws-status-seg"></div>
           <div class="sn-end sn-row sn-gap-8">
-            <select class="ws-mode-select" id="ws-mode-select" aria-label="切换演示数据量">
-              <option value="42 条多量" selected>演示：42 条多量</option>
-              <option value="5 条少量">演示：5 条少量（测占满高度）</option>
-              <option value="空态">演示：空数据</option>
-              <option value="加载中">演示：加载骨架</option>
-            </select>
+            <div id="ws-mode-select"></div>
             <button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" id="ws-compact-btn" data-tip="切换紧凑行高" aria-label="切换紧凑行高" data-i="rows-3"></button>
           </div>
         </div>

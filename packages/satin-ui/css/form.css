@@ -75,9 +75,12 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 
 /* ———— 下拉选择（触发器 + 面板） ———— */
 .sn-select { position: relative; display: inline-block; min-width: 180px; }
-.sn-select > .sn-trigger { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 8px 0 11px; border-radius: var(--sn-btn-r); /* sp-ok: 左 11 + 1px 边框，和输入框的文字左边对齐 */
+.sn-select.sn-sm { min-width: 0; }
+.sn-select > .sn-trigger { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 10px 0 12px; border-radius: var(--sn-btn-r); /* sp-ok: 光学对齐输入框内边距 */
   font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); cursor: pointer; background: var(--sn-field); border: 1px solid var(--sn-line-control); box-shadow: var(--sn-field-inset);
-  transition: border-color .15s var(--sn-ease-out), box-shadow .15s var(--sn-ease-out); }
+  transition: border-color .15s var(--sn-ease-out), box-shadow .15s var(--sn-ease-out), color .15s var(--sn-ease-out); }
+:is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-select > .sn-trigger { padding: 0 12px 0 14px; }
+.sn-select.sn-sm > .sn-trigger { height: 28px; padding: 0 9px 0 11px; gap: 6px; font-size: calc(12px * var(--sn-font-scale, 1)); }
 @media (hover: hover) {
 .sn-select > .sn-trigger:hover { border-color: var(--sn-line-control-hover); } }
 .sn-select > .sn-trigger:focus-visible, .sn-select.sn-open > .sn-trigger { border-color: var(--sn-focus); box-shadow: var(--sn-field-inset), 0 0 0 3px var(--sn-ring); }
@@ -86,15 +89,16 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 .sn-select.sn-open > .sn-trigger .sn-ic { rotate: 180deg; }
 /* 高度上限按“窗口高”算：--vh 没设就是 100vh。嵌在别的页面里的小框（官网文档的演示 iframe）里，100vh 只是小框的高——
    菜单先被压成一个小滚动盒，演示框为了露出它往下伸，菜单又跟着长高，追两三帧才稳住、这几帧被截（2026-11-20）。文档页把 --vh 设成真实窗口高 */
-.sn-menu { position: absolute; z-index: 30; left: 0; top: calc(100% + 6px); min-width: 100%; max-height: min(420px, calc(var(--sn-vh, 100vh) - 24px)); overflow: auto; padding: 4px; border-radius: var(--sn-r-lg);
+.sn-menu { position: absolute; z-index: 30; left: 0; top: calc(100% + 6px); width: max-content; min-width: 100%; max-width: min(320px, calc(100vw - 16px)); max-height: min(420px, calc(var(--sn-vh, 100vh) - 24px)); overflow: auto; padding: 4px; border-radius: var(--sn-r-lg);
   background: var(--sn-menu-bg); box-shadow: var(--sn-menu-shadow);
   transform-origin: top left; opacity: 0; scale: .97; translate: 0 -4px; pointer-events: none; visibility: hidden;
   transition: opacity .1s var(--sn-ease-in), scale 0s linear .1s, translate 0s linear .1s, visibility 0s linear .1s; }
-.sn-menu.sn-up { transform-origin: bottom left; translate: 0 4px; }
+.sn-menu.sn-up { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: 0 4px; }
 .sn-menu.sn-end { left: auto; right: 0; transform-origin: top right; }
+.sn-menu.sn-up.sn-end { transform-origin: bottom right; }
 .sn-open > .sn-menu, .sn-menu.sn-open { opacity: 1; scale: 1; translate: 0; pointer-events: auto; visibility: visible;
   transition: opacity 0s, scale .14s var(--sn-ease-out-strong), translate .14s var(--sn-ease-out-strong), visibility 0s; }
-.sn-menu .sn-item { display: flex; align-items: center; text-decoration: none; gap: 8px; height: 32px; padding: 0 8px; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); cursor: pointer;
+.sn-menu .sn-item { display: flex; align-items: center; text-decoration: none; gap: 8px; height: 32px; padding: 0 8px; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); white-space: nowrap; cursor: pointer;
   transition: background-color .08s var(--sn-ease-out); }
 .sn-menu .sn-item.sn-hl { background: var(--sn-b-ghost-hover); }
 .sn-menu .sn-item.sn-is-off { color: var(--sn-label-off); cursor: default; } .sn-menu .sn-item.sn-is-off .sn-ic { color: var(--sn-label-off); }

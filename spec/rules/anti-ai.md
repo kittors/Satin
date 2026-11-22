@@ -102,14 +102,14 @@ Lorem ipsum、渐变色块冒充图片、AI 抽象插画一眼假。
 - 判据（dom）：390 宽、触摸模式下，可点元素（button、a、[role=button]、input）按真点得到的范围量（滚到窗口里，从中心往四周逐像素用 elementFromPoint 探，透明伪元素扩出去的算、被裁掉被盖住的不算），小于 44×44 且离别的可点元素不到 8px 就报。
 - 修法：图标按钮加 `sn-tap`；分段控件、分页触屏下已经扩到 44；自己的小按钮在 `@media (pointer: coarse)` 里加 `::after { content: ""; position: absolute; inset: 50% 0 auto; height: max(100%, 44px); translate: 0 -50%; }`（按钮要 position: relative）；列表行整行可点。
 
-### 浏览器默认样式不能漏出来（`browser-default`，必须）
+### 严禁使用系统自带原生控件（必须用 Satin 组件）（`browser-default`，必须）
 
-亮蓝色带下划线的链接、灰底凸边的默认按钮、系统自带的复选框和下拉框、浏览器默认的焦点框，一眼就是没做完的页面。
+AI 写界面最高频的穿帮点之一：明明组件库有自研的下拉菜单、输入框、日期选择器、滑块、复选框与按钮，却为了省事直接写原生 <select>、裸 <input> / <textarea> / <checkbox> / <input type="date|range">。哪怕给原生 <select> 写了 appearance: none，点开弹出的依然是风格完全割裂的系统原生蓝框菜单，瞬间暴露半成品感。
 
-- 这样做：文字链接 <a class="sn-link">；按钮 <button class="sn-btn sn-secondary">；表单控件用 Satin 的标记（sn-check、sn-select、sn-input）
-- 不要：<a href="/all" class="sn-t-callout">全部项目</a>（排版类不管链接颜色，还是蓝色下划线）；<button>导出</button>；<select> 不加任何类
-- 判据（static+dom）：标记里 `<button>`、`<select>`、`<input>`（checkbox / radio / text）一个 Satin 类都没有就报；页面上量：链接的计算颜色还是浏览器默认的 rgb(0, 0, 238) 或带下划线、按钮还是默认的灰底凸边，就报。链接本身见 `link-style`。
-- 修法：套上 Satin 的类（`sn-link`、`sn-btn`、`sn-input`……）；组件库里有的控件直接用组件。
+- 这样做：下拉一律用 Satin 的 createSelect / <sn-select> / <Select>；输入框一律用 .sn-input / <Input> / <Textarea>；日期时间用 createPicker；滑块用 createSlider / <sn-slider>；复选/开关/单选用 .sn-check / .sn-switch / .sn-radio；按钮用 .sn-btn；文字链接用 .sn-link
+- 不要：在任何页面或组件里手写原生 <select>（哪怕加了自定义 class 或 appearance: none）；写裸 <input> / <textarea> / <input type="date|time|range|checkbox|radio">；写裸 <button>导出</button>；写 <a href="/all" class="sn-t-callout">（排版类不管链接颜色，还是蓝色下划线）
+- 判据（static+dom）：源码或页面中只要出现可见的原生 `<select>`、`<input type="date|time|datetime-local|month|week|range">`，或者不在 Satin 控件封装内的裸 `<input>` / `<textarea>` / `<checkbox>` / `<radio>` / `<button>`（即使外层套了 `.sn-page` / `.sn-form` / `.sn-panel` 也不豁免），一律报 error；页面链接仍是默认蓝/紫也报。链接本身另见 `link-style`。
+- 修法：原生 `<select>` → 改用 `createSelect` / `<sn-select>` / `<Select>`；`<input type="date|time">` → `createPicker`；`<input type="range">` → `createSlider`；复选/开关/单选 → `.sn-check` / `.sn-switch` / `.sn-radio`；输入/多行 → `.sn-input`；按钮 → `.sn-btn`；链接 → `.sn-link`。
 
 ### 链接用 Satin 的样式（`link-style`，建议）
 

@@ -1,6 +1,6 @@
 import {
   setup, enhance, icon, injectIcons, avatarHTML, toast,
-  createBrowserTabs, createSegmented, createTable, openDialog, closeDialog, wireDialog,
+  createBrowserTabs, createSegmented, createSelect, createTable, openDialog, closeDialog, wireDialog,
 } from "satin-ui";
 import { defineElements } from "satin-ui/elements";
 import { getMode, setMode } from "satin-ui/theme";
@@ -198,11 +198,24 @@ const statusSeg = createSegmented(document.getElementById("ws-status-seg"), {
 });
 void statusSeg;
 
-const modeSelect = document.getElementById("ws-mode-select");
-modeSelect?.addEventListener("change", (e) => {
-  dataMode = e.target.value;
-  applyDataMode();
+const modeHost = document.getElementById("ws-mode-select");
+const modeSelect = createSelect(modeHost, {
+  label: "切换演示数据量",
+  value: dataMode,
+  items: [
+    { value: "42 条多量", label: "演示：42 条多量" },
+    { value: "5 条少量", label: "演示：5 条少量（测占满）" },
+    { value: "空态", label: "演示：空数据" },
+    { value: "加载中", label: "演示：加载骨架" },
+  ],
+  onChange(v) {
+    dataMode = v;
+    applyDataMode();
+  },
 });
+const modeSelEl = modeHost?.matches(".sn-select") ? modeHost : modeHost?.querySelector(".sn-select");
+modeSelEl?.classList.add("ws-mode-sel");
+modeSelEl?.querySelector(".sn-menu")?.classList.add("sn-end");
 
 const projHost = document.getElementById("ws-projects-table");
 const projCols = [
@@ -398,7 +411,7 @@ document.getElementById("ws-new-form")?.addEventListener("submit", (e) => {
     updatedRank: -1,
   };
   projects = [item, ...projects];
-  if (dataMode === "空态" || dataMode === "加载中") { dataMode = "42 条多量"; if (modeSelect) modeSelect.value = "42 条多量"; }
+  if (dataMode === "空态" || dataMode === "加载中") { dataMode = "42 条多量"; modeSelect.update({ value: "42 条多量" }); }
   applyDataMode();
   nameInp.value = "";
   closeDialog(newDlg);

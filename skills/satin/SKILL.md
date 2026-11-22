@@ -14,7 +14,7 @@ Satin 是一套带规范的 UI 库：令牌（颜色、间距、圆角、字号�
 
 1. **自说自话**：用户此刻需要这句话吗？他已经知道、已经看得见的，就删。（"这是对话的开始""已载入 N 条""框会跟着长高"）
 2. **假**：换成真实产品的数据，会是这样吗？换一个输入，结果还对吗？（文字头像、渐变色块当图片、不管问什么都回同一句、"好的。""收到：…"）
-3. **照搬**：对面是人还是 AI？在手机上还是电脑上？用手指还是鼠标？（AI 显示"在线"、桌面卡片塞进手机、触屏上写 ⌘↵、默认的蓝色下划线链接）
+3. **照搬**：对面是人还是 AI？在手机上还是电脑上？用手指还是鼠标？是不是偷懒用了系统原生控件？（AI 显示"在线"、桌面卡片塞进手机、触屏上写 ⌘↵、默认蓝色下划线链接、直接写原生 `<select>` / `<input>` 弹出系统自带蓝框菜单）
 4. **堆信号**：这个状态别处已经表达过了吗？去掉它，用户会少知道什么？（停止按钮外圈转圈加红底、处处加粗、处处徽标、渐变光晕 emoji）
 5. **语义错位**：颜色是不是只在表达状态？同一种颜色在整页里是不是同一个意思？（"已完成"是红的、四种状态一个颜色、停止用危险色）
 6. **只在理想条件下成立**：最窄 320、最宽 1440、文字最长时、空 / 加载 / 出错、深色、触屏、键盘，都看过了吗？（写死 680px 多出滚动条、按钮字折行、指标排成 3 + 1）
@@ -277,7 +277,12 @@ createTable(document.getElementById("projects"), {
 ### 界面：一眼就是 AI 做的那几处（检查器会查，规则在 `references/rules.md` 的"界面"一组）
 
 - **头像不放字（严禁）**：不要 `<span class="sn-av">林</span>` 配随机底色。有照片放 `<img>`；没有照片用 Satin 的预设头像；列表里不需要分清是谁就不放头像。
-- **浏览器默认样式不漏出来**：文字链接用 `sn-link`（只套排版类 `sn-t-callout` 不行，还是蓝色下划线），按钮 `sn-btn`，文字框 `sn-input`，下拉用 `<sn-select>`。
+- **严禁使用系统自带原生控件（核心红线，检查器直接报 error）**：**凡是 Satin 已有对应组件的控件，一律禁止退回到浏览器/操作系统原生实现**——尤其是：
+  - 原生 `<select>`（**哪怕写了 `appearance: none` 伪装外观，点开弹出面板依然是割裂的系统蓝框菜单！**）→ 必须用 `createSelect` / `<sn-select>` / `<Select>`；
+  - 裸 `<input>` / `<textarea>` → 必须用 `.sn-input` / `<Input>` / `<Textarea>` / `fieldHTML`；
+  - 原生 `<input type="checkbox">` / `<input type="radio">` → 必须用 `.sn-check` / `.sn-switch` / `.sn-radio`（`checkHTML` / `switchHTML`）；
+  - 原生 `<input type="date|time|datetime-local|range">` → 必须用 `createPicker` / `createSlider`（`<sn-slider>`）；
+  - 裸 `<button>` → 必须用 `.sn-btn` / `.sn-textbtn`；裸 `<a href>` → 必须用 `.sn-link`（只套排版类 `sn-t-callout` 仍是蓝色下划线）。
 - **颜色只表达状态**：进度条、状态条按状态上色——完成 `--sn-success`、进行中 `--sn-accent`、待审核 `--sn-warning`、失败 `--sn-danger`；或者都用中性色、只把失败标红。四种状态一个颜色等于没有颜色。
 - **网格不留孤儿**：指标桌面一行 4 个、手机 2 × 2；不要中等宽度下排成 3 + 1。按断点写死列数。
 - **手机上铺满屏幕**：窄于 640 时不要四周留白的圆角卡片；顶上一条导航栏，主按钮放 `.sn-bottom-bar` 贴底并留出 `env(safe-area-inset-bottom)`，整页高度用 `100dvh`。对话组件在手机上自己会铺满。
@@ -308,6 +313,7 @@ createTable(document.getElementById("projects"), {
 
 ## 6. 常见错误
 
+- **用原生 `<select>` / 裸 `<input>` / `<input type="date|range">` 偷懒（极力避免）**：就算给 `<select>` 写了自定义边框和 `appearance: none`，一点开仍会弹出系统自带的蓝色原生菜单，瞬间破坏整体质感；页脚每页条数、筛选下拉、表单选择、日期时间、滑块、复选框一律使用 Satin 自己的 `createSelect` / `<sn-select>`、`createPicker`、`createSlider`、`.sn-input`、`.sn-check` / `.sn-switch`。
 - 文字链接（忘记密码、服务条款、查看全部）直接写 `<a href>`：浏览器默认蓝色下划线。加 `class="sn-link"`；像按钮的用 `sn-btn sn-ghost`。
 - 标题上面放英文全大写小字（PROJECTS · 2026、CHECKOUT · 01、YOUR WORKSPACE）：删掉，补充信息写进标题下面那句说明。
 - 标题、数字加粗写 `font-weight: 700` / `bold`：Satin 只有 400 / 500 / 600 三档，加粗用 600（或排版类 `sn-t-title2`、`sn-t-body-strong`）。

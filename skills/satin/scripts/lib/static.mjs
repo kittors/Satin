@@ -280,20 +280,54 @@ function checkClasses(cls, where, out) {
 const MARKETING = /智能|一键|赋能|极致|革命性|颠覆|黑科技/;
 // 不该折行的控件（选择器里出现这些就算）
 const CONTROL_SEL = /\bbutton\b|\.sn-(btn|tag|chip|badge|seg|textbtn)\b|\[role=["']?tab|\bth\b|\.(btn|tag|chip|badge|tab)\b/;
-// 浏览器默认的控件：button、select、文字框不在任何 Satin 组件里（祖先都没有 sn- 类），自己也一个 Satin 类都没有。
-// 复选、单选一般包在 sn-check / sn-radio 的 label 里，算在组件里；大写开头的是框架组件（<Button>），不查
+// 浏览器默认的系统原生控件：
+// · <select> 一律禁止（哪怕写自定义 CSS / appearance: none，点开仍会弹出系统自带菜单），必须改用 createSelect / <sn-select> / <Select>
+// · <input type="date|time|datetime-local|month|week|range"> 必然弹出系统原生选择器/滑块，一律改用 Satin 的 createPicker / createSlider
+// · 裸 <input> / <textarea> / <checkbox> / <radio> / <button> 不能因为外层套了 .sn-page / .sn-app / .sn-panel / .sn-form / .sn-field 就免检，必须自身有 Satin 类或处在真正封装该控件的 Satin 组件标记里
 const VOID = /^(input|img|br|hr|meta|link|source|area|col|embed|wbr|track|param|base)$/i;
+const CHECK_HOST = /(^|\s)sn-(check|radio|switch)\b/;
+const INPUT_HOST = /(^|\s)sn-(ib|ta|tagin|otp|cm|q|box-in|tbl|grid|up|th-dot|th-pick)\b/;
+const BTN_HOST = /(^|\s)sn-(seg|tab-list|pages|cal|pk|menu|bulk|grid|tbl)\b/;
+const NATIVE_PICKER_TYPE = /\btype\s*=\s*["']?(date|time|datetime-local|month|week|range)["']?/i;
+const CHECK_TYPE = /\btype\s*=\s*["']?(checkbox|radio)["']?/i;
+const SKIP_INPUT_TYPE = /\btype\s*=\s*["']?(hidden|file|color|submit|image|button|reset)["']?/i;
 function bareControls(src) {
   const out = [], stack = [];
   for (const m of src.matchAll(/<(\/?)([a-z][\w-]*)((?:[^>"'{]|"[^"]*"|'[^']*'|\{(?:[^{}]|\{[^{}]*\})*\})*)>/g)) {
     const [, close, tag, attrs] = m;
     if (close) { const i = stack.map((e) => e.tag).lastIndexOf(tag); if (i >= 0) stack.length = i; continue; }
-    const cls = (/(?:^|\s)(?:class|className|:class)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{\s*["'`]([^"'`]*)["'`]\s*\})/.exec(attrs) || []).slice(1).find((x) => x != null);
-    const dyn = /(?:^|\s)(?:class|className|:class)\s*=\s*\{(?!\s*["'`])/.test(attrs) || /\$\{/.test(cls || "");
-    const sn = tag.startsWith("sn-") || /(^|\s)sn-/.test(cls || "") || dyn;
-    const kind = tag === "button" || tag === "select" || (tag === "input" && !/\btype\s*=\s*["']?(hidden|file|color|range|submit|image|checkbox|radio)\b/.test(attrs));
-    if (kind && !sn && !stack.some((e) => e.sn)) out.push({ tag, line: lineOf(src, m.index) });
-    if (!VOID.test(tag) && !/\/\s*$/.test(attrs)) stack.push({ tag, sn });
+    const cls = (/(?:^|\s)(?:class|className|:class)\s*=\s*(?:"([^"]*)"|'([^']*)'|\{\s*["'`]([^"'`]*)["'`]\s*\})/.exec(attrs) || []).slice(1).find((x) => x != null) || "";
+    const dyn = /(?:^|\s)(?:class|className|:class)\s*=\s*\{(?!\s*["'`])/.test(attrs) || /\$\{/.test(cls);
+    const hasSn = tag.startsWith("sn-") || /(^|\s)sn-/.test(cls) || dyn;
+    const hidden = /\bhidden\b/.test(attrs);
+    const line = lineOf(src, m.index);
+    if (!hidden) {
+      if (tag === "select") {
+        out.push({ tag: "select", kind: "select", line });
+      } else if (tag === "input") {
+        const pt = NATIVE_PICKER_TYPE.exec(attrs);
+        const ct = CHECK_TYPE.exec(attrs);
+        if (pt) {
+          out.push({ tag: `input[type="${pt[1].toLowerCase()}"]`, kind: pt[1].toLowerCase() === "range" ? "range" : "picker", line });
+        } else if (ct) {
+          if (!hasSn && !stack.some((e) => e.checkHost)) out.push({ tag: `input[type="${ct[1].toLowerCase()}"]`, kind: ct[1].toLowerCase(), line });
+        } else if (!SKIP_INPUT_TYPE.test(attrs)) {
+          if (!hasSn && !stack.some((e) => e.inputHost)) out.push({ tag: "input", kind: "input", line });
+        }
+      } else if (tag === "textarea") {
+        if (!hasSn && !stack.some((e) => e.inputHost)) out.push({ tag: "textarea", kind: "textarea", line });
+      } else if (tag === "button") {
+        if (!hasSn && !stack.some((e) => e.btnHost)) out.push({ tag: "button", kind: "button", line });
+      }
+    }
+    if (!VOID.test(tag) && !/\/\s*$/.test(attrs)) {
+      stack.push({
+        tag,
+        checkHost: tag.startsWith("sn-") || CHECK_HOST.test(cls),
+        inputHost: tag.startsWith("sn-") || INPUT_HOST.test(cls),
+        btnHost: tag.startsWith("sn-") || BTN_HOST.test(cls),
+      });
+    }
   }
   return out;
 }
@@ -355,7 +389,27 @@ export function runStatic(inputs, { root = process.cwd() } = {}) {
     for (const u of units.inline) for (const d of parseInline(u.text, u.line)) checkDecl(d, at(u.line), out, lines[u.line - 1] || "");
     for (const c of units.attrColors) checkDecl({ prop: c.prop === "color" ? "color" : "fill", value: c.value, selector: c.tag }, at(c.line), out);
     for (const c of units.classes) checkClasses(c.text, at(c.line), out);
-    for (const c of bareControls(src)) out.push(finding("browser-default", at(c.line), `<${c.tag}> 没有 Satin 的类：浏览器默认的样子`, c.tag === "button" ? "加 class=\"sn-btn sn-secondary\"（或 sn-ghost、sn-primary）" : c.tag === "select" ? "用 Satin 的下拉（<sn-select> 或 createSelect），或者加 class=\"sn-input\"" : "文字框加 class=\"sn-input\"；复选、单选用 Satin 的 sn-check / sn-radio 标记"));
+    for (const c of bareControls(src)) {
+      const msg = c.kind === "select"
+        ? "使用了系统原生 <select>：哪怕写了自定义样式，点开仍会弹出系统自带下拉菜单"
+        : c.kind === "range"
+          ? `使用了系统原生 <${c.tag}>：滑块外观与交互是浏览器默认样式`
+          : c.kind === "picker"
+            ? `使用了系统原生 <${c.tag}>：点开会弹出风格割裂的系统原生选择器`
+            : `<${c.tag}> 使用了系统默认控件样式（缺少 Satin 组件封装或类名）`;
+      const fix = c.kind === "select"
+        ? "严禁使用原生 <select>，改用 Satin 的下拉组件（createSelect / <sn-select> / <Select>）"
+        : c.kind === "range"
+          ? "改用 Satin 的滑块组件（createSlider / <sn-slider> / <Slider>）"
+          : c.kind === "picker"
+            ? "改用 Satin 的日期时间选择器（createPicker）"
+            : c.kind === "checkbox" || c.kind === "radio"
+              ? "改用 Satin 的复选 / 开关 / 单选标记（checkHTML / switchHTML / .sn-check / .sn-switch / .sn-radio）"
+              : c.kind === "button"
+                ? "加 class=\"sn-btn sn-secondary\"（或 sn-primary、sn-ghost、sn-textbtn）"
+                : "加 class=\"sn-input\"（或使用 Satin 的 <Input> / <Textarea> / fieldHTML）";
+      out.push(finding("browser-default", at(c.line), msg, fix));
+    }
     for (const m of src.matchAll(AVATAR_TEXT)) { const txt = (m[1] || m[2] || m[3] || "").trim(); if (/\bsn-more\b/.test(m[0]) || /^\+\d+$/.test(txt)) continue; out.push(finding("text-avatar", at(lineOf(src, m.index)), `头像里放了字："${txt.slice(0, 6)}"`)); } // 头像组末尾的"+3"是人数，不算
     for (const m of src.matchAll(BR_IN_CONTROL)) out.push(finding("button-wrap", at(lineOf(src, m.index)), "按钮、标签里写了 <br>：硬折行", "删掉 <br>，缩短文字；放不下就省略号或者让布局让位"));
     for (const l of (units.bareLinks || []).filter((x) => x.cls)) out.push(finding("link-style", at(l.line), `<a> 只套了 "${l.cls.slice(0, 30)}"，没有管链接样子的类：还是浏览器默认的蓝色下划线`, "文字链接加 sn-link（像按钮的用 sn-btn sn-ghost）"));

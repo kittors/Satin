@@ -135,8 +135,8 @@ export const createSelect = /* @__PURE__ */ defineComponent({
   defaults: { items: [], placeholder: "" },
   html: (o) => {
     const list = items(o.items), cur = list.find((x) => x.value === String(o.value));
-    return `<div class="sn-select" data-select><button class="sn-trigger"${attrs({ "aria-label": o.label })}><span class="sn-val">${esc(cur ? cur.label : o.placeholder)}</span>${svg(chevronDown, 16, "chevron-down")}</button>`
-      + `<div class="sn-menu" role="listbox">${list.map((it) => `<div class="${cx("sn-item", cur === it && "sn-sel", it.disabled && "sn-is-off")}" data-v="${esc(it.value)}">${esc(it.label)}<span class="sn-chk">${svg(check, 16, "check")}</span></div>`).join("")}</div></div>`;
+    return `<div class="sn-select" data-select><button type="button" class="sn-trigger" aria-haspopup="listbox" aria-expanded="false"${attrs({ "aria-label": o.label })}><span class="sn-val">${esc(cur ? cur.label : o.placeholder)}</span>${svg(chevronDown, 16, "chevron-down")}</button>`
+      + `<div class="sn-menu" role="listbox">${list.map((it) => `<div class="${cx("sn-item", cur === it && "sn-sel", it.disabled && "sn-is-off")}" role="option" aria-selected="${cur === it}" data-v="${esc(it.value)}">${esc(it.label)}<span class="sn-chk">${svg(check, 16, "check")}</span></div>`).join("")}</div></div>`;
   },
   mount(el, o, api) {
     let s = mountSelect(el, { onChange: (v) => api.emit("change", v) }), sig = JSON.stringify(items(o.items));

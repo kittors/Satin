@@ -214,6 +214,10 @@ console.log("占满高度、左右固定列、贴底分页、Chrome 弧形页标
   ok(wrap.classList.contains("sn-tbl-fill") && wrap.classList.contains("sn-has-pin") && wrap.classList.contains("sn-has-foot"), "fill + fixed + pagination 外框类名齐全");
   ok(host.querySelector("thead th.sn-tbl-pick.sn-pin-l") && host.querySelector('thead th[data-c="name"].sn-pin-l.sn-pin-l-end') && host.querySelector("thead th.sn-acts.sn-pin-r.sn-pin-r-start"), "勾选列自动跟左固定，数据列左固定，操作列右固定");
   ok(visCount() === 10 && host.querySelector("[data-tbl-total]")?.textContent === "共 25 条", "本地分页：第 1 页显示 10 条，左下角共 25 条");
+  ok(!host.querySelector(".sn-tbl-foot select") && !!host.querySelector(".sn-tbl-foot .sn-select.sn-tbl-ps"), "贴底分页每页条数使用 Satin 下拉组件（零原生 <select>）");
+  click(host.querySelector('.sn-tbl-ps .sn-item[data-v="20"]'));
+  ok(visCount() === 20 && pgEv.at(-1)?.page === 1 && pgEv.at(-1)?.pageSize === 20, "通过 Satin 下拉切换 20 条/页：立即展示 20 条并发 pageChange");
+  click(host.querySelector('.sn-tbl-ps .sn-item[data-v="10"]'));
   click(host.querySelector('.sn-pager .sn-pg[data-p="3"]'));
   ok(visCount() === 5 && pgEv.at(-1)?.page === 3 && pgEv.at(-1)?.pageSize === 10, "翻到第 3 页：显示最后 5 条并发 pageChange");
   tb.update({ filter: (r) => r.shots <= 24 });

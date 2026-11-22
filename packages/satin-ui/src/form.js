@@ -99,13 +99,24 @@ const selects = new Set();
 export const forgetSelect = (api) => selects.delete(api);
 export function mountSelect(h, { onChange } = {}) {
   if (h._select) return h._select;
-  const trig = h.querySelector(".sn-trigger,[data-menubtn]"), items = [...h.querySelectorAll(".sn-menu .sn-item")];
-  const close = (refocus) => { if (!h.classList.contains("sn-open")) return; h.classList.remove("sn-open"); items.forEach((x) => x.classList.remove("sn-hl")); if (refocus) trig?.focus(); };
-  const open = () => { for (const o of selects) if (o !== api) o.close(); h.classList.add("sn-open"); hideTip(); };
+  const trig = h.querySelector(".sn-trigger,[data-menubtn]"), menu = h.querySelector(".sn-menu"), items = [...h.querySelectorAll(".sn-menu .sn-item")];
+  const fixedUp = !!menu?.classList.contains("sn-up"), fixedEnd = !!menu?.classList.contains("sn-end");
+  const close = (refocus) => { if (!h.classList.contains("sn-open")) return; h.classList.remove("sn-open"); trig?.setAttribute("aria-expanded", "false"); items.forEach((x) => x.classList.remove("sn-hl")); if (refocus) trig?.focus(); };
+  const open = () => {
+    for (const o of selects) if (o !== api) o.close();
+    if (menu && trig && typeof trig.getBoundingClientRect === "function" && typeof innerHeight === "number" && innerHeight > 0) {
+      const r = trig.getBoundingClientRect(), mh = menu.offsetHeight || 160, mw = menu.offsetWidth || r.width || 160;
+      const up = fixedUp || (r.bottom + 6 + mh > innerHeight - 8 && r.top - 6 - mh >= 8);
+      const end = fixedEnd || (r.left + mw > innerWidth - 8 && r.right - mw >= 8);
+      menu.classList.toggle("sn-up", up);
+      menu.classList.toggle("sn-end", end);
+    }
+    h.classList.add("sn-open"); trig?.setAttribute("aria-expanded", "true"); hideTip();
+  };
   const valueOf = (it) => it.dataset.v ?? it.textContent.trim();
   const pick = (it, quiet) => {
     if (it.querySelector(".sn-chk") || h.hasAttribute("data-select")) {
-      items.forEach((x) => x.classList.toggle("sn-sel", x === it));
+      items.forEach((x) => { const on = x === it; x.classList.toggle("sn-sel", on); if (x.hasAttribute("aria-selected")) x.setAttribute("aria-selected", String(on)); });
       const text = it.textContent.trim(), val = h.querySelector(".sn-val");
       if (val) val.textContent = text; else if (trig?.dataset.prefix != null) trig.firstChild.textContent = trig.dataset.prefix + text;
     }
