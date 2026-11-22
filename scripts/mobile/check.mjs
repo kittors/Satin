@@ -29,7 +29,8 @@ async function recipes() {
     const b = eng === "chrome" ? chrome : webkit;
     const ctx = await b.newContext(size === "phone" ? { ...PHONE, colorScheme: theme } : { viewport: { width: 1440, height: 900 }, colorScheme: theme, locale: "zh-CN" });
     const page = await ctx.newPage(), errs = []; watch(page, errs);
-    await page.goto(`${BASE}/tests/recipes/${id}.html`, { waitUntil: "load" });
+    await page.goto(`${BASE}/tests/recipes/${id}.html`, { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("load", { timeout: 30000 }).catch(() => {});
     await page.waitForFunction(() => document.documentElement.dataset.ready === "1", null, { timeout: 10000 }).catch(() => errs.push("没有就绪"));
     await sleep(700);
     const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
@@ -78,7 +79,8 @@ async function touchRun(engine) {
     if (engine === "webkit" && ["ctxmenu", "slider", "scrollarea", "drawer-swipe"].includes(a.key ?? a.id)) continue; // WebKit 没有 CDP，长按、拖、滑这类要逐点发触摸事件的跳过
     const ctx = await b.newContext({ ...PHONE, colorScheme: "light" }), page = await ctx.newPage(), errs = []; watch(page, errs);
     await page.addInitScript({ path: path.join(ROOT, "scripts/parity/inpage.js") });
-    await page.goto(`${BASE}/index.html?embed=${a.id}`, { waitUntil: "load" });
+    await page.goto(`${BASE}/index.html?embed=${a.id}`, { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("load", { timeout: 30000 }).catch(() => {});
     await page.evaluate(() => window.__parity.settle(400, 6000));
     let cdp = null;
     if (engine === "chrome") { cdp = await ctx.newCDPSession(page); if (CPU > 1) await cdp.send("Emulation.setCPUThrottlingRate", { rate: CPU }); }

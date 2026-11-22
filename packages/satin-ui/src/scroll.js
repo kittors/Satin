@@ -24,7 +24,7 @@ export function scrollArea(el, options = {}) {
   if (el._sa) { if (options && Object.keys(options).length) el._sa.set(options); return el._sa; } // 接过的：改选项（标记里带着 sa-vp 类、但还没接过的照常接）
   const o = { fade: "y", size: undefined, inner: false, bar: "auto", barSize: 5, barInset: 1, overscroll: "auto", wheel: "auto", ...options };
   let box, vp;
-  const elCls0 = el.className, elPad0 = el.style.padding, elOv0 = el.style.overflow; // 销毁时还原
+  const elCls0 = el.className, elPad0 = el.style.padding, elOv0 = el.style.overflow, osX0 = el.style.overscrollBehaviorX, osY0 = el.style.overscrollBehaviorY; // 销毁时还原
   if (o.inner) {
     box = el; vp = document.createElement("div");
     const cs = getComputedStyle(el);
@@ -138,7 +138,15 @@ export function scrollArea(el, options = {}) {
     by.remove(); bx.remove();
     if (o.inner) { while (vp.firstChild) el.insertBefore(vp.firstChild, vp); vp.remove(); el.style.padding = elPad0; el.style.overflow = elOv0; }
     else if (box.parentNode) { box.parentNode.insertBefore(el, box); box.remove(); }
-    el.className = elCls0; if (!elCls0) el.removeAttribute("class");
+    if (o.inner) { el.className = elCls0; if (!elCls0) el.removeAttribute("class"); }
+    else {
+      // 元素自己当视口：只撤这里加的类和内联样式（滚到头的设定、JS 驱动时的渐隐宽度）——接上以后别人加的类、写的样式不动
+      const had = new Set(elCls0.split(/\s+/));
+      for (const c of ["sn-sa-vp", "sn-fy", "sn-fx", "sn-no-t", "sn-no-b", "sn-no-l", "sn-no-r"]) if (!had.has(c)) el.classList.remove(c);
+      if (!el.className) el.removeAttribute("class");
+      el.style.overscrollBehaviorX = osX0; el.style.overscrollBehaviorY = osY0; for (const k of ["t", "b", "l", "r"]) el.style.removeProperty(`--sn-sa-${k}`);
+      if (!el.getAttribute("style")) el.removeAttribute("style");
+    }
     delete el._sa; delete vp._sa;
   };
   const api = { box, vp, refresh: measure, set(next) { Object.assign(o, next); apply(); later(); }, destroy, get options() { return { ...o }; } };

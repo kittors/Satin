@@ -12,6 +12,7 @@ const parse = (v) => { if (v == null) return undefined; try { return JSON.parse(
 const camel = (s) => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 const COMPONENTS = {
   segmented: [S.createSegmented, ["items", "value", "size", "label"]],
+  avatar: [S.createAvatar, ["src", "name", "seed", "size", "label", "decorative", "status", "online"]],
   slider: [S.createSlider, ["value", "max", "label"]],
   select: [S.createSelect, ["items", "value", "placeholder", "label"]],
   otp: [S.createOtp, ["length"]],
@@ -29,7 +30,13 @@ export function defineElements(prefix = "sn") {
     const attrs = props.map((p) => p.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase()));
     customElements.define(tag, class extends HTMLElement {
       static observedAttributes = attrs;
-      opts() { const o = {}; for (const a of attrs) if (this.hasAttribute(a)) o[camel(a)] = parse(this.getAttribute(a)); return o; }
+      opts() {
+        const o = {};
+        for (const a of attrs) if (this.hasAttribute(a)) o[camel(a)] = parse(this.getAttribute(a));
+        // 自定义元素用 status="online" 表达在线点，避开 Svelte 5 / Angular / Solid 把 on* 属性当事件监听
+        if (name === "avatar" && o.status === "online") { o.online = true; delete o.status; }
+        return o;
+      }
       // 插进页面后等这一轮同步代码跑完再创建：Angular 这类框架先插元素、同一轮里再设 [attr.xxx]，马上创建拿到的是空选项。
       // 微任务在下一帧画出来之前就跑完，纯 HTML 页面看不出差别
       connectedCallback() {

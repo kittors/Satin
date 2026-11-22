@@ -22,6 +22,8 @@ import { mountPlayer, mountAudio, playerHTML, audioHTML } from "./media.js";
 import { openPopover, popoverOf, openDialog, closeDialog, openDrawer, closeDrawer, mountCmdk, openMenu, closeMenu } from "./overlay.js";
 import { openLightbox, closeLightbox } from "./lightbox.js";
 import { tableHTML, mountTable, sortRows } from "./table.js";
+import { presetAvatar } from "./avatar-presets.js";
+export { presetAvatar, avatarSvg, AVATAR_IDS } from "./avatar-presets.js";
 
 // 给内层实例补几个方法（destroy……）：按属性描述符合并，getter（value、tags……）不会变成快照
 // 合并实例：more 的同名属性盖过 base 的，只有 destroy 两边都有时先后都调（原来直接盖掉，mountXxx 自己的 destroy 就丢了）
@@ -60,6 +62,44 @@ export const spinnerHTML = ({ size } = {}) => `<span class="${cx("sn-spinner", s
 
 // 按钮的等待、成功、复制：在已有按钮上用
 export { busy, succeed, copied, removeChip, toast, notify };
+
+// ———— 头像 ————
+// 有照片用照片（src），没给或者加载失败就按 seed / name 稳定地挑一张预设（同一个名字永远是同一张）；头像里不放文字（"+3" 这种计数照旧写 .sn-av.sn-more）。
+// 旁边已经写了名字（列表、表格、评论）就传 decorative：整个头像 aria-hidden；单独出现时 role="img"，读屏念 label（没给就念 name）。
+// 尺寸 16 / 20 / 24 / 32（默认）/ 40 / 64，类名 sn-2xs / sn-xs / sn-sm / — / sn-lg / sn-xl；24 及以下用简化版预设。online 在右下角画在线点
+const AV_SIZE = { 16: "sn-2xs", 20: "sn-xs", 24: "sn-sm", 32: "", 40: "sn-lg", 64: "sn-xl" };
+const flag = (v) => v === "" || (v != null && v !== false && v !== "false"); // 自定义元素上只写属性名（<sn-avatar decorative>）值是空字符串，也算开
+export const avatarHTML = ({ src, name, seed, size = 32, label, decorative: dec, online: on } = {}) => {
+  const decorative = flag(dec), online = flag(on), s = +size || 32, lab = decorative ? "" : String(label ?? name ?? ""), key = String(seed ?? name ?? "");
+  return `<span${attrs({ class: cx("sn-av", AV_SIZE[s], online && "sn-online"), style: s in AV_SIZE ? null : `--sn-s:${s}px`, role: lab ? "img" : null, "aria-label": lab || null, "aria-hidden": lab ? null : "true", "data-seed": src ? key : null })}>`
+    + (src ? `<img src="${esc(src)}" alt="" decoding="async">` : presetAvatar(key, s).svg) + (online ? "<i></i>" : "") + `</span>`;
+};
+const AV_KEYS = ["src", "name", "seed", "size", "label", "decorative", "online"];
+export const createAvatar = /* @__PURE__ */ defineComponent({
+  name: "avatar",
+  defaults: { size: 32 },
+  html: avatarHTML,
+  mount(el, o) {
+    let opts = o;
+    // 照片加载失败（坏链接、离线）：原地换成预设；服务端渲染出来的标记也能退回（seed 记在 data-seed 上）
+    const watch = () => {
+      const img = el.querySelector(":scope > img"); if (!img) return;
+      const fail = () => { if (!img.isConnected) return; img.insertAdjacentHTML("afterend", presetAvatar(el.dataset.seed ?? opts.seed ?? opts.name ?? "", opts.size).svg); img.remove(); };
+      if (img.complete && !img.naturalWidth && img.getAttribute("src")) fail(); else img.addEventListener("error", fail, { once: true });
+    };
+    watch();
+    return {
+      // 选项真变了才重画（父组件每次重新渲染都会调 update：不比一下，正在加载的照片会被换掉重来）；使用者自己加的非 sn- 类保留
+      update(n, p) {
+        opts = n; if (AV_KEYS.every((k) => n[k] === p[k])) return;
+        const t = el.ownerDocument.createElement("template"); t.innerHTML = avatarHTML(n); const nu = t.content.firstElementChild;
+        const keep = [...el.classList].filter((c) => !c.startsWith("sn-"));
+        for (const a of ["style", "role", "aria-label", "aria-hidden", "data-seed"]) { const v = nu.getAttribute(a); if (v == null) el.removeAttribute(a); else el.setAttribute(a, v); }
+        el.className = cx(nu.className, ...keep); el.replaceChildren(...nu.childNodes); watch();
+      },
+    };
+  },
+});
 
 // ———— 分段控件 ————
 export const createSegmented = /* @__PURE__ */ defineComponent({

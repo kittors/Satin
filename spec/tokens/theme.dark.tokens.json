@@ -631,6 +631,129 @@
         },
         "$description": "流程图画布网格点"
       }
+    },
+    "avatar": {
+      "bg": {
+        "$type": "color",
+        "$value": "#a7a7aa",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-bg",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "头像的圆底（预设头像；照片没加载出来时也露出它）（深色下保留浅色、压到约 72%：头像是图片，不反色；页面、卡片、浮层上都分得出来，黑发有剪影）"
+      },
+      "ink": {
+        "$type": "color",
+        "$value": "#424245",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-ink",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的线条、眼睛（深色下不压暗，黑发在圆底上留一道轮廓）"
+      },
+      "face": {
+        "$type": "color",
+        "$value": "#e1e1e1",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-face",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的脸、耳朵、脖子（深色下沿用浅色、压到约 90%）"
+      },
+      "black": {
+        "$type": "color",
+        "$value": "#393432",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-black",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的发色：黑（深色下沿用浅色、压到约 90%）"
+      },
+      "brown": {
+        "$type": "color",
+        "$value": "#523f32",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-brown",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的发色：深棕（深色下沿用浅色、压到约 90%）"
+      },
+      "gray": {
+        "$type": "color",
+        "$value": "#b5b2ae",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-gray",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的发色：灰（年长者）（深色下沿用浅色、压到约 90%）"
+      },
+      "blue": {
+        "$type": "color",
+        "$value": "#b3bbc4",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-blue",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的衣服、帽子、耳机：灰蓝（深色下沿用浅色、压到约 90%）"
+      },
+      "green": {
+        "$type": "color",
+        "$value": "#b9c0b4",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-green",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的衣服：灰绿（深色下沿用浅色、压到约 90%）"
+      },
+      "pink": {
+        "$type": "color",
+        "$value": "#c6bab7",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-pink",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的衣服：灰粉（深色下沿用浅色、压到约 90%）"
+      },
+      "violet": {
+        "$type": "color",
+        "$value": "#c0bcc9",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-violet",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的衣服、耳机：淡紫（深色下沿用浅色、压到约 90%）"
+      },
+      "beard": {
+        "$type": "color",
+        "$value": "#867f7a",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-beard",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的胡子（深色下沿用浅色、压到约 90%）"
+      }
     }
   },
   "shadow": {

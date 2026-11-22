@@ -41,7 +41,11 @@
 .sn-c-tertiary { color: var(--sn-label3); }
 .sn-c-off { color: var(--sn-label-off); }
 .sn-c-danger { color: var(--sn-danger); }
-.sn-c-success { color: var(--sn-success); }
+/* 成功色写成小字：浅色主题下 --sn-success 在白底上只有 4.40（小字要 ≥ 4.5），混 14% 黑到约 5.6；深色主题照旧。
+   令牌本身不动——标签圆点、进度条、横幅这些面积色用它，没有对比度问题 */
+.sn-c-success { color: color-mix(in srgb, var(--sn-success) 86%, #000); }
+:where([data-theme="dark"]) .sn-c-success { color: var(--sn-success); }
+@media (prefers-color-scheme: dark) { :where(:root:not([data-theme])) .sn-c-success { color: var(--sn-success); } }
 .sn-c-warning { color: var(--sn-warning); }
 .sn-num { font-variant-numeric: tabular-nums; }
 .sn-truncate { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

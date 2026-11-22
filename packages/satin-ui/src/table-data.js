@@ -43,6 +43,8 @@ export function optionOf(col, v) {
   if (i < 0) return null;
   const x = o[i]; return { i, label: x != null && typeof x === "object" ? String(x.label ?? x.value) : String(x), tone: x != null && typeof x === "object" && x.tone != null ? x.tone : i };
 }
+// 负责人列挑预设头像用的键：对象选项用 value（存用户 id 就按 id 挑，重名、改名都不乱），字符串选项用显示的名字
+export const ownerSeed = (col, v, text) => { const o = optionOf(col, v), x = o ? col.options[o.i] : null; return x != null && typeof x === "object" ? String(x.value) : text; };
 // 第 i 个选项的值（编辑、筛选回写用）：对象选项是 value；字符串选项看数据里原来存的是什么（数字存下标、否则存文字）
 export const optionValue = (col, i, sample) => { const x = col.options?.[i]; return x != null && typeof x === "object" ? x.value : typeof sample === "number" ? i : x; };
 export const optionLabels = (col) => (col.options || []).map((x) => (x != null && typeof x === "object" ? String(x.label ?? x.value) : String(x)));

@@ -14,12 +14,14 @@ const CASES = [
   ["toast", `import { toast } from "satin-ui/components"; toast({ text: "已保存" });`, 10],
   ["openDialog", `import { openDialog } from "satin-ui/components"; openDialog(document.querySelector("dialog"));`, 3],
   ["createTabs", `import { createTabs } from "satin-ui/components"; createTabs(document.body, { tabs: [] });`, 7],
+  ["createAvatar", `import { createAvatar } from "satin-ui/components"; createAvatar(document.body, { name: "林夏" });`, 6.5], // 头像（2026-11-22 新加）：12 张预设单独一个模块（avatar-presets.js，共用片段 + 每人差异，拼成 SVG），只有用到头像才打进包；预算 = 实测加一成余量
+  ["avatarHTML", `import { avatarHTML } from "satin-ui/components"; document.body.innerHTML = avatarHTML({ name: "林夏" });`, 4.5], // 只要标记（SSR、写标记）：预设 + 拼标记，不带组件生命周期
   ["buttonHTML", `import { buttonHTML } from "satin-ui/components"; document.body.innerHTML = buttonHTML({ text: "保存" });`, 8],
   ["React Button", `import { Button } from "satin-ui/react"; export default Button;`, 9],
   ["React Segmented", `import { Segmented } from "satin-ui/react"; export default Segmented;`, 21],
   ["Vue Segmented", `import { Segmented } from "satin-ui/vue"; export default Segmented;`, 23],
   ["markdown（重组件）", `import { renderMarkdown } from "satin-ui/markdown"; renderMarkdown(document.body, "# hi");`, 38],
-  ["grid（重组件）", `import { mountDataGrid } from "satin-ui/grid"; mountDataGrid(document.body);`, 48],
+  ["grid（重组件）", `import { mountDataGrid } from "satin-ui/grid"; mountDataGrid(document.body);`, 52], // 2026-11-22 +3.5：负责人列不再画名字的第一个字，改用预设头像（带上 12 张预设的模块，约 3.2KB）；此前 +0.5：一行放不下就横着滑（fitScroll）放得下了要回到原来的排列（带回差、焦点还原），滚动区域拆掉时连监听、内联样式一起撤
 ];
 const alias = { name: "alias", setup(b) {
   // 包里的 JS 都没有副作用（package.json 的 sideEffects 只列了 css 和 theme-boot）：插件解析出来的路径也按这个标

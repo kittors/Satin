@@ -568,6 +568,129 @@
         },
         "$description": "Tooltip、Toast 的文字"
       }
+    },
+    "avatar": {
+      "bg": {
+        "$type": "color",
+        "$value": "{color.bg.sunken}",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-bg",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "头像的圆底（预设头像；照片没加载出来时也露出它）"
+      },
+      "ink": {
+        "$type": "color",
+        "$value": "#424245",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-ink",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的线条、眼睛"
+      },
+      "face": {
+        "$type": "color",
+        "$value": "#fafafa",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-face",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的脸、耳朵、脖子"
+      },
+      "black": {
+        "$type": "color",
+        "$value": "#3f3a37",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-black",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的发色：黑"
+      },
+      "brown": {
+        "$type": "color",
+        "$value": "#5b4637",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-brown",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的发色：深棕"
+      },
+      "gray": {
+        "$type": "color",
+        "$value": "#c9c6c1",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-gray",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的发色：灰（年长者）"
+      },
+      "blue": {
+        "$type": "color",
+        "$value": "#c7d0da",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-blue",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的衣服、帽子、耳机：灰蓝"
+      },
+      "green": {
+        "$type": "color",
+        "$value": "#cdd5c8",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-green",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的衣服：灰绿"
+      },
+      "pink": {
+        "$type": "color",
+        "$value": "#dccfcb",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-pink",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的衣服：灰粉"
+      },
+      "violet": {
+        "$type": "color",
+        "$value": "#d5d1df",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-violet",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的衣服、耳机：淡紫"
+      },
+      "beard": {
+        "$type": "color",
+        "$value": "#958e88",
+        "$extensions": {
+          "com.satin": {
+            "var": "--av-beard",
+            "source": "avatar-presets"
+          }
+        },
+        "$description": "预设头像的胡子"
+      }
     }
   },
   "shadow": {

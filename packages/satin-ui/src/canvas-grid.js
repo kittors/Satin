@@ -5,7 +5,8 @@
 // - 命中判断按行高和列的 x 算；悬停、勾选、拖行让位（每帧按 45ms 时间常数逼近）、编辑后闪一下、数据到了淡入、换列位置时列从旧位置滑过去，都在画布上画；
 // - 编辑：在格子的位置盖一个输入框（选项列弹出选项），滚动就先提交；读屏：当前格子的内容写进一个看不见的 aria-live 区域。
 import { $, injectIcons, initSeg, reduced } from "./core.js";
-import { normCols, optionOf, optionValue, textOf, parseEdit, editText } from "./table-data.js";
+import { normCols, optionOf, optionValue, textOf, parseEdit, editText, ownerSeed } from "./table-data.js";
+import { presetAvatar, avatarSvg } from "./avatar-presets.js";
 import { createSource } from "./table-source.js";
 import { backendOf } from "./table-backends.js";
 import { closeGridPops, esc, heightCSS, setGridHeight, mountGridState, primaryTitle, gridBarHTML, gridShadesHTML, colStops, columnModel, createMerges, createRowMotion, createTreeSel, dragClamp, gapPieces, gapStep, mountHead, mountMergeBar, mountToolbar, openEnum, shades, slotShift, treeCols, treeDrag } from "./grid.js";
@@ -56,7 +57,22 @@ export function mountCanvasGrid(root, o = {}) {
   const probe = document.createElement("i"); probe.style.display = "none"; root.append(probe);
   const col = (v) => { probe.style.color = v; return getComputedStyle(probe).color; };
   let C = {};
-  const readColors = () => { readShape(); readFont(); C = { field: col("var(--sn-field)"), onPrimary: col("var(--sn-on-primary)"), ghostHover: col("var(--sn-b-ghost-hover)"), fillHover: col("var(--sn-fill-hover)"), bg: col("var(--sn-g-bg)"), hover: col("var(--sn-g-hover)"), sel: col("var(--sn-g-selbg)"), selHover: col("var(--sn-g-selhover)"), line: col("var(--sn-g-rowline)"), lineC: col("var(--sn-line-control)"), label: col("var(--sn-label)"), label2: col("var(--sn-label2)"), label3: col("var(--sn-label3)"), fillS: col("var(--sn-fill-subtle)"), fillA: col("var(--sn-fill-active)"), raised: col("var(--sn-raised)"), accent: col("var(--sn-accent)"), success: col("var(--sn-success)"), warning: col("var(--sn-warning)"), focus: col("var(--sn-focus)"), ring: col("var(--sn-ring)"), flash: col("var(--sn-g-flash)"), selLine: col("var(--sn-sel-ring)"), gapBg: col("color-mix(in srgb, var(--sn-label) 5%, var(--sn-g-bg))"), gapLine: col("color-mix(in srgb, var(--sn-label) 12%, transparent)"), tree: col("var(--sn-tree-line)"), selFill: col("color-mix(in srgb, var(--sn-label) 4%, transparent)"), rgFill: col("color-mix(in srgb, var(--sn-label) 7%, transparent)"), rgLine: col("var(--sn-range-line)"), dtBg: col("color-mix(in srgb, var(--sn-label) 2%, var(--sn-g-bg))"), dark: document.documentElement.dataset.theme === "dark" }; tw.clear(); schedule(); };
+  // 预设头像：SVG 里的 --sn-av-* 换成当前主题的颜色，画成图片按主题缓存；没加载好先画圆底，加载好整表重画；换主题时新的一张没好之前先用上一张（不闪成空圆）
+  const AVK = ["bg", "ink", "face", "black", "brown", "gray", "blue", "green", "pink", "violet", "beard"], avIds = new Map(), avPics = new Map(), avLast = new Map();
+  let AV = {}, avTheme = "";
+  const readAv = () => { AV = {}; for (const k of AVK) { const v = col(`var(--sn-av-${k}, transparent)`); if (v !== "rgba(0, 0, 0, 0)") AV[k] = v; } avTheme = JSON.stringify(AV); };
+  const avPic = (seed) => {
+    let id = avIds.get(seed); if (!id) avIds.set(seed, (id = presetAvatar(seed).id));
+    const key = avTheme + id; let e = avPics.get(key);
+    if (!e) {
+      const svg = avatarSvg(id, 20).replace(/var\(--sn-av-([a-z]+),([^)]+)\)/g, (_, k, fb) => AV[k] ?? fb).replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" ');
+      const img = new Image(); e = { img, ok: false }; avPics.set(key, e);
+      img.onload = () => { e.ok = true; avLast.set(id, e); schedule(); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+    return e.ok ? e : avLast.get(id);
+  };
+  const readColors = () => { readShape(); readFont(); readAv(); C = { field: col("var(--sn-field)"), onPrimary: col("var(--sn-on-primary)"), ghostHover: col("var(--sn-b-ghost-hover)"), fillHover: col("var(--sn-fill-hover)"), bg: col("var(--sn-g-bg)"), hover: col("var(--sn-g-hover)"), sel: col("var(--sn-g-selbg)"), selHover: col("var(--sn-g-selhover)"), line: col("var(--sn-g-rowline)"), lineC: col("var(--sn-line-control)"), label: col("var(--sn-label)"), label2: col("var(--sn-label2)"), label3: col("var(--sn-label3)"), fillS: col("var(--sn-fill-subtle)"), fillA: col("var(--sn-fill-active)"), raised: col("var(--sn-raised)"), accent: col("var(--sn-accent)"), success: col("var(--sn-success)"), warning: col("var(--sn-warning)"), focus: col("var(--sn-focus)"), ring: col("var(--sn-ring)"), flash: col("var(--sn-g-flash)"), selLine: col("var(--sn-sel-ring)"), gapBg: col("color-mix(in srgb, var(--sn-label) 5%, var(--sn-g-bg))"), gapLine: col("color-mix(in srgb, var(--sn-label) 12%, transparent)"), tree: col("var(--sn-tree-line)"), selFill: col("color-mix(in srgb, var(--sn-label) 4%, transparent)"), rgFill: col("color-mix(in srgb, var(--sn-label) 7%, transparent)"), rgLine: col("var(--sn-range-line)"), dtBg: col("color-mix(in srgb, var(--sn-label) 2%, var(--sn-g-bg))"), dark: document.documentElement.dataset.theme === "dark" }; tw.clear(); schedule(); };
   // 圆角：复选框用 --r-xs；图标按钮、展开箭头的悬停底照着组件库按钮的实际圆角（顶栏切"圆角"时跟着变）
   const shapeProbe = document.createElement("button"); shapeProbe.className = "sn-btn sn-ghost sn-sm sn-ibtn"; shapeProbe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none"; shapeProbe.tabIndex = -1; root.append(shapeProbe);
   let rXS = 4, rBtn = 6, rSM = 6; function readShape() { const cs = getComputedStyle(document.documentElement); rXS = parseFloat(cs.getPropertyValue("--sn-r-xs")) || 4; rSM = parseFloat(cs.getPropertyValue("--sn-r-sm")) || 6; rBtn = Math.min(14, parseFloat(getComputedStyle(shapeProbe).borderTopLeftRadius) || 6); }
@@ -115,7 +131,7 @@ export function mountCanvasGrid(root, o = {}) {
   const F = {};
   function readFont() {
     const cs = getComputedStyle(document.documentElement), fam = cs.getPropertyValue("--sn-sans").trim() || "-apple-system, 'PingFang SC', sans-serif", k = Math.min(1.14, parseFloat(cs.getPropertyValue("--sn-font-scale")) || 1);
-    Object.assign(F, { t: `400 ${13 * k}px ${fam}`, s: `400 ${12 * k}px ${fam}`, av: `500 ${11 * k}px ${fam}` }); font = "";
+    Object.assign(F, { t: `400 ${13 * k}px ${fam}`, s: `400 ${12 * k}px ${fam}` }); font = "";
   }
   let font = ""; const setFont = (f) => { if (font !== f) { g.font = f; font = f; } };
   const tw = new Map();
@@ -162,7 +178,7 @@ export function mountCanvasGrid(root, o = {}) {
         return;
       }
       case "status": { const v = src.val(r, k), op = optionOf(col, v), tone = op ? op.tone : v; g.beginPath(); g.arc(x + 15, m, 3, 0, Math.PI * 2); if (tone === 4) { g.strokeStyle = C.label3; g.lineWidth = 1.5; g.stroke(); } else { g.fillStyle = [C.label3, C.accent, C.warning, C.success][tone] ?? C.label3; g.fill(); } return text(textOf(col, v, src.row(r)), x + 24, m, F.t, C.label); }
-      case "owner": { const t = textOf(col, src.val(r, k), src.row(r)); g.beginPath(); g.arc(x + 22, m, 10, 0, Math.PI * 2); g.fillStyle = C.fillA; g.fill(); text(t[0] ?? "", x + 22, m + .5, F.av, C.label2, "center"); return text(t, x + 38, m, F.t, C.label); }
+      case "owner": { const v = src.val(r, k), t = textOf(col, v, src.row(r)), pic = avPic(ownerSeed(col, v, t)); g.beginPath(); g.arc(x + 22, m, 10, 0, Math.PI * 2); g.fillStyle = AV.bg ?? C.fillA; g.fill(); if (pic) { g.save(); g.clip(); g.drawImage(pic.img, x + 12, m - 10, 20, 20); g.restore(); } return text(t, x + 38, m, F.t, C.label); }
       case "tag": { const s = textOf(col, src.val(r, k), src.row(r)), tw2 = width(s, F.s) + 16; g.beginPath(); g.roundRect(x + 12, m - 10, tw2, 20, 10); g.fillStyle = C.fillS; g.fill(); return text(s, x + 20, m, F.s, C.label2); }
       case "time": return text(textOf(col, src.val(r, k), src.row(r)), x + 12, m, F.t, C.label2);
       case "prog": { const v = +src.val(r, k) || 0, bw = w - 24 - 42; g.fillStyle = C.fillA; g.beginPath(); g.roundRect(x + 12, m - 2, bw, 4, 2); g.fill(); if (v) { g.fillStyle = v === 100 ? C.success : C.label2; g.beginPath(); g.roundRect(x + 12, m - 2, Math.max(4, bw * v / 100), 4, 2); g.fill(); } return text(col.format ? textOf(col, v, src.row(r)) : v + "%", x + w - 12, m, F.s, C.label2, "right"); }

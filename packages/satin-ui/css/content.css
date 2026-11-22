@@ -305,7 +305,7 @@
 /* ———— 新对话（createChat 的 empty）————
    还没有消息时，消息区（输入框上面那一片）正中：单色图标、标题、副标题、几个建议胶囊（点了填进输入框）；
    发出第一条就淡出（只动透明度和位移），输入框原地不动。不加光晕、渐变，颜色只用文字的三档灰 */
-.sn-chat-empty { position: absolute; z-index: 1; inset: 0 0 var(--sn-foot-h, 0px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 24px 40px; text-align: center; pointer-events: none; }
+.sn-chat-empty { position: absolute; z-index: 1; inset: 0 0 var(--sn-foot-h, 0px); display: flex; flex-direction: column; align-items: center; justify-content: center; justify-content: safe center; padding: 24px 24px 40px; text-align: center; pointer-events: none; } /* safe：框太矮装不下时从上往下排，不往上顶到顶栏后面 */
 .sn-chat-empty[hidden] { display: none; }
 .sn-chat-empty > * { pointer-events: auto; }
 .sn-chat-empty-ic { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 18px; color: var(--sn-label3); }
@@ -328,6 +328,12 @@
   .sn-chat-empty-ic { width: 40px; height: 40px; margin-bottom: 14px; } .sn-chat-empty-ic .sn-ic { width: 40px; height: 40px; }
   .sn-chat-empty-t { font-size: calc(20px * var(--sn-font-scale, 1)); line-height: calc(28px * var(--sn-font-scale, 1)); }
   .sn-chat-sugs { margin-top: 20px; }
+}
+/* 手机横屏：空状态只剩 180～260 高，装不下图标、标题、建议一整套——去掉装饰图标、收紧上下留白（iPhone SE 横屏原来图标顶到顶栏的标题上） */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .sn-chat-empty { padding-top: 12px; padding-bottom: 16px; }
+  .sn-chat-empty-ic { display: none; }
+  .sn-chat-sugs { margin-top: 16px; }
 }
 /* 回复下面的操作：图标灰、悬停才有底；赞 / 踩按下后留底色；时间在最后 */
 .sn-ai-acts { display: flex; align-items: center; gap: 2px; margin-left: -6px; }
@@ -370,9 +376,11 @@
 /* 外圈 1px 的线画在最上面一层：画在 .sn-chat 自己身上（内阴影）会被输入框那一段的底色（淡出）盖住，左、右、下三边断开 */
 .sn-chat::after { content: ""; position: absolute; inset: 0; z-index: 7; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--sn-card-line); pointer-events: none; }
 .sn-chat-jump { bottom: calc(var(--sn-foot-h, 120px) + 4px); }
-/* 手机上（窄于 640）对话铺满，不是一张卡片：去掉圆角和外圈的线；顶栏像手机应用的导航栏（标题居中、让出刘海）；输入框贴底、让出底部安全区。
-   参照 ChatGPT、Codex 的手机端。设计稿的演示在 demo/doc.css 里照旧画成卡片 */
-@media (max-width: 640px) {
+/* 手机上（竖屏窄于 640；横屏矮于 500、窄于 960）对话铺满，不是一张卡片：去掉圆角和外圈的线；顶栏像手机应用的导航栏（标题居中、让出刘海）；输入框贴底、让出底部安全区。
+   横屏时刘海、圆角在左右两边：整个对话左右让出安全区（底色照样铺到边上）。参照 ChatGPT、Codex 的手机端。设计稿的演示在 demo/doc.css 里照旧画成卡片 */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .sn-chat { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  .sn-chat-foot { left: env(safe-area-inset-left); right: env(safe-area-inset-right); }
   .sn-chat { min-height: 0; border-radius: 0; box-shadow: none; }
   .sn-chat-hd { justify-content: center; padding-top: env(safe-area-inset-top); box-sizing: content-box; }
   .sn-chat-hd .sn-tx { justify-items: center; text-align: center; }

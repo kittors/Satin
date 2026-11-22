@@ -84,7 +84,7 @@ export function watchErrors(page, list) {
 export async function sectionIds(browser, side = "base") {
   const ctx = await newContext(browser, { side }), page = await ctx.newPage();
   await page.goto(SIDES[side].url + "/index.html?embed=color", { waitUntil: "load" });
-  const ids = await page.evaluate(async () => { const r = await fetch("index.html"), t = await r.text(); return [...t.matchAll(/<section class="spec" id="([a-z0-9-]+)"/g)].map((m) => m[1]); });
+  const ids = await page.evaluate(async () => { const r = await fetch("index.html"), t = await r.text(); return [...t.matchAll(/<section class="spec" id="([a-z0-9-]+)"([^>]*)>/g)].filter((m) => !/data-parity-appended/.test(m[2])).map((m) => m[1]); });
   await ctx.close();
   return ids;
 }

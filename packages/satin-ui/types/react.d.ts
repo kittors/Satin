@@ -1,9 +1,11 @@
 // satin-ui/react
 import type * as React from "react";
-import type { SatinInstance, Item, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions, TableColumn, TableCellContext, TableApi, ComposerParts, ComposerPartEvents } from "./components";
+import type { SatinInstance, Item, AvatarOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions, TableColumn, TableCellContext, TableApi, ComposerParts, ComposerPartEvents } from "./components";
 type Base = { className?: string; style?: React.CSSProperties; id?: string };
 type Controlled<T, K extends string = "value"> = { [P in K]?: T } & { [P in `default${Capitalize<K>}`]?: T };
 type Ref = React.Ref<SatinInstance | null>;
+/** 头像：<Avatar name="林知远" size={24} decorative />；有照片给 src，加载失败退回预设 */
+export const Avatar: React.ForwardRefExoticComponent<Base & AvatarOptions & React.RefAttributes<SatinInstance>>;
 export const Segmented: React.ForwardRefExoticComponent<Base & Controlled<string> & { items: Item[]; size?: "sm" | "md"; label?: string; onChange?(value: string): void } & React.RefAttributes<SatinInstance>>;
 export const Slider: React.ForwardRefExoticComponent<Base & Controlled<number> & { max?: number; label?: string; onChange?(value: number): void } & React.RefAttributes<SatinInstance>>;
 /** 下拉选择的属性：value 受控、defaultValue 非受控 */

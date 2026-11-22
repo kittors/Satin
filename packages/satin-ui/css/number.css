@@ -13,6 +13,10 @@
 /* ———— 演示 ———— */
 .sn-nf-cfg { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 12px; }
 .sn-nf-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+/* 正好 4 格时：放得下 4 个就一行 4 个，放不下就 2 × 2、再窄一个一行——不排成 3 + 1（演示框是尺寸容器，按演示框自己的宽度；阈值和上面 190 宽的格子一致） */
+.sn-nf-demo:has(> :nth-child(4):last-child) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@container (max-width: 795.98px) { .sn-nf-demo:has(> :nth-child(4):last-child) > * { grid-column: span 2; } }
+@container (max-width: 391.98px) { .sn-nf-demo:has(> :nth-child(4):last-child) > * { grid-column: 1 / -1; } }
 .sn-nf-card { display: grid; align-content: start; gap: 10px; padding: 16px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); }
 .sn-nf-card .sn-cap { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-nf-card .sn-nf-big, .sn-nf-card .sn-nf-mid { justify-self: start; } /* 贴合内容，位数变化时宽度跟着长、跟着收 */

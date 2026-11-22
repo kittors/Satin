@@ -1,15 +1,34 @@
 /* Satin：页面骨架——页面容器、页头、面板（卡片）、纵向堆叠、横排、自适应网格、两栏、表单、登录页。
    做整页时用这些类搭结构，组件往里放；不用自己写外边距、断点和颜色。全部是新类名，不影响其他组件。
    断点按容器宽度（04 号 §9）：compact < 720、regular 720～1199、wide ≥ 1200。间距只取令牌（04 号 §3）。
-   卡片只靠描边和明度差分层，不加阴影（阴影只给浮层，04 号 §6）。 */
+   卡片只靠描边和明度差分层，不加阴影（阴影只给浮层，04 号 §6）。
+   手机上像应用的一屏：页面不留外圈边距，面板铺满左右、去掉圆角和描边；页头变成吸顶的导航栏；整屏页面（.sn-screen）里的主操作（.sn-bottom-bar）贴底、留出底部横条。
+   "手机"和对话组件同一个条件：窄于 640，或者横着拿的手机（横屏、高不到 500、宽不到 960）。都在文件最后那段里，宽屏不变；横屏时左右按安全区让开刘海。 */
 @layer satin {
 /* 页面容器：居中、限宽、四周留白；窄屏留白收小。.sn-narrow 给设置页、表单页这类单栏内容 */
-.sn-page { box-sizing: border-box; width: 100%; max-width: var(--sn-page-max, 1200px); margin-inline: auto; padding: var(--sn-pad-page) var(--sn-sp-40) var(--sn-sp-64); container: sn-page / inline-size; }
+/* 左右、上面的留白写成变量（--sn-page-x、--sn-page-t）：手机上导航栏、面板、底部操作栏按它铺到屏幕边上 */
+.sn-page { --sn-page-x: var(--sn-sp-40); --sn-page-t: var(--sn-pad-page); box-sizing: border-box; width: 100%; max-width: var(--sn-page-max, 1200px); margin-inline: auto; padding: var(--sn-page-t) var(--sn-page-x) var(--sn-sp-64); container: sn-page / inline-size; }
 .sn-page.sn-narrow { --sn-page-max: 760px; }
 .sn-page.sn-wide { --sn-page-max: 1440px; }
-@media (max-width: 719px) { .sn-page { padding: var(--sn-sp-20) var(--sn-sp-16) var(--sn-sp-40); } }
+@media (max-width: 719px) { .sn-page { --sn-page-x: var(--sn-sp-16); --sn-page-t: var(--sn-sp-20); padding: var(--sn-page-t) var(--sn-page-x) var(--sn-sp-40); } }
 /* 放在侧栏布局的主区里（.sn-app-main 自带 20 内边距）：只补到页面内边距 */
-.sn-app-main > .sn-page { padding: var(--sn-sp-12) var(--sn-sp-20) var(--sn-sp-48); }
+.sn-app-main > .sn-page { --sn-page-x: var(--sn-sp-20); --sn-page-t: var(--sn-sp-12); padding: var(--sn-page-t) var(--sn-page-x) var(--sn-sp-48); }
+
+/* 整屏页面（.sn-page.sn-screen）：像应用的一屏——竖向排、至少一屏高。
+   里面放对话这种自己会滚的整块（.sn-chat）时，它填满剩下的高度，整页不滚；桌面上下只留 16（对话框本身就是一整块）。
+   createChat(空容器) 把 .sn-chat 渲染在容器里面一层：容器也接着往下撑（弹性布局一层层传下去，不靠百分比高度） */
+.sn-page.sn-screen { display: flex; flex-direction: column; min-height: 100dvh; padding-bottom: var(--sn-sp-32); }
+.sn-screen > .sn-chat, .sn-screen > :has(> .sn-chat) > .sn-chat { flex: 1 1 0; min-height: 0; }
+.sn-screen > :has(> .sn-chat) { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.sn-page.sn-screen:has(> .sn-chat, > * > .sn-chat) { padding-block: var(--sn-sp-16); }
+/* 整屏页面里的主操作那一排（.sn-bottom-bar：合计 + 提交、上一步 + 下一步）：宽屏上就是内容末尾的一行，不贴底、不画底色和线；手机上贴底（见文件最后） */
+.sn-screen .sn-bottom-bar { position: static; margin-top: var(--sn-sp-20); padding: 0; background: none; border: 0; }
+@media (max-width: 640px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  /* 手机上（竖着、横着都算）对话铺满：页面没有边距；html、body 的底色跟对话一样（iOS 回弹、设备框涂安全区时露出来的都是这个颜色），任何地方不露画布灰。
+     顶栏让出状态栏、输入框让出底部横条由对话自己做（.sn-chat 窄于 640 时的 env(safe-area-inset-*)），页面要写 viewport-fit=cover */
+  .sn-page.sn-screen:has(> .sn-chat, > * > .sn-chat) { padding: 0; }
+  :root:has(.sn-screen > .sn-chat, .sn-screen > * > .sn-chat), :root:has(.sn-screen > .sn-chat, .sn-screen > * > .sn-chat) > body { background: var(--sn-raised); }
+}
 
 /* 页头：标题 + 一句说明在左，操作按钮在右；放不下时按钮换到下一行 */
 /* 用网格不用 flex：原来第一块写的是 flex: 1 1 320px，页面在手机上把页头改成 flex-direction: column 时，320px 变成了高度，标题下面空出一大块 */
@@ -20,6 +39,12 @@
 .sn-page-hd h1 { font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.012em; color: var(--sn-label); }
 .sn-page-hd p { margin-top: var(--sn-sp-4); font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-page-hd .sn-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sn-sp-8); }
+/* 页头里的返回（<a class="sn-nav-back">，放在标题前面）：宽屏是标题上面一行小字链接；手机上是导航栏左边的"‹ 上一页" */
+.sn-page-hd > .sn-nav-back { grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; gap: var(--sn-sp-4); height: 28px; margin: 0 0 calc(-1 * var(--sn-sp-4)) calc(-1 * var(--sn-sp-8)); padding: 0 var(--sn-sp-8);
+  border-radius: var(--sn-r-sm); font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-decoration: none; white-space: nowrap; transition: color .15s var(--sn-ease-out), background-color .15s var(--sn-ease-out); }
+.sn-page-hd > .sn-nav-back .sn-ic { width: 16px; height: 16px; margin-left: calc(-1 * var(--sn-sp-4)); }
+@media (hover: hover) { .sn-page-hd > .sn-nav-back:hover { color: var(--sn-label); background: var(--sn-fill-hover); } }
+.sn-page-hd > .sn-nav-back:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
 
 /* 分区：页面里的大块，之间留 section 间距；分区标题 17/600 */
 .sn-section + .sn-section { margin-top: var(--sn-sp-40); }
@@ -48,6 +73,11 @@
 .sn-gap-4 { --sn-gap: var(--sn-sp-4); } .sn-gap-8 { --sn-gap: var(--sn-sp-8); } .sn-gap-12 { --sn-gap: var(--sn-sp-12); } .sn-gap-16 { --sn-gap: var(--sn-sp-16); }
 .sn-gap-20 { --sn-gap: var(--sn-sp-20); } .sn-gap-24 { --sn-gap: var(--sn-sp-24); } .sn-gap-32 { --sn-gap: var(--sn-sp-32); } .sn-gap-48 { --sn-gap: var(--sn-sp-48); }
 
+/* 列表上面的工具条（.sn-filters）：搜索框 + 筛选（分段控件、芯片）+ 右边的次要按钮（加 .sn-end 靠右）。宽屏一行、搜索框 240 宽；手机上搜索框、分段控件各占一整行 */
+.sn-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sn-sp-12); margin-bottom: var(--sn-sp-16); }
+.sn-filters > .sn-ib { width: 240px; }
+.sn-filters > .sn-end { margin-left: auto; }
+
 /* 两栏：主内容 + 右侧栏（默认 320 宽）；页面变窄时右栏落到下面 */
 .sn-with-aside { display: grid; grid-template-columns: minmax(0, 1fr) var(--sn-aside, 320px); gap: var(--sn-sp-24); align-items: start; }
 @container sn-page (max-width: 899px) { .sn-with-aside { grid-template-columns: minmax(0, 1fr); } }
@@ -70,16 +100,108 @@
 .sn-auth > .sn-panel { width: min(100%, 400px); padding: var(--sn-sp-32); }
 .sn-auth h1 { font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.012em; color: var(--sn-label); }
 .sn-auth h1 + p { margin-top: var(--sn-sp-4); font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
-@media (max-width: 479px) { .sn-auth { place-items: start center; padding-top: var(--sn-sp-48); } .sn-auth > .sn-panel { padding: var(--sn-sp-24) var(--sn-sp-20); } }
+.sn-auth > .sn-panel > .sn-form { margin-top: var(--sn-sp-24); }
+/* 卡片底部的次要链接（"还没有账号？注册"）：宽屏在主按钮下面居中；手机上贴在屏幕底部 */
+.sn-auth-ft { margin-top: var(--sn-sp-20); text-align: center; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 
 /* 数字指标：标签、数值（等宽数字）、变化；一屏最多一排 3～4 个，不做"指标墙" */
 .sn-stat { display: grid; gap: var(--sn-sp-4); min-width: 0; }
 .sn-stat > span:first-child { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-stat > b { font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.012em; color: var(--sn-label); font-variant-numeric: tabular-nums; }
 .sn-stat > small { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); font-variant-numeric: tabular-nums; }
-.sn-stat > small.sn-up { color: var(--sn-success); } .sn-stat > small.sn-down { color: var(--sn-danger); }
+.sn-stat > small.sn-down { color: var(--sn-danger); }
+/* 涨的那行是 12px 小字：浅色主题下成功色在白底上只有 4.4，混一点黑加深到约 5.6（深色主题照旧）。写法同 buttons.css 的 .sn-danger-soft */
+.sn-stat > small.sn-up { color: color-mix(in srgb, var(--sn-success) 86%, #000); }
+:where([data-theme="dark"]) .sn-stat > small.sn-up { color: var(--sn-success); }
+@media (prefers-color-scheme: dark) { :where(:root:not([data-theme])) .sn-stat > small.sn-up { color: var(--sn-success); } }
+/* 一排指标（.sn-stats 里放 .sn-stat）：宽屏有几个排几列、一行放下；页面窄于 720（平板、手机）两列——4 个是 2 × 2，不会排成 3 + 1 */
+.sn-stats { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--sn-sp-20) var(--sn-sp-24); }
+@container sn-page (max-width: 719px) { .sn-stats { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* 移动端底部操作栏（下单、提交）：贴底，避开 iPhone 底部横条；键盘弹出时停在键盘上面（--sn-kb 由 setup() 算） */
 .sn-bottom-bar { position: sticky; bottom: var(--sn-kb, 0px); z-index: 5; display: flex; align-items: center; gap: var(--sn-sp-12); padding: var(--sn-sp-12) var(--sn-sp-16) calc(var(--sn-sp-12) + env(safe-area-inset-bottom)); background: var(--sn-raised); border-top: 1px solid var(--sn-line); }
 .sn-bottom-bar > .sn-grow { flex: 1 1 auto; min-width: 0; }
+
+/* 底部标签栏（手机上代替侧栏）：.sn-app 里最后放一个 nav.sn-tabbar，每项 a.sn-nav-item（图标 + 两个字，当前页加 .sn-on）。宽屏不显示，手机上侧栏藏起来、标签栏贴底 */
+.sn-tabbar { display: none; }
+
+/* 手机上藏起来：只在宽屏上需要的东西——表格里次要的列、落地页顶栏的锚点链接 */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) { .sn-hide-phone { display: none !important; } }
+
+/* ———— 手机（窄于 640，或者横着拿的手机）：像应用的一屏，不是桌面页面缩小 ————
+   不出现"页面边距一圈灰 + 中间一块白卡片"：面板铺满左右，导航栏、底部操作栏贴到屏幕边上，留出状态栏和底部横条（要写 viewport-fit=cover）。
+   左右留白取 16 和左右安全区里大的那个：横屏时内容让开刘海，底色照样铺到屏幕边上 */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
+  .sn-page, .sn-page.sn-narrow, .sn-page.sn-wide { --sn-page-x: max(var(--sn-sp-16), env(safe-area-inset-left), env(safe-area-inset-right)); max-width: none; padding-inline: var(--sn-page-x); padding-bottom: calc(var(--sn-sp-40) + env(safe-area-inset-bottom)); }
+  /* 侧栏布局的主区自带 20 内边距：页面往外撑回去，导航栏、面板铺到主区边上 */
+  .sn-app-main > .sn-page { --sn-page-x: max(var(--sn-sp-16), env(safe-area-inset-left), env(safe-area-inset-right)); --sn-page-t: 0px; width: auto; max-width: none; margin: calc(-1 * var(--sn-sp-20)); padding: 0 var(--sn-page-x) calc(var(--sn-sp-40) + env(safe-area-inset-bottom)); }
+  /* 吸顶是相对主区的内容区算的（主区有 20 内边距）：往上抵掉，导航栏贴在主区最上沿 */
+  .sn-app-main > .sn-page > .sn-page-hd { top: calc(-1 * var(--sn-sp-20)); }
+
+  /* 页头 → 导航栏：吸在顶上，标题居中（说明是标题下面一行小字），返回在左；右边只放一个按钮（最后那个），有图标时只显示图标。
+     分段控件、搜索框这类不是按钮的东西换到导航栏下面一行、撑满。底色是半透明的页面底色加模糊，内容从下面滑过去 */
+  .sn-page-hd { position: sticky; top: 0; z-index: 10; grid-template-columns: 1fr minmax(0, max-content) 1fr; grid-template-rows: minmax(44px, auto); align-items: center; gap: 0 var(--sn-sp-8);
+    margin: calc(-1 * var(--sn-page-t, 0px)) calc(-1 * var(--sn-page-x, 0px)) var(--sn-sp-16); padding: env(safe-area-inset-top) max(var(--sn-sp-8), env(safe-area-inset-right)) 0 max(var(--sn-sp-8), env(safe-area-inset-left));
+    background: color-mix(in srgb, var(--sn-canvas) 86%, transparent); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px); }
+  .sn-page-hd > :not(.sn-nav-back, .sn-acts) { grid-area: 1 / 2; min-width: 0; padding-block: var(--sn-sp-4); text-align: center; }
+  .sn-page-hd h1 { font-size: calc(17px * var(--sn-font-scale, 1)); line-height: calc(22px * var(--sn-font-scale, 1)); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sn-page-hd p { margin-top: 0; font-size: calc(12px * var(--sn-font-scale, 1)); line-height: calc(16px * var(--sn-font-scale, 1)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sn-page-hd > .sn-nav-back { grid-area: 1 / 1; height: 44px; margin: 0; padding: 0 var(--sn-sp-8) 0 var(--sn-sp-4); gap: 0; font-size: calc(15px * var(--sn-font-scale, 1)); color: var(--sn-label); }
+  .sn-page-hd > .sn-nav-back .sn-ic { width: 22px; height: 22px; margin-left: 0; }
+  .sn-page-hd > .sn-acts { grid-area: 1 / 3; justify-self: end; flex-wrap: nowrap; }
+  .sn-page-hd > .sn-acts > .sn-btn:not(:last-child) { display: none; }
+  .sn-page-hd > .sn-acts > .sn-btn:has(> .sn-ic) { width: var(--sn-h); padding: 0; gap: 0; font-size: 0; }
+  .sn-page-hd > .sn-acts:has(> :not(.sn-btn)) { grid-area: 2 / 1 / 3 / -1; justify-self: stretch; padding: var(--sn-sp-4) var(--sn-sp-8) var(--sn-sp-8); }
+  .sn-page-hd > .sn-acts .sn-seg { flex: 1; display: grid; }
+
+  /* 面板、表格铺满左右：去掉外圈边距、圆角和描边，白底一整条放在页面底色上（像 iOS 设置的分组）；面板内边距和页面左右边距对齐 */
+  :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > :is(.sn-panel, .sn-tbl-wrap) { margin-inline: calc(-1 * var(--sn-page-x, 0px)); border-radius: 0; border-inline-width: 0; }
+  :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > .sn-panel { padding: var(--sn-sp-16) var(--sn-page-x, var(--sn-sp-16)); border-block-width: 0; }
+  /* 表格铺满左右时：横屏有刘海就让开安全区（底色照样铺到边上） */
+  :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > .sn-tbl-wrap { padding-inline: env(safe-area-inset-left) env(safe-area-inset-right); background: var(--sn-raised); }
+  .sn-with-aside { gap: var(--sn-sp-16); }
+
+  /* 设置页一组一块（iOS 的分组列表是一组一张，不是整页一张）：面板本身不画底，每组 .sn-setting 一条白底，组和组之间露出页面底色 */
+  :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section) > .sn-panel:has(> .sn-setting) { padding: 0; background: none; }
+  .sn-panel > .sn-setting { padding: var(--sn-sp-16) var(--sn-page-x, var(--sn-sp-16)); border-top: 0; background: var(--sn-raised); }
+  .sn-panel > .sn-setting + .sn-setting { margin-top: var(--sn-sp-12); }
+
+  /* 侧栏布局：侧栏藏起来，主区在上、底部标签栏贴底，让出底部横条；标签栏底色和面板一样，上沿一条细线 */
+  .sn-app:has(> .sn-tabbar) { flex-direction: column; }
+  .sn-app:has(> .sn-tabbar) > .sn-side { display: none; }
+  .sn-app:has(> .sn-tabbar) > .sn-app-main > .sn-page { padding-bottom: var(--sn-sp-24); }
+  .sn-tabbar { display: flex; flex: none; padding: 0 max(var(--sn-sp-4), env(safe-area-inset-right)) env(safe-area-inset-bottom) max(var(--sn-sp-4), env(safe-area-inset-left)); background: var(--sn-raised); border-top: 1px solid var(--sn-line); }
+  .sn-tabbar > .sn-nav-item { position: relative; flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 50px; color: var(--sn-label3); text-decoration: none;
+    font: 500 calc(11px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-sans); -webkit-tap-highlight-color: transparent; transition: color .15s var(--sn-ease-out); }
+  .sn-tabbar > .sn-nav-item .sn-ic { width: 24px; height: 24px; }
+  .sn-tabbar > .sn-nav-item.sn-on { color: var(--sn-label); }
+  .sn-tabbar > .sn-nav-item .sn-badge { position: absolute; top: 3px; left: calc(50% + 6px); }
+  .sn-tabbar > .sn-nav-item:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: -4px; border-radius: var(--sn-r-md); }
+
+  /* 整屏页面：.sn-grow 那块（比如向导的表单面板）撑满剩下的高度；主操作 .sn-bottom-bar 贴底、留出底部横条，键盘弹出时停在键盘上面 */
+  .sn-page.sn-screen { padding-bottom: calc(var(--sn-sp-32) + env(safe-area-inset-bottom)); }
+  .sn-page.sn-screen > .sn-grow { flex: 1 0 auto; display: flex; flex-direction: column; }
+  .sn-page.sn-screen:has(.sn-bottom-bar) { padding-bottom: 0; }
+  .sn-screen .sn-bottom-bar { position: sticky; bottom: var(--sn-kb, 0px); margin-top: auto; padding: var(--sn-sp-12) var(--sn-page-x, var(--sn-sp-16)) calc(var(--sn-sp-12) + env(safe-area-inset-bottom)); background: var(--sn-raised); border-top: 1px solid var(--sn-line); }
+  .sn-page.sn-screen > .sn-bottom-bar { margin-inline: calc(-1 * var(--sn-page-x)); }
+  .sn-screen .sn-panel > .sn-bottom-bar { margin-inline: calc(-1 * var(--sn-page-x, var(--sn-sp-16))); margin-bottom: calc(-1 * var(--sn-sp-16)); }
+  .sn-screen :has(+ .sn-bottom-bar) { margin-bottom: var(--sn-sp-16); }
+
+  /* 登录页：不是居中的卡片——整屏就是这一页：底色铺满，标题在上面，"还没有账号"贴底；html、body 也换成同一个底色，四周不露灰 */
+  .sn-auth { display: flex; flex-direction: column; padding: 0; }
+  .sn-auth > .sn-panel { flex: 1 0 auto; display: flex; flex-direction: column; width: 100%; padding: calc(var(--sn-sp-48) + env(safe-area-inset-top)) max(var(--sn-sp-20), env(safe-area-inset-right)) calc(var(--sn-sp-16) + env(safe-area-inset-bottom)) max(var(--sn-sp-20), env(safe-area-inset-left)); border: 0; border-radius: 0; }
+  /* 横着拿时一行太长：内容收在中间一栏（最宽 440），竖着时就是整屏宽 */
+  .sn-auth > .sn-panel { align-items: center; }
+  .sn-auth > .sn-panel > * { width: min(100%, 440px); }
+  .sn-auth h1 { font-size: calc(28px * var(--sn-font-scale, 1)); line-height: calc(36px * var(--sn-font-scale, 1)); }
+  .sn-auth-ft { margin-top: auto; padding-top: var(--sn-sp-24); }
+  :root:has(.sn-auth), :root:has(.sn-auth) > body { background: var(--sn-raised); }
+}
+/* 只看宽度的：竖着的手机太窄，指标两列、工具条的搜索框和分段控件各占一行；横屏够宽，照宽屏排 */
+@media (max-width: 640px) {
+  .sn-stats { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sn-filters { gap: var(--sn-sp-8); }
+  .sn-filters > .sn-ib { width: 100%; }
+  .sn-filters .sn-seg { flex: 1 1 100%; display: grid; }
+}
 }

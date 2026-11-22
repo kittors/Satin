@@ -9,6 +9,7 @@ const N = +arg("n", 100);
 const GRID_COLS = [{ key: "name", title: "名称", sortable: true, editable: true }, { key: "status", title: "状态", type: "status", options: ["待开始", "进行中", "已完成"], filter: "enum" }, { key: "shots", title: "镜头", type: "int", sortable: true }];
 const gridRows = (n) => Array.from({ length: n }, (_, i) => ({ id: i, name: "第 " + (i + 1) + " 场", status: i % 3, shots: (i * 7) % 40 + 1 }));
 const CASES = [
+  ["createAvatar", { name: "林夏", size: 32 }, { name: "周屿", size: 24, decorative: true }],
   ["createSegmented", { items: ["网格", "列表", "时间线"], value: "网格" }, { value: "列表" }],
   ["createSlider", { value: 30, max: 100 }, { value: 60 }],
   ["createSelect", { items: ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"], value: "16:9 · 横屏" }, { value: "1:1 · 方形" }],
@@ -43,6 +44,7 @@ const CASES = [
   ["createCanvasGrid", { columns: GRID_COLS, data: gridRows(20000) }, { data: gridRows(300), loading: true }, { size: "height:420px" }],
   ["createThemePanel", {}, {}],
   // 自定义元素（Svelte、Angular、Solid、Preact、纯 HTML 都走这条路）：插进页面自动创建、改属性 update、拿出来自动销毁
+  ["<sn-avatar>", { name: "林夏" }, { name: "周屿", size: 24 }, { element: "sn-avatar" }],
   ["<sn-segmented>", { items: ["网格", "列表"], value: "网格" }, { value: "列表" }, { element: "sn-segmented" }],
   ["<sn-select>", { items: ["16:9", "9:16"], value: "16:9" }, { value: "9:16" }, { element: "sn-select" }],
   ["<sn-tabs>", { tabs: [{ label: "概览", content: "a" }, { label: "镜头", content: "b" }], value: 0 }, { value: 1 }, { element: "sn-tabs" }],

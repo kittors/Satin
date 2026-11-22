@@ -124,20 +124,23 @@
 @keyframes sn-pulse { 50% { opacity: .35; scale: .8; } }
 .sn-badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 6px; border-radius: 9px; white-space: nowrap; background: var(--sn-accent); color: var(--sn-on-primary); font: 600 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-sans); font-variant-numeric: tabular-nums; }
 .sn-badge.sn-soft { background: var(--sn-fill-active); color: var(--sn-label); }
-.sn-av { --sn-s: 32px; width: var(--sn-s); height: var(--sn-s); flex: none; position: relative; display: inline-grid; place-items: center; border-radius: 50%; font: 600 calc(var(--sn-s) * .4)/1 var(--sn-sans);
-  color: hsl(var(--sn-h, 220) 30% 30%); background: hsl(var(--sn-h, 220) 30% 88%); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .04); }
-[data-theme="dark"] .sn-av { color: hsl(var(--sn-h, 220) 30% 86%); background: hsl(var(--sn-h, 220) 18% 28%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); }
-.sn-av.sn-xs { --sn-s: 20px; } .sn-av.sn-sm { --sn-s: 24px; } .sn-av.sn-lg { --sn-s: 40px; }
+.sn-av { --sn-s: 32px; width: var(--sn-s); height: var(--sn-s); flex: none; position: relative; display: inline-grid; place-items: center; border-radius: 50%; background: var(--sn-av-bg); }
+/* 头像里只放图（文字头像严禁，见 anti-ai 规则 text-avatar）：照片 img，或者预设 svg（自己画了圆底）；都裁成圆。照片没加载出来时露出圆底 */
+.sn-av > img, .sn-av > svg { grid-area: 1 / 1; display: block; width: 100%; height: 100%; border-radius: 50%; }
+.sn-av > img { object-fit: cover; }
+.sn-av > svg { clip-path: circle(50%); }
+.sn-av.sn-2xs { --sn-s: 16px; } .sn-av.sn-xs { --sn-s: 20px; } .sn-av.sn-sm { --sn-s: 24px; } .sn-av.sn-lg { --sn-s: 40px; } .sn-av.sn-xl { --sn-s: 64px; }
 /* "+N" 必须是不透明的底：它压在前一个头像上，半透明会把底下那个头像透出来。用主文字色按比例混进卡片底色，深浅两套都不透 */
-.sn-av.sn-more { color: var(--sn-label2); background: color-mix(in srgb, var(--sn-label) 8%, var(--sn-av-ring, var(--sn-raised))); font-size: calc(10px * var(--sn-font-scale, 1)); font-weight: 600; }
-.sn-av.sn-online > i { position: absolute; right: -1px; bottom: -1px; width: 10px; height: 10px; border-radius: 50%; background: var(--sn-success); box-shadow: 0 0 0 2px var(--sn-av-ring, var(--sn-raised)); }
+.sn-av.sn-more { color: var(--sn-label2); background: color-mix(in srgb, var(--sn-label) 8%, var(--sn-av-ring, var(--sn-raised))); font: 600 calc(10px * var(--sn-font-scale, 1))/1 var(--sn-sans); }
+.sn-av.sn-online > i { position: absolute; right: -1px; bottom: -1px; z-index: 1; width: 10px; height: 10px; border-radius: 50%; background: var(--sn-success); box-shadow: 0 0 0 2px var(--sn-av-ring, var(--sn-raised)); }
 .sn-av-group { display: inline-flex; align-items: center; outline: none; }
 /* 叠在一起的头像之间用一圈和所在底色一样的描边隔开（--av-ring，默认卡片底色；放在别的底色上时跟着设） */
 .sn-av-group .sn-av { box-shadow: 0 0 0 2px var(--sn-av-ring, var(--sn-raised)); transition: margin .25s var(--sn-ease-out-strong); }
-.sn-av-group .sn-av + .sn-av { margin-left: -6px; }
-.sn-av-group:focus-visible .sn-av + .sn-av { margin-left: 4px; }
+/* 第二个起往左叠 6px；头像外面包了一层（<sn-avatar>、React / Vue 的宿主，都是 display: contents）时不再是兄弟，按"是不是第一个子元素"算 */
+.sn-av-group .sn-av:not(.sn-av-group > :first-child, .sn-av-group > :first-child .sn-av) { margin-left: -6px; }
+.sn-av-group:focus-visible .sn-av:not(.sn-av-group > :first-child, .sn-av-group > :first-child .sn-av) { margin-left: 4px; }
 @media (hover: hover) {
-.sn-av-group:hover .sn-av + .sn-av { margin-left: 4px; } }
+.sn-av-group:hover .sn-av:not(.sn-av-group > :first-child, .sn-av-group > :first-child .sn-av) { margin-left: 4px; } }
 .sn-kv .sn-av { margin-right: 2px; }
 
 /* ———— 折叠面板 ———— */
@@ -399,9 +402,12 @@
 .sn-pager .sn-pg.sn-gap { cursor: default; } @media (hover: hover) { .sn-pager .sn-pg.sn-gap:hover { background: none; } }
 .sn-pager .sn-cur { position: absolute; top: 0; left: 0; width: 32px; height: 32px; border-radius: var(--sn-btn-r); background: var(--sn-accent); transition: translate .27s var(--sn-ease-in-out); }
 .sn-pager .sn-total { margin-right: 8px; color: var(--sn-label3); }
+/* 触屏（pointer: coarse）：页码 32 高、上一页 / 下一页 28 高，点击区用透明伪元素上下扩到 44，样子不变；左右挨着别的按钮，不扩 */
+@media (pointer: coarse) { .sn-pager .sn-pg::after, .sn-pager > .sn-btn::after { content: ""; position: absolute; inset: 50% 0 auto; height: max(100%, 44px); translate: 0 -50%; } }
 .sn-steps { display: flex; align-items: center; max-width: 720px; }
-/* 窄处：只留当前这一步的文字，其他步骤只显示序号 */
+/* 窄处：只留当前这一步的文字，其他步骤只显示序号（有 .demo 容器时按容器宽，真页面窄屏按视口宽） */
 @container demo (max-width: 520px) { .sn-steps .sn-st:not(.sn-cur) { font-size: 0; gap: 0; } .sn-steps .sn-ln { margin: 0 8px; min-width: 12px; } }
+@media (max-width: 520px) { .sn-steps .sn-st:not(.sn-cur) { font-size: 0; gap: 0; } .sn-steps .sn-ln { margin: 0 8px; min-width: 12px; } }
 .sn-steps .sn-st { display: flex; align-items: center; gap: 8px; font: 500 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); white-space: nowrap; transition: color .2s; }
 .sn-steps .sn-st .sn-n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--sn-line-control-hover); font: 600 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-sans); transition: background-color .2s, box-shadow .2s, color .2s; }
 .sn-steps .sn-st.sn-cur { color: var(--sn-label); } .sn-steps .sn-st.sn-cur .sn-n { box-shadow: inset 0 0 0 1.5px var(--sn-label); color: var(--sn-label); }

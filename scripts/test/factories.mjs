@@ -17,7 +17,7 @@ Object.assign(globalThis, {
 });
 const C = await import("../../packages/satin-ui/src/components.js");
 const MIN = {
-  createSegmented: { items: ["网格", "列表"] }, createSlider: {}, createSelect: { items: ["a", "b"] }, createOtp: {}, createTabs: { tabs: [{ label: "概览", content: "a" }, { label: "镜头", content: "b" }] },
+  createAvatar: { name: "林夏" }, createSegmented: { items: ["网格", "列表"] }, createSlider: {}, createSelect: { items: ["a", "b"] }, createOtp: {}, createTabs: { tabs: [{ label: "概览", content: "a" }, { label: "镜头", content: "b" }] },
   createPager: { total: 5 }, createCollapse: { items: [{ title: "问题", content: "答案" }] }, createTagInput: {}, createStepper: {}, createNumberFlow: { value: 12 },
   createComposer: {}, createTable: { columns: [{ key: "a", title: "A" }], rows: [{ id: 1, a: "x" }] }, createPassword: { label: "密码" }, createEmail: {}, createSearch: {}, createCount: {},
 };

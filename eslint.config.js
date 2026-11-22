@@ -21,8 +21,8 @@ export default [
   { files: ["packages/satin-ui/**/*.js", "demo/**/*.js", "site/**/*.js", "examples/**/*.js", "tests/**/*.js"], languageOptions: { ecmaVersion: "latest", sourceType: "module", globals: { ...globals.browser } }, rules: bugsOnly },
   { files: ["packages/satin-ui/src/table-worker.js"], languageOptions: { globals: { ...globals.worker } } },
   { files: ["scripts/**/*.mjs", "skills/**/*.mjs", "eslint.config.js", "examples/**/*.config.{js,mjs}", "examples/**/vite.config.js"], languageOptions: { ecmaVersion: "latest", sourceType: "module", globals: { ...globals.node, ...globals.browser } }, rules: bugsOnly },
-  // 巡检脚本里放进页面执行的函数用到页面上的全局 __audit
-  { files: ["scripts/docs-audit.mjs"], languageOptions: { globals: { __audit: "readonly" } } },
+  // 巡检脚本里放进页面执行的函数用到页面上的全局 __audit、__ai
+  { files: ["scripts/docs-audit.mjs"], languageOptions: { globals: { __audit: "readonly", __ai: "readonly" } } },
   // 页面里跑的探针（Playwright addInitScript）：浏览器全局
   { files: ["scripts/parity/inpage.js"], languageOptions: { sourceType: "script", globals: { ...globals.browser } } },
 ];

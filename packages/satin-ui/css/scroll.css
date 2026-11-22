@@ -98,6 +98,9 @@
 
 /* 一排对比的小框：每个框上面写选项和一句话说明 */
 .sn-sa-panes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 20px 16px; align-items: start; }
+/* 不留孤儿（按外面演示框的宽度）：4 格在放得下 3 个、放不下 4 个时排 2 × 2，不排 3 + 1；5 格在放得下 4 个、放不下 5 个时排 3 + 2，不排 4 + 1。阈值和上面 180 宽的格子、16 的列距一致 */
+@container (min-width: 572px) and (max-width: 767.98px) { .sn-sa-panes:has(> :nth-child(4):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (min-width: 768px) and (max-width: 963.98px) { .sn-sa-panes:has(> :nth-child(5):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .sn-sa-pane-f { display: grid; gap: 4px; min-width: 0; }
 .sn-sa-pane-f > b { font: 600 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label); }
 .sn-sa-pane-f > span { min-height: calc(36px * var(--sn-font-scale, 1)); margin-bottom: 6px; word-break: keep-all; overflow-wrap: anywhere; /* 中文按词断行，"（默认）"不拆开 */ font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }

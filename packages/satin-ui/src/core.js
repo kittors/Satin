@@ -1,6 +1,7 @@
 // Satin 运行时的公共部分：选择器、减少动态效果、图标占位、分段控件、Tooltip。
 // 组件展示页（kit.js）和官网都从这里拿，库的使用者也可以单独引入：import { initSeg, injectIcons } from "./kit-core.js"
 import { scrollArea } from "./scroll.js";
+import { track, onCleanup } from "./lifecycle.js";
 import { icon } from "./icons.js";
 export const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 // 根元素：在 Node / SSR 里导入时没有 document，这里是 undefined（只在浏览器里调用的函数才用到它）
@@ -42,12 +43,38 @@ export function edgeFrames(from, to, toTransform, k = 0) {
 }
 // 两条边的走法先算成一串关键帧，交给 Web Animations 在合成线程上播：主线程这时候再忙（换主题、换圆角、大段重排），滑块也不掉帧。
 // onChange 在动画起跑之后、隔两帧再调，重活不会压住动画的第一帧；第三个参数是这段动画，调用方可以等它播完再做事。
-// 一行放不下就横着滑：真的放不下时才把它变成滚动区域（kit-scroll.js：横向渐隐、竖着滚滚轮也横向滚、滚到头停住），加 .scroll；
+// 一行放不下就横着滑：真的放不下时才把它变成滚动区域（scroll.js：横向渐隐、竖着滚滚轮也横向滚、滚到头停住），加 .sn-scroll；
+// 后来又放得下了（转屏、容器变宽、字号变小、选项变少）就拆掉滚动区域，回到原来的排列——原来判定一次就不回头，转回横屏还卡在横滑。
+// 回差：变成横滑那一刻记下容器宽和内容宽；放得下了，还要容器比那时宽 24px 以上、或者内容比那时窄 24px 以上才回去，
+// 免得在临界宽度来回跳（页面竖滚动条随高度出现、消失，容器宽度就差 15px 上下）。
+// 刚载入时的判断和原来一样（放不下才横滑），静态画面不变。
 // bar：分段控件不出滚动条（只靠渐隐），标签页悬停时出一根细滚动条
 export function fitScroll(el, { bar = "none" } = {}) {
-  let done = false;
-  const fit = () => { if (done || el.scrollWidth <= el.clientWidth + 1) return; done = true; ro.disconnect(); el.classList.add("sn-scroll"); scrollArea(el, { fade: "x", size: 24, bar, wheel: "x", overscroll: "contain" }); };
-  const ro = new ResizeObserver(fit); ro.observe(el); for (const c of el.children) ro.observe(c); fit();
+  const H = 24;
+  let sa = null, undo = null, host = null, w0 = 0, c0 = 0;
+  // 包一层 / 拆一层要把元素挪个位置，挪的时候焦点会丢：焦点在里面的话挪完放回去
+  const keep = (f) => { const a = document.activeElement, had = a !== el && el.contains(a); f(); if (had && document.activeElement !== a) a.focus({ preventScroll: true }); };
+  const off = () => { if (!sa) return; const s = sa, u = undo; sa = undo = null; s.destroy(); u(); el.classList.remove("sn-scroll"); };
+  const fit = () => {
+    if (!el.isConnected) return;
+    const over = el.scrollWidth > el.clientWidth + 1;
+    if (!sa) {
+      if (!over) return;
+      host = el.parentElement; w0 = host ? host.clientWidth : 0; c0 = el.scrollWidth;
+      // 滚动区域加的监听、观察器单独记下来，拆的时候一起撤（不然转一次屏多一份）
+      keep(() => { el.classList.add("sn-scroll"); [sa, undo] = track(() => scrollArea(el, { fade: "x", size: 24, bar, wheel: "x", overscroll: "contain" })); });
+      if (host) ro.observe(host); // 横滑时元素自己不会比内容宽：容器变宽要看容器
+    } else {
+      if (over) return;
+      if (!(host && host.clientWidth >= w0 + H) && !(el.scrollWidth <= c0 - H)) return;
+      if (host) ro.unobserve(host);
+      keep(off);
+      fit(); // 回到原来的排列以后再量一次
+    }
+  };
+  const ro = new ResizeObserver(fit); ro.observe(el); for (const c of el.children) ro.observe(c);
+  onCleanup(off); // 组件销毁时：后来才建的滚动区域也拆掉
+  fit();
   return fit;
 }
 // 宽排版放不下就换窄排版：内容比容器宽时加 .stack，记下宽排版要多宽，容器够宽了再换回来（宽度不随排版变，不会来回跳）

@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- 一行放不下就横着滑（fitScroll）的测试页：scripts/test/fit-scroll.mjs 用。
+     #box 里的分段控件、标签页：框的宽度由测试来改（先宽后窄、先窄后宽、临界宽度来回抖）；
+     #page 里的分段控件、分页铺满页面宽度：转屏用，也量触屏下的点击区 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../packages/satin-ui/src/theme-boot.js"></script>
+<link rel="stylesheet" href="../packages/satin-ui/css/page.css">
+<style>body { margin: 0; padding: 16px; } #box { width: 600px; } #tabs { margin-top: 16px; } #page { margin-top: 24px; } #pager { margin-top: 24px; }</style>
+<script>
+  // 数每个元素上挂着几个 wheel 监听：横滑、正常来回切换，监听不能越积越多
+  (() => {
+    const W = new Map(), add = EventTarget.prototype.addEventListener, rm = EventTarget.prototype.removeEventListener;
+    EventTarget.prototype.addEventListener = function (t, cb, o) { if (t === "wheel") W.set(this, (W.get(this) || 0) + 1); return add.call(this, t, cb, o); };
+    EventTarget.prototype.removeEventListener = function (t, cb, o) { if (t === "wheel" && W.get(this)) W.set(this, W.get(this) - 1); return rm.call(this, t, cb, o); };
+    window.__wheels = (el) => W.get(el) || 0;
+  })();
+</script>
+<script type="importmap">{"imports":{"satin-ui":"../packages/satin-ui/src/index.js"}}</script>
+</head>
+<body>
+<div id="box"><div id="seg"></div><div id="tabs"></div></div>
+<div id="page"><div id="seg2"></div><div id="pager"></div></div>
+<script type="module">
+  import { setup, createSegmented, createTabs, createPager } from "satin-ui";
+  setup();
+  window.seg = createSegmented(document.getElementById("seg"), { items: ["全部", "进行中", "待审核", "已完成", "已归档", "失败"], value: "进行中" });
+  window.tabs = createTabs(document.getElementById("tabs"), { tabs: ["概览", "成员", "权限", "账单", "集成", "日志", "设置"].map((label) => ({ label, content: label })), value: 2 });
+  window.seg2 = createSegmented(document.getElementById("seg2"), { items: ["全部", "进行中", "待审核", "已完成", "已归档", "失败", "已取消"] });
+  window.pager = createPager(document.getElementById("pager"), { total: 5, page: 2 });
+  window.ready = true;
+</script>
+</body>
+</html>

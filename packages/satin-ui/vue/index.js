@@ -22,6 +22,8 @@ const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
 export const wrapSatin = (create, opts) => wrap(create, opts);
 
 export const Segmented = /* @__PURE__ */ wrap(S.createSegmented, { name: "SnSegmented", props: ["items", "value", "size", "label"] });
+// 头像：src 优先、加载失败退回预设；没有 src 按 name / seed 稳定地挑一张预设。旁边已经写了名字就加 decorative
+export const Avatar = /* @__PURE__ */ wrap(S.createAvatar, { name: "SnAvatar", props: ["src", "name", "seed", "size", "label", "decorative", "online"], events: [] });
 export const Slider = /* @__PURE__ */ wrap(S.createSlider, { name: "SnSlider", props: ["value", "max", "label"] });
 export const Select = /* @__PURE__ */ wrap(S.createSelect, { name: "SnSelect", props: ["items", "value", "placeholder", "label"] });
 export const Otp = /* @__PURE__ */ wrap(S.createOtp, { name: "SnOtp", props: ["length"], events: ["complete"] });
@@ -241,7 +243,7 @@ export const notify = (o) => (setup(), S.notify(o));
 // 数据表格这类重组件不在这里注册：import { DataGrid } from "satin-ui/vue/grid"
 export default {
   install(app) {
-    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, Search, CountInput, LongText, Composer, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
+    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Avatar, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, Search, CountInput, LongText, Composer, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
     app.directive("enhance", vEnhance);
     const off = setup(); app.onUnmount?.(off); // setup() 在服务端直接返回，什么都不做
   },

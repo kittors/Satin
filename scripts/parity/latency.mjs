@@ -22,7 +22,9 @@ for (const side of ["base", "cur"]) {
     // 选择器限定在这个区块里：嵌入页（?embed=）别的区块只是藏起来，还在文档里——不限定的话 .seg 第一个命中的是别的区块里看不见的那个
     const Q = (x) => `#${c.sec} ${c.raw ? x : S(x)}`;
     const ctx = await newContext(browser, { side, theme: "light", size: "desktop" }), page = await ctx.newPage();
-    await page.goto(embedURL(side, c.sec), { waitUntil: "load" }); await sleep(1200);
+    await page.goto(embedURL(side, c.sec), { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("load", { timeout: 30000 }).catch(() => {});
+    await sleep(1200);
     const lat = [];
     for (let i = 0; i < N; i++) {
       const sel = c.alt && i % 2 ? Q(c.alt) : Q(c.click);

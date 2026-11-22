@@ -1,7 +1,7 @@
 // satin-ui/svelte/<名字>.svelte 的类型（Svelte 5 组件，直接发 .svelte 源码，项目里的 @sveltejs/vite-plugin-svelte 编译）
 // 一个一个引：import Select from "satin-ui/svelte/Select.svelte"——导出表 "./svelte/*.svelte" 的类型指到 svelte-<名字>.d.ts，它们从这里转出
 import type { Component, Snippet } from "svelte";
-import type { SatinFactory, SatinInstance, Item, PickerKind, PickDetail } from "./components";
+import type { SatinFactory, SatinInstance, Item, PickerKind, PickDetail, AvatarOptions } from "./components";
 type Attrs = { class?: string; style?: string; id?: string; [attr: `data-${string}`]: unknown; [attr: `aria-${string}`]: unknown };
 type Inst = { /** bind:instance 拿到 Satin 实例（update / destroy / 各组件的方法） */ instance?: SatinInstance | null };
 type SelectProps = Attrs & Inst & { items: Item[]; /** bind:value 双向绑定 */ value?: string; placeholder?: string; label?: string; onchange?(value: string): void };
@@ -13,6 +13,7 @@ type DialogProps = Attrs & {
 };
 type IconProps = { name: string; size?: number; class?: string };
 type SatinProps = Attrs & Inst & { create: SatinFactory<any, any>; options?: Record<string, unknown> };
+type AvatarProps = Attrs & Inst & AvatarOptions;
 type SegmentedProps = Attrs & Inst & { items: Item[]; size?: "sm" | "md"; label?: string; /** bind:value 双向绑定 */ value?: string; onchange?(value: string): void };
 type SliderProps = Attrs & Inst & { max?: number; label?: string; /** bind:value 双向绑定 */ value?: number; onchange?(value: number): void };
 type TabsProps = Attrs & Inst & { tabs: { label: string; badge?: string | number; content?: string; html?: string }[]; /** bind:value 双向绑定 */ value?: number; onchange?(value: number): void };
@@ -32,6 +33,8 @@ export const Dialog: Component<DialogProps, {}, "open">;
 export const Icon: Component<IconProps>;
 /** 把任意 createXxx 包成组件：<Satin create={createChat} options={{ … }} bind:instance /> */
 export const Satin: Component<SatinProps, {}, "instance">;
+/** 头像：<Avatar name="林知远" size={24} decorative />；有照片给 src，加载失败退回预设 */
+export const Avatar: Component<AvatarProps, {}, "instance">;
 /** 分段控件：<Segmented items={["网格", "列表"]} bind:value={view} label="视图" /> */
 export const Segmented: Component<SegmentedProps, {}, "value" | "instance">;
 /** 滑块：<Slider bind:value={volume} max={100} label="音量" /> */

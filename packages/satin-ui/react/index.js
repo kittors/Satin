@@ -25,6 +25,8 @@ const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
 export const wrapSatin = (create, opts) => wrap(create, opts);
 
 // ———— 有交互的组件 ————
+// 头像：src 优先、加载失败退回预设；没有 src 按 name / seed 稳定地挑一张预设。旁边已经写了名字就加 decorative
+export const Avatar = /* @__PURE__ */ wrap(S.createAvatar, { events: [], displayName: "Avatar" });
 export const Segmented = /* @__PURE__ */ wrap(S.createSegmented, { displayName: "Segmented" });
 export const Slider = /* @__PURE__ */ wrap(S.createSlider, { displayName: "Slider" });
 export const Select = /* @__PURE__ */ wrap(S.createSelect, { displayName: "Select" });

@@ -70,6 +70,8 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 @media (hover: hover) {
 .sn-eye:hover { background: var(--sn-fill-hover); color: var(--sn-label); } }
 .sn-eye .sn-ic { width: 16px; height: 16px; }
+/* 触屏：显示 / 隐藏密码看得见的 28，点击区用透明伪元素扩到 44 × 44（就在输入框里，不压别的东西），样子不变 */
+@media (pointer: coarse) { .sn-ib > .sn-post { z-index: 2; } .sn-eye { position: relative; } .sn-eye::after { content: ""; position: absolute; inset: 50% auto auto 50%; width: 44px; height: 44px; translate: -50% -50%; } }
 
 /* ———— 下拉选择（触发器 + 面板） ———— */
 .sn-select { position: relative; display: inline-block; min-width: 180px; }
@@ -157,6 +159,9 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 @media (hover: hover) {
 .sn-seg button:hover { color: var(--sn-label); } }
 .sn-seg button:focus-visible { box-shadow: 0 0 0 2px var(--sn-focus); }
+/* 触屏（pointer: coarse）：每一格看得见的只有 28 高（sm 24），点击区用透明伪元素上下扩到 44（苹果建议的最小点击区），样子一像素不变；
+   横向本来就够宽，不扩。横滑（.sn-scroll）时滚动区域会把扩出去的部分裁掉，只剩看得见的高度 */
+@media (pointer: coarse) { .sn-seg button::after { content: ""; position: absolute; inset: 50% 0 auto; height: max(100%, 44px); translate: 0 -50%; } }
 
 /* ———— 滑块：悬停圆钮放大，拖动时再放大并显示数值 ———— */
 .sn-slider { position: relative; display: block; width: 240px; height: 20px; cursor: pointer; touch-action: none; }

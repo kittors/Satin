@@ -7,7 +7,8 @@
 // - 行：拖左边的把手换位置（其他行让位，拖到边上自动滚），Alt + 上下键也能挪；勾选（Shift 连选，表头全选）；
 // - 格子：单击选中，方向键、Tab、Home/End、PageUp/PageDown 移动；双击、回车、F2 或直接打字开始编辑；回车、Tab 提交，Esc 取消；不合法就红框加一句原因，不提交。
 import { $, injectIcons, initSeg, reduced } from "./core.js";
-import { normCols, optionOf, optionValue, optionLabels, textOf, parseEdit, editText, parseRange, rangeText } from "./table-data.js";
+import { normCols, optionOf, optionValue, optionLabels, textOf, parseEdit, editText, parseRange, rangeText, ownerSeed } from "./table-data.js";
+import { presetAvatar } from "./avatar-presets.js";
 import { gridBars } from "./grid-bars.js";
 import { elastic } from "./scroll.js";
 import { createSource, hasFilter } from "./table-source.js";
@@ -655,7 +656,7 @@ export function mountDataGrid(root, o = {}) {
     switch (col.type) {
       case "sel": { const ck = cell.lastChild, on = isSel(r), mx = !on && src.tree && tsel.mixed(r); ck.classList.toggle("sn-on", on); ck.classList.toggle("sn-mixed", mx); ck.setAttribute("aria-checked", mx ? "mixed" : String(on)); break; } // 树形：下级勾了一部分是半选
       case "status": { const op = optionOf(col, v); cell.querySelector(".sn-g-dot").className = "sn-g-dot sn-s" + (op ? op.tone : v); cell._t.textContent = textOf(col, v, src.row(r)); break; }
-      case "owner": { const t = textOf(col, v, src.row(r)); cell.querySelector(".sn-g-av").textContent = t[0] ?? ""; cell._t.textContent = t; break; }
+      case "owner": { const t = textOf(col, v, src.row(r)), av = cell.querySelector(".sn-g-av"), seed = ownerSeed(col, v, t); if (av._seed !== seed) { av._seed = seed; av.innerHTML = presetAvatar(seed, 20).svg; } cell._t.textContent = t; break; }
       case "prog": { const n = +v || 0; cell.querySelector(".sn-g-pbar").style.setProperty("--sn-p", n / 100); cell._t.textContent = col.format ? textOf(col, v, src.row(r)) : n + "%"; cell.classList.toggle("sn-done", n === 100); break; }
       default: if (cell._t) cell._t.textContent = textOf(col, v, src.row(r));
     }

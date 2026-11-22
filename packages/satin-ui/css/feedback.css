@@ -131,6 +131,8 @@
 .sn-pbar { position: relative; height: 4px; border-radius: 2px; background: var(--sn-fill-subtle); overflow: hidden; }
 .sn-pbar > i { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--sn-p, 0) * 100%); border-radius: inherit; background: var(--sn-accent); transition: width .3s var(--sn-ease-out), opacity .2s; }
 .sn-pbar.sn-indet > i { width: 36%; animation: sn-indet 1.4s var(--sn-ease-in-out) infinite; }
+/* 按状态上色（和 .sn-tag 的圆点同一套）：完成 sn-ok、待处理 sn-warn、失败 sn-bad；进行中 sn-run 就是默认的强调色。四种状态一个颜色等于没有颜色 */
+.sn-pbar.sn-ok > i { background: var(--sn-success); } .sn-pbar.sn-warn > i { background: var(--sn-warning); } .sn-pbar.sn-bad > i { background: var(--sn-danger); }
 @keyframes sn-indet { from { translate: -100% 0; } to { translate: 280% 0; } }
 .sn-pring { --sn-s: 20px; width: var(--sn-s); height: var(--sn-s); border-radius: 50%; background: conic-gradient(var(--sn-accent) calc(var(--sn-p) * 1turn), var(--sn-fill-subtle) 0);
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); }

@@ -21,6 +21,25 @@ export interface SatinFactory<O, I = {}> {
 }
 export type Item = string | { value: string | number; label?: string; disabled?: boolean };
 
+/** 头像：src 优先、加载失败退回预设；没有 src 按 seed（没给用 name）稳定地挑一张预设，同一个名字永远是同一张。头像里不放文字 */
+export interface AvatarOptions {
+  /** 照片地址；加载失败原地换成预设 */ src?: string;
+  /** 名字：挑预设用，单独出现时也是读屏念的名称 */ name?: string;
+  /** 挑预设用的键（比如用户 id）；不给用 name */ seed?: string;
+  /** 16 / 20 / 24 / 32 / 40 / 64，默认 32；24 及以下用简化版预设 */ size?: 16 | 20 | 24 | 32 | 40 | 64 | number;
+  /** 读屏念的名称（默认 name） */ label?: string;
+  /** 旁边已经写了名字：头像只是装饰（aria-hidden） */ decorative?: boolean;
+  /** 右下角画在线点 */ online?: boolean;
+}
+export const createAvatar: SatinFactory<AvatarOptions, {}>;
+/** 头像的标记（Node / SSR 里也能调） */
+export function avatarHTML(o?: AvatarOptions): string;
+/** 按 id 或名字稳定地挑一张预设：{ id, svg }；size ≤ 24 给简化版 */
+export function presetAvatar(seed: string, size?: number): { id: string; svg: string };
+/** 取某一张预设的 SVG 字符串（id 是 a1 … a12） */
+export function avatarSvg(id: string, size?: number): string;
+/** 12 张预设的 id */
+export const AVATAR_IDS: readonly string[];
 export interface SegmentedOptions { items?: Item[]; value?: string; size?: "sm" | "md"; label?: string; onChange?(value: string): void }
 export const createSegmented: SatinFactory<SegmentedOptions, { readonly value: string; select(value: string): void }>;
 export interface SliderOptions { value?: number; max?: number; label?: string; onChange?(value: number): void }
