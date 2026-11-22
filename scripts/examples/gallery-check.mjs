@@ -55,7 +55,7 @@ function diff(a, b, f) {
   const ia = PNG.sync.read(fs.readFileSync(a)), ib = PNG.sync.read(fs.readFileSync(b));
   if (ia.width !== ib.width || ia.height !== ib.height) return { size: `${ia.width}×${ia.height} ↔ ${ib.width}×${ib.height}` };
   const d = new PNG({ width: ia.width, height: ia.height }), n = pixelmatch(ia.data, ib.data, d.data, ia.width, ia.height, { threshold: 0, includeAA: true, alpha: 0.3 });
-  if (n) fs.writeFileSync(f, PNG.sync.write(d));
+  if (n) { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, PNG.sync.write(d)); }
   return { px: n, pct: +(n / (ia.width * ia.height) * 100).toFixed(3) };
 }
 
