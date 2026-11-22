@@ -100,16 +100,25 @@ const btabs = createBrowserTabs(tabsHost, {
 });
 
 const themeBtn = document.getElementById("ws-theme-toggle");
-const syncThemeBtn = () => {
-  if (!themeBtn) return;
-  const dark = document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
-  themeBtn.innerHTML = icon(dark ? "sun" : "moon", 15);
-};
-syncThemeBtn();
-new MutationObserver(syncThemeBtn).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+const isDarkTheme = () => document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+const swapThemeIcon = () => { if (themeBtn) themeBtn.innerHTML = icon(isDarkTheme() ? "sun" : "moon", 15); };
+let manualTheme = false;
+swapThemeIcon();
+new MutationObserver(() => { if (!manualTheme) swapThemeIcon(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 themeBtn?.addEventListener("click", () => {
-  const dark = document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
-  setMode(dark ? "light" : "dark");
+  const next = isDarkTheme() ? "light" : "dark";
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("sn-reduce-motion");
+  if (reduce) { setMode(next); swapThemeIcon(); return; }
+  manualTheme = true;
+  themeBtn.classList.add("ws-spin");
+  setMode(next);
+  setTimeout(() => {
+    swapThemeIcon();
+    requestAnimationFrame(() => {
+      themeBtn.classList.remove("ws-spin");
+      manualTheme = false;
+    });
+  }, 90);
 });
 
 const TAB_META = {
@@ -123,7 +132,16 @@ const TAB_META = {
 
 function activateView(id) {
   const viewKey = ["projects", "station", "assets", "tasks", "team"].includes(id) ? id : "blank";
-  for (const sec of document.querySelectorAll(".ws-view")) sec.hidden = sec.dataset.view !== viewKey;
+  for (const sec of document.querySelectorAll(".ws-view")) {
+    const show = sec.dataset.view === viewKey;
+    const wasHidden = sec.hidden;
+    sec.hidden = !show;
+    if (show && wasHidden) {
+      sec.classList.remove("ws-enter");
+      void sec.offsetWidth;
+      sec.classList.add("ws-enter");
+    }
+  }
   if (viewKey === "blank") {
     const t = blankTitles.get(id) ?? TAB_META[id]?.title ?? "未命名分镜";
     const h1 = document.getElementById("ws-blank-title");

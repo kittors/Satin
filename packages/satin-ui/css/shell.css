@@ -56,13 +56,16 @@
 
 /* ———— 三层配色工作台外壳（.sn-app.sn-workbench）+ Chrome 弧形多页签（.sn-btabs）+ 一屏占满工作页（.sn-page.sn-work） ———— */
 .sn-app.sn-workbench { background: var(--sn-shell); overflow: hidden; }
-.sn-app.sn-workbench > .sn-side { padding: 8px 8px 12px; background: var(--sn-side-bg); border-right: 0; }
-.sn-app.sn-workbench .sn-side-top { height: 36px; padding-left: 10px; margin-bottom: 12px; } /* 8 + 10 + 10 = 28px，与导航 16px 图标中心和收起态 56/2 严格三点一线 */
+.sn-app.sn-workbench > .sn-side { padding: 0 8px 12px; background: var(--sn-side-bg); border-right: 0; }
+.sn-app.sn-workbench .sn-side-top { height: 42px; padding-left: 10px; margin-bottom: 6px; } /* 顶栏高 42px，与右侧页签栏及右上角图标严格同高同中轴（y=21px）；8+10+10=28px 与下方导航图标同竖轴 */
+.sn-app.sn-workbench .sn-side-top [data-collapse] { top: 7px; right: 6px; } /* (42-28)/2 = 7px，严格垂直居中 */
 .sn-app.sn-workbench .sn-side-nav .sn-hl-bar,
 .sn-app.sn-workbench[data-navfx="fade"] .sn-side-nav a.sn-on::before { background: var(--sn-side-active); box-shadow: inset 0 0 0 1px var(--sn-side-active-line), var(--sn-card-shadow); }
 .sn-app-shell { flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--sn-shell); }
-/* 主内容圆角工作板：左上 10px 平滑圆角；与第 1 个激活标签左外弧（起始于 x=12px，圆角终点在 x=10px）形成 G1 水平切线连续，绝无双弧尖刺 */
-.sn-work-body { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; overflow: auto; background: var(--sn-workspace); border-top-left-radius: 10px; }
+/* 主内容工作板：第 1 个页签激活时左上角平滑归 0 与其左缘笔直一体；其余页签激活时左上角呈现 10px 柔和圆角 */
+.sn-work-body { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; overflow: auto; background: var(--sn-workspace); border-top-left-radius: 10px; transition: border-top-left-radius .18s var(--sn-ease-out); }
+.sn-btabs:has(.sn-btab:first-child.sn-on) + .sn-work-body,
+:has(> .sn-btabs .sn-btab:first-child.sn-on) + .sn-work-body { border-top-left-radius: 0; }
 .sn-work-body:has(> .sn-page.sn-work) { overflow: hidden; }
 .sn-work-body > .sn-page { --sn-page-x: var(--sn-sp-28); --sn-page-t: var(--sn-sp-24); max-width: none; padding: var(--sn-page-t) var(--sn-page-x) var(--sn-sp-24); }
 /* 一屏工作台页面：表格作为主角且下方没有其他区块时，整页锁定一屏高，主角表格自动撑满底部剩余视口高度 */
@@ -85,18 +88,24 @@
   .sn-page.sn-work > :has(.sn-tbl-wrap.sn-tbl-fill) { flex: 0 0 auto; min-height: 320px; }
 }
 
-/* Chrome 浏览器式平滑弧形页标签（.sn-btabs）：高 44px（padding-top 8 + 标签 36），与左侧栏顶栏严格同中轴（y=26px）；
-   左起留 22px（工作板左上圆角 10px + 2px 水平衔接段 + 激活页签 10px 左外弧），切线连续零尖刺 */
-.sn-btabs { flex: none; position: relative; z-index: 2; display: flex; align-items: flex-end; gap: 6px; height: 44px; padding: 8px 14px 0 0; background: var(--sn-shell); user-select: none; -webkit-user-select: none; }
-.sn-btabs-track { flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-end; height: 36px; padding: 0 12px 0 22px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+/* Chrome 浏览器式平滑弧形页标签（.sn-btabs）：高 42px，与侧栏顶栏严格齐平；
+   第 1 个标签紧贴工作板左缘（0 多余左留白），激活时左缘笔直延伸无缝合一、右缘平滑反弧；其余页签激活时双侧对称反弧；
+   右上角独立操作区（.sn-btabs-end）在 42px 顶栏内绝对垂直居中（上下各 7px） */
+.sn-btabs { flex: none; position: relative; z-index: 2; display: flex; align-items: center; gap: 6px; height: 42px; padding: 0 12px 0 0; background: var(--sn-shell); user-select: none; -webkit-user-select: none; }
+.sn-btabs-track { flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-end; height: 42px; padding: 6px 12px 0 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .sn-btabs-track::-webkit-scrollbar { display: none; }
 .sn-btab { all: unset; box-sizing: border-box; position: relative; flex: 0 1 180px; min-width: 100px; max-width: 212px; height: 36px; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px 0 12px;
-  color: var(--sn-label2); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); cursor: pointer; white-space: nowrap; transition: color .14s var(--sn-ease-out); }
-.sn-btab.sn-pinned { flex: 0 0 auto; min-width: 0; max-width: 168px; padding: 0 14px; }
+  color: var(--sn-label2); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); cursor: pointer; white-space: nowrap;
+  transition: color .16s var(--sn-ease-out), background-color .16s var(--sn-ease-out), flex-basis .2s var(--sn-ease-open), max-width .2s var(--sn-ease-open), min-width .2s var(--sn-ease-open), padding .2s var(--sn-ease-open), opacity .16s var(--sn-ease-out), transform .16s var(--sn-ease-out); }
+.sn-btab.sn-pinned { flex: 0 0 auto; min-width: 0; max-width: 172px; padding: 0 14px; }
+.sn-btab.sn-btab-enter { flex-basis: 0; min-width: 0; padding-inline: 0; opacity: 0; transform: translateY(3px); overflow: hidden; }
+.sn-btab.sn-btab-leave { flex: 0 0 0 !important; min-width: 0 !important; max-width: 0 !important; padding-inline: 0 !important; opacity: 0; overflow: hidden; pointer-events: none; }
 .sn-btab:focus-visible { outline: none; }
 .sn-btab:focus-visible .sn-btab-pill { box-shadow: inset 0 0 0 2px var(--sn-focus); }
-/* 未激活态上下完全对称的柔和悬停胶囊底 */
+/* 未激活态上下对称的柔和悬停胶囊底（紧邻激活页签侧避开底部 10px 反向外弧，留出清爽呼吸距） */
 .sn-btab-pill { position: absolute; inset: 4px 4px; border-radius: 8px; background: transparent; pointer-events: none; transition: background-color .14s var(--sn-ease-out), opacity .14s var(--sn-ease-out); }
+.sn-btab.sn-on + .sn-btab .sn-btab-pill { left: 8px; }
+.sn-btab:has(+ .sn-btab.sn-on) .sn-btab-pill { right: 8px; }
 @media (hover: hover) {
   .sn-btab:not(.sn-on):hover { color: var(--sn-label); }
   .sn-btab:not(.sn-on):hover .sn-btab-pill { background: var(--sn-btab-hover); }
@@ -109,23 +118,25 @@
   .sn-btab:hover .sn-btab-sep,
   .sn-btab:has(+ .sn-btab:hover) .sn-btab-sep { opacity: 0; }
 }
-/* 激活态：顶圆角 10px + 底部双侧内联矢量 10px 平滑反向凹弧，背景与下方工作板（--sn-workspace）完全一致 */
+/* 激活态：顶圆角 10px + 底部内联矢量 10px 平滑反向凹弧；第 1 个页签紧贴左缘，隐藏左外弧与工作板左缘无缝笔直合一 */
 .sn-btab.sn-on { z-index: 3; color: var(--sn-label); font-weight: 500; background: var(--sn-workspace); border-radius: 10px 10px 0 0; }
 .sn-btab.sn-on .sn-btab-pill { opacity: 0; }
-.sn-btab-arc { display: none; position: absolute; bottom: 0; width: 10px; height: 10px; color: var(--sn-workspace); pointer-events: none; }
-.sn-btab.sn-on .sn-btab-arc { display: block; }
+.sn-btab-arc { position: absolute; bottom: 0; display: block; width: 10px; height: 10px; overflow: visible; color: var(--sn-workspace); pointer-events: none; opacity: 0; transition: opacity .16s var(--sn-ease-out); }
+.sn-btab.sn-on .sn-btab-arc { opacity: 1; }
+.sn-btab:first-child .sn-btab-arc.sn-arc-l { display: none; }
 .sn-btab-arc.sn-arc-l { left: -10px; }
 .sn-btab-arc.sn-arc-r { right: -10px; }
-.sn-btab-ic { position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; color: var(--sn-label3); transition: color .14s; }
+.sn-btab-ic { position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; color: var(--sn-label3); transition: color .16s var(--sn-ease-out), transform .16s var(--sn-ease-out); }
 .sn-btab-ic .sn-ic { width: 14px; height: 14px; }
 .sn-btab.sn-on .sn-btab-ic { color: var(--sn-label); }
+.sn-btab:active .sn-btab-ic { transform: scale(.92); }
 .sn-btab-dot { position: relative; z-index: 1; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--sn-accent); }
 .sn-btab-dot.sn-ok { background: var(--sn-success); }
 .sn-btab-dot.sn-warn { background: var(--sn-warning); }
 .sn-btab-dot.sn-bad { background: var(--sn-danger); }
 .sn-btab-t { position: relative; z-index: 1; flex: 1 1 auto; min-width: 0; line-height: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sn-btab-x { all: unset; box-sizing: border-box; position: relative; z-index: 2; flex: none; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--sn-label3); cursor: pointer;
-  opacity: 0; transition: opacity .12s var(--sn-ease-out), background-color .12s var(--sn-ease-out), color .12s, transform .1s; }
+  opacity: 0; transition: opacity .14s var(--sn-ease-out), background-color .14s var(--sn-ease-out), color .14s var(--sn-ease-out), transform .12s var(--sn-ease-out); }
 .sn-btab-x .sn-ic { width: 12px; height: 12px; }
 .sn-btab.sn-on .sn-btab-x, .sn-btab:focus-within .sn-btab-x { opacity: .68; }
 @media (hover: hover) {
@@ -135,14 +146,17 @@
 @media (hover: none) { .sn-btab-x { opacity: .72; } }
 .sn-btab-x:active { transform: scale(var(--sn-press-icon)); }
 .sn-btab-x:focus-visible { opacity: 1; box-shadow: 0 0 0 2px var(--sn-focus); }
-/* 标签栏右侧新建按钮与辅助操作：高 36px 严格垂直居中，与页签中心同轴 */
+/* 新建标签按钮与右上角辅助操作：在 42px 顶栏内严格上下居中（上下各 7px） */
 .sn-btabs-add { all: unset; box-sizing: border-box; flex: none; width: 28px; height: 28px; margin: 0 0 4px 6px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--sn-label2); cursor: pointer;
-  transition: background-color .12s var(--sn-ease-out), color .12s, transform .1s; }
+  transition: background-color .14s var(--sn-ease-out), color .14s var(--sn-ease-out), transform .12s var(--sn-ease-out); }
 .sn-btabs-add .sn-ic { width: 14px; height: 14px; }
 @media (hover: hover) { .sn-btabs-add:hover { background: var(--sn-btab-hover); color: var(--sn-label); } }
 .sn-btabs-add:active { transform: scale(var(--sn-press-icon)); }
 .sn-btabs-add:focus-visible { box-shadow: 0 0 0 2px var(--sn-focus); }
-.sn-btabs-end { flex: none; display: flex; align-items: center; gap: 6px; height: 36px; }
+.sn-btabs-end { flex: none; display: flex; align-items: center; gap: 6px; height: 42px; }
+@media (prefers-reduced-motion: reduce) {
+  .sn-work-body, .sn-btab, .sn-btab-pill, .sn-btab-arc, .sn-btab-sep, .sn-btab-ic, .sn-btab-x, .sn-btabs-add { transition: none; }
+}
 
 /* 整屏页面（.sn-page.sn-screen）：像应用的一屏——竖向排、至少一屏高。
    里面放对话这种自己会滚的整块（.sn-chat）时，它填满剩下的高度，整页不滚；桌面上下只留 16（对话框本身就是一整块）。

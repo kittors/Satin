@@ -611,8 +611,8 @@
 /* 侧栏收起态：带待办数字徽标的导航项在图标右上角保留 6px 精致提示点，不丢提醒 */
 .sn-side-nav a:has(.sn-badge)::after { content: ""; position: absolute; left: 26px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--sn-accent); opacity: 0; scale: .5; pointer-events: none; transition: opacity .15s var(--sn-ease-out), scale .18s var(--sn-ease-out); }
 .sn-app.sn-collapsed .sn-side-nav a:has(.sn-badge)::after { opacity: 1; scale: 1; transition-delay: .12s; }
-/* 收起按钮：收起成 56px（8px 左右内边距，内部 40px）后，28px 按钮 right: 6px 正好中心在 28px，与图标严格同轴 */
-.sn-app.sn-workbench .sn-side-top [data-collapse] { top: 4px; right: 6px; }
+/* 收起按钮：工作台顶栏 42px 内上下严格对称居中（top:7px），收起成 56px 后中心落在 28px 与图标严格同轴 */
+.sn-app.sn-workbench .sn-side-top [data-collapse] { top: 7px; right: 6px; }
 /* 触屏没有悬停：悬停才变实 / 才出现的操作一直显示（09 号 §11） */
 @media (hover: none) { .sn-tbl .sn-acts .sn-btn { opacity: 1; } .sn-pc .sn-cover .sn-pick, .sn-pc .sn-cover .sn-more { opacity: 1; } }
 /* 服务端渲染的第一帧：标签页选中的那个自己画下划线（和真正的下划线同一位置、粗细、圆角），脚本接上以后去掉 */
