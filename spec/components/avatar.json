@@ -1,0 +1,365 @@
+{
+  "id": "avatar",
+  "name": "头像",
+  "nav": "头像",
+  "en": "Avatar",
+  "group": "数据展示",
+  "specRef": "",
+  "summary": "有照片用照片；加载失败或者没有照片，就按用户 id（没有就用名字）稳定地挑一张预设头像，同一个人每次都是同一张。头像里不放文字。24px 及以下自动换成简化版，深色主题下不反色。",
+  "acceptance": [
+    "没有照片就用预设：按用户 id 挑（`seed`），重名、改名都不乱；头像里不放名字的第一个字。",
+    "照片加载失败原地换成预设，不留破图；照片没加载出来之前露出圆底。",
+    "旁边已经写了名字就加 `decorative`：头像只是装饰，读屏只念一遍名字；单独出现时 `role=\"img\"`，念 `name`。",
+    "24px 及以下用简化版（去掉脖子、耳朵、嘴和眼镜，线条加粗），32px 及以上用完整版。",
+    "深色主题下头像不反色：人物沿用浅色、整体压暗，圆底也保留浅色，放在页面、卡片、浮层上都分得出来。"
+  ],
+  "api": [],
+  "usage": null,
+  "example": null,
+  "demos": [
+    {
+      "caption": "六种尺寸",
+      "html": "<div class=\"row\" style=\"gap:14px\"><sn-avatar seed=\"u4\" name=\"周屿\" size=\"16\"></sn-avatar><sn-avatar seed=\"u4\" name=\"周屿\" size=\"20\"></sn-avatar><sn-avatar seed=\"u4\" name=\"周屿\" size=\"24\"></sn-avatar><sn-avatar seed=\"u4\" name=\"周屿\"></sn-avatar><sn-avatar seed=\"u4\" name=\"周屿\" size=\"40\"></sn-avatar><sn-avatar seed=\"u4\" name=\"周屿\" size=\"64\"></sn-avatar></div>"
+    },
+    {
+      "caption": "12 张预设",
+      "html": "<div class=\"row\" style=\"gap:12px\"><sn-avatar name=\"张伟\" size=\"40\"></sn-avatar><sn-avatar name=\"何慧\" size=\"40\"></sn-avatar><sn-avatar name=\"徐丽\" size=\"40\"></sn-avatar><sn-avatar name=\"梁静\" size=\"40\"></sn-avatar><sn-avatar name=\"冯磊\" size=\"40\"></sn-avatar><sn-avatar name=\"赵敏\" size=\"40\"></sn-avatar><sn-avatar name=\"陈静\" size=\"40\"></sn-avatar><sn-avatar name=\"罗军\" size=\"40\"></sn-avatar><sn-avatar name=\"潘涛\" size=\"40\"></sn-avatar><sn-avatar name=\"赵启航\" size=\"40\"></sn-avatar><sn-avatar name=\"沈念\" size=\"40\"></sn-avatar><sn-avatar name=\"黄磊\" size=\"40\"></sn-avatar></div>"
+    },
+    {
+      "caption": "列表里",
+      "html": "<div class=\"sn-set-list\" style=\"max-width:420px\"><div class=\"sn-set-row\"><sn-avatar name=\"何慧\" decorative status=\"online\"></sn-avatar><div class=\"sn-tx\"><b>何慧</b><span>前端开发</span></div></div><div class=\"sn-set-row\"><sn-avatar src=\"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" name=\"黄磊\" decorative></sn-avatar><div class=\"sn-tx\"><b>黄磊</b><span>产品设计</span></div></div><div class=\"sn-set-row\"><sn-avatar name=\"徐丽\" decorative></sn-avatar><div class=\"sn-tx\"><b>徐丽</b><span>财务顾问</span></div></div></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": {
+    "roles": [
+      "单独出现时 `role=\"img\"` + `aria-label`（`label`，没给用 `name`）。"
+    ],
+    "focus": [
+      "头像本身不可聚焦；叠放组加 `tabindex=\"0\"` 和 `data-tip` 写全部名字。"
+    ],
+    "notes": [
+      "旁边已经写了名字就加 `decorative`：整个头像 `aria-hidden`，读屏只念一遍名字。",
+      "预设的 svg 本身 `aria-hidden`，名字由外层的 `.sn-av` 给。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "头像",
+  "lead": "代表一个人的小圆图：有照片用照片，没有就按名字稳定地挑一张预设头像，同一个人每次都是同一张；头像里不放文字。",
+  "whenToUse": [
+    "列表、表格、评论、对话里标出是谁：头像加名字，头像只是装饰。",
+    "地方紧的位置只放头像（标签、头像叠放组），名字放在 `label` 或悬停提示里。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "表示团队、项目、文件这类不是人的东西：用图标或缩略图。"
+    },
+    {
+      "text": "取名字的第一个字放进圆里当头像：这是文字头像，严禁；没有照片就用预设。"
+    }
+  ],
+  "related": [
+    {
+      "id": "tags",
+      "diff": "标签、徽标、头像叠放组的样式在那里；标签里可以带一个小头像。"
+    },
+    {
+      "id": "list",
+      "diff": "列表行左边放头像、右边写名字，头像只是装饰。"
+    }
+  ],
+  "import": {
+    "html": "// 入口里调过 defineElements()：直接写 <sn-avatar>（也可以 import { createAvatar, avatarHTML } from \"satin-ui\"）",
+    "react": "import { Avatar } from \"satin-ui/react\";",
+    "vue": "import { Avatar } from \"satin-ui/vue\";",
+    "svelte": "import Avatar from \"satin-ui/svelte/Avatar.svelte\";",
+    "angular": "// 入口里调过 defineElements()：模板里写 <sn-avatar>（组件加 CUSTOM_ELEMENTS_SCHEMA）",
+    "solid": "// 入口里调过 defineElements()：直接写 <sn-avatar>",
+    "preact": "import { Avatar } from \"satin-ui/react\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`Avatar` 组件：`name` 挑预设、也是读屏念的名称；有照片给 `src`，加载失败原地换成预设；旁边已经写了名字就加 `decorative`。",
+    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Avatar`：`name`、`src`、`size`、`decorative`。",
+    "vue": "`Avatar` 组件（全局注册后叫 `SnAvatar`）：`name`、`src`、`:size`、`decorative`。",
+    "svelte": "`Avatar` 组件（`satin-ui/svelte/Avatar.svelte`）：`name`、`src`、`size`、`decorative`。",
+    "angular": "写 `<sn-avatar>` 自定义元素：`[attr.name]`、`[attr.src]`、`[attr.size]`；`decorative` 只写属性名，在线状态写 `[attr.status]=\"online ? 'online' : null\"`（避开 `on*` 事件前缀）。",
+    "solid": "写 `<sn-avatar>`：`name`、`src`、`size`；`decorative` 写成空字符串，在线状态写 `status=\"online\"`（避开 `on*` 事件前缀）。",
+    "html": "写 `<sn-avatar name=\"张伟\" size=\"24\" decorative>`；也可以 `createAvatar(容器, 选项)`，或者在 Node / SSR 里 `avatarHTML(选项)` 拿标记。"
+  },
+  "dts": {
+    "factory": "createAvatar",
+    "functions": [
+      "avatarHTML",
+      "presetAvatar",
+      "avatarSvg"
+    ],
+    "react": "Avatar",
+    "vue": "Avatar",
+    "svelte": "Avatar"
+  },
+  "props": [
+    {
+      "name": "src",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "desc": "照片地址。加载失败（坏链接、离线）原地换成按 `seed` / `name` 挑的预设，不留破图。",
+      "names": {
+        "js": "src",
+        "react": "src",
+        "vue": "src",
+        "svelte": "src",
+        "preact": "src",
+        "element": "src",
+        "markup": "里面放 <img src alt=\"\">，加 data-seed 记下退回用的名字",
+        "html": "src"
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "default": "—",
+      "required": false,
+      "desc": "这个人的名字：没有照片时按它挑预设（同一个名字永远是同一张），单独出现时也是读屏念的名称。",
+      "names": {
+        "js": "name",
+        "react": "name",
+        "vue": "name",
+        "svelte": "name",
+        "preact": "name",
+        "element": "name",
+        "markup": "aria-label（单独出现时）",
+        "html": "name"
+      }
+    },
+    {
+      "name": "seed",
+      "type": "string",
+      "default": "同 `name`",
+      "required": false,
+      "desc": "挑预设用的键，比如用户 id：重名的人分得开，改名也不换头像。",
+      "names": {
+        "js": "seed",
+        "react": "seed",
+        "vue": "seed",
+        "svelte": "seed",
+        "preact": "seed",
+        "element": "seed",
+        "html": "seed"
+      }
+    },
+    {
+      "name": "size",
+      "type": "16 | 20 | 24 | 32 | 40 | 64 | number",
+      "default": "32",
+      "required": false,
+      "desc": "边长（像素）。24 及以下用简化版预设（去掉脖子、耳朵、嘴和眼镜，线条加粗），32 及以上用完整版。",
+      "names": {
+        "js": "size",
+        "react": "size",
+        "vue": "size",
+        "svelte": "size",
+        "preact": "size",
+        "element": "size",
+        "markup": "类名 sn-2xs / sn-xs / sn-sm / —— / sn-lg / sn-xl",
+        "html": "size"
+      }
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": "同 `name`",
+      "required": false,
+      "desc": "读屏念的名称（单独出现时）。",
+      "names": {
+        "js": "label",
+        "react": "label",
+        "vue": "label",
+        "svelte": "label",
+        "preact": "label",
+        "element": "label",
+        "markup": "aria-label",
+        "html": "label"
+      }
+    },
+    {
+      "name": "decorative",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "旁边已经写了名字（列表、表格、评论）：头像只是装饰，`aria-hidden`，读屏只念一遍名字。",
+      "names": {
+        "js": "decorative",
+        "react": "decorative",
+        "vue": "decorative",
+        "svelte": "decorative",
+        "preact": "decorative",
+        "element": "decorative（只写属性名）",
+        "markup": "aria-hidden=\"true\"",
+        "html": "decorative"
+      }
+    },
+    {
+      "name": "online",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "右下角画在线的小绿点（自定义元素写 `status=\"online\"`，避开 HTML/框架的 `on*` 事件前缀）。",
+      "names": {
+        "js": "online",
+        "react": "online",
+        "vue": "online",
+        "svelte": "online",
+        "preact": "online",
+        "element": "status=\"online\"",
+        "markup": "类名 sn-online，里面加 <i></i>",
+        "html": "status=\"online\""
+      }
+    }
+  ],
+  "events": [],
+  "slots": [],
+  "methods": [],
+  "functions": [
+    {
+      "name": "avatarHTML",
+      "signature": "avatarHTML(o?: AvatarOptions): string",
+      "returns": "string",
+      "from": "satin-ui",
+      "desc": "头像的标记（和组件渲染的一样），Node / SSR 里也能调。"
+    },
+    {
+      "name": "presetAvatar",
+      "signature": "presetAvatar(seed: string, size?: number): { id: string; svg: string }",
+      "returns": "{ id: string; svg: string }",
+      "from": "satin-ui",
+      "desc": "按 id 或名字稳定地挑一张预设：同一个 `seed` 永远同一张；`size` ≤ 24 给简化版。"
+    },
+    {
+      "name": "avatarSvg",
+      "signature": "avatarSvg(id: string, size?: number): string",
+      "returns": "string",
+      "from": "satin-ui",
+      "desc": "直接取某一张预设（`a1` … `a12`）的 SVG。"
+    }
+  ],
+  "cssVars": [
+    {
+      "name": "--sn-s",
+      "desc": "头像边长（尺寸类名就是改它）",
+      "default": "32px"
+    },
+    {
+      "name": "--sn-av-bg",
+      "desc": "预设的圆底，照片没加载出来时也露出它",
+      "default": "浅色 #e8e8ed、深色 #a7a7aa",
+      "token": true
+    },
+    {
+      "name": "--sn-av-ink / --sn-av-face",
+      "desc": "预设的线条、脸",
+      "default": "#424245 / #fafafa",
+      "token": true
+    },
+    {
+      "name": "--sn-av-black / brown / gray / blue / green / pink / violet / beard",
+      "desc": "预设的发色、衣服色、胡子",
+      "default": "低饱和，深色主题压到约 90%",
+      "token": true
+    },
+    {
+      "name": "--sn-av-ring",
+      "desc": "叠放组里每个头像外面那圈分隔色，放在别的底色上时跟着设",
+      "default": "卡片底色"
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-av",
+      "desc": "头像：里面只放 `<img>`（照片）或预设 `<svg>`，不放文字"
+    },
+    {
+      "name": ".sn-av.sn-2xs / .sn-xs / .sn-sm / .sn-lg / .sn-xl",
+      "desc": "16 / 20 / 24 / 40 / 64px（默认 32）"
+    },
+    {
+      "name": ".sn-av.sn-online > i",
+      "desc": "在线的小绿点"
+    },
+    {
+      "name": ".sn-av-group",
+      "desc": "头像叠放组：叠在一起，悬停或键盘聚焦时散开"
+    },
+    {
+      "name": ".sn-av.sn-more",
+      "desc": "叠放组末尾的 +N 计数"
+    }
+  ],
+  "types": [
+    "AvatarOptions"
+  ],
+  "keyboard": [],
+  "design": {
+    "do": [
+      "没有照片就用预设，按用户 id 挑（`seed`），重名和改名都不乱。",
+      "列表、表格里头像加名字，名字是主要信息。",
+      "同一处的头像用同一个尺寸。"
+    ],
+    "dont": [
+      {
+        "text": "头像里放名字的第一个字。",
+        "rule": "text-avatar"
+      },
+      {
+        "text": "随机色的圆底当头像，或者每次刷新换一张。"
+      }
+    ],
+    "copy": [
+      "叠放组的提示写全部名字：\"何慧、黄磊、徐丽 等 7 人\"。"
+    ],
+    "motion": [
+      {
+        "what": "叠放组悬停散开",
+        "easing": "ease.outStrong",
+        "duration": "250ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "avatar-basic",
+      "title": "六种尺寸",
+      "why": "给名字就能用：没有照片时按名字挑一张预设，同一个名字在哪个尺寸都是同一个人；24 及以下自动换成简化版。",
+      "html": "<div class=\"sn-row\"><sn-avatar name=\"张伟\" size=\"16\"></sn-avatar><sn-avatar name=\"张伟\" size=\"20\"></sn-avatar><sn-avatar name=\"张伟\" size=\"24\"></sn-avatar><sn-avatar name=\"张伟\"></sn-avatar><sn-avatar name=\"张伟\" size=\"40\"></sn-avatar><sn-avatar name=\"张伟\" size=\"64\"></sn-avatar></div>",
+      "code": {
+        "html": "<div class=\"sn-row\"><sn-avatar name=\"张伟\" size=\"16\"></sn-avatar><sn-avatar name=\"张伟\" size=\"20\"></sn-avatar><sn-avatar name=\"张伟\" size=\"24\"></sn-avatar><sn-avatar name=\"张伟\"></sn-avatar><sn-avatar name=\"张伟\" size=\"40\"></sn-avatar><sn-avatar name=\"张伟\" size=\"64\"></sn-avatar></div>\n",
+        "react": "import { Avatar } from \"satin-ui/react\";\n\nexport default function AvatarSizes() {\n  return (\n    <div className=\"sn-row\">\n      {[16, 20, 24, 32, 40, 64].map((size) => <Avatar key={size} name=\"张伟\" size={size} />)}\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Avatar } from \"satin-ui/vue\";\n\nconst sizes = [16, 20, 24, 32, 40, 64];\n</script>\n\n<template>\n  <div class=\"sn-row\">\n    <Avatar v-for=\"size in sizes\" :key=\"size\" name=\"张伟\" :size=\"size\" />\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Avatar from \"satin-ui/svelte/Avatar.svelte\";\n\n  const sizes = [16, 20, 24, 32, 40, 64];\n</script>\n\n<div class=\"sn-row\">\n  {#each sizes as size (size)}\n    <Avatar name=\"张伟\" {size} />\n  {/each}\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-avatar-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-avatar>\n  template: `<div class=\"sn-row\">\n    @for (size of sizes; track size) {\n      <sn-avatar name=\"张伟\" [attr.size]=\"size\"></sn-avatar>\n    }\n  </div>`,\n})\nexport class AvatarBasicComponent {\n  protected sizes = [16, 20, 24, 32, 40, 64];\n}\n",
+        "solid": "import { For } from \"solid-js\";\n\nexport default function AvatarSizes() {\n  return (\n    <div class=\"sn-row\">\n      <For each={[16, 20, 24, 32, 40, 64]}>{(size) => <sn-avatar name=\"张伟\" size={size}></sn-avatar>}</For>\n    </div>\n  );\n}\n",
+        "preact": "import { Avatar } from \"satin-ui/react\";\n\nexport default function AvatarSizes() {\n  return (\n    <div className=\"sn-row\">\n      {[16, 20, 24, 32, 40, 64].map((size) => <Avatar key={size} name=\"张伟\" size={size} />)}\n    </div>\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "avatar-list",
+      "title": "列表里：头像加名字",
+      "why": "名字已经写在旁边，头像加 `decorative` 只当装饰；有照片给 `src`，没有照片（或加载失败）自动换成预设。",
+      "html": "<div class=\"sn-set-list\"><div class=\"sn-set-row\"><sn-avatar name=\"何慧\" decorative status=\"online\"></sn-avatar><div class=\"sn-tx\"><b>何慧</b><span>前端开发</span></div></div><div class=\"sn-set-row\"><sn-avatar src=\"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" name=\"黄磊\" decorative></sn-avatar><div class=\"sn-tx\"><b>黄磊</b><span>产品设计</span></div></div><div class=\"sn-set-row\"><sn-avatar name=\"徐丽\" decorative></sn-avatar><div class=\"sn-tx\"><b>徐丽</b><span>财务顾问</span></div></div></div>",
+      "code": {
+        "html": "<div class=\"sn-set-list\"><div class=\"sn-set-row\"><sn-avatar name=\"何慧\" decorative status=\"online\"></sn-avatar><div class=\"sn-tx\"><b>何慧</b><span>前端开发</span></div></div><div class=\"sn-set-row\"><sn-avatar src=\"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" name=\"黄磊\" decorative></sn-avatar><div class=\"sn-tx\"><b>黄磊</b><span>产品设计</span></div></div><div class=\"sn-set-row\"><sn-avatar name=\"徐丽\" decorative></sn-avatar><div class=\"sn-tx\"><b>徐丽</b><span>财务顾问</span></div></div></div>\n",
+        "react": "import { Avatar } from \"satin-ui/react\";\n\nconst PEOPLE = [\n  { name: \"何慧\", role: \"前端开发\", online: true },\n  { name: \"黄磊\", role: \"产品设计\", src: \"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" },\n  { name: \"徐丽\", role: \"财务顾问\" },\n];\n\nexport default function Members() {\n  return (\n    <div className=\"sn-set-list\">\n      {PEOPLE.map((p) => (\n        <div className=\"sn-set-row\" key={p.name}>\n          <Avatar name={p.name} src={p.src} online={p.online} decorative />\n          <div className=\"sn-tx\"><b>{p.name}</b><span>{p.role}</span></div>\n        </div>\n      ))}\n    </div>\n  );\n}\n",
+        "vue": "<script setup>\nimport { Avatar } from \"satin-ui/vue\";\n\nconst people = [\n  { name: \"何慧\", role: \"前端开发\", online: true },\n  { name: \"黄磊\", role: \"产品设计\", src: \"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" },\n  { name: \"徐丽\", role: \"财务顾问\" },\n];\n</script>\n\n<template>\n  <div class=\"sn-set-list\">\n    <div v-for=\"p in people\" :key=\"p.name\" class=\"sn-set-row\">\n      <Avatar :name=\"p.name\" :src=\"p.src\" :online=\"p.online\" decorative />\n      <div class=\"sn-tx\"><b>{{ p.name }}</b><span>{{ p.role }}</span></div>\n    </div>\n  </div>\n</template>\n",
+        "svelte": "<script>\n  import Avatar from \"satin-ui/svelte/Avatar.svelte\";\n\n  const people = [\n    { name: \"何慧\", role: \"前端开发\", online: true },\n    { name: \"黄磊\", role: \"产品设计\", src: \"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" },\n    { name: \"徐丽\", role: \"财务顾问\" },\n  ];\n</script>\n\n<div class=\"sn-set-list\">\n  {#each people as p (p.name)}\n    <div class=\"sn-set-row\">\n      <Avatar name={p.name} src={p.src} online={p.online} decorative />\n      <div class=\"sn-tx\"><b>{p.name}</b><span>{p.role}</span></div>\n    </div>\n  {/each}\n</div>\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-avatar-list\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-avatar>\n  template: `<div class=\"sn-set-list\">\n    @for (p of people; track p.name) {\n      <div class=\"sn-set-row\">\n        <sn-avatar [attr.name]=\"p.name\" [attr.src]=\"p.src ?? null\" [attr.status]=\"p.online ? 'online' : null\" decorative></sn-avatar>\n        <div class=\"sn-tx\"><b>{{ p.name }}</b><span>{{ p.role }}</span></div>\n      </div>\n    }\n  </div>`,\n})\nexport class AvatarListComponent {\n  protected people: { name: string; role: string; src?: string; online?: boolean }[] = [\n    { name: \"何慧\", role: \"前端开发\", online: true },\n    { name: \"黄磊\", role: \"产品设计\", src: \"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" },\n    { name: \"徐丽\", role: \"财务顾问\" },\n  ];\n}\n",
+        "solid": "import { For } from \"solid-js\";\n\nconst PEOPLE = [\n  { name: \"何慧\", role: \"前端开发\", online: true },\n  { name: \"黄磊\", role: \"产品设计\", src: \"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" },\n  { name: \"徐丽\", role: \"财务顾问\" },\n];\n\nexport default function Members() {\n  return (\n    <div class=\"sn-set-list\">\n      <For each={PEOPLE}>{(p) => (\n        <div class=\"sn-set-row\">\n          <sn-avatar name={p.name} src={p.src} status={p.online ? \"online\" : undefined} decorative=\"\"></sn-avatar>\n          <div class=\"sn-tx\"><b>{p.name}</b><span>{p.role}</span></div>\n        </div>\n      )}</For>\n    </div>\n  );\n}\n",
+        "preact": "import { Avatar } from \"satin-ui/react\";\n\nconst PEOPLE = [\n  { name: \"何慧\", role: \"前端开发\", online: true },\n  { name: \"黄磊\", role: \"产品设计\", src: \"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80\" },\n  { name: \"徐丽\", role: \"财务顾问\" },\n];\n\nexport default function Members() {\n  return (\n    <div className=\"sn-set-list\">\n      {PEOPLE.map((p) => (\n        <div className=\"sn-set-row\" key={p.name}>\n          <Avatar name={p.name} src={p.src} online={p.online} decorative />\n          <div className=\"sn-tx\"><b>{p.name}</b><span>{p.role}</span></div>\n        </div>\n      ))}\n    </div>\n  );\n}\n"
+      }
+    }
+  ]
+}

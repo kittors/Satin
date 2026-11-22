@@ -58,6 +58,10 @@ const AFTER = {
   audio: ["试音听过了，语速刚好，第 3 句后面的停顿可以再长半拍。", "这一版旁白的情绪对了，只是\"末班车\"三个字读得太快，标出来了。"],
   file: ["这份文件里的镜头号和时长和现在的分镜对了一遍，有两处不一致，已经标出来了。", "人物小传里她的年龄是 26 岁，第 4 个镜头的描述写成了学生，已经改过来。"],
 };
+// 数字和后面的字之间换成不断行空格：窄屏上"车站外 3 个"不会把"3"和"个"拆到两行（样子和普通空格一样）
+const NB = (s) => s.replace(/(\d) (?=[\u4e00-\u9fff])/g, "$1\u00a0");
+for (const t of TURNS) { t[0] = NB(t[0]); t[1] = NB(t[1]); }
+for (const k in AFTER) AFTER[k] = AFTER[k].map(NB);
 function demoHistory() {
   let rnd = 11, oldestDay = 0, left = 30, lastTurn = -1;
   const rand = () => (rnd = (rnd * 16807) % 2147483647) / 2147483647;

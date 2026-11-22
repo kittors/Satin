@@ -299,8 +299,8 @@ function bareControls(src) {
 }
 // 管链接样子的 Satin 类：文字链接、按钮、文字按钮，侧栏 / 页签 / 面包屑 / 菜单这些组件的标记里的链接
 const LINKY = /(^|\s)sn-(link|btn|textbtn|tab|crumb|side|item|nav|card|pc|lb|menu|opt|logo|brand|av)\b/;
-// 头像里直接放字：<span class="sn-av">林</span>、<Avatar>周</Avatar>（.sn-av-group、.sn-ai-av 这种不算）
-const AVATAR_TEXT = /<[A-Za-z][\w-]*\b[^>]*\bclass(?:Name)?\s*=\s*["'{`][^"'`}]*\bsn-av(?![\w-])[^"'`}]*["'`}][^>]*>\s*([^<\s{][^<{]*?)\s*<|<Avatar\b[^>]*>\s*([^<\s{][^<{]*?)\s*<\/Avatar>/g;
+// 头像里直接放字：<span class="sn-av">林</span>、<Avatar>周</Avatar>、<SnAvatar>周</SnAvatar>、<sn-avatar>周</sn-avatar>（.sn-av-group、.sn-ai-av 这种不算）
+const AVATAR_TEXT = /<[A-Za-z][\w-]*\b[^>]*\bclass(?:Name)?\s*=\s*["'{`][^"'`}]*\bsn-av(?![\w-])[^"'`}]*["'`}][^>]*>\s*([^<\s{][^<{]*?)\s*<|<(?:Sn)?Avatar\b[^>]*>\s*([^<\s{][^<{]*?)\s*<\/(?:Sn)?Avatar>|<sn-avatar\b[^>]*>\s*([^<\s{][^<{]*?)\s*<\/sn-avatar>/g;
 // 按钮、标签里写了 <br>
 const BR_IN_CONTROL = /<(button|[A-Za-z][\w-]*\b[^>]*\bclass(?:Name)?\s*=\s*["'{`][^"'`}]*\bsn-(?:btn|tag|chip|badge)\b)[^>]*>[^<]*<br\s*\/?>/g;
 const FAKE = /\b(lorem|ipsum|todo|fixme|xxx)\b|示例文本|测试数据|占位文字|用户\s*[A-D]\b|test\s*data/i;
@@ -356,7 +356,7 @@ export function runStatic(inputs, { root = process.cwd() } = {}) {
     for (const c of units.attrColors) checkDecl({ prop: c.prop === "color" ? "color" : "fill", value: c.value, selector: c.tag }, at(c.line), out);
     for (const c of units.classes) checkClasses(c.text, at(c.line), out);
     for (const c of bareControls(src)) out.push(finding("browser-default", at(c.line), `<${c.tag}> 没有 Satin 的类：浏览器默认的样子`, c.tag === "button" ? "加 class=\"sn-btn sn-secondary\"（或 sn-ghost、sn-primary）" : c.tag === "select" ? "用 Satin 的下拉（<sn-select> 或 createSelect），或者加 class=\"sn-input\"" : "文字框加 class=\"sn-input\"；复选、单选用 Satin 的 sn-check / sn-radio 标记"));
-    for (const m of src.matchAll(AVATAR_TEXT)) { if (/\bsn-more\b/.test(m[0]) || /^\+\d+$/.test((m[1] || "").trim())) continue; out.push(finding("text-avatar", at(lineOf(src, m.index)), `头像里放了字："${(m[1] || m[2] || "").trim().slice(0, 6)}"`)); } // 头像组末尾的"+3"是人数，不算
+    for (const m of src.matchAll(AVATAR_TEXT)) { const txt = (m[1] || m[2] || m[3] || "").trim(); if (/\bsn-more\b/.test(m[0]) || /^\+\d+$/.test(txt)) continue; out.push(finding("text-avatar", at(lineOf(src, m.index)), `头像里放了字："${txt.slice(0, 6)}"`)); } // 头像组末尾的"+3"是人数，不算
     for (const m of src.matchAll(BR_IN_CONTROL)) out.push(finding("button-wrap", at(lineOf(src, m.index)), "按钮、标签里写了 <br>：硬折行", "删掉 <br>，缩短文字；放不下就省略号或者让布局让位"));
     for (const l of (units.bareLinks || []).filter((x) => x.cls)) out.push(finding("link-style", at(l.line), `<a> 只套了 "${l.cls.slice(0, 30)}"，没有管链接样子的类：还是浏览器默认的蓝色下划线`, "文字链接加 sn-link（像按钮的用 sn-btn sn-ghost）"));
     for (const l of (units.bareLinks || []).filter((x) => !x.cls)) out.push(finding("link-style", at(l.line), "<a href> 没有 class：浏览器默认的蓝色、下划线", "文字链接用 class=\"sn-link\"；导航里的用侧栏 / 面包屑的标记；像按钮的用 class=\"sn-btn sn-ghost\""));

@@ -49,14 +49,14 @@
 给标签和内容就能用：组件自己管选中，下划线滑过去。
 
 ```html
-<sn-tabs tabs='[{"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},{"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},{"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}]'></sn-tabs>
+<sn-tabs tabs='[{"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},{"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},{"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}]'></sn-tabs>
 ```
 
 纯 HTML 的写法：
 
 ```jsx
 <sn-tabs tabs='[
-  {"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},
+  {"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},
   {"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},
   {"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}
 ]'></sn-tabs>
@@ -68,7 +68,7 @@ React 的写法：
 import { Tabs } from "satin-ui/react";
 
 const TABS = [
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ];
@@ -85,7 +85,7 @@ Vue 的写法：
 import { Tabs } from "satin-ui/vue";
 
 const TABS = [
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ];
@@ -103,7 +103,7 @@ Svelte 的写法：
   import Tabs from "satin-ui/svelte/Tabs.svelte";
 
   const TABS = [
-    { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+    { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
     { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
     { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
   ];
@@ -119,7 +119,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 
 // 自定义元素的属性只认字符串：数组写成 JSON
 const TABS = JSON.stringify([
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ]);
@@ -139,7 +139,7 @@ Solid 的写法：
 ```jsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const TABS = JSON.stringify([
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ]);
@@ -155,7 +155,7 @@ Preact 的写法：
 import { Tabs } from "satin-ui/react";
 
 const TABS = [
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ];
@@ -170,7 +170,7 @@ export default function ProjectTabs() {
 选中的放在父组件里：显示在别处，也能从外面换。
 
 ```html
-<div class="sn-stack sn-gap-8"><sn-tabs value="1" tabs='[{"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},{"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},{"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}]'></sn-tabs><div class="sn-row"><span class="sn-help">现在看的是：镜头</span><button type="button" class="sn-btn sn-secondary sn-sm">去配音</button></div></div>
+<div class="sn-stack sn-gap-8"><sn-tabs value="1" tabs='[{"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},{"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},{"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}]'></sn-tabs><div class="sn-row"><span class="sn-help">现在看的是：镜头</span><button type="button" class="sn-btn sn-secondary sn-sm">去配音</button></div></div>
 ```
 
 纯 HTML 的写法：
@@ -178,7 +178,7 @@ export default function ProjectTabs() {
 ```jsx
 <div class="sn-stack sn-gap-8" id="tabs-box">
   <sn-tabs value="1" tabs='[
-    {"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},
+    {"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},
     {"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},
     {"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}
   ]'></sn-tabs>
@@ -201,7 +201,7 @@ import { useState } from "react";
 import { Button, Tabs } from "satin-ui/react";
 
 const TABS = [
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ];
@@ -228,7 +228,7 @@ import { ref } from "vue";
 import { Button, Tabs } from "satin-ui/vue";
 
 const TABS = [
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ];
@@ -253,7 +253,7 @@ Svelte 的写法：
   import Tabs from "satin-ui/svelte/Tabs.svelte";
 
   const TABS = [
-    { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+    { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
     { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
     { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
   ];
@@ -275,7 +275,7 @@ Angular 的写法：
 import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
 
 const LIST = [
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ];
@@ -307,7 +307,7 @@ Solid 的写法：
 import { createSignal } from "solid-js";
 
 const LIST = [
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ];
@@ -337,7 +337,7 @@ import { useState } from "react";
 import { Button, Tabs } from "satin-ui/react";
 
 const TABS = [
-  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
+  { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
   { label: "镜头", badge: 48, content: "镜头列表：按集分组，可以拖动排序。" },
   { label: "配音", content: "配音：林夏、周屿两个角色，6 段。" },
 ];

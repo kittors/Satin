@@ -542,7 +542,7 @@ export default function MillionShots() {
   const show = (keys) => { note.textContent = noteOf(keys); clear.disabled = !keys.length; };
   // defaultSelectedKeys：一开始勾上的行（rowKey，这里是 id）；用户勾选时 onSelectionChange 给出新的
   const grid = createCanvasGrid(document.getElementById("cshots-controlled"), {
-    columns, data: rows, selection: "multiple", defaultSelectedKeys: [1, 4], height: 280, label: "镜头清单",
+    columns, data: rows, selection: "multiple", defaultSelectedKeys: [1, 4], height: 320, label: "镜头清单",
     onSelectionChange: (e) => show(e.keys ?? []),
   });
   // 程序里改勾选：update({ selectedKeys })
@@ -578,7 +578,7 @@ export default function PickShots() {
   const [keys, setKeys] = useState([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <CanvasGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={280} label="镜头清单" />
+      <CanvasGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>
@@ -618,7 +618,7 @@ const note = computed(() => noteOf(keys.value));
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <CanvasGrid v-model:selected="keys" :columns="columns" :data="rows" selection="multiple" :height="280" label="镜头清单" />
+    <CanvasGrid v-model:selected="keys" :columns="columns" :data="rows" selection="multiple" :height="320" label="镜头清单" />
     <div class="sn-row sn-gap-8">
       <span class="sn-help">{{ note }}</span>
       <button type="button" class="sn-textbtn sn-sm" :disabled="!keys.length" @click="keys = []">清空</button>
@@ -656,7 +656,7 @@ Svelte 的写法：
 
 <div class="sn-stack sn-gap-8">
   <!-- 画布表格没有单独的 Svelte 组件：用 Satin 包 createCanvasGrid，选项写在 options 里 -->
-  <Satin create={createCanvasGrid} options={{ columns, data: rows, selection: "multiple", selectedKeys: keys, onSelectionChange: (e) => (keys = e.keys ?? []), height: 280, label: "镜头清单" }} />
+  <Satin create={createCanvasGrid} options={{ columns, data: rows, selection: "multiple", selectedKeys: keys, onSelectionChange: (e) => (keys = e.keys ?? []), height: 320, label: "镜头清单" }} />
   <div class="sn-row sn-gap-8">
     <span class="sn-help">{noteOf(keys)}</span>
     <button type="button" class="sn-textbtn sn-sm" disabled={!keys.length} onclick={() => (keys = [])}>清空</button>
@@ -709,7 +709,7 @@ export class CgridControlledComponent {
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
       const grid = (this.grid = createCanvasGrid(this.host().nativeElement, {
-        columns, data: rows, selection: "multiple", selectedKeys: this.keys(), height: 280, label: "镜头清单",
+        columns, data: rows, selection: "multiple", selectedKeys: this.keys(), height: 320, label: "镜头清单",
         onSelectionChange: (e) => this.keys.set(e.keys ?? []),
       }));
       destroyRef.onDestroy(() => grid.destroy());
@@ -752,7 +752,7 @@ export default function PickShots() {
   const [keys, setKeys] = createSignal(first);
   onSettled(() => {
     // selectedKeys：勾上的行的 rowKey（这里是 id）；用户勾选时 onSelectionChange 给出新的
-    grid = createCanvasGrid(host, { columns, data: rows, selection: "multiple", selectedKeys: first, height: 280, label: "镜头清单", onSelectionChange: (e) => setKeys(e.keys ?? []) });
+    grid = createCanvasGrid(host, { columns, data: rows, selection: "multiple", selectedKeys: first, height: 320, label: "镜头清单", onSelectionChange: (e) => setKeys(e.keys ?? []) });
     return () => grid.destroy();
   });
   // 程序里改勾选：update({ selectedKeys })
@@ -797,7 +797,7 @@ export default function PickShots() {
   const [keys, setKeys] = useState([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <CanvasGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={280} label="镜头清单" />
+      <CanvasGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>

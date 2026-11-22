@@ -22,7 +22,7 @@ Satin 的组件在手机上照样能用；这一页是手机上要多注意的�
 1. `<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">`；不要 `maximum-scale=1`（禁止放大不利于看不清的人）。
 2. 单栏布局；字段一栏，间距 20；页面左右留 16（`.sn-page` 在窄屏上自动收）。
 3. 主操作放底部 `.sn-bottom-bar`（总价 + 一个主按钮）；页面底部留出操作栏的高度。
-4. 可点的东西至少 44×44：按钮用 `sn-lg`，图标按钮加 `sn-tap`，列表行整行可点。可点元素之间至少 8px。
+4. 点击区至少 44×44（量的是真点得到的范围，不是看得见的框）：图标按钮加 `sn-tap`；分段控件、分页在触屏（`pointer: coarse`）下已经用透明伪元素把点击区上下扩到 44；自己的小按钮照这个写法扩（`::after { content: ""; position: absolute; inset: 50% 0 auto; height: max(100%, 44px); translate: 0 -50%; }`，按钮 `position: relative`）；挨得太近、扩不开的才把按钮换成 `sn-lg`；列表行整行可点。可点元素之间至少 8px。
 5. 选择用底部抽屉或选择器，不要跳新页面再跳回来；不要用 `alert()`。
 6. 不要只靠悬停给信息（Tooltip 里的内容在手机上要能点开看，或者直接写在界面上）。
 7. 横向不能滚动：表格在手机上改成一行一张的列表，或放进 `.sn-tbl-sc`（自己横着滑）。

@@ -57,7 +57,7 @@
 <!-- 侧栏、主区；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height:320px">
-    <div class="sn-app" data-navfx="slide">
+    <div class="sn-app" data-navfx="slide" style="height:100%">
       <aside class="sn-side">
         <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" aria-label="收起侧栏" data-i="panel-left"></button></div>
         <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -87,7 +87,7 @@ export default function AppShell() {
   // children 是右边的主区；收起按钮、⌘\ 收起和展开，主区宽度跟着连续变化
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} defaultValue="all">
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} defaultValue="all">
         <div className="sn-app-head"><b>全部项目</b></div>
       </Sidebar>
     </div>
@@ -114,7 +114,7 @@ const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
 <template>
   <!-- 默认插槽是右边的主区；收起按钮、⌘\ 收起和展开，主区宽度跟着连续变化 -->
   <div style="height: 320px">
-    <Sidebar title="Satin" :items="NAV" :footer="FOOTER" model-value="all">
+    <Sidebar style="height: 100%" title="Satin" :items="NAV" :footer="FOOTER" model-value="all">
       <div class="sn-app-head"><b>全部项目</b></div>
     </Sidebar>
   </div>
@@ -127,7 +127,7 @@ Svelte 的写法：
 <!-- 侧栏、主区；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height: 320px">
-    <div class="sn-app" data-navfx="slide">
+    <div class="sn-app" data-navfx="slide" style="height: 100%">
       <aside class="sn-side">
         <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\\" aria-label="收起侧栏" data-i="panel-left"></button></div>
         <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -150,7 +150,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   template: `
     <sn-enhance>
       <div style="height: 320px">
-        <div class="sn-app" data-navfx="slide">
+        <div class="sn-app" data-navfx="slide" style="height: 100%">
           <aside class="sn-side">
             <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" aria-label="收起侧栏" data-i="panel-left"></button></div>
             <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -173,7 +173,7 @@ export default function AppShell() {
   return (
     <sn-enhance>
       <div style="height: 320px">
-        <div class="sn-app" data-navfx="slide">
+        <div class="sn-app" data-navfx="slide" style="height: 100%">
           <aside class="sn-side">
             <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\\" aria-label="收起侧栏" data-i="panel-left"></button></div>
             <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -205,7 +205,7 @@ export default function AppShell() {
   // children 是右边的主区；收起按钮、⌘\ 收起和展开，主区宽度跟着连续变化
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} defaultValue="all">
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} defaultValue="all">
         <div class="sn-app-head"><b>全部项目</b></div>
       </Sidebar>
     </div>
@@ -227,7 +227,7 @@ export default function AppShell() {
 <!-- 选中哪一项、显示哪一页；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height:320px">
-    <div class="sn-app" data-navfx="slide">
+    <div class="sn-app" data-navfx="slide" style="height:100%">
       <aside class="sn-side">
         <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" aria-label="收起侧栏" data-i="panel-left"></button></div>
         <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -260,7 +260,7 @@ export default function AppPages() {
   const [page, setPage] = useState("all");
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} value={page} onNavigate={setPage}>
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} value={page} onNavigate={setPage}>
         <div className="sn-app-head"><b>{TITLE[page]}</b></div>
       </Sidebar>
     </div>
@@ -290,7 +290,7 @@ const page = ref("all");
 
 <template>
   <div style="height: 320px">
-    <Sidebar v-model="page" title="Satin" :items="NAV" :footer="FOOTER">
+    <Sidebar style="height: 100%" v-model="page" title="Satin" :items="NAV" :footer="FOOTER">
       <div class="sn-app-head"><b>{{ TITLE[page] }}</b></div>
     </Sidebar>
   </div>
@@ -303,7 +303,7 @@ Svelte 的写法：
 <!-- 选中哪一项、显示哪一页；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height: 320px">
-    <div class="sn-app" data-navfx="slide">
+    <div class="sn-app" data-navfx="slide" style="height: 100%">
       <aside class="sn-side">
         <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\\" aria-label="收起侧栏" data-i="panel-left"></button></div>
         <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -326,7 +326,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   template: `
     <sn-enhance>
       <div style="height: 320px">
-        <div class="sn-app" data-navfx="slide">
+        <div class="sn-app" data-navfx="slide" style="height: 100%">
           <aside class="sn-side">
             <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" aria-label="收起侧栏" data-i="panel-left"></button></div>
             <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -349,7 +349,7 @@ export default function AppPages() {
   return (
     <sn-enhance>
       <div style="height: 320px">
-        <div class="sn-app" data-navfx="slide">
+        <div class="sn-app" data-navfx="slide" style="height: 100%">
           <aside class="sn-side">
             <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\\" aria-label="收起侧栏" data-i="panel-left"></button></div>
             <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -384,7 +384,7 @@ export default function AppPages() {
   const [page, setPage] = useState("all");
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} value={page} onNavigate={setPage}>
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} value={page} onNavigate={setPage}>
         <div class="sn-app-head"><b>{TITLE[page]}</b></div>
       </Sidebar>
     </div>
@@ -406,7 +406,7 @@ fx="bar"：选中时左边一根指示条，窄侧栏用。
 <!-- data-navfx="bar"：选中时左边一根指示条；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height:320px">
-    <div class="sn-app" data-navfx="bar">
+    <div class="sn-app" data-navfx="bar" style="height:100%">
       <aside class="sn-side">
         <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" aria-label="收起侧栏" data-i="panel-left"></button></div>
         <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a class="sn-on" data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -436,7 +436,7 @@ export default function AppBar() {
   // fx 选中的切换样子：slide 底色滑过去（默认）/ bar 左边指示条 / fade 原地淡入 / text 只换文字颜色
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} defaultValue="assets" fx="bar">
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} defaultValue="assets" fx="bar">
         <div className="sn-app-head"><b>素材库</b></div>
       </Sidebar>
     </div>
@@ -463,7 +463,7 @@ const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
 <template>
   <!-- fx 选中的切换样子：slide 底色滑过去（默认）/ bar 左边指示条 / fade 原地淡入 / text 只换文字颜色 -->
   <div style="height: 320px">
-    <Sidebar title="Satin" :items="NAV" :footer="FOOTER" model-value="assets" fx="bar">
+    <Sidebar style="height: 100%" title="Satin" :items="NAV" :footer="FOOTER" model-value="assets" fx="bar">
       <div class="sn-app-head"><b>素材库</b></div>
     </Sidebar>
   </div>
@@ -476,7 +476,7 @@ Svelte 的写法：
 <!-- data-navfx="bar"：选中时左边一根指示条；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height: 320px">
-    <div class="sn-app" data-navfx="bar">
+    <div class="sn-app" data-navfx="bar" style="height: 100%">
       <aside class="sn-side">
         <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\\" aria-label="收起侧栏" data-i="panel-left"></button></div>
         <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a class="sn-on" data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -499,7 +499,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
   template: `
     <sn-enhance>
       <div style="height: 320px">
-        <div class="sn-app" data-navfx="bar">
+        <div class="sn-app" data-navfx="bar" style="height: 100%">
           <aside class="sn-side">
             <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" aria-label="收起侧栏" data-i="panel-left"></button></div>
             <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a class="sn-on" data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -522,7 +522,7 @@ export default function AppBar() {
   return (
     <sn-enhance>
       <div style="height: 320px">
-        <div class="sn-app" data-navfx="bar">
+        <div class="sn-app" data-navfx="bar" style="height: 100%">
           <aside class="sn-side">
             <div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\\" aria-label="收起侧栏" data-i="panel-left"></button></div>
             <nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a class="sn-on" data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav>
@@ -554,7 +554,7 @@ export default function AppBar() {
   // fx 选中的切换样子：slide 底色滑过去（默认）/ bar 左边指示条 / fade 原地淡入 / text 只换文字颜色
   return (
     <div style={{ height: 320 }}>
-      <Sidebar title="Satin" items={NAV} footer={FOOTER} defaultValue="assets" fx="bar">
+      <Sidebar style={{ height: "100%" }} title="Satin" items={NAV} footer={FOOTER} defaultValue="assets" fx="bar">
         <div class="sn-app-head"><b>素材库</b></div>
       </Sidebar>
     </div>

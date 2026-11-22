@@ -24,7 +24,7 @@
 
 <div class="sn-stack sn-gap-8">
   <!-- 画布表格没有单独的 Svelte 组件：用 Satin 包 createCanvasGrid，选项写在 options 里 -->
-  <Satin create={createCanvasGrid} options={{ columns, data: rows, selection: "multiple", selectedKeys: keys, onSelectionChange: (e) => (keys = e.keys ?? []), height: 280, label: "镜头清单" }} />
+  <Satin create={createCanvasGrid} options={{ columns, data: rows, selection: "multiple", selectedKeys: keys, onSelectionChange: (e) => (keys = e.keys ?? []), height: 320, label: "镜头清单" }} />
   <div class="sn-row sn-gap-8">
     <span class="sn-help">{noteOf(keys)}</span>
     <button type="button" class="sn-textbtn sn-sm" disabled={!keys.length} onclick={() => (keys = [])}>清空</button>

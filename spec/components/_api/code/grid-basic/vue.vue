@@ -21,5 +21,5 @@ const rows = [
 </script>
 
 <template>
-  <DataGrid :columns="columns" :data="rows" :height="280" label="镜头清单" />
+  <DataGrid :columns="columns" :data="rows" :height="320" label="镜头清单" />
 </template>

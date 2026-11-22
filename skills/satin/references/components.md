@@ -77,6 +77,7 @@
 | [`list`](components/list.md) | 列表与键值 · List · Description | 设置页、详情页用 |
 | [`card`](components/card.md) | 卡片 · Card | 项目、素材用卡片 |
 | [`tags`](components/tags.md) | 标签、徽标与头像 · Tag · Badge · Avatar | 标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块 |
+| [`avatar`](components/avatar.md) | 头像 · Avatar | 有照片用照片 |
 | [`collapse`](components/collapse.md) | 折叠面板 · Collapse | 高度用 0fr → 1fr 过渡，内容在展开过半时淡入 |
 | [`scrollarea`](components/scrollarea.md) | 滚动区域 · ScrollArea | 所有会溢出滚动的地方都用它：原生滚动（惯性、键盘、读屏都在），系统滚动条换成一根细的悬浮滚动条，不滚动 0.7 秒后淡出，悬停或拖动时变粗 |
 | [`vlist`](components/vlist.md) | 无限列表 · VirtualList · InfiniteList | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置 |

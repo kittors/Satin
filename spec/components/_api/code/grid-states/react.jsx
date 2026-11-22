@@ -26,7 +26,7 @@ export default function GridStates() {
       <Segmented items={STATES} value={state} onChange={setState} size="sm" label="表格状态" />
       {/* loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText */}
       <DataGrid columns={columns} data={state === "空" ? EMPTY : rows} loading={state === "加载中"} error={state === "出错" ? "网络断了，没拿到镜头" : null}
-        emptyText="还没有镜头，先从剧本里拆一批" onRetry={() => setState("有数据")} height={280} label="镜头清单" />
+        emptyText="还没有镜头，先从剧本里拆一批" onRetry={() => setState("有数据")} height={320} label="镜头清单" />
     </div>
   );
 }

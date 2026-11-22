@@ -21,6 +21,7 @@ import { initMarkdown } from "./sections/markdown.js";
 import { initCanvasGrid } from "./sections/canvas-grid.js";
 import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
 import { setup } from "../packages/satin-ui/src/setup.js";
+import { defineElements } from "../packages/satin-ui/elements/index.js";
 import { root, reduced, TICK, injectIcons, edgeFrames, initSeg, showTip, hideTip, tipTarget, resetTipLayer, fitStack } from "../packages/satin-ui/src/core.js";
 import { $, $$ } from "./dom.js";
 import { setLightboxBounds } from "../packages/satin-ui/src/lightbox.js";
@@ -29,6 +30,7 @@ import { setLightboxBounds } from "../packages/satin-ui/src/lightbox.js";
 export { reduced, edgeFrames, initSeg, showTip, hideTip, tipTarget, resetTipLayer };
 // 页面级的全局行为（Tooltip、表单、浮层栈、看图键盘、主题）：原来各模块导入时就装上，现在显式装，顺序和原来一样
 setup();
+defineElements(); // 设计稿里的头像写成 <sn-avatar>（写标记的人也这样用）
 
 // ———— 1. 生成展示内容 ————
 const SWATCHES = [

@@ -24,6 +24,6 @@
 </script>
 
 <div class="sn-stack sn-gap-8">
-  <DataGrid {columns} data={rows} onCellEdit={save} height={280} label="镜头清单" />
+  <DataGrid {columns} data={rows} onCellEdit={save} height={320} label="镜头清单" />
   <span class="sn-help">{note}</span>
 </div>

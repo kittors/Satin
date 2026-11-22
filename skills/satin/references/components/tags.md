@@ -2,9 +2,9 @@
 
 > 组件 id：`tags`　分组：数据展示
 
-标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块。头像没有照片时用名字的第一个字，底色从几种低饱和色里按名字固定取一种。
+标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块。头像有照片用照片，没有就按用户 id 挑一张预设头像（见"头像"），头像里不放文字。
 
-**状态标签只用中性底，靠前面的小圆点表示状态；徽标是数量；头像没有照片时用名字的第一个字，底色按名字固定取一种低饱和色。**
+**状态标签只用中性底，靠前面的小圆点表示状态；徽标是数量；头像有照片用照片，没有就按用户 id 挑一张预设头像（头像组件见"头像"），头像里不放文字。**
 
 ## 什么时候用
 
@@ -19,6 +19,7 @@
 
 ## 相近的组件
 
+- `avatar`：单个头像的用法（照片、预设、尺寸、读屏）在那里；这里是头像叠在一起的头像组。
 - `chip`：芯片能点（筛选、移除）；标签只读，表达状态。
 - `iconbutton`：纯图标按钮右上角的计数、小红点用同一套徽标。
 
@@ -26,21 +27,21 @@
 
 | 写法 | 引入 |
 |---|---|
-| 纯 HTML | `// 只有样式：状态标签 class="sn-tag"、徽标 class="sn-badge"、头像 class="sn-av"` |
-| React | `// 只有样式：<span className="sn-tag">、<span className="sn-badge">、<span className="sn-av">` |
-| Vue | `// 只有样式：<span class="sn-tag">、<span class="sn-badge">、<span class="sn-av">` |
-| Svelte | `// 只有样式：<span class="sn-tag">、<span class="sn-badge">、<span class="sn-av">` |
-| Angular | `// 只有样式：<span class="sn-tag">、<span class="sn-badge">、<span class="sn-av">` |
-| Solid | `// 只有样式：<span class="sn-tag">、<span class="sn-badge">、<span class="sn-av">` |
-| Preact | `// 只有样式：<span class="sn-tag">、<span class="sn-badge">、<span class="sn-av">` |
+| 纯 HTML | `// 标签、徽标只有样式：class="sn-tag"、class="sn-badge"；头像写 <sn-avatar>（入口里调过 defineElements()）` |
+| React | `import { Avatar } from "satin-ui/react"; // 标签、徽标只有样式：<span className="sn-tag">、<span className="sn-badge">` |
+| Vue | `import { Avatar } from "satin-ui/vue"; // 标签、徽标只有样式：<span class="sn-tag">、<span class="sn-badge">` |
+| Svelte | `import Avatar from "satin-ui/svelte/Avatar.svelte"; // 标签、徽标只有样式` |
+| Angular | `// 标签、徽标只有样式；头像写 <sn-avatar>（入口里调过 defineElements()，组件加 CUSTOM_ELEMENTS_SCHEMA）` |
+| Solid | `// 标签、徽标只有样式；头像写 <sn-avatar>（入口里调过 defineElements()）` |
+| Preact | `import { Avatar } from "satin-ui/react"; // 经 preact/compat；标签、徽标只有样式` |
 
-- React：纯样式，没有组件：状态标签 `<span className="sn-tag sn-ok"><i></i>已完成</span>`（`<i>` 是前面的小圆点），徽标 `<span className="sn-badge">`，头像 `<span className="sn-av" style={{ "--sn-h": 210 }}>林</span>`。
-- Preact：纯样式：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`、`<span class="sn-av" style="--sn-h:210">`。
-- Vue：纯样式，没有组件：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`、`<span class="sn-av" :style="{ '--sn-h': 210 }">`。
-- Svelte：纯样式：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`、`<span class="sn-av" style="--sn-h:210">`。
-- Angular：纯样式：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`、头像的色相用 `[style.--sn-h]` 绑。
-- Solid：纯样式：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`、`<span class="sn-av" style="--sn-h:210">`。
-- 纯 HTML：纯样式：状态标签 `<span class="sn-tag sn-ok"><i></i>已完成</span>`，徽标 `<span class="sn-badge">3</span>`，头像 `<span class="sn-av" style="--sn-h:210">林</span>`。
+- React：纯样式，没有组件：状态标签 `<span className="sn-tag sn-ok"><i></i>已完成</span>`（`<i>` 是前面的小圆点），徽标 `<span className="sn-badge">`；头像用 `<Avatar seed="u3" name="林夏" size={24} decorative />`（头像里不放字）。
+- Preact：纯样式：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`；头像用 `satin-ui/react` 的 `<Avatar name>`。
+- Vue：纯样式，没有组件：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`；头像用 `<Avatar seed="u3" name="林夏" :size="24" decorative />`。
+- Svelte：纯样式：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`；头像用 `Avatar` 组件（`satin-ui/svelte/Avatar.svelte`）。
+- Angular：纯样式：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`；头像写 `<sn-avatar [attr.name]>`。
+- Solid：纯样式：`<span class="sn-tag sn-ok"><i></i>已完成</span>`、`<span class="sn-badge">`；头像写 `<sn-avatar name>`。
+- 纯 HTML：纯样式：状态标签 `<span class="sn-tag sn-ok"><i></i>已完成</span>`，徽标 `<span class="sn-badge">3</span>`；头像写 `<sn-avatar seed="u3" name="林夏" size="24" decorative>`（头像里不放字）。
 
 ## 示例（由浅入深）
 
@@ -260,23 +261,23 @@ export default function TagsBadge() {
 
 ### 头像与头像组
 
-没有照片用名字的第一个字，底色按名字固定；人多时叠成一组，悬停看全部名字。
+没有照片用预设头像，按用户 id 挑（同一个人永远是同一张）；人多时叠成一组，悬停看全部名字。
 
 ```html
-<div class="sn-row"><span class="sn-av sn-sm" style="--sn-h: 30">周</span><span class="sn-av" style="--sn-h: 150">陈</span><span class="sn-av sn-lg sn-online" style="--sn-h: 340">李<i></i></span><div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人"><span class="sn-av sn-sm" style="--sn-h: 210">林</span><span class="sn-av sn-sm" style="--sn-h: 30">周</span><span class="sn-av sn-sm" style="--sn-h: 150">陈</span></div></div>
+<div class="sn-row"><sn-avatar seed="u4" name="周屿" size="24"></sn-avatar><sn-avatar seed="u8" name="陈默"></sn-avatar><sn-avatar seed="u5" name="李然" size="40" status="online"></sn-avatar><div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人"><sn-avatar seed="u3" name="林夏" size="24" decorative></sn-avatar><sn-avatar seed="u4" name="周屿" size="24" decorative></sn-avatar><sn-avatar seed="u8" name="陈默" size="24" decorative></sn-avatar></div></div>
 ```
 
 纯 HTML 的写法：
 
 ```jsx
 <div class="sn-row">
-  <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-  <span class="sn-av" style="--sn-h: 150">陈</span>
-  <span class="sn-av sn-lg sn-online" style="--sn-h: 340">李<i></i></span>
+  <sn-avatar seed="u4" name="周屿" size="24"></sn-avatar>
+  <sn-avatar seed="u8" name="陈默"></sn-avatar>
+  <sn-avatar seed="u5" name="李然" size="40" status="online"></sn-avatar>
   <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人">
-    <span class="sn-av sn-sm" style="--sn-h: 210">林</span>
-    <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-    <span class="sn-av sn-sm" style="--sn-h: 150">陈</span>
+    <sn-avatar seed="u3" name="林夏" size="24" decorative></sn-avatar>
+    <sn-avatar seed="u4" name="周屿" size="24" decorative></sn-avatar>
+    <sn-avatar seed="u8" name="陈默" size="24" decorative></sn-avatar>
   </div>
 </div>
 ```
@@ -284,16 +285,18 @@ export default function TagsBadge() {
 React 的写法：
 
 ```jsx
+import { Avatar } from "satin-ui/react";
+
 export default function TagsAvatar() {
   return (
     <div className="sn-row">
-      <span className="sn-av sn-sm" style={{ "--sn-h": 30 }}>周</span>
-      <span className="sn-av" style={{ "--sn-h": 150 }}>陈</span>
-      <span className="sn-av sn-lg sn-online" style={{ "--sn-h": 340 }}>李<i></i></span>
+      <Avatar seed="u4" name="周屿" size={24} />
+      <Avatar seed="u8" name="陈默" />
+      <Avatar seed="u5" name="李然" size={40} online />
       <div className="sn-av-group" tabIndex="0" data-tip="林夏、周屿、陈默 3 人">
-        <span className="sn-av sn-sm" style={{ "--sn-h": 210 }}>林</span>
-        <span className="sn-av sn-sm" style={{ "--sn-h": 30 }}>周</span>
-        <span className="sn-av sn-sm" style={{ "--sn-h": 150 }}>陈</span>
+        <Avatar seed="u3" name="林夏" size={24} decorative />
+        <Avatar seed="u4" name="周屿" size={24} decorative />
+        <Avatar seed="u8" name="陈默" size={24} decorative />
       </div>
     </div>
   );
@@ -303,15 +306,19 @@ export default function TagsAvatar() {
 Vue 的写法：
 
 ```vue
+<script setup>
+import { Avatar } from "satin-ui/vue";
+</script>
+
 <template>
   <div class="sn-row">
-    <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-    <span class="sn-av" style="--sn-h: 150">陈</span>
-    <span class="sn-av sn-lg sn-online" style="--sn-h: 340">李<i></i></span>
+    <Avatar seed="u4" name="周屿" :size="24" />
+    <Avatar seed="u8" name="陈默" />
+    <Avatar seed="u5" name="李然" :size="40" online />
     <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人">
-      <span class="sn-av sn-sm" style="--sn-h: 210">林</span>
-      <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-      <span class="sn-av sn-sm" style="--sn-h: 150">陈</span>
+      <Avatar seed="u3" name="林夏" :size="24" decorative />
+      <Avatar seed="u4" name="周屿" :size="24" decorative />
+      <Avatar seed="u8" name="陈默" :size="24" decorative />
     </div>
   </div>
 </template>
@@ -320,14 +327,18 @@ Vue 的写法：
 Svelte 的写法：
 
 ```jsx
+<script>
+  import Avatar from "satin-ui/svelte/Avatar.svelte";
+</script>
+
 <div class="sn-row">
-  <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-  <span class="sn-av" style="--sn-h: 150">陈</span>
-  <span class="sn-av sn-lg sn-online" style="--sn-h: 340">李<i></i></span>
+  <Avatar seed="u4" name="周屿" size={24} />
+  <Avatar seed="u8" name="陈默" />
+  <Avatar seed="u5" name="李然" size={40} online />
   <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人">
-    <span class="sn-av sn-sm" style="--sn-h: 210">林</span>
-    <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-    <span class="sn-av sn-sm" style="--sn-h: 150">陈</span>
+    <Avatar seed="u3" name="林夏" size={24} decorative />
+    <Avatar seed="u4" name="周屿" size={24} decorative />
+    <Avatar seed="u8" name="陈默" size={24} decorative />
   </div>
 </div>
 ```
@@ -335,19 +346,20 @@ Svelte 的写法：
 Angular 的写法：
 
 ```ts
-import { Component } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 
 @Component({
   selector: "demo-tags-avatar",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-avatar>
   template: `
     <div class="sn-row">
-      <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-      <span class="sn-av" style="--sn-h: 150">陈</span>
-      <span class="sn-av sn-lg sn-online" style="--sn-h: 340">李<i></i></span>
+      <sn-avatar seed="u4" name="周屿" size="24"></sn-avatar>
+      <sn-avatar seed="u8" name="陈默"></sn-avatar>
+      <sn-avatar seed="u5" name="李然" size="40" status="online"></sn-avatar>
       <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人">
-        <span class="sn-av sn-sm" style="--sn-h: 210">林</span>
-        <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-        <span class="sn-av sn-sm" style="--sn-h: 150">陈</span>
+        <sn-avatar seed="u3" name="林夏" size="24" decorative></sn-avatar>
+        <sn-avatar seed="u4" name="周屿" size="24" decorative></sn-avatar>
+        <sn-avatar seed="u8" name="陈默" size="24" decorative></sn-avatar>
       </div>
     </div>
   `,
@@ -361,13 +373,13 @@ Solid 的写法：
 export default function TagsAvatar() {
   return (
     <div class="sn-row">
-      <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-      <span class="sn-av" style="--sn-h: 150">陈</span>
-      <span class="sn-av sn-lg sn-online" style="--sn-h: 340">李<i></i></span>
+      <sn-avatar seed="u4" name="周屿" size="24"></sn-avatar>
+      <sn-avatar seed="u8" name="陈默"></sn-avatar>
+      <sn-avatar seed="u5" name="李然" size="40" status="online"></sn-avatar>
       <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人">
-        <span class="sn-av sn-sm" style="--sn-h: 210">林</span>
-        <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-        <span class="sn-av sn-sm" style="--sn-h: 150">陈</span>
+        <sn-avatar seed="u3" name="林夏" size="24" decorative=""></sn-avatar>
+        <sn-avatar seed="u4" name="周屿" size="24" decorative=""></sn-avatar>
+        <sn-avatar seed="u8" name="陈默" size="24" decorative=""></sn-avatar>
       </div>
     </div>
   );
@@ -377,16 +389,18 @@ export default function TagsAvatar() {
 Preact 的写法：
 
 ```jsx
+import { Avatar } from "satin-ui/react";
+
 export default function TagsAvatar() {
   return (
     <div class="sn-row">
-      <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-      <span class="sn-av" style="--sn-h: 150">陈</span>
-      <span class="sn-av sn-lg sn-online" style="--sn-h: 340">李<i></i></span>
+      <Avatar seed="u4" name="周屿" size={24} />
+      <Avatar seed="u8" name="陈默" />
+      <Avatar seed="u5" name="李然" size={40} online />
       <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人">
-        <span class="sn-av sn-sm" style="--sn-h: 210">林</span>
-        <span class="sn-av sn-sm" style="--sn-h: 30">周</span>
-        <span class="sn-av sn-sm" style="--sn-h: 150">陈</span>
+        <Avatar seed="u3" name="林夏" size={24} decorative />
+        <Avatar seed="u4" name="周屿" size={24} decorative />
+        <Avatar seed="u8" name="陈默" size={24} decorative />
       </div>
     </div>
   );
@@ -397,7 +411,7 @@ export default function TagsAvatar() {
 
 | 变量 | 作用 | 默认值 |
 |---|---|---|
-| `--sn-h` | 头像底色的色相（0–360）：按名字固定取一种，不随机 | — |
+| `--sn-av-ring` | 头像组里每个头像外面那圈分隔色，放在别的底色上时跟着设 | 卡片底色 |
 
 | 类名 / 属性 | 作用 |
 |---|---|
@@ -405,8 +419,8 @@ export default function TagsAvatar() {
 | `.sn-run / .sn-ok / .sn-warn / .sn-bad` | 状态：生成中（圆点闪动）、已完成、待审核、失败——只改圆点颜色 |
 | `.sn-tag.sn-sm` | 小号标签 |
 | `.sn-badge / .sn-badge.sn-soft` | 数量徽标（等宽数字）/ 浅色的 |
-| `.sn-av / .sn-xs / .sn-sm / .sn-lg` | 头像和尺寸 |
-| `.sn-av.sn-online + <i>` | 在线的小绿点 |
+| `.sn-av / .sn-2xs / .sn-xs / .sn-sm / .sn-lg / .sn-xl` | 头像和尺寸（16 / 20 / 24 / 32 / 40 / 64px）：里面只放照片或预设，用法见"头像" |
+| `.sn-av.sn-online > i` | 在线的小绿点 |
 | `.sn-av-group` | 头像组（叠在一起，悬停 data-tip 写全部名字） |
 
 ## 键盘

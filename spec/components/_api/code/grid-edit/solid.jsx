@@ -24,7 +24,7 @@ export default function EditShots() {
   const [note, setNote] = createSignal("双击格子改；名称不能空，镜头要是 1～999 的整数");
   onSettled(() => {
     // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
-    const grid = createDataGrid(host, { columns, data: rows, height: 280, label: "镜头清单", onCellEdit: (e) => setNote(savedText(e)) });
+    const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头清单", onCellEdit: (e) => setNote(savedText(e)) });
     return () => grid.destroy();
   });
   return (

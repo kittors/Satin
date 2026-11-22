@@ -35,7 +35,7 @@ export class GridSortComponent {
     const destroyRef = inject(DestroyRef);
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
-      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 280, label: "镜头清单", defaultSort: { key: "shots", dir: -1 }, onSortChange: (s) => this.note.set(describe(s)) });
+      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 320, label: "镜头清单", defaultSort: { key: "shots", dir: -1 }, onSortChange: (s) => this.note.set(describe(s)) });
       destroyRef.onDestroy(() => grid.destroy());
     });
   }

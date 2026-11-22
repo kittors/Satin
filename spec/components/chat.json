@@ -107,7 +107,7 @@
   },
   "example": {
     "0": {
-      "js": "import { createChat } from \"satin-ui/chat\";\n\n// 已有设计稿里的 .sn-chat 标记直接传（空容器也行：顶栏、消息区、底部输入框都由 createChat 填好、接好）\n// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文；先进缓冲、匀速放出来。这里用写好的一段话模拟\nconst wait = (ms) => new Promise((r) => setTimeout(r, ms));\ncreateChat(document.querySelector(\"#chatBox\"), {\n  respond: async function* (question, state) {\n    for (const piece of [\"先看这一场的节奏：\", \"雨夜、车站、\", \"等最后一班车的人。\"]) { if (state.stopped) return; yield { think: piece }; await wait(120); }\n    const text = `好的。\"${question}\"可以拆成三个镜头：远景站台、林夏的中景、车灯穿过雨幕的特写。`;\n    for (const ch of text) { if (state.stopped) return; yield ch; await wait(16); } // 换成你的模型流式输出\n  },\n});"
+      "js": "import { createChat } from \"satin-ui/chat\";\n\n// 已有设计稿里的 .sn-chat 标记直接传（空容器也行：顶栏、消息区、底部输入框都由 createChat 填好、接好）\n// 接模型：异步生成器，一段一段地给——{ think } 是思考，字符串是正文；先进缓冲、匀速放出来。这里用写好的一段话模拟\nconst wait = (ms) => new Promise((r) => setTimeout(r, ms));\ncreateChat(document.querySelector(\"#chatBox\"), {\n  respond: async function* (question, state) {\n    for (const piece of [\"先看这一场的节奏：\", \"雨夜、车站、\", \"等最后一班车的人。\"]) { if (state.stopped) return; yield { think: piece }; await wait(120); }\n    const text = \"这一场可以拆成三个镜头：远景站台、林夏的中景、车灯穿过雨幕的特写。\";\n    for (const ch of text) { if (state.stopped) return; yield ch; await wait(16); } // 换成你的模型流式输出\n  },\n});"
     }
   },
   "demos": [

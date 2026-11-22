@@ -6,16 +6,17 @@ import { SCENES } from "../data.js";
 import { toast } from "../../packages/satin-ui/src/feedback.js";
 import { BOX } from "../../packages/satin-ui/src/form.js";
 import { scrollArea } from "../../packages/satin-ui/src/scroll.js";
-import { createTable } from "../../packages/satin-ui/src/components.js";
+import { createTable, avatarHTML } from "../../packages/satin-ui/src/components.js";
 import { icon } from "../../packages/satin-ui/src/icons.js";
 // 展示页、官网都用真实照片，不用渐变色块冒充图片
-const PEOPLE = [["林夏", 210], ["周屿", 30], ["陈默", 150], ["许诺", 280], ["李然", 340]];
+// 第二项是用户 id：头像按它挑预设（重名、改名都不乱），同一个人在哪里都是同一张
+const PEOPLE = [["林夏", "u3"], ["周屿", "u4"], ["陈默", "u8"], ["许诺", "u11"], ["李然", "u5"]];
 const PROJECTS = [
   ["雨夜车站", 0, "ok", "已完成", 48, 756, "3 分钟前", 9], ["海边的第七天", 1, "run", "生成中", 32, 512, "12 分钟前", 8],
   ["城南旧事（第二版）", 2, "", "草稿", 12, 180, "1 小时前", 7], ["长夜", 3, "bad", "失败", 20, 300, "昨天", 6],
   ["山那边的学校", 4, "warn", "待审核", 64, 1022, "昨天", 5], ["最后一班地铁", 0, "ok", "已完成", 28, 420, "11 月 14 日", 4],
   ["雾港", 1, "ok", "已完成", 40, 615, "11 月 12 日", 3], ["春天的信", 2, "", "草稿", 6, 90, "11 月 10 日", 2],
-].map(([n, p, s, st, shots, dur, t, ts], i) => ({ n, o: PEOPLE[p][0], h: PEOPLE[p][1], s, st, shots, dur, t, ts, g: SCENES[i % SCENES.length] }));
+].map(([n, p, s, st, shots, dur, t, ts], i) => ({ n, o: PEOPLE[p][0], seed: PEOPLE[p][1], s, st, shots, dur, t, ts, g: SCENES[i % SCENES.length] }));
 const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 export function initData(ctx) {
   const { $, $$, injectIcons, initSeg, reduced, overlays } = ctx;
@@ -34,19 +35,19 @@ export function initData(ctx) {
   const UP = new Map(), TREE = PROJECTS.map((p, i) => {
     const ne = 2 + (i % 3), P0 = Object.assign(p, { id: "p" + i, lv: 0, top: i });
     p.children = Array.from({ length: ne }, (_, k) => {
-      const s = k === 0 ? p.s : ["ok", "run", ""][(i + k) % 3], E = { id: `p${i}.e${k}`, lv: 1, top: i, n: `第 ${k + 1} 集`, o: p.o, h: p.h, s, st: ST[s], shots: Math.max(4, Math.round(p.shots / ne) + k * 3 - 2), dur: Math.round(p.dur / ne) + k * 17, t: p.t };
-      const ns = 2 + ((i + k) % 2); E.children = Array.from({ length: ns }, (_, j) => { const s2 = ["ok", "run", "", "warn"][(i + k + j) % 4]; return { id: `${E.id}.s${j}`, lv: 2, top: i, n: `第 ${j + 1} 场 · ${SCN[(i * 3 + k * 2 + j) % SCN.length]}`, o: p.o, h: p.h, s: s2, st: ST[s2], shots: Math.max(2, Math.round(E.shots / ns) + j - 1), dur: Math.round(E.dur / ns) + j * 9, t: p.t }; });
+      const s = k === 0 ? p.s : ["ok", "run", ""][(i + k) % 3], E = { id: `p${i}.e${k}`, lv: 1, top: i, n: `第 ${k + 1} 集`, o: p.o, seed: p.seed, s, st: ST[s], shots: Math.max(4, Math.round(p.shots / ne) + k * 3 - 2), dur: Math.round(p.dur / ne) + k * 17, t: p.t };
+      const ns = 2 + ((i + k) % 2); E.children = Array.from({ length: ns }, (_, j) => { const s2 = ["ok", "run", "", "warn"][(i + k + j) % 4]; return { id: `${E.id}.s${j}`, lv: 2, top: i, n: `第 ${j + 1} 场 · ${SCN[(i * 3 + k * 2 + j) % SCN.length]}`, o: p.o, seed: p.seed, s: s2, st: ST[s2], shots: Math.max(2, Math.round(E.shots / ns) + j - 1), dur: Math.round(E.dur / ns) + j * 9, t: p.t }; });
       for (const x of E.children) UP.set(x.id, E.id); UP.set(E.id, P0.id);
       return E;
     });
     return P0;
   });
   const parents = [], walkAll = (list) => { for (const nd of list) if (nd.children?.length) { parents.push(nd.id); walkAll(nd.children); } }; walkAll(TREE);
-  const tagHTML = (s, st) => `<span class="sn-tag ${s && "sn-" + s}"><i></i>${st}</span>`, avHTML = (o, h) => `<span class="sn-name"><span class="sn-av sn-xs" style="--sn-h:${h}">${o[0]}</span>${o}</span>`;
+  const tagHTML = (s, st) => `<span class="sn-tag ${s && "sn-" + s}"><i></i>${st}</span>`, avHTML = (o, seed) => `<span class="sn-name">${avatarHTML({ name: o, seed, size: 20, decorative: true })}${o}</span>`;
   // 列：项目名（展开箭头由表格放在前面；第一级带封面，有下级的带数量）、负责人（连续相同的合成一格）、状态、镜头、时长、更新（按时间先后，第一次点从新到旧）、行末的操作
   const COLS = [
     { key: "n", title: "项目", sortable: true, resizable: true, minWidth: 200, editable: true, html: (v, nd) => `${nd.lv === 0 ? `<span class="sn-cv" style="--sn-g:${nd.g}"></span>` : ""}<b>${v}</b>${nd.children?.length ? `<span class="sn-cnt">${nd.children.length} ${nd.lv === 0 ? "集" : "场"}</span>` : ""}` },
-    { key: "o", title: "负责人", sortable: true, resizable: true, width: 124, minWidth: 96, merge: true, html: (v, nd) => avHTML(nd.o, nd.h) },
+    { key: "o", title: "负责人", sortable: true, resizable: true, width: 124, minWidth: 96, merge: true, html: (v, nd) => avHTML(nd.o, nd.seed) },
     { key: "st", title: "状态", sortable: true, resizable: true, width: 112, minWidth: 96, html: (v, nd) => tagHTML(nd.s, nd.st) },
     { key: "shots", title: "镜头", align: "right", sortable: true, resizable: true, width: 76, minWidth: 64 },
     { key: "dur", title: "时长", align: "right", sortable: true, resizable: true, width: 80, minWidth: 64, format: mmss },
@@ -123,7 +124,7 @@ export function initData(ctx) {
   cards.innerHTML = PROJECTS.slice(0, 6).map((p, i) => `<div class="sn-pc" tabindex="0" data-card="${i}" aria-label="${p.n}">`
     + `<div class="sn-cover"><span class="sn-art" style="--sn-g:${p.g}"></span><label class="sn-check sn-pick" aria-label="选择"><input type="checkbox">${BOX}</label>`
     + `<button class="sn-btn sn-ibtn sn-sm sn-more" data-card-more data-tip="更多" data-i="ellipsis"></button><span class="sn-len">${mmss(p.dur)}</span></div>`
-    + `<div class="sn-meta"><b>${p.n}</b><span class="sn-sub">${p.shots} 个镜头 · ${p.t}<span class="sn-av-group">${[0, 1, 2].slice(0, 1 + (i % 3)).map((k) => { const [nm, h] = PEOPLE[(i + k) % PEOPLE.length]; return `<span class="sn-av sn-xs" style="--sn-h:${h}">${nm[0]}</span>`; }).join("")}</span></span></div></div>`).join("");
+    + `<div class="sn-meta"><b>${p.n}</b><span class="sn-sub">${p.shots} 个镜头 · ${p.t}<span class="sn-av-group">${[0, 1, 2].slice(0, 1 + (i % 3)).map((k) => { const [nm, seed] = PEOPLE[(i + k) % PEOPLE.length]; return avatarHTML({ name: nm, seed, size: 20, decorative: true }); }).join("")}</span></span></div></div>`).join("");
   injectIcons(cards);
   cards.addEventListener("change", (e) => { const c = e.target.closest(".sn-pc"); c?.classList.toggle("sn-sel", e.target.checked); });
   cards.addEventListener("click", (e) => {

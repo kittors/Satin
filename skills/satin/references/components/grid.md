@@ -80,7 +80,7 @@
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
   // 给一个空容器：工具条、表头、表体都由 createDataGrid 填好；不用了（单页应用换页时）调 grid.destroy()
-  const grid = createDataGrid(document.getElementById("shots-basic"), { columns, data: rows, height: 280, label: "镜头清单" });
+  const grid = createDataGrid(document.getElementById("shots-basic"), { columns, data: rows, height: 320, label: "镜头清单" });
 </script>
 ```
 
@@ -108,7 +108,7 @@ const rows = [
 ];
 
 export default function ShotList() {
-  return <DataGrid columns={columns} data={rows} height={280} label="镜头清单" />;
+  return <DataGrid columns={columns} data={rows} height={320} label="镜头清单" />;
 }
 ```
 
@@ -138,7 +138,7 @@ const rows = [
 </script>
 
 <template>
-  <DataGrid :columns="columns" :data="rows" :height="280" label="镜头清单" />
+  <DataGrid :columns="columns" :data="rows" :height="320" label="镜头清单" />
 </template>
 ```
 
@@ -167,7 +167,7 @@ Svelte 的写法：
   ];
 </script>
 
-<DataGrid {columns} data={rows} height={280} label="镜头清单" />
+<DataGrid {columns} data={rows} height={320} label="镜头清单" />
 ```
 
 Angular 的写法：
@@ -204,7 +204,7 @@ export class GridBasicComponent {
     const destroyRef = inject(DestroyRef);
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
-      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 280, label: "镜头清单" });
+      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 320, label: "镜头清单" });
       destroyRef.onDestroy(() => grid.destroy());
     });
   }
@@ -239,7 +239,7 @@ export default function ShotList() {
   let host;
   // 挂上以后建表格；卸载时 destroy() 撤掉监听和放进 <head> 的样式
   onSettled(() => {
-    const grid = createDataGrid(host, { columns, data: rows, height: 280, label: "镜头清单" });
+    const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头清单" });
     return () => grid.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;
@@ -270,7 +270,7 @@ const rows = [
 ];
 
 export default function ShotList() {
-  return <DataGrid columns={columns} data={rows} height={280} label="镜头清单" />;
+  return <DataGrid columns={columns} data={rows} height={320} label="镜头清单" />;
 }
 ```
 
@@ -316,7 +316,7 @@ export default function ShotList() {
   const note = document.getElementById("shots-sort-note");
   // defaultSort：一开始的排序；点表头时 onSortChange 给出 { key, dir }（dir 1 升序、-1 降序）或 null
   createDataGrid(document.getElementById("shots-sort"), {
-    columns, data: rows, height: 280, label: "镜头清单",
+    columns, data: rows, height: 320, label: "镜头清单",
     defaultSort: { key: "shots", dir: -1 },
     onSortChange: (s) => (note.textContent = describe(s)),
   });
@@ -352,7 +352,7 @@ export default function SortedShots() {
   const [sort, setSort] = useState({ key: "shots", dir: -1 });
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} sort={sort} onSortChange={setSort} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} sort={sort} onSortChange={setSort} height={320} label="镜头清单" />
       <span className="sn-help">{describe(sort)}</span>
     </div>
   );
@@ -390,7 +390,7 @@ const note = computed(() => describe(sort.value));
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <DataGrid v-model:sort="sort" :columns="columns" :data="rows" :height="280" label="镜头清单" />
+    <DataGrid v-model:sort="sort" :columns="columns" :data="rows" :height="320" label="镜头清单" />
     <span class="sn-help">{{ note }}</span>
   </div>
 </template>
@@ -424,7 +424,7 @@ Svelte 的写法：
 </script>
 
 <div class="sn-stack sn-gap-8">
-  <DataGrid {columns} data={rows} bind:sort height={280} label="镜头清单" />
+  <DataGrid {columns} data={rows} bind:sort height={320} label="镜头清单" />
   <span class="sn-help">{describe(sort)}</span>
 </div>
 ```
@@ -469,7 +469,7 @@ export class GridSortComponent {
     const destroyRef = inject(DestroyRef);
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
-      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 280, label: "镜头清单", defaultSort: { key: "shots", dir: -1 }, onSortChange: (s) => this.note.set(describe(s)) });
+      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 320, label: "镜头清单", defaultSort: { key: "shots", dir: -1 }, onSortChange: (s) => this.note.set(describe(s)) });
       destroyRef.onDestroy(() => grid.destroy());
     });
   }
@@ -506,7 +506,7 @@ export default function SortedShots() {
   const [note, setNote] = createSignal(describe(first));
   onSettled(() => {
     // defaultSort：一开始的排序；点表头时 onSortChange 给出 { key, dir } 或 null
-    const grid = createDataGrid(host, { columns, data: rows, height: 280, label: "镜头清单", defaultSort: first, onSortChange: (s) => setNote(describe(s)) });
+    const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头清单", defaultSort: first, onSortChange: (s) => setNote(describe(s)) });
     return () => grid.destroy();
   });
   return (
@@ -547,7 +547,7 @@ export default function SortedShots() {
   const [sort, setSort] = useState({ key: "shots", dir: -1 });
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} sort={sort} onSortChange={setSort} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} sort={sort} onSortChange={setSort} height={320} label="镜头清单" />
       <span className="sn-help">{describe(sort)}</span>
     </div>
   );
@@ -602,7 +602,7 @@ export default function SortedShots() {
   const show = (keys) => { note.textContent = noteOf(keys); clear.disabled = !keys.length; };
   // defaultSelectedKeys：一开始勾上的行（rowKey，这里是 id）；用户勾选时 onSelectionChange 给出新的
   const grid = createDataGrid(document.getElementById("shots-select"), {
-    columns, data: rows, selection: "multiple", defaultSelectedKeys: [1, 4], height: 280, label: "镜头清单",
+    columns, data: rows, selection: "multiple", defaultSelectedKeys: [1, 4], height: 320, label: "镜头清单",
     onSelectionChange: (e) => show(e.keys ?? []),
   });
   // 程序里改勾选：update({ selectedKeys })
@@ -638,7 +638,7 @@ export default function PickShots() {
   const [keys, setKeys] = useState([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>
@@ -678,7 +678,7 @@ const note = computed(() => noteOf(keys.value));
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <DataGrid v-model:selected="keys" :columns="columns" :data="rows" selection="multiple" :height="280" label="镜头清单" />
+    <DataGrid v-model:selected="keys" :columns="columns" :data="rows" selection="multiple" :height="320" label="镜头清单" />
     <div class="sn-row sn-gap-8">
       <span class="sn-help">{{ note }}</span>
       <button type="button" class="sn-textbtn sn-sm" :disabled="!keys.length" @click="keys = []">清空</button>
@@ -714,7 +714,7 @@ Svelte 的写法：
 </script>
 
 <div class="sn-stack sn-gap-8">
-  <DataGrid {columns} data={rows} selection="multiple" bind:selectedKeys={keys} height={280} label="镜头清单" />
+  <DataGrid {columns} data={rows} selection="multiple" bind:selectedKeys={keys} height={320} label="镜头清单" />
   <div class="sn-row sn-gap-8">
     <span class="sn-help">{noteOf(keys)}</span>
     <button type="button" class="sn-textbtn sn-sm" disabled={!keys.length} onclick={() => (keys = [])}>清空</button>
@@ -767,7 +767,7 @@ export class GridSelectComponent {
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
       const grid = (this.grid = createDataGrid(this.host().nativeElement, {
-        columns, data: rows, selection: "multiple", selectedKeys: this.keys(), height: 280, label: "镜头清单",
+        columns, data: rows, selection: "multiple", selectedKeys: this.keys(), height: 320, label: "镜头清单",
         onSelectionChange: (e) => this.keys.set(e.keys ?? []),
       }));
       destroyRef.onDestroy(() => grid.destroy());
@@ -810,7 +810,7 @@ export default function PickShots() {
   const [keys, setKeys] = createSignal(first);
   onSettled(() => {
     // selectedKeys：勾上的行的 rowKey（这里是 id）；用户勾选时 onSelectionChange 给出新的
-    grid = createDataGrid(host, { columns, data: rows, selection: "multiple", selectedKeys: first, height: 280, label: "镜头清单", onSelectionChange: (e) => setKeys(e.keys ?? []) });
+    grid = createDataGrid(host, { columns, data: rows, selection: "multiple", selectedKeys: first, height: 320, label: "镜头清单", onSelectionChange: (e) => setKeys(e.keys ?? []) });
     return () => grid.destroy();
   });
   // 程序里改勾选：update({ selectedKeys })
@@ -855,7 +855,7 @@ export default function PickShots() {
   const [keys, setKeys] = useState([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>
@@ -903,7 +903,7 @@ export default function PickShots() {
     { id: 5, name: "出站口", tags: ["外景"], budget: 5200, dur: 75 },
     { id: 6, name: "天桥", tags: ["外景", "航拍"], budget: 18900, dur: 96 },
   ];
-  createDataGrid(document.getElementById("shots-render"), { columns, data: rows, height: 280, label: "镜头预算" });
+  createDataGrid(document.getElementById("shots-render"), { columns, data: rows, height: 320, label: "镜头预算" });
 </script>
 ```
 
@@ -930,7 +930,7 @@ const rows = [
 
 export default function ShotTags() {
   // render 返回 React 节点：每个格子画进一个小的 React 根（拿不到外面的 Context，要用就把值从 row 里传进去）
-  return <DataGrid columns={columns} data={rows} height={280} label="镜头预算" />;
+  return <DataGrid columns={columns} data={rows} height={320} label="镜头预算" />;
 }
 ```
 
@@ -958,7 +958,7 @@ const rows = [
 </script>
 
 <template>
-  <DataGrid :columns="columns" :data="rows" :height="280" label="镜头预算">
+  <DataGrid :columns="columns" :data="rows" :height="320" label="镜头预算">
     <!-- 插槽拿到 { value, row, index } -->
     <template #cell-tags="{ value }">
       <span class="sn-row sn-gap-4">
@@ -999,7 +999,7 @@ Svelte 的写法：
   ];
 </script>
 
-<DataGrid {columns} data={rows} height={280} label="镜头预算" />
+<DataGrid {columns} data={rows} height={320} label="镜头预算" />
 ```
 
 Angular 的写法：
@@ -1041,7 +1041,7 @@ export class GridRenderComponent {
     const destroyRef = inject(DestroyRef);
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
-      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 280, label: "镜头预算" });
+      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 320, label: "镜头预算" });
       destroyRef.onDestroy(() => grid.destroy());
     });
   }
@@ -1080,7 +1080,7 @@ const rows = [
 export default function ShotTags() {
   let host;
   onSettled(() => {
-    const grid = createDataGrid(host, { columns, data: rows, height: 280, label: "镜头预算" });
+    const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头预算" });
     return () => grid.destroy();
   });
   return <div ref={(el) => (host = el)}></div>;
@@ -1110,7 +1110,7 @@ const rows = [
 
 export default function ShotTags() {
   // render 返回 React 节点：每个格子画进一个小的 React 根（拿不到外面的 Context，要用就把值从 row 里传进去）
-  return <DataGrid columns={columns} data={rows} height={280} label="镜头预算" />;
+  return <DataGrid columns={columns} data={rows} height={320} label="镜头预算" />;
 }
 ```
 
@@ -1462,7 +1462,7 @@ export default function RemoteShots() {
   const note = document.getElementById("shots-edit-note");
   // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
   createDataGrid(document.getElementById("shots-edit"), {
-    columns, data: rows, height: 280, label: "镜头清单",
+    columns, data: rows, height: 320, label: "镜头清单",
     onCellEdit: (e) => (note.textContent = savedText(e)),
   });
 </script>
@@ -1498,7 +1498,7 @@ export default function EditShots() {
   const save = (e) => setNote(savedText(e));
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} onCellEdit={save} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} onCellEdit={save} height={320} label="镜头清单" />
       <span className="sn-help">{note}</span>
     </div>
   );
@@ -1536,7 +1536,7 @@ const save = (e) => (note.value = savedText(e));
 
 <template>
   <div class="sn-stack sn-gap-8">
-    <DataGrid :columns="columns" :data="rows" :height="280" label="镜头清单" @cell-edit="save" />
+    <DataGrid :columns="columns" :data="rows" :height="320" label="镜头清单" @cell-edit="save" />
     <span class="sn-help">{{ note }}</span>
   </div>
 </template>
@@ -1571,7 +1571,7 @@ Svelte 的写法：
 </script>
 
 <div class="sn-stack sn-gap-8">
-  <DataGrid {columns} data={rows} onCellEdit={save} height={280} label="镜头清单" />
+  <DataGrid {columns} data={rows} onCellEdit={save} height={320} label="镜头清单" />
   <span class="sn-help">{note}</span>
 </div>
 ```
@@ -1617,7 +1617,7 @@ export class GridEditComponent {
     // 渲染完再建（只在浏览器里跑）；组件销毁时 destroy() 撤掉监听和放进 <head> 的样式
     afterNextRender(() => {
       // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
-      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 280, label: "镜头清单", onCellEdit: (e) => this.note.set(savedText(e)) });
+      const grid = createDataGrid(this.host().nativeElement, { columns, data: rows, height: 320, label: "镜头清单", onCellEdit: (e) => this.note.set(savedText(e)) });
       destroyRef.onDestroy(() => grid.destroy());
     });
   }
@@ -1653,7 +1653,7 @@ export default function EditShots() {
   const [note, setNote] = createSignal("双击格子改；名称不能空，镜头要是 1～999 的整数");
   onSettled(() => {
     // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
-    const grid = createDataGrid(host, { columns, data: rows, height: 280, label: "镜头清单", onCellEdit: (e) => setNote(savedText(e)) });
+    const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头清单", onCellEdit: (e) => setNote(savedText(e)) });
     return () => grid.destroy();
   });
   return (
@@ -1695,7 +1695,7 @@ export default function EditShots() {
   const save = (e) => setNote(savedText(e));
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} onCellEdit={save} height={280} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} onCellEdit={save} height={320} label="镜头清单" />
       <span className="sn-help">{note}</span>
     </div>
   );
@@ -1741,7 +1741,7 @@ export default function EditShots() {
   const box = document.getElementById("shots-states"), seg = box.querySelector("sn-segmented");
   // loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText
   const grid = createDataGrid(document.getElementById("shots-states-grid"), {
-    columns, data: [], height: 280, label: "镜头清单", emptyText: "还没有镜头，先从剧本里拆一批",
+    columns, data: [], height: 320, label: "镜头清单", emptyText: "还没有镜头，先从剧本里拆一批",
     onRetry: () => show("有数据"),
   });
   function show(state) {
@@ -1784,7 +1784,7 @@ export default function GridStates() {
       <Segmented items={STATES} value={state} onChange={setState} size="sm" label="表格状态" />
       {/* loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText */}
       <DataGrid columns={columns} data={state === "空" ? EMPTY : rows} loading={state === "加载中"} error={state === "出错" ? "网络断了，没拿到镜头" : null}
-        emptyText="还没有镜头，先从剧本里拆一批" onRetry={() => setState("有数据")} height={280} label="镜头清单" />
+        emptyText="还没有镜头，先从剧本里拆一批" onRetry={() => setState("有数据")} height={320} label="镜头清单" />
     </div>
   );
 }
@@ -1822,7 +1822,7 @@ const state = ref("空");
     <Segmented v-model="state" :items="STATES" size="sm" label="表格状态" />
     <!-- loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText -->
     <DataGrid :columns="columns" :data="state === '空' ? EMPTY : rows" :loading="state === '加载中'" :error="state === '出错' ? '网络断了，没拿到镜头' : null"
-      empty-text="还没有镜头，先从剧本里拆一批" :height="280" label="镜头清单" @retry="state = '有数据'" />
+      empty-text="还没有镜头，先从剧本里拆一批" :height="320" label="镜头清单" @retry="state = '有数据'" />
   </div>
 </template>
 ```
@@ -1857,7 +1857,7 @@ Svelte 的写法：
   <Segmented items={STATES} bind:value={state} size="sm" label="表格状态" />
   <!-- loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText -->
   <DataGrid {columns} data={state === "空" ? EMPTY : rows} loading={state === "加载中"} error={state === "出错" ? "网络断了，没拿到镜头" : null}
-    emptyText="还没有镜头，先从剧本里拆一批" onRetry={() => (state = "有数据")} height={280} label="镜头清单" />
+    emptyText="还没有镜头，先从剧本里拆一批" onRetry={() => (state = "有数据")} height={320} label="镜头清单" />
 </div>
 ```
 
@@ -1905,7 +1905,7 @@ export class GridStatesComponent {
     afterNextRender(() => {
       // loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText
       const grid = (this.grid = createDataGrid(this.host().nativeElement, {
-        columns, data: [], height: 280, label: "镜头清单", emptyText: "还没有镜头，先从剧本里拆一批",
+        columns, data: [], height: 320, label: "镜头清单", emptyText: "还没有镜头，先从剧本里拆一批",
         onRetry: () => this.show("有数据"),
       }));
       destroyRef.onDestroy(() => grid.destroy());
@@ -1950,7 +1950,7 @@ export default function GridStates() {
   };
   onSettled(() => {
     // loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText
-    grid = createDataGrid(host, { columns, data: [], height: 280, label: "镜头清单", emptyText: "还没有镜头，先从剧本里拆一批", onRetry: () => show("有数据") });
+    grid = createDataGrid(host, { columns, data: [], height: 320, label: "镜头清单", emptyText: "还没有镜头，先从剧本里拆一批", onRetry: () => show("有数据") });
     // 名字带横线的事件用 addEventListener 挂（Solid 的 onXxx 只认驼峰的事件名）
     seg.addEventListener("sn-change", (e) => show(e.detail));
     return () => grid.destroy();
@@ -1995,7 +1995,7 @@ export default function GridStates() {
       <Segmented items={STATES} value={state} onChange={setState} size="sm" label="表格状态" />
       {/* loading：盖一层加载中；error：写出错的原因，旁边有"重试"（点了发 retry）；data 是空数组时显示 emptyText */}
       <DataGrid columns={columns} data={state === "空" ? EMPTY : rows} loading={state === "加载中"} error={state === "出错" ? "网络断了，没拿到镜头" : null}
-        emptyText="还没有镜头，先从剧本里拆一批" onRetry={() => setState("有数据")} height={280} label="镜头清单" />
+        emptyText="还没有镜头，先从剧本里拆一批" onRetry={() => setState("有数据")} height={320} label="镜头清单" />
     </div>
   );
 }

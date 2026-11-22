@@ -167,7 +167,7 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 十万行数据表格 | `<DataGrid columns data rowKey>`（`satin-ui/react/grid`、`satin-ui/vue/grid`、`satin-ui/svelte/DataGrid.svelte`） | `createDataGrid(el, { columns, data })`（`satin-ui/grid`）；服务端的数据给 `dataSource: { total, load }` | 只在行数真的很多（上千）或要编辑、拖列、树形时用；几十行的表用上面的 `Table`。列定义见 `components/grid.md` |
 | 百万行画布表格 | `<CanvasGrid columns dataSource>`（`satin-ui/react/canvas-grid`、`satin-ui/vue/canvas-grid`） | `createCanvasGrid(el, { columns, dataSource })`（`satin-ui/canvas-grid`） | 表体画在画布上：格子只能写文字（`format`），要放自己的标记用 DataGrid |
 | 状态标签 | | `<span class="sn-tag sn-ok"><i></i>已完成</span>` | `sn-run` 进行中、`sn-ok` 完成、`sn-warn` 待处理、`sn-bad` 失败、不加是草稿 |
-| 数量徽标 / 头像 | | `<span class="sn-badge">3</span>`、`<span class="sn-av sn-sm" style="--sn-h:210">林</span>` | 头像底色用 `--sn-h` 色相，不写颜色 |
+| 数量徽标 / 头像 | | `<span class="sn-badge">3</span>`、`<sn-avatar seed="u3" name="林夏" size="24">`（React `<Avatar name>`） | 头像里不放字：有照片给 `src`，没有就按 `seed` / `name` 挑预设 |
 | 设置列表 | | `.sn-set-list > .sn-set-row` | 见 `list.md` |
 | 键值对 | | `<dl class="sn-kv"><dt>负责人</dt><dd>林夏</dd></dl>` | |
 | 空状态 | | `.sn-empty-state`（图标 + 一句话 + 一个按钮） | 说清楚为什么空、下一步做什么 |
@@ -269,7 +269,7 @@ createTable(document.getElementById("projects"), {
 12. **浮层不被裁、不被挡**，按钮文字不换行，元素不重叠，没有横向滚动条。
 13. **键盘能用**：可点的东西都能 Tab 到，有焦点框（`:focus-visible`）。
 14. **深浅两套主题都要好看**：不写死颜色就自动适配。切深浅：`import { setMode } from "satin-ui/theme"; setMode("dark")`（`"auto"` 跟系统，`"light"` 浅色）；换主色、字体、字号：`set({ accent: "blue" })`。
-15. **手机上点得到**：可点区域至少 44×44（按钮 `sn-lg`，图标按钮加 `sn-tap`），字段一栏，底部操作用 `.sn-bottom-bar` 贴底；侧栏布局在手机上收成图标栏（纯 HTML `enhance()` 自动接，框架里 `createSidebar(el, { collapseBelow: 720 })`）。详见 `references/mobile.md`。
+15. **手机上点得到**：点击区至少 44×44——看得见的不用跟着变大：图标按钮加 `sn-tap`，分段控件、分页触屏下自己会把点击区上下扩到 44，自己写的小按钮在 `@media (pointer: coarse)` 里用透明伪元素扩；挨得太近扩不开的才用 `sn-lg`。字段一栏，底部操作用 `.sn-bottom-bar` 贴底；侧栏布局在手机上收成图标栏（纯 HTML `enhance()` 自动接，框架里 `createSidebar(el, { collapseBelow: 720 })`）。详见 `references/mobile.md`。
 16. **不加英文眉题**：标题上面不放全大写、加字距的英文小字（"PROJECTS · 2026""DASHBOARD"）——这是模板味；层级靠标题字号和说明文字。
 
 ### 界面：一眼就是 AI 做的那几处（检查器会查，规则在 `references/rules.md` 的"界面"一组）

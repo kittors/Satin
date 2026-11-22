@@ -56,6 +56,17 @@
 | `--sn-b-lift` | `0 1px 2px rgba(0, 0, 0, .05)` | `0 0 0 0 transparent` | 按钮极淡的落影 |
 | `--sn-tip-bg` | `#1d1d1f` | `#3a3a3c` | Tooltip、Toast 的反色底 |
 | `--sn-tip-fg` | `#f5f5f7` | `#f5f5f7` | Tooltip、Toast 的文字 |
+| `--sn-av-bg` | `var(--sn-sunken)` | `#a7a7aa` | 头像的圆底（预设头像；照片没加载出来时也露出它） |
+| `--sn-av-ink` | `#424245` | `#424245` | 预设头像的线条、眼睛 |
+| `--sn-av-face` | `#fafafa` | `#e1e1e1` | 预设头像的脸、耳朵、脖子 |
+| `--sn-av-black` | `#3f3a37` | `#393432` | 预设头像的发色：黑 |
+| `--sn-av-brown` | `#5b4637` | `#523f32` | 预设头像的发色：深棕 |
+| `--sn-av-gray` | `#c9c6c1` | `#b5b2ae` | 预设头像的发色：灰（年长者） |
+| `--sn-av-blue` | `#c7d0da` | `#b3bbc4` | 预设头像的衣服、帽子、耳机：灰蓝 |
+| `--sn-av-green` | `#cdd5c8` | `#b9c0b4` | 预设头像的衣服：灰绿 |
+| `--sn-av-pink` | `#dccfcb` | `#c6bab7` | 预设头像的衣服：灰粉 |
+| `--sn-av-violet` | `#d5d1df` | `#c0bcc9` | 预设头像的衣服、耳机：淡紫 |
+| `--sn-av-beard` | `#958e88` | `#867f7a` | 预设头像的胡子 |
 | `--sn-field-inset` | `0 0 0 0 transparent` | `0 0 0 0 transparent` | 输入框内阴影（默认没有） |
 | `--sn-card-shadow` | `0 1px 3px rgba(0, 0, 0, .04)` | `none` | 卡片极淡的落影（一般不用：卡片只靠描边） |
 | `--sn-e1` | `0 8px 24px rgba(0, 0, 0, .1), 0 0 0 1px rgba(0, 0, 0, .06)` | `0 8px 24px rgba(0, 0, 0, .5), inset 0 0 0 1px rgba(255, 255, 255, .09)` | 浮层阴影：菜单、弹出面板、通知 |

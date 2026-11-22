@@ -26,7 +26,7 @@
   const note = document.getElementById("shots-sort-note");
   // defaultSort：一开始的排序；点表头时 onSortChange 给出 { key, dir }（dir 1 升序、-1 降序）或 null
   createDataGrid(document.getElementById("shots-sort"), {
-    columns, data: rows, height: 280, label: "镜头清单",
+    columns, data: rows, height: 320, label: "镜头清单",
     defaultSort: { key: "shots", dir: -1 },
     onSortChange: (s) => (note.textContent = describe(s)),
   });

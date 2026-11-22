@@ -95,12 +95,12 @@ Lorem ipsum、渐变色块冒充图片、AI 抽象插画一眼假。
 
 ### 移动端可点区域够大（`touch-target`，建议）
 
-手机上 28px 的图标按钮很难点中。
+手机上 28px 的按钮很难点中。苹果建议点击区至少 44×44。
 
-- 这样做：390 宽下可点元素至少 40×40（用 sn-btn 的 lg 尺寸，或者给图标按钮加 sn-tap 扩大点击区）
-- 不要：手机页面上 24px 的关闭按钮、挤在一起的链接
-- 判据（dom）：390 宽、触摸模式下，可点元素（button、a、[role=button]、input）的点击框小于 40×40 且和别的可点元素间距小于 8px 就报。
-- 修法：移动端用 lg 尺寸；图标按钮加 `sn-tap`；列表行整行可点。
+- 这样做：手机上点击区至少 44×44：看得见的可以小，在 (pointer: coarse) 下用透明伪元素把点击区扩出去（样子一像素不变）；挨得太近、扩不开的才把实际尺寸加大
+- 不要：手机页面上 24px 的关闭按钮、挤在一起的链接；为了点得到把看得见的按钮整个放大，改了原来的样子
+- 判据（dom）：390 宽、触摸模式下，可点元素（button、a、[role=button]、input）按真点得到的范围量（滚到窗口里，从中心往四周逐像素用 elementFromPoint 探，透明伪元素扩出去的算、被裁掉被盖住的不算），小于 44×44 且离别的可点元素不到 8px 就报。
+- 修法：图标按钮加 `sn-tap`；分段控件、分页触屏下已经扩到 44；自己的小按钮在 `@media (pointer: coarse)` 里加 `::after { content: ""; position: absolute; inset: 50% 0 auto; height: max(100%, 44px); translate: 0 -50%; }`（按钮要 position: relative）；列表行整行可点。
 
 ### 浏览器默认样式不能漏出来（`browser-default`，必须）
 
@@ -267,13 +267,13 @@ AI 助手顶栏写"在线"、角落写"就绪""空闲""系统运行正常"——
 - 判据（dom）：backdrop-filter 不为 none、而 position 不是 fixed / sticky / absolute 的元素就报。
 - 修法：去掉 backdrop-filter，用 `--sn-raised` 实底。
 
-### 导航选中用中性底色，字重不变（`nav-selected`，建议）
+### 导航选中用中性底色；横排的选中字重不变（`nav-selected`，建议）
 
-左边一根彩色竖条、品牌色底，是后台模板的味道；字重变了文字会挤动。
+左边一根彩色竖条、品牌色底，是后台模板的味道。横排的导航、页签选中后加粗，字会撑宽、把旁边的项挤动；竖排侧栏一项占一行，挤不动别人。
 
-- 这样做：选中项 background: var(--sn-fill-active); color: var(--sn-label)；字重始终 400 / 500 不变
-- 不要：选中项左边 3px 品牌色竖条；选中后变粗
-- 判据（dom）：导航里 [aria-current]、.on、.active 的项带彩色 border-left / 彩色背景，或者和未选中项 font-weight 不同就报。
+- 这样做：选中项 background: var(--sn-fill-active); color: var(--sn-label)；横排（导航条、页签、分段）选中前后字重不变；竖排侧栏选中可以用 500
+- 不要：选中项左边 3px 品牌色竖条；品牌色底；页签选中后变粗；侧栏选中用 600 以上
+- 判据（dom）：导航里 [aria-current]、.on、.active 的项带彩色 border-left / 彩色背景就报；字重：和未选中项在同一行（横排）时只要不同就报，竖排时超过 500 才报。
 - 修法：用 `sn-side` 侧边栏组件，选中样式已经是对的。
 
 ## 6. 只在理想条件下成立

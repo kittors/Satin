@@ -1,7 +1,7 @@
 // 标签页、面包屑、分页、步骤的 API 契约（手写）。格式见 spec/components/_api/README.md
 import { code } from "./_code.mjs";
 
-const TABS = `[{"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},{"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},{"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}]`;
+const TABS = `[{"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},{"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},{"label":"配音","content":"配音：林夏、周屿两个角色，6 段。"}]`;
 
 export default {
   title: "标签页、面包屑、分页、步骤",

@@ -86,7 +86,12 @@ function pageChecks({ theme, width, want }) {
       const sel = items.find(isSel), other = items.find((x) => !isSel(x) && x.tagName === sel?.tagName);
       if (!sel || !other) continue;
       const a = cs(sel), b = cs(other), why = [];
-      if (a.fontWeight !== b.fontWeight) why.push(`字重 ${b.fontWeight} → ${a.fontWeight}`);
+      // 字重：横排（导航条、页签——选中项和别的项在同一行）选中前后不许变，加粗会把字撑宽、挤动旁边；
+      // 竖排侧栏一项占一行，挤不动别人，选中允许到 500，再粗才报
+      const rs = sel.getBoundingClientRect(), ro = other.getBoundingClientRect();
+      const row = rs.top < ro.bottom - 2 && ro.top < rs.bottom - 2 && Math.abs(rs.left - ro.left) > 2;
+      const ws = parseFloat(a.fontWeight), wo = parseFloat(b.fontWeight);
+      if (ws !== wo && (row || ws > 500)) why.push(`${row ? "横排" : "竖排"}字重 ${b.fontWeight} → ${a.fontWeight}`);
       const bl = parse(a.borderLeftColor); if (parseFloat(a.borderLeftWidth) >= 2 && bl && sat(bl).s > .3) why.push("左边彩色竖条");
       const bef = cs(sel, "::before"); const bc = parse(bef.backgroundColor); if (bef.content !== "none" && parseFloat(bef.width) <= 4 && bc && sat(bc).s > .3) why.push("左边彩色竖条");
       const bg = parse(a.backgroundColor); if (bg && bg[3] > .3 && sat(bg).s > .4) why.push("彩色底");
@@ -180,12 +185,32 @@ function pageChecks({ theme, width, want }) {
     if (dark) for (const el of vis) { const c = parse(cs(el).backgroundColor), r = el.getBoundingClientRect(); if (c && c[0] > 250 && c[1] > 250 && c[2] > 250 && c[3] > .95 && r.width >= 40 && r.height >= 24 && !control(el)) { add("both-themes", el, "深色主题下还是 #fff 白底的块", "底色用 var(--sn-raised) / var(--sn-canvas)，深色下会自动变深"); break; } }
   }
   if (want.includes("touch")) {
-    const tg = vis.filter((el) => el.matches("button, a[href], [role=button], [role=tab], [role=switch], [role=checkbox], select, textarea, summary, input:not([type=hidden])") && !el.closest("label") && +cs(el).opacity > .05).concat(vis.filter((el) => el.matches("label") && el.querySelector("input")));
+    const tg = vis.filter((el) => el.matches("button, a[href], [role=button], [role=tab], [role=switch], [role=checkbox], select, textarea, summary, input:not([type=hidden])") && !el.closest("label") && +cs(el).opacity > .05).concat(vis.filter((el) => el.matches("label") && el.querySelector("input")))
+      .filter((el) => cs(el).pointerEvents !== "none" && !el.matches(":disabled, [aria-disabled=true]"));
     const rect = (el) => el.getBoundingClientRect(), gap = (a, b) => Math.max(0, Math.max(a.left - b.right, b.left - a.right), Math.max(a.top - b.bottom, b.top - a.bottom));
     let n = 0;
-    // 点击区：加了 sn-tap 的按伪元素扩出来的范围算（样子不变、能点到的至少 44×44）
-    const hitBox = (el) => { const r = rect(el), a = getComputedStyle(el, "::after"); if (!el.classList.contains("sn-tap") || a.content === "none") return r; const w = Math.max(r.width, parseFloat(a.width) || 0), h = Math.max(r.height, parseFloat(a.height) || 0); return { left: r.left + r.width / 2 - w / 2, top: r.top + r.height / 2 - h / 2, width: w, height: h, right: r.left + r.width / 2 + w / 2, bottom: r.top + r.height / 2 + h / 2 }; };
-    for (const el of tg) { const r = hitBox(el); if (r.width >= 40 && r.height >= 40) continue; const near = tg.find((o) => o !== el && !o.contains(el) && !el.contains(o) && gap(r, rect(o)) < 8); if (near && n++ < 10) add("touch-target", el, `手机宽度下点击区只有 ${Math.round(r.width)}×${Math.round(r.height)}，离 ${label(near)} 不到 8px`); }
+    // 点击区按"真点得到的范围"量，不按看得见的框：元素滚到窗口中间，从中心往上下左右逐像素探，
+    // elementFromPoint 落在它自己（或它里面的东西）上就算——透明伪元素扩出去的算进去，被父元素裁掉、被旁边元素盖住的不算。
+    // 每个方向探到够 T 就停（够了不用知道多大）
+    const T = 44, sc = all.filter((e) => e.scrollWidth > e.clientWidth || e.scrollHeight > e.clientHeight).map((e) => [e, e.scrollLeft, e.scrollTop]), wx = scrollX, wy = scrollY;
+    const hitBox = (el) => {
+      el.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" });
+      const r = rect(el), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const mine = (x, y) => { if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) return false; const t = document.elementFromPoint(x, y); return !!t && (t === el || el.contains(t)); };
+      if (!mine(cx, cy)) return null; // 中心都点不到：被盖住了（no-overlap 管）
+      const reach = (dx, dy, cap) => { let k = 0; while (k < cap && mine(cx + dx * (k + 1), cy + dy * (k + 1))) k++; return k; };
+      const box = (cx2, cy2) => { const u = reach(0, -1, cy2), d = reach(0, 1, cy2), l = reach(-1, 0, cx2), rt = reach(1, 0, cx2); return { left: cx - l, right: cx + rt + 1, top: cy - u, bottom: cy + d + 1, width: l + rt + 1, height: u + d + 1 }; };
+      const quick = box(T, T); if (quick.width >= T && quick.height >= T) return quick;
+      return box(r.width / 2 + T, r.height / 2 + T); // 不够大：再量一遍完整的范围，报出来的数才准
+    };
+    for (const el of tg) {
+      if (!el.isConnected || n >= 10) continue;
+      const r = hitBox(el); if (!r || (r.width >= T && r.height >= T)) continue;
+      const near = tg.find((o) => o !== el && o.isConnected && !o.contains(el) && !el.contains(o) && gap(r, rect(o)) < 8);
+      if (near) { n++; add("touch-target", el, `手机宽度下点击区只有 ${Math.round(r.width)}×${Math.round(r.height)}（看得见的 ${Math.round(rect(el).width)}×${Math.round(rect(el).height)}），离 ${label(near)} 不到 8px`); }
+    }
+    for (const [e, x, y] of sc) { e.scrollLeft = x; e.scrollTop = y; }
+    scrollTo(wx, wy);
   }
   return out;
 }

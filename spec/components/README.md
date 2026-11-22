@@ -1,6 +1,6 @@
 # 组件清单
 
-每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`popconfirm`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`table`、`grid`、`cgrid`、`list`、`card`、`tags`、`collapse`、`scrollarea`、`vlist`、`chat`、`md`、`flow`、`flowstress`、`image`、`media`、`upload`、`sidebar`、`tabs`、`reorder`、`addremove`、`optimistic`。
+每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`popconfirm`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`table`、`grid`、`cgrid`、`list`、`card`、`tags`、`avatar`、`collapse`、`scrollarea`、`vlist`、`chat`、`md`、`flow`、`flowstress`、`image`、`media`、`upload`、`sidebar`、`tabs`、`reorder`、`addremove`、`optimistic`。
 
 ## 契约格式（手写的 API 契约）
 
@@ -133,7 +133,8 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | `cgrid` | 数据表格 · Canvas（Canvas grid · 一百万行） | ✓ | 一百万行，表体画在一块画布上，功能和上面的 DOM 版一样：懒加载（200 行一块）、搜索和列头筛选、排序、拖列、改宽、左右固定列、拖行、编辑、勾选、键盘。表头… |
 | `list` | 列表与键值（List · Description） | ✓ | 设置页、详情页用。行高 44，左边图标、中间标题和说明、右边是值或开关；能点进去的行末尾有箭头，悬停时箭头往右挪 2px。 |
 | `card` | 卡片（Card） | ✓ | 项目、素材用卡片。悬停时卡片不上浮、不加阴影：封面在框里慢慢放大一点，右上角出现"更多"，左上角出现勾选框。选中后外圈一道 2px 的线。 |
-| `tags` | 标签、徽标与头像（Tag · Badge · Avatar） | ✓ | 标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块。头像没有照片时用名字的第一个字，底色从几种低饱和色里按名字固定取一种。 |
+| `tags` | 标签、徽标与头像（Tag · Badge · Avatar） | ✓ | 标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块。头像有照片用照片，没有就按用户 id 挑一张预设头像（见"头像"），头像里不放文字。 |
+| `avatar` | 头像（Avatar） | ✓ | 有照片用照片；加载失败或者没有照片，就按用户 id（没有就用名字）稳定地挑一张预设头像，同一个人每次都是同一张。头像里不放文字。24px 及以下自动换成简化版，… |
 | `collapse` | 折叠面板（Collapse） | ✓ | 高度用 0fr → 1fr 过渡，内容在展开过半时淡入；箭头跟着转 90°。可以同时展开多个，也可以只开一个（手风琴）。 |
 | `scrollarea` | 滚动区域（ScrollArea） | ✓ | 所有会溢出滚动的地方都用它：原生滚动（惯性、键盘、读屏都在），系统滚动条换成一根细的悬浮滚动条，不滚动 0.7 秒后淡出，悬停或拖动时变粗；边缘渐隐只在那个方向… |
 | `vlist` | 无限列表（VirtualList · InfiniteList） | ✓ | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置。滚到离底部 400px 时自动加载下一页，底部先出骨架行（300ms 内回来就不出）；加载失… |
