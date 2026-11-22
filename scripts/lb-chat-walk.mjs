@@ -158,7 +158,13 @@ try {
 
   // ———— 和用户录屏一样：演示上沿滚到顶栏底下，对话里翻到视频，点开，点关闭按钮 ————
   await say("对话页：演示上半截滚进顶栏底下"); await move(W - 220, H / 2, 400);
-  await pageTo(await demoTop() + 40);
+  // 上面有多个契约示例框懒加载会撑高页面：连续滚直到"完整演示"真正停在顶栏上面 -40px
+  for (let k = 0; k < 6; k++) {
+    const dt = await demoTop();
+    if (Math.abs(dt + 40) < 6) break;
+    await pageTo(dt + 40);
+    await page.waitForTimeout(300);
+  }
   // 组件页现在先放契约示例，设计稿那块演示在下面，滚到了才开始载入：等它载好、对话里有消息了再开始翻
   await page.waitForFunction(() => { const f = document.querySelector(".dx:not([data-play]) .d-frame iframe"); try { return f.parentElement.classList.contains("sn-ready") && !!f.contentDocument.querySelector(".sn-chat-vp .sn-bubble"); } catch { return false; } }, null, { timeout: 20000 }).catch(() => {});
   await page.waitForTimeout(800);
