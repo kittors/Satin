@@ -4,7 +4,7 @@
     "table": {
       "selectionRing": {
         "$type": "color",
-        "$value": "color-mix(in srgb, {color.text.primary} 80%, transparent)",
+        "$value": "color-mix(in srgb, {color.accent} 45%, transparent)",
         "$extensions": {
           "com.satin": {
             "css": true,
@@ -12,11 +12,11 @@
             "source": "kit.css"
           }
         },
-        "$description": "选中框"
+        "$description": "可文字编辑单元格的柔和修改框选"
       },
       "rangeLine": {
         "$type": "color",
-        "$value": "color-mix(in srgb, {color.text.primary} 70%, transparent)",
+        "$value": "color-mix(in srgb, {color.accent} 52%, transparent)",
         "$extensions": {
           "com.satin": {
             "css": true,
@@ -24,11 +24,11 @@
             "source": "kit.css"
           }
         },
-        "$description": "范围选择的连线"
+        "$description": "多格合并范围框选的柔和边框"
       },
       "guideLine": {
         "$type": "color",
-        "$value": "color-mix(in srgb, {color.text.primary} 60%, transparent)",
+        "$value": "color-mix(in srgb, {color.text.primary} 48%, transparent)",
         "$extensions": {
           "com.satin": {
             "css": true,

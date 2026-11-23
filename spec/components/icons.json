@@ -5,7 +5,7 @@
   "en": "04 号 §7",
   "group": "基础",
   "specRef": "",
-  "summary": "统一的线性图标，线宽 1.5，颜色跟随文字。16 放在正文旁，20 用在工具栏，24 用在空状态。不用 emoji，不用彩色图标。",
+  "summary": "统一采用 Solar Icons（24px 网格、1.5px 线宽、圆润轮廓），全部消除重影与断线毛刺，颜色跟随文字。同时提供可交互的 3D 立体质感图标用于应用入口与专题卡片。",
   "acceptance": [],
   "api": [],
   "usage": null,
@@ -14,6 +14,10 @@
     {
       "caption": "",
       "html": "<div class=\"row\" style=\"margin-bottom:16px\"><div class=\"sn-seg sn-sm\" data-seg=\"iconsize\"><span class=\"sn-thumb\"></span><button data-v=\"16\">16</button><button data-v=\"20\">20</button><button data-v=\"24\">24</button></div></div>\n<div class=\"icon-grid\" id=\"iconGrid\"></div>"
+    },
+    {
+      "caption": "3D 立体质感图标（移动鼠标体验陀螺仪倾角视差与动态镜面高光）",
+      "html": "<div id=\"icons3dDemo\"></div>"
     }
   ],
   "states": [],

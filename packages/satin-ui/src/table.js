@@ -709,10 +709,22 @@ export function mountTable(wrap, o0 = {}, emit) {
     syncSel(); fire("select", [...picked]);
   };
 
-  // ———— 选中、改名、键盘（cellSelect）：单击数据格子选中（贴边细线框），点勾选框、把手、展开、操作就收起；editable 的列双击改（白底输入框） ————
-  const selectTd = (td) => { if (selTd === td) { wrap.classList.toggle("sn-sel-on", !!td); return; } selTd?.classList.remove("sn-on"); selTd = td; td?.classList.add("sn-on"); wrap.classList.toggle("sn-sel-on", !!td); };
+  // ———— 选中、改名、键盘（cellSelect）：单格修改框选只出现在可文字编辑（editable）单元格上；选择器与只读格不画框选（键盘巡航时仅铺极淡中性定位底色）；点表头、把手、勾选框、展开、内部控件收起 ————
+  const isTextEdTd = (td) => Boolean(td && colOf(td.dataset.c)?.editable);
+  const INTERACTIVE = "a,button,input,textarea,select,label,[role=button],[role=combobox],[role=switch],[role=checkbox],[contenteditable],.sn-select,.sn-switch,.sn-check,.sn-radio,.sn-btn,.sn-link";
+  let kbdNav = false;
+  const syncTdBox = (on, kbd = false) => {
+    const ed = !!on && isTextEdTd(selTd);
+    wrap.classList.toggle("sn-sel-on", ed);
+    wrap.classList.toggle("sn-kbd-on", !!on && kbd && !!selTd && !ed);
+  };
+  const selectTd = (td, kbd = false) => {
+    kbdNav = !!td && kbd;
+    if (selTd !== td) { selTd?.classList.remove("sn-on"); selTd = td; td?.classList.add("sn-on"); }
+    syncTdBox(!!td, kbdNav);
+  };
   const dataTd = (t) => { const td = t.closest("td"); return td && td.dataset.c ? td : null; };
-  const hideSel = () => { if (o.cellSelect) wrap.classList.remove("sn-sel-on"); }; /* 点表头、把手、勾选框、展开箭头、操作：只收起选中框，选中的格子还记着（方向键从它接着走，和数据表格一样） */
+  const hideSel = () => { kbdNav = false; if (o.cellSelect) { wrap.classList.remove("sn-sel-on", "sn-kbd-on"); } }; /* 点表头、把手、勾选框、展开箭头、操作：只收起提示态，选中的格子还记着（方向键从它接着走） */
   const onBodyDown = (e) => {
     if (e.button !== 0 || (editing && e.target === editing)) return; // 点在改名的输入框里：只是挪光标
     if (editing) editing.blur(); // 先把正在改的存下来——这一下照样拖得起来、选得中，不用多点一次
@@ -720,14 +732,16 @@ export function mountTable(wrap, o0 = {}, emit) {
     if (o.resizableRows && e.target.closest(".sn-g-rh")) { hideSel(); startRowResize(tr, e); return; }
     if (o.draggableRows && e.target.closest(".sn-grip")) { hideSel(); startRowDrag(tr, e); return; }
     if (e.target.closest(".sn-exp")) { e.preventDefault(); hideSel(); setOpen([tr], !isOpen(nodeOf(tr)), true); return; }
+    if (e.target.closest(INTERACTIVE)) { hideSel(); return; } // 单元格内嵌选择器、按钮、开关、链接：绝不拦截也不画框选
     if (!o.cellSelect) return;
     const td = dataTd(e.target); if (!td) { hideSel(); return; }
-    e.preventDefault(); table.focus({ preventScroll: true }); selectTd(td);
+    e.preventDefault(); table.focus({ preventScroll: true }); selectTd(td, false);
   };
   const onBodyClick = (e) => { const b = e.target.closest(".sn-exp"); if (b && e.detail === 0) { const tr = b.closest("tr"); setOpen([tr], !isOpen(nodeOf(tr)), true); } }; /* 键盘（Enter、空格）按展开 */
   const onBodyDbl = (e) => {
     const rh = e.target.closest(".sn-g-rh"); if (rh && o.resizableRows) { const tr = rh.closest("tr"); tr.style.removeProperty("--sn-rh"); fire("rowResize", { key: tr.dataset.id, height: null }); return; }
-    const td = dataTd(e.target); if (td && colOf(td.dataset.c)?.editable && td.closest("tr[data-id]") && !e.target.closest(".sn-exp")) { if (o.cellSelect) selectTd(td); rename(td); }
+    if (e.target.closest(INTERACTIVE)) return;
+    const td = dataTd(e.target); if (td && colOf(td.dataset.c)?.editable && td.closest("tr[data-id]") && !e.target.closest(".sn-exp")) { if (o.cellSelect) selectTd(td, false); rename(td); }
   };
   // 一格的内容重新画一遍（改完以后、这一行的数据换了）：树形主列只换展开箭头后面的部分；正在改的输入框留着
   const indexOf = (nd) => { let i = 0, at = -1; walkAll(T.top, (x) => { if (x === nd) at = i; i++; }); return at; };
@@ -761,20 +775,21 @@ export function mountTable(wrap, o0 = {}, emit) {
     if (inp && inp.getAttribute("aria-label") !== l) inp.setAttribute("aria-label", l);
   }
   function rename(td) {
-    const r = td.closest("tr"), nd = nodeOf(r), k = td.dataset.c, inp = document.createElement("input"); inp.className = "sn-cell-ed"; inp.value = String(nd.row?.[k] ?? ""); inp.spellcheck = false; td.append(inp); td.classList.add("sn-editing"); inp.focus(); inp.select(); editing = inp;
-    const end = (save) => {
+    const r = td.closest("tr"), nd = nodeOf(r), k = td.dataset.c, inp = document.createElement("input"); inp.className = "sn-cell-ed"; inp.value = String(nd.row?.[k] ?? ""); inp.spellcheck = false; td.append(inp); td.classList.add("sn-editing"); wrap.classList.remove("sn-sel-on", "sn-kbd-on"); inp.focus(); inp.select(); editing = inp;
+    const end = (save, refocus = true) => {
       if (editing !== inp) return; editing = null; const v = inp.value.trim(), old = nd.row?.[k];
       if (save && v && v !== String(old ?? "")) { const val = typeof old === "number" && !isNaN(+v) ? +v : v; if (nd.row) nd.row[k] = val; fillCell(td, colOf(k), nd); SIG.set(nd.key, sigOf(nd, indexOf(nd))); fire("cellEdit", { row: nd.row, key: k, value: val, oldValue: old }); }
-      inp.remove(); td.classList.remove("sn-editing"); table.focus({ preventScroll: true });
+      inp.remove(); td.classList.remove("sn-editing");
+      if (refocus) { table.focus({ preventScroll: true }); if (o.cellSelect) syncTdBox(true, kbdNav); }
     };
-    inp.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter") { e.preventDefault(); end(true); } else if (e.key === "Escape") { e.preventDefault(); end(false); } });
-    inp.addEventListener("blur", () => end(true));
+    inp.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter") { e.preventDefault(); end(true, true); } else if (e.key === "Escape") { e.preventDefault(); end(false, true); } });
+    inp.addEventListener("blur", () => end(true, false));
   }
   const onKey = (e) => {
     if (editing) return;
-    if (!selTd) { if (/^Arrow|^Enter$/.test(e.key)) { const r = visRows()[0]; if (r) { e.preventDefault(); selectTd(cellOf(r, M.prim)); } } return; } /* 用 Tab 进来还没选中格子：方向键先选中第一格（焦点就在这里显出来） */ const vs = visRows(), tr = selTd.closest("tr"), ri = vs.indexOf(tr), keys = order, ci = keys.indexOf(selTd.dataset.c);
+    if (!selTd) { if (/^Arrow|^Enter$/.test(e.key)) { const r = visRows()[0]; if (r) { e.preventDefault(); selectTd(cellOf(r, M.prim), true); } } return; } /* 用 Tab 进来还没选中格子：方向键先选中第一格 */ const vs = visRows(), tr = selTd.closest("tr"), ri = vs.indexOf(tr), keys = order, ci = keys.indexOf(selTd.dataset.c);
     const at = (i, k) => { const row = vs[Math.max(0, Math.min(vs.length - 1, i))]; let td = cellOf(row, k); if (td?.hidden) { for (let j = vs.indexOf(row) - 1; j >= 0 && td.hidden; j--) td = cellOf(vs[j], k); } return td; }; // 落在被合并藏起来的格子上，就选合并的那一格
-    const go = (td) => { if (td) { e.preventDefault(); selectTd(td); } };
+    const go = (td) => { if (td) { e.preventDefault(); selectTd(td, true); } };
     if (M.T.tree && selTd.dataset.c === M.prim && tr.dataset.id && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
       const nd = nodeOf(tr), has = nd.kids.length > 0, op = has && isOpen(nd);
       if (e.key === "ArrowRight" && has && !op) { e.preventDefault(); setOpen([tr], true, true); return; }
@@ -784,10 +799,10 @@ export function mountTable(wrap, o0 = {}, emit) {
     if (e.key === "ArrowDown") go(at(ri + (selTd.rowSpan || 1), keys[ci])); else if (e.key === "ArrowUp") go(at(ri - 1, keys[ci]));
     else if (e.key === "ArrowRight") go(at(ri, keys[Math.min(keys.length - 1, ci + 1)])); else if (e.key === "ArrowLeft") go(at(ri, keys[Math.max(0, ci - 1)]));
     else if (e.key === "Enter" && colOf(selTd.dataset.c)?.editable && tr.dataset.id) { e.preventDefault(); rename(selTd); }
-    else if (e.key === "Escape") { e.preventDefault(); selectTd(null); }
+    else if (e.key === "Escape") { e.preventDefault(); selectTd(null, false); }
   };
-  const onFocusOut = (e) => { if (!table.contains(e.relatedTarget)) wrap.classList.remove("sn-sel-on"); };
-  const onFocusIn = () => { if (selTd) wrap.classList.add("sn-sel-on"); };
+  const onFocusOut = (e) => { if (!table.contains(e.relatedTarget)) { kbdNav = false; wrap.classList.remove("sn-sel-on", "sn-kbd-on"); } };
+  const onFocusIn = () => { if (selTd && !editing) syncTdBox(true, kbdNav); };
 
   // ———— 拖行换位置（跟手）：被拖的行连同展开的下级浮起来（一层投影），一比一跟着指针上下走；其他行逐帧缓动让开，让出来的空位就是落点 ————
   // 松手：从指针那里缓动落进空位，投影同时淡掉，再真正换顺序；拖到表格外 40px 以外 = 拿出去了（变淡、其他行回原位、空位回到原处），松手就回原处；Esc、失焦也回原处。

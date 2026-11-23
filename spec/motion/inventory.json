@@ -1,14 +1,14 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 277,
-  "var(--sn-ease-out-strong)": 58,
+  "var(--sn-ease-out)": 295,
+  "var(--sn-ease-out-strong)": 59,
   "linear": 37,
-  "var(--sn-ease-overshoot)": 10,
+  "var(--sn-ease-overshoot)": 11,
   "var(--sn-ease-in-out)": 24,
   "var(--sn-ease-in)": 21,
   "ease-in": 2,
   "cubic-bezier(.3, .1, .3, 1)": 1,
-  "var(--sn-ease-open)": 11
+  "var(--sn-ease-open)": 13
  },
  "css": [
   {
@@ -160,6 +160,66 @@
    "selector": ".sn-disc .sn-ic",
    "prop": "transition",
    "value": "rotate .2s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ch-leg",
+   "prop": "transition",
+   "value": "background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), opacity .18s var(--sn-ease-out), transform .1s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ch-leg-dot",
+   "prop": "transition",
+   "value": "transform .2s var(--sn-ease-overshoot)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ch-btn",
+   "prop": "transition",
+   "value": "background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), transform .1s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ch-hint",
+   "prop": "transition",
+   "value": "opacity .25s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ch-tip",
+   "prop": "transition",
+   "value": "opacity .14s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ch-donut-val",
+   "prop": "transition",
+   "value": "transform .22s var(--sn-ease-out-strong), opacity .16s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ch-donut-item",
+   "prop": "transition",
+   "value": "background-color .14s var(--sn-ease-out), opacity .16s var(--sn-ease-out), transform .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ico3d-shadow",
+   "prop": "transition",
+   "value": "opacity .24s var(--sn-ease-out), transform .24s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ico3d-body",
+   "prop": "transition",
+   "value": "box-shadow .24s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/charts.css",
+   "selector": ".sn-ico3d-body, .sn-ico3d-glyph, .sn-ico3d-shadow",
+   "prop": "transition",
+   "value": "none"
   },
   {
    "file": "packages/satin-ui/css/content.css",
@@ -871,6 +931,12 @@
   },
   {
    "file": "packages/satin-ui/css/data.css",
+   "selector": ".sn-tbl tr > td:has(> .sn-name > .sn-exp)::after",
+   "prop": "transition",
+   "value": "scale .2s var(--sn-ease-open), opacity .16s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/data.css",
    "selector": ".sn-player .sn-pl-spin",
    "prop": "transition",
    "value": "opacity .2s var(--sn-ease-out)"
@@ -1342,6 +1408,12 @@
    "selector": ".sn-g-row.sn-exp .sn-g-detail",
    "prop": "animation",
    "value": "sn-g-dt-in .24s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-grid.sn-tree .sn-g-tg::after",
+   "prop": "transition",
+   "value": "scale .2s var(--sn-ease-open), opacity .16s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/grid.css",

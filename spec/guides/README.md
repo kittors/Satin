@@ -12,6 +12,7 @@
 | [圆角与线](shape.md) | Radius & line | 圆角 6 档：4、6、8、12、16 和胶囊。 |
 | [阴影与层级](elevation.md) | Elevation | 三层：卡片（只靠描边和明度差）、浮层（菜单、弹出面板、通知）、对话框。 |
 | [动效](motion.md) | Motion | 八条曲线、六档时长：进入先快后慢，离开先慢后快，换位两端慢中间快。以逐帧记录为准验收。 |
+| [内容加载与过渡](loading-motion.md) | Loading & transitions | 悬停静默预取、180ms 原子提交、300/500ms 防闪律与同构骨架交叉显影，彻底消灭切换白闪与砸屏。 |
 | [图标](icons.md) | Icons | 统一采用 Solar Icons（480 Design，CC BY 4.0），24px 网格、1.5px 线宽、圆润轮廓，默认 line-duotone 双色调层次（--sn-ic-duo 可免重绘切纯线性），颜色跟随文字。 |
 | [交互质感](feel.md) | Interaction feel | 悬停、按下、拖拽、等待、打断、乐观更新。同样的功能，好用和难用就差在这些地方。 |
 | [去 AI 感](no-ai.md) | No AI look | 不要星星和仙女棒图标、不要乱画分隔线、不要假数据和渐变冒充图片；对齐要量、布局不能跳、切换要有过渡。 |

@@ -651,14 +651,17 @@ export function mountDataGrid(root, o = {}) {
   const cellH = (p) => { const r = src.rowAt(p), hh = src.rowH(p); return r >= 0 && expd.has(r) ? Math.min(hh, expd.get(r)) : hh; };
   function paintSelBox() {
     for (const arr of Object.values(rgBoxes)) for (const b of arr) b.hidden = true;
-    const R2 = rgRect(); let p0, p1, keys;
-    if (R2) ({ p0, p1, keys } = R2);
-    else if (selShown && document.activeElement === vp) { const am = merges.at(active.p, active.c); p0 = am ? am.p0 : active.p; p1 = am ? am.p1 : active.p; keys = am ? am.keys : [active.c]; }
+    const R2 = rgRect(); let p0, p1, keys, mode = "";
+    if (R2) { ({ p0, p1, keys } = R2); mode = "rg"; }
+    else if (document.activeElement === vp && (selShown || (kbdNav && activeSelected))) {
+      const am = merges.at(active.p, active.c); p0 = am ? am.p0 : active.p; p1 = am ? am.p1 : active.p; keys = am ? am.keys : [active.c];
+      mode = selShown && activeEditable() ? "sel" : "kbd";
+    }
     if (!keys?.length || editing || rowDrag || p0 > p1 || p0 >= src.shown) return;
     const gw = model.width(), lw = model.leftW(), rwc = model.rightW(), st = vp.scrollTop, sl = vp.scrollLeft, vw = vp.clientWidth;
     if (rgL._w !== lw) { rgL._w = lw; rgL.style.width = lw + "px"; } if (rgR._w !== rwc) { rgR._w = rwc; rgR.style.width = rwc + "px"; }
     const X0 = model.xOf(keys[0]), X1 = model.xOf(keys.at(-1)) + model.byKey[keys.at(-1)].w, Y0 = src.rowY(p0), Y1 = src.rowY(p1) + cellH(p1);
-    const L = X0 > 0 ? X0 - 1 : 0, T = Y0 > 0 ? Y0 - 1 : 0, W = X1 - L, H = Y1 - T;
+    const L = mode === "kbd" ? X0 : X0 > 0 ? X0 - 1 : 0, T = mode === "kbd" ? Y0 : Y0 > 0 ? Y0 - 1 : 0, W = X1 - L, H = (mode === "kbd" ? Math.max(0, Y1 - 1) : Y1) - T;
     const zone = merges.zoneOf(keys[0]), host = zone === "L" ? rgL : zone === "R" ? rgR : body, poolB = rgBoxes[zone];
     const x = zone === "R" ? L - (gw - rwc) : L;
     const ct = Math.max(0, st - T), cl = zone === "M" ? Math.max(0, sl + lw - 1 - L) : zone === "R" ? Math.max(0, -1 - x) : 0;
@@ -666,9 +669,11 @@ export function mountDataGrid(root, o = {}) {
     if (cl + cr >= W || ct >= H) return;
     let box = poolB[0];
     if (!box) { box = document.createElement("i"); box.className = "sn-g-rgbox"; host.append(box); poolB.push(box); }
+    box.classList.toggle("sn-is-rg", mode === "rg");
+    box.classList.toggle("sn-is-kbd", mode === "kbd");
     box.hidden = false; box.style.cssText = `left:${x}px;top:${T}px;width:${W}px;height:${H}px;clip-path:inset(${ct}px ${cr}px 0 ${cl}px)`;
   }
-  vp.addEventListener("focus", () => schedule()); vp.addEventListener("blur", () => schedule());
+  vp.addEventListener("focus", () => schedule()); vp.addEventListener("blur", () => { kbdNav = false; schedule(); });
   function makeRow() {
     const el = document.createElement("div"); el.className = "sn-g-row"; el.setAttribute("role", "row");
     el.innerHTML = model.cols.map((c) => `<div class="sn-g-cell${c.align === "right" ? " sn-r" : ""}" data-c="${c.key}"${colAttrs(model, c)} role="gridcell">${c.render ? CELL.text : CELL[c.type] ?? CELL.text}</div>`).join("")
@@ -750,7 +755,7 @@ export function mountDataGrid(root, o = {}) {
       cell.classList.toggle("sn-on", m ? m === am : p === active.p && c.key === active.c);
       let inR = false, t = false, b = false, l = false, rr = false;
       if (R2 && c.type !== "sel" && c.type !== "act" && !cell.classList.contains("sn-mg-hide")) { const ca = disp.indexOf(c.key), cb = ca + (m ? m.keys.length - 1 : 0); inR = p >= R2.p0 && p <= R2.p1 && ca >= R2.c0 && cb <= R2.c1; if (inR) { t = p === R2.p0; b = p === R2.p1; l = ca === R2.c0; rr = cb === R2.c1; } }
-      cell.classList.toggle("sn-rg", inR && !cell.classList.contains("sn-on")); void t; void b; void l; void rr; // 起点格不铺淡底；外圈由 paintSelBox 的框画
+      cell.classList.toggle("sn-rg", inR); void t; void b; void l; void rr; // 整块均匀铺柔和淡底；外圈由 paintSelBox 的 1.5px 细框画
     }
   }
   // 行详情：使用的人给的 detail(el, row, 行号)（或 { init, fill }）往 .sn-g-detail 里填
@@ -810,82 +815,122 @@ export function mountDataGrid(root, o = {}) {
   const paintBar = () => { barUI.paint(); selChanged(); }; // 工具条（勾了几行）跟着勾选重画的地方，顺手发 selectionChange
 
   // ———— 格子：选中、框选、键盘、编辑 ————
-  // 选中框只在单击了数据格子、或者用键盘走格子之后出现；点把手、勾选框、操作按钮、表头、滚动条，开始拖任何东西，按 Esc，焦点离开表格，都收起。
-  // 选中是贴着格子的一圈细实线（不像输入框）；编辑时才出现白底、有光标、带外圈的输入框，两者一眼能分开。
-  // 按住格子拖 = 框选一块（框选后可以合并）；Shift 点、Shift 加方向键扩大框选。落在合并块里的选中、框选都按整块算。
+  // 规范：单格修改框选只出现在可文字内容编辑（edit 且非 enum 选择器）单元格上，选择器列与只读列绝不出修改框选；
+  // 键盘导航经过选择器 / 只读格时仅铺极淡中性定位底色（无边框）；网格模式下按住格子拖动 ≥4px 跨多格才出范围框选（用于合并）。
   const posOf = (el) => +el.closest(".sn-g-row")._p;
-  let selShown = false, rg = null; // rg：框选 { ap, ac, fp, fc }（两个角的行号和列名）
-  const showSel = (on) => { if (selShown !== on) { selShown = on; root.classList.toggle("sn-sel-on", on); syncMergeBar(); schedule(); } }; // 框由 render 里的 paintSelBox 摆，变了就排一帧
+  const INTERACTIVE = "a,button,input,textarea,select,label,[role=button],[role=combobox],[role=switch],[role=checkbox],[contenteditable],.sn-select,.sn-switch,.sn-check,.sn-radio,.sn-btn,.sn-link";
+  const isTextEditable = (col) => Boolean(col && col.edit && col.edit !== "enum" && col.type !== "sel" && col.type !== "act");
+  const activeEditable = () => { const am = merges.at(active.p, active.c); return isTextEditable(model.byKey[am ? am.key0 : active.c]); };
+  let selShown = false, activeSelected = false, kbdNav = false, rg = null; // rg：多格范围框选 { ap, ac, fp, fc }
+  const showSel = (on, kbd = false) => {
+    const nextSel = !!on, nextKbd = nextSel && !!kbd, nextShow = nextSel && activeEditable();
+    if (activeSelected !== nextSel || kbdNav !== nextKbd || selShown !== nextShow) {
+      activeSelected = nextSel; kbdNav = nextKbd; selShown = nextShow;
+      root.classList.toggle("sn-sel-on", nextShow);
+      syncMergeBar(); schedule();
+    }
+  }; // 框由 render 里的 paintSelBox 摆，变了就排一帧
   const dataKeys = () => model.display().filter((c) => c.type !== "sel" && c.type !== "act").map((c) => c.key);
   const anchorOf = (p, c) => { const x = merges.at(p, c); return x ? [x.p0, x.key0] : [p, c]; }; // 落在合并块里就换成块的左上角
-  function setActive(p, c, reveal = true) { [p, c] = anchorOf(Math.max(0, Math.min(src.shown - 1, p)), c); active = { p, c, id: src.idAt(p) }; dver++; schedule(); if (reveal) revealActive(); syncMergeBar(); }
+  function setActive(p, c, reveal = true) {
+    [p, c] = anchorOf(Math.max(0, Math.min(src.shown - 1, p)), c); active = { p, c, id: src.idAt(p) };
+    if (activeSelected) { selShown = activeEditable(); root.classList.toggle("sn-sel-on", selShown); }
+    dver++; schedule(); if (reveal) revealActive(); syncMergeBar();
+  }
   function revealActive() {
     const x = merges.at(active.p, active.c), top = src.rowY(active.p), rh = x ? src.rowY(x.p1 + 1) - top : src.rowH(active.p), h = vp.clientHeight - HEAD;
     if (top < vp.scrollTop) vp.scrollTop = top; else if (top + rh > vp.scrollTop + h) vp.scrollTop = Math.min(top, top + rh - h);
     const col = model.byKey[active.c]; if (col.pin) return; const x0 = model.xOf(active.c), w = x ? x.keys.reduce((t, k) => t + model.byKey[k].w, 0) : col.w, lo = vp.scrollLeft + model.leftW(), hi = vp.scrollLeft + vp.clientWidth - model.rightW();
     if (x0 < lo) vp.scrollLeft = x0 - model.leftW(); else if (x0 + w > hi) vp.scrollLeft = Math.min(x0 - model.leftW(), x0 + w - vp.clientWidth + model.rightW());
   }
-  // 框选的矩形：行号区间、列序号区间；碰到的合并块整块算进来
+  // 多格范围框选的矩形：仅网格模式下有效，行号区间、列序号区间；碰到的合并块整块算进来；单格或单个已有合并块本身不算范围框选
   function rgRect() {
-    if (!rg) return null; const disp = model.display().map((c) => c.key);
+    if (!rg || !merges.enabled) return null; const disp = model.display().map((c) => c.key);
+    const aci = disp.indexOf(rg.ac), fci = disp.indexOf(rg.fc); if (aci < 0 || fci < 0) return null;
     const z = merges.zoneOf(rg.ac), okIdx = disp.map((k, i) => (merges.zoneOf(k) === z && model.byKey[k].type !== "sel" && model.byKey[k].type !== "act" ? i : -1)).filter((i) => i >= 0);
+    if (!okIdx.length) return null;
     const clampI = (i) => Math.max(okIdx[0], Math.min(okIdx.at(-1), i)); // 框选只在起点所在那一区里走（固定列、普通列分开，和合并的规则一致）
-    let p0 = Math.min(rg.ap, rg.fp), p1 = Math.max(rg.ap, rg.fp), c0 = clampI(Math.min(disp.indexOf(rg.ac), disp.indexOf(rg.fc))), c1 = clampI(Math.max(disp.indexOf(rg.ac), disp.indexOf(rg.fc)));
+    let p0 = Math.min(rg.ap, rg.fp), p1 = Math.max(rg.ap, rg.fp), c0 = clampI(Math.min(aci, fci)), c1 = clampI(Math.max(aci, fci));
     for (let more = true, n = 0; more && n < 8; n++) { more = false; for (const x of merges.active()) { if (x.p1 < p0 || x.p0 > p1 || x.c1 < c0 || x.c0 > c1) continue; if (x.p0 < p0) { p0 = x.p0; more = true; } if (x.p1 > p1) { p1 = x.p1; more = true; } if (x.c0 < c0) { c0 = x.c0; more = true; } if (x.c1 > c1) { c1 = x.c1; more = true; } } }
-    return { p0, p1, c0, c1, keys: disp.slice(c0, c1 + 1) };
+    const keys = disp.slice(c0, c1 + 1);
+    if (p0 === p1 && c0 === c1) return null;
+    const am = merges.at(p0, keys[0]);
+    if (am && am.p0 === p0 && am.p1 === p1 && am.c0 === c0 && am.c1 === c1) return null;
+    return { p0, p1, c0, c1, keys };
   }
   body.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return; const rowEl = e.target.closest(".sn-g-row"); if (!rowEl || rowEl.classList.contains("sn-g-xrow") || rowEl.classList.contains("sn-g-lift")) return; const p = rowEl._p;
-    if (src.tree && e.target.closest(".sn-g-exp")) { e.preventDefault(); showSel(false); toggleTree(p); return; } // 树形：展开下级（值还没到的行也能展开，结构是知道的）
+    if (src.tree && e.target.closest(".sn-g-exp")) { e.preventDefault(); rg = null; showSel(false); toggleTree(p); return; } // 树形：展开下级（值还没到的行也能展开，结构是知道的）
     if (rowEl.classList.contains("sn-sk")) return;
-    if (e.target.closest(".sn-g-rh")) { showSel(false); startRowResize(rowEl, e); return; }
-    if (e.target.closest(".sn-g-exp")) { e.preventDefault(); showSel(false); toggleExpand(p); return; }
-    const cell = e.target.closest(".sn-g-cell"); if (!cell) return;
-    if (e.target.closest(".sn-g-grip")) { showSel(false); (src.tree ? startTreeDrag : startRowDrag)(rowEl, e); return; }
-    if (e.target.closest(".sn-check")) { e.preventDefault(); showSel(false); const r = rowEl._r; if (e.shiftKey && anchorP >= 0) { const on = !isSel(r); for (let q = Math.min(anchorP, p); q <= Math.max(anchorP, p); q++) { const rr = src.tree ? src.idAt(q) : src.rowAt(q); if (rr >= 0) toggleSel(rr, on); } } else toggleSel(r); anchorP = p; dver++; schedule(); paintBar(); headUI.paint(); if (isSel(r)) popCheck(rowEl._cells[SEL].querySelector(".sn-box")); return; } // 树形：勾上一级 = 勾上它下面所有的
-    if (e.target.closest(".sn-g-ab")) { showSel(false); return; }
+    if (e.target.closest(".sn-g-rh")) { rg = null; showSel(false); startRowResize(rowEl, e); return; }
+    if (e.target.closest(".sn-g-exp")) { e.preventDefault(); rg = null; showSel(false); toggleExpand(p); return; }
+    const cell = e.target.closest(".sn-g-cell"); if (!cell) { rg = null; showSel(false); return; }
+    if (e.target.closest(".sn-g-grip")) { rg = null; showSel(false); (src.tree ? startTreeDrag : startRowDrag)(rowEl, e); return; }
+    if (e.target.closest(".sn-check")) { e.preventDefault(); rg = null; showSel(false); const r = rowEl._r; if (e.shiftKey && anchorP >= 0) { const on = !isSel(r); for (let q = Math.min(anchorP, p); q <= Math.max(anchorP, p); q++) { const rr = src.tree ? src.idAt(q) : src.rowAt(q); if (rr >= 0) toggleSel(rr, on); } } else toggleSel(r); anchorP = p; dver++; schedule(); paintBar(); headUI.paint(); if (isSel(r)) popCheck(rowEl._cells[SEL].querySelector(".sn-box")); return; } // 树形：勾上一级 = 勾上它下面所有的
+    if (e.target.closest(".sn-g-ab")) { rg = null; showSel(false); return; }
     if (editing && cell.contains(editing.input)) return;
-    const key = cell.dataset.c; if (special(key)) { showSel(false); return; }
+    if (e.target.closest(INTERACTIVE)) { rg = null; showSel(false); return; } // 自定义 render 内的选择器、按钮、开关、链接：不抢焦点、不出框选
+    const key = cell.dataset.c; if (special(key)) { rg = null; showSel(false); return; }
     e.preventDefault(); vp.focus({ preventScroll: true });
-    if (e.shiftKey && selShown) { rg = { ap: rg?.ap ?? active.p, ac: rg?.ac ?? active.c, fp: p, fc: key }; dver++; schedule(); syncMergeBar(); return; }
-    rg = null; setActive(p, key, false); showSel(true); startRangeDrag(e, active.p, active.c);
+    if (e.shiftKey && activeSelected && merges.enabled) {
+      kbdNav = false;
+      const ap = rg?.ap ?? active.p, ac = rg?.ac ?? active.c;
+      const [a0, k0] = anchorOf(ap, ac), [b0, k1] = anchorOf(p, key);
+      rg = a0 === b0 && k0 === k1 ? null : { ap, ac, fp: p, fc: key };
+      dver++; schedule(); syncMergeBar(); return;
+    }
+    rg = null; setActive(p, key, false); showSel(true, false);
+    if (merges.enabled) startRangeDrag(e, active.p, active.c);
   });
-  // 按住格子拖：框选一块。先动 4px 才算（只点一下就是选中，双击照样进编辑）；拖到边上自动滚；指针出了表格就停在边上那一格
+  // 按住格子拖：框选一块（仅在网格模式下启用）。先动 4px 才算；拖回起点格时清掉范围选区；拖到边上自动滚；指针出了表格就停在边上那一格
   function startRangeDrag(e, ap, ac) {
     let px = e.clientX, py = e.clientY, raf3 = 0, done = false, moved = false;
     const cellAt = (x, y) => { const vr = vp.getBoundingClientRect(); x = Math.max(vr.left + 2, Math.min(vr.left + vp.clientWidth - 2, x)); y = Math.max(vr.top + HEAD + 2, Math.min(vr.top + vp.clientHeight - 2, y)); const c = document.elementFromPoint(x, y)?.closest(".sn-g-cell"); if (!c || !body.contains(c)) return null; const k = c.dataset.c; return special(k) ? null : [posOf(c), k]; };
+    const applyPt = (h) => {
+      if (!h) return;
+      const [bp, bk] = anchorOf(h[0], h[1]);
+      if (bp === ap && bk === ac) { if (rg) { rg = null; dver++; schedule(); syncMergeBar(); } return; }
+      if (!rg || rg.fp !== h[0] || rg.fc !== h[1]) { rg = { ap, ac, fp: h[0], fc: h[1] }; dver++; schedule(); syncMergeBar(); }
+    };
     const tick = () => {
       raf3 = 0; if (done) return; const vr = vp.getBoundingClientRect(), top = vr.top + HEAD + 24, bot = vr.top + vp.clientHeight - 24, lf = vr.left + model.leftW() + 24, rt = vr.left + vp.clientWidth - model.rightW() - 24;
       const dy = py < top ? -(top - py) / 3 : py > bot ? (py - bot) / 3 : 0, dx = px < lf ? -(lf - px) / 3 : px > rt ? (px - rt) / 3 : 0;
       if (dy) vp.scrollTop += Math.max(-24, Math.min(24, dy)); if (dx) vp.scrollLeft += Math.max(-24, Math.min(24, dx));
-      const h = cellAt(px, py); if (h && (!rg || rg.fp !== h[0] || rg.fc !== h[1]) && (rg || h[0] !== ap || h[1] !== ac)) { rg = { ap, ac, fp: h[0], fc: h[1] }; dver++; schedule(); syncMergeBar(); }
+      applyPt(cellAt(px, py));
       if (dx || dy) raf3 = requestAnimationFrame(tick);
     };
     const mv = (ev) => { px = ev.clientX; py = ev.clientY; if (!moved) { if (Math.hypot(px - e.clientX, py - e.clientY) < 4) return; moved = true; try { body.setPointerCapture(ev.pointerId); } catch {} } if (!raf3) raf3 = requestAnimationFrame(tick); };
-    const fin = () => { if (done) return; done = true; if (moved && raf3) { cancelAnimationFrame(raf3); raf3 = 0; const h = cellAt(px, py); if (h && (!rg || rg.fp !== h[0] || rg.fc !== h[1]) && (rg || h[0] !== ap || h[1] !== ac)) { rg = { ap, ac, fp: h[0], fc: h[1] }; dver++; schedule(); syncMergeBar(); } } cancelAnimationFrame(raf3); for (const [t, f] of evs) body.removeEventListener(t, f); removeEventListener("pointerup", fin); };
+    const fin = () => { if (done) return; done = true; if (moved && raf3) { cancelAnimationFrame(raf3); raf3 = 0; applyPt(cellAt(px, py)); } cancelAnimationFrame(raf3); for (const [t, f] of evs) body.removeEventListener(t, f); removeEventListener("pointerup", fin); };
     const evs = [["pointermove", mv], ["pointerup", fin], ["pointercancel", fin], ["lostpointercapture", fin]];
     for (const [t, f] of evs) body.addEventListener(t, f); addEventListener("pointerup", fin); // 没拿到捕获时在窗口上收尾
   }
-  body.addEventListener("click", (e) => { const b = e.target.closest(".sn-g-ab"); if (!b) return; const p = posOf(b); if (b.dataset.act === "detail") { toggleExpand(p); return; } if (b.dataset.act === "edit") { setActive(p, NAME, false); showSel(true); vp.focus({ preventScroll: true }); startEdit(); } else { const r = src.rowAt(p); if (r >= 0) emit("rowAction", { action: b.dataset.act, row: src.row(r), rowKey: keyOf(r), index: p }); } });
-  // 点一行（数据格子，不算勾选框、把手、操作按钮、展开箭头）：rowClick
-  body.addEventListener("click", (e) => { if (e.target.closest(".sn-check, .sn-g-grip, .sn-g-ab, .sn-g-exp, .sn-cell-ed")) return; const cell = e.target.closest(".sn-g-cell"); if (!cell) return; const p = posOf(cell), r = src.rowAt(p); if (r >= 0) emit("rowClick", { row: src.row(r), rowKey: keyOf(r), key: cell.dataset.c, index: p }); });
-  body.addEventListener("dblclick", (e) => { const rh = e.target.closest(".sn-g-rh"); if (rh) { resetRowH(rh.closest(".sn-g-row")); return; } const cell = e.target.closest(".sn-g-cell"); if (!cell || e.target.closest(".sn-check, .sn-g-grip, .sn-g-ab, .sn-g-exp")) return; const k = cell.dataset.c; if (special(k)) return; rg = null; setActive(posOf(cell), k, false); showSel(true); startEdit(); });
-  head.addEventListener("pointerdown", () => showSel(false)); // 点表头（排序、筛选、拖列、改列宽）
+  body.addEventListener("click", (e) => { const b = e.target.closest(".sn-g-ab"); if (!b) return; const p = posOf(b); if (b.dataset.act === "detail") { toggleExpand(p); return; } if (b.dataset.act === "edit") { setActive(p, NAME, false); showSel(true, false); vp.focus({ preventScroll: true }); startEdit(); } else { const r = src.rowAt(p); if (r >= 0) emit("rowAction", { action: b.dataset.act, row: src.row(r), rowKey: keyOf(r), index: p }); } });
+  // 点一行（数据格子，不算勾选框、把手、操作按钮、展开箭头、自定义交互控件）：rowClick
+  body.addEventListener("click", (e) => { if (e.target.closest(".sn-check, .sn-g-grip, .sn-g-ab, .sn-g-exp, .sn-cell-ed") || e.target.closest(INTERACTIVE)) return; const cell = e.target.closest(".sn-g-cell"); if (!cell) return; const p = posOf(cell), r = src.rowAt(p); if (r >= 0) emit("rowClick", { row: src.row(r), rowKey: keyOf(r), key: cell.dataset.c, index: p }); });
+  body.addEventListener("dblclick", (e) => { const rh = e.target.closest(".sn-g-rh"); if (rh) { resetRowH(rh.closest(".sn-g-row")); return; } const cell = e.target.closest(".sn-g-cell"); if (!cell || e.target.closest(".sn-check, .sn-g-grip, .sn-g-ab, .sn-g-exp") || e.target.closest(INTERACTIVE)) return; const k = cell.dataset.c; if (special(k)) return; rg = null; setActive(posOf(cell), k, false); showSel(true, false); startEdit(); });
+  head.addEventListener("pointerdown", () => { rg = null; showSel(false); }); // 点表头（排序、筛选、拖列、改列宽）
   // 表格里任何地方按下、打字：先把还在等落位的拖行落好；正在编辑时点了别处，先把编辑存下来（不合法就停在编辑框里，这一下不生效）——拖得起来，不用多点一次
-  root.addEventListener("pointerdown", (e) => { flushDrop(); if (editing?.input && !editing.cell.contains(e.target) && editing.end(true) === false) { e.preventDefault(); e.stopPropagation(); } }, true);
+  root.addEventListener("pointerdown", (e) => { flushDrop(); if (editing?.input && !editing.cell.contains(e.target) && editing.end(true, 0, false) === false) { e.preventDefault(); e.stopPropagation(); } }, true);
   root.addEventListener("keydown", () => flushDrop(), true);
-  vp.parentElement.addEventListener("pointerdown", (e) => { if (e.target.closest(".sn-g-sb")) showSel(false); }); // 点滚动条
+  vp.parentElement.addEventListener("pointerdown", (e) => { if (e.target.closest(".sn-g-sb")) { rg = null; showSel(false); } }); // 点滚动条
   vp.addEventListener("keydown", (e) => {
     if (editing) return; const disp = dataKeys(), ci = disp.indexOf(active.c), page = Math.max(1, Math.floor((vp.clientHeight - HEAD) / RH) - 1);
     if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) { e.preventDefault(); moveByKey(e.key === "ArrowUp" ? -1 : 1); return; }
-    if (e.key === "Escape") { if (rg || selShown) { e.preventDefault(); rg = null; showSel(false); dver++; schedule(); } return; }
+    if (e.key === "Escape") { if (rg || selShown || activeSelected) { e.preventDefault(); rg = null; showSel(false); dver++; schedule(); } return; }
     const nav = { ArrowDown: [1, 0], ArrowUp: [-1, 0], ArrowRight: [0, 1], ArrowLeft: [0, -1] }[e.key];
-    if (nav && e.shiftKey) { e.preventDefault(); showSel(true); const b = rg || { ap: active.p, ac: active.c, fp: active.p, fc: active.c }; rg = { ...b, fp: Math.max(0, Math.min(src.shown - 1, b.fp + nav[0])), fc: disp[Math.max(0, Math.min(disp.length - 1, disp.indexOf(b.fc) + nav[1]))] }; dver++; schedule(); syncMergeBar(); return; }
-    const go = (p, c) => { e.preventDefault(); rg = null; showSel(true); setActive(p, c ?? active.c); };
+    if (nav && e.shiftKey && merges.enabled) {
+      e.preventDefault(); showSel(true, true);
+      const b = rg || { ap: active.p, ac: active.c, fp: active.p, fc: active.c };
+      const fp = Math.max(0, Math.min(src.shown - 1, b.fp + nav[0])), fc = disp[Math.max(0, Math.min(disp.length - 1, disp.indexOf(b.fc) + nav[1]))];
+      const [a0, k0] = anchorOf(b.ap, b.ac), [f0, fk] = anchorOf(fp, fc);
+      rg = a0 === f0 && k0 === fk ? null : { ...b, fp, fc };
+      dver++; schedule(); syncMergeBar(); return;
+    }
+    const go = (p, c) => { e.preventDefault(); rg = null; setActive(p, c ?? active.c); showSel(true, true); };
     const am = merges.at(active.p, active.c), cEnd = am ? disp.indexOf(am.keys.at(-1)) : ci; // 从合并块出来时越过整块
     // 树形，在名称格上：右键展开（已经展开或没有下级时往右走一格），左键收起、再按走到上级（和简单表格一样）
     if (src.tree && active.c === NAME && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
-      const id = src.idAt(active.p), has = src.hasKids(id), op = has && src.isOpen(id); showSel(true);
+      const id = src.idAt(active.p), has = src.hasKids(id), op = has && src.isOpen(id); showSel(true, true);
       if (e.key === "ArrowRight" && has && !op) { e.preventDefault(); toggleTree(active.p, true); return; }
       if (e.key === "ArrowLeft" && op) { e.preventDefault(); toggleTree(active.p, false); return; }
       if (e.key === "ArrowLeft" && src.parentOf(id) >= 0) { const pp = src.findPos(src.parentOf(id)); if (pp >= 0) return go(pp, NAME); }
@@ -896,10 +941,10 @@ export function mountDataGrid(root, o = {}) {
       case "Tab": return go(active.p, disp[Math.max(0, Math.min(disp.length - 1, e.shiftKey ? ci - 1 : cEnd + 1))]);
       case "PageDown": return go(active.p + page); case "PageUp": return go(active.p - page);
       case "Home": return e.ctrlKey || e.metaKey ? go(0) : go(active.p, disp[0]); case "End": return e.ctrlKey || e.metaKey ? go(src.shown - 1) : go(active.p, disp.at(-1));
-      case "Enter": case "F2": e.preventDefault(); showSel(true); startEdit(); return;
+      case "Enter": case "F2": e.preventDefault(); showSel(true, true); startEdit(); return;
       case " ": { e.preventDefault(); const r = src.rowAt(active.p); if (r >= 0) { toggleSel(r); dver++; schedule(); paintBar(); headUI.paint(); if (isSel(r)) popCheck(cellEl(active.p, "sel")?.querySelector(".sn-box")); } return; }
     }
-    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) { const col = model.byKey[active.c]; if (col.edit && col.edit !== "enum") { e.preventDefault(); showSel(true); startEdit(e.key); } }
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) { const col = model.byKey[active.c]; if (isTextEditable(col)) { e.preventDefault(); showSel(true, true); startEdit(e.key); } }
   });
   function cellEl(p, key) { const row = pool.find((r) => r._p === p && r.style.display !== "none"); return row?._cells[key]; }
   function startEdit(initial) {
@@ -907,25 +952,38 @@ export function mountDataGrid(root, o = {}) {
     revealActive(); render(); const cell = cellEl(active.p, col.key); if (!cell) return;
     const cur = src.val(r, col.key);
     if (col.edit === "enum") {
-      editing = { input: null }; cell.classList.add("sn-editing");
-      openEnum(cell.getBoundingClientRect(), col, optionOf(col, cur)?.i ?? -1, (k, step) => { editing = null; cell.classList.remove("sn-editing"); const nv = optionValue(col, k, cur); if (nv !== cur) commitEdit(r, col.key, nv, cur); if (step) moveActive(step); vp.focus({ preventScroll: true }); dver++; schedule(); }, () => { editing = null; cell.classList.remove("sn-editing"); vp.focus({ preventScroll: true }); });
+      const wasKbd = kbdNav;
+      editing = { input: null }; showSel(false); cell.classList.add("sn-editing");
+      openEnum(cell.getBoundingClientRect(), col, optionOf(col, cur)?.i ?? -1, (k, step) => {
+        editing = null; cell.classList.remove("sn-editing");
+        const nv = optionValue(col, k, cur); if (nv !== cur) commitEdit(r, col.key, nv, cur);
+        if (step) { moveActive(step); showSel(true, true); vp.focus({ preventScroll: true }); }
+        else if (wasKbd) { showSel(true, true); vp.focus({ preventScroll: true }); }
+        dver++; schedule();
+      }, () => {
+        editing = null; cell.classList.remove("sn-editing");
+        if (wasKbd) { showSel(true, true); vp.focus({ preventScroll: true }); }
+        dver++; schedule();
+      });
       return;
     }
     const input = document.createElement("input"); input.className = "sn-cell-ed" + (col.align === "right" ? " sn-r" : ""); input.value = initial ?? editText(col, cur); input.spellcheck = false;
     cell.append(input); cell.classList.add("sn-editing");
     if (cell.classList.contains("sn-mg")) { const H = parseFloat(cell.style.getPropertyValue("--mg-h")), ih = cell.offsetHeight - 8; Object.assign(input.style, { top: Math.max(4, H / 2 - ih / 2) + "px", bottom: "auto", height: ih + "px" }); cell.closest(".sn-g-row").classList.add("sn-g-editrow"); }
     input.focus({ preventScroll: true }); if (initial == null) input.select();
-    editing = { input, cell, col, r, end: (c, st) => end(c, st) };
-    const end = (commit, step = 0) => {
+    editing = { input, cell, col, r, end: (c, st, rf) => end(c, st, rf) };
+    const end = (commit, step = 0, refocus = true) => {
       if (!editing) return;
       if (commit) { const res = parseEdit(col, input.value); if (res.error) { showErr(cell, res.error); input.focus({ preventScroll: true }); return false; } if (res.value !== cur) commitEdit(r, col.key, res.value, cur); }
-      hideErr(); input.remove(); cell.classList.remove("sn-editing"); cell.closest(".sn-g-row")?.classList.remove("sn-g-editrow"); editing = null; dver++; schedule(); vp.focus({ preventScroll: true });
-      if (step === "down") { const am = merges.at(active.p, active.c); setActive((am ? am.p1 : active.p) + 1, active.c); } else if (step) moveActive(step);
+      hideErr(); input.remove(); cell.classList.remove("sn-editing"); cell.closest(".sn-g-row")?.classList.remove("sn-g-editrow"); editing = null; dver++; schedule();
+      if (refocus) vp.focus({ preventScroll: true });
+      if (step === "down") { const am = merges.at(active.p, active.c); setActive((am ? am.p1 : active.p) + 1, active.c); showSel(true, true); }
+      else if (step) { moveActive(step); showSel(true, true); }
       return true;
     };
     input.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter") { e.preventDefault(); end(true, "down"); } else if (e.key === "Escape") { e.preventDefault(); end(false); } else if (e.key === "Tab") { e.preventDefault(); end(true, e.shiftKey ? -1 : 1); } });
     input.addEventListener("input", hideErr);
-    input.addEventListener("blur", () => setTimeout(() => editing?.input === input && end(true), 0));
+    input.addEventListener("blur", () => setTimeout(() => editing?.input === input && end(true, 0, false), 0));
   }
   // 改了一个值：本地先生效、格子闪一下、发 cellEdit（{ row（改之前的行）, rowKey, key, value, oldValue }）
   function commitEdit(r, key, value, oldValue) { const row = src.row(r); src.edit(r, key, value); flash(r, key); emit("cellEdit", { row, rowKey: keyOf(r), key, value, oldValue }); }
@@ -1158,18 +1216,18 @@ export function mountDataGrid(root, o = {}) {
     const r = rgRect(), cells = r ? (r.p1 - r.p0 + 1) * r.keys.length : 0, zones = r ? new Set(r.keys.map(merges.zoneOf)) : new Set(), sib = !r || merges.siblings(r.p0, r.p1);
     mb.merge.disabled = !merges.enabled || !(cells > 1 && zones.size === 1 && r.p1 - r.p0 < 200 && sib);
     mb.merge.dataset.tip = !merges.enabled ? tt("grid.33") : cells > 1 && zones.size > 1 ? tt("grid.34") : cells > 1 && !sib ? tt("grid.35") : cells > 1 ? tt("grid.36", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }) : tt("grid.37");
-    mb.split.hidden = !(selShown && merges.at(active.p, active.c));
+    mb.split.hidden = !(activeSelected && merges.at(active.p, active.c));
     const n = merges.suspended(); mb.hint.hidden = !n; mb.hint.textContent = merges.enabled ? tt("grid.38", { p0: n, p1: src.tree ? tt("grid.54") : tt("grid.55") }) : tt("grid.39", { p0: n });
   }
   mb.merge.addEventListener("click", () => {
     const r = rgRect(); if (!r || mb.merge.disabled) return;
     const inside = merges.active().filter((x) => x.p0 >= r.p0 && x.p1 <= r.p1 && x.c0 >= r.c0 && x.c1 <= r.c1).map((x) => x.m); inside.forEach((m) => merges.remove(m));
     const m = merges.add(r.p0, r.p1, r.keys); if (!m) { inside.forEach((x) => merges.restore(x)); toast({ text: tt("grid.40") }); return; }
-    rg = null; vp.focus({ preventScroll: true }); setActive(r.p0, r.keys[0], false); showSel(true); dver++; schedule();
+    rg = null; vp.focus({ preventScroll: true }); setActive(r.p0, r.keys[0], false); showSel(true, false); dver++; schedule();
     toast({ kind: "action", text: tt("grid.41", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }), action: { label: tt("grid.42"), run: (t) => { merges.remove(m); inside.forEach((x) => merges.restore(x)); dver++; schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("grid.43"), done: true, duration: 1600 }); } } });
   });
   mb.split.addEventListener("click", () => {
-    const x = merges.at(active.p, active.c); if (!x) return; merges.remove(x.m); vp.focus({ preventScroll: true }); dver++; schedule(); syncMergeBar();
+    const x = merges.at(active.p, active.c); if (!x) return; merges.remove(x.m); vp.focus({ preventScroll: true }); showSel(activeSelected, kbdNav); dver++; schedule(); syncMergeBar();
     toast({ kind: "action", text: tt("grid.44"), action: { label: tt("grid.42"), run: (t) => { merges.restore(x.m); dver++; schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("grid.45"), done: true, duration: 1600 }); } } });
   });
 

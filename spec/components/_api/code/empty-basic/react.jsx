@@ -5,7 +5,7 @@ export default function FirstProject() {
     <div className="sn-empty-state">
       <span className="sn-art"><Icon name="folder-open" /></span>
       <h4>还没有项目</h4>
-      <p>从一部小说或剧本开始，几分钟就能看到第一版分镜。</p>
+      <p>新建或导入原文即可开始。</p>
       <div className="sn-acts">
         <Button variant="primary" icon="plus">新建项目</Button>
         <Button variant="secondary">导入原文</Button>

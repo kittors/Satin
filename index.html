@@ -704,13 +704,13 @@
 
   <section class="spec" id="empty">
     <h2>空状态<small>Empty</small></h2>
-    <p>空的时候告诉用户这里会有什么、下一步做什么。三种：第一次用、筛选没结果、出错。不用插画，只用一个图标。</p>
+    <p>空的时候用最简短的一句话告诉用户这里会有什么、下一步做什么。三种：第一次用、筛选没结果、出错。不用插画，用双层柔和图标徽章建立清晰层次。</p>
     <div class="demo flush"><div class="sn-empty-grid">
-      <div class="sn-empty-state"><span class="sn-art" data-i="folder-open"></span><h4>还没有项目</h4><p>从一部小说或剧本开始，几分钟就能看到第一版分镜。</p><div class="sn-acts"><button class="sn-btn sn-primary" data-i="plus:before">新建项目</button><button class="sn-btn sn-secondary">导入原文</button></div></div>
-      <div class="sn-empty-state"><span class="sn-art" data-i="search"></span><h4>没有找到"雨夜"相关的镜头</h4><p>换个关键词，或者清除筛选再看看。</p><div class="sn-acts"><button class="sn-btn sn-secondary">清除筛选</button></div></div>
-      <div class="sn-empty-state"><span class="sn-art" data-i="wifi-off"></span><h4>加载失败</h4><p>网络好像断了，恢复后会自动重试。</p><div class="sn-acts"><button class="sn-btn sn-secondary" data-act data-retry>重试</button></div></div>
+      <div class="sn-empty-state"><span class="sn-art" data-i="folder-open"></span><h4>还没有项目</h4><p>新建或导入原文即可开始。</p><div class="sn-acts"><button class="sn-btn sn-primary" data-i="plus:before">新建项目</button><button class="sn-btn sn-secondary">导入原文</button></div></div>
+      <div class="sn-empty-state"><span class="sn-art" data-i="search"></span><h4>未找到“雨夜”相关镜头</h4><p>换个关键词，或清除当前筛选。</p><div class="sn-acts"><button class="sn-btn sn-secondary">清除筛选</button></div></div>
+      <div class="sn-empty-state"><span class="sn-art" data-i="wifi-off"></span><h4>暂时无法加载</h4><p>连接已中断，网络恢复后自动重试。</p><div class="sn-acts"><button class="sn-btn sn-secondary" data-act data-retry>重试</button></div></div>
     </div></div>
-    <ul class="rules"><li>图标放在 48 的浅灰圆角方块里；标题 15/600，说明 13，最宽 280，标题均衡断行。</li><li>按钮最多两个，第一次用的主按钮用实心；其他两种只用次按钮。</li></ul>
+    <ul class="rules"><li>图标徽章采用 56px 柔底外盘 + 40px 同心微浮内片 + 20px Solar 双色调图标，纯中性色建出明确景深，不用渐变或大插画。</li><li>容器内严格垂直居中（<code>min-height: 224px</code>）；间距遵循分组节奏：图标到标题 16px、标题到说明 6px、说明到操作 20px。</li><li>文案克制短句、绝不啰嗦：标题 15/600、说明 13px 且 <code>max-width: 260px</code> 配合 <code>text-wrap: balance</code> 杜绝孤字折行；按钮最多两个，只有第一次用放实心主按钮。</li></ul>
   </section>
 
   <section class="spec" id="loading">

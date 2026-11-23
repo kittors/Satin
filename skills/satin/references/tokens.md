@@ -77,9 +77,9 @@
 
 | 变量 | 值 | 说明 |
 |---|---|---|
-| `--sn-sel-ring` | `color-mix(in srgb, var(--sn-label) 80%, transparent)` | 选中框 |
-| `--sn-range-line` | `color-mix(in srgb, var(--sn-label) 70%, transparent)` | 范围选择的连线 |
-| `--sn-guide-line` | `color-mix(in srgb, var(--sn-label) 60%, transparent)` | 对齐参考线 |
+| `--sn-sel-ring` | `color-mix(in srgb, var(--sn-accent) 45%, transparent)` | 可文字编辑单元格的柔和修改框选 |
+| `--sn-range-line` | `color-mix(in srgb, var(--sn-accent) 52%, transparent)` | 多格合并范围框选的柔和边框 |
+| `--sn-guide-line` | `color-mix(in srgb, var(--sn-label) 48%, transparent)` | 对齐参考线 |
 | `--sn-tree-line` | `color-mix(in srgb, var(--sn-label) 12%, transparent)` | 树形缩进线 |
 | `--sn-menu-bg` | `var(--sn-overlay)` | 菜单底色 |
 | `--sn-sk-shine` | `rgba(255, 255, 255, .75)` | 骨架屏扫光 |

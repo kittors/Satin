@@ -208,19 +208,22 @@
 .sn-g-ghost.sn-away > * { opacity: .4; }
 
 /* ———— 选中、框选（DOM 版；Canvas 版画同样的样子）————
-   选中：贴着格子的一圈 2px 细实线（文字色 80%）加一层很淡的底，不像输入框；只在单击了格子或用键盘走格子之后、表格有焦点时出现。
-   框选：淡底 + 外圈一条 2px 线，合并块整块算进来。 */
-/* 框（kit-grid.js 的 paintSelBox 摆位置）：2px 压在格线上，直角；层级高过表头（只许压住表头底下那条线，别的被 clip-path 裁掉）。
+   单格修改框选：只出现在可文字内容编辑单元格上（选择器 / 只读列不出现），1.5px 柔和细框 + 微圆角 + 极淡底色，克制不抢戏；
+   键盘落在选择器或只读格时：仅铺一层极淡中性定位底色（.sn-is-kbd），不画修改框选框；
+   多格范围框选（.sn-is-rg，网格模式下拖拽 ≥2 格用于合并）：柔和淡底 + 1.5px 外圈细框，合并块整块算进来。 */
+/* 框（grid.js 的 paintSelBox 摆位置）：1.5px 压在格线上，2px 微圆角；层级低于通栏详情（z-index 6），跨详情时不劈穿。
    固定列的框放在两条贴边的 sticky 层里（高度 0，不占地方） */
 .sn-g-rgl, .sn-g-rgr { position: sticky; z-index: 5; height: 0; pointer-events: none; }
 .sn-g-rgl { left: 0; }
 .sn-g-rgr { right: 0; margin-left: auto; } /* 宽度 = 左 / 右固定列的总宽，paintSelBox 写 */
-.sn-g-rgbox { position: absolute; z-index: 5; box-shadow: inset 0 0 0 2px var(--sn-sel-ring); pointer-events: none; }
+.sn-g-rgbox { position: absolute; z-index: 5; border-radius: 2px; background: color-mix(in srgb, var(--sn-accent) 4%, transparent); box-shadow: inset 0 0 0 1.5px var(--sn-sel-ring), inset 0 0 0 3px color-mix(in srgb, var(--sn-accent) 6%, transparent); pointer-events: none; }
+.sn-g-rgbox.sn-is-rg { background: transparent; box-shadow: inset 0 0 0 1.5px var(--sn-range-line); }
+.sn-g-rgbox.sn-is-kbd { border-radius: 0; background: color-mix(in srgb, var(--sn-label) 5%, transparent); box-shadow: none; }
 .sn-g-body > .sn-g-rgbox { z-index: 5; }
-/* 框选的淡底（起点那一格不铺） */
-.sn-g-cell.sn-rg, .sn-g-row.sn-sel .sn-g-cell.sn-rg { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-g-bg)); }
+/* 多格范围框选的柔和底色（起点格保留略浅，一眼看出起点） */
+.sn-g-cell.sn-rg, .sn-g-row.sn-sel .sn-g-cell.sn-rg { background: color-mix(in srgb, var(--sn-accent) 6.5%, var(--sn-g-bg)); }
 @media (hover: hover) {
-.sn-g-row:hover .sn-g-cell.sn-rg { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-g-bg)); } }
+.sn-g-row:hover .sn-g-cell.sn-rg { background: color-mix(in srgb, var(--sn-accent) 6.5%, var(--sn-g-bg)); } }
 
 /* ———— 合并单元格：每一行画自己那一截（第一列格子横跨几列），内容往下挪到整块正中；块内不画行线、不跟着某一行变色 ———— */
 .sn-g-cell.sn-mg-hide { display: none; }

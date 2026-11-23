@@ -1,0 +1,34 @@
+{
+  "id": "loadingmotion",
+  "name": "内容加载与过渡",
+  "nav": "内容加载与过渡",
+  "en": "Loading & transitions",
+  "group": "基础",
+  "specRef": "",
+  "summary": "消灭「点一下先白屏闪空壳，几十毫秒后再硬砸进 DOM」的割裂体验。本官网文档页切换已完整实装悬停预取、180ms 原子提交宽限期、300/500ms 骨架防闪律与微位移交叉显影。",
+  "acceptance": [
+    "导航悬停（`pointerenter` / `focusin`）静默预取目标元数据，在用户点击落定前完成 90% 的数据就绪。",
+    "路由切换设置 180ms 原子提交宽限期：数据及时到位则连同正文、右侧目录一次性提交过渡，杜绝空壳闪烁。",
+    "局部异步加载 300ms 内完成绝不展示转圈或骨架；一旦露出骨架至少平稳驻留 500ms，再用 `opacity` + `translateY(6px)` 平滑交叉显影。"
+  ],
+  "api": [],
+  "usage": null,
+  "example": null,
+  "demos": [
+    {
+      "caption": "路由切换体验对比（点左侧目录项切换，调不同延迟感受差距）",
+      "html": "<div class=\"lm-cmp\" id=\"lmCompare\">\n  <div class=\"lm-bar\">\n    <div class=\"lm-navs\" role=\"tablist\" aria-label=\"切换页面\">\n      <button type=\"button\" class=\"sn-btn sn-ghost sn-sm sn-on\" data-lm-nav=\"button\">按钮</button>\n      <button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-lm-nav=\"grid\">数据表格</button>\n      <button type=\"button\" class=\"sn-btn sn-ghost sn-sm\" data-lm-nav=\"charts\">数据图表与 3D</button>\n    </div>\n    <div class=\"lm-delay\">\n      <span class=\"sn-cap\">模拟网络</span>\n      <div class=\"sn-seg sn-sm\" data-seg=\"lmdelay\"><span class=\"sn-thumb\"></span><button data-v=\"80\">80ms</button><button data-v=\"240\">240ms</button><button data-v=\"620\">620ms</button></div>\n    </div>\n  </div>\n  <div class=\"lm-cols\">\n    <div class=\"lm-pane\">\n      <div class=\"lm-pane-hd\"><b>传统方式（清空 → 砸屏）</b><span class=\"sn-note\" data-lm-raw-stat>点击上方页签对比</span></div>\n      <div class=\"lm-pane-bd\" data-lm-raw></div>\n    </div>\n    <div class=\"lm-pane lm-pane-good\">\n      <div class=\"lm-pane-hd\"><b>Satin（原子提交 + 同构骨架显影）</b><span class=\"sn-note\" data-lm-satin-stat>零白闪 · 平滑落定</span></div>\n      <div class=\"lm-pane-bd\" data-lm-satin></div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "caption": "300ms 宽限与 500ms 最小驻留实验",
+      "html": "<div class=\"lm-grace\" id=\"lmGrace\">\n  <div class=\"row\" style=\"gap:8px;flex-wrap:wrap\">\n    <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-lm-run=\"120\">快速响应（120ms · 不出骨架）</button>\n    <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-lm-run=\"420\">临界耗时（420ms · 驻留满 500ms）</button>\n    <button type=\"button\" class=\"sn-btn sn-secondary sn-sm\" data-lm-run=\"900\">慢速请求（900ms · 平滑交叉）</button>\n  </div>\n  <div class=\"lm-timeline\">\n    <span data-lm-step=\"0\">就绪</span><span data-lm-step=\"1\">0–300ms 静默宽限</span><span data-lm-step=\"2\">≥ 500ms 同构骨架</span><span data-lm-step=\"3\">交叉淡入落定</span>\n  </div>\n  <div class=\"lm-stage\" data-lm-stage></div>\n  <p class=\"sn-note\" data-lm-log style=\"margin-top:8px\">点击上方按钮模拟不同耗时下的状态流转。</p>\n</div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": [],
+  "mobile": []
+}

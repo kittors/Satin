@@ -102,16 +102,22 @@
 .sn-shot-row:not(.sn-failed) .sn-bad-line { opacity: 0; translate: 0 -4px; }
 .sn-shot-row:not(.sn-failed) .sn-ok-line { opacity: 1; translate: 0; }
 
-/* ———— 空状态 ———— */
-.sn-empty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+/* ———— 空状态：三层微景深图标徽章（柔和托盘 → 同心微浮内片 → Solar 双色调图标）+ 严格垂直居中 + 组内紧凑/组间倍距 ———— */
+.sn-empty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); align-items: stretch; }
 .sn-empty-grid > * + * { }
-.sn-empty-state { display: grid; justify-items: center; align-content: start; text-align: center; gap: 6px; min-width: 0; padding: 40px 24px; }
-.sn-empty-state .sn-acts { flex-wrap: wrap; justify-content: center; }
-.sn-empty-state .sn-art { width: 48px; height: 48px; margin-bottom: 10px; border-radius: 14px; display: grid; place-items: center; background: var(--sn-fill-subtle); color: var(--sn-label2); }
-.sn-empty-state .sn-art .sn-ic { width: 22px; height: 22px; }
-.sn-empty-state h4 { font: 600 calc(15px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); text-wrap: balance; }
-.sn-empty-state p { max-width: 280px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-wrap: pretty; }
-.sn-empty-state .sn-acts { display: flex; gap: 8px; margin-top: 14px; }
+.sn-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-width: 0; width: 100%; min-height: 224px; padding: 40px 24px; }
+.sn-empty-state.sn-sm { min-height: 160px; padding: 24px 16px; }
+.sn-empty-state .sn-art { position: relative; flex: none; width: 56px; height: 56px; margin-bottom: 16px; border-radius: var(--sn-r-xl); display: grid; place-items: center; background: var(--sn-fill-subtle); box-shadow: inset 0 0 0 1px var(--sn-line); color: var(--sn-label); }
+.sn-empty-state .sn-art::before { content: ""; position: absolute; inset: 8px; border-radius: calc(var(--sn-r-xl) - 6px); background: var(--sn-raised); box-shadow: var(--sn-card-shadow), inset 0 0 0 1px var(--sn-line-control); pointer-events: none; }
+[data-theme="dark"] .sn-empty-state .sn-art::before { background: var(--sn-overlay); box-shadow: inset 0 0 0 1px var(--sn-line-control); }
+.sn-empty-state .sn-art > .sn-ic { position: relative; z-index: 1; width: 20px; height: 20px; }
+.sn-empty-state.sn-sm .sn-art { width: 48px; height: 48px; margin-bottom: 12px; border-radius: var(--sn-r-lg); }
+.sn-empty-state.sn-sm .sn-art::before { inset: 6px; border-radius: calc(var(--sn-r-lg) - 4px); }
+.sn-empty-state.sn-sm .sn-art > .sn-ic { width: 18px; height: 18px; }
+.sn-empty-state h4 { margin: 0; font: 600 calc(15px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -0.01em; color: var(--sn-label); text-wrap: balance; }
+.sn-empty-state p { margin: 6px 0 0; max-width: 260px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-wrap: balance; }
+.sn-empty-state .sn-acts { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; }
+.sn-empty-state.sn-sm .sn-acts { margin-top: 16px; }
 
 /* ———— 骨架：整列共用一道光（背景固定在视口上），1.2 秒扫过，停 0.4 秒 ———— */
 .sn-sk { display: block; border-radius: var(--sn-r-xs); background-color: var(--sn-fill-subtle); background-image: linear-gradient(100deg, transparent 40%, var(--sn-sk-shine) 50%, transparent 60%);

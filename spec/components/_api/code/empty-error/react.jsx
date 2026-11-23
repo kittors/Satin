@@ -4,8 +4,8 @@ export default function LoadFailed() {
   return (
     <div className="sn-empty-state">
       <span className="sn-art"><Icon name="wifi-off" /></span>
-      <h4>加载失败</h4>
-      <p>网络好像断了，恢复后会自动重试。</p>
+      <h4>暂时无法加载</h4>
+      <p>连接已中断，网络恢复后自动重试。</p>
       <div className="sn-acts">
         <Button variant="secondary">重试</Button>
       </div>

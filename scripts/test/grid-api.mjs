@@ -15,6 +15,7 @@ Object.assign(window.Element.prototype, { animate: () => ({ finished: Promise.re
 for (const k of ["clientHeight", "clientWidth", "scrollHeight", "scrollWidth", "offsetWidth", "offsetHeight"]) Object.defineProperty(window.Element.prototype, k, { configurable: true, get: () => (k.includes("Width") ? 800 : 400) });
 Object.assign(globalThis, {
   window, document, HTMLElement: window.HTMLElement, Element: window.Element, Node: window.Node, CustomEvent: window.CustomEvent, Event: window.Event, EventTarget: window.EventTarget,
+  addEventListener: noop, removeEventListener: noop,
   ResizeObserver: RO, IntersectionObserver: RO, MutationObserver: window.MutationObserver ?? RO, innerWidth: 1280, innerHeight: 900, devicePixelRatio: 1,
   matchMedia: () => ({ matches: false, addEventListener: noop, removeEventListener: noop }), CSS: { escape: (s) => String(s).replace(/[^\w-]/g, (c) => "\\" + c), supports: () => false },
   requestAnimationFrame: (f) => setTimeout(() => f(performance.now()), 0), cancelAnimationFrame: clearTimeout,
@@ -148,6 +149,42 @@ console.log("Canvas 表格：同一套选项、事件、状态");
   g.update({ error: null, data: DATA.slice(0, 2) }); await sleep(30); ok(st.hidden && !el.querySelector(".sn-grid").classList.contains("sn-g-st-on"), "有数据了：状态层收起");
   const styles0 = document.head.querySelectorAll("style").length; g.destroy(); await sleep(10);
   ok(document.head.querySelectorAll("style").length < styles0 && !el.firstChild, "销毁：拿掉样式、清空容器");
+}
+console.log("表格：单元格框选边界规范（可文字编辑 vs 选择器 / 只读 / 合并块）");
+{
+  const el = document.createElement("div"); document.body.append(el);
+  const g = createDataGrid(el, {
+    columns: [
+      { key: "name", title: "名称", edit: "text" },
+      { key: "status", title: "状态", type: "status", edit: "enum", options: ["待开始", "进行中", "已完成"] },
+      { key: "shots", title: "镜头", type: "int", edit: "int" },
+      { key: "prog", title: "进度", type: "prog" },
+    ],
+    data: [
+      { id: "1", name: "雨夜车站", status: 0, shots: 12, prog: 40 },
+      { id: "2", name: "候车厅", status: 1, shots: 20, prog: 80 },
+    ],
+    rowKey: "id",
+    selection: "multiple",
+    merges: [{ rows: [0, 1], keys: ["status", "shots"] }],
+  });
+  const api = el.querySelector(".sn-grid")._grid, vp = el.querySelector(".sn-g-vp");
+  await api.ready; await sleep(30);
+  const pd = (cell) => cell.dispatchEvent(Object.assign(new window.Event("pointerdown", { bubbles: true, cancelable: true }), { button: 0, clientX: 10, clientY: 10 }));
+  const row0 = [...el.querySelectorAll(".sn-g-row")].find((r) => r._p === 0);
+  pd(row0.querySelector('[data-c="name"]'));
+  ok(api.sel().shown === true, "单击可文字编辑格（name）：显示柔和修改框选");
+  pd(row0.querySelector('[data-c="status"]'));
+  ok(api.sel().shown === false, "单击选择器合并格（status 起点，edit=enum）：绝不显示修改框选");
+  const splitBtn = el.querySelector(".sn-g-mbar [data-g-split]");
+  ok(splitBtn && !splitBtn.hidden, "单击非可编辑合并块：不画修改框选，但工具栏「拆分」按钮保持可用");
+  pd(row0.querySelector('[data-c="prog"]'));
+  ok(api.sel().shown === false, "单击只读列（prog）：绝不显示修改框选");
+  vp.dispatchEvent(Object.assign(new window.Event("keydown", { bubbles: true, cancelable: true }), { key: "ArrowLeft" }));
+  ok(api.active().c === "status" && api.sel().shown === false, "键盘走到选择器合并块（status）：绝不显示修改框选");
+  vp.dispatchEvent(Object.assign(new window.Event("keydown", { bubbles: true, cancelable: true }), { key: "ArrowLeft" }));
+  ok(api.active().c === "name" && api.sel().shown === true, "键盘走回可文字编辑格（name）：显示柔和修改框选");
+  g.destroy();
 }
 console.log(bad ? `数据表格 API：${bad}/${n} 项不通过` : `数据表格 API：${n} 项全部通过`);
 process.exit(bad ? 1 : 0);
