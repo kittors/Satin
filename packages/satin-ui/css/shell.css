@@ -298,7 +298,7 @@
   .sn-page-hd > .sn-acts .sn-seg { flex: 1; display: grid; }
 
   /* 面板：采用现代 iOS Inset Grouped 大圆角分组卡片（左右留 16px 呼吸边、大圆角纯净白底 + 柔和微阴影，告别老旧通栏白纸切灰条） */
-  :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > .sn-panel { border-radius: var(--sn-r-xl); padding: var(--sn-sp-16); border: 0; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-line) 75%, transparent), 0 1px 3px rgba(0, 0, 0, .025); }
+  :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > .sn-panel { border-radius: 20px; padding: var(--sn-sp-16); border: 0; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-line) 65%, transparent), 0 1px 3px rgba(0, 0, 0, .02); }
   :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > .sn-panel.sn-flush { padding: 0; overflow: hidden; }
   /* 表格铺满左右时：让开左右安全区（底色照样铺到边上） */
   :where(.sn-page, .sn-page > .sn-stack, .sn-page > .sn-section, .sn-page .sn-with-aside) > .sn-tbl-wrap { margin-inline: calc(-1 * var(--sn-page-x, 0px)); border-radius: 0; border-inline-width: 0; padding-inline: env(safe-area-inset-left) env(safe-area-inset-right); background: var(--sn-raised); }

@@ -79,13 +79,14 @@
 /* ———— 列表与键值 ———— */
 .sn-list-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 32px; align-items: start; }
 .sn-set-list { border-radius: var(--sn-r-lg); border: 1px solid var(--sn-line); overflow: hidden; }
-.sn-set-row { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 12px 8px 14px; cursor: pointer; outline: none; transition: background-color .1s var(--sn-ease-out); }
-.sn-set-row + .sn-set-row { }
+.sn-set-row { display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 12px 16px; cursor: pointer; outline: none; transition: background-color .1s var(--sn-ease-out); }
+.sn-set-row + .sn-set-row { box-shadow: inset 0 1px 0 color-mix(in srgb, var(--sn-line) 70%, transparent); }
 @media (hover: hover) {
 .sn-set-row:hover { background: var(--sn-fill-hover); } }
 .sn-set-row:focus-visible { box-shadow: inset 0 0 0 2px var(--sn-focus); }
-.sn-set-row .sn-ico { width: 28px; height: 28px; flex: none; border-radius: var(--sn-r-sm); display: grid; place-items: center; background: var(--sn-fill-subtle); color: var(--sn-label2); }
-.sn-set-row .sn-ico .sn-ic { width: 16px; height: 16px; }
+/* 列表行图标：纯粹克制的裸矢量图标，绝不强行套浅灰圆角小方盒（去 AI 味规范 no-icon-box） */
+.sn-set-row .sn-ico { width: 18px; height: 18px; flex: none; display: grid; place-items: center; color: var(--sn-label3); }
+.sn-set-row .sn-ico .sn-ic { width: 18px; height: 18px; }
 .sn-set-row .sn-tx { flex: 1; min-width: 96px; display: grid; } /* 文字栏至少留 96：右边的值和开关放不下时整行换行，不把标题挤成一列字 */
 .sn-set-row { flex-wrap: wrap; }
 .sn-set-row .sn-tx b { font: 500 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); }
