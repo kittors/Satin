@@ -1,6 +1,5 @@
 // zh-CN · canvas-grid
 export default {
-  "canvas-grid.0": "正在加载更多…",
   "canvas-grid.1": "已经到底了，共 {p0} 行",
   "canvas-grid.3": "第 {p0} 级{p1}，",
   "canvas-grid.4": "第 {p0} 行，{p1}{p2}：{p3}",

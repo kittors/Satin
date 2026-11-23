@@ -23,7 +23,6 @@ export default {
   "grid.20": "Collapse children",
   "grid.21": "Expand children",
   "grid.22": "Show details",
-  "grid.24": "Loading more…",
   "grid.25": "That's everything — {p0} rows",
   "grid.27": "Clear sorting and filters before reordering rows by hand",
   "grid.28": "Merged rows can't be dragged on their own — split them first",

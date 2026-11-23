@@ -16,6 +16,7 @@ import { createSource, hasFilter } from "./table-source.js";
 export const heightCSS = (h) => (h == null || h === "" ? "" : typeof h === "number" ? h + "px" : String(h));
 export const setGridHeight = (root, h) => { const v = heightCSS(h); if (v) root.style.setProperty("--sn-g-h", v); else root.style.removeProperty("--sn-g-h"); };
 export const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const mk = (t, c, hid) => { const e = document.createElement(t); if (c) e.className = c; if (hid) e.setAttribute("aria-hidden", "true"); return e; };
 import { backendOf } from "./table-backends.js";
 import { toast } from "./feedback.js";
 import { BOX, EASE, EASE_CSS, contentW, liftIn, popCheck, tween } from "./form.js";
@@ -498,120 +499,68 @@ export function treeDrag(src, merges, p0) {
 // 反向中途打断（例如连点展开/收起或快速合并/拆分）按当前进度无缝反向接续，绝不硬跳。
 export function createMergeFx() {
   let primed = false;
-  const prev = new Map(), entering = new Map(), leaving = new Map(), ENTER_DUR = 260, LEAVE_DUR = 240;
-  const ease = (t) => 1 - (1 - t) ** 3;
-  const clamp = (v) => Math.max(0, Math.min(1, v));
+  const prev = new Map(), en = new Map(), lv = new Map(), ED = 260, LD = 240;
+  const ease = (t) => 1 - (1 - t) ** 3, cl = (v) => Math.max(0, Math.min(1, v));
+  const reset = () => { primed = false; prev.clear(); en.clear(); lv.clear(); };
   return {
-    prime(live, snapOf) {
-      primed = true; prev.clear(); entering.clear(); leaving.clear();
-      for (const x of live) prev.set(x.m, snapOf ? snapOf(x) : x);
-    },
-    reset() { primed = false; prev.clear(); entering.clear(); leaving.clear(); },
-    diff(live, now, snapOf) {
-      const next = new Map();
-      for (const x of live) next.set(x.m, snapOf ? snapOf(x) : x);
-      const entered = [], left = [];
+    prime(live, f) { reset(); primed = true; for (const x of live) prev.set(x.m, f ? f(x) : x); },
+    reset,
+    diff(live, now, f) {
+      const next = new Map(), entered = [], left = [], noFx = reduced();
+      for (const x of live) next.set(x.m, f ? f(x) : x);
       if (!primed) { primed = true; for (const [m, s] of next) prev.set(m, s); return { entered, left }; }
-      const noFx = reduced();
-      for (const x of live) {
-        if (prev.has(x.m)) continue;
-        if (noFx) { leaving.delete(x.m); continue; }
-        let start = 0;
-        const lv = leaving.get(x.m);
-        if (lv) { start = 1 - clamp((now - lv.t0) / lv.dur); leaving.delete(x.m); }
-        entering.set(x.m, { t0: now - start * ENTER_DUR, dur: ENTER_DUR, x });
-        entered.push(x);
+      for (const x of live) if (!prev.has(x.m)) {
+        if (noFx) { lv.delete(x.m); continue; }
+        const old = lv.get(x.m), s = old ? 1 - cl((now - old.t0) / LD) : 0; lv.delete(x.m);
+        en.set(x.m, { t0: now - s * ED, x }); entered.push(x);
       }
-      for (const [m, snap] of prev) {
-        if (next.has(m)) continue;
-        if (noFx) { entering.delete(m); continue; }
-        let start = 0;
-        const en = entering.get(m);
-        if (en) { start = 1 - clamp((now - en.t0) / en.dur); entering.delete(m); }
-        const item = { m, snap, t0: now - start * LEAVE_DUR, dur: LEAVE_DUR };
-        leaving.set(m, item);
-        left.push(item);
+      for (const [m, snap] of prev) if (!next.has(m)) {
+        if (noFx) { en.delete(m); continue; }
+        const old = en.get(m), s = old ? 1 - cl((now - old.t0) / ED) : 0; en.delete(m);
+        const it = { m, snap, t0: now - s * LD }; lv.set(m, it); left.push(it);
       }
-      prev.clear();
-      for (const [m, s] of next) prev.set(m, s);
+      prev.clear(); for (const [m, s] of next) prev.set(m, s);
       return { entered, left };
     },
-    enterP(m, now) {
-      const en = entering.get(m); if (!en) return 1;
-      const t = clamp((now - en.t0) / en.dur);
-      if (t >= 1) { entering.delete(m); return 1; }
-      return ease(t);
-    },
-    leaves(now) {
-      const out = [];
-      for (const [m, lv] of leaving) {
-        const t = clamp((now - lv.t0) / lv.dur);
-        if (t >= 1) { leaving.delete(m); continue; }
-        out.push({ m, snap: lv.snap, t, q: ease(t) });
-      }
-      return out;
-    },
-    get busy() { return entering.size > 0 || leaving.size > 0; },
+    enterP(m, now) { const o = en.get(m); if (!o) return 1; const t = cl((now - o.t0) / ED); return t >= 1 ? (en.delete(m), 1) : ease(t); },
+    leaves(now) { const out = []; for (const [m, o] of lv) { const t = cl((now - o.t0) / LD); if (t >= 1) lv.delete(m); else out.push({ m, snap: o.snap, t, q: ease(t) }); } return out; },
+    get busy() { return en.size > 0 || lv.size > 0; },
   };
 }
 // 工具条上的合并 / 拆分按钮和"有几处合并暂时不显示"的提示（两版表格共用）：
 // 拆分按钮与挂起提示装在水平折叠槽（.sn-g-mslot / .sn-g-hslot）里，进出场 220ms/180ms 丝滑展开收拢，不硬跳、不闪现
 export function mountMergeBar(root, injectIcons) {
-  const info = root.querySelector("[data-g-info]"), bar = document.createElement("span"); bar.className = "sn-g-mbar";
-  bar.innerHTML = tt("grid.15");
-  // 合并按钮、提示、行数放在单独一行（固定高度、不换行）：提示出现、行数变长时只在这一行里伸缩（提示超长打省略号），不把下面的表格往下推
-  injectIcons(bar);
+  const info = root.querySelector("[data-g-info]"), bar = mk("span", "sn-g-mbar");
+  bar.innerHTML = tt("grid.15"); injectIcons(bar);
   const merge = bar.querySelector("[data-g-merge]"), split = bar.querySelector("[data-g-split]"), hint = bar.querySelector(".sn-g-mhint");
-  const wrapSlot = (el, cls) => {
-    if (!el) return null;
-    const slot = document.createElement("span"); slot.className = cls;
-    const inner = document.createElement("span");
+  const mkSlot = (el, cls, focusable) => {
+    const slot = mk("span", cls), inner = mk("span");
     el.before(slot); inner.append(el); slot.append(inner);
-    return slot;
+    let tm = 0, shown = false;
+    return {
+      set(on) {
+        if (on === shown) return false; shown = on; clearTimeout(tm); tm = 0;
+        if (on) { el.hidden = false; el.removeAttribute("aria-hidden"); if (focusable) el.removeAttribute("tabindex"); if (!reduced() && !slot.classList.contains("sn-on")) void slot.offsetWidth; slot.classList.add("sn-on"); }
+        else { slot.classList.remove("sn-on"); el.setAttribute("aria-hidden", "true"); if (focusable) el.setAttribute("tabindex", "-1"); if (reduced()) el.hidden = true; else tm = setTimeout(() => { if (!slot.classList.contains("sn-on")) el.hidden = true; }, 200); }
+        return true;
+      },
+      clear() { clearTimeout(tm); },
+    };
   };
-  const splitSlot = wrapSlot(split, "sn-g-mslot"), hintSlot = wrapSlot(hint, "sn-g-hslot");
-  let splitT = 0, hintT = 0, wasReady = false, splitShown = false, hintShown = false;
-  const setSlot = (slot, el, on, isSplit) => {
-    if (!slot || !el) return;
-    if (isSplit) { clearTimeout(splitT); splitT = 0; } else { clearTimeout(hintT); hintT = 0; }
-    if (on) {
-      el.hidden = false; el.removeAttribute("aria-hidden"); if (isSplit) el.removeAttribute("tabindex");
-      if (reduced()) { slot.classList.add("sn-on"); return; }
-      if (!slot.classList.contains("sn-on")) { void slot.offsetWidth; slot.classList.add("sn-on"); }
-    } else {
-      slot.classList.remove("sn-on"); el.setAttribute("aria-hidden", "true"); if (isSplit) el.setAttribute("tabindex", "-1");
-      if (reduced()) { el.hidden = true; return; }
-      const t = setTimeout(() => { if (!slot.classList.contains("sn-on")) el.hidden = true; }, 200);
-      if (isSplit) splitT = t; else hintT = t;
-    }
-  };
-  let splitHoverCb = null;
-  const setSplitHover = (on) => splitHoverCb?.(on);
-  if (split) {
-    split.addEventListener("pointerenter", () => setSplitHover(true));
-    split.addEventListener("pointerleave", () => setSplitHover(false));
-    split.addEventListener("focus", () => setSplitHover(true));
-    split.addEventListener("blur", () => setSplitHover(false));
-  }
-  // 没有信息栏（工具条关掉了、或者照自己的标记挂的）：合并按钮不放进页面，返回不在页面里的元素，调用的地方不用判断
+  const spSlot = mkSlot(split, "sn-g-mslot", true), htSlot = mkSlot(hint, "sn-g-hslot", false);
+  let wasReady = false, hoverCb = null;
+  for (const [ev, v] of [["pointerenter", true], ["pointerleave", false], ["focus", true], ["blur", false]]) split?.addEventListener(ev, () => hoverCb?.(v));
   if (info) { const meta = document.createElement("div"); meta.className = "sn-g-meta"; info.before(meta); meta.append(bar, info); }
   return {
-    merge, split, hint,
-    onSplitHover(cb) { splitHoverCb = cb; },
+    merge, split, hint, onSplitHover(cb) { hoverCb = cb; },
     sync({ canMerge, mergeTip, showSplit, hintText }) {
-      const ready = !!canMerge;
-      merge.disabled = !ready;
-      merge.classList.toggle("sn-g-mready", ready);
+      const ready = !!canMerge; merge.disabled = !ready; merge.classList.toggle("sn-g-mready", ready);
       if (ready && !wasReady && !reduced()) { merge.classList.remove("sn-g-mpop"); void merge.offsetWidth; merge.classList.add("sn-g-mpop"); }
-      wasReady = ready;
-      merge.dataset.tip = mergeTip; retip(merge);
-      const sp = !!showSplit;
-      if (sp !== splitShown) { splitShown = sp; if (!sp) setSplitHover(false); setSlot(splitSlot, split, sp, true); }
-      const ht = String(hintText || ""), hs = !!ht;
-      if (hs) hint.textContent = ht;
-      if (hs !== hintShown) { hintShown = hs; setSlot(hintSlot, hint, hs, false); }
+      wasReady = ready; merge.dataset.tip = mergeTip; retip(merge);
+      if (!showSplit && spSlot.set(false)) hoverCb?.(false); else if (showSplit) spSlot.set(true);
+      const ht = String(hintText || ""); if (ht) hint.textContent = ht; htSlot.set(!!ht);
     },
-    dispose() { clearTimeout(splitT); clearTimeout(hintT); },
+    dispose() { spSlot.clear(); htSlot.clear(); },
   };
 }
 // 空、加载、出错三种状态（两种表格共用）：表身上面一层，表头照常（列还在、能看出是哪张表）。第一次要显示时才建这一层；
@@ -671,7 +620,9 @@ export function mountDataGrid(root, o = {}) {
   }
   const paintState = mountGridState(root, vp, src, o, emit);
   // 滚动条：常驻时占独立的一条（竖条从表头下面开始，横条只在中间的列下面），两端箭头可点；自动时悬浮、滚动才出现
-  const bars = gridBars(vp.parentElement, vp, { head: HEAD, rowH: RH, rowsH: () => src.rowsH() + (src.mode === "append" ? RH : 0), colsW: () => model.width(), pinL: () => model.leftW(), pinR: () => model.rightW(), stops: () => colStops(model), reduced });
+  const SK_MORE = 3;
+  const tailH = () => (src.mode !== "append" ? 0 : src.hasMore ? SK_MORE * RH : src.total > 0 ? RH : 0);
+  const bars = gridBars(vp.parentElement, vp, { head: HEAD, rowH: RH, rowsH: () => src.rowsH() + tailH(), colsW: () => model.width(), pinL: () => model.leftW(), pinR: () => model.rightW(), stops: () => colStops(model), reduced });
   const DETAIL = 112, EXPD = { flat: new Map(), tree: new Map() }, expAnim = new Map(), expTo = new Map(); // expAnim / expTo：正在展开收起的行这一次的记号、要去的状态（连点时只让最新的那次动）
   let expd = EXPD.flat; // 展开了详情的行：行号 → 收起时（格子部分）的高度；平铺、树形各记各的
   const merges = createMerges(src, model, (p) => { const r = src.rowAt(p); return r >= 0 && expd.has(r); });
@@ -818,6 +769,7 @@ export function mountDataGrid(root, o = {}) {
     const r = src.rowAt(p), was = el.classList.contains("sn-sk"), hh = src.rowH(p), ex = r >= 0 && expd.has(r), ch = ex ? Math.min(hh, expd.get(r)) : hh;
     if (el._r !== r) nofx(el); // 复用的行换了内容：勾选框、底色直接到位，不播过渡（滚动时不会看到一行行"勾掉""褪色"）
     el._p = p; el._v = dver; el._r = r; el.style.top = src.rowY(p) + "px"; el.style.height = hh === RH ? "" : hh + "px"; el.style.setProperty("--sn-ch", ch + "px"); el.style.setProperty("--sn-dh", hh - ch + "px"); el.style.display = ""; el.setAttribute("aria-rowindex", p + 2);
+    el.dataset.skv = String(((p % 3) + 3) % 3);
     el.classList.toggle("sn-sk", r < 0); el.classList.toggle("sn-exp", ex);
     if (src.tree) { // 树形：缩进、精准引导线（末项收口 50% 不撞后续箭头）；有下级的是展开箭头（按"该是什么状态"转，收起时不等下级淡出），没有的是小圆点；详情挪到操作列的按钮上
       const id = src.idAt(p), lv = src.lvAt(p), kids = src.hasKids(id), op = kids && src.isOpen(id); el.style.setProperty("--sn-lv", lv); el.classList.toggle("sn-tk", kids); el.classList.toggle("sn-to", op);
@@ -896,36 +848,31 @@ export function mountDataGrid(root, o = {}) {
     Object.assign(el.style, { left: x + "px", top: y0 + "px", width: w + "px", height: h + "px" });
     host.append(el);
   };
+  const innerLines = (x, y0) => {
+    const out = []; let cx = 0;
+    for (let q = x.p0; q < x.p1; q++) out.push(`<i class="sn-h" style="top:${src.rowY(q) + cellH(q) - y0 - 1}px"></i>`);
+    for (let i = 0; i < x.keys.length - 1; i++) { cx += model.byKey[x.keys[i]].w; out.push(`<i class="sn-v" style="left:${cx - 1}px"></i>`); }
+    return out.join("");
+  };
   function spawnMergeMelt(x) {
     if (reduced()) return;
-    const s = snapMerge(x); if (s.w <= 1 || s.h <= 1) return;
-    const lines = [];
-    for (let q = x.p0; q < x.p1; q++) lines.push(`<i class="sn-h" style="top:${src.rowY(q) + cellH(q) - s.y0 - 1}px"></i>`);
-    let cx = 0;
-    for (let i = 0; i < x.keys.length - 1; i++) { cx += model.byKey[x.keys[i]].w; lines.push(`<i class="sn-v" style="left:${cx - 1}px"></i>`); }
-    if (!lines.length) return;
-    const el = document.createElement("div"); el.className = "sn-g-mfx sn-g-mfx-melt"; el.setAttribute("aria-hidden", "true");
-    el.innerHTML = lines.join("");
+    const s = snapMerge(x), html = s.w > 1 && s.h > 1 ? innerLines(x, s.y0) : ""; if (!html) return;
+    const el = mk("div", "sn-g-mfx sn-g-mfx-melt", 1); el.innerHTML = html;
     placeMfx(el, s.zone, s.x0, s.y0, s.w - 1, s.h - 1); mfxEls.add(el);
-    const a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: EASE_CSS.out, fill: "forwards" });
-    const done = () => { el.remove(); mfxEls.delete(el); };
-    a.onfinish = done; a.oncancel = done;
+    const a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: EASE_CSS.out, fill: "forwards" }), done = () => { el.remove(); mfxEls.delete(el); };
+    a.onfinish = a.oncancel = done;
   }
   function spawnSplitGhost(lv) {
     if (reduced()) return;
     const s = lv.snap; if (!s || s.h <= 1 || s.w <= 1) return;
-    const el = document.createElement("div"); el.className = "sn-g-mfx sn-g-mfx-ghost"; el.setAttribute("aria-hidden", "true");
+    const el = mk("div", "sn-g-mfx sn-g-mfx-ghost", 1);
     placeMfx(el, s.zone, s.x0, s.y0, s.w - 1, s.h - 1); mfxEls.add(el);
     if (s.html) {
-      const bodyEl = document.createElement("div"); bodyEl.className = "sn-g-mfx-gbody" + (s.right ? " sn-r" : "");
-      bodyEl.style.height = s.h0 + "px"; bodyEl.innerHTML = s.html;
-      el.append(bodyEl);
-      const dy0 = (s.h - s.h0) / 2;
-      bodyEl.animate([{ transform: `translateY(${dy0}px)`, opacity: 1 }, { transform: `translateY(${(dy0 * .35).toFixed(1)}px)`, opacity: 0 }], { duration: 130, easing: EASE_CSS.out, fill: "forwards" });
+      const b = mk("div", "sn-g-mfx-gbody" + (s.right ? " sn-r" : "")), dy0 = (s.h - s.h0) / 2; b.style.height = s.h0 + "px"; b.innerHTML = s.html; el.append(b);
+      b.animate([{ transform: `translateY(${dy0}px)`, opacity: 1 }, { transform: `translateY(${(dy0 * .35).toFixed(1)}px)`, opacity: 0 }], { duration: 130, easing: EASE_CSS.out, fill: "forwards" });
     }
-    const a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: EASE_CSS.outStrong, fill: "forwards" });
-    const done = () => { el.remove(); mfxEls.delete(el); };
-    a.onfinish = done; a.oncancel = done;
+    const a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: EASE_CSS.outStrong, fill: "forwards" }), done = () => { el.remove(); mfxEls.delete(el); };
+    a.onfinish = a.oncancel = done;
   }
   function paintSplitPrev() {
     const am = splitPrev && activeSelected && !rgRect() ? merges.at(active.p, active.c) : null;
@@ -933,34 +880,24 @@ export function mountDataGrid(root, o = {}) {
       if (splitPrevEl) { const old = splitPrevEl; splitPrevEl = null; old.classList.remove("sn-on"); setTimeout(() => old.remove(), 160); }
       return;
     }
-    if (!splitPrevEl) { splitPrevEl = document.createElement("div"); splitPrevEl.className = "sn-g-mfx sn-g-mfx-splitprev"; splitPrevEl.setAttribute("aria-hidden", "true"); }
-    const X0 = model.xOf(am.key0), X1 = model.xOf(am.keys.at(-1)) + model.byKey[am.keys.at(-1)].w, Y0 = src.rowY(am.p0), Y1 = src.rowY(am.p1) + cellH(am.p1);
-    const lines = [];
-    for (let q = am.p0; q < am.p1; q++) lines.push(`<i class="sn-h" style="top:${src.rowY(q) + cellH(q) - Y0 - 1}px"></i>`);
-    let cx = 0;
-    for (let i = 0; i < am.keys.length - 1; i++) { cx += model.byKey[am.keys[i]].w; lines.push(`<i class="sn-v" style="left:${cx - 1}px"></i>`); }
-    splitPrevEl.innerHTML = lines.join("");
-    placeMfx(splitPrevEl, merges.zoneOf(am.key0), X0, Y0, X1 - X0, Y1 - Y0);
+    if (!splitPrevEl) splitPrevEl = mk("div", "sn-g-mfx sn-g-mfx-splitprev", 1);
+    const s = snapMerge(am); splitPrevEl.innerHTML = innerLines(am, s.y0);
+    placeMfx(splitPrevEl, s.zone, s.x0, s.y0, s.w, s.h);
     if (!splitPrevEl.classList.contains("sn-on")) { void splitPrevEl.offsetWidth; splitPrevEl.classList.add("sn-on"); }
   }
   const syncHovMerge = (m) => {
     if (hovMerge === m) return; hovMerge = m;
-    for (const row of pool) {
-      if (row.style.display === "none" || !row._mg?.length) continue;
-      for (const k of row._mg) { const c = row._cells[k]; if (c._mgSeg) c.classList.toggle("sn-mg-hov", c._mgSeg.m === hovMerge); }
-    }
+    for (const r of pool) if (r.style.display !== "none" && r._mg?.length) for (const k of r._mg) { const c = r._cells[k]; if (c._mgSeg) c.classList.toggle("sn-mg-hov", c._mgSeg.m === m); }
   };
-  body.addEventListener("pointermove", (e) => {
-    const cell = e.target.closest?.(".sn-g-cell.sn-mg");
-    syncHovMerge(cell?._mgSeg?.m || null);
-  });
+  body.addEventListener("pointermove", (e) => syncHovMerge(e.target.closest?.(".sn-g-cell.sn-mg")?._mgSeg?.m || null));
   body.addEventListener("pointerleave", () => syncHovMerge(null));
 
-  const xpool = []; // 树的过渡里跑出渲染范围、这一帧还看得见的行（滑出去的、原地淡出的）：单独一组行元素，压在别的行下面
+  const xpool = [], morePool = []; let lastAppendN = 0; // 树的过渡里跑出渲染范围的行；滚到底再加载末尾的 3 行同构骨架行
   function render() {
-    if (raf) cancelAnimationFrame(raf); raf = 0; /* 直接调 render（展开、改行高的每一步）时，把已经排上的那一帧取消：不然一帧里画两遍，树的钟也走两次 */ const now = performance.now(); mo.tick(now); fading = false; if (arrived.size > 400) for (const [r, t] of arrived) if (now - t > 120) arrived.delete(r);
-    const n = src.shown, st = vp.scrollTop, h = vp.clientHeight - HEAD;
-    body.style.height = src.rowsH() + "px";
+    if (raf) cancelAnimationFrame(raf); raf = 0; const now = performance.now(); mo.tick(now); fading = false; if (arrived.size > 400) for (const [r, t] of arrived) if (now - t > 120) arrived.delete(r);
+    const n = src.shown, st = vp.scrollTop, h = vp.clientHeight - HEAD, app = src.mode === "append";
+    if (app) { if (n > lastAppendN && lastAppendN > 0 && !reduced()) for (let q = lastAppendN; q < Math.min(n, lastAppendN + 6); q++) { const rr = src.rowAt(q); if (rr >= 0) arrived.set(rr, now); } lastAppendN = n; } else lastAppendN = 0;
+    body.style.height = src.rowsH() + tailH() + "px";
     const first = Math.max(0, src.rowAtY(st) - OVER), last = Math.min(n, src.rowAtY(st + h) + 1 + OVER), need = last - first, offs = rowDrag ? rowDrag.offs(first, last) : null;
     if (pool.length < need) { while (pool.length < need) pool.push(makeRow()); for (const r of pool) r._p = -1; }
     const { entered, left } = mergeFx.diff(merges.active(), now, snapMerge);
@@ -969,8 +906,8 @@ export function mountDataGrid(root, o = {}) {
     const size = pool.length, used = new Set();
     for (let p = first; p < last; p++) {
       const el = pool[p % size]; used.add(el);
-      if (rowDrag?.hides(p)) { el.style.display = "none"; el._p = -1; continue; } // 被拖的行（树形：连同展开着的下级）由单独那一块画（跟着指针走）
-      if (editing && el.contains(editing.input)) continue; // 正在编辑的那行不重填
+      if (rowDrag?.hides(p)) { el.style.display = "none"; el._p = -1; continue; }
+      if (editing && el.contains(editing.input)) continue;
       if (el._p !== p || el._v !== dver) fill(el, p);
       if (el._mg?.length) for (const k of el._mg) {
         const c = el._cells[k], sg = c._mgSeg; if (!sg) continue;
@@ -978,7 +915,7 @@ export function mountDataGrid(root, o = {}) {
         const lo = Math.max(sg.y0 + sg.h0 / 2, st + sg.h0 / 2), hi = Math.min(sg.y1 - sg.h1 / 2, st + h - sg.h1 / 2);
         if (hi >= lo) cy = Math.max(lo, Math.min(hi, cy));
         const ep = mergeFx.enterP(sg.m, now);
-        if (ep < 1) { cy = (sg.y0 + sg.h0 / 2) + (cy - (sg.y0 + sg.h0 / 2)) * ep; fading = true; }
+        if (ep < 1) { cy = sg.y0 + sg.h0 / 2 + (cy - sg.y0 - sg.h0 / 2) * ep; fading = true; }
         c.style.setProperty("--sn-mg-s", (cy - sg.py - sg.ch / 2).toFixed(2) + "px");
       }
       look(el, p, offs?.[p - first] || 0, now);
@@ -987,14 +924,21 @@ export function mountDataGrid(root, o = {}) {
     let xi = 0; if (mo.busy) for (const p of mo.extras(first, last)) { const el = xpool[xi] ?? (xpool[xi] = makeRow()); el.classList.add("sn-g-xrow"); xi++; if (el._p !== p || el._v !== dver) fill(el, p); look(el, p, 0, now); }
     for (let j = xi; j < xpool.length; j++) if (xpool[j]._p !== -1) { xpool[j].style.display = "none"; xpool[j]._p = -1; }
     src.ensure(first, last);
-    if (src.mode === "append" && last >= n - 4) src.more();
-    foot.style.top = src.rowY(n) + "px"; foot.textContent = src.mode !== "append" ? "" : src.appending ? tt("grid.24") : n >= src.total ? tt("grid.25", { p0: src.total.toLocaleString("zh-CN") }) : "";
-    foot.hidden = src.mode !== "append";
-    if (src.mode === "append") body.style.height = src.rowsH() + RH + "px";
-    rowDrag?.paint(); shade(); paintSelBox(); paintSplitPrev(); if (rowDrag?.anim || mo.busy || fading || mergeFx.busy) schedule(); // 指针动了由 pointermove 排下一帧；这里只管缓动、过渡没走完的
-    root._grid?.onFrame?.(now); /* 逐帧检查用：每画完一帧调一次（测试脚本挂上去，在真正画出来的每一帧里量） */
+    if (app && last >= n - 4) src.more();
+    // 滚到底再加载：有更多数据时展示 3 行同构渐隐骨架行（零文字加载），全部到底时居中克制收尾
+    const yTail = src.rowY(n), showMore = app && src.hasMore && yTail < st + h + OVER * RH;
+    if (showMore) for (let j = 0; j < SK_MORE; j++) {
+      const el = morePool[j] ?? (morePool[j] = Object.assign(makeRow(), {}));
+      if (!el.classList.contains("sn-g-more")) { el.classList.add("sn-sk", "sn-g-more"); el.setAttribute("aria-hidden", "true"); el.style.setProperty("--sn-sk-i", j); }
+      el.style.display = ""; el.style.top = yTail + j * RH + "px"; el.dataset.skv = String((n + j) % 3); el.classList.toggle("sn-loading", src.appending);
+    } else for (const el of morePool) el.style.display = "none";
+    const showEnd = app && !src.hasMore && src.total > 0;
+    foot.style.top = yTail + "px"; foot.hidden = !showEnd;
+    if (showEnd) foot.innerHTML = `<span class="sn-g-foot-in">${esc(tt("grid.25", { p0: src.total.toLocaleString("zh-CN") }))}</span>`;
+    rowDrag?.paint(); shade(); paintSelBox(); paintSplitPrev(); if (rowDrag?.anim || mo.busy || fading || mergeFx.busy) schedule();
+    root._grid?.onFrame?.(now);
   }
-  function shade() { bars.refresh(); shades(root, vp, model, src.rowsH() + (src.mode === "append" ? RH : 0)); }
+  function shade() { bars.refresh(); shades(root, vp, model, src.rowsH() + tailH()); }
   const schedule = () => { if (!raf) raf = requestAnimationFrame(render); };
   const edges = () => { root.classList.toggle("sn-sx", vp.scrollLeft > 0); root.classList.toggle("sn-ex", vp.scrollLeft + vp.clientWidth < vp.scrollWidth - 1); };
   vp.addEventListener("scroll", () => { edges(); schedule(); }, { passive: true });
@@ -1206,7 +1150,7 @@ export function mountDataGrid(root, o = {}) {
     let lt = 0, was = false;
     const begin = () => {
       on = true; vp.classList.add("sn-rowdrag");
-      gapEl = document.createElement("i"); gapEl.className = "sn-g-gap"; gapEl2 = document.createElement("i"); gapEl2.className = "sn-g-gap"; body.append(gapEl, gapEl2); gOrder = gapOrder();
+      gapEl = mk("i", "sn-g-gap"); gapEl2 = mk("i", "sn-g-gap"); body.append(gapEl, gapEl2); gOrder = gapOrder();
       liftEl = makeRow(); fill(liftEl, p0); liftEl.classList.add("sn-g-lift"); // 被拖的行单独一块：复用的行元素滚动时会换内容，被拖的行也可能离开渲染范围
       rowDrag = {
         p0, hides: (p) => p === p0, get out() { return out; }, get anim() { return anim; },
@@ -1270,7 +1214,7 @@ export function mountDataGrid(root, o = {}) {
       D = treeDrag(src, merges, p0); on = true; vp.classList.add("sn-rowdrag");
       for (const [p, v] of seed) if (!D.inMe(p)) off.set(p, v);
       lift = seed.get(p0) ?? 0; y0 = src.rowY(p0) + lift; s0 = vp.scrollTop; lastTop = s0; gapY = y0; to = D.idx;
-      gapEl = document.createElement("i"); gapEl.className = "sn-g-gap"; gapEl2 = document.createElement("i"); gapEl2.className = "sn-g-gap"; body.append(gapEl, gapEl2); gOrder = gapOrder();
+      gapEl = mk("i", "sn-g-gap"); gapEl2 = mk("i", "sn-g-gap"); body.append(gapEl, gapEl2); gOrder = gapOrder();
       boxEl = document.createElement("i"); boxEl.className = "sn-g-liftbox"; body.append(boxEl); liftIn(boxEl); // 整块一层投影（每一行各画一层会在行和行之间叠出暗线）
       rowDrag = {
         tree: true, hides: (p) => D.inMe(p), get out() { return out; }, get anim() { return anim; },
@@ -1414,31 +1358,29 @@ export function mountDataGrid(root, o = {}) {
     mb.sync({ canMerge, mergeTip, showSplit, hintText });
     if (!showSplit && splitPrev) { splitPrev = false; paintSplitPrev(); }
   }
+  const refreshM = () => { dver++; schedule(); syncMergeBar(); };
   mb.merge.addEventListener("click", () => {
     const r = rgRect(); if (!r || mb.merge.disabled) return;
     const inside = merges.active().filter((x) => x.p0 >= r.p0 && x.p1 <= r.p1 && x.c0 >= r.c0 && x.c1 <= r.c1).map((x) => x.m); inside.forEach((m) => merges.remove(m));
     const m = merges.add(r.p0, r.p1, r.keys); if (!m) { inside.forEach((x) => merges.restore(x)); toast({ text: tt("grid.40") }); return; }
     rg = null; vp.focus({ preventScroll: true }); setActive(r.p0, r.keys[0], false); showSel(true, false); dver++; schedule();
-    toast({ kind: "action", text: tt("grid.41", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }), action: { label: tt("grid.42"), run: (t) => { merges.remove(m); inside.forEach((x) => merges.restore(x)); dver++; schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("grid.43"), done: true, duration: 1600 }); } } });
+    toast({ kind: "action", text: tt("grid.41", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }), action: { label: tt("grid.42"), run: (t) => { merges.remove(m); inside.forEach((x) => merges.restore(x)); refreshM(); t.update({ kind: "status", text: tt("grid.43"), done: true, duration: 1600 }); } } });
   });
   mb.split.addEventListener("click", () => {
-    const x = merges.at(active.p, active.c); if (!x) return; splitPrev = false; paintSplitPrev(); merges.remove(x.m); vp.focus({ preventScroll: true }); showSel(activeSelected, kbdNav); dver++; schedule(); syncMergeBar();
-    toast({ kind: "action", text: tt("grid.44"), action: { label: tt("grid.42"), run: (t) => { merges.restore(x.m); dver++; schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("grid.45"), done: true, duration: 1600 }); } } });
+    const x = merges.at(active.p, active.c); if (!x) return; splitPrev = false; paintSplitPrev(); merges.remove(x.m); vp.focus({ preventScroll: true }); showSel(activeSelected, kbdNav); refreshM();
+    toast({ kind: "action", text: tt("grid.44"), action: { label: tt("grid.42"), run: (t) => { merges.restore(x.m); refreshM(); t.update({ kind: "status", text: tt("grid.45"), done: true, duration: 1600 }); } } });
   });
 
-  const sbSeg = $('[data-seg="gsb"]', root), lnSeg = $('[data-seg="glines"]', root); // 设计稿的演示才有这两个开关
+  const sbSeg = $('[data-seg="gsb"]', root), lnSeg = $('[data-seg="glines"]', root);
   if (sbSeg) initSeg(sbSeg, (v) => { bars.mode(v); shade(); schedule(); }, 0);
   root.dataset.lines = o.lines ?? "grid"; merges.enabled = root.dataset.lines === "grid";
-  if (lnSeg) initSeg(lnSeg, (v) => { root.dataset.lines = v; merges.enabled = v === "grid"; if (!merges.enabled) rg = null; dver++; schedule(); syncMergeBar(); }, 1); /* 默认网格：合并单元格只在网格下出现 */
-  // 滚到底：发 scrollEnd（按块加载 / 无限滚动时接下一页）
+  if (lnSeg) initSeg(lnSeg, (v) => { root.dataset.lines = v; merges.enabled = v === "grid"; if (!merges.enabled) rg = null; refreshM(); }, 1);
   let atEnd = false; vp.addEventListener("scroll", () => { const end = vp.scrollTop + vp.clientHeight >= vp.scrollHeight - 2; if (end && !atEnd && src.shown > 0) emit("scrollEnd"); atEnd = end; }, { passive: true });
-  // 一开始的合并（{ rows: [p0, p1], keys }）：数据到了再合并（静默初始化不闪动画）
-  src.ready.then(() => { for (const m of o.merges || []) merges.add(m.rows[0], m.rows[1], m.keys); if (o.merges?.length) { mergeFx.prime(merges.active(), snapMerge); dver++; schedule(); syncMergeBar(); } paintState(); });
+  src.ready.then(() => { for (const m of o.merges || []) merges.add(m.rows[0], m.rows[1], m.keys); if (o.merges?.length) { mergeFx.prime(merges.active(), snapMerge); refreshM(); } paintState(); });
   apply(); paintBar(); headUI.paint(); schedule();
   root._grid = { src, model, active: () => ({ ...active }), range: () => rgRect(), selShown: () => selShown, setActive, startEdit: (k) => startEdit(k), scrollToRow: (p) => { vp.scrollTop = src.rowY(p); }, editing: () => !!editing, selCount, poolSize: () => pool.length, rowDragging: () => !!rowDrag, merges, sel: () => ({ shown: selShown, rg: rgRect() }), toggleExpand, expanded: () => expd.size,
     toggleTree, expandAll, tsel, motion: () => mo.busy, mclock: () => mo.clock, selState,
-    // 公开：合并一块（第 p0～p1 行 × keys 这几列）、当前排序 / 筛选、勾选的 rowKey、滚到某一行、重新加载
-    merge: (p0, p1, keys, opts) => { merges.add(p0, p1, keys); if (opts?.silent) mergeFx.prime(merges.active(), snapMerge); dver++; schedule(); syncMergeBar(); }, get sort() { return src.query.sort || null; }, get filter() { return { q: src.query.q || "", filters: src.query.filters || {} }; },
+    merge: (p0, p1, keys, opts) => { merges.add(p0, p1, keys); if (opts?.silent) mergeFx.prime(merges.active(), snapMerge); refreshM(); }, get sort() { return src.query.sort || null; }, get filter() { return { q: src.query.q || "", filters: src.query.filters || {} }; },
     get selectedKeys() { return selKeys(); }, reload: () => src.retry(), ready: src.ready };
   // 销毁：停掉下一帧的重画、拿掉放进 <head> 的两段样式（列宽、列位移动画）、关掉开着的弹层和编辑报错、放开实例（同一个容器可以再挂一次）。
   // 挂载时加的监听、观察器、后台线程（筛选排序那个 Worker）由 createDataGrid 一起撤
@@ -1459,13 +1401,11 @@ export function mountDataGrid(root, o = {}) {
 // 工具条（搜索、平铺 / 树形、全部展开、加载方式、滚动条、行线 / 网格、筛选条件、行数信息）：DOM 版和 Canvas 版共用，seg 是分段控件名字的前缀
 // 搜索框搜的是主列：占位文字、读屏名称写主列的标题（"搜索名称"）
 export const primaryTitle = (columns = []) => (columns.find((c) => c.primary) || columns.find((c) => c.type !== "sel" && c.type !== "act"))?.title ?? "";
+const segHTML = (n, a, b, c, d) => `<div class="sn-seg sn-sm" data-seg="${n}"><span class="sn-thumb"></span><button data-v="${a}">${tt(b)}</button><button data-v="${c}">${tt(d)}</button></div>`;
 export const gridBarHTML = ({ seg = "g", title = "", placeholder = tt("grid.56", { p0: title }), controls = false } = {}) =>
   `<div class="sn-g-bar"><span class="sn-ib sn-has-pre" style="width:220px"><span class="sn-pre" data-i="search"></span><input class="sn-input sn-sm" data-g-q placeholder="${esc(placeholder)}" aria-label="${esc(tt("grid.57", { p0: title }))}"></span>`
-  + (controls ? `<div class="sn-seg sn-sm" data-seg="${seg}tree"><span class="sn-thumb"></span><button data-v="flat">${tt("grid.58")}</button><button data-v="tree">${tt("grid.59")}</button></div>`
-  + `<button class="sn-btn sn-ghost sn-sm" data-g-expand hidden data-i="chevrons-up-down:before">${tt("grid.14")}</button>`
-  + `<div class="sn-seg sn-sm" data-seg="${seg}mode"><span class="sn-thumb"></span><button data-v="known">${tt("grid.60")}</button><button data-v="append">${tt("grid.61")}</button></div>`
-  + `<div class="sn-seg sn-sm" data-seg="${seg}sb"><span class="sn-thumb"></span><button data-v="gutter">${tt("grid.62")}</button><button data-v="auto">${tt("grid.63")}</button></div>`
-  + `<div class="sn-seg sn-sm" data-seg="${seg}lines"><span class="sn-thumb"></span><button data-v="row">${tt("grid.64")}</button><button data-v="grid">${tt("grid.65")}</button></div>` : "")
+  + (controls ? segHTML(seg + "tree", "flat", "grid.58", "tree", "grid.59") + `<button class="sn-btn sn-ghost sn-sm" data-g-expand hidden data-i="chevrons-up-down:before">${tt("grid.14")}</button>`
+  + segHTML(seg + "mode", "known", "grid.60", "append", "grid.61") + segHTML(seg + "sb", "gutter", "grid.62", "auto", "grid.63") + segHTML(seg + "lines", "row", "grid.64", "grid", "grid.65") : "")
   + `<span class="sn-g-filters" data-g-filters></span><span class="sn-g-info" data-g-info></span></div>`;
 const SHADES = `<i class="sn-g-shade sn-l" aria-hidden="true"></i><i class="sn-g-shade sn-r" aria-hidden="true"></i>`;
 // DOM 版数据表格的标记（和设计稿里那块一样）：createDataGrid 遇到空容器自己用它填

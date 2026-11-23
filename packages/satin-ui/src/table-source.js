@@ -120,6 +120,7 @@ export function createSource({ backend, n: n0 = 0, primary = "name", block = 100
   const api = {
     get total() { return tree ? m : total; }, get shown() { return tree ? (mode === "append" ? tshown : vn) : mode === "append" ? shown : total; }, get busy() { return busy; }, get ms() { return lastMs; },
     get mode() { return mode; }, get query() { return query; }, get appending() { return appending; },
+    get hasMore() { return mode === "append" && api.shown < (tree ? vn : total); },
     rowAt: (p) => (tree ? (p >= 0 && p < vn && got[vrows[p]] ? vrows[p] : -1) : p >= 0 && p < total ? rows[p] : -1),
     // 第 r 行（行号）的数据对象、某一列的值；name 是主列的值（树形的名字、详情标题用）
     row: (r) => (tree ? tById.get(r) : byId.get(r)), val: (r, k) => (tree ? tById.get(r) : byId.get(r))?.[k], name: (r) => (tree ? tById.get(r) : byId.get(r))?.[primary],

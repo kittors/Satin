@@ -35,6 +35,7 @@ export function mountCanvasGrid(root, o = {}) {
   const model = columnModel(cols0), NAME = model.primary, isT = (k, t) => model.byKey[k]?.type === t, styleEl = document.createElement("style"), motionEl = document.createElement("style"); document.head.append(styleEl, motionEl); /* motionEl：表头的列位移、透明度，每帧和表身一起画 */
   let W = 0, Hc = 0, dpr = 1, raf = 0, more = false, lastDraw = performance.now(), dt = 16;
   let active = { p: 0, c: NAME, id: 0 }, hoverP = -1, selAll = false, selSet = new Set(), anchorP = -1, editing = null, drag = null, fnow = 0; /* fnow：这一帧的时间（画格子时取列的位移、透明度用同一个时间） */
+  let lastAppendN = 0;
   const flashes = [], fades = new Map(), wasSk = new Set(); let drawn = [];
   // 拖行松手后还在等落位时又去点别的：先把这一次落好（不然新的拖动会把它冲掉，这一次的换位就丢了）
   const flushDrop = () => { if (drag?.done) { const d = drag; drag = null; commitDrag(d); schedule(); } };
@@ -48,7 +49,9 @@ export function mountCanvasGrid(root, o = {}) {
   }
   const paintState = mountGridState(root, vp, src, o, emit); // 空、加载、出错（和 DOM 版同一层，盖在画布上面）
   // 滚动条：和 DOM 版同一套（常驻占位 / 自动悬浮），一百万行时滑块最短 24px，拖滑块一下能跨几十万行
-  const bars = gridBars(frame, vp, { head: HEAD, rowH: RH, rowsH: () => src.rowsH() + (src.mode === "append" ? RH : 0), colsW: () => model.width(), pinL: () => model.leftW(), pinR: () => model.rightW(), stops: () => colStops(model), reduced });
+  const SK_MORE = 3;
+  const tailH = () => (src.mode !== "append" ? 0 : src.hasMore ? SK_MORE * RH : src.total > 0 ? RH : 0);
+  const bars = gridBars(frame, vp, { head: HEAD, rowH: RH, rowsH: () => src.rowsH() + tailH(), colsW: () => model.width(), pinL: () => model.leftW(), pinR: () => model.rightW(), stops: () => colStops(model), reduced });
   const DETAIL = 96, EXPD = { flat: new Map(), tree: new Map() }, expAnim = new Map(), expTo = new Map(); // expAnim / expTo：正在展开收起的行这一次的记号、要去的状态
   let expd = EXPD.flat; // 展开了详情的行；平铺、树形各记各的
   const merges = createMerges(src, model, (p) => { const r = src.rowAt(p); return r >= 0 && expd.has(r); });
@@ -213,10 +216,49 @@ export function mountCanvasGrid(root, o = {}) {
       default: { const t = textOf(c, src.val(r, k), src.row(r)); return c.align === "right" ? text(t, x + w - 12, m, F.t, C.label, "right") : text(trunc(t, w - 24, F.t), x + 12, m, F.t, C.label); }
     }
   }
-  function skel(o, y, h = RH, p = -1) {
-    const c = o.c; if (c.type === "sel" || c.type === "act") return; let bw = (c.w - 24) * (c.key === NAME ? .7 : c.align === "right" ? .4 : .52), bx = c.align === "right" ? o.x + c.w - 12 - bw : o.x + 12;
-    if (src.tree && c.key === NAME && p >= 0) { bx = treeHead(o.x, y, h, y + h / 2, p); bw = Math.max(0, Math.min(bw - (bx - o.x - 12), o.x + c.w - 12 - bx)); } // 树形：值还没到也画缩进、引导线、箭头（结构是知道的），占位条从名字的位置开始
-    g.fillStyle = C.fillS; g.beginPath(); g.roundRect(bx, y + h / 2 - 4, bw, 8, 4); g.fill();
+  const SK_NAME = [.64, .48, .72], SK_TXT = [.54, .42, .62], SK_NUM = [.38, .48, .32], SK_ST = [40, 48, 36], SK_OW = [36, 46, 40], SK_TAG = [46, 56, 40];
+  function skel(o, y, h = RH, p = -1, seed = 0) {
+    const c = o.c; if (c.type === "sel" || c.type === "act") return;
+    const v = (((p >= 0 ? p : seed) % 3) + 3) % 3, m = y + h / 2, x = o.x, w = c.w;
+    g.fillStyle = C.fillS;
+    if (c.key === NAME && c.type !== "sel" && c.type !== "act") {
+      let bx = x + 12;
+      if (src.tree && p >= 0) bx = treeHead(x, y, h, m, p);
+      else if (opt.detail && !src.tree) bx = x + 30;
+      const bw = Math.max(24, (x + w - 12 - bx) * SK_NAME[v]);
+      g.beginPath(); g.roundRect(bx, m - 4, bw, 8, 4); g.fill();
+      return;
+    }
+    switch (c.type) {
+      case "status": {
+        g.beginPath(); g.arc(x + 15, m, 3, 0, Math.PI * 2); g.fill();
+        const bw = Math.min(SK_ST[v], Math.max(16, w - 36));
+        g.beginPath(); g.roundRect(x + 24, m - 4, bw, 8, 4); g.fill();
+        return;
+      }
+      case "owner": {
+        g.beginPath(); g.arc(x + 22, m, 10, 0, Math.PI * 2); g.fill();
+        const bw = Math.min(SK_OW[v], Math.max(16, w - 50));
+        g.beginPath(); g.roundRect(x + 38, m - 4, bw, 8, 4); g.fill();
+        return;
+      }
+      case "tag": {
+        const bw = Math.min(SK_TAG[v], Math.max(24, w - 24));
+        g.beginPath(); g.roundRect(x + 12, m - 10, bw, 20, 10); g.fill();
+        return;
+      }
+      case "prog": {
+        const bw = Math.max(24, w - 24 - 42);
+        g.beginPath(); g.roundRect(x + 12, m - 2, bw, 4, 2); g.fill();
+        g.beginPath(); g.roundRect(x + w - 12 - 28, m - 4, 28, 8, 4); g.fill();
+        return;
+      }
+      default: {
+        const bw = Math.max(20, (w - 24) * (c.align === "right" ? SK_NUM[v] : SK_TXT[v]));
+        const bx = c.align === "right" ? x + w - 12 - bw : x + 12;
+        g.beginPath(); g.roundRect(bx, m - 4, bw, 8, 4); g.fill();
+      }
+    }
   }
   // 树形的名称格前半截：每深一级缩进 24px，左边一条条竖的引导线（压在每一级箭头的中线上），展开着的从箭头下面往下引一条；
   // 有下级的是展开箭头（和 .disc 一样：按"该是什么状态"转 90°，200ms；指着时出底、变深），没有的是小圆点。返回名字从哪开始
@@ -273,6 +315,10 @@ export function mountCanvasGrid(root, o = {}) {
       if (!drag.done) drag.lift = drag.follow() - src.rowY(drag.p0);
       else { const lt = back ? 0 : drag.slot(drag.to) - src.rowY(drag.p0); drag.lift += (lt - drag.lift) * k; if (Math.abs(lt - drag.lift) < .3) drag.lift = lt; else { more = true; drag.anim = true; } }
     }
+    if (src.mode === "append") {
+      if (n > lastAppendN && lastAppendN > 0 && !reduced()) { for (let q = lastAppendN; q < Math.min(n, lastAppendN + 6); q++) fades.set(tr ? src.idAt(q) : q, now); }
+      lastAppendN = n;
+    } else lastAppendN = 0;
     const offs = []; for (let p = first; p < last; p++) { const r = src.rowAt(p), fk = tr ? src.idAt(p) : p; if (r < 0) wasSk.add(fk); else if (wasSk.delete(fk) && !reduced()) fades.set(fk, now); offs.push(rowOffset(p, ddt)); } // 占位变成数据：淡入；拖行时让位每帧按空位算一次
     if (drag) {
       for (const [hy, hh] of gapPieces(drag.gapY, drag.h0, drag.rangeAt(drag.gapY))) { if (hh <= .5) continue; g.fillStyle = C.gapBg; g.fillRect(0, hy - st, W, hh); } // 贴边的一条空行，不圆角不描边
@@ -382,9 +428,41 @@ export function mountCanvasGrid(root, o = {}) {
       }
       g.restore(); font = "";
     }
-    // 表体固定列分隔线：画在普通行与合并格之上、通栏详情面板之下——与表头 40px .sn-g-shade 无缝对接，且绝不劈穿展开的详情面板
+    // 滚到底再加载：有更多数据时在末尾渲染 3 行列对齐同构渐隐骨架（彻底去文字加载）；全部加载到底时居中克制收尾
+    if (src.mode === "append") {
+      const y0 = src.rowY(n) - st;
+      if (y0 < Hc) {
+        if (src.hasMore) {
+          const STEP_A = [.92, .58, .28], breath = src.appending && !reduced();
+          if (breath) more = true;
+          for (const [zone, x0, x1] of zones) {
+            if (x1 <= x0) continue;
+            g.save(); g.beginPath(); g.rect(x0, 0, x1 - x0, Hc); g.clip();
+            for (let j = 0; j < SK_MORE; j++) {
+              const y = y0 + j * RH;
+              if (y >= Hc || y + RH <= 0) continue;
+              const sa = STEP_A[j], pa = breath ? .82 + .18 * Math.sin(now / 260 - j * .7) : 1;
+              g.globalAlpha = 1; g.fillStyle = C.bg; g.fillRect(x0, y, x1 - x0, RH);
+              g.globalAlpha = sa * pa;
+              for (const o of L.cols) { if (o.zone !== zone || o.x + o.c.w <= x0 || o.x >= x1) continue; skel(o, y, RH, -1, n + j); }
+              g.globalAlpha = sa * .9; g.fillStyle = C.line; g.fillRect(x0, y + RH - 1, x1 - x0, 1);
+              if (root.dataset.lines === "grid") for (const o of L.cols) { if (o.zone !== zone || o.c.type === "act") continue; const rx = o.x + o.c.w - 1; if (rx >= x0 && rx < x1) g.fillRect(rx, y, 1, Math.max(0, RH - 1)); }
+            }
+            g.restore(); font = "";
+          }
+          g.globalAlpha = 1;
+        } else if (src.total > 0) {
+          const label = tt("canvas-grid.1", { p0: src.total.toLocaleString("zh-CN") }), tw0 = width(label, F.s), cy = y0 + RH / 2, cx = W / 2;
+          g.fillStyle = C.line;
+          g.fillRect(Math.round(cx - tw0 / 2 - 34), Math.round(cy), 24, 1);
+          g.fillRect(Math.round(cx + tw0 / 2 + 10), Math.round(cy), 24, 1);
+          text(label, cx, cy, F.s, C.label3, "center");
+        }
+      }
+    }
+    // 表体固定列分隔线：画在普通行、合并格与末尾骨架之上、通栏详情面板之下——与表头 40px .sn-g-shade 无缝对接，且绝不劈穿展开的详情面板或到底收尾行
     {
-      const sh = Math.min(Hc, rowsH() - st);
+      const sh = Math.min(Hc, src.rowsH() + (src.mode === "append" && src.hasMore ? SK_MORE * RH : 0) - st);
       if (sh > 0) {
         g.fillStyle = C.line;
         if (vp.scrollLeft > 0 && L.lw > 0) g.fillRect(L.lw - 1, 0, 1, sh);
@@ -447,15 +525,13 @@ export function mountCanvasGrid(root, o = {}) {
     }
     // 松手：等被拖的行落进空位、让开的行回位、投影淡掉（至少 160ms），再真正换顺序——画面不跳
     if (drag?.done) { const t = now - drag.done; if (reduced() || (!drag.anim && t >= 160) || t > 800) { const d = drag; drag = null; commitDrag(d); } else more = true; }
-    // 滚到底再加载：末尾一行提示
-    if (src.mode === "append") { const y = src.rowY(n) - st; if (y < Hc) text(src.appending ? tt("canvas-grid.0") : n >= src.total ? tt("canvas-grid.1", { p0: src.total.toLocaleString("zh-CN") }) : "", 16, y + RH / 2, F.s, C.label3); }
     if (more) schedule();
     root._grid?.onFrame?.(now); /* 逐帧检查用：每画完一帧调一次 */
   }
   const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
 
   // ———— 尺寸、列、表头、工具条 ————
-  const rowsH = () => src.rowsH() + (src.mode === "append" ? RH : 0);
+  const rowsH = () => src.rowsH() + tailH();
   function sizeBody() { sizer.style.height = Math.max(0, rowsH() - Hc) + "px"; shade(); }
   function shade() { bars.refresh(); shades(root, vp, model, rowsH()); }
   function resize() { dpr = Math.min(2, devicePixelRatio || 1); W = vp.clientWidth; Hc = Math.max(0, vp.clientHeight - HEAD); cv.style.width = W + "px"; cv.style.height = Hc + "px"; cv.width = Math.round(W * dpr); cv.height = Math.round(Hc * dpr); font = ""; sizeBody(); schedule(); }

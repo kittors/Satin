@@ -1,6 +1,5 @@
 // en · canvas-grid
 export default {
-  "canvas-grid.0": "Loading more…",
   "canvas-grid.1": "That's everything — {p0} rows",
   "canvas-grid.3": "Level {p0}{p1}, ",
   "canvas-grid.4": "Row {p0}, {p1}{p2}: {p3}",
