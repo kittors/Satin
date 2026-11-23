@@ -9,7 +9,7 @@ import { normCols, optionOf, optionValue, textOf, parseEdit, editText, ownerSeed
 import { presetAvatar, avatarSvg } from "./avatar-presets.js";
 import { createSource } from "./table-source.js";
 import { backendOf } from "./table-backends.js";
-import { closeGridPops, esc, heightCSS, setGridHeight, mountGridState, primaryTitle, gridBarHTML, gridShadesHTML, colStops, columnModel, createMerges, createRowMotion, createTreeSel, dragClamp, gapPieces, gapStep, mountHead, mountMergeBar, mountToolbar, openEnum, shades, slotShift, treeCols, treeDrag } from "./grid.js";
+import { closeGridPops, esc, heightCSS, setGridHeight, mountGridState, primaryTitle, gridBarHTML, gridShadesHTML, colStops, columnModel, createMerges, mergeSegs, treeGuides, createRowMotion, createTreeSel, dragClamp, gapPieces, gapStep, mountHead, mountMergeBar, mountToolbar, openEnum, shades, slotShift, treeCols, treeDrag } from "./grid.js";
 import { gridBars } from "./grid-bars.js";
 import { elastic } from "./scroll.js";
 import { ICONS } from "./icons.js";
@@ -27,6 +27,7 @@ export function mountCanvasGrid(root, o = {}) {
   const opt = o, canDrag = !!(o.rowDraggable || o.dataSource?.move); // 选项（下面好几个函数的参数也叫 o：那是列的位置）；能不能拖行（不能就不画把手）
   const emit = (type, detail) => (o.emit ? o.emit(type, detail) : o["on" + type[0].toUpperCase() + type.slice(1)]?.(detail));
   if (o.height != null) setGridHeight(root, o.height);
+  root.classList.add("sn-cg");
   const vp = $(".sn-g-vp", root), head = $(".sn-g-head", root), cv = $(".sn-cg-cv", root), sizer = $(".sn-cg-sizer", root), frame = $(".sn-g-frame", root), sr = $(".sn-cg-sr", root);
   const g = cv.getContext("2d"), RH = 32, HEAD = 40;
   const cols0 = normCols(o.columns || []), selMode = o.selection ?? (cols0.some((c) => c.type === "sel") ? "multiple" : "none");
@@ -48,8 +49,9 @@ export function mountCanvasGrid(root, o = {}) {
   const paintState = mountGridState(root, vp, src, o, emit); // 空、加载、出错（和 DOM 版同一层，盖在画布上面）
   // 滚动条：和 DOM 版同一套（常驻占位 / 自动悬浮），一百万行时滑块最短 24px，拖滑块一下能跨几十万行
   const bars = gridBars(frame, vp, { head: HEAD, rowH: RH, rowsH: () => src.rowsH() + (src.mode === "append" ? RH : 0), colsW: () => model.width(), pinL: () => model.leftW(), pinR: () => model.rightW(), stops: () => colStops(model), reduced });
-  const merges = createMerges(src, model), DETAIL = 96, EXPD = { flat: new Map(), tree: new Map() }, expAnim = new Map(), expTo = new Map(); // expAnim / expTo：正在展开收起的行这一次的记号、要去的状态
+  const DETAIL = 96, EXPD = { flat: new Map(), tree: new Map() }, expAnim = new Map(), expTo = new Map(); // expAnim / expTo：正在展开收起的行这一次的记号、要去的状态
   let expd = EXPD.flat; // 展开了详情的行；平铺、树形各记各的
+  const merges = createMerges(src, model, (p) => { const r = src.rowAt(p); return r >= 0 && expd.has(r); });
   const expOpen = (r) => expTo.get(r) ?? expd.has(r); // 展开的行：行号 → 收起时（格子部分）的高度
   let selShown = false, rg = null; // 选中框是否显示；框选 { ap, ac, fp, fc }
 
@@ -209,10 +211,16 @@ export function mountCanvasGrid(root, o = {}) {
   // 有下级的是展开箭头（和 .disc 一样：按"该是什么状态"转 90°，200ms；指着时出底、变深），没有的是小圆点。返回名字从哪开始
   function treeHead(x, y, h, m, p) {
     const id = src.idAt(p), lv = src.lvAt(p), ix = x + lv * 24, a0 = g.globalAlpha; g.fillStyle = C.tree;
-    for (let j = 0; j < lv; j++) g.fillRect(x + 15.5 + j * 24, y, 1, h);
+    if (lv > 0) {
+      const gd = treeGuides(src, p);
+      for (let j = 0; j < lv; j++) {
+        if (j === lv - 1) g.fillRect(x + 15.5 + j * 24, y, 1, gd.last ? h / 2 : h);
+        else if (gd.anc[j]) g.fillRect(x + 15.5 + j * 24, y, 1, h);
+      }
+    }
     if (src.hasKids(id)) {
       const op = src.isOpen(id), ev = tv("tx" + id, op ? 1 : 0), ez = tv("ztx:" + id, hz === "tx:" + id ? 1 : 0);
-      if (op) g.fillRect(ix + 15.5, m + 12, 1, Math.max(0, y + h - m - 12));
+      if (ev > .01) { g.globalAlpha = a0 * ev; g.fillRect(ix + 15.5, m + 12, 1, Math.max(0, y + h - m - 12) * ev); g.globalAlpha = a0; }
       if (ez > 0) { g.globalAlpha = a0 * ez; g.fillStyle = C.fillHover; g.beginPath(); g.roundRect(ix + 6, m - 10, 20, 20, rSM); g.fill(); g.globalAlpha = a0; }
       icon2("chevron-right", ix + 9, m - 7, 14, C.label3, C.label, ez, ev * Math.PI / 2);
     } else { g.fillStyle = C.lineC; g.beginPath(); g.arc(ix + 16, m, 2.5, 0, Math.PI * 2); g.fill(); }
@@ -232,8 +240,9 @@ export function mountCanvasGrid(root, o = {}) {
     const fk = src.tree ? src.idAt(p) : p, fade = fades.get(fk), a = fade != null ? Math.min(1, (performance.now() - fade) / 120) : 1;
     if (a < 1) { g.globalAlpha = ra * (.4 + .6 * a); more = true; } else if (fade != null) fades.delete(fk);
     for (const o of L.cols) { if (o.zone !== zone || o.x + o.c.w <= x0 || o.x >= x1) continue; const da = headUI.dimNow(o.c.key, fnow); if (da < 1) g.globalAlpha *= da; if (r < 0) skel(o, y, h, p); else cell(o, y, r, p, hov, h); if (da < 1) g.globalAlpha /= da; }
-    g.globalAlpha = ra; g.fillStyle = C.line; g.fillRect(x0, y + H - 1, x1 - x0, 1);
-    if (root.dataset.lines === "grid") for (const o of L.cols) { if (o.zone !== zone || o.c.type === "act") continue; const rx = o.x + o.c.w - 1; if (rx >= x0 && rx < x1) g.fillRect(rx, y, 1, H); } /* 网格：每一格右边一条线 */
+    // 主行底线精准画在 y + h - 1（展开详情时清晰分隔主行与详情面板），网格竖线只画主行高 h（绝不戳进详情区）
+    g.globalAlpha = ra; g.fillStyle = C.line; g.fillRect(x0, y + h - 1, x1 - x0, 1);
+    if (root.dataset.lines === "grid") for (const o of L.cols) { if (o.zone !== zone || o.c.type === "act") continue; const rx = o.x + o.c.w - 1; if (rx >= x0 && rx < x1) g.fillRect(rx, y, 1, h); } /* 网格：每一格右边一条线 */
     g.globalAlpha = 1;
   }
   function draw() {
@@ -274,25 +283,91 @@ export function mountCanvasGrid(root, o = {}) {
       g.save(); g.globalAlpha = fade * (.4 + .6 * sh); g.strokeStyle = C.lineC; g.lineWidth = 1; g.strokeRect(.5, y + .5, W - 1, h - 1); g.restore();
       for (const p of ps) drawn.push([src.rowAt(p), src.rowY(p) - st + drag.lift, src.rowH(p), 1, src.idAt(p)]);
     }
-    // 行详情：展开的行下面那一截，贴着视口左边（横滚时不跑）
-    for (let p = first; p < last; p++) { const r = src.rowAt(p); if (r >= 0 && expd.has(r) && !(drag && drag.hides(p))) { const a = ta(p); if (a <= .002) continue; g.globalAlpha = a; drawDetail(r, src.rowY(p) - st + offs[p - first] + ty(p) + Math.min(src.rowH(p), expd.get(r)), src.rowH(p) - Math.min(src.rowH(p), expd.get(r))); g.globalAlpha = 1; } }
-    // 合并单元格：整块一个底、内容在整块正中，块里不画行线
+    // 合并单元格：若块内有行展开了通栏详情，按连续子段分段绘制——每段都有完整底线、左右线与可视居中内容（防表头腰斩），下段随展开进度平滑淡入淡出，彻底消除空白死洞与断线毛刺
+    const cellH = (p) => { const rr = src.rowAt(p), hh = src.rowH(p); return rr >= 0 && expd.has(rr) ? Math.min(hh, expd.get(rr)) : hh; };
     const live = merges.active();
     if (live.length) for (const [zone, x0, x1] of zones) {
       if (x1 <= x0) continue; g.save(); g.beginPath(); g.rect(x0, 0, x1 - x0, Hc); g.clip();
-      for (const x of live) { if (merges.zoneOf(x.key0) !== zone || x.p1 < first || x.p0 >= last) continue; const o = L.cols.find((c) => c.c.key === x.key0); if (!o) continue; const w = x.keys.reduce((t, k) => t + model.byKey[k].w, 0), y = src.rowY(x.p0) - st + (offs[Math.max(0, x.p0 - first)] ?? 0) + ty(x.p0), hh = src.rowY(x.p1 + 1) - src.rowY(x.p0), r0 = src.rowAt(x.p0); g.globalAlpha = ta(x.p0); g.fillStyle = C.bg; g.fillRect(o.x, y, w, hh - 1); g.fillStyle = C.line; g.fillRect(o.x, y + hh - 1, w, 1); if (root.dataset.lines !== "grid") g.fillRect(o.x, y, 1, hh); g.fillRect(o.x + w - 1, y, 1, hh); if (r0 >= 0) cell({ ...o, c: { ...o.c, w } }, y, r0, x.p0, false, hh); g.globalAlpha = 1; }
+      for (const x of live) {
+        if (merges.zoneOf(x.key0) !== zone || x.p1 < first || x.p0 >= last) continue;
+        const o = L.cols.find((c) => c.c.key === x.key0); if (!o) continue;
+        const w = x.keys.reduce((t, k) => t + model.byKey[k].w, 0), r0 = src.rowAt(x.p0), segs = mergeSegs(src, x, cellH);
+        let sumAll = 0; if (segs.length > 1) for (let q = x.p0; q <= x.p1; q++) sumAll += cellH(q);
+        for (let si = 0; si < segs.length; si++) {
+          const s = segs[si];
+          if (s.p1 < first || s.p0 >= last) continue;
+          const sy0 = src.rowY(s.p0), sy = sy0 - st + (offs[Math.max(0, s.p0 - first)] ?? 0) + ty(s.p0), segH = src.rowY(s.p1) + cellH(s.p1) - sy0;
+          if (sy + segH <= 0 || sy >= Hc) continue;
+          const ra = ta(s.p0);
+          g.globalAlpha = ra; g.fillStyle = C.bg; g.fillRect(o.x, sy, w, Math.max(0, segH - 1));
+          g.fillStyle = C.line; g.fillRect(o.x, sy + segH - 1, w, 1);
+          if (root.dataset.lines !== "grid") g.fillRect(o.x, sy, 1, segH);
+          g.fillRect(o.x + w - 1, sy, 1, segH);
+          if (r0 >= 0) {
+            // 段内内容垂直居中：首段在展开过渡时从整块中心平滑滑入段中心，长段滚出表头/视口底时优雅夹在可见区间内绝不被表头腰斩；后续段随详情拉开平滑淡入
+            const h0 = cellH(s.p0), h1 = cellH(s.p1);
+            let midH = segH;
+            if (segs.length > 1 && si === 0 && s.dhAfter > 0) midH = sumAll + (segH - sumAll) * Math.min(1, s.dhAfter / Math.min(DETAIL, 48));
+            let cy = sy + midH / 2;
+            const lo = Math.max(sy + h0 / 2, h0 / 2), hi = Math.min(sy + segH - h1 / 2, Hc - h1 / 2);
+            if (hi >= lo) cy = Math.max(lo, Math.min(hi, cy));
+            const ca = s.dhBefore > 0 ? Math.min(1, s.dhBefore / Math.min(DETAIL, 48)) : 1;
+            if (ca > .005) {
+              g.save(); g.beginPath(); g.rect(o.x, sy, w, Math.max(0, segH - 1)); g.clip();
+              g.globalAlpha = ra * ca;
+              cell({ ...o, c: { ...o.c, w } }, cy - h0 / 2, r0, x.p0, false, h0);
+              g.restore(); font = "";
+            }
+          }
+          g.globalAlpha = 1;
+        }
+      }
       g.restore(); font = "";
     }
-    // 框选：淡底 + 外圈 2px 线（按区域裁）
+    // 表体固定列分隔线：画在普通行与合并格之上、通栏详情面板之下——与表头 40px .sn-g-shade 无缝对接，且绝不劈穿展开的详情面板
+    {
+      const sh = Math.min(Hc, rowsH() - st);
+      if (sh > 0) {
+        g.fillStyle = C.line;
+        if (vp.scrollLeft > 0 && L.lw > 0) g.fillRect(L.lw - 1, 0, 1, sh);
+        if (vp.scrollLeft + W < model.width() - 1 && L.rw > 0) g.fillRect(L.rx0 - 1, 0, 1, sh);
+      }
+    }
+    // 框选：淡底 + 外圈 2px 直角贴格线框（画在通栏详情下面，跨详情时被详情面板自然盖住，绝不分裂成两个框）
     const R2 = rgRect();
-    if (R2) { const y = src.rowY(R2.p0) - st, hh = src.rowY(R2.p1 + 1) - src.rowY(R2.p0); for (const [zone, x0, x1] of zones) { if (x1 <= x0) continue; const cs = L.cols.filter((o) => o.zone === zone && R2.keys.includes(o.c.key)); if (!cs.length) continue; const a = Math.min(...cs.map((o) => o.x)), b = Math.max(...cs.map((o) => o.x + o.c.w)); g.save(); g.beginPath(); g.rect(x0, 0, x1 - x0, Hc); g.clip(); g.fillStyle = C.rgFill; g.fillRect(a, y, b - a, hh - 1); g.strokeStyle = C.rgLine; g.lineWidth = 2; g.strokeRect(a + 1, y + 1, b - a - 2, hh - 3); g.restore(); } }
+    if (R2) {
+      const y = src.rowY(R2.p0) - st, hh = src.rowY(R2.p1) + cellH(R2.p1) - src.rowY(R2.p0);
+      for (const [zone, x0, x1] of zones) {
+        if (x1 <= x0) continue; const cs = L.cols.filter((o) => o.zone === zone && R2.keys.includes(o.c.key)); if (!cs.length) continue;
+        const a = Math.min(...cs.map((o) => o.x)), b = Math.max(...cs.map((o) => o.x + o.c.w));
+        const bx = a > 0 ? a - 1 : 0, by = y > 0 ? y - 1 : 0, bw = b - bx, bh = y + hh - by;
+        g.save(); g.beginPath(); g.rect(x0, 0, x1 - x0, Hc); g.clip();
+        g.fillStyle = C.rgFill; g.fillRect(bx + 1, by + 1, bw - 2, bh - 2);
+        g.strokeStyle = C.rgLine; g.lineWidth = 2; g.strokeRect(bx + 1, by + 1, bw - 2, bh - 2);
+        g.restore();
+      }
+    }
+    // 行详情：展开的行下面那一截，贴着视口左边（横滚时不跑）；画在合并单元格、固定列线与框选上面，保证整条详情完整通栏不被劈穿
+    for (let p = first; p < last; p++) { const r = src.rowAt(p); if (r >= 0 && expd.has(r) && !(drag && drag.hides(p))) { const a = ta(p); if (a <= .002) continue; g.globalAlpha = a; drawDetail(r, src.rowY(p) - st + offs[p - first] + ty(p) + Math.min(src.rowH(p), expd.get(r)), src.rowH(p) - Math.min(src.rowH(p), expd.get(r))); g.globalAlpha = 1; } }
     // 固定列边上的阴影：不在画布上画，外框上有两条贯通表头和表体的阴影条（.g-shade），和 DOM 版一样
     // 编辑后闪一下（700ms 淡掉）
     for (let k = flashes.length - 1; k >= 0; k--) { const f = flashes[k], t = (now - f.t0) / 700; if (t >= 1) { flashes.splice(k, 1); continue; } more = true; const o = L.cols.find((o) => o.c.key === f.key), p = f.p; if (!o) continue; g.globalAlpha = 1 - t; g.fillStyle = C.flash; g.fillRect(o.x, src.rowY(p) - st + ty(p), o.c.w, src.rowH(p) - 1); g.globalAlpha = 1; }
     // 当前格子：焦点框
     const ao = L.cols.find((o) => o.c.key === active.c);
-    // 选中框：只在单击了格子或用键盘走格子之后、表格有焦点时画；贴着格子的一圈 2px 细实线 + 很淡的底（不像输入框），合并块按整块
-    if (ao && selShown && !editing && !drag && document.activeElement === vp) { const am = merges.at(active.p, active.c), rp1 = am ? am.p1 : active.p, w = am ? am.keys.reduce((t, k) => t + model.byKey[k].w, 0) : ao.c.w; if (rp1 >= first && active.p < last) { g.save(); g.beginPath(); const [cx0, cx1] = ao.zone === "M" ? [L.lw, W - L.rw] : [0, W]; g.rect(cx0, 0, cx1 - cx0, Hc); g.clip(); const ry = src.rowY(active.p) - st + ty(active.p), ah = (am ? src.rowY(am.p1 + 1) : src.rowY(active.p) + Math.min(src.rowH(active.p), expd.get(src.rowAt(active.p)) ?? 1e9)) - src.rowY(active.p); g.fillStyle = C.selFill; g.fillRect(ao.x + 1, ry + 1, w - 2, ah - 3); g.strokeStyle = C.selLine; g.lineWidth = 2; g.beginPath(); g.roundRect(ao.x + 2, ry + 2, w - 4, ah - 5, 3); g.stroke(); g.restore(); } }
+    // 选中框：只在单击了格子或用键盘走格子之后、表格有焦点时画；与 DOM 版完全一致——贴着格线的直角 2px 细实线 + 极淡底色（与编辑框的圆角白底外晕一眼区分）
+    if (ao && selShown && !editing && !drag && document.activeElement === vp && !R2) {
+      const am = merges.at(active.p, active.c), rp0 = am ? am.p0 : active.p, rp1 = am ? am.p1 : active.p, w = am ? am.keys.reduce((t, k) => t + model.byKey[k].w, 0) : ao.c.w;
+      if (rp1 >= first && rp0 < last) {
+        const ry = src.rowY(rp0) - st + ty(rp0), ah = src.rowY(rp1) + cellH(rp1) - src.rowY(rp0);
+        if (ah >= 4 && ry + ah > 0 && ry < Hc) {
+          const bx = ao.x > 0 ? ao.x - 1 : 0, by = ry > 0 ? ry - 1 : 0, bw = ao.x + w - bx, bh = ry + ah - by;
+          g.save(); g.beginPath(); const [cx0, cx1] = ao.zone === "M" ? [L.lw, W - L.rw] : [0, W]; g.rect(cx0, 0, cx1 - cx0, Hc); g.clip();
+          g.fillStyle = C.selFill; g.fillRect(bx + 1, by + 1, bw - 2, bh - 2);
+          g.strokeStyle = C.selLine; g.lineWidth = 2; g.strokeRect(bx + 1, by + 1, bw - 2, bh - 2);
+          g.restore();
+        }
+      }
+    }
     // 拖列：被拖那一列的地方画成空位，和表头里那一截（DOM）接上：上沿画到画布外面，看不到圆角；随这一列淡出同步淡入
     const sk = headUI.slotKey();
     if (sk) {
@@ -363,7 +438,7 @@ export function mountCanvasGrid(root, o = {}) {
     if (!o) return null; const rr = src.rowAt(p), ch = rr >= 0 && expd.has(rr) ? Math.min(src.rowH(p), expd.get(rr)) : src.rowH(p), detail = yy - src.rowY(p) > ch && !edge, mg = merges.at(p, o.c.key), id = src.idAt(p), ax = x - o.x - (src.tree ? src.lvAt(p) * 24 : 0);
     return { p, id, key: o.c.key, col: o.c, x: x - o.x, ox: o.x, edge, detail, exp: o.c.key === NAME && !detail && !mg && ax >= 4 && ax < 28 && (src.tree ? src.hasKids(id) : !!opt.detail), dt: src.tree && !!opt.detail && o.c.type === "act" && x - o.x >= o.c.w - 112 && x - o.x < o.c.w - 84, mp: mg ? mg.p0 : p, mk: mg ? mg.key0 : o.c.key };
   }
-  const cellRect = (p, key) => { const L = layout(), o = L.cols.find((o) => o.c.key === key), r = cv.getBoundingClientRect(), y = src.rowY(p) - vp.scrollTop, x = merges.at(p, key), rr = src.rowAt(p), w = x ? x.keys.reduce((t, k) => t + model.byKey[k].w, 0) : o.c.w, h = x ? src.rowY(x.p1 + 1) - src.rowY(x.p0) : rr >= 0 && expd.has(rr) ? Math.min(src.rowH(p), expd.get(rr)) : src.rowH(p); return { x: o.x, y, w, left: r.left + o.x, top: r.top + y, right: r.left + o.x + w, bottom: r.top + y + h, width: w, height: h }; };
+  const cellRect = (p, key) => { const L = layout(), o = L.cols.find((o) => o.c.key === key), r = cv.getBoundingClientRect(), y = src.rowY(p) - vp.scrollTop, x = merges.at(p, key), rr = src.rowAt(p), chOf = (q) => { const r2 = src.rowAt(q), hh = src.rowH(q); return r2 >= 0 && expd.has(r2) ? Math.min(hh, expd.get(r2)) : hh; }, w = x ? x.keys.reduce((t, k) => t + model.byKey[k].w, 0) : o.c.w, h = x ? src.rowY(x.p1) + chOf(x.p1) - src.rowY(x.p0) : rr >= 0 && expd.has(rr) ? Math.min(src.rowH(p), expd.get(rr)) : src.rowH(p); return { x: o.x, y, w, left: r.left + o.x, top: r.top + y, right: r.left + o.x + w, bottom: r.top + y + h, width: w, height: h }; };
   cv.addEventListener("pointermove", (e) => {
     lastPt = [e.clientX, e.clientY]; if (e.buttons || drag) return; const h = hit(e.clientX, e.clientY), p = h ? h.p : -1, r = h ? src.rowAt(h.p) : -1;
     const z = !h || h.edge || h.detail ? "" : src.tree && h.exp ? "tx:" + h.id : r < 0 ? "" : h.col.type === "sel" ? (canDrag && h.x < 26 ? "grip:" + r : h.x >= 28 && h.x < 50 ? "ck:" + r : "") : h.col.type === "act" ? (h.dt ? "ad:" + r : h.x >= h.col.w - 76 && h.x < h.col.w - 48 ? "ae:" + r : h.x >= h.col.w - 40 && h.x < h.col.w - 12 ? "am:" + r : "") : h.exp ? "exp:" + r : "";
@@ -404,7 +479,7 @@ export function mountCanvasGrid(root, o = {}) {
       if (dx || dy) raf3 = requestAnimationFrame(tick);
     };
     const mv = (ev) => { px = ev.clientX; py = ev.clientY; if (!moved) { if (Math.hypot(px - e.clientX, py - e.clientY) < 4) return; moved = true; try { cv.setPointerCapture(ev.pointerId); } catch {} } if (!raf3) raf3 = requestAnimationFrame(tick); };
-    const fin = () => { if (done) return; done = true; cancelAnimationFrame(raf3); for (const [t, f] of evs) cv.removeEventListener(t, f); removeEventListener("pointerup", fin); };
+    const fin = () => { if (done) return; done = true; if (moved && raf3) { cancelAnimationFrame(raf3); raf3 = 0; const h = at(px, py); if (h && (!rg || rg.fp !== h[0] || rg.fc !== h[1]) && (rg || h[0] !== ap || h[1] !== ac)) { rg = { ap, ac, fp: h[0], fc: h[1] }; syncMergeBar(); schedule(); } } cancelAnimationFrame(raf3); for (const [t, f] of evs) cv.removeEventListener(t, f); removeEventListener("pointerup", fin); };
     const evs = [["pointermove", mv], ["pointerup", fin], ["pointercancel", fin], ["lostpointercapture", fin]];
     for (const [t, f] of evs) cv.addEventListener(t, f); addEventListener("pointerup", fin);
   }
@@ -498,11 +573,11 @@ export function mountCanvasGrid(root, o = {}) {
     const done = (changed, v) => { if (changed) { const row = src.row(r); src.edit(r, c.key, v); flashes.push({ p, key: c.key, t0: performance.now() }); emit("cellEdit", { row, rowKey: keyOf(r), key: c.key, value: v, oldValue: cur }); } editing = null; vp.focus({ preventScroll: true }); schedule(); };
     if (c.edit === "enum") { editing = { input: null }; schedule(); openEnum(rc, c, optionOf(c, cur)?.i ?? -1, (k, step) => { const nv = optionValue(c, k, cur); done(nv !== cur, nv); if (step) moveActive(step); }, () => done(false)); return; }
     const input = document.createElement("input"); input.className = "sn-cell-ed sn-cg-ed" + (c.align === "right" ? " sn-r" : ""); input.value = initial ?? editText(c, cur); input.spellcheck = false;
-    const ih = Math.min(rc.height, Math.max(RH, src.rowH(p))) - 6; Object.assign(input.style, { left: rc.x + 4 + "px", top: HEAD + rc.y + (rc.height - ih) / 2 + "px", width: rc.width - 8 + "px", height: ih + "px" }); frame.append(input); input.focus(); if (initial == null) input.select();
+    const ih = Math.min(rc.height, Math.max(RH, src.rowH(p))) - 6; Object.assign(input.style, { left: rc.x + 4 + "px", top: HEAD + rc.y + (rc.height - ih) / 2 + "px", width: rc.width - 8 + "px", height: ih + "px" }); frame.append(input); input.focus({ preventScroll: true }); if (initial == null) input.select();
     const end = (commit, step = 0, soft = false) => {
       if (!editing || editing.input !== input) return;
       if (commit && soft && parseEdit(c, input.value).error) commit = false;
-      if (commit) { const res = parseEdit(c, input.value); if (res.error) { hideErr(); input.classList.add("sn-bad"); errEl = document.createElement("div"); errEl.className = "sn-g-err"; errEl.textContent = res.error; document.body.append(errEl); const b = input.getBoundingClientRect(); errEl.style.left = b.left + "px"; errEl.style.top = b.bottom + 6 + "px"; input.focus(); return; } hideErr(); input.remove(); done(res.value !== cur, res.value); }
+      if (commit) { const res = parseEdit(c, input.value); if (res.error) { hideErr(); input.classList.add("sn-bad"); errEl = document.createElement("div"); errEl.className = "sn-g-err"; errEl.textContent = res.error; document.body.append(errEl); const b = input.getBoundingClientRect(); errEl.style.left = b.left + "px"; errEl.style.top = b.bottom + 6 + "px"; input.focus({ preventScroll: true }); return; } hideErr(); input.remove(); done(res.value !== cur, res.value); }
       else { hideErr(); input.remove(); done(false); }
       if (step === "down") setActive(active.p + 1, active.c); else if (step) moveActive(step);
     };
@@ -596,7 +671,7 @@ export function mountCanvasGrid(root, o = {}) {
   function setTreeMode(on) { flushDrop(); if (editing?.end) editing.end(true, 0, true); mo.reset(); hAnim.clear(); expAnim.clear(); expTo.clear(); src.setTree(on); }
   let shownTree = false;
   function syncTree() { // 新视图到了：换成这一套的外观（操作列多一个"详情"按钮、名称列宽一些放得下缩进）
-    const t = src.tree; if (t === shownTree) return; shownTree = t; expd = EXPD[t ? "tree" : "flat"]; wasSk.clear(); fades.clear(); TW.clear(); hoverP = -1; hz = "";
+    const t = src.tree; if (t === shownTree) return; shownTree = t; expd = EXPD[t ? "tree" : "flat"]; merges.invalidate(); wasSk.clear(); fades.clear(); TW.clear(); hoverP = -1; hz = "";
     treeCols(model, t); apply(); active = { p: 0, c: NAME, id: src.idAt(0) };
   }
   // ———— 拖行高：在最左边那一列拖某一行的下边线（底边 5px，光标变上下箭头）；双击恢复默认；全选时所有行一起改（被拖那一行在视口里不动） ————
@@ -646,11 +721,15 @@ export function mountCanvasGrid(root, o = {}) {
   }
 
   readColors(); apply(); paintBar(); headUI.paint(); resize();
-  // ———— 行详情（画在展开的行下面那一截，贴着视口左边）：底色、分隔线由表格画，内容交给 detail.draw（设计稿的封面、标题、说明、镜头条在 demo/sections/canvas-grid.js） ————
+  // ———— 行详情（画在展开的行下面那一截，贴着视口左边）：底色、底边完整分隔线由表格画（裁剪区含完整高度 h），展开/收起时内容柔和淡入淡出 ————
   function drawDetail(r, y, h) {
-    if (h <= 1 || y > Hc || y + h < 0) return; g.save(); g.beginPath(); g.rect(0, y, W, h - 1); g.clip(); g.fillStyle = C.dtBg; g.fillRect(0, y, W, h);
-    opt.detail?.draw?.({ g, row: src.row(r), r, y, w: W, h, C, F, text, trunc, width });
-    g.fillStyle = C.line; g.fillRect(0, y + h - 1, W, 1); g.restore(); font = "";
+    if (h <= 1 || y > Hc || y + h < 0) return;
+    const a0 = g.globalAlpha, ca = Math.min(1, Math.max(0, (h - 6) / 36));
+    g.save(); g.beginPath(); g.rect(0, y, W, h); g.clip();
+    g.fillStyle = C.dtBg; g.fillRect(0, y, W, h);
+    if (ca > .01) { g.globalAlpha = a0 * ca; opt.detail?.draw?.({ g, row: src.row(r), r, y, w: W, h, C, F, text, trunc, width }); g.globalAlpha = a0; }
+    g.fillStyle = C.line; g.fillRect(0, y + h - 1, W, 1);
+    g.restore(); font = "";
   }
 
   // ———— 行展开收起：名称前面的小三角；220ms 缓缓长高，下面的行跟着往下走 ————
@@ -658,9 +737,9 @@ export function mountCanvasGrid(root, o = {}) {
   function toggleExpand(p) {
     flushDrop(); const r = src.rowAt(p); if (r < 0) return; const open = !expOpen(r); expTo.set(r, open);
     const h0 = expd.get(r) ?? src.rowH(p), from = src.rowH(p), to = open ? h0 + DETAIL : h0;
-    if (open && !expd.has(r)) expd.set(r, h0); src.track(r, p); fx("ex" + r, open ? 0 : 1, open ? 1 : 0, 200);
+    if (open && !expd.has(r)) expd.set(r, h0); merges.invalidate(); syncMergeBar(); src.track(r, p); fx("ex" + r, open ? 0 : 1, open ? 1 : 0, 200);
     let t0 = 0; const dur = reduced() ? 0 : 220, tok = {}; expAnim.set(r, tok); // t0 在第一步定：第一步就按走了一帧算，点下去下一帧就动
-    const step = (now) => { if (expAnim.get(r) !== tok) return; if (!t0) t0 = now - 16.7; const k = dur ? Math.max(0, Math.min(1, (now - t0) / dur)) : 1, q = 1 - (1 - k) ** 3; src.setIdH(r, from + (to - from) * q); sizeBody(); draw(); if (k < 1) { requestAnimationFrame(step); return; } expAnim.delete(r); expTo.delete(r); if (!open) { expd.delete(r); src.setIdH(r, h0); sizeBody(); draw(); } };
+    const step = (now) => { if (expAnim.get(r) !== tok) return; if (!t0) t0 = now - 16.7; const k = dur ? Math.max(0, Math.min(1, (now - t0) / dur)) : 1, q = 1 - (1 - k) ** 3; src.setIdH(r, from + (to - from) * q); sizeBody(); draw(); if (k < 1) { requestAnimationFrame(step); return; } expAnim.delete(r); expTo.delete(r); if (!open) { expd.delete(r); merges.invalidate(); syncMergeBar(); src.setIdH(r, h0); sizeBody(); draw(); } };
     requestAnimationFrame(step);
   }
   // ———— 合并、拆分 ————

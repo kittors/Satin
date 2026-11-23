@@ -79,12 +79,13 @@
 .sn-ib.sn-search:not(.sn-filled) .sn-clear { width: 0; margin: 0; }
 
 /* ———— 标签输入 ———— */
+sn-tag-input { display: block; }
 .sn-tagin { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 36px; padding: 4px 8px; }
 .sn-tagin input { all: unset; flex: 1; min-width: 120px; height: 24px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(24px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
 .sn-tagin input::placeholder { color: var(--sn-label3); }
 .sn-tagin .sn-chip.sn-tag { height: 24px; padding: 0 8px; }
 .sn-tagin .sn-chip.sn-tag.sn-armed { background: var(--sn-danger-ring); color: var(--sn-danger); box-shadow: inset 0 0 0 1px var(--sn-danger); }
-.sn-tagin-foot { display: flex; justify-content: space-between; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sn-tagin-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 6px; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); font-variant-numeric: tabular-nums; }
 
 /* ———— 数字步进：按住加减会连发并加速；数字滚动；到边界按钮变灰、再按抖一下；在数字上左右拖动可以直接调 ———— */
 .sn-stepper { display: inline-flex; align-items: center; height: 36px; padding: 2px; border-radius: var(--sn-btn-r); background: var(--sn-field); border: 1px solid var(--sn-line-control); box-shadow: 0 0 0 0 var(--sn-ring);

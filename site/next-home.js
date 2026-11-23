@@ -131,16 +131,24 @@ const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="s
     }, 900);
   };
   SHOTS[4].pct = 58; progress(SHOTS[4]); recount();
-  // 选中一个镜头：右边的检查器换成它（画面先在底下载好再淡入盖上去，不闪黑）
-  let sel = SHOTS[3];
+  // 选中一个镜头：右边的检查器换成它（画面先在底下载好再淡入盖上去，不闪黑）；视频只停在有视频的镜头且在视口里时播
+  let sel = SHOTS[3], swapId = 0, vidInView = false;
+  const v = $("video", vid), meta = VIDEO.find((x) => x.id === Number(v.dataset.video)); let loaded = false;
+  const syncVid = () => {
+    if (vidInView && sel.v && !reduced()) { if (!loaded) { loaded = true; v.preload = "auto"; v.src = videoSrc(meta.id); } v.play().catch(() => {}); }
+    else if (!v.paused) v.pause();
+  };
   const paintInsp = (s, swap = true) => {
     title.textContent = `镜头 ${String(s.n).padStart(2, "0")}`; dur.textContent = s.d; prompt.textContent = s.t;
     tagEl.className = "sn-tag" + (s.s === "ok" ? "" : " sn-" + s.s); tagEl.innerHTML = s.s === "ok" ? "已采用" : s.s === "need" ? "<i></i>待审核" : "<i></i>生成中";
-    vid.classList.toggle("sn-vid", !!s.v);
+    vid.classList.toggle("sn-vid", !!s.v); syncVid();
     if (!swap) return;
-    const old = $$(".na-still", vid), im = document.createElement("img"); im.className = "na-still"; im.alt = PHOTO[s.p].alt; im.decoding = "async";
-    im.addEventListener("load", () => { im.classList.add("ld"); setTimeout(() => old.forEach((o) => o.remove()), 320); }, { once: true });
-    im.src = img(s.p, 640, 72); vid.insertBefore(im, $("video", vid));
+    const tok = ++swapId, old = $$(".na-still", vid), im = document.createElement("img"); im.className = "na-still"; im.alt = PHOTO[s.p].alt; im.decoding = "async";
+    im.addEventListener("load", () => {
+      if (tok !== swapId) { im.remove(); return; }
+      im.classList.add("ld"); setTimeout(() => { if (tok === swapId) old.forEach((o) => o.remove()); }, 320);
+    }, { once: true });
+    im.src = img(s.p, 640, 72); vid.insertBefore(im, v);
   };
   grid.addEventListener("click", (e) => {
     const b = e.target.closest(".na-shot"); if (!b) return;
@@ -172,11 +180,8 @@ const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="s
   }
   const s = $(".na-insp [data-slider]"), out = $("[data-motion-v]"); initSlider(s); s.addEventListener("slide", (e) => (out.textContent = e.detail));
   // 镜头 12 的画面是一段真视频（Mixkit）：进入视口才播，离开就停；减少动态效果时不自动播
-  const v = $("video", vid), meta = VIDEO.find((x) => x.id === Number(v.dataset.video)); let loaded = false;
   v.addEventListener("playing", () => v.classList.add("ld"));
-  new IntersectionObserver(([e]) => {
-    if (e.isIntersecting && !reduced()) { if (!loaded) { loaded = true; v.preload = "auto"; v.src = videoSrc(meta.id); } v.play().catch(() => {}); } else if (!v.paused) v.pause();
-  }, { threshold: .3 }).observe(vid);
+  new IntersectionObserver(([e]) => { vidInView = e.isIntersecting; syncVid(); }, { threshold: .3 }).observe(vid);
 }
 
 // ———— 配乐：真实音乐（Mixkit），波形用 Mixkit 给的波形数据画 ————
@@ -213,9 +218,10 @@ const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="s
   btn.addEventListener("click", () => (audio.paused ? audio.play().catch(() => toast({ icon: "circle-x", tone: "danger", text: "音乐没能加载，检查网络后再试", alert: true })) : audio.pause()));
   const seekTo = (p) => { const s = Math.max(0, Math.min(1, p)) * dur; if (audio.readyState >= 1) audio.currentTime = s; else { pendingSeek = s; audio.preload = "metadata"; audio.load(); } paint(); };
   wave.addEventListener("pointerdown", (e) => {
-    wave.setPointerCapture(e.pointerId); const r = wave.getBoundingClientRect(), at = (x) => seekTo((x - r.left) / r.width);
-    at(e.clientX); const mv = (ev) => at(ev.clientX), up = () => { wave.removeEventListener("pointermove", mv); wave.removeEventListener("pointerup", up); };
-    wave.addEventListener("pointermove", mv); wave.addEventListener("pointerup", up);
+    try { wave.setPointerCapture(e.pointerId); } catch {} const r = wave.getBoundingClientRect(), at = (x) => seekTo((x - r.left) / r.width);
+    at(e.clientX); const mv = (ev) => at(ev.clientX), up = () => { for (const [t, f] of evs) wave.removeEventListener(t, f); };
+    const evs = [["pointermove", mv], ["pointerup", up], ["pointercancel", up], ["lostpointercapture", up]];
+    for (const [t, f] of evs) wave.addEventListener(t, f);
   });
   wave.addEventListener("keydown", (e) => { const d = e.key === "ArrowRight" ? 5 : e.key === "ArrowLeft" ? -5 : 0; if (!d) return; e.preventDefault(); seekTo(((pendingSeek ?? audio.currentTime) + d) / dur); });
 }
@@ -227,16 +233,22 @@ const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="s
   wins.innerHTML = tabs.map((t) => `<div class="n-win" data-k="${t.dataset.k}"><div class="mac"><div class="mac-bar"><span class="mac-lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="mac-title">${esc(t.dataset.t)}</span></div><div class="mac-body" style="height:${t.dataset.h}px"><div class="d-load"><span class="sn-spinner"></span>正在载入</div></div></div></div>`).join("");
   const ws = $$(".n-win", wins), frames = [];
   const fit = () => { const top = parseFloat(getComputedStyle(wins).top) || 0, hi = Math.max(...ws.map((w) => w.offsetHeight)); panel.style.height = Math.ceil(top * 2 + hi) + "px"; };
+  const showFrame = (f) => {
+    try { f.contentDocument.documentElement.dataset.theme = root.dataset.theme; } catch {}
+    if (!f.classList.contains("ld")) { f.classList.add("ld"); $(".d-load", f.parentElement)?.remove(); }
+  };
   addEventListener("message", (e) => {
     if (e.origin !== location.origin || !e.data?.satinEmbed) return;
     const f = frames.find((x) => x.contentWindow === e.source); if (!f) return;
-    f.parentElement.style.height = Math.ceil(e.data.h) + "px"; fit();
+    if (e.data.h > 0) { f.parentElement.style.height = Math.ceil(e.data.h) + "px"; fit(); showFrame(f); }
   });
   addEventListener("resize", fit); fit();
   const load = (i) => {
     const body = $(".mac-body", ws[i]); if ($("iframe", body)) return;
-    const f = document.createElement("iframe"); f.title = tabs[i].textContent.trim() + "演示"; f.src = `../index.html?embed=${tabs[i].dataset.k}&win=1`;
-    f.addEventListener("load", () => { try { f.contentDocument.documentElement.dataset.theme = root.dataset.theme; } catch {} f.classList.add("ld"); $(".d-load", body)?.remove(); });
+    const f = document.createElement("iframe"); f.title = tabs[i].textContent.trim() + "演示";
+    const demoQ = tabs[i].dataset.demo != null ? `&demo=${tabs[i].dataset.demo}` : "";
+    f.src = `../index.html?embed=${tabs[i].dataset.k}${demoQ}&win=1`;
+    f.addEventListener("load", () => showFrame(f));
     body.append(f); frames.push(f);
   };
   onMode((t) => { for (const f of frames) try { f.contentDocument.documentElement.dataset.theme = t; } catch {} });
@@ -327,7 +339,7 @@ const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="s
     const name = li.dataset.name;
     toast({ kind: "action", text: `已归档"${q(name)}"`, action: { label: "撤销", run: (t) => { put(li); t.update({ kind: "status", text: `已恢复"${q(name)}"`, done: true, duration: 2000 }); } } });
   });
-  list.parentElement.addEventListener("click", (e) => { if (e.target.closest("[data-ar-all]")) for (const li of home) if (!li.isConnected) put(li); });
+  list.parentElement.addEventListener("click", (e) => { if (e.target.closest("[data-ar-all]")) for (const li of home) if (!li.isConnected || li.classList.contains("leaving")) put(li); });
 }
 
 // ———— 细节三：等待 → 成功 ————

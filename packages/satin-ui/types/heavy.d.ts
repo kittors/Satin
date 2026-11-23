@@ -139,3 +139,20 @@ export function playerHTML(o?: { src?: string; poster?: string; label?: string }
 export function mountPlayer(el: HTMLElement, o?: { onError?(e: MediaError | null): void }): { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; video: HTMLVideoElement; destroy(): void };
 export function audioHTML(o?: { src?: string; title?: string; sub?: string; wave?: string }): string;
 export function mountAudio(el: HTMLElement, o?: { onError?(e: MediaError | null): void }): { toggle(): void; audio: HTMLAudioElement; destroy(): void };
+
+export interface ChartSeries { name: string; values: number[]; color?: string; unit?: string; dashed?: boolean }
+export interface AreaChartOptions { labels: string[]; series: ChartSeries[]; height?: number | string; unit?: string; legend?: boolean; area?: boolean; tipNote?(index: number, cfg: AreaChartOptions): string }
+export interface BarChartOptions { labels: string[]; series: ChartSeries[]; height?: number | string; unit?: string; legend?: boolean; activeIndex?: number; onSelect?(label: string | null, index: number): void }
+export interface DonutItem { label: string; value: number; color?: string }
+export interface DonutChartOptions { items: DonutItem[]; totalLabel?: string; unit?: string; activeIndex?: number; onSelect?(item: DonutItem | null, index: number): void }
+export interface Chart3DOptions { rows: string[]; cols: string[]; values: number[][]; height?: number | string; unit?: string; metricLabel?: string; rowColors?: string[]; interactive?: boolean }
+export interface SparklineOptions { values: number[]; color?: string; height?: number | string }
+export interface Icon3DOptions { name?: string; tone?: "obsidian" | "ceramic" | "cobalt" | "emerald" | "amber" | "crimson"; size?: "sm" | "md" | "lg"; label?: string }
+export const createAreaChart: SatinFactory<AreaChartOptions, { replay(): void }>;
+export const createBarChart: SatinFactory<BarChartOptions, { replay(): void }>;
+export const createDonutChart: SatinFactory<DonutChartOptions, { replay(): void }>;
+export const createChart3D: SatinFactory<Chart3DOptions, { setView(name: "iso" | "top" | "front"): void; replay(): void }>;
+export const createSparkline: SatinFactory<SparklineOptions, Record<string, never>>;
+export const createIcon3D: SatinFactory<Icon3DOptions, Record<string, never>>;
+export function icon3DHTML(o?: Icon3DOptions): string;
+export function bindIcons3D(scope?: Document | HTMLElement): () => void;

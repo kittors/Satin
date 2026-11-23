@@ -39,6 +39,7 @@ export const USAGE = {
   table: { css: ["data.css"], js: "createTable（satin-ui）：列定义 + 数据；排序、勾选、多级展开、合并、拖行拖列、改列宽都是选项，写法见上面的示例；静态的几种只要标记和样式", skipDemos: [8] },
   grid: { css: ["grid.css", "data.css"], api: [["createDataGrid(空容器, { columns, data 或 dataSource, rowKey })", "satin-ui/grid"]] },
   cgrid: { css: ["grid.css", "data.css"], api: [["createCanvasGrid(空容器, { columns, data 或 dataSource, rowKey })", "satin-ui/canvas-grid"]] },
+  charts: { css: ["charts.css"], api: [["createAreaChart(容器, { labels, series, height, unit })", "satin-ui/charts"], ["createBarChart(容器, { labels, series, onSelect })", "satin-ui/charts"], ["createDonutChart(容器, { items, centerLabel, onSelect })", "satin-ui/charts"], ["createChart3D(容器, { rows, cols, values, unit })", "satin-ui/charts"], ["createSparkline(容器, { values, color })", "satin-ui/charts"], ["icon3DHTML({ name, tone, size, label }) / bindIcons3D(scope)", "satin-ui/charts"]] },
   list: { css: ["data.css"] },
   card: { css: ["data.css"], api: [["openMenu(菜单, { trigger, anchor, align })", C]] },
   tags: { css: ["data.css"] },
@@ -135,6 +136,32 @@ createScrollArea(document.querySelector(".sn-list"), { size: 24 });`,
 
 const doc = renderMarkdown(document.querySelector("#readme"), text, { codeMax: 240 });
 doc.update(newText); // 换内容；doc.set({ codeMax: 0 }) 改折叠高度`,
+  charts: `import { createAreaChart, createBarChart, createDonutChart, createChart3D, createSparkline, icon3DHTML, bindIcons3D } from "satin-ui/charts";
+import "satin-ui/css/charts.css";
+
+// 1. 趋势面积图（周期切换平滑 Morph）
+const area = createAreaChart(document.querySelector("#chArea"), {
+  labels: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+  series: [
+    { name: "生成镜头", color: "accent", values: [168, 214, 196, 268, 312, 284, 342] },
+    { name: "一次通过", color: "success", values: [134, 178, 162, 224, 266, 241, 298] },
+  ],
+  unit: " 镜",
+});
+
+// 2. 真交互 3D 立体柱阵（可 360° 拖拽旋转、预设视角飞行、悬停立体抬升）
+const c3d = createChart3D(document.querySelector("#ch3d"), {
+  rows: ["上海集群", "杭州集群", "深圳集群"],
+  cols: ["周一", "周二", "周三", "周四", "周五", "周六"],
+  rowColors: ["blue", "violet", "success"],
+  metricLabel: "渲染吞吐",
+  unit: " 镜/h",
+  values: [[72, 94, 88, 126, 148, 112], [56, 78, 108, 118, 134, 96], [42, 64, 74, 92, 106, 84]],
+});
+
+// 3. 3D 立体质感图标（陀螺仪倾角视差 + 动态高光）
+el.innerHTML = icon3DHTML({ name: "clapperboard", tone: "obsidian", size: "lg", label: "分镜创作" });
+bindIcons3D(el);`,
   choice: `// 复选、单选、开关都是纯标记：勾上时方框轻轻弹一下是 setup() 装好的页面级行为，不用另外接
 // 标记可以照着手写，也可以用标记函数生成，两种一模一样：
 //   import { checkHTML, switchHTML } from "satin-ui/components";

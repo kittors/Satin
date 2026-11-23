@@ -77,6 +77,7 @@
 .dx { --dx-bg: color-mix(in srgb, var(--sn-label) 5%, var(--sn-canvas)); margin-top: 16px; padding: 6px; border-radius: 22px; background: var(--dx-bg); }
 [data-theme="dark"] .dx { --dx-bg: color-mix(in srgb, var(--sn-label) 8%, var(--sn-canvas)); }
 .dx-bar { display: flex; align-items: center; gap: 12px; min-height: 34px; padding: 0 0 6px 6px; } /* 框顶一行：左边设置项，右边"在展示页打开"（不浮在预览上，免得压住演示角落里的东西） */
+.dx-bar:not(:has(.dx-ctl > *, .dx-note:not(:empty))) { display: none; } /* 没设置项也没有说明文字时藏掉，预览白盒贴齐外框顶部 */
 .dx-ctl { display: flex; align-items: center; gap: 16px; min-width: 0; flex-wrap: wrap; row-gap: 8px; } /* 设置项多、屏幕窄时折到下一行，不把整页撑宽（390 宽时对话页的框顶一行有 440 宽） */
 .dx-opt { display: flex; align-items: center; gap: 8px; font: 500 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
 .dx-note { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 400 calc(12px * var(--fsx))/calc(16px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
@@ -122,8 +123,8 @@
 [data-theme="dark"] .n-docs .d-tablewrap { background: color-mix(in srgb, var(--sn-label) 8%, var(--sn-canvas)); }
 .n-docs .d-table { border-radius: 12px; overflow: hidden; background: var(--sn-canvas); }
 .n-docs .d-table th { background: transparent; }
-/* 左边目录：开始、规范两组带图标 */
-.n-docs .d-side a .sn-ic { width: 16px; height: 16px; margin-right: 10px; color: var(--sn-label3); flex: none; }
+/* 左边目录：开始、规范两组带图标；侧栏本身已是低饱和灰字，把双色调次笔画调至 .92 防止 16px 图标发虚断线 */
+.n-docs .d-side a .sn-ic { width: 16px; height: 16px; margin-right: 10px; color: var(--sn-label3); flex: none; --sn-ic-duo: .92; }
 .n-docs .d-side a[aria-current] .sn-ic { color: var(--sn-label); }
 /* 翻页：两颗胶囊按钮 */
 .n-docs .d-pager { display: flex; justify-content: space-between; margin-top: 80px; }
@@ -332,6 +333,7 @@
 .n-win.sn-out { opacity: 0; transform: translateY(-6px) scale(.99); transition-duration: .2s; transition-timing-function: var(--sn-ease-in); }
 .n-win .mac-body { background: var(--sn-raised); }
 .n-win iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--sn-raised); opacity: 0; transition: opacity .3s var(--sn-ease-out); }
+[data-theme="dark"] .n-win iframe { color-scheme: dark; }
 .n-win iframe.ld { opacity: 1; }
 .n-win .d-load { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--sn-label3); font: 400 calc(13px * var(--fsx))/1 var(--sn-sans); }
 
@@ -566,7 +568,7 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 /* 导航列表 */
 .s-mn { padding: 4px 12px 16px; }
 .s-mn a { display: flex; align-items: center; height: 44px; padding: 0 12px; border-radius: var(--sn-r-md); font: 400 calc(15px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label2); text-decoration: none; -webkit-tap-highlight-color: transparent; }
-.s-mn a .sn-ic { width: 18px; height: 18px; margin-right: 12px; color: var(--sn-label3); flex: none; }
+.s-mn a .sn-ic { width: 18px; height: 18px; margin-right: 12px; color: var(--sn-label3); flex: none; --sn-ic-duo: .92; }
 .s-mn a[aria-current] { background: var(--sn-fill-active); color: var(--sn-label); font-weight: 500; }
 .s-mn a[aria-current] .sn-ic { color: var(--sn-label); }
 @media (hover: hover) { .s-mn a:hover, .s-mn-h:hover { background: var(--sn-fill-hover); color: var(--sn-label); } }
@@ -897,3 +899,44 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .d-rwrap.d-rphone > .d-rframe { display: none; }
 .d-rwrap.d-rphone > .s-devbox { margin-top: var(--sn-sp-8); }
 @media (max-width: 860px) { .d-rbar { display: none; } .d-rwrap.d-rphone > .d-rframe { display: block; } .d-rwrap.d-rphone > .s-devbox { display: none; } }
+
+/* ———— 12. 内容加载与过渡体系（实装于官网文档页切换与演示框加载） ———— */
+/* 文档页正文原子提交后的柔和显影：只动 opacity 与微小位移（5px），拒绝白屏硬砸 */
+.d-page-enter { animation: d-pg-in 240ms var(--sn-ease-out-strong) both; }
+.d-page-enter > .d-head { animation: d-pg-in 200ms var(--sn-ease-out-strong) both; }
+.d-toc-enter { animation: d-toc-in 200ms var(--sn-ease-out) both; }
+@keyframes d-pg-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes d-toc-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* 慢网回退（>180ms）时的结构同构骨架：行数、圆角与真实章节对齐，杜绝塌陷跳动 */
+.d-skel-page { margin-top: 32px; display: grid; gap: 14px; animation: d-toc-in 180ms var(--sn-ease-out) both; }
+.d-skel-h { width: 32%; height: 24px; border-radius: 8px; }
+.d-skel-p { width: 88%; height: 16px; border-radius: 6px; }
+.d-skel-p2 { width: 64%; height: 16px; border-radius: 6px; }
+.d-skel-stage { height: 220px; margin-top: 8px; border-radius: 18px; }
+.d-skel-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.d-skel-row > i { height: 84px; border-radius: 12px; }
+.d-skel-page .sn-skel { display: block; background: var(--sn-fill-subtle); position: relative; overflow: hidden; }
+.d-skel-page .sn-skel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sn-label) 5%, transparent), transparent); transform: translateX(-100%); animation: d-shimmer 1.3s var(--sn-ease-in-out) infinite; }
+@keyframes d-shimmer { to { transform: translateX(100%); } }
+
+/* 演示框柔和占位与交叉显影：300ms 内就绪完全隐藏占位；就绪后平滑 scale(.994 → 1) + opacity 显影 */
+.n-docs .d-frame iframe { transform: scale(.994); transition: opacity .24s var(--sn-ease-out-strong), transform .28s var(--sn-ease-out-strong); }
+.n-docs .d-frame.sn-sized iframe { transition: opacity .24s var(--sn-ease-out-strong), transform .28s var(--sn-ease-out-strong), height .32s var(--sn-ease-out-strong); }
+.n-docs .d-frame.sn-ready iframe { opacity: 1; transform: none; }
+.n-docs .d-frame.sn-instant iframe { transform: none; transition: none; }
+.n-docs .d-load { flex-direction: column; gap: 10px; padding: 20px; pointer-events: none; }
+.d-load-bars { display: flex; flex-direction: column; align-items: center; gap: 8px; width: min(260px, 68%); }
+.d-load-bars i { display: block; height: 10px; border-radius: 99px; background: var(--sn-fill-subtle); position: relative; overflow: hidden; }
+.d-load-bars i:first-child { width: 58%; height: 12px; }
+.d-load-bars i:last-child { width: 100%; }
+.d-load-bars i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sn-label) 6%, transparent), transparent); transform: translateX(-100%); animation: d-shimmer 1.3s var(--sn-ease-in-out) infinite; }
+
+/* 配方深度案例文档块（blockquote 提示卡等） */
+.d-rcase-quote { margin: 16px 0 0; padding: 14px 16px; border-radius: 12px; background: var(--sn-fill-subtle); color: var(--sn-label2); font: 400 calc(14px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); }
+.d-rcase-quote b { color: var(--sn-label); }
+@media (prefers-reduced-motion: reduce) {
+  .d-page-enter, .d-page-enter > .d-head, .d-toc-enter, .d-skel-page { animation: none !important; }
+  .d-skel-page .sn-skel::after, .d-load-bars i::after { animation: none !important; }
+  .n-docs .d-frame iframe { transform: none !important; transition: opacity .12s linear !important; }
+}

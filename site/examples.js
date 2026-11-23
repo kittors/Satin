@@ -1613,4 +1613,36 @@ export const API = {
       ["sa-jump", "拖滑块一下跳很远时，在视口上同步发出：虚拟列表在同一个任务里画出新位置的内容，不等下一帧"],
     ]],
   ],
+  charts: [
+    ["createAreaChart(容器, 选项)", ["选项", "类型", "默认", "说明"], [
+      ["labels", "string[]", "[]", "X 轴时间或类目刻度标签"],
+      ["series", "{ name, values, color? }[]", "[]", "多系列折线/面积数据；color 支持 accent / blue / success / warning / danger / violet / muted 或 CSS 色值"],
+      ["height", "number | string", "248", "绘图区高度，随容器宽度自适应并自动按 2x DPR 重绘"],
+      ["unit", "string", '""', "悬浮提示中的数值后缀单位"],
+      ["legend", "boolean", "true", "是否显示可点击开关的交互图例"],
+      ["area", "boolean", "true", "是否填充曲线下方柔和梯度面积"],
+    ]],
+    ["createBarChart(容器, 选项)", ["选项", "类型", "默认", "说明"], [
+      ["labels", "string[]", "[]", "柱组 X 轴类目名称"],
+      ["series", "{ name, values, color? }[]", "[]", "分组对比系列，支持入场交错弹簧生长与数据切换 Morph"],
+      ["onSelect", "(label, index) => void", "—", "点击柱组时回调，用于联动下方明细表或状态过滤"],
+    ]],
+    ["createDonutChart(容器, 选项)", ["选项", "类型", "默认", "说明"], [
+      ["items", "{ label, value, color? }[]", "[]", "环形分片数据；悬停或点击自动外扩并更新中心汇总数字"],
+      ["centerLabel", "string", '"总计"', "环心副标签文字"],
+      ["size", "number", "168", "圆环直径（px）"],
+      ["onSelect", "(item, index) => void", "—", "点击分片或图例项时回调，返回当前选中项或 null"],
+    ]],
+    ["createChart3D(容器, 选项)", ["选项", "类型", "默认", "说明"], [
+      ["rows / cols", "string[]", "[]", "三维矩阵的纵深行维度与横向列维度名称"],
+      ["values", "number[][]", "[]", "二维数值矩阵 values[row][col]，决定每根 3D 柱体高度"],
+      ["rowColors", "string[]", "null", "各行对应的语义色调，自动按受光面计算明暗渐变与棱线高光"],
+      ["interactive", "boolean", "true", "开启 360° 拖拽惯性旋转、等轴测/俯视/正面视角飞行与悬停抬升"],
+    ]],
+    ["createSparkline / icon3DHTML / bindIcons3D", ["函数", "参数", "说明"], [
+      ["createSparkline(容器, 选项)", "{ values, color, height }", "KPI 指标卡迷你平滑趋势线与末端发光脉冲点"],
+      ["icon3DHTML(选项)", "{ name, tone, size, label }", "生成带实体底座、棱边高光与悬浮投影的 3D 质感图标 HTML（tone：obsidian / cobalt / emerald / amber / crimson / violet / glass）"],
+      ["bindIcons3D(scope)", "HTMLElement | Document", "绑定指针陀螺仪倾角视差与动态镜面高光跟踪"],
+    ]],
+  ],
 };

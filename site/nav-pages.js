@@ -12,7 +12,7 @@ export const SIDE_IC = {
   intro: "book-open", start: "zap", cli: "terminal", frameworks: "blocks", mobile: "smartphone", browsers: "globe",
   theming: "palette", dark: "moon", tokens: "hash", i18n: "languages", "icon-usage": "star",
   ai: "code-xml", agents: "file-text", checker: "check-check", eval: "chart-column",
-  principles: "compass", color: "swatch-book", type: "type", spacing: "ruler", layout: "layout-dashboard", shape: "box", elevation: "layers", motion: "activity",
+  principles: "compass", color: "swatch-book", type: "type", spacing: "ruler", layout: "layout-dashboard", shape: "box", elevation: "layers", motion: "activity", "loading-motion": "loader-circle",
   icons: "component", feel: "mouse-pointer-2", "no-ai": "scan-eye", a11y: "accessibility", writing: "pen-line",
   components: "layout-grid", recipes: "rows-3", changelog: "history", roadmap: "map-pin",
 };

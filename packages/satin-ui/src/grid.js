@@ -91,7 +91,7 @@ export function openFilter(btn, col, src) {
   const go = (clear) => { src.setQuery({ ...src.query, filters: { ...src.query.filters, [col.key]: clear ? null : { min: val(p.el.querySelector("[data-min]").value), max: val(p.el.querySelector("[data-max]").value) } } }); p.close(); };
   p.el.querySelector("[data-apply]").addEventListener("click", () => go(false)); p.el.querySelector("[data-clear]").addEventListener("click", () => go(true));
   p.el.addEventListener("keydown", (e) => { if (e.key === "Enter") go(false); });
-  setTimeout(() => p.el.querySelector("[data-min]").focus());
+  setTimeout(() => p.el.querySelector("[data-min]")?.focus({ preventScroll: true }));
   return p;
 }
 // ———— 表头：排序、筛选、拖列换位置、拖边改宽；DOM 版和 Canvas 版共用 ————
@@ -260,10 +260,34 @@ export function shades(root, vp, model, rowsH) {
 }
 // 横向箭头一步走到下一列：中间每一列的左边对齐到可滚区域左边时的 scrollLeft
 export function colStops(model) { const out = []; let x = 0; for (const k of model.mid) { out.push(x); x += model.byKey[k].w; } return out; }
+// 合并单元格分段：块内若有行展开了通栏行详情，把合并块在详情处自然分成多个连续子段，避免下段变成空白死洞或被底线割裂
+export function mergeSegs(src, x, cellH) {
+  const out = []; let s0 = x.p0, dhBefore = 0;
+  for (let q = x.p0; q <= x.p1; q++) {
+    const dh = q < x.p1 ? Math.max(0, src.rowH(q) - cellH(q)) : 0;
+    if (dh > .5 || q === x.p1) { out.push({ p0: s0, p1: q, dhBefore, dhAfter: dh }); s0 = q + 1; dhBefore = dh; }
+  }
+  return out;
+}
+// 树形引导线（O(lv)）：返回 { anc: boolean[]（0..lv-2 祖先后面是否仍有兄弟）, last: boolean（本行是否直接父层末项）}
+export function treeGuides(src, p) {
+  const lv = src.lvAt(p);
+  if (lv <= 0) return { anc: [], last: false };
+  const isEnd = (q, l) => { const e = src.blockEnd(q); return e >= src.shown || src.lvAt(e) < l; };
+  const anc = new Array(lv - 1).fill(false);
+  let cur = src.idAt(p);
+  for (let d = lv - 1; d >= 1; d--) {
+    cur = src.parentOf(cur);
+    if (cur < 0) break;
+    const ap = src.findPos(cur);
+    anc[d - 1] = ap >= 0 && !isEnd(ap, d);
+  }
+  return { anc, last: isEnd(p, lv) };
+}
 // 合并单元格：按行号记行（排序、筛选、拖行后行会换位置，数据源追踪它们现在排第几），按列名记列。
 // 当前视图里这几行连续、这几列连续且在同一侧（左固定 / 中间 / 右固定）时才生效；排序、筛选、拖开了就暂时不显示，回来还在。
 // 树形模式：合并不跨上级——块里的行必须是同一个上级下面的兄弟；中间那一行展开了（下级插进来）就不连续，暂时不显示，收起来又出来。平铺、树形各记各的
-export function createMerges(src, model) {
+export function createMerges(src, model, isSplit) {
   const lists = { flat: [], tree: [] }; let ver = 0, ck = "", cache = [], on = true; /* on：表格是"网格"（行线 + 列线）时才显示合并；只有行线时合并格会像一个洞 */
   const cur = () => lists[src.tree ? "tree" : "flat"];
   const zoneOf = (k) => (model.left.includes(k) ? "L" : model.right.includes(k) ? "R" : "M");
@@ -273,6 +297,8 @@ export function createMerges(src, model) {
     for (const m of cur()) {
       const p0 = src.posOf(m.ids[0]); let ok = p0 >= 0 && p0 + m.ids.length <= src.shown && sameParent(m.ids);
       for (let k = 1; ok && k < m.ids.length; k++) ok = src.posOf(m.ids[k]) === p0 + k;
+      // 块内非末行展开了通栏行详情时（和树形展开下级插行一样）行不再视觉连续：暂时挂起合并，恢复各行独立单元格，收起后自动复原
+      if (ok && isSplit) for (let k = 0; ok && k < m.ids.length - 1; k++) if (isSplit(p0 + k)) ok = false;
       const ci = m.keys.map((k) => disp.indexOf(k)).sort((a, b) => a - b);
       ok = ok && ci[0] >= 0 && ci.at(-1) - ci[0] === ci.length - 1 && m.keys.every((k) => zoneOf(k) === zoneOf(m.keys[0]));
       out.push({ m, ok, p0, p1: p0 + m.ids.length - 1, c0: ci[0], c1: ci.at(-1), keys: ci[0] >= 0 ? disp.slice(ci[0], ci.at(-1) + 1) : m.keys, key0: ci[0] >= 0 ? disp[ci[0]] : m.keys[0] });
@@ -282,6 +308,7 @@ export function createMerges(src, model) {
   const all = () => { const k = ver + "|" + on + "|" + src.tree + "|" + src.pver + "|" + src.shown + "|" + model.display().map((c) => c.key).join(); if (k !== ck) { ck = k; cache = compute().map((x) => (on ? x : { ...x, ok: false })); } return cache; };
   return {
     zoneOf,
+    invalidate() { ver++; },
     active: () => all().filter((x) => x.ok),
     suspended: () => all().filter((x) => !x.ok).length,
     at(p, key) { for (const x of all()) if (x.ok && p >= x.p0 && p <= x.p1 && x.keys.includes(key)) return x; return null; },
@@ -534,15 +561,18 @@ export function mountDataGrid(root, o = {}) {
   const paintState = mountGridState(root, vp, src, o, emit);
   // 滚动条：常驻时占独立的一条（竖条从表头下面开始，横条只在中间的列下面），两端箭头可点；自动时悬浮、滚动才出现
   const bars = gridBars(vp.parentElement, vp, { head: HEAD, rowH: RH, rowsH: () => src.rowsH() + (src.mode === "append" ? RH : 0), colsW: () => model.width(), pinL: () => model.leftW(), pinR: () => model.rightW(), stops: () => colStops(model), reduced });
-  const merges = createMerges(src, model), DETAIL = 112, EXPD = { flat: new Map(), tree: new Map() }, expAnim = new Map(), expTo = new Map(); // expAnim / expTo：正在展开收起的行这一次的记号、要去的状态（连点时只让最新的那次动）
+  const DETAIL = 112, EXPD = { flat: new Map(), tree: new Map() }, expAnim = new Map(), expTo = new Map(); // expAnim / expTo：正在展开收起的行这一次的记号、要去的状态（连点时只让最新的那次动）
   let expd = EXPD.flat; // 展开了详情的行：行号 → 收起时（格子部分）的高度；平铺、树形各记各的
+  const merges = createMerges(src, model, (p) => { const r = src.rowAt(p); return r >= 0 && expd.has(r); });
   // 列：轨道、顺序、固定列 sticky、固定列阴影；拖着的列变淡
   function apply() {
     const disp = model.display(), id = "#" + root.id; root.style.setProperty("--sn-gcols", disp.map((c) => c.w + "px").join(" ")); root.style.setProperty("--sn-gw", model.width() + "px");
     let css = "", left = 0, right = 0; disp.forEach((c, k) => { css += `${id} [data-c="${c.key}"]{order:${k}}`; });
     for (const k of model.left) { css += `${id} [data-c="${k}"]{position:sticky;left:${left}px;z-index:2}`; left += model.byKey[k].w; }
     for (const k of [...model.right].reverse()) { css += `${id} [data-c="${k}"]{position:sticky;right:${right}px;z-index:2}`; right += model.byKey[k].w; }
-    shade(); // 固定列边上的分隔线和阴影：外框上两条贯通的阴影条，不按格子画（按格子画会被下一行的底色截成一段一段）
+    if (model.left.length) css += `${id}.sn-has-exp.sn-sx .sn-g-body [data-c="${model.left.at(-1)}"]:not(.sn-mg){box-shadow:inset -1px -1px 0 var(--sn-g-rowline)}`;
+    if (model.right.length) css += `${id}.sn-has-exp.sn-ex .sn-g-body [data-c="${model.right[0]}"]{box-shadow:-1px 0 0 var(--sn-g-rowline),inset 0 -1px 0 var(--sn-g-rowline)}`;
+    shade(); // 固定列边上的分隔线和阴影：外框上两条贯通的阴影条，有展开详情时表体由固定列格子自绘避免劈穿详情面板
     if (styleEl.textContent !== "@layer satin{" + css + "}") styleEl.textContent = "@layer satin{" + css + "}"; /* 没变就不写：改写样式表有开销，还会打断刚开始的 CSS 动画 */ edges();
   }
   // 列的位移、被拖那一列的透明度：单独一张样式表，动的时候每帧写一次（mountHead 里算值）
@@ -614,12 +644,13 @@ export function mountDataGrid(root, o = {}) {
   // 框选时选区里铺一层淡底，起点那一格不铺（一眼看出从哪开始的）。
   // 普通列的框放在表身里，和内容一起滚（同一帧，不拖影），被左右固定列挡住的部分用 clip-path 裁掉；
   // 固定列的框放在贴边的 sticky 层里：横滚时不动、竖滚时跟着走，和固定列自己一样。
-  const rgL = document.createElement("div"), rgR = document.createElement("div"), boxM = document.createElement("i"), boxL = document.createElement("i"), boxR = document.createElement("i");
-  rgL.className = "sn-g-rgl"; rgR.className = "sn-g-rgr"; for (const b of [boxM, boxL, boxR]) { b.className = "sn-g-rgbox"; b.hidden = true; }
-  rgL.append(boxL); rgR.append(boxR); body.prepend(rgL, rgR); body.append(boxM);
+  const rgL = document.createElement("div"), rgR = document.createElement("div"), rgBoxes = { L: [], R: [], M: [] };
+  rgL.className = "sn-g-rgl"; rgR.className = "sn-g-rgr";
+  rgL.dataset.zone = "L"; rgR.dataset.zone = "R";
+  body.prepend(rgL, rgR);
   const cellH = (p) => { const r = src.rowAt(p), hh = src.rowH(p); return r >= 0 && expd.has(r) ? Math.min(hh, expd.get(r)) : hh; };
   function paintSelBox() {
-    for (const b of [boxM, boxL, boxR]) b.hidden = true;
+    for (const arr of Object.values(rgBoxes)) for (const b of arr) b.hidden = true;
     const R2 = rgRect(); let p0, p1, keys;
     if (R2) ({ p0, p1, keys } = R2);
     else if (selShown && document.activeElement === vp) { const am = merges.at(active.p, active.c); p0 = am ? am.p0 : active.p; p1 = am ? am.p1 : active.p; keys = am ? am.keys : [active.c]; }
@@ -627,14 +658,14 @@ export function mountDataGrid(root, o = {}) {
     const gw = model.width(), lw = model.leftW(), rwc = model.rightW(), st = vp.scrollTop, sl = vp.scrollLeft, vw = vp.clientWidth;
     if (rgL._w !== lw) { rgL._w = lw; rgL.style.width = lw + "px"; } if (rgR._w !== rwc) { rgR._w = rwc; rgR.style.width = rwc + "px"; }
     const X0 = model.xOf(keys[0]), X1 = model.xOf(keys.at(-1)) + model.byKey[keys.at(-1)].w, Y0 = src.rowY(p0), Y1 = src.rowY(p1) + cellH(p1);
-    // 左边、上边：盖住前一格的格线（第一列、第一行前面没有格线 / 是表头那条线，就从 0 开始）；右边、下边：盖住自己的格线
     const L = X0 > 0 ? X0 - 1 : 0, T = Y0 > 0 ? Y0 - 1 : 0, W = X1 - L, H = Y1 - T;
-    const zone = merges.zoneOf(keys[0]), box = zone === "L" ? boxL : zone === "R" ? boxR : boxM;
+    const zone = merges.zoneOf(keys[0]), host = zone === "L" ? rgL : zone === "R" ? rgR : body, poolB = rgBoxes[zone];
     const x = zone === "R" ? L - (gw - rwc) : L;
-    // 裁：上面不压到表头里（只许压住表头底下那条线）；普通列不压到固定列上（只许压住交界那条线）
     const ct = Math.max(0, st - T), cl = zone === "M" ? Math.max(0, sl + lw - 1 - L) : zone === "R" ? Math.max(0, -1 - x) : 0;
     const cr = zone === "M" ? Math.max(0, L + W - (sl + vw - rwc + 1)) : zone === "L" ? Math.max(0, x + W - (lw + 1)) : 0;
     if (cl + cr >= W || ct >= H) return;
+    let box = poolB[0];
+    if (!box) { box = document.createElement("i"); box.className = "sn-g-rgbox"; host.append(box); poolB.push(box); }
     box.hidden = false; box.style.cssText = `left:${x}px;top:${T}px;width:${W}px;height:${H}px;clip-path:inset(${ct}px ${cr}px 0 ${cl}px)`;
   }
   vp.addEventListener("focus", () => schedule()); vp.addEventListener("blur", () => schedule());
@@ -669,27 +700,49 @@ export function mountDataGrid(root, o = {}) {
     if (el._r !== r) nofx(el); // 复用的行换了内容：勾选框、底色直接到位，不播过渡（滚动时不会看到一行行"勾掉""褪色"）
     el._p = p; el._v = dver; el._r = r; el.style.top = src.rowY(p) + "px"; el.style.height = hh === RH ? "" : hh + "px"; el.style.setProperty("--sn-ch", ch + "px"); el.style.setProperty("--sn-dh", hh - ch + "px"); el.style.display = ""; el.setAttribute("aria-rowindex", p + 2);
     el.classList.toggle("sn-sk", r < 0); el.classList.toggle("sn-exp", ex);
-    if (src.tree) { // 树形：缩进、引导线；有下级的是展开箭头（按"该是什么状态"转，收起时不等下级淡出），没有的是小圆点；详情挪到操作列的按钮上
+    if (src.tree) { // 树形：缩进、精准引导线（末项收口 50% 不撞后续箭头）；有下级的是展开箭头（按"该是什么状态"转，收起时不等下级淡出），没有的是小圆点；详情挪到操作列的按钮上
       const id = src.idAt(p), lv = src.lvAt(p), kids = src.hasKids(id), op = kids && src.isOpen(id); el.style.setProperty("--sn-lv", lv); el.classList.toggle("sn-tk", kids); el.classList.toggle("sn-to", op);
       el.setAttribute("aria-level", lv + 1); el._cells[NAME]?.setAttribute("aria-expanded", String(op)); el._exp?.setAttribute("aria-expanded", String(op)); el._exp?.setAttribute("aria-label", op ? tt("grid.20") : tt("grid.21"));
       el._cnt.textContent = kids && o.treeCount ? o.treeCount(src.kidsN(id), lv) || "" : ""; if (r >= 0) el._dtb?.setAttribute("aria-expanded", String(expTo.get(r) ?? ex));
+      const tg = el._cells[NAME]?.querySelector(".sn-g-tg");
+      if (tg) {
+        if (lv <= 0) tg.style.removeProperty("--sn-tbg");
+        else {
+          const gd = treeGuides(src, p), segs = [];
+          for (let d = 0; d < lv; d++) {
+            const gx = 3.5 + d * 24;
+            if (d === lv - 1) segs.push(`linear-gradient(var(--sn-tree-line),var(--sn-tree-line)) ${gx}px 0/1px ${gd.last ? "50%" : "100%"} no-repeat`);
+            else if (gd.anc[d]) segs.push(`linear-gradient(var(--sn-tree-line),var(--sn-tree-line)) ${gx}px 0/1px 100% no-repeat`);
+          }
+          const bg = segs.length ? segs.join(",") : "none";
+          if (tg.style.getPropertyValue("--sn-tbg") !== bg) tg.style.setProperty("--sn-tbg", bg);
+        }
+      }
     } else {
       if (el.classList.contains("sn-tk") || el.classList.contains("sn-to") || el.style.getPropertyValue("--sn-lv")) { el.classList.remove("sn-tk", "sn-to"); el.style.removeProperty("--sn-lv"); el.removeAttribute("aria-level"); el._cnt.textContent = ""; el._exp?.setAttribute("aria-label", tt("grid.22")); }
       el._cells[NAME]?.setAttribute("aria-expanded", String(ex)); el._exp?.setAttribute("aria-expanded", String(r >= 0 && (expTo.get(r) ?? ex))); // 箭头按"要去的状态"转：收起时一点就转回来，不等高度动完
     }
     if (r >= 0) { for (const c of model.cols) fillCell(el._cells[c.key], c, r); el.classList.toggle("sn-sel", isSel(r)); if (was && !reduced()) arrived.set(r, performance.now()); if (ex) fillDetail(el, r); } // 占位变成数据：120ms 从 40% 淡到 100%（render 里按时间算，和树的过渡乘在一起）
     else el.classList.remove("sn-sel");
-    // 合并单元格：先清掉这一行上次的合并样式，再看现在落在哪个合并块里——
-    // 块的第一列格子横跨几列（grid-column: span），其余被盖住的格子藏起来；每一行画自己那一截，内容往下挪到整块的正中，各行各裁各的，固定列、横滚、复用行都不受影响
-    for (const k of el._mg || []) { const c = el._cells[k]; c.classList.remove("sn-mg", "sn-mg-hide", "sn-mg-last", "sn-mg-wait"); c.style.gridColumn = ""; for (const v of ["--mg-h", "--mg-o", "--sn-mg-s"]) c.style.removeProperty(v); }
+    // 合并单元格：先清掉这一行上次的合并样式，再按连续子段（遇中间展开详情自动分段，每段独立居中显示内容与底线，下段随展开进度平滑淡入）渲染
+    for (const k of el._mg || []) { const c = el._cells[k]; c.classList.remove("sn-mg", "sn-mg-hide", "sn-mg-last", "sn-mg-wait"); c.style.gridColumn = ""; c._mgSeg = null; for (const v of ["--mg-h", "--mg-o", "--sn-mg-s", "--sn-mg-a"]) c.style.removeProperty(v); }
     el._mg = [];
     const live = merges.active(), am = merges.at(active.p, active.c), R2 = rgRect(), disp = R2 ? model.display().map((c) => c.key) : null;
     for (const x of live) {
       if (p < x.p0 || p > x.p1) continue;
-      const a = el._cells[x.key0], y0 = src.rowY(x.p0), H = src.rowY(x.p1 + 1) - y0, off = src.rowY(p) - y0, r0 = src.rowAt(x.p0);
-      a.classList.add("sn-mg"); a.classList.toggle("sn-mg-last", p === x.p1); a.classList.toggle("sn-mg-wait", r0 < 0); a.style.gridColumn = `span ${x.keys.length}`;
-      a.style.setProperty("--mg-h", H + "px"); a.style.setProperty("--mg-o", off + "px"); a.style.setProperty("--sn-mg-s", H / 2 - off - ch / 2 + "px");
-      if (r0 >= 0 && r0 !== r) fillCell(a, model.byKey[x.key0], r0); // 每一截都显示合并块第一行的内容
+      const segs = mergeSegs(src, x, cellH), s = segs.find((sg) => p >= sg.p0 && p <= sg.p1) ?? { p0: x.p0, p1: x.p1, dhBefore: 0, dhAfter: 0 };
+      const a = el._cells[x.key0], y0 = src.rowY(s.p0), segH = src.rowY(s.p1) + cellH(s.p1) - y0, off = src.rowY(p) - y0, r0 = src.rowAt(x.p0);
+      let midH = segH;
+      if (segs.length > 1 && s === segs[0] && s.dhAfter > 0) {
+        let sum = 0; for (let q = x.p0; q <= x.p1; q++) sum += cellH(q);
+        midH = sum + (segH - sum) * Math.min(1, s.dhAfter / Math.min(DETAIL, 48));
+      }
+      const alpha = s.dhBefore > 0 ? Math.min(1, s.dhBefore / Math.min(DETAIL, 48)) : 1;
+      a.classList.add("sn-mg"); a.classList.toggle("sn-mg-last", p === s.p1); a.classList.toggle("sn-mg-wait", r0 < 0); a.style.gridColumn = `span ${x.keys.length}`;
+      a._mgSeg = { y0, y1: y0 + segH, midH, h0: cellH(s.p0), h1: cellH(s.p1), ch, py: src.rowY(p) };
+      a.style.setProperty("--mg-h", midH + "px"); a.style.setProperty("--mg-o", off + "px"); a.style.setProperty("--sn-mg-s", midH / 2 - off - ch / 2 + "px");
+      if (alpha < .999) a.style.setProperty("--sn-mg-a", alpha.toFixed(3));
+      if (r0 >= 0 && r0 !== r) fillCell(a, model.byKey[x.key0], r0); // 每一段都显示合并块首行内容，绝不留空白死洞
       el._mg.push(x.key0); for (const k of x.keys) if (k !== x.key0) { el._cells[k].classList.add("sn-mg-hide"); el._mg.push(k); }
     }
     for (const c of model.cols) {
@@ -725,6 +778,13 @@ export function mountDataGrid(root, o = {}) {
       if (rowDrag?.hides(p)) { el.style.display = "none"; el._p = -1; continue; } // 被拖的行（树形：连同展开着的下级）由单独那一块画（跟着指针走）
       if (editing && el.contains(editing.input)) continue; // 正在编辑的那行不重填
       if (el._p !== p || el._v !== dver) fill(el, p);
+      if (el._mg?.length) for (const k of el._mg) {
+        const c = el._cells[k], sg = c._mgSeg; if (!sg) continue;
+        let cy = sg.y0 + sg.midH / 2;
+        const lo = Math.max(sg.y0 + sg.h0 / 2, st + sg.h0 / 2), hi = Math.min(sg.y1 - sg.h1 / 2, st + h - sg.h1 / 2);
+        if (hi >= lo) cy = Math.max(lo, Math.min(hi, cy));
+        c.style.setProperty("--sn-mg-s", (cy - sg.py - sg.ch / 2).toFixed(2) + "px");
+      }
       look(el, p, offs?.[p - first] || 0, now);
     }
     for (const el of pool) if (!used.has(el)) { el.style.display = "none"; el._p = -1; }
@@ -802,7 +862,7 @@ export function mountDataGrid(root, o = {}) {
       if (dx || dy) raf3 = requestAnimationFrame(tick);
     };
     const mv = (ev) => { px = ev.clientX; py = ev.clientY; if (!moved) { if (Math.hypot(px - e.clientX, py - e.clientY) < 4) return; moved = true; try { body.setPointerCapture(ev.pointerId); } catch {} } if (!raf3) raf3 = requestAnimationFrame(tick); };
-    const fin = () => { if (done) return; done = true; cancelAnimationFrame(raf3); for (const [t, f] of evs) body.removeEventListener(t, f); removeEventListener("pointerup", fin); };
+    const fin = () => { if (done) return; done = true; if (moved && raf3) { cancelAnimationFrame(raf3); raf3 = 0; const h = cellAt(px, py); if (h && (!rg || rg.fp !== h[0] || rg.fc !== h[1]) && (rg || h[0] !== ap || h[1] !== ac)) { rg = { ap, ac, fp: h[0], fc: h[1] }; dver++; schedule(); syncMergeBar(); } } cancelAnimationFrame(raf3); for (const [t, f] of evs) body.removeEventListener(t, f); removeEventListener("pointerup", fin); };
     const evs = [["pointermove", mv], ["pointerup", fin], ["pointercancel", fin], ["lostpointercapture", fin]];
     for (const [t, f] of evs) body.addEventListener(t, f); addEventListener("pointerup", fin); // 没拿到捕获时在窗口上收尾
   }
@@ -854,11 +914,11 @@ export function mountDataGrid(root, o = {}) {
     const input = document.createElement("input"); input.className = "sn-cell-ed" + (col.align === "right" ? " sn-r" : ""); input.value = initial ?? editText(col, cur); input.spellcheck = false;
     cell.append(input); cell.classList.add("sn-editing");
     if (cell.classList.contains("sn-mg")) { const H = parseFloat(cell.style.getPropertyValue("--mg-h")), ih = cell.offsetHeight - 8; Object.assign(input.style, { top: Math.max(4, H / 2 - ih / 2) + "px", bottom: "auto", height: ih + "px" }); cell.closest(".sn-g-row").classList.add("sn-g-editrow"); }
-    input.focus(); if (initial == null) input.select();
+    input.focus({ preventScroll: true }); if (initial == null) input.select();
     editing = { input, cell, col, r, end: (c, st) => end(c, st) };
     const end = (commit, step = 0) => {
       if (!editing) return;
-      if (commit) { const res = parseEdit(col, input.value); if (res.error) { showErr(cell, res.error); input.focus(); return false; } if (res.value !== cur) commitEdit(r, col.key, res.value, cur); }
+      if (commit) { const res = parseEdit(col, input.value); if (res.error) { showErr(cell, res.error); input.focus({ preventScroll: true }); return false; } if (res.value !== cur) commitEdit(r, col.key, res.value, cur); }
       hideErr(); input.remove(); cell.classList.remove("sn-editing"); cell.closest(".sn-g-row")?.classList.remove("sn-g-editrow"); editing = null; dver++; schedule(); vp.focus({ preventScroll: true });
       if (step === "down") { const am = merges.at(active.p, active.c); setActive((am ? am.p1 : active.p) + 1, active.c); } else if (step) moveActive(step);
       return true;
@@ -1027,7 +1087,7 @@ export function mountDataGrid(root, o = {}) {
   function setTreeMode(on) { flushDrop(); if (editing?.end) editing.end(true); mo.reset(); hAnim.clear(); expAnim.clear(); expTo.clear(); src.setTree(on); }
   let shownTree = false;
   function syncTree() { // 新视图到了：换成这一套的外观（操作列多一个"详情"按钮、名称列宽一些放得下缩进、读屏按树形表格读）
-    const t = src.tree; if (t === shownTree) return; shownTree = t; expd = EXPD[t ? "tree" : "flat"]; root.classList.toggle("sn-tree", t); vp.setAttribute("role", t ? "treegrid" : "grid");
+    const t = src.tree; if (t === shownTree) return; shownTree = t; expd = EXPD[t ? "tree" : "flat"]; root.classList.toggle("sn-tree", t); root.classList.toggle("sn-has-exp", expd.size > 0); merges.invalidate(); vp.setAttribute("role", t ? "treegrid" : "grid");
     treeCols(model, t); apply(); active = { p: 0, c: NAME, id: src.idAt(0) };
   }
   // ———— 拖行高：在最左边那一列拖某一行的下边线；双击恢复默认；全选时所有行一起改（被拖那一行在视口里的位置不动） ————
@@ -1081,14 +1141,14 @@ export function mountDataGrid(root, o = {}) {
   function toggleExpand(p) {
     flushDrop(); const r = src.rowAt(p); if (r < 0) return; const open = !(expTo.get(r) ?? expd.has(r)); expTo.set(r, open);
     const h0 = expd.get(r) ?? src.rowH(p), from = src.rowH(p), to = open ? h0 + DETAIL : h0;
-    if (open && !expd.has(r)) expd.set(r, h0); src.track(r, p);
+    if (open && !expd.has(r)) expd.set(r, h0); root.classList.toggle("sn-has-exp", expd.size > 0); merges.invalidate(); syncMergeBar(); src.track(r, p);
     let t0 = 0; const dur = reduced() ? 0 : 220, tok = {}; expAnim.set(r, tok); dver++; schedule(); // t0 在第一步定：第一步就按走了一帧算，点下去下一帧就动
     const step = (now) => {
       if (expAnim.get(r) !== tok) return; if (!t0) t0 = now - 16.7;
       const k = dur ? Math.max(0, Math.min(1, (now - t0) / dur)) : 1, q = 1 - (1 - k) ** 3;
       src.setIdH(r, from + (to - from) * q); dver++; render();
       if (k < 1) { requestAnimationFrame(step); return; }
-      expAnim.delete(r); expTo.delete(r); if (!open) { expd.delete(r); src.setIdH(r, h0); dver++; render(); }
+      expAnim.delete(r); expTo.delete(r); if (!open) { expd.delete(r); root.classList.toggle("sn-has-exp", expd.size > 0); merges.invalidate(); syncMergeBar(); src.setIdH(r, h0); dver++; render(); }
     };
     requestAnimationFrame(step);
   }

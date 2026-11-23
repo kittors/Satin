@@ -8,7 +8,7 @@ const ROOT = path.resolve(import.meta.dirname, "../..");
 const SRC = path.join(ROOT, "spec/recipes"), OUT = path.join(ROOT, "tests/recipes");
 fs.mkdirSync(OUT, { recursive: true });
 const P = "../../packages/satin-ui";
-const IMPORTS = { "satin-ui": `${P}/src/index.js`, "satin-ui/components": `${P}/src/components.js`, "satin-ui/elements": `${P}/elements/index.js`, "satin-ui/theme": `${P}/src/theme.js`, "satin-ui/chat": `${P}/src/chat.js`, "satin-ui/markdown": `${P}/src/markdown.js` };
+const IMPORTS = { "satin-ui": `${P}/src/index.js`, "satin-ui/components": `${P}/src/components.js`, "satin-ui/elements": `${P}/elements/index.js`, "satin-ui/theme": `${P}/src/theme.js`, "satin-ui/charts": `${P}/src/charts.js`, "satin-ui/chat": `${P}/src/chat.js`, "satin-ui/markdown": `${P}/src/markdown.js` };
 // 占位图：中性灰的 SVG（不带彩色，不像"AI 插画"）
 const ph = (w, h) => "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="#d8d8dc"/><rect x="${w * .08}" y="${h * .12}" width="${w * .3}" height="${h * .06}" rx="4" fill="#c4c4c9"/><rect x="${w * .08}" y="${h * .24}" width="${w * .84}" height="${h * .64}" rx="8" fill="#cbcbd0"/></svg>`);
 const pages = [];
@@ -47,6 +47,7 @@ for (const f of fs.readdirSync(SRC).filter((f) => /^\d+-.*\.md$/.test(f)).sort()
 <meta charset="utf-8">
 ${viewport || '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'}
 <title>配方 · ${title}</title>
+<link rel="icon" href="data:,">
 <script src="${P}/src/theme-boot.js"></script>
 <link rel="stylesheet" href="${P}/css/page.css">
 <script type="importmap">${JSON.stringify({ imports: IMPORTS })}</script>

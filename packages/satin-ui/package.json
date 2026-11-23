@@ -94,6 +94,10 @@
       "types": "./types/heavy.d.ts",
       "default": "./src/canvas-grid.js"
     },
+    "./charts": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/charts.js"
+    },
     "./lightbox": {
       "types": "./types/heavy.d.ts",
       "default": "./src/lightbox.js"

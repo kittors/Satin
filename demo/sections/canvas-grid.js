@@ -14,13 +14,13 @@ import { createDemoBackend } from "../grid-backend.js";
 // 行详情（画在画布上）：封面渐变、标题、一句话说明、镜头条。表格画好底色和分隔线、裁好范围，这里画内容
 const TITLE_F = "600 13px -apple-system, 'PingFang SC', sans-serif";
 function drawDetail({ g, row, r, y, w: W, C, F, text, trunc }) {
-  const hue = (r * 47) % 360, x0 = 64, cw = 112, chh = 63, gr = g.createLinearGradient(x0, y + 10, x0 + cw, y + 10 + chh); gr.addColorStop(0, `hsl(${hue} 32% 34%)`); gr.addColorStop(1, `hsl(${(hue + 40) % 360} 28% 13%)`);
-  g.fillStyle = gr; g.beginPath(); g.roundRect(x0, y + 12, cw, chh, 6); g.fill();
+  const hue = (r * 47) % 360, x0 = 64, cw = 112, chh = 64, gr = g.createLinearGradient(x0, y + 16, x0 + cw, y + 16 + chh); gr.addColorStop(0, `hsl(${hue} 32% 34%)`); gr.addColorStop(1, `hsl(${(hue + 40) % 360} 28% 13%)`);
+  g.fillStyle = gr; g.beginPath(); g.roundRect(x0, y + 16, cw, chh, 6); g.fill();
   const tx = x0 + cw + 16, sh = row.shots;
-  text(trunc(row.name, W - tx - 16, TITLE_F), tx, y + 22, TITLE_F, C.label);
-  text(trunc(`${TAGS[row.tag]} · ${sh} 个镜头 · 时长 ${fmt.dur(row.dur)} · ${STATUS[row.status]}，进度 ${row.prog}% · 负责人 ${OWNERS[row.owner]} · ${fmt.time(row.upd)} 更新`, W - tx - 16, F.s), tx, y + 44, F.s, C.label2);
-  for (let k = 0; k < Math.min(10, sh); k++) { const g2 = g.createLinearGradient(tx + k * 32, y + 58, tx + k * 32 + 28, y + 74); g2.addColorStop(0, `hsl(${(hue + k * 23) % 360} 30% 36%)`); g2.addColorStop(1, `hsl(${(hue + k * 23 + 30) % 360} 26% 16%)`); g.fillStyle = g2; g.beginPath(); g.roundRect(tx + k * 32, y + 58, 28, 16, 3); g.fill(); }
-  if (sh > 10) text(`+${sh - 10}`, tx + 10 * 32 + 4, y + 66, F.s, C.label3);
+  text(trunc(row.name, W - tx - 16, TITLE_F), tx, y + 25, TITLE_F, C.label);
+  text(trunc(`${TAGS[row.tag]} · ${sh} 个镜头 · 时长 ${fmt.dur(row.dur)} · ${STATUS[row.status]}，进度 ${row.prog}% · 负责人 ${OWNERS[row.owner]} · ${fmt.time(row.upd)} 更新`, W - tx - 16, F.s), tx, y + 47, F.s, C.label2);
+  for (let k = 0; k < Math.min(10, sh); k++) { const g2 = g.createLinearGradient(tx + k * 32, y + 62, tx + k * 32 + 28, y + 78); g2.addColorStop(0, `hsl(${(hue + k * 23) % 360} 30% 36%)`); g2.addColorStop(1, `hsl(${(hue + k * 23 + 30) % 360} 26% 16%)`); g.fillStyle = g2; g.beginPath(); g.roundRect(tx + k * 32, y + 62, 28, 16, 3); g.fill(); }
+  if (sh > 10) text(`+${sh - 10}`, tx + 10 * 32 + 4, y + 70, F.s, C.label3);
 }
 
 // 展示页

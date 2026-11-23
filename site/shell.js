@@ -134,9 +134,23 @@ const onScroll = () => nav?.classList.toggle("scrolled", scrollY > 4);
 addEventListener("scroll", onScroll, { passive: true }); onScroll();
 
 // ———— 进入视口时轻轻浮上来（只做一次） ————
+// 阈值放宽到 0.01 并提前 64px 触发：高容器（如首屏 736px 应用窗口）刚露出即刻流畅入场，绝不因达不到高百分比而留白
 export function reveal(scope = document) {
-  const io = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { e.target.classList.add("sn-in"); io.unobserve(e.target); } }, { rootMargin: "0px 0px -8% 0px", threshold: .12 });
-  for (const el of $$(".rv:not(.sn-in)", scope)) io.observe(el);
+  const els = $$(".rv:not(.sn-in)", scope);
+  if (!els.length) return;
+  const io = new IntersectionObserver((es) => {
+    for (const e of es) if (e.isIntersecting) { e.target.classList.add("sn-in"); io.unobserve(e.target); }
+  }, { rootMargin: "0px 0px 64px 0px", threshold: 0.01 });
+  const visibleNow = [];
+  for (const el of els) {
+    const r = el.getBoundingClientRect();
+    if (r.top < innerHeight + 64 && r.bottom > -64) visibleNow.push(el);
+    else io.observe(el);
+  }
+  if (visibleNow.length) {
+    // 已在首屏范围内的元素下一帧立刻进入：既保留柔和浮现动效，又保证刷新后 100% 必定显现
+    requestAnimationFrame(() => { for (const el of visibleNow) el.classList.add("sn-in"); });
+  }
 }
 
 // 框架偏好不在顶栏上（只在文档侧栏顶上、代码块头部，见 fwpref.js）；页面里写了 data-set-fw 的按钮点了就换

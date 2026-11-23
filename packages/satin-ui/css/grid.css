@@ -100,6 +100,8 @@
 
 /* ———— 弹层：筛选、选项 ———— */
 .sn-g-pop { min-width: 180px; }
+.sn-g-pop .sn-pop-checks { margin: 2px 0; }
+.sn-g-pop .sn-pop-checks .sn-check { padding: 0 8px; }
 .sn-g-fhead { padding: 6px 8px 4px; font: 600 calc(11px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-g-frange { display: flex; align-items: center; gap: 6px; padding: 4px 8px; }
 .sn-g-frange .sn-input { width: 88px; }
@@ -117,6 +119,7 @@
 /* 固定列和滚动内容的交界：横滚开以后只出一条 1px 的线，和别的格线同色同粗（不加渐变阴影：叠在格线上会显得一条粗线）。
    左边这条压在固定列自己那条竖线上（网格模式下两条重合成一条），右边这条贴着右固定列的左边 */
 .sn-g-shade { position: absolute; z-index: 7; top: 0; height: var(--sn-g-shh, 0px); width: 1px; pointer-events: none; opacity: 0; background: var(--sn-line); }
+.sn-grid.sn-cg .sn-g-shade, .sn-grid.sn-has-exp .sn-g-shade { height: 40px; } /* Canvas 版与展开行详情时，外框阴影条只画表头 40px，表体边线让开详情面板不劈穿 */
 .sn-g-shade.sn-l { left: calc(var(--sn-g-lw, 0px) - 1px); }
 .sn-g-shade.sn-r { right: var(--sn-g-rw, 0px); }
 .sn-grid.sn-sx .sn-g-shade.sn-l, .sn-grid.sn-ex .sn-g-shade.sn-r { opacity: 1; }
@@ -221,7 +224,7 @@
 
 /* ———— 合并单元格：每一行画自己那一截（第一列格子横跨几列），内容往下挪到整块正中；块内不画行线、不跟着某一行变色 ———— */
 .sn-g-cell.sn-mg-hide { display: none; }
-.sn-g-cell.sn-mg > * { translate: 0 var(--sn-mg-s, 0px); }
+.sn-g-cell.sn-mg > * { translate: 0 var(--sn-mg-s, 0px); opacity: var(--sn-mg-a, 1); }
 .sn-g-cell.sn-mg.sn-mg-wait > * { visibility: hidden; }
 .sn-g-cell.sn-mg { box-shadow: inset 1px 0 0 var(--sn-g-rowline), inset -1px 0 0 var(--sn-g-rowline); } /* 合并格左右都画线（只有行线时也画）：看起来就是一整格，不像一个洞；块里不画行线 */
 .sn-g-cell.sn-mg.sn-mg-last { box-shadow: inset 1px 0 0 var(--sn-g-rowline), inset -1px -1px 0 var(--sn-g-rowline); }
@@ -252,7 +255,7 @@
 .sn-g-row { grid-template-rows: var(--sn-ch, 40px) var(--sn-dh, 0px); }
 .sn-g-exp { margin: 0 2px 0 -6px; } /* 展开箭头本身是共用的 .disc（buttons.css） */
 .sn-g-detail { display: none; }
-.sn-g-row.sn-exp .sn-g-detail { position: sticky; left: 0; grid-row: 2; grid-column: 1 / -1; display: flex; gap: 16px; align-items: flex-start; width: var(--sn-vpw, 600px); height: var(--sn-dh, 0px); padding: 12px 16px 12px 64px; overflow: hidden; box-shadow: inset 0 -1px 0 var(--sn-g-rowline); background: color-mix(in srgb, var(--sn-label) 2%, var(--sn-g-bg)); animation: sn-g-dt-in .24s var(--sn-ease-out); }
+.sn-g-row.sn-exp .sn-g-detail { position: sticky; left: 0; z-index: 6; grid-row: 2; grid-column: 1 / -1; display: flex; gap: 16px; align-items: flex-start; width: var(--sn-vpw, 600px); height: var(--sn-dh, 0px); padding: 12px 16px 12px 64px; overflow: hidden; box-shadow: inset 0 -1px 0 var(--sn-g-rowline); background: color-mix(in srgb, var(--sn-label) 2%, var(--sn-g-bg)); animation: sn-g-dt-in .24s var(--sn-ease-out); }
 @keyframes sn-g-dt-in { from { opacity: 0; } }
 .sn-g-dt-cv { flex: none; width: 128px; aspect-ratio: 16 / 9; border-radius: 6px; background: linear-gradient(150deg, hsl(var(--sn-h, 210) 32% 34%), hsl(calc(var(--sn-h, 210) + 40) 28% 13%)); }
 .sn-g-dt-main { min-width: 0; display: grid; gap: 6px; }
@@ -278,8 +281,9 @@
    没有下级的是一个小圆点；名称后面是下级数量（"4 集"）；行详情挪到操作列的"详情"按钮上（名称前的箭头留给下级） */
 .sn-g-tg, .sn-g-leaf, .sn-g-cnt { display: none; }
 .sn-grid.sn-tree .sn-g-cell:is([data-c="name"], [data-primary]) { padding-left: calc(12px + var(--sn-lv, 0) * 24px); }
-.sn-grid.sn-tree .sn-g-tg { display: block; position: absolute; top: 0; bottom: 0; left: 12px; width: calc(var(--sn-lv, 0) * 24px); background: repeating-linear-gradient(90deg, transparent 0 3.5px, var(--sn-tree-line) 3.5px 4.5px, transparent 4.5px 24px); pointer-events: none; }
-.sn-grid.sn-tree .sn-g-row.sn-to .sn-g-tg::after { content: ""; position: absolute; left: calc(3.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); }
+.sn-grid.sn-tree .sn-g-tg { display: block; position: absolute; top: 0; bottom: 0; left: 12px; width: calc(var(--sn-lv, 0) * 24px); background: var(--sn-tbg, repeating-linear-gradient(90deg, transparent 0 3.5px, var(--sn-tree-line) 3.5px 4.5px, transparent 4.5px 24px)); pointer-events: none; }
+.sn-grid.sn-tree .sn-g-tg::after { content: ""; position: absolute; left: calc(3.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); transform-origin: top; scale: 1 0; opacity: 0; transition: scale .2s var(--sn-ease-open), opacity .16s var(--sn-ease-out); }
+.sn-grid.sn-tree .sn-g-row.sn-to .sn-g-tg::after { scale: 1 1; opacity: 1; }
 .sn-grid.sn-tree .sn-g-row:not(.sn-tk) .sn-g-exp { display: none; }
 .sn-grid.sn-tree .sn-g-row:not(.sn-tk) .sn-g-leaf { display: grid; flex: none; place-items: center; width: 20px; height: 20px; margin: 0 2px 0 -6px; }
 .sn-g-leaf::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--sn-line-control); }

@@ -109,7 +109,7 @@ const winAt = (c, w) => (w?.demo ?? Math.max(0, (c?.demos.length || 1) - 1));
 function demoBox(id, { code = true, n } = {}) {
   if (USAGE[id]?.demoOnly) code = false; // 展示页自己的演示：没有能抄的代码
   const c = cat.byId[id], w0 = WIN[id], w = w0 && (n == null || n === winAt(c, w0)) ? w0 : null, min = TALL[id] || 0; // 不给保底高度：内容比预览框矮时由预览框上下居中，不把空白都堆在下面
-  const frame = `<div class="d-frame" style="--sn-h:${Math.max(min, w ? 320 : 120)}px" data-min="${min}"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="${esc(c?.name || "")}演示" data-src="../index.html?embed=${id}${n != null ? "&demo=" + n : ""}${w ? "&win=1" : ""}${w?.flush ? "&flush=1" : ""}${TALL[id] ? "&center=1" : ""}"></iframe></div>`;
+  const frame = `<div class="d-frame" style="--sn-h:${Math.max(min, w ? 320 : 120)}px" data-min="${min}"><div class="d-load" aria-hidden="true"><div class="d-load-bars"><i></i><i></i></div></div><iframe title="${esc(c?.name || "")}演示" data-src="../index.html?embed=${id}${n != null ? "&demo=" + n : ""}${w ? "&win=1" : ""}${w?.flush ? "&flush=1" : ""}${TALL[id] ? "&center=1" : ""}"></iframe></div>`;
   return `<div class="dx${w ? " is-win" : ""}" data-demo="${id}"${n != null ? ` data-n="${n}"` : ""}>
     <div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div>
     <div class="dx-stage">${w ? `<img class="dx-wall" src="${img("mist", 1800, 70)}" alt="" decoding="async">` : ""}${w ? MAC(w.title, frame) : frame}</div>
@@ -669,22 +669,61 @@ function overviewPage(pg) {
     + groups.map((g, i) => anchor("g" + i, `${esc(g.name)}<span class="d-h2-sub">${g.items.length}</span>`) + `<div class="d-cards">${g.items.map((c) => `<a class="d-card" href="#/c/${c.id}"><b>${esc(c.name)}</b><small>${esc(c.en.split(" · ")[0])}</small><span>${esc(plain(c.desc))}</span></a>`).join("")}</div>`).join("");
 }
 // 配方总览：8 种页面，每张卡片上是这一页缩小的实时预览（滚到附近才载入）
-const RSUB = { "admin-table": "侧栏 + 搜索筛选 + 表格 + 分页", settings: "单栏窄页面，左边标题、右边字段", auth: "整屏居中一个面板：字段 + 撑满的主按钮", dashboard: "指标面板 + 两栏：主要内容和最近动态",
+const RSUB = { "admin-table": "侧栏 + 搜索筛选 + 表格 + 分页", settings: "单栏窄页面，左边标题、右边字段", auth: "整屏居中一个面板：字段 + 撑满的主按钮", dashboard: "KPI 火花线 + 面积/环形/3D 立体算力图 + 联动明细表",
   chat: "对话框占满主区：消息区 + 提示词输入框", landing: "首屏 + 3 个功能点 + 真实场景 + 页脚", "mobile-order": "单栏 + 底部贴边的操作栏", wizard: "步骤条 + 当前一步的字段 + 上一步 / 下一步" };
 function recipesPage(pg) {
   return head(pg, "配方总览", `配方 <span>Recipes</span>`, "8 种常见页面的骨架：先照着搭结构，再换成自己的内容。只用 Satin 的骨架类和组件，不用自己写布局和颜色。每一种都有实时预览和代码，代码可以切换 HTML、React、Vue。")
     + `<div class="d-cards d-rcards">${RECIPES.map((r) => `<a class="d-card d-rcard" href="#/recipe/${r.id}"><span class="d-rprev" aria-hidden="true"><iframe src="../tests/recipes/${r.id}.html" loading="lazy" tabindex="-1" title=""></iframe></span><b>${esc(r.title)}</b><span>${esc(RSUB[r.id] || "")}</span></a>`).join("")}</div>`;
 }
-// 单个配方：原文（spec/recipes/*.md）载好后填进来——说明、实时预览、代码、补充说明
+// 单个配方：原文（spec/recipes/*.md）载好后填进来——说明、实时预览、代码、详尽案例介绍或补充说明
 function recipePage(pg) {
   return head(pg, pg.r.title, `配方 <span>Recipe</span>`, `<span data-async-lead></span>`) + `<div data-async="recipe:${pg.r.id}"></div>`;
 }
 const md2html = (t) => esc(t).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+// 把配方代码段后面的 Markdown 案例说明渲染为完整结构化文档（## 自动进右侧 TOC、###、表格、列表、引用块、段落）；无 ## 时沿用原本的"补充说明"列表
+function renderRecipeAfter(raw) {
+  const text = String(raw || "").trim();
+  if (!text) return "";
+  if (!/^## /m.test(text)) {
+    const notes = text.split(/\n+/).filter(Boolean);
+    return anchor("notes", "补充说明") + `<ul class="d-list">${notes.map((n) => `<li>${md2html(n)}</li>`).join("")}</ul>`;
+  }
+  const lines = text.split("\n"), out = [];
+  let i = 0, secN = 0;
+  const parseCells = (ln) => ln.trim().replace(/^\||\|$/g, "").split("|").map((c) => md2html(c.trim()));
+  while (i < lines.length) {
+    const ln = lines[i].trim();
+    if (!ln) { i++; continue; }
+    if (ln.startsWith("## ")) { out.push(anchor("case-" + ++secN, esc(ln.slice(3).trim()))); i++; continue; }
+    if (ln.startsWith("### ")) { out.push(`<h3 class="d-h3">${esc(ln.slice(4).trim())}</h3>`); i++; continue; }
+    if (ln.startsWith("> ")) {
+      const qs = []; while (i < lines.length && lines[i].trim().startsWith("> ")) { qs.push(md2html(lines[i].trim().slice(2))); i++; }
+      out.push(`<blockquote class="d-rcase-quote">${qs.join("<br>")}</blockquote>`); continue;
+    }
+    if (ln.startsWith("|") && i + 1 < lines.length && /^\|?[\s:-]+\|/.test(lines[i + 1].trim())) {
+      const hd = parseCells(lines[i]); i += 2;
+      const rows = []; while (i < lines.length && lines[i].trim().startsWith("|")) { rows.push(parseCells(lines[i])); i++; }
+      out.push(BLOCK.table(hd, rows)); continue;
+    }
+    if (/^[-*] /.test(ln)) {
+      const items = []; while (i < lines.length && /^[-*] /.test(lines[i].trim())) { items.push(`<li>${md2html(lines[i].trim().slice(2))}</li>`); i++; }
+      out.push(`<ul class="d-list">${items.join("")}</ul>`); continue;
+    }
+    const ps = []; while (i < lines.length) {
+      const t = lines[i].trim();
+      if (!t || t.startsWith("#") || t.startsWith("> ") || /^[-*] /.test(t) || t.startsWith("|")) break;
+      ps.push(md2html(t)); i++;
+    }
+    if (ps.length) out.push(`<p>${ps.join(" ")}</p>`);
+  }
+  return out.join("");
+}
 const RMD = new Map();
 const loadRecipe = (r) => RMD.get(r.id) || (RMD.set(r.id, fetch(new URL(`../spec/recipes/${r.file}`, location.href)).then((x) => x.text()).then((md) => {
   const title = (md.match(/^# (.+)$/m) || [, r.title])[1], i = md.indexOf("```html"), j = md.indexOf("```", i + 7);
-  const before = md.slice(md.indexOf("\n", md.indexOf("# ")) + 1, i).trim().split(/\n+/), after = md.slice(j + 3).trim().split(/\n+/).filter(Boolean);
-  return { title, lead: before, code: md.slice(md.indexOf("\n", i) + 1, j).trimEnd(), notes: after };
+  const before = md.slice(md.indexOf("\n", md.indexOf("# ")) + 1, i).trim().split(/\n+/), afterRaw = md.slice(j + 3).trim();
+  const after = afterRaw ? afterRaw.split(/\n+/).filter(Boolean) : [];
+  return { title, lead: before, code: md.slice(md.indexOf("\n", i) + 1, j).trimEnd(), notes: after, afterRaw };
 })), RMD.get(r.id));
 // 配方的三种写法：标记里的 <meta>、<link> 属于 <head>，组件里不要；<script> 里的接线搬进组件的挂载
 // doc：预览 iframe 里载好的配方页（按计算样式判断空白要不要留）；没给就按标签猜
@@ -701,9 +740,23 @@ window.__satinRecipeFiles = async () => {
   const f = $(".d-rframe iframe", main); let doc = null; try { doc = f?.contentDocument; } catch {}
   const d = await loadRecipe(pg.r); return { id: pg.r.id, ready: !!doc && doc.readyState === "complete", files: recipeFiles(pg.r, d, doc && doc.URL !== "about:blank" ? doc : null) };
 };
+// 契约示例的演示舞台排布：小控件水平+垂直居中，表单单控件收束到 320px，中等容器 480px，宽控件 600px，应用级全宽容器保持铺满
+const PLAY_LY_SLUG = { "button-mobile": "", "select-field": "field", "count-longtext": "med", "card-basic": "center" };
+const PLAY_LY_ID = {
+  button: "center", iconbutton: "center", link: "center", compound: "center", chip: "center", choice: "center",
+  segmented: "center", slider: "center", otp: "center", number: "center", numflow: "center", avatar: "center",
+  tags: "center", tooltip: "center", popover: "center", popconfirm: "center", ctxmenu: "center", dialog: "center",
+  drawer: "center", cmdk: "center", toast: "center", notify: "center", select: "center", image: "center", empty: "center",
+  input: "field", field: "field", special: "field", count: "field", taginput: "field", picker: "field",
+  prompt: "med", progress: "med", collapse: "med", list: "med", loading: "med", upload: "med",
+  addremove: "med", reorder: "med", optimistic: "med", scrollarea: "med",
+  banner: "wide", tabs: "wide",
+};
+const playLayout = (id, slug) => (slug in PLAY_LY_SLUG ? PLAY_LY_SLUG[slug] : PLAY_LY_ID[id] || "");
 // 契约示例的演示框：现场演示就是纯 HTML 示例那份代码本身（examples/html/play.html?demo=<slug>），代码块读当前框架的同名文件
 function playBox(c, ex) {
-  const frame = `<div class="d-frame" style="--sn-h:120px" data-min="0"><div class="d-load"><span class="sn-spinner"></span>正在载入演示</div><iframe title="${esc(ex.title)}演示" data-src="../examples/html/play.html?demo=${ex.slug}"></iframe></div>`;
+  const ly = playLayout(c.id, ex.slug);
+  const frame = `<div class="d-frame" style="--sn-h:120px" data-min="0"><div class="d-load" aria-hidden="true"><div class="d-load-bars"><i></i><i></i></div></div><iframe title="${esc(ex.title)}演示" data-src="../examples/html/play.html?demo=${ex.slug}${ly ? "&layout=" + ly : ""}"></iframe></div>`;
   return `<div class="dx" data-demo="${c.id}" data-play="${ex.slug}"${/手机/.test(ex.title) ? ` data-phone="${esc(ex.title)}"` : ""}><div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div><div class="dx-stage">${frame}</div><div class="dx-code" data-slug="${ex.slug}"><div class="dx-cx"></div></div></div>`;
 }
 const tbl = (head, rows) => BLOCK.table(head, rows);
@@ -837,14 +890,43 @@ function contractHTML(c, k) {
   if (cat0?.rules?.length) out.push(rulesHTML(cat0.rules));
   return out.join("");
 }
+// 全站异步数据缓存：组件契约、去 AI 味规则、令牌表与配方 Markdown 均缓存，并由左侧目录悬停预取（0ms 感知切换）
+const DATA_CACHE = new Map();
+const fetchJSON = (rel) => DATA_CACHE.get(rel) || (DATA_CACHE.set(rel, fetch(new URL(rel, location.href)).then((x) => x.json())), DATA_CACHE.get(rel));
+const READY_CACHE = new Map(); // 已解出的同步值：在原子提交时直接拿，零异步空壳
+
+function prefetchAsync(k, arg) {
+  const key = `${k}:${arg || ""}`;
+  if (k === "contract") return fetchJSON(`../spec/components/${arg}.json`).then((v) => { READY_CACHE.set(key, v); return v; });
+  if (k === "recipe") { const r = RECIPES.find((x) => x.id === arg); return r ? loadRecipe(r).then((v) => { READY_CACHE.set(key, v); return v; }) : Promise.resolve(null); }
+  if (k === "rules") return fetchJSON("../spec/rules/anti-ai.json").then((v) => { READY_CACHE.set(key, v); return v; });
+  if (k === "tokens") return Promise.all(["base", "theme.light", "theme.dark"].map((f) => fetchJSON(`../packages/satin-ui/tokens/${f}.tokens.json`))).then((v) => { READY_CACHE.set(key, v); return v; });
+  return Promise.resolve(null);
+}
+function asyncTaskOf(pg) {
+  if (!pg) return null;
+  if (pg.kind === "comp" && CONTRACTED.has(pg.c.id)) return ["contract", pg.c.id];
+  if (pg.kind === "recipe") return ["recipe", pg.r.id];
+  if (pg.p?.body?.some(([b]) => b === "rules")) return ["rules", ""];
+  if (pg.p?.body?.some(([b]) => b === "tokens")) return ["tokens", ""];
+  return null;
+}
+function prefetchPage(pg) {
+  const t = asyncTaskOf(pg);
+  return t ? prefetchAsync(t[0], t[1]).catch(() => null) : Promise.resolve(null);
+}
+// 悬停 / 键盘聚焦侧栏项即静默预取目标页元数据（内容加载与过渡规范 #1）
+side.addEventListener("pointerenter", (e) => { const a = e.target.closest?.("a[href]"); if (a) prefetchPage(byHash.get(a.getAttribute("href"))); }, true);
+side.addEventListener("focusin", (e) => { const a = e.target.closest?.("a[href]"); if (a) prefetchPage(byHash.get(a.getAttribute("href"))); });
+
 const ASYNC = {
   async contract(id) {
-    const k = await fetch(new URL(`../spec/components/${id}.json`, location.href)).then((x) => x.json());
+    const k = READY_CACHE.get(`contract:${id}`) || await prefetchAsync("contract", id);
     const lead = $("[data-async-lead]", main); if (lead && k.lead) lead.outerHTML = md(k.lead);
     return contractHTML(cat.byId[id], k);
   },
   async recipe(id) {
-    const r = RECIPES.find((x) => x.id === id), d = await loadRecipe(r);
+    const r = RECIPES.find((x) => x.id === id), d = READY_CACHE.get(`recipe:${id}`) || await prefetchAsync("recipe", id);
     const lead = $("[data-async-lead]", main); if (lead) lead.outerHTML = md2html(d.lead.join(" "));
     // 手机页面（mobile）：桌面上放进设备框；原来的整宽预览留着（手机上显示，示例生成器也读它），桌面上藏起来
     // 桌面页面：预览上面一个"在手机上看"开关，打开后同一个页面放进设备框（mountPhoneToggles）
@@ -852,10 +934,10 @@ const ASYNC = {
       // 预览框分两类：app 式（对话、向导、后台列表、登录——整页就是一个应用，自己占满一屏）固定高度；内容页（仪表盘、落地页、设置、下单）和内容一样高，框里不出滚动条（fitRecipes）
       + `<div class="d-rframe${r.mobile ? " d-rframe-m" : ""}" data-fit="${r.shell ? "fixed" : "content"}"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>` + (r.mobile ? "" : "</div>")
       + anchor("code", "代码") + `<div class="dx-code d-rcode" data-recipe="${id}" data-fold="24"><div class="dx-cx"></div></div>`
-      + (d.notes.length ? anchor("notes", "补充说明") + `<ul class="d-list">${d.notes.map((n) => `<li>${md2html(n)}</li>`).join("")}</ul>` : "");
+      + renderRecipeAfter(d.afterRaw);
   },
   async rules() {
-    const data = await fetch(new URL("../spec/rules/anti-ai.json", location.href)).then((x) => x.json()), { rules } = data;
+    const data = READY_CACHE.get("rules:") || await prefetchAsync("rules", ""), { rules } = data;
     // "查法"是两三个字的短标签，不折行、按内容定宽；"怎么改"里的令牌名、类名、路径（规则文件里用反引号）渲染成整体不断开的代码，只在" / "、逗号这些地方换行（样式 .d-rules）
     // 查法按规则文件的 check.kind：static 源码、dom 页面、static+dom 两样都查；上面那句"一共 N 条"按规则文件实际条数改
     const how = (r) => { const k = r.check?.kind || "static"; return `<span class="d-nw">${k === "dom" ? "页面" : /\+|both/.test(k) ? "源码 + 页面" : "源码"}</span>`; };
@@ -877,8 +959,7 @@ const ASYNC = {
       + (rest.length ? `<h3 class="d-h3" id="root-x">其他<span class="d-h2-sub">${rest.length}</span></h3>` + table(rest) : "");
   },
   async tokens() {
-    const get = (f) => fetch(new URL(`../packages/satin-ui/tokens/${f}.tokens.json`, location.href)).then((x) => x.json());
-    const [base, light, dark] = await Promise.all([get("base"), get("theme.light"), get("theme.dark")]);
+    const [base, light, dark] = READY_CACHE.get("tokens:") || await prefetchAsync("tokens", "");
     // 拍平成 { var: { value, desc, path } }
     const flat = (tree, out = {}, path = []) => { for (const [k, v] of Object.entries(tree)) { if (k[0] === "$") continue; if (v && typeof v === "object" && "$value" in v) { const x = v.$extensions?.["com.satin"]; if (x?.var) out[x.var] = { value: v.$value, desc: v.$description || "", path: [...path, k].join(".") }; } else if (v && typeof v === "object") flat(v, out, [...path, k]); } return out; };
     const B = flat(base), L = flat(light), D = flat(dark), all = { ...B, ...L };
@@ -894,20 +975,38 @@ const fitPrev = () => { for (const pv of $$(".d-rprev", main)) pv.style.setPrope
 addEventListener("resize", fitPrev);
 // 窗口式演示背后的壁纸：载好了再淡入（.ld）。换页时接一遍；契约页的"完整演示"是后来异步填进来的，fillAsync 里再接一遍（不接就一直透明）
 const wireWalls = (scope) => { for (const w of $$(".dx-wall:not(.ld)", scope)) { if (w._wall) continue; w._wall = 1; const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); } };
-// 页面里异步的几块（[data-async]）：载好以后填进去，重新排本页目录
+// 慢网回退（>180ms）时的结构同构骨架 HTML
+const SKEL_HTML = `<div class="d-skel-page" aria-hidden="true"><span class="sn-skel d-skel-h"></span><span class="sn-skel d-skel-p"></span><span class="sn-skel d-skel-p2"></span><span class="sn-skel d-skel-stage"></span><div class="d-skel-row"><i class="sn-skel"></i><i class="sn-skel"></i><i class="sn-skel"></i></div></div>`;
+
+// 页面里异步的几块（[data-async]）：若已预取完成则瞬间原子填充，避免先出空壳；慢网时展示同构骨架并遵守 360ms 最小驻留防闪律
 async function fillAsync(scope, base) {
   const list = $$("[data-async]", scope); if (!list.length) return;
-  await Promise.all(list.map(async (el) => {
+  const cachedAll = list.every((el) => READY_CACHE.has(el.dataset.async.includes(":") ? el.dataset.async : el.dataset.async + ":"));
+  let skelAt = 0;
+  if (!cachedAll) {
+    skelAt = performance.now();
+    for (const el of list) el.innerHTML = SKEL_HTML;
+  }
+  const results = await Promise.all(list.map(async (el) => {
     const [k, arg] = el.dataset.async.split(":");
-    try { el.outerHTML = await ASYNC[k](arg); } catch (e) { el.outerHTML = `<p class="d-err">这一块没能载入：${esc(e.message)}</p>`; }
+    try { return [el, await ASYNC[k](arg)]; } catch (e) { return [el, `<p class="d-err">这一块没能载入：${esc(e.message)}</p>`]; }
   }));
+  if (skelAt && !reduced()) {
+    const left = Math.max(0, 360 - (performance.now() - skelAt));
+    if (left > 0) await new Promise((r) => setTimeout(r, left));
+  }
   if (curPage?.hash !== base) return; // 载入期间已经换页了
+  for (const [el, html] of results) el.outerHTML = html;
   injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main); mountDevices(main); mountPhoneToggles(main); fitRecipes(main); nbProse(main); balanceCards(main);
   for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
   for (const box of $$(".dx:not([data-wired])", main)) { box.dataset.wired = ""; wireDemo(box, cat.byId[box.dataset.demo]); }
   pump();
   await fillAll();
   buildToc(base);
+  if (skelAt && !reduced()) {
+    const art = main.firstElementChild;
+    art?.classList.remove("d-page-enter"); void art?.offsetWidth; art?.classList.add("d-page-enter");
+  }
 }
 function textPage(pg) {
   const p = pg.p, sec = p.rulesOf ? cat.byId[p.rulesOf] : null;
@@ -946,6 +1045,7 @@ function buildToc(base) {
   tocHs = $$("h2[id]", main);
   const tt = (h) => { const c = h.cloneNode(true); c.querySelector(".d-h2-sub")?.remove(); return c.textContent.trim(); };
   tocVp.innerHTML = tocHs.length ? `<p>本页</p>` + tocHs.map((h) => `<a href="${base}:${h.id}" data-to="${h.id}">${esc(tt(h))}</a>`).join("") : "";
+  if (!reduced() && tocHs.length) { tocVp.classList.remove("d-toc-enter"); void tocVp.offsetWidth; tocVp.classList.add("d-toc-enter"); }
   tocLinks = new Map($$("a", tocVp).map((a) => [a.dataset.to, a]));
   spyToc();
   // 窄屏（右边的本页目录藏起来了）：标题和说明下面一条"本页目录"，点开是一张菜单（组件库的按钮菜单），点一项滚到那一节
@@ -960,9 +1060,9 @@ function buildToc(base) {
   }
 }
 
-// ———— 路由 ————
-let curPage = null, first = true;
-function route() {
+// ———— 路由（实装「内容加载与过渡」规范：悬停预取 + 180ms 原子提交宽限期 + 同构骨架防闪） ————
+let curPage = null, first = true, routeSeq = 0;
+async function route() {
   followURL(); // 网址里的 fw 变了（手改地址、带参数的链接）：先换框架
   const { base: b0, part } = parseHash(location.hash || "#/intro"), base = b0 || "#/intro";
   // 基础那几项（颜色、排版、间距……）契约 id 在 #/c/ 下没有页，内容在规范里：#/c/color 转到 #/guide/color（契约、AI 引用的地址照样能打开）
@@ -971,45 +1071,66 @@ function route() {
   const pg = byHash.get(base === "#/" || base === "#" ? "#/intro" : base);
   queueMicrotask(syncURL); // 用户选过框架：换页以后把 ?fw= 写回网址（复制地址栏分享出去对方看到同一种写法）
   if (pg !== curPage) {
+    const seq = ++routeSeq;
+    // 切换目标页前等待异步数据最多 180ms（悬停预取命中时 0ms 即回）：彻底消灭先切出空壳再硬砸进 DOM 的闪白
+    if (pg && asyncTaskOf(pg)) {
+      await Promise.race([prefetchPage(pg), new Promise((r) => setTimeout(r, first ? 600 : 180))]);
+      if (seq !== routeSeq) return;
+    }
     if (!first && document.startViewTransition && !reduced()) {
       root.classList.add("vt-page");
-      const vt = document.startViewTransition(() => { swapPage(pg, part); return shownSoon(180); });
+      const vt = document.startViewTransition(async () => {
+        await swapPage(pg, part, true);
+        await shownSoon(220);
+      });
       vt.ready.catch(() => {}); // 浏览器中途放弃过渡（手机上地址栏伸缩、窗口大小变了）时 ready 会 reject，内容照样换好
       vt.finished.finally(() => root.classList.remove("vt-page"));
       return;
     }
-    if (first) { swapPage(pg, part); shownSoon(700).then(() => root.classList.remove("booting")); return; } // 刷新 / 首次打开：第一屏演示好了再整页露出来（见 next-docs.html 的 .booting）
-    swapPage(pg, part);
+    if (first) { await swapPage(pg, part, false); shownSoon(700).then(() => root.classList.remove("booting")); return; } // 刷新 / 首次打开：第一屏演示好了再整页露出来（见 next-docs.html 的 .booting）
+    await swapPage(pg, part, false);
     return;
   }
   if (part) { const el = document.getElementById(part); if (el) el.scrollIntoView({ behavior: reduced() ? "instant" : "smooth", block: "start" }); }
 }
-function swapPage(pg, part) {
+async function swapPage(pg, part, inVT = false) {
   curPage = pg; frames.clear(); resetQueue(); h2n = 0;
+  const wasFirst = first;
   if (!pg) {
     main.innerHTML = `<div class="d-404"><h1 class="d-h1">没有这一页</h1><p class="d-lead">地址可能写错了，或者这一页改了名字。</p><a class="sn-btn sn-secondary" href="#/intro">回到介绍</a></div>`;
     tocVp.innerHTML = ""; document.title = "没有这一页 · Satin";
   } else {
     const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
-    main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}${pg.p?.id === "mobile" ? " d-devpage" : ""}">${body}${pager(pg)}</article>`;
+    const enterCls = !wasFirst && !inVT && !reduced() ? " d-page-enter" : "";
+    main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}${pg.p?.id === "mobile" ? " d-devpage" : ""}${enterCls}">${body}${pager(pg)}</article>`;
     injectIcons(main); mountCode(main); mountFwButtons(main); mountDevices(main); mountPhoneToggles(main); fitRecipes(main); nbProse(main); balanceCards(main);
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     wireWalls(main);
     for (const box of $$(".dx", main)) { box.dataset.wired = ""; wireDemo(box, pg.c || cat.byId[box.dataset.demo]); }
-    fillAll();
-    buildToc(pg.hash); fillAsync(main, pg.hash); fitPrev();
     document.title = `${pg.title} · Satin`;
-    if (!first && !document.startViewTransition && !reduced()) main.firstElementChild.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: OUT_STRONG });
   }
   sideLinks.forEach((a, h) => a.toggleAttribute("aria-current", h === pg?.hash));
   if (pg) { const a = sideLinks.get(pg.hash), vp = a.closest(".sn-sa-vp") || side, r = a.getBoundingClientRect(), vr = vp.getBoundingClientRect(); if (r.top < vr.top + 40 || r.bottom > vr.bottom - 40) vp.scrollTop += r.top - vr.top - vr.height / 3; }
   for (const n of $$("[data-nav]")) n.toggleAttribute("aria-current", !!pg && n.dataset.nav === NAV_OF(pg));
   scrollTo({ top: 0, behavior: "instant" });
   mnav?.sync();
-  if (!first) main.focus({ preventScroll: true });
+  if (!wasFirst) main.focus({ preventScroll: true });
   first = false;
-  if (part) { const el = document.getElementById(part); if (el) el.scrollIntoView({ behavior: "instant", block: "start" }); }
-  pump(); // 滚到位以后再开始载演示：看得见的先载
+  if (pg) {
+    const asyncList = $$("[data-async]", main);
+    const readyNow = asyncList.length > 0 && asyncList.every((el) => READY_CACHE.has(el.dataset.async.includes(":") ? el.dataset.async : el.dataset.async + ":"));
+    if (readyNow) {
+      // 数据已命中缓存（悬停预取或 180ms 宽限内完成）：在 View Transition 截帧之前同步原子落地正文 + TOC + 代码块，零二次跳变！
+      await fillAsync(main, pg.hash);
+    } else {
+      fillAll();
+      buildToc(pg.hash);
+      fillAsync(main, pg.hash);
+    }
+    fitPrev();
+    if (part) { const el = document.getElementById(part); if (el) el.scrollIntoView({ behavior: "instant", block: "start" }); }
+    pump(); // 滚到位以后再开始载演示：看得见的先载
+  }
 }
 addEventListener("hashchange", route);
 toc.addEventListener("click", (e) => { const a = e.target.closest("a[data-to]"); if (a && a.getAttribute("href") === hashOf({ ...parseHash(), params: null })) { e.preventDefault(); document.getElementById(a.dataset.to)?.scrollIntoView({ behavior: reduced() ? "instant" : "smooth", block: "start" }); } });

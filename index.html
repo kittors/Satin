@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="packages/satin-ui/css/content.css">
 <link rel="stylesheet" href="demo/stress.css">
 <link rel="stylesheet" href="packages/satin-ui/css/picker.css">
+<link rel="stylesheet" href="packages/satin-ui/css/charts.css">
 <link rel="stylesheet" href="packages/satin-ui/css/number.css">
 <link rel="stylesheet" href="demo/layout.css">
 <link rel="stylesheet" href="packages/satin-ui/css/grid.css">
@@ -50,7 +51,7 @@
   const ONE = new URLSearchParams(location.search).get("demo");
   if (ONE != null) st.textContent += `${S}>h3,${S}>.demo:not(.only){display:none!important}${S}>.demo.only{margin-top:0!important;padding-top:24px!important}`;
   if (new URLSearchParams(location.search).get("flush")) st.textContent += `${S}>.demo{padding:0!important}${S}>.demo>:only-child{border-radius:0!important;box-shadow:none!important;max-width:none!important}`;
-  if (new URLSearchParams(location.search).get("win")) st.textContent += `${S}>[class$="-cfg"]{display:none!important}${S}>.demo,${S}>:not(h2,h3,p,.rules,[class$="-cfg"]){margin:0!important;border-radius:0!important;box-shadow:none!important}`;
+  if (new URLSearchParams(location.search).get("win")) st.textContent += `${S}>[class$="-cfg"]{display:none!important}${S}>.demo,${S}>:not(h2,h3,p,.rules,[class$="-cfg"]){margin:0!important;border-radius:0!important;box-shadow:none!important}${S}>.demo>:is(.sn-player,.sn-audio-row){margin-inline:auto}`;
   // 和库样式在同一个层里（@layer satin），层内顺序和原来一样：优先级不变
   st.textContent = "@layer satin{" + st.textContent + "}";
   document.head.append(st);
@@ -86,7 +87,7 @@
 <div class="doc">
 <nav class="doc-nav" aria-label="目录">
   <p>基础</p>
-  <a href="#color">颜色</a><a href="#type">排版</a><a href="#spacing">间距</a><a href="#layout">布局</a><a href="#space">圆角与线</a><a href="#elevation">阴影与层级</a><a href="#motion">动效曲线</a><a href="#icons">图标</a>
+  <a href="#color">颜色</a><a href="#type">排版</a><a href="#spacing">间距</a><a href="#layout">布局</a><a href="#space">圆角与线</a><a href="#elevation">阴影与层级</a><a href="#motion">动效曲线</a><a href="#loadingmotion">内容加载与过渡</a><a href="#icons">图标</a>
   <p>按钮</p>
   <a href="#button">按钮</a><a href="#iconbutton">纯图标按钮</a><a href="#link">文字链接</a><a href="#compound">组合按钮</a><a href="#chip">切换芯片</a>
   <p>表单</p>
@@ -96,7 +97,7 @@
   <p>反馈</p>
   <a href="#toast">轻提示</a><a href="#notify">通知</a><a href="#banner">横幅与条目上的失败</a><a href="#empty">空状态</a><a href="#loading">骨架与加载</a><a href="#progress">进度</a><a href="#numflow">数字变化</a>
   <p>数据展示</p>
-  <a href="#table">表格</a><a href="#grid">数据表格</a><a href="#cgrid">Canvas 表格</a><a href="#list">列表与键值</a><a href="#card">卡片</a><a href="#tags">标签、徽标与头像</a><a href="#avatar" data-parity-appended>头像</a><a href="#collapse">折叠面板</a><a href="#scrollarea">滚动区域</a><a href="#vlist">无限列表</a><a href="#chat">聊天与 AI 对话</a><a href="#md">Markdown 文档</a><a href="#flow">流程图</a><a href="#flowstress">万级节点压测</a>
+  <a href="#table">表格</a><a href="#grid">数据表格</a><a href="#cgrid">Canvas 表格</a><a href="#charts">数据图表与 3D</a><a href="#list">列表与键值</a><a href="#card">卡片</a><a href="#tags">标签、徽标与头像</a><a href="#avatar" data-parity-appended>头像</a><a href="#collapse">折叠面板</a><a href="#scrollarea">滚动区域</a><a href="#vlist">无限列表</a><a href="#chat">聊天与 AI 对话</a><a href="#md">Markdown 文档</a><a href="#flow">流程图</a><a href="#flowstress">万级节点压测</a>
   <p>媒体与上传</p>
   <a href="#image">图片</a><a href="#media">视频与音频</a><a href="#upload">上传</a>
   <p>导航</p>
@@ -238,14 +239,68 @@
     <div class="demo"><div class="grid-m" style="grid-template-columns:minmax(0,160px) minmax(0,160px) 1fr" id="durations"></div></div>
   </section>
 
+  <!-- ———— 内容加载与过渡 ———— -->
+  <section class="spec" id="loadingmotion">
+    <h2>内容加载与过渡<small>Loading &amp; transitions</small></h2>
+    <p>消灭「点一下先白屏闪空壳，几十毫秒后再硬砸进 DOM」的割裂体验。本官网文档页切换已完整实装悬停预取、180ms 原子提交宽限期、300/500ms 骨架防闪律与微位移交叉显影。</p>
+    <h3>路由切换体验对比（点左侧目录项切换，调不同延迟感受差距）</h3>
+    <div class="demo">
+      <div class="lm-cmp" id="lmCompare">
+        <div class="lm-bar">
+          <div class="lm-navs" role="tablist" aria-label="切换页面">
+            <button type="button" class="sn-btn sn-ghost sn-sm sn-on" data-lm-nav="button">按钮</button>
+            <button type="button" class="sn-btn sn-ghost sn-sm" data-lm-nav="grid">数据表格</button>
+            <button type="button" class="sn-btn sn-ghost sn-sm" data-lm-nav="charts">数据图表与 3D</button>
+          </div>
+          <div class="lm-delay">
+            <span class="sn-cap">模拟网络</span>
+            <div class="sn-seg sn-sm" data-seg="lmdelay"><span class="sn-thumb"></span><button data-v="80">80ms</button><button data-v="240">240ms</button><button data-v="620">620ms</button></div>
+          </div>
+        </div>
+        <div class="lm-cols">
+          <div class="lm-pane">
+            <div class="lm-pane-hd"><b>传统方式（清空 → 砸屏）</b><span class="sn-note" data-lm-raw-stat>点击上方页签对比</span></div>
+            <div class="lm-pane-bd" data-lm-raw></div>
+          </div>
+          <div class="lm-pane lm-pane-good">
+            <div class="lm-pane-hd"><b>Satin（原子提交 + 同构骨架显影）</b><span class="sn-note" data-lm-satin-stat>零白闪 · 平滑落定</span></div>
+            <div class="lm-pane-bd" data-lm-satin></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <h3>300ms 宽限与 500ms 最小驻留实验</h3>
+    <div class="demo">
+      <div class="lm-grace" id="lmGrace">
+        <div class="row" style="gap:8px;flex-wrap:wrap">
+          <button type="button" class="sn-btn sn-secondary sn-sm" data-lm-run="120">快速响应（120ms · 不出骨架）</button>
+          <button type="button" class="sn-btn sn-secondary sn-sm" data-lm-run="420">临界耗时（420ms · 驻留满 500ms）</button>
+          <button type="button" class="sn-btn sn-secondary sn-sm" data-lm-run="900">慢速请求（900ms · 平滑交叉）</button>
+        </div>
+        <div class="lm-timeline">
+          <span data-lm-step="0">就绪</span><span data-lm-step="1">0–300ms 静默宽限</span><span data-lm-step="2">≥ 500ms 同构骨架</span><span data-lm-step="3">交叉淡入落定</span>
+        </div>
+        <div class="lm-stage" data-lm-stage></div>
+        <p class="sn-note" data-lm-log style="margin-top:8px">点击上方按钮模拟不同耗时下的状态流转。</p>
+      </div>
+    </div>
+    <ul class="rules">
+      <li>导航悬停（<code>pointerenter</code> / <code>focusin</code>）静默预取目标元数据，在用户点击落定前完成 90% 的数据就绪。</li>
+      <li>路由切换设置 180ms 原子提交宽限期：数据及时到位则连同正文、右侧目录一次性提交过渡，杜绝空壳闪烁。</li>
+      <li>局部异步加载 300ms 内完成绝不展示转圈或骨架；一旦露出骨架至少平稳驻留 500ms，再用 <code>opacity</code> + <code>translateY(6px)</code> 平滑交叉显影。</li>
+    </ul>
+  </section>
+
   <!-- ———— 图标 ———— -->
   <section class="spec" id="icons">
     <h2>图标<small>04 号 §7</small></h2>
-    <p>统一的线性图标，线宽 1.5，颜色跟随文字。16 放在正文旁，20 用在工具栏，24 用在空状态。不用 emoji，不用彩色图标。</p>
+    <p>统一采用 Solar Icons（24px 网格、1.5px 线宽、圆润轮廓），全部消除重影与断线毛刺，颜色跟随文字。同时提供可交互的 3D 立体质感图标用于应用入口与专题卡片。</p>
     <div class="demo">
       <div class="row" style="margin-bottom:16px"><div class="sn-seg sn-sm" data-seg="iconsize"><span class="sn-thumb"></span><button data-v="16">16</button><button data-v="20">20</button><button data-v="24">24</button></div></div>
       <div class="icon-grid" id="iconGrid"></div>
     </div>
+    <h3>3D 立体质感图标（移动鼠标体验陀螺仪倾角视差与动态镜面高光）</h3>
+    <div class="demo"><div id="icons3dDemo"></div></div>
   </section>
 
   <!-- ———— 按钮 ———— -->
@@ -775,6 +830,53 @@
     <ul class="rules"><li>滚动用原生滚动条：滚动容器里放一块和全部行一样高的垫片，画布 sticky 贴在视口里不动，滚到哪画哪；一百万行 × 32 = 3200 万 px，在浏览器元素高度的上限（约 3355 万）以内。</li><li>一帧只画看得见的十几行：中间列裁在两边固定列之间，固定列最后画、盖在上面；横着滚开时固定列边上画一道渐变阴影。字体切换尽量少，量过的字宽缓存起来，放不下就截断加省略号。</li><li>悬停、勾选、拖行让位、编辑后闪一下、数据到了淡入、换列位置时列从旧位置滑过去，都在画布上画；动画只在进行中的那几帧重画。</li><li>编辑：在格子的位置盖一个输入框（选项列弹出选项），滚动时能提交就提交、不合法就取消；当前格子的内容写进一个看不见的 aria-live 区域，读屏能读到。</li><li>什么时候用哪个：几千行以内、格子里要放复杂的交互组件用 DOM 版；几十万行以上、只读或简单编辑、要求快速滚动不掉帧用 Canvas 版。</li></ul>
   </section>
 
+  <!-- ———— 数据图表与 3D 视觉 ———— -->
+  <section class="spec" id="charts">
+    <h2>数据图表与 3D 视觉<small>Charts · 3D</small></h2>
+    <p>零第三方依赖 Canvas 微动效图表与 3D 立体视觉套件：平滑曲线描边入场、数据切换形变插值、阻尼跟手准星、分组柱状聚焦、环形联动、可 360° 拖拽旋转的真 3D 立体柱阵，以及带陀螺仪视差高光的 3D 立体质感图标。颜色全读 <code>--sn-*</code> 令牌，深浅主题即时重绘。</p>
+    <h3>平滑趋势面积图（切换周期体验曲线 Morph 形变，悬停体验阻尼准星与多系列对比）</h3>
+    <div class="demo">
+      <div class="ch-demo-bar">
+        <div class="sn-seg sn-sm" data-seg="charea"><span class="sn-thumb"></span><button data-v="week">本周</button><button data-v="month">本月</button><button data-v="quarter">季度</button></div>
+        <button type="button" class="sn-btn sn-ghost sn-sm" data-ch-area-replay data-i="refresh-cw:before">重播入场</button>
+      </div>
+      <div id="chArea"></div>
+    </div>
+    <h3>分组对比柱状图 &amp; 环形占比图（悬停压暗非焦点、点击柱组或环段可联动筛选）</h3>
+    <div class="demo">
+      <div class="ch-demo-bar">
+        <span class="sn-note" id="chLinkNote">点击柱组或环段可聚焦联动查看</span>
+        <button type="button" class="sn-btn sn-ghost sn-sm" data-ch-bar-replay data-i="refresh-cw:before">重播生长</button>
+      </div>
+      <div class="ch-demo-2col">
+        <div id="chBar"></div>
+        <div id="chDonut"></div>
+      </div>
+    </div>
+    <h3>3D 立体柱阵图表（拖拽 360° 自由旋转、切预设视角飞行、悬停单柱立体抬升）</h3>
+    <div class="demo">
+      <div class="ch-demo-bar">
+        <div class="sn-seg sn-sm" data-seg="ch3d"><span class="sn-thumb"></span><button data-v="gpu">集群渲染吞吐</button><button data-v="cost">任务算力分布</button></div>
+        <span class="sn-note">支持鼠标左键拖拽旋转 · 惯性阻尼</span>
+      </div>
+      <div id="ch3d"></div>
+    </div>
+    <h3>3D 立体质感图标 &amp; KPI 迷你趋势火花线</h3>
+    <div class="demo">
+      <div id="chIcons3d"></div>
+      <div class="ch-demo-sparks" id="chSparks">
+        <div class="ch-spk-card"><div><span>日均生成镜头</span><b class="sn-num">254 镜</b><small class="sn-up">+14.2%</small></div><div id="spk1"></div></div>
+        <div class="ch-spk-card"><div><span>首镜通过率</span><b class="sn-num">93.4%</b><small class="sn-up">+4.8%</small></div><div id="spk2"></div></div>
+        <div class="ch-spk-card"><div><span>单镜渲染耗时</span><b class="sn-num">1 分 48 秒</b><small class="sn-up">-22 秒</small></div><div id="spk3"></div></div>
+      </div>
+    </div>
+    <ul class="rules">
+      <li>全部图表基于高分屏 Canvas 2D（2x DPR）绘制，入场与切换使用非线性缓动（<code>ease.outStrong</code> / <code>ease.overshoot</code>），静止时零额外渲染开销。</li>
+      <li>3D 立体柱阵严格按 Painter's Algorithm 深度排序、动态法线背向剔除与受光面渐变着色；仅在需要呈现「双维度 × 指标高度」空间热力结构时引入 3D，日常趋势和对比优先使用 2D 折线/柱状图。</li>
+      <li>3D 立体图标采用 CSS 透视分层 + 指针倾角视差 + 动态镜面高光，仅用于产品导航入口、专题页头或空状态，绝不堆在表格正文或按钮栏里。</li>
+    </ul>
+  </section>
+
 
 
   <section class="spec" id="list">
@@ -975,7 +1077,7 @@
     <h2>视频与音频<small>Player</small></h2>
     <p>控制条叠在画面上，用玻璃材质（09 号 §10）；播放时指针停 2 秒不动，控制条和指针一起淡出，一动就回来（指针停在控制条上时不淡出）。进度每帧连续往前走；点进度条跳过去有 150ms 的过渡，拖动时跟手。悬停喇叭展开音量条；全屏、画中画都是真的（画面是一块画布实时画出来，再喂给 <code class="k">&lt;video&gt;</code>）。</p>
     <div class="demo">
-      <div class="sn-player" id="player" tabindex="0" aria-label="视频播放器：夜里安静的街道"><video class="sn-frame" playsinline preload="metadata" disableremoteplayback src="https://assets.mixkit.co/videos/4451/4451-720.mp4"></video>
+      <div class="sn-player" id="player" tabindex="0" aria-label="视频播放器：夜里安静的街道"><video class="sn-frame" playsinline preload="metadata" disableremoteplayback data-src="https://assets.mixkit.co/videos/4451/4451-720.mp4"></video>
         <div class="sn-pip-note"><span data-i="picture-in-picture-2"></span><b>正在画中画里播放</b><button class="sn-btn sn-secondary sn-sm" data-pip-back>回到这里播放</button></div>
         <div class="sn-hud" aria-live="polite"></div><span class="sn-spinner sn-pl-spin" aria-hidden="true"></span>
         <button class="sn-big-play sn-glass" aria-label="播放"><span data-i="play"></span></button>

@@ -2649,5 +2649,41 @@
   "cap": "加载失败和重试",
   "css": false,
   "contract": true
+ },
+ {
+  "slug": "charts-0",
+  "id": "charts",
+  "n": 0,
+  "name": "数据图表与 3D",
+  "group": "数据展示",
+  "cap": "平滑趋势面积图",
+  "css": true
+ },
+ {
+  "slug": "charts-1",
+  "id": "charts",
+  "n": 1,
+  "name": "数据图表与 3D",
+  "group": "数据展示",
+  "cap": "分组对比柱状图 & 环形占比图",
+  "css": true
+ },
+ {
+  "slug": "charts-2",
+  "id": "charts",
+  "n": 2,
+  "name": "数据图表与 3D",
+  "group": "数据展示",
+  "cap": "3D 立体柱阵图表",
+  "css": true
+ },
+ {
+  "slug": "charts-3",
+  "id": "charts",
+  "n": 3,
+  "name": "数据图表与 3D",
+  "group": "数据展示",
+  "cap": "3D 立体质感图标 & KPI 迷你趋势火花线",
+  "css": true
  }
 ]

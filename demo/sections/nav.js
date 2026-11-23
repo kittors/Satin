@@ -30,10 +30,14 @@ export function initNav() {
   });
   grid.addEventListener("keydown", (e) => { const im = e.target.closest(".sn-im"); if (im && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); im.click(); } });
 
-  // 视频与音频：真视频、真音乐（Mixkit），交互在 kit-media.js；只在本区块可见时弹演示提示，避免 ?embed= 其它区块时隐藏媒体在后台报错挡住画面
-  const mediaVis = () => !!$("#media")?.offsetParent;
-  mountPlayer($("#player"), { onError: () => { if (mediaVis()) toast({ icon: "circle-x", tone: "danger", text: "视频没能加载，检查网络后再试", alert: true }); } });
-  mountAudio($("#audio"), { onError: () => { if (mediaVis()) toast({ icon: "circle-x", tone: "danger", text: "音频没能加载，检查网络后再试", alert: true }); } });
+  // 视频与音频：真视频、真音乐（Mixkit），交互在 kit-media.js；非 media 嵌入模式不挂载、不发起外部音视频请求（免得阻塞其他组件演示的 iframe load）
+  const emb = new URLSearchParams(location.search).get("embed");
+  if (!emb || emb === "media") {
+    const mediaVis = () => !!$("#media")?.offsetParent;
+    const pv = $("#player video"); if (pv && !pv.getAttribute("src") && pv.dataset.src) pv.src = pv.dataset.src;
+    mountPlayer($("#player"), { onError: () => { if (mediaVis()) toast({ icon: "circle-x", tone: "danger", text: "视频没能加载，检查网络后再试", alert: true }); } });
+    mountAudio($("#audio"), { onError: () => { if (mediaVis()) toast({ icon: "circle-x", tone: "danger", text: "音频没能加载，检查网络后再试", alert: true }); } });
+  }
 
   // 上传：只收 txt、docx、epub，50 MB 以内；"模拟拖入"一次放三个（一个会断网、一个太大）
   const drop = $("#drop"), upl = mountUpload(drop, { list: $("#files"), accept: /\.(txt|docx|epub)$/i, maxSize: 50 * 1024 * 1024, badType: "格式不支持，只能上传 txt、docx、epub", tooBig: "超过 50 MB" });

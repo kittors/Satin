@@ -10,7 +10,7 @@ examples/*/.nuxt/
 examples/*/.output/
 examples/*/.angular/
 examples/*/next-env.d.ts
-# 由 spec/recipes 生成的配方测试页（scripts/skill/recipes-render.mjs）
-tests/recipes/
+# 由 spec/recipes 生成的配方测试页（scripts/skill/recipes-render.mjs）：纳入跟踪以确保 GitHub Pages 静态部署的配方预览正常加载
+# tests/recipes/
 # 评测拼图（scripts/eval/montage.py，截图来自 /tmp/satin-eval）
 eval/sheets/
