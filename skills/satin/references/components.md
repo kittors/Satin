@@ -86,7 +86,7 @@
 | [`chat`](components/chat.md) | 聊天与 AI 对话 · Chat | 超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条 |
 | [`md`](components/md.md) | Markdown 文档 · Markdown | AI 的回复、说明文档都用它渲染：标题、列表和任务、引用和提示块、表格、代码（高亮、行号、复制、自动换行、超高折叠）、图片（定高、定宽、定比例、加载占位、失败提示、点开放大）、公式（TeX 写法转成浏览器原生的 MathML） |
 | [`flow`](components/flow.md) | 流程图 · FlowCanvas | 做视频的流水线：原文 → 拆分 → 分镜 |
-| [`flowstress`](components/flowstress.md) | 流程图 · 万级节点压测 · Canvas · 神经网络 · 视口裁剪 · 细节分级 | 节点多到几百个以上，就不能每个节点一个 DOM 了：换成一块画布，只画看得见的，越远画得越省 |
+| [`flowstress`](components/flowstress.md) | 流程图 · 万级 ComfyUI 节点集群 · Canvas · 异构多端口节点 · 视口裁剪 · 细节分级 | 节点超过几百个后改由一块 Canvas 画布承接，按 1024px 空间网格做视口裁剪与三档 LOD 细节分级 |
 
 ## 媒体与上传
 

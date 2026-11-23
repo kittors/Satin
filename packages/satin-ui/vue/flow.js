@@ -5,4 +5,4 @@
 import { createFlow } from "../src/flow.js";
 import { wrap } from "./wrap.js";
 
-export const Flow = /* @__PURE__ */ wrap(createFlow, { name: "SnFlow", props: ["nodes", "edges", "label"], events: [], modelEvent: null });
+export const Flow = /* @__PURE__ */ wrap(createFlow, { name: "SnFlow", props: ["nodes", "edges", "groups", "label"], events: [], modelEvent: null });

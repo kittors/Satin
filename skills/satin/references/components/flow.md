@@ -606,8 +606,9 @@ export default function MessyPipeline() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `nodes` | `FlowNode[]` | [] | 否 | 节点：`id`、`x` / `y`（画布坐标）、`title` 标题、`icon` 图标名、`detail` 一行说明、`kind` 类型（text / board / image / audio / video / out，决定颜色和能连到哪）、`bg` 缩略图（CSS 背景）。短名 t / ic / d / k 也认。只在创建时用。 | createXxx 选项：`nodes`；React：`nodes`；Preact：`nodes`；Vue：`nodes` |
-| `edges` | `[string, string][]` | [] | 否 | 连线：`[从哪个 id, 到哪个 id]`。只在创建时用。 | createXxx 选项：`edges`；React：`edges`；Preact：`edges`；Vue：`edges` |
+| `nodes` | `FlowNode[]` | [] | 否 | 节点：`id`、`x` / `y`（画布坐标）、`title` 标题、`icon` 图标名、`detail` 一行说明、`kind` 类型、`w` 宽度、`inputs` / `outputs` 多端口插槽、`params` 参数行、`preview` 真实预览图、`reroute` 转接点、`bg` 缩略图。短名 t / ic / d / k 也认。只在创建时用。 | createXxx 选项：`nodes`；React：`nodes`；Preact：`nodes`；Vue：`nodes` |
+| `edges` | `FlowEdge[]` | [] | 否 | 连线：`[从哪个 id, 到哪个 id]`，或对象 `{ from, fromPort, to, toPort, type }` 指定端口与数据类型颜色。只在创建时用。 | createXxx 选项：`edges`；React：`edges`；Preact：`edges`；Vue：`edges` |
+| `groups` | `FlowGroup[]` | [] | 否 | 群组分区框（ComfyUI 风格）：`{ id, title, x, y, w, h, hue }`，拖动群组标题栏可整体平移组内全部节点。 | createXxx 选项：`groups`；React：`groups`；Preact：`groups`；Vue：`groups` |
 | `label` | `string` | "流程图画布" | 否 | 画布的读屏名。 | createXxx 选项：`label`；React：`label`；Preact：`label`；Vue：`label` |
 | `className / style / id` | `string / CSSProperties / string` | — | 否 | 加在画布容器上（默认高 560）。 | React：`className / style / id`；Preact：`class / style / id` |
 
@@ -634,7 +635,7 @@ export default function MessyPipeline() {
 
 ## 导出的类型
 
-`FlowOptions`、`FlowNode`
+`FlowOptions`、`FlowNode`、`FlowEdge`、`FlowGroup`、`FlowPort`
 
 ## 键盘
 

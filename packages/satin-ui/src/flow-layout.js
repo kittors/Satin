@@ -72,10 +72,15 @@ export function layeredLayout(n, ea, eb, w, h, { gapX = 72, gapY = 32 } = {}) {
 }
 
 // 空间索引：把画布切成 cell 大小的格子，节点按它的矩形、连线按源到目标的包围盒放进覆盖到的格子。
+// W、H 可以是统一数值，也可以是按节点下标给的 TypedArray / 数组（支持异构尺寸节点）。
 // 结果是紧凑的类型化数组（每格一段：start[c] ～ start[c+1]），先计数、再一次填好；没有闭包和小数组，五万个节点几毫秒。
 export function buildGrid(n, X, Y, ea, eb, W, H, CELL) {
+  const arrW = typeof W === "number" ? null : W, arrH = typeof H === "number" ? null : H;
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  for (let i = 0; i < n; i++) { const x = X[i], y = Y[i]; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x + W > x1) x1 = x + W; if (y + H > y1) y1 = y + H; }
+  for (let i = 0; i < n; i++) {
+    const x = X[i], y = Y[i], wi = arrW ? arrW[i] : W, hi = arrH ? arrH[i] : H;
+    if (x < x0) x0 = x; if (y < y0) y0 = y; if (x + wi > x1) x1 = x + wi; if (y + hi > y1) y1 = y + hi;
+  }
   if (!n) { x0 = y0 = 0; x1 = y1 = 1; }
   const gx0 = Math.floor(x0 / CELL), gy0 = Math.floor(y0 / CELL), gw = Math.floor(x1 / CELL) - gx0 + 1, gh = Math.floor(y1 / CELL) - gy0 + 1, cells = gw * gh, m = ea.length;
   const nStart = new Int32Array(cells + 1), eStart = new Int32Array(cells + 1);
@@ -83,11 +88,13 @@ export function buildGrid(n, X, Y, ea, eb, W, H, CELL) {
     const nPos = pass ? nStart.slice(0, cells) : null, ePos = pass ? eStart.slice(0, cells) : null;
     const nList = pass ? new Int32Array(nStart[cells]) : null, eList = pass ? new Int32Array(eStart[cells]) : null;
     for (let i = 0; i < n; i++) {
-      const cx0 = Math.floor(X[i] / CELL) - gx0, cx1 = Math.floor((X[i] + W) / CELL) - gx0, cy0 = Math.floor(Y[i] / CELL) - gy0, cy1 = Math.floor((Y[i] + H) / CELL) - gy0;
+      const wi = arrW ? arrW[i] : W, hi = arrH ? arrH[i] : H;
+      const cx0 = Math.floor(X[i] / CELL) - gx0, cx1 = Math.floor((X[i] + wi) / CELL) - gx0, cy0 = Math.floor(Y[i] / CELL) - gy0, cy1 = Math.floor((Y[i] + hi) / CELL) - gy0;
       for (let cy = cy0; cy <= cy1; cy++) for (let cx = cx0; cx <= cx1; cx++) { const c = cy * gw + cx; if (pass) nList[nPos[c]++] = i; else nStart[c + 1]++; }
     }
     for (let e = 0; e < m; e++) {
-      const a = ea[e], b = eb[e], ax = X[a] + W, ay = Y[a] + H / 2, bx = X[b], by = Y[b] + H / 2;
+      const a = ea[e], b = eb[e], wa = arrW ? arrW[a] : W, ha = arrH ? arrH[a] : H, hb = arrH ? arrH[b] : H;
+      const ax = X[a] + wa, ay = Y[a] + ha / 2, bx = X[b], by = Y[b] + hb / 2;
       const cx0 = Math.floor((ax < bx ? ax : bx) / CELL) - gx0, cx1 = Math.floor((ax < bx ? bx : ax) / CELL) - gx0, cy0 = Math.floor((ay < by ? ay : by) / CELL) - gy0, cy1 = Math.floor((ay < by ? by : ay) / CELL) - gy0;
       for (let cy = cy0; cy <= cy1; cy++) for (let cx = cx0; cx <= cx1; cx++) { const c = cy * gw + cx; if (pass) eList[ePos[c]++] = e; else eStart[c + 1]++; }
     }

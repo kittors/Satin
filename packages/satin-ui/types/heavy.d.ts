@@ -45,15 +45,25 @@ export function mountChat(box: HTMLElement, o?: ChatOptions): ChatApi & { destro
 /** 对话（统一写法）：空容器按选项渲染；update({ status }) 改顶栏状态；destroy 停掉生成中的回答、撤掉监听、清空容器 */
 export const createChat: SatinFactory<ChatOptions, ChatApi>;
 export function chatHTML(o?: { title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean; menu?: boolean; newChat?: boolean }): string;
+export interface FlowPort { name: string; type?: string }
+export interface FlowGroup { id: string; title: string; x: number; y: number; w: number; h: number; hue?: number; color?: string }
+export type FlowEdge = [string, string] | { from: string; to: string; fromPort?: string; toPort?: string; type?: string };
 export interface FlowNode {
   id: string; x: number; y: number;
   /** 标题（短名 t） */ title?: string; t?: string;
   /** 图标名（短名 ic） */ icon?: string; ic?: string;
   /** 一行说明（短名 d） */ detail?: string; d?: string;
-  /** 类型：决定颜色和能连到哪（短名 k） */ kind?: "text" | "board" | "image" | "audio" | "video" | "out"; k?: "text" | "board" | "image" | "audio" | "video" | "out";
+  /** 类型：决定颜色和能连到哪（短名 k） */ kind?: "text" | "board" | "image" | "audio" | "video" | "out" | string; k?: "text" | "board" | "image" | "audio" | "video" | "out" | string;
   /** 缩略图（CSS 背景） */ bg?: string;
+  /** 真实图片预览地址（如 ComfyUI 出图 / 参考图预览） */ preview?: string;
+  /** 自定义节点宽度（默认 200，ComfyUI 多参数节点可设 210–280） */ w?: number;
+  /** 节点角标（如模型架构或步数标识） */ badge?: string;
+  /** 是否为轻量级转接路由点（Reroute） */ reroute?: boolean;
+  /** 多输入端口（ComfyUI 风格语义插槽） */ inputs?: (string | FlowPort)[];
+  /** 多输出端口（ComfyUI 风格语义插槽） */ outputs?: (string | FlowPort)[];
+  /** 节点内部参数键值对 */ params?: [string, string | number][];
 }
-export interface FlowOptions { nodes?: FlowNode[]; edges?: [string, string][]; label?: string }
+export interface FlowOptions { nodes?: FlowNode[]; edges?: FlowEdge[]; groups?: FlowGroup[]; label?: string }
 export function mountFlow(flow: HTMLElement, o?: FlowOptions): { nodes: Map<string, unknown>; readonly edges: unknown[]; destroy(): void };
 export function flowHTML(o?: { label?: string }): string;
 /** 流程图（统一写法）：节点、连线只在创建时给；destroy 停掉"运行"、撤掉监听、清空容器 */

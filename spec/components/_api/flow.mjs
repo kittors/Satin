@@ -27,8 +27,9 @@ export default {
   },
   dts: { factory: "createFlow", react: "Flow", vue: "Flow" },
   props: [
-    { name: "nodes", type: "FlowNode[]", default: "[]", required: false, desc: "节点：`id`、`x` / `y`（画布坐标）、`title` 标题、`icon` 图标名、`detail` 一行说明、`kind` 类型（text / board / image / audio / video / out，决定颜色和能连到哪）、`bg` 缩略图（CSS 背景）。短名 t / ic / d / k 也认。只在创建时用。", names: { js: "nodes", react: "nodes", preact: "nodes", vue: "nodes" } },
-    { name: "edges", type: "[string, string][]", default: "[]", required: false, desc: "连线：`[从哪个 id, 到哪个 id]`。只在创建时用。", names: { js: "edges", react: "edges", preact: "edges", vue: "edges" } },
+    { name: "nodes", type: "FlowNode[]", default: "[]", required: false, desc: "节点：`id`、`x` / `y`（画布坐标）、`title` 标题、`icon` 图标名、`detail` 一行说明、`kind` 类型、`w` 宽度、`inputs` / `outputs` 多端口插槽、`params` 参数行、`preview` 真实预览图、`reroute` 转接点、`bg` 缩略图。短名 t / ic / d / k 也认。只在创建时用。", names: { js: "nodes", react: "nodes", preact: "nodes", vue: "nodes" } },
+    { name: "edges", type: "FlowEdge[]", default: "[]", required: false, desc: "连线：`[从哪个 id, 到哪个 id]`，或对象 `{ from, fromPort, to, toPort, type }` 指定端口与数据类型颜色。只在创建时用。", names: { js: "edges", react: "edges", preact: "edges", vue: "edges" } },
+    { name: "groups", type: "FlowGroup[]", default: "[]", required: false, desc: "群组分区框（ComfyUI 风格）：`{ id, title, x, y, w, h, hue }`，拖动群组标题栏可整体平移组内全部节点。", names: { js: "groups", react: "groups", preact: "groups", vue: "groups" } },
     { name: "label", type: "string", default: "\"流程图画布\"", required: false, desc: "画布的读屏名。", names: { js: "label", react: "label", preact: "label", vue: "label" } },
     { name: "className / style / id", type: "string / CSSProperties / string", default: "—", required: false, desc: "加在画布容器上（默认高 560）。", names: { react: "className / style / id", preact: "class / style / id" } },
   ],
@@ -47,7 +48,7 @@ export default {
     { name: ".sn-flow / .sn-flow-world / .sn-flow-nodes / .sn-flow-edges", desc: "画布 / 一起平移缩放的那层 / 节点 / 连线（SVG）" },
     { name: ".sn-flow-tools / .sn-flow-run / .sn-flow-mini", desc: "工具条 / 运行 / 小地图" },
   ],
-  types: ["FlowOptions", "FlowNode"],
+  types: ["FlowOptions", "FlowNode", "FlowEdge", "FlowGroup", "FlowPort"],
   keyboard: [
     { keys: "⌘ / Ctrl + = / -", does: "放大 / 缩小。" },
     { keys: "⇧1 / ⇧2", does: "适配整张图 / 把选中的节点（没选就整张图）移到中间。" },

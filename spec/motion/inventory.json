@@ -381,7 +381,7 @@
    "file": "packages/satin-ui/css/content.css",
    "selector": ".sn-flow-edges .sn-e",
    "prop": "transition",
-   "value": "opacity .25s var(--sn-ease-out), stroke-width .2s var(--sn-ease-out)"
+   "value": "opacity .22s var(--sn-ease-out), stroke-width .18s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/content.css",
@@ -393,7 +393,7 @@
    "file": "packages/satin-ui/css/content.css",
    "selector": ".sn-flow-edges g.sn-run .sn-light",
    "prop": "animation",
-   "value": "sn-beam 1.2s linear infinite"
+   "value": "sn-beam 1.1s linear infinite"
   },
   {
    "file": "packages/satin-ui/css/content.css",
@@ -405,7 +405,7 @@
    "file": "packages/satin-ui/css/content.css",
    "selector": ".sn-fnode",
    "prop": "transition",
-   "value": "opacity .25s var(--sn-ease-out), box-shadow .2s var(--sn-ease-out)"
+   "value": "opacity .22s var(--sn-ease-out), box-shadow .18s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/content.css",
