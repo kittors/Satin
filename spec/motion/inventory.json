@@ -1,7 +1,7 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 311,
-  "var(--sn-ease-out-strong)": 62,
+  "var(--sn-ease-out)": 324,
+  "var(--sn-ease-out-strong)": 68,
   "linear": 37,
   "var(--sn-ease-overshoot)": 11,
   "var(--sn-ease-in-out)": 24,
@@ -447,13 +447,13 @@
    "file": "packages/satin-ui/css/content.css",
    "selector": ".sn-chat-sug",
    "prop": "transition",
-   "value": "background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong)"
+   "value": "background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), box-shadow .15s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong)"
   },
   {
    "file": "packages/satin-ui/css/content.css",
    "selector": ".sn-chat-sug:active",
    "prop": "transition-duration",
-   "value": ".15s, .15s, .08s"
+   "value": ".15s, .15s, .15s, .08s"
   },
   {
    "file": "packages/satin-ui/css/content.css",
@@ -1399,6 +1399,36 @@
   },
   {
    "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-rgbox",
+   "prop": "transition",
+   "value": "opacity .14s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-rgbox.sn-is-rg",
+   "prop": "animation",
+   "value": "sn-g-rgin .14s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-cell.sn-mg",
+   "prop": "transition",
+   "value": "background-color .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-mfx-pulse",
+   "prop": "animation",
+   "value": "sn-g-mpulse .26s var(--sn-ease-out) both"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-mfx-splitprev",
+   "prop": "transition",
+   "value": "opacity .14s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
    "selector": ".sn-g-row.sn-g-lift",
    "prop": "transition",
    "value": "opacity .15s var(--sn-ease-out)"
@@ -1426,6 +1456,48 @@
    "selector": ".sn-g-row.sn-exp .sn-g-detail",
    "prop": "animation",
    "value": "sn-g-dt-in .24s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-mbar [data-g-merge]",
+   "prop": "transition",
+   "value": "opacity .16s var(--sn-ease-out), background-color .16s var(--sn-ease-out), color .16s var(--sn-ease-out), box-shadow .16s var(--sn-ease-out), transform .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-mbar [data-g-merge].sn-g-mpop",
+   "prop": "animation",
+   "value": "sn-g-mready .22s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-mslot",
+   "prop": "transition",
+   "value": "grid-template-columns .22s var(--sn-ease-out-strong), opacity .16s var(--sn-ease-out), transform .22s var(--sn-ease-out-strong), margin .22s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-hslot",
+   "prop": "transition",
+   "value": "grid-template-columns .22s var(--sn-ease-out-strong), opacity .18s var(--sn-ease-out), transform .22s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-mslot, .sn-g-hslot, .sn-g-mbar [data-g-merge], .sn-g-mfx-splitprev, .sn-g-rgbox",
+   "prop": "transition",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-mslot, .sn-g-hslot, .sn-g-mbar [data-g-merge], .sn-g-mfx-splitprev, .sn-g-rgbox",
+   "prop": "animation",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/grid.css",
+   "selector": ".sn-g-mfx-pulse, .sn-g-mbar [data-g-merge].sn-g-mpop",
+   "prop": "animation",
+   "value": "none"
   },
   {
    "file": "packages/satin-ui/css/grid.css",
@@ -1645,13 +1717,13 @@
   },
   {
    "file": "packages/satin-ui/css/input.css",
-   "selector": ".sn-cm-mic .sn-swap > *",
+   "selector": ".sn-cm-bar .sn-cm-mic .sn-swap > *",
    "prop": "transition",
    "value": "opacity .16s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong)"
   },
   {
    "file": "packages/satin-ui/css/input.css",
-   "selector": ".sn-cm-mic .sn-swap > *",
+   "selector": ".sn-cm-bar .sn-cm-mic .sn-swap > *",
    "prop": "transition",
    "value": "none"
   },
@@ -2395,6 +2467,16 @@
   {
    "file": "packages/satin-ui/src/grid.js",
    "duration": "COL_DUR",
+   "easing": "EASE_CSS.outStrong"
+  },
+  {
+   "file": "packages/satin-ui/src/grid.js",
+   "duration": "130",
+   "easing": "EASE_CSS.out"
+  },
+  {
+   "file": "packages/satin-ui/src/grid.js",
+   "duration": "240",
    "easing": "EASE_CSS.outStrong"
   },
   {

@@ -32,7 +32,7 @@ export function initCanvasGrid() {
   // 开头连续几行负责人（不然类型）相同，先合并好
   g.ready.then(() => {
     const src = g.src, o = src.val(src.rowAt(0), "owner"); let k = 1; while (k < 6 && src.rowAt(k) >= 0 && src.val(src.rowAt(k), "owner") === o) k++;
-    if (k >= 2) { g.merge(0, k - 1, ["owner"]); return; }
-    const t = src.val(src.rowAt(0), "tag"); k = 1; while (k < 6 && src.rowAt(k) >= 0 && src.val(src.rowAt(k), "tag") === t) k++; if (k >= 2) g.merge(0, k - 1, ["tag"]);
+    if (k >= 2) { g.merge(0, k - 1, ["owner"], { silent: true }); return; }
+    const t = src.val(src.rowAt(0), "tag"); k = 1; while (k < 6 && src.rowAt(k) >= 0 && src.val(src.rowAt(k), "tag") === t) k++; if (k >= 2) g.merge(0, k - 1, ["tag"], { silent: true });
   });
 }

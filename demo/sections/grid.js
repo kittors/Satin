@@ -24,5 +24,5 @@ export function initGrid() {
     onRowAction: ({ action, row }) => { if (action === "more") toast({ text: `"${row.name}"的更多操作` }); },
   });
   // 开头连续几行负责人相同，先合并好
-  g.ready.then(() => { const src = g.src, o = src.val(src.rowAt(0), "owner"); let k = 1; while (k < 6 && src.rowAt(k) >= 0 && src.val(src.rowAt(k), "owner") === o) k++; if (k >= 2) g.merge(0, k - 1, ["owner"]); });
+  g.ready.then(() => { const src = g.src, o = src.val(src.rowAt(0), "owner"); let k = 1; while (k < 6 && src.rowAt(k) >= 0 && src.val(src.rowAt(k), "owner") === o) k++; if (k >= 2) g.merge(0, k - 1, ["owner"], { silent: true }); });
 }

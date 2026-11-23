@@ -216,8 +216,9 @@
 .sn-g-rgl, .sn-g-rgr { position: sticky; z-index: 5; height: 0; pointer-events: none; }
 .sn-g-rgl { left: 0; }
 .sn-g-rgr { right: 0; margin-left: auto; } /* 宽度 = 左 / 右固定列的总宽，paintSelBox 写 */
-.sn-g-rgbox { position: absolute; z-index: 5; border-radius: 2px; background: color-mix(in srgb, var(--sn-accent) 4%, transparent); box-shadow: inset 0 0 0 1.5px var(--sn-sel-ring), inset 0 0 0 3px color-mix(in srgb, var(--sn-accent) 6%, transparent); pointer-events: none; }
-.sn-g-rgbox.sn-is-rg { background: transparent; box-shadow: inset 0 0 0 1.5px var(--sn-range-line); }
+.sn-g-rgbox { position: absolute; z-index: 5; border-radius: 2px; background: color-mix(in srgb, var(--sn-accent) 4%, transparent); box-shadow: inset 0 0 0 1.5px var(--sn-sel-ring), inset 0 0 0 3px color-mix(in srgb, var(--sn-accent) 6%, transparent); pointer-events: none; transition: opacity .14s var(--sn-ease-out); }
+.sn-g-rgbox.sn-is-rg { background: transparent; box-shadow: inset 0 0 0 1.5px var(--sn-range-line); animation: sn-g-rgin .14s var(--sn-ease-out); }
+@keyframes sn-g-rgin { from { opacity: 0; } }
 .sn-g-rgbox.sn-is-kbd { border-radius: 0; background: color-mix(in srgb, var(--sn-label) 5%, transparent); box-shadow: none; }
 .sn-g-body > .sn-g-rgbox { z-index: 5; }
 /* 多格范围框选的柔和底色（起点格保留略浅，一眼看出起点） */
@@ -225,16 +226,34 @@
 @media (hover: hover) {
 .sn-g-row:hover .sn-g-cell.sn-rg { background: color-mix(in srgb, var(--sn-accent) 6.5%, var(--sn-g-bg)); } }
 
-/* ———— 合并单元格：每一行画自己那一截（第一列格子横跨几列），内容往下挪到整块正中；块内不画行线、不跟着某一行变色 ———— */
+/* ———— 合并单元格：每一行画自己那一截（第一列格子横跨几列），内容往下挪到整块正中；块内不画行线、整块统一响应悬停与选中柔底 ———— */
 .sn-g-cell.sn-mg-hide { display: none; }
 .sn-g-cell.sn-mg > * { translate: 0 var(--sn-mg-s, 0px); opacity: var(--sn-mg-a, 1); }
 .sn-g-cell.sn-mg.sn-mg-wait > * { visibility: hidden; }
-.sn-g-cell.sn-mg { box-shadow: inset 1px 0 0 var(--sn-g-rowline), inset -1px 0 0 var(--sn-g-rowline); } /* 合并格左右都画线（只有行线时也画）：看起来就是一整格，不像一个洞；块里不画行线 */
+.sn-g-cell.sn-mg { box-shadow: inset 1px 0 0 var(--sn-g-rowline), inset -1px 0 0 var(--sn-g-rowline); transition: background-color .12s var(--sn-ease-out); } /* 合并格左右都画线（只有行线时也画）：看起来就是一整格，不像一个洞；块里不画行线 */
 .sn-g-cell.sn-mg.sn-mg-last { box-shadow: inset 1px 0 0 var(--sn-g-rowline), inset -1px -1px 0 var(--sn-g-rowline); }
 .sn-g-row.sn-sel .sn-g-cell.sn-mg { background: var(--sn-g-bg); }
 @media (hover: hover) {
 .sn-g-row:hover .sn-g-cell.sn-mg { background: var(--sn-g-bg); } }
+.sn-g-cell.sn-mg.sn-mg-sel, .sn-g-row.sn-sel .sn-g-cell.sn-mg.sn-mg-sel,
+.sn-g-row:hover .sn-g-cell.sn-mg.sn-mg-sel { background: color-mix(in srgb, var(--sn-label) 4%, var(--sn-g-bg)); }
+@media (hover: hover) {
+.sn-g-cell.sn-mg.sn-mg-hov, .sn-g-row:hover .sn-g-cell.sn-mg.sn-mg-hov { background: var(--sn-g-hover); }
+.sn-g-cell.sn-mg.sn-mg-sel.sn-mg-hov, .sn-g-row:hover .sn-g-cell.sn-mg.sn-mg-sel.sn-mg-hov { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-g-bg)); } }
 .sn-g-row.sn-g-editrow { z-index: 4; }
+/* 合并 / 拆分物理微交互合成层（只动 opacity / transform，纯合成线程 60fps；层级低于通栏详情 z-index: 6） */
+.sn-g-mfx { position: absolute; z-index: 5; pointer-events: none; box-sizing: border-box; }
+.sn-g-mfx-pulse { border-radius: 2px; background: color-mix(in srgb, var(--sn-accent) 4.5%, transparent); box-shadow: inset 0 0 0 1.5px var(--sn-range-line); opacity: 0; animation: sn-g-mpulse .26s var(--sn-ease-out) both; }
+@keyframes sn-g-mpulse { 0% { opacity: 0; transform: scale(.992); } 36% { opacity: .88; transform: none; } 100% { opacity: 0; transform: none; } }
+.sn-g-mfx-ghost { overflow: hidden; background: var(--sn-g-bg); box-shadow: inset 1px 0 0 var(--sn-g-rowline), inset -1px -1px 0 var(--sn-g-rowline); }
+.sn-g-mfx-ghost::after { content: ""; position: absolute; inset: 0; border-radius: 2px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-range-line) 55%, transparent); }
+.sn-g-mfx-gbody { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; padding: 0 12px; gap: 6px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); will-change: transform, opacity; }
+.sn-g-mfx-gbody.sn-r { justify-content: flex-end; }
+.sn-g-mfx-splitprev { opacity: 0; transition: opacity .14s var(--sn-ease-out); }
+.sn-g-mfx-splitprev.sn-on { opacity: 1; }
+.sn-g-mfx-splitprev i { position: absolute; pointer-events: none; }
+.sn-g-mfx-splitprev i.sn-h { left: 2px; right: 2px; height: 0; border-top: 1px dashed color-mix(in srgb, var(--sn-range-line) 58%, transparent); }
+.sn-g-mfx-splitprev i.sn-v { top: 2px; bottom: 2px; width: 0; border-left: 1px dashed color-mix(in srgb, var(--sn-range-line) 58%, transparent); }
 
 /* ———— 拖行：被拖的行直接在落点（强调框 + 一点浮起），其他行让开；指针旁边一个小标签 ———— */
 .sn-g-row.sn-g-lift { z-index: 6; transition: opacity .15s var(--sn-ease-out); } /* 被拖的行：浮起来跟着指针走 */
@@ -268,10 +287,32 @@
 .sn-g-dt-shots i { width: 28px; height: 16px; border-radius: 3px; background: linear-gradient(150deg, hsl(var(--sn-h) 30% 36%), hsl(calc(var(--sn-h) + 30) 26% 16%)); }
 .sn-g-dt-shots span { margin-left: 4px; font: 400 calc(11px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 
-/* ———— 工具条：合并 / 拆分按钮，暂时不显示的合并的提示 ———— */
+/* ———— 工具条：合并 / 拆分按钮与提示的丝滑展开收拢微交互 ———— */
 .sn-g-mbar { display: inline-flex; align-items: center; gap: 4px; }
-.sn-g-mbar .sn-btn[disabled] { opacity: .45; }
-.sn-g-mhint { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sn-g-mbar [data-g-merge] { transition: opacity .16s var(--sn-ease-out), background-color .16s var(--sn-ease-out), color .16s var(--sn-ease-out), box-shadow .16s var(--sn-ease-out), transform .12s var(--sn-ease-out); }
+.sn-g-mbar .sn-btn[disabled] { opacity: .42; }
+.sn-g-mbar [data-g-merge].sn-g-mready { --sn-bg: var(--sn-b-soft); --sn-fg: var(--sn-label); opacity: 1; }
+@media (hover: hover) {
+.sn-g-mbar [data-g-merge].sn-g-mready:hover { --sn-bg: var(--sn-b-soft-hover); } }
+.sn-g-mbar [data-g-merge].sn-g-mpop { animation: sn-g-mready .22s var(--sn-ease-out-strong); }
+@keyframes sn-g-mready { 0% { transform: scale(.96); } 55% { transform: scale(1.02); } 100% { transform: none; } }
+/* 水平折叠槽：拆分按钮 / 挂起提示出现时丝滑展开推开右侧元素，消失时平滑收拢归位，彻底告别硬闪现 */
+.sn-g-mslot { display: inline-grid; grid-template-columns: 0fr; align-items: center; flex: none; opacity: 0; margin-left: -4px; transform: translateX(-6px) scale(.94); transform-origin: left center; pointer-events: none;
+  transition: grid-template-columns .22s var(--sn-ease-out-strong), opacity .16s var(--sn-ease-out), transform .22s var(--sn-ease-out-strong), margin .22s var(--sn-ease-out-strong); }
+.sn-g-mslot > span { min-width: 0; overflow: hidden; display: inline-flex; align-items: center; }
+.sn-g-mslot.sn-on { grid-template-columns: 1fr; opacity: 1; margin-left: 0; transform: none; pointer-events: auto; }
+.sn-g-mslot [data-g-split] { --sn-bg: var(--sn-b-soft); --sn-fg: var(--sn-label); }
+@media (hover: hover) {
+.sn-g-mslot [data-g-split]:hover { --sn-bg: var(--sn-b-soft-hover); } }
+.sn-g-hslot { display: grid; grid-template-columns: 0fr; align-items: center; flex: 0 1 auto; min-width: 0; opacity: 0; transform: translateX(-4px);
+  transition: grid-template-columns .22s var(--sn-ease-out-strong), opacity .18s var(--sn-ease-out), transform .22s var(--sn-ease-out-strong); }
+.sn-g-hslot > span { min-width: 0; overflow: hidden; display: flex; align-items: center; }
+.sn-g-hslot.sn-on { grid-template-columns: 1fr; flex: 1 1 auto; opacity: 1; transform: none; }
+.sn-g-mhint { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (prefers-reduced-motion: reduce) {
+  .sn-g-mslot, .sn-g-hslot, .sn-g-mbar [data-g-merge], .sn-g-mfx-splitprev, .sn-g-rgbox { transition: none; animation: none; }
+  .sn-g-mfx-pulse, .sn-g-mbar [data-g-merge].sn-g-mpop { animation: none; }
+}
 
 /* ———— 线：默认只有行线；切到"网格"时每一格右边也有一条（操作列除外；Canvas 版按同样的位置画） ———— */
 .sn-grid[data-lines="grid"] .sn-g-cell:not(:is([data-c="act"], [data-t="act"])) { box-shadow: inset -1px -1px 0 var(--sn-g-rowline); }

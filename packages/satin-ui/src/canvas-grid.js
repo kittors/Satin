@@ -9,7 +9,7 @@ import { normCols, optionOf, optionValue, textOf, parseEdit, editText, ownerSeed
 import { presetAvatar, avatarSvg } from "./avatar-presets.js";
 import { createSource } from "./table-source.js";
 import { backendOf } from "./table-backends.js";
-import { closeGridPops, esc, heightCSS, setGridHeight, mountGridState, primaryTitle, gridBarHTML, gridShadesHTML, colStops, columnModel, createMerges, mergeSegs, treeGuides, createRowMotion, createTreeSel, dragClamp, gapPieces, gapStep, mountHead, mountMergeBar, mountToolbar, openEnum, shades, slotShift, treeCols, treeDrag } from "./grid.js";
+import { closeGridPops, esc, heightCSS, setGridHeight, mountGridState, primaryTitle, gridBarHTML, gridShadesHTML, colStops, columnModel, createMerges, createMergeFx, mergeSegs, treeGuides, createRowMotion, createTreeSel, dragClamp, gapPieces, gapStep, mountHead, mountMergeBar, mountToolbar, openEnum, shades, slotShift, treeCols, treeDrag } from "./grid.js";
 import { gridBars } from "./grid-bars.js";
 import { elastic } from "./scroll.js";
 import { ICONS } from "./icons.js";
@@ -39,7 +39,7 @@ export function mountCanvasGrid(root, o = {}) {
   // 拖行松手后还在等落位时又去点别的：先把这一次落好（不然新的拖动会把它冲掉，这一次的换位就丢了）
   const flushDrop = () => { if (drag?.done) { const d = drag; drag = null; commitDrag(d); schedule(); } };
   const keyOf = (r) => { const it = src.row(r) ?? src.allRows?.()?.[r]; return it == null ? r : typeof o.rowKey === "function" ? o.rowKey(it) : it[o.rowKey ?? "id"] ?? r; };
-  const src = createSource({ backend: backendOf({ data: o.data, dataSource: o.dataSource, columns: model.cols, rowKey: o.rowKey, primary: NAME }), primary: NAME, block: 200, rowH: RH, query: (o.sort ?? o.defaultSort) ? { sort: o.sort ?? o.defaultSort } : undefined, onChange: (w) => { if (w === "view") { if (drag?.tree) { drag.abort(); drag = null; } mo.reset(); syncTree(); active.p = Math.min(active.p, Math.max(0, src.shown - 1)); active.id = src.idAt(active.p); if (!drag && !keepScroll) vp.scrollTop = 0; keepScroll = false; rg = null; anchorP = -1; showSel(false); applyKeys(); } if (w === "block") keysOnBlock(); sizeBody(); paintBar(); headUI.paint(); schedule(); paintState(); queryChanged(); } });
+  const src = createSource({ backend: backendOf({ data: o.data, dataSource: o.dataSource, columns: model.cols, rowKey: o.rowKey, primary: NAME }), primary: NAME, block: 200, rowH: RH, query: (o.sort ?? o.defaultSort) ? { sort: o.sort ?? o.defaultSort } : undefined, onChange: (w) => { if (w === "view") { if (drag?.tree) { drag.abort(); drag = null; } mo.reset(); mergeFx.reset(); syncTree(); active.p = Math.min(active.p, Math.max(0, src.shown - 1)); active.id = src.idAt(active.p); if (!drag && !keepScroll) vp.scrollTop = 0; keepScroll = false; rg = null; anchorP = -1; showSel(false); applyKeys(); } if (w === "block") keysOnBlock(); sizeBody(); paintBar(); headUI.paint(); schedule(); paintState(); queryChanged(); } });
   let lastSort = JSON.stringify(src.query.sort || null), lastFilter = JSON.stringify({ q: src.query.q || "", filters: src.query.filters || {} });
   function queryChanged() {
     const s1 = JSON.stringify(src.query.sort || null), f1 = JSON.stringify({ q: src.query.q || "", filters: src.query.filters || {} });
@@ -52,6 +52,9 @@ export function mountCanvasGrid(root, o = {}) {
   const DETAIL = 96, EXPD = { flat: new Map(), tree: new Map() }, expAnim = new Map(), expTo = new Map(); // expAnim / expTo：正在展开收起的行这一次的记号、要去的状态
   let expd = EXPD.flat; // 展开了详情的行；平铺、树形各记各的
   const merges = createMerges(src, model, (p) => { const r = src.rowAt(p); return r >= 0 && expd.has(r); });
+  const mergeFx = createMergeFx(), mgIds = new WeakMap();
+  let mgSeq = 0, hovMerge = null, selMerge = null, splitHover = false, lastRgKey = "";
+  const mgId = (m) => { let id = mgIds.get(m); if (!id) mgIds.set(m, (id = ++mgSeq)); return id; };
   const expOpen = (r) => expTo.get(r) ?? expd.has(r); // 展开的行：行号 → 收起时（格子部分）的高度
   let selShown = false, activeSelected = false, kbdNav = false, rg = null; // selShown：可文字编辑单格修改框选；activeSelected：是否聚焦某数据格/合并块；kbdNav：键盘巡航态；rg：多格范围框选 { ap, ac, fp, fc }
 
@@ -74,7 +77,7 @@ export function mountCanvasGrid(root, o = {}) {
     }
     return e.ok ? e : avLast.get(id);
   };
-  const readColors = () => { readShape(); readFont(); readAv(); C = { field: col("var(--sn-field)"), onPrimary: col("var(--sn-on-primary)"), ghostHover: col("var(--sn-b-ghost-hover)"), fillHover: col("var(--sn-fill-hover)"), bg: col("var(--sn-g-bg)"), hover: col("var(--sn-g-hover)"), sel: col("var(--sn-g-selbg)"), selHover: col("var(--sn-g-selhover)"), line: col("var(--sn-g-rowline)"), lineC: col("var(--sn-line-control)"), label: col("var(--sn-label)"), label2: col("var(--sn-label2)"), label3: col("var(--sn-label3)"), fillS: col("var(--sn-fill-subtle)"), fillA: col("var(--sn-fill-active)"), raised: col("var(--sn-raised)"), accent: col("var(--sn-accent)"), success: col("var(--sn-success)"), warning: col("var(--sn-warning)"), focus: col("var(--sn-focus)"), ring: col("var(--sn-ring)"), flash: col("var(--sn-g-flash)"), selLine: col("var(--sn-sel-ring)"), gapBg: col("color-mix(in srgb, var(--sn-label) 5%, var(--sn-g-bg))"), gapLine: col("color-mix(in srgb, var(--sn-label) 12%, transparent)"), tree: col("var(--sn-tree-line)"), selFill: col("color-mix(in srgb, var(--sn-accent) 4%, transparent)"), selGlow: col("color-mix(in srgb, var(--sn-accent) 6%, transparent)"), kbdFill: col("color-mix(in srgb, var(--sn-label) 5%, transparent)"), rgFill: col("color-mix(in srgb, var(--sn-accent) 6.5%, transparent)"), rgLine: col("var(--sn-range-line)"), dtBg: col("color-mix(in srgb, var(--sn-label) 2%, var(--sn-g-bg))"), dark: document.documentElement.dataset.theme === "dark" }; tw.clear(); schedule(); };
+  const readColors = () => { readShape(); readFont(); readAv(); C = { field: col("var(--sn-field)"), onPrimary: col("var(--sn-on-primary)"), ghostHover: col("var(--sn-b-ghost-hover)"), fillHover: col("var(--sn-fill-hover)"), bg: col("var(--sn-g-bg)"), hover: col("var(--sn-g-hover)"), sel: col("var(--sn-g-selbg)"), selHover: col("var(--sn-g-selhover)"), line: col("var(--sn-g-rowline)"), lineC: col("var(--sn-line-control)"), label: col("var(--sn-label)"), label2: col("var(--sn-label2)"), label3: col("var(--sn-label3)"), fillS: col("var(--sn-fill-subtle)"), fillA: col("var(--sn-fill-active)"), raised: col("var(--sn-raised)"), accent: col("var(--sn-accent)"), success: col("var(--sn-success)"), warning: col("var(--sn-warning)"), focus: col("var(--sn-focus)"), ring: col("var(--sn-ring)"), flash: col("var(--sn-g-flash)"), selLine: col("var(--sn-sel-ring)"), gapBg: col("color-mix(in srgb, var(--sn-label) 5%, var(--sn-g-bg))"), gapLine: col("color-mix(in srgb, var(--sn-label) 12%, transparent)"), tree: col("var(--sn-tree-line)"), selFill: col("color-mix(in srgb, var(--sn-accent) 4%, transparent)"), selGlow: col("color-mix(in srgb, var(--sn-accent) 6%, transparent)"), mgSel: col("color-mix(in srgb, var(--sn-label) 4%, transparent)"), kbdFill: col("color-mix(in srgb, var(--sn-label) 5%, transparent)"), rgFill: col("color-mix(in srgb, var(--sn-accent) 6.5%, transparent)"), rgLine: col("var(--sn-range-line)"), dtBg: col("color-mix(in srgb, var(--sn-label) 2%, var(--sn-g-bg))"), dark: document.documentElement.dataset.theme === "dark" }; tw.clear(); schedule(); };
   // 圆角：复选框用 --r-xs；图标按钮、展开箭头的悬停底照着组件库按钮的实际圆角（顶栏切"圆角"时跟着变）
   const shapeProbe = document.createElement("button"); shapeProbe.className = "sn-btn sn-ghost sn-sm sn-ibtn"; shapeProbe.style.cssText = "position:absolute;top:0;left:0;visibility:hidden;pointer-events:none"; shapeProbe.tabIndex = -1; root.append(shapeProbe);
   let rXS = 4, rBtn = 6, rSM = 6, icDuo = .48; function readShape() { const cs = getComputedStyle(document.documentElement); rXS = parseFloat(cs.getPropertyValue("--sn-r-xs")) || 4; rSM = parseFloat(cs.getPropertyValue("--sn-r-sm")) || 6; rBtn = Math.min(14, parseFloat(getComputedStyle(shapeProbe).borderTopLeftRadius) || 6); const d = parseFloat(cs.getPropertyValue("--sn-ic-duo")); icDuo = Number.isFinite(d) ? Math.max(0, Math.min(1, d)) : .48; }
@@ -99,9 +102,17 @@ export function mountCanvasGrid(root, o = {}) {
   const visibleSel = () => { const st = vp.scrollTop, out = new Map(); for (let p = Math.max(0, src.rowAtY(st) - 1); p < Math.min(src.shown, src.rowAtY(st + Hc) + 2); p++) { const r = src.rowAt(p); if (r >= 0) out.set(r, selCode(r)); } return out; };
   // 悬停：哪一行、指着哪个小控件（把手 grip、复选框 ck、展开 exp、编辑 ae、更多 am）
   let hz = "", lastPt = null, hoverDirty = false;
-  function setHover(p, z, fade = true) {
+  function setHover(p, z, fade = true, mg = null) {
     if (p !== hoverP) { const r0 = src.rowAt(hoverP), r1 = src.rowAt(p); if (fade) { if (r0 >= 0) fx("h" + r0, 1, 0, 100); if (r1 >= 0) fx("h" + r1, 0, 1, 100); } else { TW.delete("h" + r0); TW.delete("h" + r1); } hoverP = p; schedule(); }
+    if (mg !== hovMerge) { if (fade) { if (hovMerge) fx("mgh" + mgId(hovMerge), 1, 0, 110); if (mg) fx("mgh" + mgId(mg), 0, 1, 110); } else { if (hovMerge) TW.delete("mgh" + mgId(hovMerge)); if (mg) TW.delete("mgh" + mgId(mg)); } hovMerge = mg; schedule(); }
     if (z !== hz) { if (hz) fx("z" + hz, 1, 0, 120); if (z) fx("z" + z, 0, 1, 120); hz = z; }
+  }
+  function syncSelMerge() {
+    const am = activeSelected && !rgRect() && !selShown ? merges.at(active.p, active.c)?.m ?? null : null;
+    if (am === selMerge) return;
+    if (selMerge) fx("mgs" + mgId(selMerge), 1, 0, 120);
+    if (am) fx("mgs" + mgId(am), 0, 1, 120);
+    selMerge = am; schedule();
   }
   // 线性图标（Solar Icons line-duotone）：可以转、可以在两个颜色之间过渡（两遍描边按比例叠，次要笔画乘 --sn-ic-duo）
   function icon2(name, x, y, size, c0, c1, v, rot = 0) {
@@ -249,7 +260,7 @@ export function mountCanvasGrid(root, o = {}) {
     if (raf) cancelAnimationFrame(raf); raf = 0; more = false; /* 直接调 draw()（展开、改行高的每一步）时，把已经排上的那一帧取消——不然一帧里会画好几遍，越积越多 */ const now = performance.now(); dt = Math.min(64, now - lastDraw); lastDraw = now; fnow = now;
     if (headUI.moving(now)) more = true; const mcss = headUI.motionCss("#" + root.id, false, now); if (motionEl.textContent !== "@layer satin{" + mcss + "}") motionEl.textContent = "@layer satin{" + mcss + "}"; /* 表头的位移和表身这一帧一起画 */
     const tr = src.tree; if (tr && mo.tick(now)) more = true; /* 树的过渡：先走钟（收起的下级淡完了就真正收起，结构和滚动位置可能跟着变），再按新的样子画 */
-    if (hoverDirty) { hoverDirty = false; if (lastPt && !drag) { const h = hit(lastPt[0], lastPt[1]); setHover(h ? h.p : -1, "", false); } } /* 结构变了：指针下面换了一行，悬停跟着换（直接到位） */
+    if (hoverDirty) { hoverDirty = false; if (lastPt && !drag) { const h = hit(lastPt[0], lastPt[1]), mg = h && !h.edge && !h.detail ? merges.at(h.p, h.key)?.m ?? null : null; setHover(h ? h.p : -1, "", false, mg); } } /* 结构变了：指针下面换了一行，悬停跟着换（直接到位） */
     const st = vp.scrollTop, n = src.shown, first = Math.max(0, src.rowAtY(st) - 1), last = Math.min(n, src.rowAtY(st + Hc) + 2);
     src.ensure(first, last); if (src.mode === "append" && last >= n - 4) src.more();
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.textBaseline = "middle"; g.fillStyle = C.bg; g.fillRect(0, 0, W, Hc);
@@ -283,40 +294,104 @@ export function mountCanvasGrid(root, o = {}) {
       g.save(); g.globalAlpha = fade * (.4 + .6 * sh); g.strokeStyle = C.lineC; g.lineWidth = 1; g.strokeRect(.5, y + .5, W - 1, h - 1); g.restore();
       for (const p of ps) drawn.push([src.rowAt(p), src.rowY(p) - st + drag.lift, src.rowH(p), 1, src.idAt(p)]);
     }
-    // 合并单元格：若块内有行展开了通栏详情，按连续子段分段绘制——每段都有完整底线、左右线与可视居中内容（防表头腰斩），下段随展开进度平滑淡入淡出，彻底消除空白死洞与断线毛刺
+    // 合并单元格：支持 260ms 聚合进场 / 240ms 溶解退场（含手动合并、拆分、撤销、切换行线/网格、展开/收起详情挂起复原）、整块柔和悬停、选中柔底与「拆分」按钮悬停虚线网格预览
     const cellH = (p) => { const rr = src.rowAt(p), hh = src.rowH(p); return rr >= 0 && expd.has(rr) ? Math.min(hh, expd.get(rr)) : hh; };
     const live = merges.active();
-    if (live.length) for (const [zone, x0, x1] of zones) {
+    const snapMerge = (x) => ({ m: x.m, zone: merges.zoneOf(x.key0), ids: [...x.m.ids], keys: [...x.keys], key0: x.key0, p0: x.p0, p1: x.p1, r0: src.rowAt(x.p0) });
+    mergeFx.diff(live, now, snapMerge);
+    const leaves = mergeFx.leaves(now), activeM = activeSelected && !rgRect() ? merges.at(active.p, active.c)?.m ?? null : null, spv = tv("mgsp", splitHover ? 1 : 0);
+    if (live.length || leaves.length) for (const [zone, x0, x1] of zones) {
       if (x1 <= x0) continue; g.save(); g.beginPath(); g.rect(x0, 0, x1 - x0, Hc); g.clip();
+      // 1. 正在拆分 / 挂起溶解的旧合并块：遮罩底色平滑褪去露出独立网格，主内容优雅滑回第 1 行原位
+      for (const lv of leaves) {
+        const s0 = lv.snap; if (s0.zone !== zone) continue;
+        more = true;
+        const o = L.cols.find((c) => c.c.key === s0.key0); if (!o) continue;
+        const p0 = src.posOf(s0.ids[0]), p1 = src.posOf(s0.ids.at(-1));
+        if (p0 < 0 || p1 < p0 || p1 < first || p0 >= last) continue;
+        const w = s0.keys.reduce((t, k) => t + (model.byKey[k]?.w || 0), 0);
+        const sy0 = src.rowY(p0), sy = sy0 - st + (offs[Math.max(0, p0 - first)] ?? 0) + ty(p0), segH = src.rowY(p1) + cellH(p1) - sy0;
+        if (sy + segH <= 0 || sy >= Hc || w <= 1 || segH <= 1) continue;
+        const inv = 1 - lv.q, ra = ta(p0);
+        g.globalAlpha = ra * inv; g.fillStyle = C.bg; g.fillRect(o.x, sy, w, Math.max(0, segH - 1));
+        g.globalAlpha = ra * inv * .85; g.fillStyle = C.line; g.fillRect(o.x, sy + segH - 1, w, 1);
+        if (root.dataset.lines !== "grid") g.fillRect(o.x, sy, 1, segH);
+        g.fillRect(o.x + w - 1, sy, 1, segH);
+        // 柔和外框淡出，交代合并边界优雅解除
+        const bx = o.x > 0 ? o.x - 1 : 0, by = sy > 0 ? sy - 1 : 0, bw = o.x + w - bx, bh = sy + segH - by;
+        g.globalAlpha = ra * inv * .48; g.strokeStyle = C.rgLine; g.lineWidth = 1; g.beginPath(); g.roundRect(bx + .5, by + .5, Math.max(0, bw - 1), Math.max(0, bh - 1), 2); g.stroke();
+        const r0 = src.rowAt(p0);
+        if (r0 >= 0) {
+          const h0 = cellH(p0), h1 = cellH(p1);
+          let cyM = sy + segH / 2;
+          const lo = Math.max(sy + h0 / 2, h0 / 2), hi = Math.min(sy + segH - h1 / 2, Hc - h1 / 2);
+          if (hi >= lo) cyM = Math.max(lo, Math.min(hi, cyM));
+          const cy = cyM + (sy + h0 / 2 - cyM) * lv.q * .65;
+          const textA = Math.max(0, 1 - lv.t * 1.9);
+          if (textA > .01) {
+            g.save(); g.beginPath(); g.rect(o.x, sy, w, Math.max(0, segH - 1)); g.clip();
+            g.globalAlpha = ra * textA * textA;
+            cell({ ...o, c: { ...o.c, w } }, cy - h0 / 2, r0, p0, false, h0);
+            g.restore(); font = "";
+          }
+        }
+        g.globalAlpha = 1;
+      }
+      // 2. 当前活跃合并块（含 260ms 聚合进场、悬停、选中柔底与「拆分」悬停内部虚线网格预览）
       for (const x of live) {
         if (merges.zoneOf(x.key0) !== zone || x.p1 < first || x.p0 >= last) continue;
         const o = L.cols.find((c) => c.c.key === x.key0); if (!o) continue;
         const w = x.keys.reduce((t, k) => t + model.byKey[k].w, 0), r0 = src.rowAt(x.p0), segs = mergeSegs(src, x, cellH);
+        const ep = mergeFx.enterP(x.m, now), id = mgId(x.m);
+        if (ep < 1) more = true;
+        const mhv = tv("mgh" + id, hovMerge === x.m ? 1 : 0), msv = tv("mgs" + id, selMerge === x.m ? 1 : 0);
         let sumAll = 0; if (segs.length > 1) for (let q = x.p0; q <= x.p1; q++) sumAll += cellH(q);
         for (let si = 0; si < segs.length; si++) {
           const s = segs[si];
           if (s.p1 < first || s.p0 >= last) continue;
           const sy0 = src.rowY(s.p0), sy = sy0 - st + (offs[Math.max(0, s.p0 - first)] ?? 0) + ty(s.p0), segH = src.rowY(s.p1) + cellH(s.p1) - sy0;
           if (sy + segH <= 0 || sy >= Hc) continue;
-          const ra = ta(s.p0);
-          g.globalAlpha = ra; g.fillStyle = C.bg; g.fillRect(o.x, sy, w, Math.max(0, segH - 1));
-          g.fillStyle = C.line; g.fillRect(o.x, sy + segH - 1, w, 1);
+          const ra = ta(s.p0), bgA = Math.min(1, ep * 1.18);
+          // 融合底色：进场时平滑融化内部网格线与次要单元格内容；稳定态下支持柔和悬停与选中微亮
+          g.globalAlpha = ra * bgA; g.fillStyle = C.bg; g.fillRect(o.x, sy, w, Math.max(0, segH - 1));
+          if (ep < 1) { g.globalAlpha = ra; g.fillStyle = C.bg; g.fillRect(o.x, sy, o.c.w, Math.max(0, cellH(s.p0) - 1)); } // 首格不重影
+          if (msv > .005) { g.globalAlpha = ra * bgA * msv; g.fillStyle = C.mgSel; g.fillRect(o.x, sy, w, Math.max(0, segH - 1)); }
+          if (mhv > .005) { g.globalAlpha = ra * bgA * mhv; g.fillStyle = C.hover; g.fillRect(o.x, sy, w, Math.max(0, segH - 1)); }
+          g.globalAlpha = ra * Math.min(1, ep * 1.1); g.fillStyle = C.line; g.fillRect(o.x, sy + segH - 1, w, 1);
           if (root.dataset.lines !== "grid") g.fillRect(o.x, sy, 1, segH);
           g.fillRect(o.x + w - 1, sy, 1, segH);
+          // 悬停工具条「拆分」按钮时，在内容层下方柔和淡入即将切开的虚线网格预览（绝不劈穿标签与文字）
+          if (spv > .01 && activeM === x.m) {
+            g.save(); g.globalAlpha = ra * spv * .65; g.strokeStyle = C.rgLine; g.lineWidth = 1; g.setLineDash([3, 3]);
+            g.beginPath();
+            for (let q = s.p0; q < s.p1; q++) { const ly = src.rowY(q) + cellH(q) - sy0 + sy - .5; g.moveTo(o.x + 2, ly); g.lineTo(o.x + w - 2, ly); }
+            let cx = o.x;
+            for (let ki = 0; ki < x.keys.length - 1; ki++) { cx += model.byKey[x.keys[ki]].w; g.moveTo(cx - .5, sy + 2); g.lineTo(cx - .5, sy + segH - 2); }
+            g.stroke(); g.restore();
+          }
           if (r0 >= 0) {
-            // 段内内容垂直居中：首段在展开过渡时从整块中心平滑滑入段中心，长段滚出表头/视口底时优雅夹在可见区间内绝不被表头腰斩；后续段随详情拉开平滑淡入
+            // 段内内容垂直居中：进场时从第 1 行原位优雅滑落到合并块居中位置；长段滚出表头/视口底时优雅夹在可见区间内绝不被表头腰斩
             const h0 = cellH(s.p0), h1 = cellH(s.p1);
             let midH = segH;
             if (segs.length > 1 && si === 0 && s.dhAfter > 0) midH = sumAll + (segH - sumAll) * Math.min(1, s.dhAfter / Math.min(DETAIL, 48));
             let cy = sy + midH / 2;
             const lo = Math.max(sy + h0 / 2, h0 / 2), hi = Math.min(sy + segH - h1 / 2, Hc - h1 / 2);
             if (hi >= lo) cy = Math.max(lo, Math.min(hi, cy));
+            if (ep < 1) cy = (sy + h0 / 2) + (cy - (sy + h0 / 2)) * ep;
             const ca = s.dhBefore > 0 ? Math.min(1, s.dhBefore / Math.min(DETAIL, 48)) : 1;
             if (ca > .005) {
               g.save(); g.beginPath(); g.rect(o.x, sy, w, Math.max(0, segH - 1)); g.clip();
               g.globalAlpha = ra * ca;
               cell({ ...o, c: { ...o.c, w } }, cy - h0 / 2, r0, x.p0, false, h0);
               g.restore(); font = "";
+            }
+          }
+          // 聚合微光锁定环（进场 260ms 内柔和亮起再消散，明确传递「已融为一体」的确认手感）
+          if (ep < 1) {
+            const pulse = Math.sin(ep * Math.PI), bx = o.x > 0 ? o.x - 1 : 0, by = sy > 0 ? sy - 1 : 0, bw = o.x + w - bx, bh = sy + segH - by;
+            if (pulse > .01) {
+              g.globalAlpha = ra * pulse * .75; g.fillStyle = C.selFill; g.beginPath(); g.roundRect(bx + .75, by + .75, Math.max(0, bw - 1.5), Math.max(0, bh - 1.5), 2); g.fill();
+              g.globalAlpha = ra * pulse * .85; g.strokeStyle = C.rgLine; g.lineWidth = 1.5; g.stroke();
             }
           }
           g.globalAlpha = 1;
@@ -333,15 +408,16 @@ export function mountCanvasGrid(root, o = {}) {
         if (vp.scrollLeft + W < model.width() - 1 && L.rw > 0) g.fillRect(L.rx0 - 1, 0, 1, sh);
       }
     }
-    // 多格范围框选：柔和淡底 + 1.5px 微圆角细框（画在通栏详情下面，跨详情时被详情面板自然盖住，绝不劈穿）
-    const R2 = rgRect();
+    // 多格范围框选：柔和淡底 + 1.5px 微圆角细框，首次拉出柔和淡入（画在通栏详情下面，跨详情时被详情面板自然盖住，绝不劈穿）
+    const R2 = rgRect(), rgK = R2 ? "on" : "";
+    if (rgK !== lastRgKey) { lastRgKey = rgK; if (rgK) fx("rga", 0, 1, 130); else TW.delete("rga"); }
     if (R2) {
-      const y = src.rowY(R2.p0) - st, hh = src.rowY(R2.p1) + cellH(R2.p1) - src.rowY(R2.p0);
+      const rgA = tv("rga", 1), y = src.rowY(R2.p0) - st, hh = src.rowY(R2.p1) + cellH(R2.p1) - src.rowY(R2.p0);
       for (const [zone, x0, x1] of zones) {
         if (x1 <= x0) continue; const cs = L.cols.filter((o) => o.zone === zone && R2.keys.includes(o.c.key)); if (!cs.length) continue;
         const a = Math.min(...cs.map((o) => o.x)), b = Math.max(...cs.map((o) => o.x + o.c.w));
         const bx = a > 0 ? a - 1 : 0, by = y > 0 ? y - 1 : 0, bw = b - bx, bh = y + hh - by;
-        g.save(); g.beginPath(); g.rect(x0, 0, x1 - x0, Hc); g.clip();
+        g.save(); g.beginPath(); g.rect(x0, 0, x1 - x0, Hc); g.clip(); g.globalAlpha = rgA;
         g.fillStyle = C.rgFill; g.beginPath(); g.roundRect(bx + .75, by + .75, Math.max(0, bw - 1.5), Math.max(0, bh - 1.5), 2); g.fill();
         g.strokeStyle = C.rgLine; g.lineWidth = 1.5; g.stroke();
         g.restore();
@@ -434,7 +510,7 @@ export function mountCanvasGrid(root, o = {}) {
   new ResizeObserver(() => { resize(); shade(); }).observe(vp);
   // 表格不回弹：一次滚动在表格里开始，滚到头就停住、不带着页面滚；开始时已经到头，交给页面接着滚（见 kit-scroll.js 的 elastic）
   elastic(vp, () => ({ overscroll: "auto" }), () => { vp.style.overscrollBehaviorY = ""; });
-  vp.addEventListener("scroll", () => { edges(); if (editing?.input) editing.end(true, 0, true); if (lastPt && !drag) { const h = hit(lastPt[0], lastPt[1]); if ((h ? h.p : -1) !== hoverP) setHover(h ? h.p : -1, "", false); } schedule(); }, { passive: true }); // 编辑中滚动：能提交就提交，不合法就取消
+  vp.addEventListener("scroll", () => { edges(); if (editing?.input) editing.end(true, 0, true); if (lastPt && !drag) { const h = hit(lastPt[0], lastPt[1]), mg = h && !h.edge && !h.detail ? merges.at(h.p, h.key)?.m ?? null : null; if ((h ? h.p : -1) !== hoverP || mg !== hovMerge) setHover(h ? h.p : -1, "", false, mg); } schedule(); }, { passive: true }); // 编辑中滚动：能提交就提交，不合法就取消
   vp.addEventListener("focus", schedule); vp.addEventListener("blur", () => { kbdNav = false; schedule(); });
 
   // ———— 命中判断 ————
@@ -449,10 +525,11 @@ export function mountCanvasGrid(root, o = {}) {
   cv.addEventListener("pointermove", (e) => {
     lastPt = [e.clientX, e.clientY]; if (e.buttons || drag) return; const h = hit(e.clientX, e.clientY), p = h ? h.p : -1, r = h ? src.rowAt(h.p) : -1;
     const z = !h || h.edge || h.detail ? "" : src.tree && h.exp ? "tx:" + h.id : r < 0 ? "" : h.col.type === "sel" ? (canDrag && h.x < 26 ? "grip:" + r : h.x >= 28 && h.x < 50 ? "ck:" + r : "") : h.col.type === "act" ? (h.dt ? "ad:" + r : h.x >= h.col.w - 76 && h.x < h.col.w - 48 ? "ae:" + r : h.x >= h.col.w - 40 && h.x < h.col.w - 12 ? "am:" + r : "") : h.exp ? "exp:" + r : "";
-    setHover(p, z);
+    const mg = h && !h.edge && !h.detail ? merges.at(h.p, h.key)?.m ?? null : null;
+    setHover(p, z, true, mg);
     cv.style.cursor = !h ? "" : h.edge ? "row-resize" : h.col.type === "sel" ? (canDrag && h.x < 26 ? "grab" : h.x >= 28 && h.x < 50 ? "pointer" : "") : h.col.type === "act" || h.exp ? "pointer" : "";
   });
-  cv.addEventListener("pointerleave", () => { lastPt = null; if (!drag) setHover(-1, ""); });
+  cv.addEventListener("pointerleave", () => { lastPt = null; if (!drag) setHover(-1, "", true, null); });
   // 表格里任何地方按下、打字：先把还在等落位的拖行落好；正在编辑时点了别处，先把编辑存下来（不合法就停在编辑框里，这一下不生效）
   root.addEventListener("pointerdown", (e) => { flushDrop(); if (editing?.input && e.target !== editing.input) { const inp = editing.input; editing.end(true, 0, false, false); if (editing?.input === inp) { e.preventDefault(); e.stopPropagation(); } } }, true);
   root.addEventListener("keydown", () => flushDrop(), true);
@@ -543,7 +620,7 @@ export function mountCanvasGrid(root, o = {}) {
     const nextSel = !!on, nextKbd = nextSel && !!kbd, nextShow = nextSel && activeEditable();
     if (activeSelected !== nextSel || kbdNav !== nextKbd || selShown !== nextShow) {
       activeSelected = nextSel; kbdNav = nextKbd; selShown = nextShow;
-      schedule(); syncMergeBar();
+      syncSelMerge(); schedule(); syncMergeBar();
     }
   }
   const anchorOf = (p, c) => { const x = merges.at(p, c); return x ? [x.p0, x.key0] : [p, c]; };
@@ -564,6 +641,7 @@ export function mountCanvasGrid(root, o = {}) {
   function setActive(p, c, reveal = true) {
     [p, c] = anchorOf(Math.max(0, Math.min(src.shown - 1, p)), c); active = { p, c, id: src.idAt(p) };
     if (activeSelected) selShown = activeEditable();
+    syncSelMerge();
     if (reveal) revealActive(); schedule(); syncMergeBar();
     const r = src.rowAt(active.p), col = model.byKey[c], lv = src.tree ? tt("canvas-grid.3", { p0: src.lvAt(active.p) + 1, p1: src.hasKids(r) ? (src.isOpen(r) ? tt("canvas-grid.25") : tt("canvas-grid.26")) : "" }) : ""; if (r >= 0) sr.textContent = tt("canvas-grid.4", { p0: active.p + 1, p1: lv, p2: col.title || tt("canvas-grid.27"), p3: textOf(col, src.val(r, c), src.row(r)) });
   }
@@ -730,7 +808,7 @@ export function mountCanvasGrid(root, o = {}) {
   function setTreeMode(on) { flushDrop(); if (editing?.end) editing.end(true, 0, true); mo.reset(); hAnim.clear(); expAnim.clear(); expTo.clear(); src.setTree(on); }
   let shownTree = false;
   function syncTree() { // 新视图到了：换成这一套的外观（操作列多一个"详情"按钮、名称列宽一些放得下缩进）
-    const t = src.tree; if (t === shownTree) return; shownTree = t; expd = EXPD[t ? "tree" : "flat"]; merges.invalidate(); wasSk.clear(); fades.clear(); TW.clear(); hoverP = -1; hz = "";
+    const t = src.tree; if (t === shownTree) return; shownTree = t; expd = EXPD[t ? "tree" : "flat"]; merges.invalidate(); mergeFx.reset(); hovMerge = null; selMerge = null; wasSk.clear(); fades.clear(); TW.clear(); hoverP = -1; hz = "";
     treeCols(model, t); apply(); active = { p: 0, c: NAME, id: src.idAt(0) };
   }
   // ———— 拖行高：在最左边那一列拖某一行的下边线（底边 5px，光标变上下箭头）；双击恢复默认；全选时所有行一起改（被拖那一行在视口里不动） ————
@@ -803,13 +881,20 @@ export function mountCanvasGrid(root, o = {}) {
   }
   // ———— 合并、拆分 ————
   const mb = mountMergeBar(root, injectIcons);
+  mb.onSplitHover((on) => {
+    if (splitHover === on) return;
+    splitHover = on; fx("mgsp", on ? 0 : 1, on ? 1 : 0, 140); schedule();
+  });
   function syncMergeBar() {
     const r = rgRect(), cells = r ? (r.p1 - r.p0 + 1) * r.keys.length : 0, zones = r ? new Set(r.keys.map(merges.zoneOf)) : new Set();
     const sib = !r || merges.siblings(r.p0, r.p1);
-    mb.merge.disabled = !merges.enabled || !(cells > 1 && zones.size === 1 && r.p1 - r.p0 < 200 && sib);
-    mb.merge.dataset.tip = !merges.enabled ? tt("canvas-grid.12") : cells > 1 && zones.size > 1 ? tt("canvas-grid.13") : cells > 1 && !sib ? tt("canvas-grid.14") : cells > 1 ? tt("canvas-grid.15", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }) : tt("canvas-grid.16");
-    mb.split.hidden = !(activeSelected && merges.at(active.p, active.c));
-    const n = merges.suspended(); mb.hint.hidden = !n; mb.hint.textContent = merges.enabled ? tt("canvas-grid.17", { p0: n, p1: src.tree ? tt("canvas-grid.28") : tt("canvas-grid.29") }) : tt("canvas-grid.18", { p0: n });
+    const canMerge = merges.enabled && cells > 1 && zones.size === 1 && r.p1 - r.p0 < 200 && sib;
+    const mergeTip = !merges.enabled ? tt("canvas-grid.12") : cells > 1 && zones.size > 1 ? tt("canvas-grid.13") : cells > 1 && !sib ? tt("canvas-grid.14") : cells > 1 ? tt("canvas-grid.15", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }) : tt("canvas-grid.16");
+    const showSplit = Boolean(activeSelected && merges.at(active.p, active.c));
+    const n = merges.suspended();
+    const hintText = n ? (merges.enabled ? tt("canvas-grid.17", { p0: n, p1: src.tree ? tt("canvas-grid.28") : tt("canvas-grid.29") }) : tt("canvas-grid.18", { p0: n })) : "";
+    mb.sync({ canMerge, mergeTip, showSplit, hintText });
+    syncSelMerge();
   }
   mb.merge.addEventListener("click", () => {
     const r = rgRect(); if (!r || mb.merge.disabled) return;
@@ -819,17 +904,17 @@ export function mountCanvasGrid(root, o = {}) {
     toast({ kind: "action", text: tt("canvas-grid.20", { p0: r.p1 - r.p0 + 1, p1: r.keys.length }), action: { label: tt("canvas-grid.21"), run: (t) => { merges.remove(m); inside.forEach((x) => merges.restore(x)); schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("canvas-grid.22"), done: true, duration: 1600 }); } } });
   });
   mb.split.addEventListener("click", () => {
-    const x = merges.at(active.p, active.c); if (!x) return; merges.remove(x.m); vp.focus({ preventScroll: true }); showSel(activeSelected, kbdNav); schedule(); syncMergeBar();
+    const x = merges.at(active.p, active.c); if (!x) return; splitHover = false; TW.delete("mgsp"); merges.remove(x.m); vp.focus({ preventScroll: true }); showSel(activeSelected, kbdNav); schedule(); syncMergeBar();
     toast({ kind: "action", text: tt("canvas-grid.23"), action: { label: tt("canvas-grid.21"), run: (t) => { merges.restore(x.m); schedule(); syncMergeBar(); t.update({ kind: "status", text: tt("canvas-grid.24"), done: true, duration: 1600 }); } } });
   });
-  src.ready.then(() => { for (const m of opt.merges || []) merges.add(m.rows[0], m.rows[1], m.keys); if (opt.merges?.length) { schedule(); syncMergeBar(); } paintState(); });
+  src.ready.then(() => { for (const m of opt.merges || []) merges.add(m.rows[0], m.rows[1], m.keys); if (opt.merges?.length) { mergeFx.prime(merges.active(), (x) => ({ m: x.m, zone: merges.zoneOf(x.key0), ids: [...x.m.ids], keys: [...x.keys], key0: x.key0, p0: x.p0, p1: x.p1, r0: src.rowAt(x.p0) })); schedule(); syncMergeBar(); } paintState(); });
 
   root._grid = { toggleTree, expandAll, tsel, motion: () => mo.busy, selState, dbgHides: (id) => !!drag && (src.tree ? drag.hides(src.findPos(id)) : src.rowAt(drag.p0) === id), drawn: () => drawn, src, model, active: () => ({ ...active }), setActive, startEdit: (k) => startEdit(k), scrollToRow: (p) => { vp.scrollTop = src.rowY(p); }, editing: () => !!editing, selCount, cellRect, hit, rowDragging: () => !!drag, dbg: () => (drag ? { to: drag.to, out: drag.out, done: !!drag.done, lift: drag.lift, off: Object.fromEntries(drag.off), gapY: drag.gapY, top: src.rowY(drag.p0) + drag.lift } : null), merges, sel: () => ({ shown: selShown, rg: rgRect() }), toggleExpand, expanded: () => expd.size };
   // 销毁：停掉下一帧的重画、拿掉放进 <head> 的两段样式、关掉开着的弹层、放开实例。挂载时加的监听、观察器、后台线程由 createCanvasGrid 一起撤
   const api = root._grid;
   // 公开的方法和只读属性（用属性描述符搬过去：Object.assign 会把 getter 当场取值，sort、selectedKeys 就不跟着变了）
   Object.defineProperties(api, Object.getOwnPropertyDescriptors({
-    merge: (p0, p1, keys) => { merges.add(p0, p1, keys); schedule(); syncMergeBar(); }, get sort() { return src.query.sort || null; }, get filter() { return { q: src.query.q || "", filters: src.query.filters || {} }; },
+    merge: (p0, p1, keys, opts) => { merges.add(p0, p1, keys); if (opts?.silent) mergeFx.prime(merges.active(), (x) => ({ m: x.m, zone: merges.zoneOf(x.key0), ids: [...x.m.ids], keys: [...x.keys], key0: x.key0, p0: x.p0, p1: x.p1, r0: src.rowAt(x.p0) })); schedule(); syncMergeBar(); }, get sort() { return src.query.sort || null; }, get filter() { return { q: src.query.q || "", filters: src.query.filters || {} }; },
     get selectedKeys() { return selKeys(); }, reload: () => src.retry(), ready: src.ready,
     // 选项变了：数据换了重新要；受控的 sort、selectedKeys 传进来的值换了才跟着变；三种状态重画
     update(n, prev = {}) {
@@ -840,7 +925,7 @@ export function mountCanvasGrid(root, o = {}) {
       Object.assign(opt, n); paintState();
     },
   }));
-  api.destroy = () => { cancelAnimationFrame(raf); raf = 0; styleEl.remove(); motionEl.remove(); closeGridPops(); hideErr(); src.destroy(); if (root._grid === api) delete root._grid; };
+  api.destroy = () => { cancelAnimationFrame(raf); raf = 0; mb.dispose?.(); styleEl.remove(); motionEl.remove(); closeGridPops(); hideErr(); src.destroy(); if (root._grid === api) delete root._grid; };
   return api;
 }
 
