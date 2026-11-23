@@ -13,5 +13,13 @@ export default {
   "theme.10": "小",
   "theme.11": "标准",
   "theme.12": "大",
-  "theme.13": "特大"
+  "theme.13": "特大",
+  "theme.14": "方",
+  "theme.15": "标准",
+  "theme.16": "柔和",
+  "theme.17": "胶囊",
+  "theme.18": "极细",
+  "theme.19": "清晰",
+  "theme.20": "干脆",
+  "theme.21": "极简"
 };

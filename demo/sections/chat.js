@@ -81,20 +81,37 @@ function demoHistory() {
       const after = (kind) => { const left = AFTER[kind].filter((x) => !used.has(x)); if (!left.length) return null; const x = left[(rand() * left.length) | 0]; used.add(x); return x; };
       for (let t = 0; t < 18; t++) {
         const [ask, answer] = TURNS[order[t]], r = rand();
+        const hh = 9 + Math.floor((t * 38) / 60), mm = (t * 38 + ((rand() * 14) | 0)) % 60;
+        const tm = `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+        const durSec = +(1.1 + rand() * 2.4).toFixed(1), tps = +(58 + rand() * 34).toFixed(1);
         // 用户这一轮：多半是一句话，偶尔是参考图、试音、文件（助手的回答跟着说到它）
         const kind = r < .06 ? "image" : r < .075 ? "audio" : r < .09 ? "file" : null, reply = kind && after(kind);
         if (reply) {
-          if (kind === "image") out.push({ kind: "msg", me: true, type: "image", g: SCENES[(rand() * SCENES.length) | 0], cap: "参考：雨夜的站台" });
-          else if (kind === "audio") out.push({ kind: "msg", me: true, type: "audio", dur: `0:${20 + ((rand() * 39) | 0)}`, seed: 1 + ((rand() * 50) | 0), name: "旁白试音.mp3" });
-          else { const d = DOCS[(rand() * DOCS.length) | 0]; out.push({ kind: "msg", me: true, type: "file", name: d[0], ext: d[1], size: 2e5 + rand() * 4e6 }); }
-          out.push({ kind: "msg", me: false, type: "text", text: reply }); continue;
+          if (kind === "image") out.push({ kind: "msg", me: true, type: "image", g: SCENES[(rand() * SCENES.length) | 0], cap: "参考：雨夜的站台", time: tm });
+          else if (kind === "audio") out.push({ kind: "msg", me: true, type: "audio", dur: `0:${20 + ((rand() * 39) | 0)}`, seed: 1 + ((rand() * 50) | 0), name: "旁白试音.mp3", time: tm });
+          else { const d = DOCS[(rand() * DOCS.length) | 0]; out.push({ kind: "msg", me: true, type: "file", name: d[0], ext: d[1], size: 2e5 + rand() * 4e6, time: tm }); }
+          out.push({ kind: "msg", me: false, type: "text", text: reply, time: tm, durSec, tps }); continue;
         }
-        out.push({ kind: "msg", me: true, type: "text", text: ask });
+        out.push({ kind: "msg", me: true, type: "text", text: ask, time: tm });
+        // 当天最后一轮：给一个带思考 + 工具调用 + 真实时间/TPS 的富 AI 回答示例，开箱即看
+        if (oldestDay === 0 && s === 0 && t === 17) {
+          out.push({
+            kind: "ai", me: false, ph: "done", open: false, secs: 1.8,
+            think: "先读取第三集全部分镜的时间轴与色温元数据，确认开场三个雨夜镜头的灯光偏移量，再统一应用冷蓝 5200K LUT 并检查前后场衔接。",
+            tools: [
+              { id: "t1", name: "read_storyboard", label: "ep03 · 12 个镜头元数据", status: "done", ms: 240, args: { episode: 3, fields: ["shot", "lut", "duration"] }, result: { shots: 12, avgTempK: 5800, totalDuration: "02:48" } },
+              { id: "t2", name: "apply_color_grade", label: "shot 01-03 → 5200K 雨夜冷调", status: "done", ms: 410, args: { shots: [1, 2, 3], tempK: 5200, contrast: 1.08 }, result: { updated: 3, previewReady: true } },
+            ],
+            text: answer,
+            time: tm, durSec: 2.4, tps: 76.4, acts: true,
+          });
+          continue;
+        }
         // 助手这一轮：多半是一段话；偶尔先发生成的画面或成片，再说明
         const q = rand();
-        if (q < .1) out.push({ kind: "msg", me: false, type: "image", g: SCENES[(rand() * SCENES.length) | 0], cap: `第 ${shot()} 个镜头的画面` });
-        else if (q < .14) out.push({ kind: "msg", me: false, type: "video", g: `url("${CLIP.poster}") center / cover`, src: CLIP.src, poster: CLIP.poster, dur: `0:0${3 + ((rand() * 6) | 0)}`, cap: `第 ${shot()} 个镜头 · 成片` });
-        out.push({ kind: "msg", me: false, type: "text", text: answer });
+        if (q < .1) out.push({ kind: "msg", me: false, type: "image", g: SCENES[(rand() * SCENES.length) | 0], cap: `第 ${shot()} 个镜头的画面`, time: tm });
+        else if (q < .14) out.push({ kind: "msg", me: false, type: "video", g: `url("${CLIP.poster}") center / cover`, src: CLIP.src, poster: CLIP.poster, dur: `0:0${3 + ((rand() * 6) | 0)}`, cap: `第 ${shot()} 个镜头 · 成片`, time: tm });
+        out.push({ kind: "msg", me: false, type: "text", text: answer, time: tm, durSec, tps });
       }
       lastTurn = order[17];
     }
@@ -114,30 +131,37 @@ async function* network(text, ctx) {
   while (i < chars.length && !ctx.stopped) { const n = 2 + ((Math.random() * 9) | 0); yield chars.slice(i, i + n).join(""); i += n; await wait(Math.random() < .12 ? 260 + Math.random() * 300 : 20 + Math.random() * 90); }
 }
 const CARDS = [["03", "远景 · 4 秒", "雨刚停，积水里的路灯", SCENES[0]], ["04", "全景 · 6 秒", "她收起伞走进候车厅", SCENES[2]], ["05", "特写 · 3 秒", "车灯照亮她的侧脸", SCENES[3]]];
-// 剧本：思考 → 两个步骤 → 正文 → 三张镜头卡片 → 生成一张画面
+// 剧本：思考（实时读秒）→ 2 个可展开工具调用 → 匀速流式正文（实测 TPS）→ 三张镜头卡片 → 生成一张画面
 async function* script(prompt, ctx) {
-  for await (const t of network(prompt.includes("图") ? "先看参考图的色调：冷蓝、低饱和、有雾。再对一下第三集开头的三个镜头，它们现在偏暖，和参考不一致。打算把色温降下来，景别保持不变。" : "先找到第三集里对应的镜头，再看哪些参数要改：色调、景别还是时长。改完要重新生成画面，顺便检查前后镜头的衔接。", ctx)) yield { think: t };
+  await wait(360); if (ctx.stopped) return;
+  for await (const t of network(prompt.includes("图") ? "先看参考图的色调：冷蓝、低饱和、有雾。再对一下第三集开头的三个镜头，它们现在偏暖，和参考不一致。打算把色温降下来，景别保持不变。" : "先检索第三集对应的镜头参数，核对色调、景别和时长，然后调用调色工具统一冷雨夜基调并重出预览帧。", ctx)) yield { think: t };
   if (ctx.stopped) return;
-  yield { step: { t: "读取第三集的 48 个镜头", s: "run" } }; await wait(650); if (ctx.stopped) return;
-  yield { stepUpdate: { index: 0, s: "done" } };
-  yield { step: { t: "调整开头几个镜头的色调和景别", s: "run", n: "0/3" } };
-  for (let k = 1; k <= 3; k++) { await wait(330); if (ctx.stopped) return; yield { stepUpdate: { index: 1, n: `${k}/3` } }; }
-  yield { stepUpdate: { index: 1, s: "done", n: "" } };
-  yield* network("改好了。开头三个镜头的色温都降了，雨夜更冷一些；第 3 个镜头换成了特写，车灯打在她脸上的那一下会更突出。\n\n下面是改过的三个镜头，画面已经按新的设定重新生成：", ctx);
+  yield { tool: { id: "inspect", name: "read_storyboard", label: "读取第三集 48 个镜头", args: { episode: 3, range: "01-05" } } };
+  await wait(520); if (ctx.stopped) return;
+  yield { toolUpdate: { id: "inspect", status: "done", ms: 520, result: { matched: 3, currentTempK: 5900, durationSec: 13 } } };
+  yield { tool: { id: "grade", name: "apply_color_lut", label: "冷蓝 5200K · 第 3 镜改特写", args: { shots: [3, 4, 5], lut: "rain_night_5200k", shot3Framing: "close_up" } } };
+  await wait(680); if (ctx.stopped) return;
+  yield { toolUpdate: { id: "grade", status: "done", ms: 680, result: { rendered: 3, consistencyScore: 0.96 } } };
+  yield* network("改好了。开头三个镜头的色温都降到了 5200K，雨夜更冷峻一些；第 3 个镜头切成了侧面特写，车灯穿过雨幕照亮侧脸的高光会更突出。\n\n下面是更新后的三个镜头，预览帧已按新设定重新生成：", ctx);
   if (ctx.stopped) return;
   for (let k = 1; k <= 3; k++) { await wait(k === 1 ? 120 : 110); if (ctx.stopped) return; yield { card: CARDS[k - 1] }; }
   yield { image: { g: SCENES[(Math.random() * SCENES.length) | 0] } };
   for (let p = 0; p < 1 && !ctx.stopped; ) { await wait(120); p = Math.min(1, p + .06 + Math.random() * .06); yield { imageProgress: p }; }
   if (ctx.stopped) return;
   yield { imageDone: true };
-  await wait(300);
+  await wait(240);
 }
 
-export function initChat() {
-  const box = document.getElementById("chatBox"), chat = mountChat(box, { history: demoHistory(), respond: script, hiRes });
+export function initChat(ctx = {}) {
+  const box = document.getElementById("chatBox"), chat = mountChat(box, { history: demoHistory(), respond: script, hiRes, rail: "left" });
+  const sec = box.closest(".spec") || document;
+  // 侧边刻度轨位置切换（左侧 / 右侧 / 隐藏）
+  const railSeg = sec.querySelector('[data-seg="chatrail"]');
+  if (railSeg && ctx.initSeg) ctx.initSeg(railSeg, (v) => chat.setRail(v === "off" ? false : v), 0);
   // 演示按钮
-  (box.closest(".spec") || document).addEventListener("click", (e) => {
+  sec.addEventListener("click", (e) => {
     const sim = e.target.closest("[data-chat-sim]")?.dataset.chatSim; if (!sim) return;
+    if (sim === "stream") chat.send("把第三集开头的雨夜再调冷一点，并重新出预览");
     if (sim === "incoming") chat.receive({ text: AI_LINES[(Math.random() * AI_LINES.length) | 0] });
     if (sim === "fail") chat.sendText("这条会发送失败，点感叹号重发", { fail: true });
     if (sim === "top") chat.scrollToOldest();

@@ -97,7 +97,7 @@
   <p>反馈</p>
   <a href="#toast">轻提示</a><a href="#notify">通知</a><a href="#banner">横幅与条目上的失败</a><a href="#empty">空状态</a><a href="#loading">骨架与加载</a><a href="#progress">进度</a><a href="#numflow">数字变化</a>
   <p>数据展示</p>
-  <a href="#table">表格</a><a href="#grid">数据表格</a><a href="#cgrid">Canvas 表格</a><a href="#charts">数据图表与 3D</a><a href="#list">列表与键值</a><a href="#card">卡片</a><a href="#tags">标签、徽标与头像</a><a href="#avatar" data-parity-appended>头像</a><a href="#collapse">折叠面板</a><a href="#scrollarea">滚动区域</a><a href="#vlist">无限列表</a><a href="#chat">聊天与 AI 对话</a><a href="#md">Markdown 文档</a><a href="#flow">流程图</a><a href="#flowstress">万级节点压测</a>
+  <a href="#table">表格</a><a href="#grid">数据表格</a><a href="#cgrid">Canvas 表格</a><a href="#charts">数据图表与 3D</a><a href="#list">列表与键值</a><a href="#card">卡片</a><a href="#tags">标签、徽标与头像</a><a href="#avatar" data-parity-appended>头像</a><a href="#collapse">折叠面板</a><a href="#scrollarea">滚动区域</a><a href="#vlist">无限列表</a><a href="#chat">聊天与 AI 对话</a><a href="#md">Markdown 文档</a><a href="#editorial" data-parity-appended>图文编排与内容张力</a><a href="#flow">流程图</a><a href="#flowstress">万级节点压测</a>
   <p>媒体与上传</p>
   <a href="#image">图片</a><a href="#media">视频与音频</a><a href="#upload">上传</a>
   <p>导航</p>
@@ -208,8 +208,8 @@
   </section>
 
   <section class="spec" id="space">
-    <h2>圆角与线<small>04 号 §4–§5 · 09 号 §4</small></h2>
-    <p>圆角 6 档。线只有 1px，焦点环 2px；默认不画分割线。间距见上一节。</p>
+    <h2>圆角、线与材质<small>04 号 §4–§5 · 09 号 §4</small></h2>
+    <p>圆角 6 档、线条粗细 4 档、毛玻璃虚化 3 档、功能渐变仅限 3 种——全部统一由令牌控制，并可在右上角「主题定制」或代码里自由调整。</p>
     <div class="demo"><div class="row" id="radii" style="gap:20px"></div></div>
     <h3>嵌套圆角：内层 = 外层 − 内边距</h3>
     <div class="demo"><div class="row" style="gap:32px">
@@ -217,6 +217,34 @@
       <div class="nest" style="--R:12px;--sn-p:4px"><div></div><span class="sn-cap">外 12，内边距 4 → 内 8（菜单与菜单项）</span></div>
       <div class="nest bad-nest" style="--R:16px;--sn-p:8px"><div></div><span class="sn-cap sn-c-danger">错误：内外同为 16，四周间距不均</span></div>
     </div></div>
+    <h3 data-parity-appended>统一线条、虚化与功能性渐变规范</h3>
+    <div class="demo" data-parity-appended>
+      <div class="sf-grid">
+        <div class="sf-card">
+          <span class="sn-cap">线条粗细 · --sn-bw-*</span>
+          <div class="sf-lines">
+            <div><i style="height:var(--sn-bw-hairline);background:var(--sn-line-control)"></i><span>1px 细线 / 控件</span><code>--sn-bw-hairline</code></div>
+            <div><i style="height:var(--sn-bw-accent);background:var(--sn-label2)"></i><span>2px 导引 / 拉引线</span><code>--sn-bw-accent</code></div>
+            <div><i style="height:var(--sn-bw-focus);background:var(--sn-focus)"></i><span>2px 焦点环</span><code>--sn-bw-focus</code></div>
+          </div>
+        </div>
+        <div class="sf-card">
+          <span class="sn-cap">毛玻璃虚化 · 仅限浮层</span>
+          <div class="sf-blur-stage">
+            <span class="sf-glass" style="backdrop-filter:blur(var(--sn-blur-sm));-webkit-backdrop-filter:blur(var(--sn-blur-sm))">8px · sm</span>
+            <span class="sf-glass" style="backdrop-filter:blur(var(--sn-blur-md));-webkit-backdrop-filter:blur(var(--sn-blur-md))">16px · md</span>
+            <span class="sf-glass" style="backdrop-filter:blur(var(--sn-blur-lg));-webkit-backdrop-filter:blur(var(--sn-blur-lg))">24px · lg</span>
+          </div>
+        </div>
+        <div class="sf-card">
+          <span class="sn-cap">克制功能渐变 · 严禁装饰</span>
+          <div class="sf-grads">
+            <div class="sf-grad-scrim"><span>--sn-grad-scrim</span><small>照片压字护读底罩</small></div>
+            <div class="sf-grad-fade"><span>--sn-grad-fade</span><small>列表边界融合渐隐</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ———— 阴影与层级 ———— -->
@@ -714,25 +742,48 @@
   </section>
 
   <section class="spec" id="loading">
-    <h2>骨架与加载<small>Skeleton · Spinner</small></h2>
-    <p>300ms 以内的等待什么都不显示；超过 300ms 才出现，一旦出现至少留 500ms。布局已知时用骨架，不用孤零零的转圈；数据到了逐行替换，每行间隔 40ms 淡入。</p>
+    <h2>动感加载与骨架<small>Loader · Skeleton</small></h2>
+    <p>严禁纯文字「正在加载…」。瞬时状态、工具调用和首字节等待使用 8 款极简几何物理 Loader（零文字、纯 CSS/SVG 60fps，尺寸、速度、色彩全可定制）；结构已知的列表与表格采用同构渐隐骨架，遵守 300ms 延迟与 500ms 最小驻留。</p>
+    <h3 data-parity-appended>动感加载器画廊（实时可定制）</h3>
+    <div class="demo" data-parity-appended>
+      <div class="ld-cfg">
+        <span class="ld-cfg-g"><span class="sn-cap">尺寸</span><div class="sn-seg sn-sm" data-seg="ldsize"><span class="sn-thumb"></span><button data-v="sm">16</button><button data-v="md">20</button><button data-v="lg">28</button><button data-v="xl">36</button></div></span>
+        <span class="ld-cfg-g"><span class="sn-cap">节奏</span><div class="sn-seg sn-sm" data-seg="ldspeed"><span class="sn-thumb"></span><button data-v="0.7">舒缓</button><button data-v="1">标准</button><button data-v="1.5">疾速</button></div></span>
+        <span class="ld-cfg-g"><span class="sn-cap">色调</span><div class="sn-seg sn-sm" data-seg="ldtone"><span class="sn-thumb"></span><button data-v="label">中性墨</button><button data-v="accent">主色</button><button data-v="success">成功</button><button data-v="warning">琥珀</button></div></span>
+      </div>
+      <div class="ld-grid" id="ldGallery"></div>
+    </div>
+    <h3>同构骨架与 300 / 500ms 防闪</h3>
     <div class="demo"><div class="row" style="margin-bottom:16px">
       <button class="sn-btn sn-secondary" data-load="200">加载（快，200ms）</button><button class="sn-btn sn-secondary" data-load="1600">加载（慢，1.6 秒）</button>
       <span class="sn-note" id="loadNote">快的那次不会闪出骨架</span>
     </div><div class="sn-sk-list" id="skList"></div></div>
-    <ul class="rules"><li>骨架的光带 1.2 秒扫过一次，整列共用一道光，不是每块各扫各的。</li><li>转圈 0.9 秒一圈；按钮里的转圈至少转满一圈再停。只在按钮里和很小的区域用转圈。</li><li>自动保存这类用户不用察觉的等待，不显示加载，只在固定位置放一个安静的状态字。</li></ul>
+    <ul class="rules"><li>严禁在表格末尾、对话区或卡片里出现干巴巴的纯文字「正在加载更多…」；文字只留给 <code>.sn-sr</code> 读屏。</li><li>所有动感加载器均可通过 <code>--sn-ld-size</code>、<code>--sn-ld-color</code>、<code>--sn-ld-speed</code> 即时定制，开启减少动态效果自动收敛为低频微呼吸。</li><li>骨架的光带 1.2 秒扫过一次，整列共用一道光；300ms 内完成不出现，出现后至少留 500ms 再错峰替换。</li></ul>
   </section>
 
   <section class="spec" id="progress">
     <h2>进度<small>Progress</small></h2>
-    <p>能数清楚、超过 3 秒的工作（导入、导出、上传、批量生成）显示进度：数量、进度条、剩余时间，可以取消。完成时旧文字模糊淡出，新文字淡入，不整块重画。AI 生成先列出步骤，再一段段淡入结果，提前留好高度，内容出来时页面不跳。</p>
+    <p>能数清楚、超过 3 秒的工作显示进度：活跃流体微光、双段非均匀变速不确定态、分段刻度进度条与高精度圆头 SVG 数值环全部支持尺寸、圆角与颜色定制。完成时旧文字模糊淡出，新文字淡入，图标原地切对勾。</p>
     <div class="demo stack" style="gap:20px">
-      <div class="grid-m lc">
-        <span class="sn-cap">进度条</span><div class="stack" style="gap:12px;max-width:420px"><div class="sn-pbar" style="--sn-p:.62"><i></i></div><div class="sn-pbar sn-indet"><i></i></div></div>
-        <span class="sn-cap">进度环</span><div class="row"><span class="sn-pring" style="--sn-p:.25"></span><span class="sn-pring" style="--sn-p:.62"></span><span class="sn-pring sn-lg" style="--sn-p:.9"></span><span class="sn-spinner"></span><span class="sn-spinner sn-lg"></span></div>
+      <div class="pg-live-bar" data-parity-appended>
+        <span class="sn-cap">实时拖动预览</span>
+        <div class="sn-slider" id="pgSlider" data-slider data-max="100" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64" aria-label="演示进度"><span class="sn-rail"></span><span class="sn-fillbar" style="width:64%"></span><span class="sn-knob" style="left:64%"></span><span class="sn-bubble" style="left:64%">64</span></div>
+        <span class="sn-t-code sn-c-tertiary sn-num" id="pgVal">64%</span>
+      </div>
+      <div class="grid-m lc" id="pgShowcase">
+        <span class="sn-cap">活跃微光</span><div class="stack" style="gap:10px;max-width:440px"><div class="sn-pbar sn-active sn-lg" data-pg-bind style="--sn-p:.64"><i></i></div><div class="sn-pbar sn-active sn-ok" data-pg-bind style="--sn-p:.64"><i></i></div></div>
+        <span class="sn-cap">双段不确定</span><div style="max-width:440px"><div class="sn-pbar sn-lg sn-indet"><i></i></div></div>
+        <span class="sn-cap">分段刻度</span><div style="max-width:440px"><div class="sn-pseg" id="pgSeg"></div></div>
+        <span class="sn-cap">圆头进度环</span><div class="row" style="gap:16px" id="pgRings">
+          <span class="sn-pring-svg sn-sm" data-pg-bind style="--sn-p:.64"><svg viewBox="0 0 36 36"><circle class="sn-pr-tr" cx="18" cy="18" r="15.9"/><circle class="sn-pr-fg" cx="18" cy="18" r="15.9" pathLength="100"/></svg></span>
+          <span class="sn-pring-svg" data-pg-bind style="--sn-p:.64"><svg viewBox="0 0 36 36"><circle class="sn-pr-tr" cx="18" cy="18" r="15.9"/><circle class="sn-pr-fg" cx="18" cy="18" r="15.9" pathLength="100"/></svg><b data-pg-pct>64%</b></span>
+          <span class="sn-pring-svg sn-lg sn-ok" data-pg-bind style="--sn-p:.64"><svg viewBox="0 0 36 36"><circle class="sn-pr-tr" cx="18" cy="18" r="15.9"/><circle class="sn-pr-fg" cx="18" cy="18" r="15.9" pathLength="100"/></svg><b data-pg-pct>64%</b></span>
+          <span class="sn-pring-svg sn-warn" style="--sn-p:.42"><svg viewBox="0 0 36 36"><circle class="sn-pr-tr" cx="18" cy="18" r="15.9"/><circle class="sn-pr-fg" cx="18" cy="18" r="15.9" pathLength="100"/></svg><b>42%</b></span>
+          <span class="sn-pring-svg sn-bad" style="--sn-p:.85"><svg viewBox="0 0 36 36"><circle class="sn-pr-tr" cx="18" cy="18" r="15.9"/><circle class="sn-pr-fg" cx="18" cy="18" r="15.9" pathLength="100"/></svg><b>85%</b></span>
+        </div>
       </div>
       <div class="sn-pcard" id="pcard"><span class="sn-pc-ic"><span class="sn-swap"><span class="sn-a" data-i="film"></span><span class="sn-b" data-i="check"></span></span></span>
-        <div class="sn-pc-main"><div class="sn-pc-top"><b class="sn-pc-title"><span>正在导出 第三集.mp4</span></b><span class="sn-pc-num sn-num">0%</span></div><div class="sn-pbar"><i></i></div><div class="sn-pc-sub sn-num"><span>准备中…</span></div></div>
+        <div class="sn-pc-main"><div class="sn-pc-top"><b class="sn-pc-title"><span>正在导出 第三集.mp4</span></b><span class="sn-pc-num sn-num">0%</span></div><div class="sn-pbar sn-active"><i></i></div><div class="sn-pc-sub sn-num"><span>准备中…</span></div></div>
         <div class="sn-pc-acts"><button class="sn-btn sn-ghost sn-sm" data-pc-cancel>取消</button></div></div>
       <div class="row"><button class="sn-btn sn-secondary" data-pc-start data-i="refresh-cw:before">重新导出</button><span class="sn-note">中途点"取消"看取消后的状态</span></div>
       <div class="sn-aigen" id="aigen">
@@ -741,7 +792,7 @@
         <div class="sn-ai-out"></div>
       </div>
     </div>
-    <ul class="rules"><li>进度卡入场 420ms；完成时旧文字 160ms 模糊淡出，新文字 420ms 淡入，图标原地换成对勾。</li><li>每次等待只用一个指示器：有进度卡就不再转圈、不再弹 Toast。</li></ul>
+    <ul class="rules"><li>进度卡入场 420ms；活跃进度条带克制单向微光（<code>--sn-grad-sheen</code>），完成时自动静止，图标原地切对勾。</li><li>不确定进度采用双段非均匀变速流轨；每次等待只用一个指示器，不叠多个转圈。</li></ul>
   </section>
 
   <section class="spec" id="numflow">
@@ -990,7 +1041,7 @@
   <section class="spec" id="chat">
     <h2>聊天与 AI 对话<small>Chat</small></h2>
     <p>超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条；已经载入的消息滚得再快、拖滚动条拖得再猛，都直接显示真内容，不换骨架，也不露白。发送时，输入框里的字原地变成气泡，果断地飞进它在列表里的位置（一起步就是高速，再柔和停住），图片、视频的缩略图边飞边放大，音频、文档整条飞过去，原来的消息同时往上让位。AI 回复先思考（灰字流出，想完自动收起，可以点开看），再列出步骤，再逐词流出正文、镜头卡片和生成的画面；生成中发送按钮变成"停止"。</p>
-    <div class="sn-chat-cfg"><span class="sn-cap">演示</span><button class="sn-btn sn-ghost sn-sm" data-chat-sim="top" data-i="arrow-up:before">快速滚到最早</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="incoming">模拟收到消息</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="fail">模拟发送失败</button></div>
+    <div class="sn-chat-cfg"><span class="sn-cap">演示</span><button class="sn-btn sn-secondary sn-sm" data-chat-sim="stream" data-i="play:before">体验流式与工具调用</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="top" data-i="arrow-up:before">快速滚到最早</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="incoming">模拟收到消息</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="fail">模拟发送失败</button><span class="sn-cap" style="margin-left:auto">刻度轨</span><div class="sn-seg sn-sm" data-seg="chatrail"><span class="sn-thumb"></span><button data-v="left">左侧</button><button data-v="right">右侧</button><button data-v="off">隐藏</button></div></div>
     <div class="demo">
       <div class="sn-chat" id="chatBox">
         <div class="sn-chat-hd"><div class="sn-tx"><b>分镜助手</b><span class="sn-sub"><span data-chat-status></span></span></div></div>
@@ -1039,6 +1090,114 @@
       <div class="sn-md-demo" data-view="doc"><div class="sn-md-doc" id="mdDoc"></div><textarea class="sn-md-src" id="mdSrc" spellcheck="false" aria-label="Markdown 源码"></textarea></div>
     </div>
     <ul class="rules"><li>用法：<code class="k">renderMarkdown(el, md, { codeMax: 240, imgH: 220, tableMax: 0 })</code>，返回的 <code class="k">set()</code> 改高度、<code class="k">update()</code> 换内容；也可以直接在容器上设 <code class="k">--md-code-max</code>、<code class="k">--md-img-h</code>、<code class="k">--md-table-max</code>。</li><li>单个块：代码块的信息行写 <code class="k">```js title=app.js maxh=120 wrap nonum</code>（文件名、最高、自动换行、不要行号）；图片在地址后面写 <code class="k">=x160</code> 定高、<code class="k">=320x</code> 定宽、<code class="k">=16:9</code> 定比例。</li><li>代码比上限高出一行以上才折叠，底部渐隐，点"展开全部"在 240ms 里缓缓展开；收起时代码块顶部跑出窗口就把它拉回来。复制的是原文，不带行号。</li><li>公式：行内 <code class="k">$…$</code>、块级 <code class="k">$$…$$</code>；支持分式、根号、上下标、求和与积分（块级时上下限在符号上下）、希腊字母、常用关系符和箭头、矩阵、分段函数、<code class="k">\left … \right</code> 括号自动长高、<code class="k">\text</code>、<code class="k">\mathbb</code>。不认识的写法原样显示源码，不影响别的内容。</li><li>安全：文字全部转义，不渲染原始 HTML；链接只放行 http(s)、mailto 和站内地址，图片另外放行 data:image，外链新窗口打开。半截的 Markdown（流式输出时）也能渲：没闭合的代码块照样显示成代码块。</li></ul>
+  </section>
+
+  <section class="spec" id="editorial" data-parity-appended>
+    <h2>图文编排与内容张力<small>Editorial</small></h2>
+    <p>打破单调文字墙与 AI 模板卡：用大字阶非对称杂志头图、2px 拉引金句、去盒化极简数字带、不对称 Bento 视觉拼贴、交互悬浮标注点与调色/声波多元素组合，让文字、段落与影像自带张力与节奏。所有圆角、线宽、毛玻璃虚化与护字渐变均走统一令牌并可随时定制。</p>
+    <div class="demo">
+      <article class="sn-ed">
+        <!-- 1. 非对称杂志头图 -->
+        <header class="sn-ed-hero">
+          <div class="sn-ed-hero-copy">
+            <div>
+              <span class="sn-ed-kicker"><i></i>雨夜车站 · 第三集摄影手记</span>
+              <div class="sn-ed-title" role="heading" aria-level="3">把冷雨夜的光影层次，压进三分钟的留白里</div>
+              <div class="sn-ed-deck">在没有密集对白的夜戏里，色彩温差、机位高度与环境声就是叙事本身。我们把站前广场的冷蓝积水与候车厅的暖黄钨丝灯拆成两条互相牵引的情绪线。</div>
+            </div>
+            <div class="sn-ed-byline">
+              <div class="sn-ed-author">
+                <sn-avatar seed="u3" name="林夏" size="32" decorative></sn-avatar>
+                <div><b>林夏 · 摄影指导</b><span>2026 年 11 月 19 日 · 4 分钟阅读</span></div>
+              </div>
+              <div class="sn-ed-acts">
+                <button type="button" class="sn-btn sn-primary sn-sm" data-i="play:before">看第三集样片</button>
+                <button type="button" class="sn-btn sn-secondary sn-sm" data-i="star:before">收藏手记</button>
+              </div>
+            </div>
+          </div>
+          <div class="sn-ed-frame" data-ed-zoom>
+            <img src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&h=640&q=80" alt="雨夜车站广场灯光倒影" decoding="async">
+            <span class="sn-ed-scrim" aria-hidden="true"></span>
+            <div class="sn-ed-exif">
+              <span class="sn-ed-glass">35mm · f/1.8 · 5200K · 1/60s</span>
+              <span class="sn-ed-cap-light">图 01 · 站前广场雨后倒影（点图放大）</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- 2. 杂志正文 + 2px 拉引金句 + 去盒化极简数字带 + 侧栏图注 -->
+        <div class="sn-ed-article">
+          <div class="sn-ed-prose">
+            <div class="sn-ed-lead">开场前四十秒几乎没有人物近景。摄影机贴在离地六十厘米的湿润石板上方，让路灯在积水里拉出长而克制的纵向倒影，观众在看见林夏之前，先听见远处最后一班列车进站的制动低鸣。</div>
+            <figure class="sn-ed-quote">
+              <blockquote>“不要把画面填满，留出三分之一给雨雾和暗部，观众自己的想象会把情绪补完。”</blockquote>
+              <cite>— 导演分镜批注 · 第三集定稿评审</cite>
+            </figure>
+            <div class="sn-ed-p">进入候车厅以后，色温从室外的 5200K 缓慢滑向 3400K。长椅选用带有磨损木纹的旧松木，扶手反光刚好接住顶灯余晖；整段六分钟实拍素材最终剪入五个镜头，用一次十二帧叠化把雨声无缝送进站台。</div>
+            <div class="sn-ed-metrics">
+              <div class="sn-ed-metric"><b>48</b><span>全集精修镜头</span></div>
+              <div class="sn-ed-metric"><b>5200K</b><span>雨夜冷调基线</span></div>
+              <div class="sn-ed-metric"><b>02:48</b><span>第三集成片时长</span></div>
+              <div class="sn-ed-metric"><b>12</b><span>实景机位方案</span></div>
+            </div>
+          </div>
+          <aside class="sn-ed-aside">
+            <figure class="sn-ed-fig">
+              <div class="sn-ed-fig-img" data-ed-zoom><img src="https://images.unsplash.com/photo-1554103577-c0d26e9b90e0?auto=format&fit=crop&w=560&h=420&q=80" alt="候车厅暖光实景参考" decoding="async"></div>
+              <figcaption><b>图 02 · 候车厅中景</b>：暖黄顶灯与冷色雨夜玻璃门形成天然画幅分割。</figcaption>
+            </figure>
+            <figure class="sn-ed-fig">
+              <div class="sn-ed-fig-img" data-ed-zoom><img src="https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=560&h=420&q=80" alt="夜间铁道站台灯光" decoding="async"></div>
+              <figcaption><b>图 03 · 站台九盏灯</b>：长镜头慢摇过七盏灯，车灯恰好切入画框。</figcaption>
+            </figure>
+          </aside>
+        </div>
+
+        <!-- 3. 不对称 Bento 拼贴画廊：宽幅交互标注 + 竖幅特写 + 电影色板 + 实景声波 -->
+        <div class="sn-ed-bento">
+          <div class="sn-ed-tile sn-ed-wide" data-ed-zoom>
+            <img src="https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=960&h=560&q=80" alt="夜色街道与雨幕高光分析" decoding="async">
+            <span class="sn-ed-scrim" aria-hidden="true"></span>
+            <button type="button" class="sn-ed-pin sn-on" style="--sn-x:30%;--sn-y:42%" aria-label="查看主光标注" aria-pressed="true"></button>
+            <button type="button" class="sn-ed-pin" style="--sn-x:72%;--sn-y:34%" aria-label="查看构图标注" aria-pressed="false"></button>
+            <div class="sn-ed-note" id="edPinNote"><b>5200K 冷雨夜主光</b><span>站前广场积水反射冷白钠灯，压低高光饱和度，与后景候车厅 3400K 暖灯形成冷暖纵深。</span></div>
+          </div>
+
+          <div class="sn-ed-tile sn-ed-tall" data-ed-zoom>
+            <img src="https://images.unsplash.com/photo-1541702467897-41915a07d3a7?auto=format&fit=crop&w=640&h=900&q=80" alt="竖幅夜雨光影特写" decoding="async">
+            <span class="sn-ed-scrim" aria-hidden="true"></span>
+            <div class="sn-ed-exif"><span class="sn-ed-cap-light">镜 09 · 车灯切过侧脸的 1.4 秒停顿</span></div>
+          </div>
+
+          <div class="sn-ed-tile sn-ed-palette">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+              <b class="sn-t-body-strong">本场实景采样色板</b>
+              <span class="sn-t-caption sn-c-tertiary">点色块复制</span>
+            </div>
+            <div class="sn-ed-swatches">
+              <button type="button" class="sn-ed-swatch" data-hex="#1C2733" style="--sn-c:#1C2733"><i></i><span>#1C2733</span></button>
+              <button type="button" class="sn-ed-swatch" data-hex="#4A6274" style="--sn-c:#4A6274"><i></i><span>#4A6274</span></button>
+              <button type="button" class="sn-ed-swatch" data-hex="#C8935B" style="--sn-c:#C8935B"><i></i><span>#C8935B</span></button>
+              <button type="button" class="sn-ed-swatch" data-hex="#7D2932" style="--sn-c:#7D2932"><i></i><span>#7D2932</span></button>
+            </div>
+          </div>
+
+          <div class="sn-ed-tile sn-ed-sound" id="edSound">
+            <div class="sn-ed-sound-top">
+              <div><b>站台雨夜环境音 · 01:14</b><span>同期双声道 · 降噪后压低 6dB</span></div>
+              <button type="button" class="sn-btn sn-primary sn-round sn-ibtn" data-ed-play aria-label="播放环境音" aria-pressed="false"><span class="sn-swap"><span class="sn-a" data-i="play"></span><span class="sn-b" data-i="pause"></span></span></button>
+            </div>
+            <div class="sn-ed-wave" aria-hidden="true"></div>
+          </div>
+        </div>
+      </article>
+    </div>
+    <ul class="rules">
+      <li><b>层次张力</b>：非对称比例（1 : 1.32 头图、62ch 正文 + 232px 侧注、跨列/跨行 Bento 拼贴）打破呆板均分栅格，大字阶标题配合 <code>text-wrap: balance</code>。</li>
+      <li><b>去 KPI 盒化</b>：关键数据用纯大号 <code>tabular-nums</code> 与上下 1px 细线构成极简指标带，绝不套一排彩色小盒子。</li>
+      <li><b>统一材质规范</b>：摄影压字仅用 <code>--sn-grad-scrim</code> 护读，浮签仅用 <code>--sn-blur-md</code> 毛玻璃与 <code>--sn-glass-bg</code>，零装饰性彩色渐变。</li>
+    </ul>
   </section>
 
   <section class="spec" id="flow">

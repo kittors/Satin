@@ -1,10 +1,14 @@
 /* Satin 基础：减少动态效果、[hidden]、排版类（层级 × 色调）、主题定制面板、分段控件 / 标签页放不下时横着滑。必需。 */
 @layer satin {
-.sn-reduce-motion *, .sn-reduce-motion *::before, .sn-reduce-motion *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+.sn-reduce-motion *, .sn-reduce-motion *::before, .sn-reduce-motion *::after,
+[data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+[data-motion="crisp"] { --sn-motion-scale: .55; }
+[data-motion="off"] { --sn-motion-scale: 0; }
 [hidden] { display: none !important; }
-/* 主题定制面板（展示页顶栏、官网共用）：主色、状态色、字体、字号 */
-.sn-th-panel { width: 304px; padding: 16px; display: grid; gap: 16px; transform-origin: 100% 0; }
-.sn-th-sec { display: grid; gap: 8px; }
+/* 主题定制面板（展示页顶栏、官网共用）：主色、状态色、字体、字号、圆角、线条、动效节奏 */
+.sn-th-panel { width: 316px; max-height: min(82dvh, 620px); overflow: auto; padding: 16px; display: grid; gap: 14px; transform-origin: 100% 0; }
+.sn-th-sec { display: grid; gap: 6px; }
+.sn-th-grid { display: grid; gap: 14px; }
 .sn-th-h { font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-th-sw { display: flex; align-items: center; gap: 10px; }
 .sn-th-dot { all: unset; box-sizing: border-box; position: relative; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--sn-c, var(--sn-label)); cursor: pointer; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-label) 14%, transparent); transition: box-shadow .15s var(--sn-ease-out), scale .1s var(--sn-ease-out); }

@@ -9,5 +9,8 @@ export default {
   "theme-panel.6": "Danger",
   "theme-panel.7": "Font",
   "theme-panel.8": "Text size",
-  "theme-panel.10": "Reset"
+  "theme-panel.9": "Radius",
+  "theme-panel.10": "Reset",
+  "theme-panel.11": "Line contrast",
+  "theme-panel.12": "Transitions"
 };

@@ -9,5 +9,7 @@
     d.dataset.radius = localStorage.getItem("satin-radius") || "pill";
     const c = JSON.parse(localStorage.getItem("satin-custom-css") || "null");
     for (const [k, v] of Object.entries((c && c[d.dataset.theme]) || {})) d.style.setProperty(k, v);
+    const m = JSON.parse(localStorage.getItem("satin-custom") || "null")?.motion;
+    if (m && m !== "normal") d.dataset.motion = m;
   } catch {}
 })();

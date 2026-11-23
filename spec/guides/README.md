@@ -9,7 +9,7 @@
 | [排版](type.md) | Typography | Text 组件 = 层级 × 色调。 |
 | [间距](spacing.md) | Spacing | 16 以下每 2px 一档，只在控件内部用； |
 | [布局与响应式](layout.md) | Layout | 断点按容器宽度划分，不按窗口宽度：compact 小于 720、regular 720～1199、wide 1200 及以上。 |
-| [圆角与线](shape.md) | Radius & line | 圆角 6 档：4、6、8、12、16 和胶囊。 |
+| [圆角、线与材质](shape.md) | Radius, line & surface | 圆角 6 档（4 / 6 / 8 / 12 / 16 / 胶囊），线条粗细 4 档（1px 细线与控件、2px 焦点与导引），虚化 3 档（8 / 16 / 24px），渐变仅限三种功能用途——全部可按需自定义。 |
 | [阴影与层级](elevation.md) | Elevation | 三层：卡片（只靠描边和明度差）、浮层（菜单、弹出面板、通知）、对话框。 |
 | [动效](motion.md) | Motion | 八条曲线、六档时长：进入先快后慢，离开先慢后快，换位两端慢中间快。以逐帧记录为准验收。 |
 | [内容加载与过渡](loading-motion.md) | Loading & transitions | 悬停静默预取、180ms 原子提交、300/500ms 防闪律与同构骨架交叉显影，彻底消灭切换白闪与砸屏。 |

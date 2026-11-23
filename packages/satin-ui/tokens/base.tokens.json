@@ -367,6 +367,138 @@
         },
         "$description": "图标按钮按下时缩到的比例"
       }
+    },
+    "scale": {
+      "$type": "number",
+      "$value": 1,
+      "$extensions": {
+        "com.satin": {
+          "var": "--motion-scale",
+          "source": "base.css"
+        }
+      },
+      "$description": "全局动效节奏倍率：1 标准，0.55 干脆，0 零过渡"
+    },
+    "duration": {
+      "fast": {
+        "$type": "duration",
+        "$value": "calc(120ms * {motion.scale})",
+        "$extensions": {
+          "com.satin": {
+            "css": true,
+            "var": "--dur-fast",
+            "source": "base.css"
+          }
+        },
+        "$description": "即时反馈时长（悬停、按下、微态切换）"
+      },
+      "base": {
+        "$type": "duration",
+        "$value": "calc(200ms * {motion.scale})",
+        "$extensions": {
+          "com.satin": {
+            "css": true,
+            "var": "--dur-base",
+            "source": "base.css"
+          }
+        },
+        "$description": "小型进出时长（提示、浮层、微动效显影）"
+      },
+      "slow": {
+        "$type": "duration",
+        "$value": "calc(320ms * {motion.scale})",
+        "$extensions": {
+          "com.satin": {
+            "css": true,
+            "var": "--dur-slow",
+            "source": "base.css"
+          }
+        },
+        "$description": "中型容器展开时长（抽屉、对话框、卡片展开）"
+      }
+    }
+  },
+  "border": {
+    "width": {
+      "hairline": {
+        "$type": "dimension",
+        "$value": "1px",
+        "$extensions": {
+          "com.satin": {
+            "var": "--bw-hairline",
+            "source": "base.css"
+          }
+        },
+        "$description": "常规分割线、表格网格线、卡片细描边"
+      },
+      "control": {
+        "$type": "dimension",
+        "$value": "1px",
+        "$extensions": {
+          "com.satin": {
+            "var": "--bw-ctrl",
+            "source": "base.css"
+          }
+        },
+        "$description": "输入框、次要按钮与选择器描边"
+      },
+      "focus": {
+        "$type": "dimension",
+        "$value": "2px",
+        "$extensions": {
+          "com.satin": {
+            "var": "--bw-focus",
+            "source": "base.css"
+          }
+        },
+        "$description": "键盘焦点环粗细"
+      },
+      "accent": {
+        "$type": "dimension",
+        "$value": "2px",
+        "$extensions": {
+          "com.satin": {
+            "var": "--bw-accent",
+            "source": "base.css"
+          }
+        },
+        "$description": "拉引线、思考导引线、侧边刻度指示线粗细"
+      }
+    }
+  },
+  "blur": {
+    "sm": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$extensions": {
+        "com.satin": {
+          "var": "--blur-sm",
+          "source": "base.css"
+        }
+      },
+      "$description": "轻虚化：悬浮图注标签、小型毛玻璃徽标"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "16px",
+      "$extensions": {
+        "com.satin": {
+          "var": "--blur-md",
+          "source": "base.css"
+        }
+      },
+      "$description": "标准虚化：吸顶顶栏、浮层卡片、对话侧边浮窗"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "24px",
+      "$extensions": {
+        "com.satin": {
+          "var": "--blur-lg",
+          "source": "base.css"
+        }
+      },
+      "$description": "深虚化：全幅媒体控制栏、沉浸式遮罩浮层"
     }
   },
   "radius": {

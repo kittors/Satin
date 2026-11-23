@@ -4,7 +4,7 @@ export default {
   "chat.3": "Play video",
   "chat.4": "Play",
   "chat.5": "<div class=\"sn-msg-meta sn-bad\">Not sent — tap the exclamation mark to retry</div>",
-  "chat.6": "<span class=\"sn-spinner\"></span><span class=\"sn-ci-sr\">Loading earlier messages</span>",
+  "chat.6": "<span class=\"sn-ld sn-ld-arc sn-xs\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\"><circle class=\"sn-ld-tr\" cx=\"12\" cy=\"12\" r=\"9\"/><circle class=\"sn-ld-hd\" cx=\"12\" cy=\"12\" r=\"9\"/></svg></span><span class=\"sn-ci-sr\">Loading earlier messages</span>",
   "chat.9": "Generated image",
   "chat.10": "Video",
   "chat.11": "Image",
@@ -24,5 +24,9 @@ export default {
   "chat.jump": "Jump to latest",
   "chat.26": "Thinking",
   "chat.27": "Failed to send, tap to retry",
+  "chat.28": "Edit prompt",
+  "chat.29": "Arguments",
+  "chat.30": "Result",
+  "chat.31": "Thread navigation",
   "chat.empty": "What can I help with?"
 };

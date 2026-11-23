@@ -1,15 +1,15 @@
 {
   "id": "loading",
-  "name": "骨架与加载",
+  "name": "动感加载与骨架",
   "nav": "骨架与加载",
-  "en": "Skeleton · Spinner",
+  "en": "Loader · Skeleton",
   "group": "反馈",
   "specRef": "",
-  "summary": "300ms 以内的等待什么都不显示；超过 300ms 才出现，一旦出现至少留 500ms。布局已知时用骨架，不用孤零零的转圈；数据到了逐行替换，每行间隔 40ms 淡入。",
+  "summary": "严禁纯文字「正在加载…」。瞬时状态、工具调用和首字节等待使用 8 款极简几何物理 Loader（零文字、纯 CSS/SVG 60fps，尺寸、速度、色彩全可定制）；结构已知的列表与表格采用同构渐隐骨架，遵守 300ms 延迟与 500ms 最小驻留。",
   "acceptance": [
-    "骨架的光带 1.2 秒扫过一次，整列共用一道光，不是每块各扫各的。",
-    "转圈 0.9 秒一圈；按钮里的转圈至少转满一圈再停。只在按钮里和很小的区域用转圈。",
-    "自动保存这类用户不用察觉的等待，不显示加载，只在固定位置放一个安静的状态字。"
+    "严禁在表格末尾、对话区或卡片里出现干巴巴的纯文字「正在加载更多…」；文字只留给 `.sn-sr` 读屏。",
+    "所有动感加载器均可通过 `--sn-ld-size`、`--sn-ld-color`、`--sn-ld-speed` 即时定制，开启减少动态效果自动收敛为低频微呼吸。",
+    "骨架的光带 1.2 秒扫过一次，整列共用一道光；300ms 内完成不出现，出现后至少留 500ms 再错峰替换。"
   ],
   "api": [
     {
@@ -60,7 +60,11 @@
   },
   "demos": [
     {
-      "caption": "",
+      "caption": "动感加载器画廊（实时可定制）",
+      "html": "<div class=\"ld-cfg\">\n  <span class=\"ld-cfg-g\"><span class=\"sn-cap\">尺寸</span><div class=\"sn-seg sn-sm\" data-seg=\"ldsize\"><span class=\"sn-thumb\"></span><button data-v=\"sm\">16</button><button data-v=\"md\">20</button><button data-v=\"lg\">28</button><button data-v=\"xl\">36</button></div></span>\n  <span class=\"ld-cfg-g\"><span class=\"sn-cap\">节奏</span><div class=\"sn-seg sn-sm\" data-seg=\"ldspeed\"><span class=\"sn-thumb\"></span><button data-v=\"0.7\">舒缓</button><button data-v=\"1\">标准</button><button data-v=\"1.5\">疾速</button></div></span>\n  <span class=\"ld-cfg-g\"><span class=\"sn-cap\">色调</span><div class=\"sn-seg sn-sm\" data-seg=\"ldtone\"><span class=\"sn-thumb\"></span><button data-v=\"label\">中性墨</button><button data-v=\"accent\">主色</button><button data-v=\"success\">成功</button><button data-v=\"warning\">琥珀</button></div></span>\n</div>\n<div class=\"ld-grid\" id=\"ldGallery\"></div>"
+    },
+    {
+      "caption": "同构骨架与 300 / 500ms 防闪",
       "html": "<div class=\"row\" style=\"margin-bottom:16px\">\n      <button class=\"sn-btn sn-secondary\" data-load=\"200\">加载（快，200ms）</button><button class=\"sn-btn sn-secondary\" data-load=\"1600\">加载（慢，1.6 秒）</button>\n      <span class=\"sn-note\" id=\"loadNote\">快的那次不会闪出骨架</span>\n    </div><div class=\"sn-sk-list\" id=\"skList\"></div>"
     }
   ],

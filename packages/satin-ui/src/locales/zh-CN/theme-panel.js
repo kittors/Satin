@@ -9,5 +9,8 @@ export default {
   "theme-panel.6": "危险",
   "theme-panel.7": "字体",
   "theme-panel.8": "字号",
-  "theme-panel.10": "恢复默认"
+  "theme-panel.9": "圆角",
+  "theme-panel.10": "恢复默认",
+  "theme-panel.11": "线条质感",
+  "theme-panel.12": "过渡节奏"
 };

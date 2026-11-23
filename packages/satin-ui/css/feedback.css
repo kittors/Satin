@@ -150,20 +150,127 @@
 .sn-sk-row .sn-meta { flex: 1; display: grid; gap: 8px; }
 .sn-sk-row .sn-thumb { width: 64px; height: 40px; border-radius: var(--sn-r-sm); background: var(--sn-g); }
 .sn-sk-row b { font: 500 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); } .sn-sk-row span { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
-.sn-spinner { width: 16px; height: 16px; border-radius: 50%; border: 1.75px solid var(--sn-fill-active); border-top-color: var(--sn-label); animation: sn-spin .9s linear infinite; }
+.sn-spinner { width: 16px; height: 16px; border-radius: 50%; border: 1.75px solid var(--sn-fill-active); border-top-color: var(--sn-label); animation: sn-spin .85s cubic-bezier(.55, .15, .45, .85) infinite; }
 .sn-spinner.sn-lg { width: 24px; height: 24px; border-width: 2px; }
 @keyframes sn-spin { to { rotate: 360deg; } }
+.sn-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* ———— 进度 ———— */
-.sn-pbar { position: relative; height: 4px; border-radius: 2px; background: var(--sn-fill-subtle); overflow: hidden; }
-.sn-pbar > i { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--sn-p, 0) * 100%); border-radius: inherit; background: var(--sn-accent); transition: width .3s var(--sn-ease-out), opacity .2s; }
-.sn-pbar.sn-indet > i { width: 36%; animation: sn-indet 1.4s var(--sn-ease-in-out) infinite; }
-/* 按状态上色（和 .sn-tag 的圆点同一套）：完成 sn-ok、待处理 sn-warn、失败 sn-bad；进行中 sn-run 就是默认的强调色。四种状态一个颜色等于没有颜色 */
-.sn-pbar.sn-ok > i { background: var(--sn-success); } .sn-pbar.sn-warn > i { background: var(--sn-warning); } .sn-pbar.sn-bad > i { background: var(--sn-danger); }
-@keyframes sn-indet { from { translate: -100% 0; } to { translate: 280% 0; } }
+/* ———— 动感几何加载器（.sn-ld）：零文字加载、纯 CSS/SVG 60fps、全面支持 --sn-ld-size / --sn-ld-color / --sn-ld-speed 自定义 ———— */
+.sn-ld { --sn-ld-size: 20px; --sn-ld-color: currentColor; --sn-ld-speed: 1; position: relative; display: inline-grid; place-items: center; width: var(--sn-ld-size); height: var(--sn-ld-size); color: var(--sn-ld-color); flex: none; vertical-align: middle; }
+.sn-ld.sn-xs { --sn-ld-size: 14px; }
+.sn-ld.sn-sm { --sn-ld-size: 16px; }
+.sn-ld.sn-lg { --sn-ld-size: 28px; }
+.sn-ld.sn-xl { --sn-ld-size: 36px; }
+
+/* 1. matrix：3×3 对角波纹点阵（AI 思考 / 推理 / 工具调用首选） */
+.sn-ld-matrix { grid-template-columns: repeat(3, 1fr); gap: calc(var(--sn-ld-size) * .12); padding: calc(var(--sn-ld-size) * .06); }
+.sn-ld-matrix > i { display: block; width: 100%; height: 100%; border-radius: 50%; background: currentColor; animation: sn-ld-mat calc(1.15s / var(--sn-ld-speed)) var(--sn-ease-in-out) infinite; }
+.sn-ld-matrix > i:nth-child(1) { animation-delay: 0s; }
+.sn-ld-matrix > i:nth-child(2), .sn-ld-matrix > i:nth-child(4) { animation-delay: calc(.11s / var(--sn-ld-speed)); }
+.sn-ld-matrix > i:nth-child(3), .sn-ld-matrix > i:nth-child(5), .sn-ld-matrix > i:nth-child(7) { animation-delay: calc(.22s / var(--sn-ld-speed)); }
+.sn-ld-matrix > i:nth-child(6), .sn-ld-matrix > i:nth-child(8) { animation-delay: calc(.33s / var(--sn-ld-speed)); }
+.sn-ld-matrix > i:nth-child(9) { animation-delay: calc(.44s / var(--sn-ld-speed)); }
+@keyframes sn-ld-mat { 0%, 100% { transform: scale(.42); opacity: .22; } 38% { transform: scale(1); opacity: 1; } }
+
+/* 2. dots：弹性三点韵律（微压扁弹簧弹跳） */
+.sn-ld-dots { display: inline-flex; align-items: center; justify-content: center; gap: calc(var(--sn-ld-size) * .18); width: auto; min-width: calc(var(--sn-ld-size) * 1.45); }
+.sn-ld-dots > i { display: block; width: calc(var(--sn-ld-size) * .26); height: calc(var(--sn-ld-size) * .26); border-radius: 50%; background: currentColor; animation: sn-ld-dot calc(1.05s / var(--sn-ld-speed)) cubic-bezier(.34, 1.56, .64, 1) infinite; }
+.sn-ld-dots > i:nth-child(2) { animation-delay: calc(.14s / var(--sn-ld-speed)); }
+.sn-ld-dots > i:nth-child(3) { animation-delay: calc(.28s / var(--sn-ld-speed)); }
+@keyframes sn-ld-dot { 0%, 62%, 100% { transform: translateY(0) scale(.86); opacity: .34; } 28% { transform: translateY(calc(var(--sn-ld-size) * -.22)) scale(1.08); opacity: 1; } }
+
+/* 3. arc：可变弧长呼吸旋环（SVG 矢量圆头，按钮与微等待首选） */
+.sn-ld-arc > svg { width: 100%; height: 100%; animation: sn-spin calc(1.35s / var(--sn-ld-speed)) linear infinite; }
+.sn-ld-arc .sn-ld-tr { fill: none; stroke: currentColor; stroke-width: 2.2; opacity: .16; }
+.sn-ld-arc .sn-ld-hd { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 1 60; stroke-dashoffset: 0; animation: sn-ld-arc calc(1.35s / var(--sn-ld-speed)) var(--sn-ease-in-out) infinite; }
+@keyframes sn-ld-arc { 0% { stroke-dasharray: 4 60; stroke-dashoffset: 0; } 50% { stroke-dasharray: 38 60; stroke-dashoffset: -14; } 100% { stroke-dasharray: 4 60; stroke-dashoffset: -56; } }
+
+/* 4. orbit：双星物理微环 */
+.sn-ld-orbit { border-radius: 50%; box-shadow: inset 0 0 0 1.25px color-mix(in srgb, currentColor 18%, transparent); }
+.sn-ld-orbit > i { position: absolute; inset: 0; animation: sn-spin calc(1.1s / var(--sn-ld-speed)) cubic-bezier(.62, .12, .38, .88) infinite; }
+.sn-ld-orbit > i::after { content: ""; position: absolute; top: calc(var(--sn-ld-size) * -.06); left: 50%; width: calc(var(--sn-ld-size) * .24); height: calc(var(--sn-ld-size) * .24); margin-left: calc(var(--sn-ld-size) * -.12); border-radius: 50%; background: currentColor; }
+.sn-ld-orbit > i:nth-child(2) { animation-delay: calc(-.55s / var(--sn-ld-speed)); opacity: .42; }
+.sn-ld-orbit > i:nth-child(2)::after { width: calc(var(--sn-ld-size) * .17); height: calc(var(--sn-ld-size) * .17); margin-left: calc(var(--sn-ld-size) * -.085); top: calc(var(--sn-ld-size) * -.02); }
+
+/* 5. bars：声纹四柱律动 */
+.sn-ld-bars { display: inline-flex; align-items: center; justify-content: space-between; padding: calc(var(--sn-ld-size) * .08) calc(var(--sn-ld-size) * .06); }
+.sn-ld-bars > i { display: block; width: max(2px, calc(var(--sn-ld-size) * .14)); height: 100%; border-radius: 999px; background: currentColor; transform-origin: center; animation: sn-ld-bar calc(1s / var(--sn-ld-speed)) var(--sn-ease-in-out) infinite; }
+.sn-ld-bars > i:nth-child(1) { animation-delay: 0s; }
+.sn-ld-bars > i:nth-child(2) { animation-delay: calc(.14s / var(--sn-ld-speed)); }
+.sn-ld-bars > i:nth-child(3) { animation-delay: calc(.28s / var(--sn-ld-speed)); }
+.sn-ld-bars > i:nth-child(4) { animation-delay: calc(.42s / var(--sn-ld-speed)); }
+@keyframes sn-ld-bar { 0%, 100% { transform: scaleY(.28); opacity: .34; } 45% { transform: scaleY(1); opacity: 1; } }
+
+/* 6. grid：2×2 接力圆角方块 */
+.sn-ld-grid { grid-template-columns: repeat(2, 1fr); gap: calc(var(--sn-ld-size) * .14); padding: calc(var(--sn-ld-size) * .08); }
+.sn-ld-grid > i { display: block; width: 100%; height: 100%; border-radius: max(1.5px, calc(var(--sn-ld-size) * .12)); background: currentColor; animation: sn-ld-sq calc(1.1s / var(--sn-ld-speed)) var(--sn-ease-out-strong) infinite; }
+.sn-ld-grid > i:nth-child(1) { animation-delay: 0s; }
+.sn-ld-grid > i:nth-child(2) { animation-delay: calc(.18s / var(--sn-ld-speed)); }
+.sn-ld-grid > i:nth-child(4) { animation-delay: calc(.36s / var(--sn-ld-speed)); }
+.sn-ld-grid > i:nth-child(3) { animation-delay: calc(.54s / var(--sn-ld-speed)); }
+@keyframes sn-ld-sq { 0%, 100% { transform: scale(.64); opacity: .24; } 35% { transform: scale(1); opacity: 1; } }
+
+/* 7. radar：同心微脉冲涟漪 */
+.sn-ld-radar > i { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid currentColor; opacity: 0; animation: sn-ld-rad calc(1.5s / var(--sn-ld-speed)) var(--sn-ease-out) infinite; }
+.sn-ld-radar > i:nth-child(2) { animation-delay: calc(.75s / var(--sn-ld-speed)); }
+.sn-ld-radar > b { display: block; width: calc(var(--sn-ld-size) * .28); height: calc(var(--sn-ld-size) * .28); border-radius: 50%; background: currentColor; }
+@keyframes sn-ld-rad { 0% { transform: scale(.28); opacity: .75; } 100% { transform: scale(1); opacity: 0; } }
+
+/* 8. morph：圆方几何呼吸 */
+.sn-ld-morph > i { display: block; width: 62%; height: 62%; background: currentColor; animation: sn-ld-mrp calc(1.4s / var(--sn-ld-speed)) var(--sn-ease-in-out) infinite; }
+@keyframes sn-ld-mrp {
+  0%, 100% { border-radius: 50%; transform: scale(.74) rotate(0deg); opacity: .55; }
+  50% { border-radius: 26%; transform: scale(1) rotate(135deg); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sn-ld *, .sn-ld > i { animation-duration: 2.8s !important; }
+  .sn-ld-arc > svg, .sn-ld-orbit > i, .sn-ld-morph > i { animation-name: sn-ld-still !important; }
+}
+@keyframes sn-ld-still { 50% { opacity: .45; } }
+
+/* ———— 进度：可自定义高度 / 圆角 / 颜色 + 活跃微光 + 双段变速不确定态 + 分段刻度 + 高精度圆头 SVG 环 ———— */
+.sn-pbar { --sn-p-h: 4px; --sn-p-r: 999px; --sn-p-fg: var(--sn-accent); --sn-p-bg: var(--sn-fill-subtle); position: relative; height: var(--sn-p-h); border-radius: var(--sn-p-r); background: var(--sn-p-bg); overflow: hidden; }
+.sn-pbar.sn-lg { --sn-p-h: 6px; }
+.sn-pbar.sn-xl { --sn-p-h: 8px; }
+.sn-pbar > i { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--sn-p, 0) * 100%); border-radius: inherit; background: var(--sn-p-fg); overflow: hidden; transition: width .32s var(--sn-ease-out), opacity .2s; }
+/* 活跃流体微光：只在进行中（未到 100% 且非 ok）温和掠过，避免呆板死灰条 */
+.sn-pbar.sn-active > i::after { content: ""; position: absolute; inset: 0; background: var(--sn-grad-sheen); transform: translateX(-100%); animation: sn-p-sheen 1.65s var(--sn-ease-in-out) infinite; }
+.sn-pbar.sn-ok > i::after { display: none; }
+@keyframes sn-p-sheen { to { transform: translateX(180%); } }
+/* 双段非均匀变速不确定态：主轨与尾轨错相接力，告别机械来回扫 */
+.sn-pbar.sn-indet > i { inset: 0; width: 100%; background: transparent; }
+.sn-pbar.sn-indet > i::before, .sn-pbar.sn-indet > i::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; border-radius: inherit; background: var(--sn-p-fg); will-change: transform; }
+.sn-pbar.sn-indet > i::before { width: 42%; animation: sn-indet-a 1.65s cubic-bezier(.65, .815, .735, .395) infinite; }
+.sn-pbar.sn-indet > i::after { width: 26%; opacity: .72; animation: sn-indet-b 1.65s cubic-bezier(.165, .84, .44, 1) .68s infinite; }
+@keyframes sn-indet-a { 0% { transform: translateX(-110%) scaleX(.6); } 60% { transform: translateX(135%) scaleX(1.25); } 100% { transform: translateX(260%) scaleX(.5); } }
+@keyframes sn-indet-b { 0% { transform: translateX(-130%) scaleX(.9); } 65% { transform: translateX(210%) scaleX(.7); } 100% { transform: translateX(410%) scaleX(.3); } }
+/* 按状态上色（和 .sn-tag 的圆点同一套）：完成 sn-ok、待处理 sn-warn、失败 sn-bad；进行中 sn-run 就是默认的强调色 */
+.sn-pbar.sn-ok { --sn-p-fg: var(--sn-success); } .sn-pbar.sn-warn { --sn-p-fg: var(--sn-warning); } .sn-pbar.sn-bad { --sn-p-fg: var(--sn-danger); }
+
+/* 分段刻度进度条（可自定义段数、高度、间距、颜色） */
+.sn-pseg { --sn-p-h: 5px; --sn-p-fg: var(--sn-accent); display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; width: 100%; }
+.sn-pseg > i { display: block; height: var(--sn-p-h); border-radius: 999px; background: var(--sn-fill-subtle); overflow: hidden; position: relative; }
+.sn-pseg > i::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--sn-p-fg); transform: scaleX(0); transform-origin: left; transition: transform .28s var(--sn-ease-out); }
+.sn-pseg > i.sn-done::after { transform: scaleX(1); }
+.sn-pseg > i.sn-cur::after { transform: scaleX(.62); animation: sn-pseg-cur 1.2s var(--sn-ease-in-out) infinite; }
+.sn-pseg.sn-ok { --sn-p-fg: var(--sn-success); }
+@keyframes sn-pseg-cur { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+
+/* 进度环：保留旧 conic 版向下兼容；新增高精度 SVG 圆头进度环（支持居中百分比） */
 .sn-pring { --sn-s: 20px; width: var(--sn-s); height: var(--sn-s); border-radius: 50%; background: conic-gradient(var(--sn-accent) calc(var(--sn-p) * 1turn), var(--sn-fill-subtle) 0);
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); }
 .sn-pring.sn-lg { --sn-s: 28px; }
+.sn-pring-svg { --sn-s: 40px; --sn-p-fg: var(--sn-accent); position: relative; display: inline-grid; place-items: center; width: var(--sn-s); height: var(--sn-s); flex: none; }
+.sn-pring-svg.sn-sm { --sn-s: 24px; }
+.sn-pring-svg.sn-lg { --sn-s: 52px; }
+.sn-pring-svg.sn-ok { --sn-p-fg: var(--sn-success); }
+.sn-pring-svg.sn-warn { --sn-p-fg: var(--sn-warning); }
+.sn-pring-svg.sn-bad { --sn-p-fg: var(--sn-danger); }
+.sn-pring-svg > svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.sn-pring-svg .sn-pr-tr { fill: none; stroke: var(--sn-fill-subtle); stroke-width: var(--sn-sw, 3); }
+.sn-pring-svg .sn-pr-fg { fill: none; stroke: var(--sn-p-fg); stroke-width: var(--sn-sw, 3); stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: calc(100 - var(--sn-p, 0) * 100); transition: stroke-dashoffset .36s var(--sn-ease-out); }
+.sn-pring-svg > b { position: absolute; font: 600 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-mono); font-variant-numeric: tabular-nums; color: var(--sn-label); }
+.sn-pring-svg.sn-lg > b { font-size: calc(12px * var(--sn-font-scale, 1)); }
 .sn-pcard { display: flex; align-items: center; gap: 14px; max-width: 520px; padding: 14px 14px 14px 16px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: var(--sn-e1); }
 .sn-pcard .sn-pc-ic { width: 36px; height: 36px; flex: none; border-radius: var(--sn-r-md); display: grid; place-items: center; background: var(--sn-fill-subtle); color: var(--sn-label2); }
 .sn-pcard .sn-pc-ic .sn-swap .sn-ic { width: 18px; height: 18px; }

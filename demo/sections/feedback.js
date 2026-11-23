@@ -2,6 +2,7 @@
 // UI 库设计稿第二批：反馈。这里先放 Toast（状态、操作、进度），通知、横幅、骨架、进度卡见 initFeedback。
 // 数值照 09 号 §6、§7：进入 500ms 下落 10px 并从 8px 模糊变清晰，离开 200ms ease.in；同时最多 3 条；悬停或聚焦时暂停计时。
 import { setToastPos, toastPos, toast, notify, bindBanners, closeBanner, loadWithSkeleton, mountProgress, reduced } from "../../packages/satin-ui/src/feedback.js";
+import { loaderHTML, progressHTML } from "../../packages/satin-ui/src/components.js";
 import { PHOTOS } from "../data.js";
 // ———— 第二批 · 反馈区的演示：Toast 四种、通知堆叠、横幅、条目失败、空状态、骨架、进度卡、AI 生成 ————
 export function initFeedback(ctx) {
@@ -76,6 +77,32 @@ export function initFeedback(ctx) {
   // 4. 空状态里的重试
   for (const b of $$("#empty [data-retry]")) b.addEventListener("click", async () => { await busy(b, 900); succeed(b); });
 
+  // 4.5 动感加载器画廊：8 款几何物理动效 + 尺寸 / 节奏 / 色调实时定制
+  const ldBox = $("#ldGallery");
+  if (ldBox) {
+    const LD_META = [
+      ["matrix", "波纹点阵", "AI 思考 · 工具调用"],
+      ["dots", "弹性三点", "对话首字节 · 轻等待"],
+      ["arc", "可变弧环", "按钮等待 · 局部刷新"],
+      ["orbit", "行星微环", "同步 · 检索运行"],
+      ["bars", "声纹四柱", "语音 · 流式渲染"],
+      ["grid", "接力方块", "结构构建 · 批处理"],
+      ["radar", "同心涟漪", "连接 · 实时发现"],
+      ["morph", "几何呼吸", "沉浸态 · 极简微核"],
+    ];
+    const TONES = { label: "var(--sn-label)", accent: "var(--sn-accent)", success: "var(--sn-success)", warning: "var(--sn-warning)" };
+    const st = { size: "lg", speed: 1, tone: "label" };
+    const paintLd = () => {
+      ldBox.innerHTML = LD_META.map(([v, name, use]) =>
+        `<div class="ld-cell"><div class="ld-stage">${loaderHTML({ variant: v, size: st.size, speed: st.speed, color: TONES[st.tone], label: name })}</div><b>${name}</b><span>${use}</span><code>${v}</code></div>`
+      ).join("");
+    };
+    paintLd();
+    initSeg($('[data-seg="ldsize"]'), (v) => { st.size = v; paintLd(); }, 2);
+    initSeg($('[data-seg="ldspeed"]'), (v) => { st.speed = Number(v); paintLd(); }, 1);
+    initSeg($('[data-seg="ldtone"]'), (v) => { st.tone = v; paintLd(); }, 0);
+  }
+
   // 5. 骨架：300ms 内回来就不显示；显示了就至少留 500ms；数据到了逐行替换，间隔 40ms
   const ROWS = [["07", "车站外，雨刚停", "远景 · 4 秒", PHOTOS[0]], ["08", "林夏走进候车厅", "全景 · 6 秒", PHOTOS[1]],
     ["09", "站台上的最后一班车", "中景 · 5 秒", PHOTOS[2]], ["10", "车窗里的倒影", "特写 · 3 秒", PHOTOS[3]]];
@@ -88,6 +115,27 @@ export function initFeedback(ctx) {
     const r = await loadWithSkeleton(skList, { load: () => new Promise((ok) => setTimeout(() => ok(ROWS), ms)), skeleton: ROWS.map((_, i) => skRow(i)).join(""), render: (rows) => rows.map(dataRow).join("") });
     if (r) note.textContent = r.shown ? `等了 ${r.waited}ms，骨架至少留了 500ms` : `${ms}ms 就回来了，没有闪出骨架`;
   });
+
+  // 6. 进度实时联动展示（滑块 0-100 联动线性微光条、分段刻度、圆头 SVG 进度环）
+  const pgSlider = $("#pgSlider"), pgVal = $("#pgVal"), pgSeg = $("#pgSeg"), pgShow = $("#pgShowcase");
+  if (pgSeg) {
+    const renderSeg = (p) => {
+      const cur = $("#pgSeg"); if (!cur) return;
+      const tmp = document.createElement("div"); tmp.innerHTML = progressHTML({ value: p, segments: 8, tone: p >= 1 ? "ok" : "run" });
+      cur.className = tmp.firstElementChild.className; cur.innerHTML = tmp.firstElementChild.innerHTML;
+    };
+    const updateAll = (pct) => {
+      const p = Math.max(0, Math.min(100, Number(pct))) / 100;
+      if (pgVal) pgVal.textContent = Math.round(p * 100) + "%";
+      if (pgShow) {
+        for (const el of $$("[data-pg-bind]", pgShow)) el.style.setProperty("--sn-p", String(p));
+        for (const b of $$("[data-pg-pct]", pgShow)) b.textContent = Math.round(p * 100) + "%";
+      }
+      renderSeg(p);
+    };
+    updateAll(64);
+    pgSlider?.addEventListener("slide", (e) => updateAll(e.detail));
+  }
 
   // 6. 进度卡：数量、进度条、剩余时间、可取消；完成时文字模糊换掉，图标原地变对勾
   const pc = $("#pcard"); $(".sn-pc-acts", pc).insertAdjacentHTML("beforeend", '<button class="sn-btn sn-secondary sn-sm sn-off" data-pc-open>打开文件夹</button>');

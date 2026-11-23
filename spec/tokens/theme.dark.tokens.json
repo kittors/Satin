@@ -312,6 +312,30 @@
         "$description": "卡片内描边"
       }
     },
+    "glass": {
+      "bg": {
+        "$type": "color",
+        "$value": "rgba(28, 28, 30, .74)",
+        "$extensions": {
+          "com.satin": {
+            "var": "--glass-bg",
+            "source": "base.css"
+          }
+        },
+        "$description": "毛玻璃浮动表面底色（深色主题）"
+      },
+      "line": {
+        "$type": "color",
+        "$value": "rgba(255, 255, 255, .12)",
+        "$extensions": {
+          "com.satin": {
+            "var": "--glass-line",
+            "source": "base.css"
+          }
+        },
+        "$description": "毛玻璃浮动表面细描边（深色主题）"
+      }
+    },
     "button": {
       "primary": {
         "$type": "color",
@@ -828,6 +852,44 @@
         }
       },
       "$description": "菜单阴影"
+    }
+  },
+  "gradient": {
+    "scrim": {
+      "$type": "color",
+      "$value": "linear-gradient(to top, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .28) 50%, transparent 100%)",
+      "$extensions": {
+        "com.satin": {
+          "css": true,
+          "var": "--grad-scrim",
+          "source": "base.css"
+        }
+      },
+      "$description": "功能性压图护字底罩（深色主题）"
+    },
+    "fade": {
+      "$type": "color",
+      "$value": "linear-gradient(to bottom, color-mix(in srgb, {color.bg.raised} 0%, transparent), {color.bg.raised})",
+      "$extensions": {
+        "com.satin": {
+          "css": true,
+          "var": "--grad-fade",
+          "source": "base.css"
+        }
+      },
+      "$description": "功能性边缘渐隐（深色主题）"
+    },
+    "sheen": {
+      "$type": "color",
+      "$value": "linear-gradient(90deg, transparent, rgba(255, 255, 255, .2), transparent)",
+      "$extensions": {
+        "com.satin": {
+          "css": true,
+          "var": "--grad-sheen",
+          "source": "base.css"
+        }
+      },
+      "$description": "功能性单向微光（深色主题）"
     }
   },
   "flow": {

@@ -56,11 +56,39 @@ export const inputHTML = ({ value = "", placeholder = "", size, type = "text", i
 export const fieldHTML = ({ label = "", control = "", help = "", error, id, name } = {}) =>
   `<div class="${cx("sn-field", error && "sn-bad")}"${attrs({ "data-f": name })}>${label ? `<label class="sn-lbl"${attrs({ for: id })}>${esc(label)}</label>` : ""}${control}${help ? `<div class="sn-help">${esc(help)}</div>` : ""}${error != null ? `<div class="sn-err"><span>${esc(error)}</span></div>` : ""}</div>`;
 export const chipHTML = ({ text = "", on, removable } = {}) => `<span class="${cx("sn-chip", removable && "sn-tag", on && "sn-on")}">${esc(text)}${removable ? `<button class="sn-x" aria-label="${tt("components.14")}${esc(text)}">${svg(x, 10, "x")}</button>` : ""}</span>`;
-// 进度条（value 0–1；不给 value 是不确定进度）、进度环
+// 进度条（value 0–1；不给 value 是双段变速不确定进度；支持 active 微光、tone 状态色、segments 分段刻度、svg 圆头数值进度环）
 const num = (v) => String(+v).replace(/^0\./, ".");
-export const progressHTML = ({ value, ring, size } = {}) => (ring
-  ? `<span class="${cx("sn-pring", size === "lg" && "sn-lg")}" style="--sn-p:${num(value ?? 0)}"></span>`
-  : `<div class="${cx("sn-pbar", value == null && "sn-indet")}"${value == null ? "" : ` style="--sn-p:${num(value)}"`}><i></i></div>`);
+export const progressHTML = ({ value, ring, svg: svgRing, size, tone, active, segments, showValue, height } = {}) => {
+  const tn = tone && tone !== "run" ? `sn-${tone}` : "";
+  if (segments > 0) {
+    const p = Math.max(0, Math.min(1, value ?? 0)), filled = Math.floor(p * segments), partial = p > 0 && p < 1 && filled < segments;
+    return `<div class="${cx("sn-pseg", tn)}"${height ? ` style="--sn-p-h:${height}px"` : ""}>${Array.from({ length: segments }, (_, i) => `<i${i < filled ? ' class="sn-done"' : i === filled && partial ? ' class="sn-cur"' : ""}></i>`).join("")}</div>`;
+  }
+  if (ring && (svgRing || showValue)) {
+    const p = Math.max(0, Math.min(1, value ?? 0));
+    return `<span class="${cx("sn-pring-svg", size && size !== "md" && `sn-${size}`, tn)}" style="--sn-p:${num(p)}"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="sn-pr-tr" cx="18" cy="18" r="15.9"/><circle class="sn-pr-fg" cx="18" cy="18" r="15.9" pathLength="100"/></svg>${showValue ? `<b>${Math.round(p * 100)}%</b>` : ""}</span>`;
+  }
+  if (ring) return `<span class="${cx("sn-pring", size === "lg" && "sn-lg")}" style="--sn-p:${num(value ?? 0)}"></span>`;
+  const st = [value == null ? "" : `--sn-p:${num(value)}`, height ? `--sn-p-h:${height}px` : ""].filter(Boolean).join(";");
+  return `<div class="${cx("sn-pbar", value == null && "sn-indet", active && "sn-active", size && size !== "md" && `sn-${size}`, tn)}"${st ? ` style="${st}"` : ""}><i></i></div>`;
+};
+// 动感几何加载器：matrix(3×3波纹点阵) / dots(弹性三点) / arc(可变弧长旋环) / orbit(双星微环) / bars(声纹四柱) / grid(2×2接力) / radar(同心涟漪) / morph(几何呼吸)
+const LD_BODY = {
+  matrix: "<i></i>".repeat(9),
+  dots: "<i></i>".repeat(3),
+  arc: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle class="sn-ld-tr" cx="12" cy="12" r="9"/><circle class="sn-ld-hd" cx="12" cy="12" r="9"/></svg>',
+  orbit: "<i></i><i></i>",
+  bars: "<i></i>".repeat(4),
+  grid: "<i></i>".repeat(4),
+  radar: "<i></i><i></i><b></b>",
+  morph: "<i></i>",
+};
+export const LOADER_VARIANTS = Object.keys(LD_BODY);
+export const loaderHTML = ({ variant = "matrix", size, color, speed, label = "Loading" } = {}) => {
+  const v = Object.hasOwn(LD_BODY, variant) ? variant : "matrix";
+  const st = [typeof size === "number" ? `--sn-ld-size:${size}px` : "", color ? `--sn-ld-color:${color}` : "", speed != null && speed !== 1 ? `--sn-ld-speed:${speed}` : ""].filter(Boolean).join(";");
+  return `<span class="${cx("sn-ld", `sn-ld-${v}`, typeof size === "string" && size !== "md" && `sn-${size}`)}" role="status"${st ? ` style="${st}"` : ""}>${LD_BODY[v]}<span class="sn-sr">${esc(label)}</span></span>`;
+};
 export const spinnerHTML = ({ size } = {}) => `<span class="${cx("sn-spinner", size === "lg" && "sn-lg")}"></span>`;
 
 // 按钮的等待、成功、复制：在已有按钮上用

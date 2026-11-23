@@ -33,6 +33,8 @@
 | `--sn-field` | `#fff` | `#1c1c1e` | 输入框底色 |
 | `--sn-ring` | `rgba(0, 0, 0, .07)` | `rgba(255, 255, 255, .09)` | 很淡的一圈描边（头像、缩略图） |
 | `--sn-card-line` | `rgba(0, 0, 0, .06)` | `rgba(255, 255, 255, .09)` | 卡片内描边 |
+| `--sn-glass-bg` | `rgba(255, 255, 255, .78)` | `rgba(28, 28, 30, .74)` | 毛玻璃浮动表面底色（仅限 fixed / sticky / absolute 浮层） |
+| `--sn-glass-line` | `rgba(0, 0, 0, .08)` | `rgba(255, 255, 255, .12)` | 毛玻璃浮动表面细描边 |
 | `--sn-b-primary` | `var(--sn-accent)` | `var(--sn-accent)` | 主按钮底色 |
 | `--sn-b-primary-hover` | `color-mix(in srgb, var(--sn-accent) 86%, #fff)` | `color-mix(in srgb, var(--sn-accent) 70%, #fff)` | 主按钮底色（悬停） |
 | `--sn-b-primary-active` | `color-mix(in srgb, var(--sn-accent) 86%, #000)` | `color-mix(in srgb, var(--sn-accent) 90%, #000)` | 主按钮底色（按下） |
@@ -72,6 +74,9 @@
 | `--sn-e1` | `0 8px 24px rgba(0, 0, 0, .1), 0 0 0 1px rgba(0, 0, 0, .06)` | `0 8px 24px rgba(0, 0, 0, .5), inset 0 0 0 1px rgba(255, 255, 255, .09)` | 浮层阴影：菜单、弹出面板、通知 |
 | `--sn-e2` | `0 24px 64px rgba(0, 0, 0, .16), 0 0 0 1px rgba(0, 0, 0, .06)` | `0 24px 64px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .1)` | 弹窗阴影 |
 | `--sn-tip-shadow` | `0 4px 14px rgba(0, 0, 0, .14)` | `0 4px 14px rgba(0, 0, 0, .5), inset 0 0 0 1px rgba(255, 255, 255, .08)` | Tooltip 阴影 |
+| `--sn-grad-scrim` | `linear-gradient(to top, rgba(0, 0, 0, .64) 0%, rgba(0, 0, 0, .22) 48%, transparent 100%)` | `linear-gradient(to top, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .28) 50%, transparent 100%)` | 功能性压图护字底罩（仅用于摄影图上压字防糊，不作装饰） |
+| `--sn-grad-fade` | `linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised))` | `linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised))` | 功能性边缘渐隐（列表底/顶融合底色） |
+| `--sn-grad-sheen` | `linear-gradient(90deg, transparent, rgba(255, 255, 255, .36), transparent)` | `linear-gradient(90deg, transparent, rgba(255, 255, 255, .2), transparent)` | 功能性单向微光（活跃进度与完成瞬时反馈） |
 
 ## color
 
@@ -116,6 +121,27 @@
 | `--sn-ease-open` | `cubic-bezier(0.32, 0.72, 0, 1)` | 展开 / 抽屉 / 侧栏开合 |
 | `--sn-press` | `0.97` | 按钮按下时缩到的比例 |
 | `--sn-press-icon` | `0.92` | 图标按钮按下时缩到的比例 |
+| `--sn-motion-scale` | `1` | 全局动效节奏倍率：1 标准，0.55 干脆，0 零过渡 |
+| `--sn-dur-fast` | `calc(120ms * var(--sn-motion-scale))` | 即时反馈时长（悬停、按下、微态切换） |
+| `--sn-dur-base` | `calc(200ms * var(--sn-motion-scale))` | 小型进出时长（提示、浮层、微动效显影） |
+| `--sn-dur-slow` | `calc(320ms * var(--sn-motion-scale))` | 中型容器展开时长（抽屉、对话框、卡片展开） |
+
+## border
+
+| 变量 | 值 | 说明 |
+|---|---|---|
+| `--sn-bw-hairline` | `1px` | 常规分割线、表格网格线、卡片细描边 |
+| `--sn-bw-ctrl` | `1px` | 输入框、次要按钮与选择器描边 |
+| `--sn-bw-focus` | `2px` | 键盘焦点环粗细 |
+| `--sn-bw-accent` | `2px` | 拉引线、思考导引线、侧边刻度指示线粗细 |
+
+## blur
+
+| 变量 | 值 | 说明 |
+|---|---|---|
+| `--sn-blur-sm` | `8px` | 轻虚化：悬浮图注标签、小型毛玻璃徽标 |
+| `--sn-blur-md` | `16px` | 标准虚化：吸顶顶栏、浮层卡片、对话侧边浮窗 |
+| `--sn-blur-lg` | `24px` | 深虚化：全幅媒体控制栏、沉浸式遮罩浮层 |
 
 ## radius
 

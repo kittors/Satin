@@ -25,6 +25,17 @@
   --sn-ease-open: cubic-bezier(.32, .72, 0, 1);
   --sn-press: .97;
   --sn-press-icon: .92;
+  --sn-motion-scale: 1;
+  --sn-dur-fast: calc(120ms * var(--sn-motion-scale));
+  --sn-dur-base: calc(200ms * var(--sn-motion-scale));
+  --sn-dur-slow: calc(320ms * var(--sn-motion-scale));
+  --sn-bw-hairline: 1px;
+  --sn-bw-ctrl: 1px;
+  --sn-bw-focus: 2px;
+  --sn-bw-accent: 2px;
+  --sn-blur-sm: 8px;
+  --sn-blur-md: 16px;
+  --sn-blur-lg: 24px;
   --sn-r-xs: 4px;
   --sn-r-sm: 6px;
   --sn-r-md: 8px;
@@ -92,6 +103,8 @@
   --sn-field: #fff;
   --sn-ring: rgba(0, 0, 0, .07);
   --sn-card-line: rgba(0, 0, 0, .06);
+  --sn-glass-bg: rgba(255, 255, 255, .78);
+  --sn-glass-line: rgba(0, 0, 0, .08);
   --sn-b-primary: var(--sn-accent);
   --sn-b-primary-hover: color-mix(in srgb, var(--sn-accent) 86%, #fff);
   --sn-b-primary-active: color-mix(in srgb, var(--sn-accent) 86%, #000);
@@ -131,6 +144,9 @@
   --sn-e1: 0 8px 24px rgba(0, 0, 0, .1), 0 0 0 1px rgba(0, 0, 0, .06);
   --sn-e2: 0 24px 64px rgba(0, 0, 0, .16), 0 0 0 1px rgba(0, 0, 0, .06);
   --sn-tip-shadow: 0 4px 14px rgba(0, 0, 0, .14);
+  --sn-grad-scrim: linear-gradient(to top, rgba(0, 0, 0, .64) 0%, rgba(0, 0, 0, .22) 48%, transparent 100%);
+  --sn-grad-fade: linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised));
+  --sn-grad-sheen: linear-gradient(90deg, transparent, rgba(255, 255, 255, .36), transparent);
   --sn-sel-ring: color-mix(in srgb, var(--sn-accent) 45%, transparent);
   --sn-range-line: color-mix(in srgb, var(--sn-accent) 52%, transparent);
   --sn-guide-line: color-mix(in srgb, var(--sn-label) 48%, transparent);
@@ -177,6 +193,8 @@
   --sn-field: #1c1c1e;
   --sn-ring: rgba(255, 255, 255, .09);
   --sn-card-line: rgba(255, 255, 255, .09);
+  --sn-glass-bg: rgba(28, 28, 30, .74);
+  --sn-glass-line: rgba(255, 255, 255, .12);
   --sn-b-primary: var(--sn-accent);
   --sn-b-primary-hover: color-mix(in srgb, var(--sn-accent) 70%, #fff);
   --sn-b-primary-active: color-mix(in srgb, var(--sn-accent) 90%, #000);
@@ -222,6 +240,9 @@
   --sn-e2: 0 24px 64px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .1);
   --sn-tip-shadow: 0 4px 14px rgba(0, 0, 0, .5), inset 0 0 0 1px rgba(255, 255, 255, .08);
   --sn-menu-shadow: 0 18px 34px rgba(0, 0, 0, .42), 0 2px 4px rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(255, 255, 255, .09), inset 0 1px 0 rgba(255, 255, 255, .06);
+  --sn-grad-scrim: linear-gradient(to top, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .28) 50%, transparent 100%);
+  --sn-grad-fade: linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised));
+  --sn-grad-sheen: linear-gradient(90deg, transparent, rgba(255, 255, 255, .2), transparent);
   --sn-edge-s: 70%;
   --sn-edge-l: 66%;
   --sn-edge-a: .7;
@@ -263,6 +284,8 @@
   --sn-field: #1c1c1e;
   --sn-ring: rgba(255, 255, 255, .09);
   --sn-card-line: rgba(255, 255, 255, .09);
+  --sn-glass-bg: rgba(28, 28, 30, .74);
+  --sn-glass-line: rgba(255, 255, 255, .12);
   --sn-b-primary: var(--sn-accent);
   --sn-b-primary-hover: color-mix(in srgb, var(--sn-accent) 70%, #fff);
   --sn-b-primary-active: color-mix(in srgb, var(--sn-accent) 90%, #000);
@@ -308,6 +331,9 @@
   --sn-e2: 0 24px 64px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .1);
   --sn-tip-shadow: 0 4px 14px rgba(0, 0, 0, .5), inset 0 0 0 1px rgba(255, 255, 255, .08);
   --sn-menu-shadow: 0 18px 34px rgba(0, 0, 0, .42), 0 2px 4px rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(255, 255, 255, .09), inset 0 1px 0 rgba(255, 255, 255, .06);
+  --sn-grad-scrim: linear-gradient(to top, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .28) 50%, transparent 100%);
+  --sn-grad-fade: linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised));
+  --sn-grad-sheen: linear-gradient(90deg, transparent, rgba(255, 255, 255, .2), transparent);
   --sn-edge-s: 70%;
   --sn-edge-l: 66%;
   --sn-edge-a: .7;

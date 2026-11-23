@@ -15,6 +15,11 @@ export function themePanelHTML() {
     + `</div></div>`
     + `<div class="sn-th-sec"><span class="sn-th-h">${tt("theme-panel.7")}</span><div class="sn-seg sn-sm" data-th="font"><span class="sn-thumb"></span>${T.FONTS.map((f) => `<button data-v="${f.id}">${f.name}</button>`).join("")}</div></div>`
     + `<div class="sn-th-sec"><span class="sn-th-h">${tt("theme-panel.8")}</span><div class="sn-seg sn-sm" data-th="scale"><span class="sn-thumb"></span>${T.SCALES.map((s) => `<button data-v="${s.id}">${s.name}</button>`).join("")}</div></div>`
+    + `<div class="sn-th-sec"><span class="sn-th-h">${tt("theme-panel.9")}</span><div class="sn-seg sn-sm" data-th="radius"><span class="sn-thumb"></span>${T.RADII.map((r) => `<button data-v="${r.id}">${r.name}</button>`).join("")}</div></div>`
+    + `<div class="sn-th-grid">`
+    + `<div class="sn-th-sec"><span class="sn-th-h">${tt("theme-panel.11")}</span><div class="sn-seg sn-sm" data-th="line"><span class="sn-thumb"></span>${T.LINES.map((l) => `<button data-v="${l.id}">${l.name}</button>`).join("")}</div></div>`
+    + `<div class="sn-th-sec"><span class="sn-th-h">${tt("theme-panel.12")}</span><div class="sn-seg sn-sm" data-th="motion"><span class="sn-thumb"></span>${T.MOTIONS.map((m) => `<button data-v="${m.id}">${m.name}</button>`).join("")}</div></div>`
+    + `</div>`
     + `<div class="sn-th-foot"><button class="sn-textbtn" data-th-reset>${tt("theme-panel.10")}</button></div>`;
 }
 // 挂到一个容器上：生成面板内容、接上交互；返回 { sync()（外面改了主题时刷新选中状态）, destroy() }。
@@ -23,7 +28,7 @@ export function mountThemePanel(box, { initSeg = coreInitSeg, injectIcons = core
   box.innerHTML = themePanelHTML(); injectIcons?.(box);
   let segs = {}, own = false;
   const setOwn = (patch) => { own = true; T.set(patch); own = false; }; // 自己的分段控件改的：不再回头挪它（它可能正在动画里，或者已经点到了下一格）
-  // 选中状态跟着当前主题走：主色圆点、自定义色、状态色、字体和字号两个分段控件（别处改了主题，这里也跟着变）
+  // 选中状态跟着当前主题走：主色圆点、自定义色、状态色、字体/字号/圆角/线条/动效五个分段控件（别处改了主题，这里也跟着变）
   const sync = () => {
     const t = T.get();
     for (const b of box.querySelectorAll("[data-accent]")) b.setAttribute("aria-checked", String(!t.custom && t.accent === b.dataset.accent));
@@ -32,6 +37,9 @@ export function mountThemePanel(box, { initSeg = coreInitSeg, injectIcons = core
     if (own) return;
     segs.font?.go(Math.max(0, T.FONTS.findIndex((f) => f.id === t.font)), false, true);
     segs.scale?.go(Math.max(0, T.SCALES.findIndex((x) => x.id === t.scale)), false, true);
+    segs.radius?.go(Math.max(0, T.RADII.findIndex((x) => x.id === t.radius)), false, true);
+    segs.line?.go(Math.max(0, T.LINES.findIndex((x) => x.id === t.line)), false, true);
+    segs.motion?.go(Math.max(0, T.MOTIONS.findIndex((x) => x.id === t.motion)), false, true);
   };
   box.addEventListener("click", (e) => {
     const a = e.target.closest("[data-accent]"); if (a) { T.set({ accent: a.dataset.accent, custom: "" }); sync(); return; }
@@ -46,6 +54,9 @@ export function mountThemePanel(box, { initSeg = coreInitSeg, injectIcons = core
     segs = {
       font: initSeg(box.querySelector('[data-th="font"]'), (v) => setOwn({ font: v }), Math.max(0, T.FONTS.findIndex((f) => f.id === t.font))),
       scale: initSeg(box.querySelector('[data-th="scale"]'), (v) => setOwn({ scale: v }), Math.max(0, T.SCALES.findIndex((s) => s.id === t.scale))),
+      radius: initSeg(box.querySelector('[data-th="radius"]'), (v) => setOwn({ radius: v }), Math.max(0, T.RADII.findIndex((r) => r.id === t.radius))),
+      line: initSeg(box.querySelector('[data-th="line"]'), (v) => setOwn({ line: v }), Math.max(0, T.LINES.findIndex((l) => l.id === t.line))),
+      motion: initSeg(box.querySelector('[data-th="motion"]'), (v) => setOwn({ motion: v }), Math.max(0, T.MOTIONS.findIndex((m) => m.id === t.motion))),
     };
   };
   wire();

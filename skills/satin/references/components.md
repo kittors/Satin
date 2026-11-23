@@ -10,7 +10,7 @@
 | [`type`](components/type.md) | 排版 · Text | Text 组件 = 层级 × 色调 |
 | [`spacing`](components/spacing.md) | 间距 · Spacing | 16 以下每 2px 一档，只在控件内部用（图标和字之间、控件内边距） |
 | [`layout`](components/layout.md) | 布局与响应式 · Layout | 断点按容器宽度划分，不按窗口宽度：compact 小于 720、regular 720～1199、wide 1200 及以上 |
-| [`space`](components/space.md) | 圆角与线 · 04 号 §4–§5 | 圆角 6 档 |
+| [`space`](components/space.md) | 圆角、线与材质 · 04 号 §4–§5 | 圆角 6 档、线条粗细 4 档、毛玻璃虚化 3 档、功能渐变仅限 3 种——全部统一由令牌控制，并可在右上角「主题定制」或代码里自由调整 |
 | [`elevation`](components/elevation.md) | 阴影与层级 · 04 号 §6 | 三层：卡片（只靠描边和明度差）、浮层（菜单、Popover、通知）、对话框 |
 | [`motion`](components/motion.md) | 动效曲线 · 09 号 §1 | 全系统只有这几条曲线 |
 | [`loadingmotion`](components/loadingmotion.md) | 内容加载与过渡 · Loading & transitions | 消灭「点一下先白屏闪空壳，几十毫秒后再硬砸进 DOM」的割裂体验 |
@@ -64,8 +64,8 @@
 | [`notify`](components/notify.md) | 通知 · Notification | 不是用户刚才的操作引起的：后台任务完成或失败、额度、更新、审核 |
 | [`banner`](components/banner.md) | 横幅与条目上的失败 · Banner · Inline error | 必须修好的问题不用 Toast：整页受影响的放在内容顶部的横幅，单个条目的失败留在条目上，附修复入口，一直留到修好为止 |
 | [`empty`](components/empty.md) | 空状态 · Empty | 空的时候用克制的纯中性场景 SVG 插画搭配一句直白的话告诉用户这里会有什么、下一步做什么 |
-| [`loading`](components/loading.md) | 骨架与加载 · Skeleton · Spinner | 300ms 以内的等待什么都不显示 |
-| [`progress`](components/progress.md) | 进度 · Progress | 能数清楚、超过 3 秒的工作（导入、导出、上传、批量生成）显示进度：数量、进度条、剩余时间，可以取消 |
+| [`loading`](components/loading.md) | 动感加载与骨架 · Loader · Skeleton | 严禁纯文字「正在加载…」 |
+| [`progress`](components/progress.md) | 进度 · Progress | 能数清楚、超过 3 秒的工作显示进度：活跃流体微光、双段非均匀变速不确定态、分段刻度进度条与高精度圆头 SVG 数值环全部支持尺寸、圆角与颜色定制 |
 | [`numflow`](components/numflow.md) | 数字变化 · NumberFlow | 数字变了只动变了的那几位：变大往上走、变小往下走，从个位开始依次动 |
 
 ## 数据展示
@@ -85,6 +85,7 @@
 | [`vlist`](components/vlist.md) | 无限列表 · VirtualList · InfiniteList | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置 |
 | [`chat`](components/chat.md) | 聊天与 AI 对话 · Chat | 超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条 |
 | [`md`](components/md.md) | Markdown 文档 · Markdown | AI 的回复、说明文档都用它渲染：标题、列表和任务、引用和提示块、表格、代码（高亮、行号、复制、自动换行、超高折叠）、图片（定高、定宽、定比例、加载占位、失败提示、点开放大）、公式（TeX 写法转成浏览器原生的 MathML） |
+| [`editorial`](components/editorial.md) | 图文编排与内容张力 · Editorial | 打破单调文字墙与 AI 模板卡：用大字阶非对称杂志头图、2px 拉引金句、去盒化极简数字带、不对称 Bento 视觉拼贴、交互悬浮标注点与调色/声波多元素组合，让文字、段落与影像自带张力与节奏 |
 | [`flow`](components/flow.md) | 流程图 · FlowCanvas | 做视频的流水线：原文 → 拆分 → 分镜 |
 | [`flowstress`](components/flowstress.md) | 流程图 · 万级 ComfyUI 节点集群 · Canvas · 异构多端口节点 · 视口裁剪 · 细节分级 | 节点超过几百个后改由一块 Canvas 画布承接，按 1024px 空间网格做视口裁剪与三档 LOD 细节分级 |
 

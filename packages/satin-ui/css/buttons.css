@@ -3,14 +3,15 @@
 .sn-btn { --sn-h: 32px; --sn-px: 12px; --sn-r: var(--sn-btn-r); --sn-fs: 13px; --sn-icon: 16px; --sn-bg: transparent; --sn-fg: var(--sn-label); --sn-line: transparent;
   all: unset; box-sizing: border-box; position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   height: var(--sn-h); padding: 0 var(--sn-px); border-radius: var(--sn-r); font: 500 calc(var(--sn-fs) * var(--sn-font-scale, 1))/1 var(--sn-sans); white-space: nowrap; cursor: pointer; user-select: none;
-  color: var(--sn-fg); background: var(--sn-bg); box-shadow: inset 0 0 0 1px var(--sn-line), var(--sn-b-lift-on, 0 0 0 0 transparent);
-  transition: transform .1s var(--sn-ease-out), background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out), box-shadow .12s var(--sn-ease-out), opacity .12s var(--sn-ease-out); }
+  color: var(--sn-fg); background: var(--sn-bg); box-shadow: inset 0 0 0 var(--sn-bw-ctrl, 1px) var(--sn-line), var(--sn-b-lift-on, 0 0 0 0 transparent);
+  transition: transform calc(100ms * var(--sn-motion-scale, 1)) var(--sn-ease-out), background-color var(--sn-dur-fast, 120ms) var(--sn-ease-out), color var(--sn-dur-fast, 120ms) var(--sn-ease-out), box-shadow var(--sn-dur-fast, 120ms) var(--sn-ease-out), opacity var(--sn-dur-fast, 120ms) var(--sn-ease-out); }
 .sn-btn.sn-sm { --sn-h: 28px; --sn-px: 10px; --sn-r: max(4px, calc(var(--sn-btn-r) - 2px)); --sn-fs: 12px; --sn-icon: 14px; }
 .sn-btn.sn-lg { --sn-h: 40px; --sn-px: 16px; --sn-r: calc(var(--sn-btn-r) + 2px); --sn-fs: 14px; }
-.sn-btn .sn-ic { width: var(--sn-icon); height: var(--sn-icon); }
-.sn-btn .sn-ic.sn-after { margin-right: -2px; transition: transform .15s var(--sn-ease-out); }
+.sn-btn .sn-ic { width: var(--sn-icon); height: var(--sn-icon); transition: transform calc(160ms * var(--sn-motion-scale, 1)) var(--sn-ease-out); }
+.sn-btn .sn-ic.sn-after { margin-right: -2px; }
 @media (hover: hover) {
-.sn-btn:hover .sn-ic.sn-after { transform: translateX(2px); } }
+.sn-btn:hover .sn-ic.sn-after { transform: translateX(2.5px); }
+.sn-btn:not(.sn-ibtn):hover .sn-ic:not(.sn-after):not(.sn-caret) { transform: scale(1.06); } }
 .sn-btn .sn-ic.sn-caret { width: 12px; height: 12px; opacity: .6; margin-right: -3px; transition: transform .2s var(--sn-ease-out-strong); } /* sp-ok: 箭头图标自带留白，往右贴近边缘的视觉补偿 */
 
 .sn-primary { --sn-bg: var(--sn-b-primary); --sn-fg: var(--sn-b-on-primary); }
@@ -57,14 +58,14 @@
 .sn-btn .sn-spin, .sn-btn .sn-tick { position: absolute; right: calc(100% + 7px); top: 50%; width: 13px; height: 13px; margin-top: -6.5px; opacity: 0; pointer-events: none; } /* sp-ok: 13px 的转圈用负外边距居中 */
 .sn-btn:not(.sn-block) .sn-spin, .sn-btn:not(.sn-block) .sn-tick { right: auto; left: 50%; margin-left: -6.5px; } /* sp-ok: 13px 的转圈用负外边距居中 */
 .sn-btn:not(.sn-block).sn-busy .sn-txt, .sn-btn:not(.sn-block).sn-ok .sn-txt { opacity: 0; }
-.sn-btn .sn-spin { border-radius: 50%; border: 1.5px solid currentColor; border-right-color: transparent; animation: sn-spin .9s linear infinite; transition: opacity .18s var(--sn-ease-out); }
-.sn-btn.sn-busy .sn-spin { opacity: .85; }
+.sn-btn .sn-spin { border-radius: 50%; border: 1.6px solid color-mix(in srgb, currentColor 22%, transparent); border-top-color: currentColor; border-right-color: currentColor; animation: sn-spin .78s cubic-bezier(.55, .15, .45, .85) infinite; transition: opacity .16s var(--sn-ease-out), transform .18s var(--sn-ease-out); transform: scale(.78); }
+.sn-btn.sn-busy .sn-spin { opacity: .92; transform: scale(1); }
 .sn-btn .sn-tick { transform: scale(.4); transition: opacity .12s var(--sn-ease-out), transform .26s var(--sn-ease-overshoot); }
 .sn-btn.sn-ok .sn-tick { opacity: 1; transform: none; }
 .sn-btn.sn-busy, .sn-btn.sn-ok { pointer-events: none; }
 .sn-btn .sn-sheen { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
-.sn-btn .sn-sheen::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; transform: translateX(-130%) skewX(-14deg);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .28), transparent); }
+.sn-btn .sn-sheen::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 42%; transform: translateX(-130%) skewX(-14deg);
+  background: var(--sn-grad-sheen, linear-gradient(90deg, transparent, rgba(255, 255, 255, .28), transparent)); }
 /* 深色主题的主按钮是浅底，白色光泽扫过去看不见，所以不扫，成功只靠对勾和文字变化 */
 [data-theme="dark"] .sn-primary .sn-sheen { display: none; }
 .sn-btn.sn-ok .sn-sheen::after { animation: sn-sheen .7s var(--sn-ease-in-out) .06s; }

@@ -21,7 +21,9 @@ import { initMarkdown } from "./sections/markdown.js";
 import { initCanvasGrid } from "./sections/canvas-grid.js";
 import { initCharts } from "./sections/charts.js";
 import { initLoadingMotion } from "./sections/loading-motion.js";
+import { initEditorial } from "./sections/editorial.js";
 import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
+import * as Theme from "../packages/satin-ui/src/theme.js";
 import { setup } from "../packages/satin-ui/src/setup.js";
 import { defineElements } from "../packages/satin-ui/elements/index.js";
 import { root, reduced, TICK, injectIcons, edgeFrames, initSeg, showTip, hideTip, tipTarget, resetTipLayer, fitStack } from "../packages/satin-ui/src/core.js";
@@ -131,9 +133,10 @@ applyTheme(false); mq.addEventListener("change", () => applyTheme(true));
 // 色块列出的值：深浅主题换了、主色和状态色被改了，都重新写（官网直接改 iframe 里的 data-theme 时也走这里）
 new MutationObserver(() => paintSwatches()).observe(root, { attributes: true, attributeFilter: ["data-theme", "style"] });
 generate(); injectIcons();
-// 圆角定为胶囊（2026-11-18 用户确认）；评审开关先留着，方便对比
+// 圆角定为胶囊（2026-11-18 用户确认）；与主题定制面板双向同步
 const rPref = localStorage.getItem("satin-radius") || "pill"; root.dataset.radius = rPref;
-initSeg($('[data-seg="radius"]'), (v) => { root.dataset.radius = v; localStorage.setItem("satin-radius", v); }, Math.max(0, ["6", "8", "10", "pill"].indexOf(rPref)));
+const radiusSeg = initSeg($('[data-seg="radius"]'), (v) => { Theme.set({ radius: v }); }, Math.max(0, ["6", "8", "10", "pill"].indexOf(rPref)));
+Theme.onChange((t) => { radiusSeg?.go(Math.max(0, ["6", "8", "10", "pill"].indexOf(t.radius || "pill")), false, true); });
 // 主题定制：主色、状态色、字体、字号（第一次打开时才生成面板：里面的分段控件要量得到宽度）
 {
   const btn = $("[data-theme-btn]"), panel = $("[data-theme-panel]"); let mounted = false;
@@ -158,7 +161,7 @@ addEventListener("storage", (e) => {
   pref = e.newValue || "auto"; themeSeg?.go(Math.max(0, ["auto", "light", "dark"].indexOf(pref)), false, true); applyTheme(!EMBED);
 });
 { const s = $('[data-seg="iconsize"]'); if (s) initSeg(s, (v) => paintIcons(Number(v))); }
-for (const s of $$(".doc-main .sn-seg[data-seg]")) if (!["theme", "iconsize", "toastpos", "safade", "navfx", "nfstyle", "sabar", "saover", "ctxbound", "ctxsize", "spdensity", "lomode", "gmode", "cgmode", "gsb", "cgsb", "glines", "cglines", "tlines", "mdcode", "mdimg", "mdtable", "mdview", "lmdelay", "charea", "ch3d"].includes(s.dataset.seg)) initSeg(s);
+for (const s of $$(".doc-main .sn-seg[data-seg]")) if (!["theme", "iconsize", "toastpos", "safade", "navfx", "nfstyle", "sabar", "saover", "ctxbound", "ctxsize", "spdensity", "lomode", "gmode", "cgmode", "gsb", "cgsb", "glines", "cglines", "tlines", "mdcode", "mdimg", "mdtable", "mdview", "lmdelay", "charea", "ch3d", "ldsize", "ldspeed", "ldtone", "chatrail"].includes(s.dataset.seg)) initSeg(s);
 $("#reduce")?.addEventListener("change", (e) => root.classList.toggle("sn-reduce-motion", e.target.checked));
 // 动效曲线：点一下，圆点按这条曲线走到另一头；再点回来
 for (const c of $$(".curve")) c.addEventListener("click", () => {
@@ -179,7 +182,7 @@ initNav({ $, $$, injectIcons, reduced, edgeFrames, initSeg, numberFlow, ...forms
 if (need("vlist") || need("scrollarea")) initLists({ $, $$, injectIcons, reduced, initSeg });
 if (need("flow")) initFlow({ $, $$, reduced, icon });
 if (need("flowstress")) initFlowStress({ $, reduced });
-if (need("chat")) initChat({ $, $$, reduced, icon, injectIcons });
+if (need("chat")) initChat({ $, $$, reduced, icon, injectIcons, initSeg });
 initPickers({ $, $$, reduced, injectIcons });
 initNumbers({ $, $$, reduced, initSeg });
 initSpacing({ $, $$, initSeg });
@@ -189,6 +192,7 @@ if (need("md")) initMarkdown({ $, initSeg });
 if (need("cgrid")) initCanvasGrid({ $, $$, injectIcons, initSeg, reduced });
 if (need("charts") || need("icons")) initCharts({ $, $$, initSeg });
 if (need("loadingmotion")) initLoadingMotion({ $, $$, initSeg, reduced });
+if (need("editorial")) initEditorial({ $, $$ });
 // 最后统一把会溢出滚动的地方换成滚动区域（菜单、命令面板、通知列表、抽屉、目录，以及带 data-sa 的元素）
 initScroll({ $, $$, initSeg });
 
@@ -198,7 +202,7 @@ initScroll({ $, $$, initSeg });
 // 嵌入模式（官网文档的演示 iframe）不用：只有一块，用不着跳过；而且画布一开始只有占位高，大部分内容算在视口外、按估算高度占位，
 // 画布长大后才真正排出来，高度又变——演示露出来以后框高跳一下（2026-11-20 巡检：间距规范 2092 → 2128）
 if (!EMBED) requestAnimationFrame(() => {
-  const demos = $$(".doc-main .demo").filter((d) => !d.querySelector(".sn-select, [data-menubtn], .sn-pk, .sn-chat, .sn-vl, .sn-flow, .sn-lo-frame, .sn-grid"));
+  const demos = $$(".doc-main .demo").filter((d) => !d.querySelector(".sn-select, [data-menubtn], .sn-pk, .sn-chat, .sn-vl, .sn-flow, .sn-lo-frame, .sn-grid, .ld-grid, .sn-ed"));
   const hs = demos.map((d) => d.offsetHeight);
   demos.forEach((d, i) => { d.style.setProperty("--sn-ch", hs[i] + "px"); d.classList.add("sn-cv"); });
 });

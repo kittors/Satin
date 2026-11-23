@@ -312,6 +312,30 @@
         "$description": "卡片内描边"
       }
     },
+    "glass": {
+      "bg": {
+        "$type": "color",
+        "$value": "rgba(255, 255, 255, .78)",
+        "$extensions": {
+          "com.satin": {
+            "var": "--glass-bg",
+            "source": "base.css"
+          }
+        },
+        "$description": "毛玻璃浮动表面底色（仅限 fixed / sticky / absolute 浮层）"
+      },
+      "line": {
+        "$type": "color",
+        "$value": "rgba(0, 0, 0, .08)",
+        "$extensions": {
+          "com.satin": {
+            "var": "--glass-line",
+            "source": "base.css"
+          }
+        },
+        "$description": "毛玻璃浮动表面细描边"
+      }
+    },
     "button": {
       "primary": {
         "$type": "color",
@@ -753,6 +777,44 @@
         }
       },
       "$description": "Tooltip 阴影"
+    }
+  },
+  "gradient": {
+    "scrim": {
+      "$type": "color",
+      "$value": "linear-gradient(to top, rgba(0, 0, 0, .64) 0%, rgba(0, 0, 0, .22) 48%, transparent 100%)",
+      "$extensions": {
+        "com.satin": {
+          "css": true,
+          "var": "--grad-scrim",
+          "source": "base.css"
+        }
+      },
+      "$description": "功能性压图护字底罩（仅用于摄影图上压字防糊，不作装饰）"
+    },
+    "fade": {
+      "$type": "color",
+      "$value": "linear-gradient(to bottom, color-mix(in srgb, {color.bg.raised} 0%, transparent), {color.bg.raised})",
+      "$extensions": {
+        "com.satin": {
+          "css": true,
+          "var": "--grad-fade",
+          "source": "base.css"
+        }
+      },
+      "$description": "功能性边缘渐隐（列表底/顶融合底色）"
+    },
+    "sheen": {
+      "$type": "color",
+      "$value": "linear-gradient(90deg, transparent, rgba(255, 255, 255, .36), transparent)",
+      "$extensions": {
+        "com.satin": {
+          "css": true,
+          "var": "--grad-sheen",
+          "source": "base.css"
+        }
+      },
+      "$description": "功能性单向微光（活跃进度与完成瞬时反馈）"
     }
   }
 }

@@ -1,11 +1,11 @@
 {
   "id": "space",
-  "name": "圆角与线",
+  "name": "圆角、线与材质",
   "nav": "圆角与线",
   "en": "04 号 §4–§5",
   "group": "基础",
   "specRef": "04 号 §4–§5 · 09 号 §4",
-  "summary": "圆角 6 档。线只有 1px，焦点环 2px；默认不画分割线。间距见上一节。",
+  "summary": "圆角 6 档、线条粗细 4 档、毛玻璃虚化 3 档、功能渐变仅限 3 种——全部统一由令牌控制，并可在右上角「主题定制」或代码里自由调整。",
   "acceptance": [],
   "api": [],
   "usage": null,
@@ -18,6 +18,10 @@
     {
       "caption": "嵌套圆角：内层 = 外层 − 内边距",
       "html": "<div class=\"row\" style=\"gap:32px\">\n      <div class=\"nest\" style=\"--R:16px;--sn-p:8px\"><div></div><span class=\"sn-cap\">外 16，内边距 8 → 内 8</span></div>\n      <div class=\"nest\" style=\"--R:12px;--sn-p:4px\"><div></div><span class=\"sn-cap\">外 12，内边距 4 → 内 8（菜单与菜单项）</span></div>\n      <div class=\"nest bad-nest\" style=\"--R:16px;--sn-p:8px\"><div></div><span class=\"sn-cap sn-c-danger\">错误：内外同为 16，四周间距不均</span></div>\n    </div>"
+    },
+    {
+      "caption": "统一线条、虚化与功能性渐变规范",
+      "html": "<div class=\"sf-grid\">\n  <div class=\"sf-card\">\n    <span class=\"sn-cap\">线条粗细 · --sn-bw-*</span>\n    <div class=\"sf-lines\">\n      <div><i style=\"height:var(--sn-bw-hairline);background:var(--sn-line-control)\"></i><span>1px 细线 / 控件</span><code>--sn-bw-hairline</code></div>\n      <div><i style=\"height:var(--sn-bw-accent);background:var(--sn-label2)\"></i><span>2px 导引 / 拉引线</span><code>--sn-bw-accent</code></div>\n      <div><i style=\"height:var(--sn-bw-focus);background:var(--sn-focus)\"></i><span>2px 焦点环</span><code>--sn-bw-focus</code></div>\n    </div>\n  </div>\n  <div class=\"sf-card\">\n    <span class=\"sn-cap\">毛玻璃虚化 · 仅限浮层</span>\n    <div class=\"sf-blur-stage\">\n      <span class=\"sf-glass\" style=\"backdrop-filter:blur(var(--sn-blur-sm));-webkit-backdrop-filter:blur(var(--sn-blur-sm))\">8px · sm</span>\n      <span class=\"sf-glass\" style=\"backdrop-filter:blur(var(--sn-blur-md));-webkit-backdrop-filter:blur(var(--sn-blur-md))\">16px · md</span>\n      <span class=\"sf-glass\" style=\"backdrop-filter:blur(var(--sn-blur-lg));-webkit-backdrop-filter:blur(var(--sn-blur-lg))\">24px · lg</span>\n    </div>\n  </div>\n  <div class=\"sf-card\">\n    <span class=\"sn-cap\">克制功能渐变 · 严禁装饰</span>\n    <div class=\"sf-grads\">\n      <div class=\"sf-grad-scrim\"><span>--sn-grad-scrim</span><small>照片压字护读底罩</small></div>\n      <div class=\"sf-grad-fade\"><span>--sn-grad-fade</span><small>列表边界融合渐隐</small></div>\n    </div>\n  </div>\n</div>"
     }
   ],
   "states": [],
