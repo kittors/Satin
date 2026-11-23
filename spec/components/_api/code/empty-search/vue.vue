@@ -1,10 +1,10 @@
 <script setup>
-import { Button, Icon } from "satin-ui/vue";
+import { Button, EmptyArt } from "satin-ui/vue";
 </script>
 
 <template>
   <div class="sn-empty-state">
-    <span class="sn-art"><Icon name="search" /></span>
+    <EmptyArt name="search" />
     <h4>未找到“雨夜”相关镜头</h4>
     <p>换个关键词，或清除当前筛选。</p>
     <div class="sn-acts">

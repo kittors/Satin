@@ -16,7 +16,7 @@ onBeforeUnmount(() => off());
   <div ref="root">
     <div class="sn-empty-grid">
       <div class="sn-empty-state">
-        <span class="sn-art" data-i="folder-open"></span>
+        <sn-empty-art name="projects"></sn-empty-art>
         <h4>还没有项目</h4>
         <p>新建或导入原文即可开始。</p>
         <div class="sn-acts">
@@ -25,7 +25,7 @@ onBeforeUnmount(() => off());
         </div>
       </div>
       <div class="sn-empty-state">
-        <span class="sn-art" data-i="search"></span>
+        <sn-empty-art name="search"></sn-empty-art>
         <h4>未找到“雨夜”相关镜头</h4>
         <p>换个关键词，或清除当前筛选。</p>
         <div class="sn-acts">
@@ -33,7 +33,7 @@ onBeforeUnmount(() => off());
         </div>
       </div>
       <div class="sn-empty-state">
-        <span class="sn-art" data-i="wifi-off"></span>
+        <sn-empty-art name="error"></sn-empty-art>
         <h4>暂时无法加载</h4>
         <p>连接已中断，网络恢复后自动重试。</p>
         <div class="sn-acts">

@@ -63,7 +63,7 @@
 | [`toast`](components/toast.md) | 轻提示 · Toast | 只回应用户刚做的事 |
 | [`notify`](components/notify.md) | 通知 · Notification | 不是用户刚才的操作引起的：后台任务完成或失败、额度、更新、审核 |
 | [`banner`](components/banner.md) | 横幅与条目上的失败 · Banner · Inline error | 必须修好的问题不用 Toast：整页受影响的放在内容顶部的横幅，单个条目的失败留在条目上，附修复入口，一直留到修好为止 |
-| [`empty`](components/empty.md) | 空状态 · Empty | 空的时候用最简短的一句话告诉用户这里会有什么、下一步做什么 |
+| [`empty`](components/empty.md) | 空状态 · Empty | 空的时候用克制的纯中性场景 SVG 插画搭配一句直白的话告诉用户这里会有什么、下一步做什么 |
 | [`loading`](components/loading.md) | 骨架与加载 · Skeleton · Spinner | 300ms 以内的等待什么都不显示 |
 | [`progress`](components/progress.md) | 进度 · Progress | 能数清楚、超过 3 秒的工作（导入、导出、上传、批量生成）显示进度：数量、进度条、剩余时间，可以取消 |
 | [`numflow`](components/numflow.md) | 数字变化 · NumberFlow | 数字变了只动变了的那几位：变大往上走、变小往下走，从个位开始依次动 |
@@ -77,7 +77,7 @@
 | [`cgrid`](components/cgrid.md) | 数据表格 · Canvas · Canvas grid · 一百万行 | 一百万行，表体画在一块画布上，功能和上面的 DOM 版一样：懒加载（200 行一块）、搜索和列头筛选、排序、拖列、改宽、左右固定列、拖行、编辑、勾选、键盘 |
 | [`charts`](components/charts.md) | 数据图表与 3D 视觉 · Charts · 3D | 零第三方依赖 Canvas 微动效图表与 3D 立体视觉套件：平滑曲线描边入场、数据切换形变插值、阻尼跟手准星、分组柱状聚焦、环形联动、可 360° 拖拽旋转的真 3D 立体柱阵，以及带陀螺仪视差高光的 3D 立体质感图标 |
 | [`list`](components/list.md) | 列表与键值 · List · Description | 设置页、详情页用 |
-| [`card`](components/card.md) | 卡片 · Card | 项目、素材用卡片 |
+| [`card`](components/card.md) | 卡片 · Card | 项目、素材与通用内容均采用预设实面底（`--sn-raised`）加 1px 描边与轻托影，在浅灰/深黑画布及白底面板上边界均清晰独立 |
 | [`tags`](components/tags.md) | 标签、徽标与头像 · Tag · Badge · Avatar | 标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块 |
 | [`avatar`](components/avatar.md) | 头像 · Avatar | 有照片用照片 |
 | [`collapse`](components/collapse.md) | 折叠面板 · Collapse | 高度用 0fr → 1fr 过渡，内容在展开过半时淡入 |

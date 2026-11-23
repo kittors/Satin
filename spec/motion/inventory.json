@@ -1,6 +1,6 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 295,
+  "var(--sn-ease-out)": 301,
   "var(--sn-ease-out-strong)": 59,
   "linear": 37,
   "var(--sn-ease-overshoot)": 11,
@@ -525,7 +525,7 @@
    "file": "packages/satin-ui/css/data.css",
    "selector": ".sn-pc",
    "prop": "transition",
-   "value": "background-color .15s var(--sn-ease-out), box-shadow .2s var(--sn-ease-out)"
+   "value": "background-color .15s var(--sn-ease-out), border-color .15s var(--sn-ease-out), box-shadow .2s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/data.css",
@@ -544,6 +544,12 @@
    "selector": ".sn-pc .sn-cover .sn-more",
    "prop": "transition",
    "value": "opacity .15s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/data.css",
+   "selector": ".sn-card:not(.sn-fx-g)",
+   "prop": "transition",
+   "value": "background-color .15s var(--sn-ease-out), border-color .15s var(--sn-ease-out), box-shadow .2s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/data.css",
@@ -1042,6 +1048,18 @@
    "selector": ".sn-shot-row .sn-state > span",
    "prop": "transition",
    "value": "opacity .2s var(--sn-ease-out), translate .3s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/feedback.css",
+   "selector": ".sn-empty-art .sn-ea-lift",
+   "prop": "transition",
+   "value": "transform .36s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/feedback.css",
+   "selector": ".sn-empty-art .sn-ea-badge",
+   "prop": "transition",
+   "value": "transform .36s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/feedback.css",

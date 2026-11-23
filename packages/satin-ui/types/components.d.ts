@@ -40,6 +40,23 @@ export function presetAvatar(seed: string, size?: number): { id: string; svg: st
 export function avatarSvg(id: string, size?: number): string;
 /** 12 张预设的 id */
 export const AVATAR_IDS: readonly string[];
+
+/** 空状态内置场景 SVG 插画名（纯中性灰度、深浅双主题自适应） */
+export type EmptyArtName = "projects" | "search" | "error" | "inbox" | "folder" | "lock";
+/** 空状态场景插画选项 */
+export interface EmptyArtOptions {
+  /** 场景名：projects（首次使用 / 还没有项目，默认）| search（筛选无结果）| error（加载失败）| inbox（空收件箱）| folder（空文件夹）| lock（无权限） */
+  name?: EmptyArtName;
+  /** 读屏描述（省略时插画为纯装饰 aria-hidden） */
+  label?: string;
+}
+export const createEmptyArt: SatinFactory<EmptyArtOptions, {}>;
+/** 空状态场景插画的 HTML 标记（Node / SSR 安全） */
+export function emptyArtHTML(o?: EmptyArtOptions): string;
+/** 取某一款空状态场景插画的纯 SVG 字符串 */
+export function emptyArtSvg(name?: EmptyArtName | (string & {})): string;
+/** 全部内置空状态场景插画名 */
+export const EMPTY_ART_IDS: readonly EmptyArtName[];
 export interface SegmentedOptions { items?: Item[]; value?: string; size?: "sm" | "md"; label?: string; onChange?(value: string): void }
 export const createSegmented: SatinFactory<SegmentedOptions, { readonly value: string; select(value: string): void }>;
 export interface SliderOptions { value?: number; max?: number; label?: string; onChange?(value: number): void }

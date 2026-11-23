@@ -1,9 +1,9 @@
 <script>
-  import Icon from "satin-ui/svelte/Icon.svelte";
+  import EmptyArt from "satin-ui/svelte/EmptyArt.svelte";
 </script>
 
 <div class="sn-empty-state">
-  <span class="sn-art"><Icon name="search" /></span>
+  <EmptyArt name="search" />
   <h4>未找到“雨夜”相关镜头</h4>
   <p>换个关键词，或清除当前筛选。</p>
   <div class="sn-acts">

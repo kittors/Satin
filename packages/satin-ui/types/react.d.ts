@@ -1,6 +1,6 @@
 // satin-ui/react
 import type * as React from "react";
-import type { SatinInstance, Item, AvatarOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions, TableColumn, TableCellContext, TableApi, ComposerParts, ComposerPartEvents } from "./components";
+import type { SatinInstance, Item, AvatarOptions, EmptyArtOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions, TableColumn, TableCellContext, TableApi, ComposerParts, ComposerPartEvents } from "./components";
 type Base = { className?: string; style?: React.CSSProperties; id?: string };
 type Controlled<T, K extends string = "value"> = { [P in K]?: T } & { [P in `default${Capitalize<K>}`]?: T };
 type Ref = React.Ref<SatinInstance | null>;
@@ -44,6 +44,8 @@ export type Variant = "primary" | "secondary" | "tertiary" | "ghost" | "danger" 
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled"> & { variant?: Variant; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; /** 菜单按钮后面的小箭头（菜单开着时转过去） */ caret?: boolean; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string; /** 徽标：数字是右上角的计数，true 是小红点 */ badge?: number | string | boolean };
 export const Button: React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>>;
 export function Icon(p: { name: string; size?: number; className?: string }): React.ReactElement;
+/** 空状态场景 SVG 插画：<EmptyArt name="projects" />，6 款纯中性灰度微缩场景，深浅主题自动适配 */
+export function EmptyArt(p?: Base & EmptyArtOptions): React.ReactElement;
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> & { size?: "sm" | "md" | "lg" | "xl"; invalid?: boolean };
 export const Input: React.ForwardRefExoticComponent<InputProps & React.RefAttributes<HTMLInputElement>>;
 export const Textarea: React.ForwardRefExoticComponent<React.TextareaHTMLAttributes<HTMLTextAreaElement> & React.RefAttributes<HTMLTextAreaElement>>;

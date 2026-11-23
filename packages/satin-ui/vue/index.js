@@ -9,6 +9,7 @@ import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
 import { ICONS } from "../src/icons.js";
+import { emptyArtSvg } from "../src/empty-art.js";
 import { CHECK, removeChip, shakeInput } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
@@ -98,6 +99,10 @@ export const DatePicker = /* @__PURE__ */ wrap(S.createPicker, { name: "SnDatePi
 export const Icon = /* @__PURE__ */ defineComponent({
   name: "SnIcon", props: { name: String, size: { type: Number, default: 16 } },
   setup: (p) => () => h("svg", { class: "sn-ic", "data-icon": p.name, width: p.size, height: p.size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true", innerHTML: ICONS[p.name] || "" }),
+});
+export const EmptyArt = /* @__PURE__ */ defineComponent({
+  name: "SnEmptyArt", props: { name: { type: String, default: "projects" }, label: String },
+  setup: (p) => () => h("span", { class: "sn-empty-art", role: p.label ? "img" : undefined, "aria-label": p.label, "aria-hidden": p.label ? undefined : "true", innerHTML: emptyArtSvg(p.name) }),
 });
 // 按钮：loading、done 写了（true 或 false）才套等待要用的结构（.sn-label > .sn-spin + .sn-tick + .sn-txt），宽度全程不跳；没写就和手写的 <button class="sn-btn"> 一样。
 // loading 变成 true 以后过了 300ms 还没结束才转圈，转圈出现后至少留 500ms（和 busy() 函数同一条规矩）；done 为 true 时原地打勾（等转圈收起以后）。等待中、打勾时点了不触发 click
@@ -243,7 +248,7 @@ export const notify = (o) => (setup(), S.notify(o));
 // 数据表格这类重组件不在这里注册：import { DataGrid } from "satin-ui/vue/grid"
 export default {
   install(app) {
-    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Avatar, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, Search, CountInput, LongText, Composer, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
+    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Avatar, EmptyArt, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, Search, CountInput, LongText, Composer, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
     app.directive("enhance", vEnhance);
     const off = setup(); app.onUnmount?.(off); // setup() 在服务端直接返回，什么都不做
   },

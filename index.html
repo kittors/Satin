@@ -704,13 +704,13 @@
 
   <section class="spec" id="empty">
     <h2>空状态<small>Empty</small></h2>
-    <p>空的时候用最简短的一句话告诉用户这里会有什么、下一步做什么。三种：第一次用、筛选没结果、出错。不用插画，用双层柔和图标徽章建立清晰层次。</p>
+    <p>空的时候用克制的纯中性场景 SVG 插画搭配一句直白的话告诉用户这里会有什么、下一步做什么。内置 6 款语义自适应场景（<code>projects</code> / <code>search</code> / <code>error</code> / <code>inbox</code> / <code>folder</code> / <code>lock</code>），零渐变、零彩色污染、深浅两套主题无缝衔接。</p>
     <div class="demo flush"><div class="sn-empty-grid">
-      <div class="sn-empty-state"><span class="sn-art" data-i="folder-open"></span><h4>还没有项目</h4><p>新建或导入原文即可开始。</p><div class="sn-acts"><button class="sn-btn sn-primary" data-i="plus:before">新建项目</button><button class="sn-btn sn-secondary">导入原文</button></div></div>
-      <div class="sn-empty-state"><span class="sn-art" data-i="search"></span><h4>未找到“雨夜”相关镜头</h4><p>换个关键词，或清除当前筛选。</p><div class="sn-acts"><button class="sn-btn sn-secondary">清除筛选</button></div></div>
-      <div class="sn-empty-state"><span class="sn-art" data-i="wifi-off"></span><h4>暂时无法加载</h4><p>连接已中断，网络恢复后自动重试。</p><div class="sn-acts"><button class="sn-btn sn-secondary" data-act data-retry>重试</button></div></div>
+      <div class="sn-empty-state"><sn-empty-art name="projects"></sn-empty-art><h4>还没有项目</h4><p>新建或导入原文即可开始。</p><div class="sn-acts"><button class="sn-btn sn-primary" data-i="plus:before">新建项目</button><button class="sn-btn sn-secondary">导入原文</button></div></div>
+      <div class="sn-empty-state"><sn-empty-art name="search"></sn-empty-art><h4>未找到“雨夜”相关镜头</h4><p>换个关键词，或清除当前筛选。</p><div class="sn-acts"><button class="sn-btn sn-secondary">清除筛选</button></div></div>
+      <div class="sn-empty-state"><sn-empty-art name="error"></sn-empty-art><h4>暂时无法加载</h4><p>连接已中断，网络恢复后自动重试。</p><div class="sn-acts"><button class="sn-btn sn-secondary" data-act data-retry>重试</button></div></div>
     </div></div>
-    <ul class="rules"><li>图标徽章采用 56px 柔底外盘 + 40px 同心微浮内片 + 20px Solar 双色调图标，纯中性色建出明确景深，不用渐变或大插画。</li><li>容器内严格垂直居中（<code>min-height: 224px</code>）；间距遵循分组节奏：图标到标题 16px、标题到说明 6px、说明到操作 20px。</li><li>文案克制短句、绝不啰嗦：标题 15/600、说明 13px 且 <code>max-width: 260px</code> 配合 <code>text-wrap: balance</code> 杜绝孤字折行；按钮最多两个，只有第一次用放实心主按钮。</li></ul>
+    <ul class="rules"><li>使用 <code>&lt;sn-empty-art name="projects|search|error|inbox|folder|lock"&gt;</code>（React / Vue / Svelte 提供 <code>&lt;EmptyArt&gt;</code>）渲染 144×104 纯中性微缩场景 SVG，拒绝 AI 模板式的「单薄灰方块 + 20px 小图标」与廉价彩色渐变插画。</li><li>容器内严格垂直居中（<code>min-height: 248px</code>，紧凑态 <code>.sn-sm</code> 为 176px）；分组间距严格拉开：插画到标题 14px、标题到说明 6px、说明到操作 20px。</li><li>文案克制短句、绝不啰嗦：标题 15/600、说明 13px 且 <code>max-width: 260px</code> 配合 <code>text-wrap: balance</code> 杜绝孤字折行；按钮最多两个，只有第一次用放实心主按钮。</li></ul>
   </section>
 
   <section class="spec" id="loading">
@@ -904,9 +904,9 @@
 
   <section class="spec" id="card">
     <h2>卡片<small>Card</small></h2>
-    <p>项目、素材用卡片。悬停时卡片不上浮、不加阴影：封面在框里慢慢放大一点，右上角出现"更多"，左上角出现勾选框。选中后外圈一道 2px 的线。</p>
+    <p>项目、素材与通用内容均采用预设实面底（<code>--sn-raised</code>）加 1px 描边与轻托影，在浅灰/深黑画布及白底面板上边界均清晰独立。提供 5 种表面与边框变体（默认实面、<code>.sn-bordered</code> 清晰描边、<code>.sn-subtle</code> 柔灰填充、<code>.sn-dashed</code> 虚线槽位、<code>.sn-ghost</code> 极简无框）、全出血封面（<code>.sn-bleed</code>）、横向卡片（<code>.sn-row-card</code>）、通用内容卡（<code>.sn-card</code>）及全套 <code>--sn-card-*</code> 自定义变量。悬停时卡片不上浮、不炸阴影，只强化描边并缓慢放大封面。</p>
     <div class="demo"><div class="sn-pcards" id="pcards"></div></div>
-    <ul class="rules"><li>封面 16:9，圆角 12（卡片）、内部元素按嵌套公式缩小；标题 13/500 一行截断，副信息 12。</li><li>封面放大 1.04、600ms <code class="k">ease.out</code>；客户端的项目卡片悬停时改为播放预览视频。</li></ul>
+    <ul class="rules"><li>默认实面卡片带 <code>--sn-raised</code> 背景、1px <code>--sn-line</code> 描边与微托影，头像叠放环 <code>--sn-av-ring</code> 自动跟随卡片底色。</li><li>封面 16:9，卡片默认圆角 12px（封面按嵌套公式减 4px 同心收敛）；支持 <code>--sn-card-bg</code> / <code>--sn-card-bd</code> / <code>--sn-card-bw</code> / <code>--sn-card-r</code> / <code>--sn-card-pad</code> / <code>--sn-card-sh</code> 一键定制。</li><li>封面悬停放大 1.04、600ms <code class="k">ease.out</code>，选中后外圈呈现主色强调框；纯静态信息卡可加 <code>.sn-static</code> 关闭悬停态。</li></ul>
   </section>
 
   <section class="spec" id="tags">

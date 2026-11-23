@@ -1,9 +1,10 @@
 <script>
+  import EmptyArt from "satin-ui/svelte/EmptyArt.svelte";
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
 <div class="sn-empty-state">
-  <span class="sn-art"><Icon name="folder-open" /></span>
+  <EmptyArt name="projects" />
   <h4>还没有项目</h4>
   <p>新建或导入原文即可开始。</p>
   <div class="sn-acts">

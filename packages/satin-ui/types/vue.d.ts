@@ -1,6 +1,6 @@
 // satin-ui/vue
 import type { DefineComponent, Plugin } from "vue";
-import type { Item, AvatarOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, TableOptions, ComposerParts } from "./components";
+import type { Item, AvatarOptions, EmptyArtOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, TableOptions, ComposerParts } from "./components";
 type C<P> = DefineComponent<P & { modelValue?: any }>;
 export const Password: C<{ value?: string; label?: string; help?: string; name?: string; id?: string; placeholder?: string; meter?: boolean; size?: "sm" | "lg" | "xl"; autocomplete?: string }>;
 export const Search: DefineComponent<{ search?(q: string): number | unknown[] | Promise<number | unknown[]>; debounce?: number; placeholder?: string; label?: string; kbd?: string | false; id?: string; name?: string; size?: "sm" | "lg" | "xl" }>;
@@ -27,6 +27,8 @@ export const NumberFlow: DefineComponent<{ value: number; /** 变化的样子 */
 /** 日期、时间、地址选择器：@change 拿到 { text }（触发框里显示的文字）；没有 v-model（现在只能读出选中的结果） */
 export const DatePicker: DefineComponent<Omit<PickerOptions, "onChange">>;
 export const Icon: DefineComponent<{ name: string; size?: number }>;
+/** 空状态场景 SVG 插画：<EmptyArt name="projects" />（全局注册为 SnEmptyArt） */
+export const EmptyArt: DefineComponent<EmptyArtOptions>;
 export const Button: DefineComponent<{ variant?: "primary" | "secondary" | "tertiary" | "ghost" | "danger" | "danger-soft"; size?: "sm" | "md" | "lg"; icon?: string; iconAfter?: string; caret?: boolean; round?: boolean; selected?: boolean; loading?: boolean; done?: boolean; disabled?: boolean; tip?: string; badge?: number | string | boolean; type?: string }>;
 export const Input: C<{ size?: "sm" | "md" | "lg" | "xl"; invalid?: boolean }>;
 export const Field: DefineComponent<{ label?: string; help?: string; error?: string; for?: string }>;

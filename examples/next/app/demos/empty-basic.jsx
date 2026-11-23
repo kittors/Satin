@@ -1,10 +1,10 @@
 "use client";
-import { Button, Icon } from "satin-ui/react";
+import { Button, EmptyArt } from "satin-ui/react";
 
 export default function FirstProject() {
   return (
     <div className="sn-empty-state">
-      <span className="sn-art"><Icon name="folder-open" /></span>
+      <EmptyArt name="projects" />
       <h4>还没有项目</h4>
       <p>新建或导入原文即可开始。</p>
       <div className="sn-acts">

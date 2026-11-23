@@ -1,0 +1,36 @@
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-card-content",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: `
+    <div class="sn-pcards" style="--sn-card-min:260px">
+      <div class="sn-card sn-divided">
+        <div class="sn-card-hd">
+          <div class="sn-card-titles"><b>云端渲染队列</b><span class="sn-card-sub">华东节点 · 4K 导出</span></div>
+          <span class="sn-tag sn-ok"><i></i>运行中</span>
+        </div>
+        <div class="sn-card-bd">当前排队 3 个分镜工程，预计 14 分钟后全部完成并同步至素材库。</div>
+        <div class="sn-card-ft">
+          <span class="sn-card-sub">更新于 2 分钟前</span>
+          <button type="button" class="sn-btn sn-secondary sn-sm">查看详情</button>
+        </div>
+      </div>
+      <div class="sn-card sn-bordered">
+        <div class="sn-card-hd">
+          <div class="sn-card-titles"><b>团队协作权限</b><span class="sn-card-sub">仅项目成员可导出成片</span></div>
+        </div>
+        <div class="sn-card-bd">已授权 5 位成员参与剪辑与审片，访客链接有效期 7 天。</div>
+        <div class="sn-card-ft">
+          <span class="sn-av-group">
+            <sn-avatar seed="u3" name="林夏" size="24" decorative></sn-avatar>
+            <sn-avatar seed="u4" name="周屿" size="24" decorative></sn-avatar>
+            <sn-avatar seed="u8" name="陈默" size="24" decorative></sn-avatar>
+          </span>
+          <button type="button" class="sn-btn sn-ghost sn-sm">管理成员</button>
+        </div>
+      </div>
+    </div>
+  `,
+})
+export class CardContentComponent {}

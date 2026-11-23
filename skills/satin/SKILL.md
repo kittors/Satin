@@ -171,7 +171,8 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 数量徽标 / 头像 | | `<span class="sn-badge">3</span>`、`<sn-avatar seed="u3" name="林夏" size="24">`（React `<Avatar name>`） | 头像里不放字：有照片给 `src`，没有就按 `seed` / `name` 挑预设 |
 | 设置列表 | | `.sn-set-list > .sn-set-row` | 见 `list.md` |
 | 键值对 | | `<dl class="sn-kv"><dt>负责人</dt><dd>林夏</dd></dl>` | |
-| 空状态 | | `.sn-empty-state`（图标 + 一句话 + 一个按钮） | 说清楚为什么空、下一步做什么 |
+| 空状态 | `<EmptyArt name="projects" />` | `.sn-empty-state` + `<sn-empty-art name="projects|search|error|inbox|folder|lock">` | 144×104 纯中性场景 SVG + 一句短说明 + 最多两按钮 |
+| 卡片 | | `.sn-pc`（媒体卡）/ `.sn-card`（内容卡）；`.sn-bordered` / `.sn-subtle` / `.sn-dashed` / `.sn-ghost` / `.sn-bleed` / `.sn-row-card` | 默认实面 `--sn-raised` + 1px 描边 + 轻托影，支持 `--sn-card-*` 全量定制 |
 | 加载 | `<Spinner>`；`loadWithSkeleton()` | 骨架见 `loading.md` | 快的请求不闪骨架 |
 | 进度 | `<Progress value={0.6}>`、`ring` | `progressHTML()` | |
 | 轻提示 | `toast({ text, tone, icon })` | | 操作结果用它；不要 `alert()` |
@@ -292,7 +293,8 @@ createTable(document.getElementById("projects"), {
   2. **完整表格交互**：后台列表表默认考虑复选框（表头三态全选 + 勾选浮出批量操作条）、宽表固定列（主键列 `fixed: "left"` 自动带动勾选列左固定，操作列 `fixed: "right"` 离边浮现投影）、内置贴底分页（总条数 + 每页条数 + 页码）与排序/筛选/空态/加载骨架/出错重试。
   3. **可收起展开侧栏**：后台侧栏 `.sn-side-top` 必须放 `[data-collapse]` 折叠按钮（配合 `⌘\` 快捷键与收起态 Tooltip），不要做死板无法收起的侧栏。
   4. **三层表面层次 + 多页签工作台**：多文档/多任务工作台采用 `.sn-app.sn-workbench` 三层配色（`--sn-shell` 壳层 → `--sn-side-bg` 侧栏 → `--sn-workspace` 圆角工作板），并在工作板顶部搭配 `createBrowserTabs` Chrome 平滑弧形页签。
-- **空状态要有景深层次、垂直居中、文案克制**：不要放一个单薄的大灰方块加顶对齐排版和冗长推销句（如"从一部小说或剧本开始，几分钟就能看到第一版分镜"导致孤字折行）。直接用 `.sn-empty-state`（三层纯中性景深徽章 + 严格垂直居中 + 组内 6px / 组间 16–20px 节奏），说明一句 ≤ 18 字、配合 `text-wrap: balance` 杜绝孤字。
+- **空状态用精致纯中性场景 SVG 插画，拒用「灰方块 + 小图标」AI 模板**：不要放一个 48–56px 小灰方块塞 20px 图标加顶对齐排版和冗长推销句。直接用 `.sn-empty-state` + `<EmptyArt name="projects|search|error|inbox|folder|lock" />`（HTML 用 `<sn-empty-art>`）渲染 144×104 纯中性灰度场景插画（零渐变、深浅主题自动适配），严格垂直居中，组内 6px / 组间 14–20px，说明一句 ≤ 18 字配 `text-wrap: balance` 杜绝孤字。
+- **卡片默认有清晰实面与边框，禁止透明透底融进背景**：`.sn-pc`（媒体卡）与 `.sn-card`（通用内容卡）默认自带 `--sn-raised` 预设底色 + 1px 描边 + 轻托影，并提供 `.sn-bordered` / `.sn-subtle` / `.sn-dashed` / `.sn-ghost` 变体与 `--sn-card-bg` / `--sn-card-bd` / `--sn-card-bw` / `--sn-card-r` / `--sn-card-pad` 全量定制；悬停不抬升、不炸阴影。
 - **控件限宽与垂直居中节奏**：绝不无脑给独立输入框、搜索框、日期选择器写 `width: 100%` 撑满宽屏——按内容约束在 240～320px（单列表单 420～520px）；独立演示、登录、空态容器严格垂直居中；同一模块内组间间距至少是组内间距的 2 倍（如组内 6～8px，组间 16～24px）。
 - **表格修改框选边界**：单格修改框选只允许出现在可文字内容编辑的单元格上（1.5px 柔和半透明细框 + 微圆角），选择器列（`enum` / 内嵌下拉）、只读列、复选框列绝不出现修改框选，编辑态绝不叠出双框。
 - **不处处加粗、处处徽标**：正文 400，一屏只有标题和最要紧的那一个数是 600；徽标只给需要处理的状态。

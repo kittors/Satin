@@ -1,7 +1,7 @@
 // satin-ui/svelte/<名字>.svelte 的类型（Svelte 5 组件，直接发 .svelte 源码，项目里的 @sveltejs/vite-plugin-svelte 编译）
 // 一个一个引：import Select from "satin-ui/svelte/Select.svelte"——导出表 "./svelte/*.svelte" 的类型指到 svelte-<名字>.d.ts，它们从这里转出
 import type { Component, Snippet } from "svelte";
-import type { SatinFactory, SatinInstance, Item, PickerKind, PickDetail, AvatarOptions } from "./components";
+import type { SatinFactory, SatinInstance, Item, PickerKind, PickDetail, AvatarOptions, EmptyArtOptions } from "./components";
 type Attrs = { class?: string; style?: string; id?: string; [attr: `data-${string}`]: unknown; [attr: `aria-${string}`]: unknown };
 type Inst = { /** bind:instance 拿到 Satin 实例（update / destroy / 各组件的方法） */ instance?: SatinInstance | null };
 type SelectProps = Attrs & Inst & { items: Item[]; /** bind:value 双向绑定 */ value?: string; placeholder?: string; label?: string; onchange?(value: string): void };
@@ -12,6 +12,7 @@ type DialogProps = Attrs & {
   /** 关完以后（open 同时改回 false） */ onclose?(): void; onsubmit?(e: SubmitEvent): void; footerClass?: string; children?: Snippet; footer?: Snippet;
 };
 type IconProps = { name: string; size?: number; class?: string };
+type EmptyArtProps = Attrs & EmptyArtOptions;
 type SatinProps = Attrs & Inst & { create: SatinFactory<any, any>; options?: Record<string, unknown> };
 type AvatarProps = Attrs & Inst & AvatarOptions;
 type SegmentedProps = Attrs & Inst & { items: Item[]; size?: "sm" | "md"; label?: string; /** bind:value 双向绑定 */ value?: string; onchange?(value: string): void };
@@ -31,6 +32,8 @@ export const DatePicker: Component<DatePickerProps, {}, "instance">;
 export const Dialog: Component<DialogProps, {}, "open">;
 /** 图标：<Icon name="plus" /> */
 export const Icon: Component<IconProps>;
+/** 空状态场景 SVG 插画：<EmptyArt name="projects" /> */
+export const EmptyArt: Component<EmptyArtProps>;
 /** 把任意 createXxx 包成组件：<Satin create={createChat} options={{ … }} bind:instance /> */
 export const Satin: Component<SatinProps, {}, "instance">;
 /** 头像：<Avatar name="林知远" size={24} decorative />；有照片给 src，加载失败退回预设 */

@@ -12,6 +12,7 @@ import { setup } from "../src/setup.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
 import { initSeg } from "../src/core.js";
 import { ICONS } from "../src/icons.js";
+import { emptyArtSvg } from "../src/empty-art.js";
 import { CHECK, removeChip, shakeInput } from "../src/form.js";
 import { scoped } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
@@ -110,6 +111,10 @@ export const Button = /* @__PURE__ */ forwardRef(function Button({ variant = "se
 // 图标：satin-ui/icons 里的名字。直接渲染 <svg class="sn-ic">（和 icon() 生成的一模一样，按钮里 .sn-btn > .sn-ic 这类选择器照样命中）
 export function Icon({ name, size = 16, className }) {
   return h("svg", { className: cx("sn-ic", className), "data-icon": name, width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true", dangerouslySetInnerHTML: { __html: ICONS[name] || "" } });
+}
+// 空状态场景插画：<EmptyArt name="projects" />（projects / search / error / inbox / folder / lock），纯中性语义令牌 SVG，SSR 零闪烁直出
+export function EmptyArt({ name = "projects", label, className, style, id } = {}) {
+  return h("span", { id, style, className: cx("sn-empty-art", className), role: label ? "img" : undefined, "aria-label": label, "aria-hidden": label ? undefined : "true", dangerouslySetInnerHTML: { __html: emptyArtSvg(name) } });
 }
 export const Input = /* @__PURE__ */ forwardRef(function Input({ size, invalid, className, ...rest }, ref) {
   return h("input", { ref, ...rest, className: cx("sn-input", size && size !== "md" && `sn-${size}`, className), "aria-invalid": invalid ? "true" : undefined });

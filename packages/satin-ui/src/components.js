@@ -25,6 +25,8 @@ import { tableHTML, mountTable, sortRows } from "./table.js";
 import { browserTabsHTML, mountBrowserTabs } from "./browser-tabs.js";
 import { presetAvatar } from "./avatar-presets.js";
 export { presetAvatar, avatarSvg, AVATAR_IDS } from "./avatar-presets.js";
+import { emptyArtSvg, emptyArtHTML, EMPTY_ART_IDS } from "./empty-art.js";
+export { emptyArtSvg, emptyArtHTML, EMPTY_ART_IDS };
 
 // 给内层实例补几个方法（destroy……）：按属性描述符合并，getter（value、tags……）不会变成快照
 // 合并实例：more 的同名属性盖过 base 的，只有 destroy 两边都有时先后都调（原来直接盖掉，mountXxx 自己的 destroy 就丢了）
@@ -97,6 +99,22 @@ export const createAvatar = /* @__PURE__ */ defineComponent({
         const keep = [...el.classList].filter((c) => !c.startsWith("sn-"));
         for (const a of ["style", "role", "aria-label", "aria-hidden", "data-seed"]) { const v = nu.getAttribute(a); if (v == null) el.removeAttribute(a); else el.setAttribute(a, v); }
         el.className = cx(nu.className, ...keep); el.replaceChildren(...nu.childNodes); watch();
+      },
+    };
+  },
+});
+
+export const createEmptyArt = /* @__PURE__ */ defineComponent({
+  name: "empty-art",
+  defaults: { name: "projects" },
+  html: emptyArtHTML,
+  mount(el, o) {
+    return {
+      update(n, p) {
+        if (n.name === p.name && n.label === p.label) return;
+        const t = el.ownerDocument.createElement("template"); t.innerHTML = emptyArtHTML(n); const nu = t.content.firstElementChild;
+        for (const a of ["role", "aria-label", "aria-hidden"]) { const v = nu.getAttribute(a); if (v == null) el.removeAttribute(a); else el.setAttribute(a, v); }
+        el.replaceChildren(...nu.childNodes);
       },
     };
   },
@@ -412,7 +430,9 @@ export function enhance(root = typeof document !== "undefined" ? document : null
   const keys = (n) => Object.keys(n).filter((k) => k[0] === "_");
   const before = new Map([...els()].map((n) => [n, new Set(keys(n))]));
   const [, dispose] = track(() => {
-    injectIcons(root); _bindForms(root); _bindInputs(root); _bindCollapses(root); bindPickers(root); _bindOverlays(root); _bindBanners(root);
+    injectIcons(root);
+    for (const art of root.querySelectorAll("[data-art]")) { const k = art.dataset.art; art.removeAttribute("data-art"); art.innerHTML = emptyArtSvg(k); }
+    _bindForms(root); _bindInputs(root); _bindCollapses(root); bindPickers(root); _bindOverlays(root); _bindBanners(root);
     // 侧栏布局：接上选中滑块、收起按钮、⌘\；窄于 720（手机、竖着的平板）自动收成图标栏（data-collapse-below 可改，0 不收）
     for (const app of [...(root.matches?.(".sn-app") ? [root] : []), ...root.querySelectorAll(".sn-app")]) if (app.querySelector(".sn-side-nav")) mountSidebar(app, { collapseBelow: +(app.dataset.collapseBelow ?? 720) });
     wire?.(root);

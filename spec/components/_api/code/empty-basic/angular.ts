@@ -2,11 +2,11 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 
 @Component({
   selector: "demo-empty-basic",
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
     <sn-enhance>
       <div class="sn-empty-state">
-        <span class="sn-art" data-i="folder-open"></span>
+        <sn-empty-art name="projects"></sn-empty-art>
         <h4>还没有项目</h4>
         <p>新建或导入原文即可开始。</p>
         <div class="sn-acts">

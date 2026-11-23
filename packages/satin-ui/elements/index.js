@@ -13,6 +13,7 @@ const camel = (s) => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 const COMPONENTS = {
   segmented: [S.createSegmented, ["items", "value", "size", "label"]],
   avatar: [S.createAvatar, ["src", "name", "seed", "size", "label", "decorative", "status", "online"]],
+  "empty-art": [S.createEmptyArt, ["name", "label"]],
   slider: [S.createSlider, ["value", "max", "label"]],
   select: [S.createSelect, ["items", "value", "placeholder", "label"]],
   otp: [S.createOtp, ["length"]],

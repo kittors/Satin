@@ -102,11 +102,25 @@
 .sn-shot-row:not(.sn-failed) .sn-bad-line { opacity: 0; translate: 0 -4px; }
 .sn-shot-row:not(.sn-failed) .sn-ok-line { opacity: 1; translate: 0; }
 
-/* ———— 空状态：三层微景深图标徽章（柔和托盘 → 同心微浮内片 → Solar 双色调图标）+ 严格垂直居中 + 组内紧凑/组间倍距 ———— */
+/* ———— 空状态：纯中性灰度场景 SVG 插画（144×104）+ 严格垂直居中 + 组内紧凑/组间倍距；保留 .sn-art 向下兼容紧凑图标 ———— */
 .sn-empty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); align-items: stretch; }
 .sn-empty-grid > * + * { }
-.sn-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-width: 0; width: 100%; min-height: 224px; padding: 40px 24px; }
-.sn-empty-state.sn-sm { min-height: 160px; padding: 24px 16px; }
+.sn-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-width: 0; width: 100%; min-height: 248px; padding: 40px 24px; }
+.sn-empty-state.sn-sm { min-height: 176px; padding: 24px 16px; }
+.sn-empty-art { display: inline-flex; align-items: center; justify-content: center; flex: none; margin-bottom: 14px; color: var(--sn-label); --sn-ea-front: var(--sn-raised); }
+.sn-empty-art .sn-ea-svg { display: block; width: 144px; height: 104px; overflow: visible; }
+.sn-empty-art .sn-ea-lift { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .06)); transition: transform .36s var(--sn-ease-out); }
+.sn-empty-art .sn-ea-badge { filter: drop-shadow(0 3px 8px rgba(0, 0, 0, .09)); transition: transform .36s var(--sn-ease-out); }
+[data-theme="dark"] .sn-empty-art { --sn-ea-front: var(--sn-overlay); }
+[data-theme="dark"] .sn-empty-art .sn-ea-lift { filter: drop-shadow(0 5px 12px rgba(0, 0, 0, .38)); }
+[data-theme="dark"] .sn-empty-art .sn-ea-badge { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .48)); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .sn-empty-art { --sn-ea-front: var(--sn-overlay); }
+  :root:not([data-theme]) .sn-empty-art .sn-ea-lift { filter: drop-shadow(0 5px 12px rgba(0, 0, 0, .38)); }
+  :root:not([data-theme]) .sn-empty-art .sn-ea-badge { filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .48)); }
+}
+.sn-empty-state.sn-sm .sn-empty-art { margin-bottom: 10px; }
+.sn-empty-state.sn-sm .sn-empty-art .sn-ea-svg { width: 112px; height: 80px; }
 .sn-empty-state .sn-art { position: relative; flex: none; width: 56px; height: 56px; margin-bottom: 16px; border-radius: var(--sn-r-xl); display: grid; place-items: center; background: var(--sn-fill-subtle); box-shadow: inset 0 0 0 1px var(--sn-line); color: var(--sn-label); }
 .sn-empty-state .sn-art::before { content: ""; position: absolute; inset: 8px; border-radius: calc(var(--sn-r-xl) - 6px); background: var(--sn-raised); box-shadow: var(--sn-card-shadow), inset 0 0 0 1px var(--sn-line-control); pointer-events: none; }
 [data-theme="dark"] .sn-empty-state .sn-art::before { background: var(--sn-overlay); box-shadow: inset 0 0 0 1px var(--sn-line-control); }
@@ -118,6 +132,13 @@
 .sn-empty-state p { margin: 6px 0 0; max-width: 260px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-wrap: balance; }
 .sn-empty-state .sn-acts { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; }
 .sn-empty-state.sn-sm .sn-acts { margin-top: 16px; }
+/* 预设插画一览小格（文档/配置页用） */
+.sn-empty-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 184px), 1fr)); gap: 12px; width: 100%; }
+.sn-empty-preset { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 18px 12px 14px; border-radius: var(--sn-r-lg); background: var(--sn-raised); border: 1px solid var(--sn-line); box-shadow: var(--sn-card-shadow); text-align: center; }
+.sn-empty-preset .sn-empty-art { margin-bottom: 2px; }
+.sn-empty-preset .sn-empty-art .sn-ea-svg { width: 120px; height: 86px; }
+.sn-empty-preset b { font: 500 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sn-empty-preset code { font: 400 calc(11px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label3); }
 
 /* ———— 骨架：整列共用一道光（背景固定在视口上），1.2 秒扫过，停 0.4 秒 ———— */
 .sn-sk { display: block; border-radius: var(--sn-r-xs); background-color: var(--sn-fill-subtle); background-image: linear-gradient(100deg, transparent 40%, var(--sn-sk-shine) 50%, transparent 60%);

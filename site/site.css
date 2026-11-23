@@ -85,7 +85,7 @@ a { color: inherit; }
 .vc-chip { position: absolute; top: 16px; left: 16px; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: var(--sn-r-full); background: rgba(0, 0, 0, .38); color: #fff; font: 500 calc(12px * var(--fsx))/1 var(--sn-sans); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 
 /* 人物卡 */
-.sn-pc { display: grid; gap: 16px; justify-items: start; }
+.s-card.sn-pc { display: grid; gap: 16px; justify-items: start; }
 .pc-photo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px var(--sn-raised), 0 0 0 4px var(--sn-line); }
 .pc-stats { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 0; box-shadow: inset 0 -1px 0 var(--sn-line); }
 .pc-stats b { display: block; font: 600 calc(16px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); font-variant-numeric: tabular-nums; }
