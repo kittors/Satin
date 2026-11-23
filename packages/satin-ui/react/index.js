@@ -15,7 +15,7 @@ import { initSeg } from "../src/core.js";
 import { ICONS } from "../src/icons.js";
 import { emptyArtSvg } from "../src/empty-art.js";
 import { CHECK, removeChip, shakeInput } from "../src/form.js";
-import { scoped } from "../src/i18n.js";
+import { scoped, setLocale as setI18nLocale, getLocale as getI18nLocale, onLocaleChange } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
 import { wrap, useIso, cx } from "./wrap.js";
 const tt = /* @__PURE__ */ scoped(I18N_COMPONENTS);
@@ -238,11 +238,15 @@ export function Drawer({ open, onClose, title, children, footer, className }) {
     h("div", { className: "sn-bd" }, children), footer ? h("div", { className: "sn-ft" }, footer) : null);
 }
 
-// ———— 应用根部：页面级行为装一次，并支持声明式配置全局深浅模式与主题（对标 ConfigProvider） ————
-// 用法：<SatinProvider mode="auto" theme={{ accent: "blue", radius: "8", line: "normal", motion: "crisp" }}><App /></SatinProvider>
-export function SatinProvider({ mode, theme, persist = false, children }) {
+// ———— 应用根部：页面级行为装一次，并支持声明式配置全局深浅模式、主题与多语言（对标 ConfigProvider） ————
+// 用法：<SatinProvider mode="auto" locale="en" messages={en} theme={{ accent: "blue", radius: "8" }}><App /></SatinProvider>
+export function SatinProvider({ mode, theme, locale, messages, persist = false, children }) {
   const themeKey = theme ? JSON.stringify(theme) : "";
   useIso(() => setup(), []);
+  useIso(() => {
+    if (locale) setI18nLocale(locale, messages);
+    else if (messages) setI18nLocale(messages);
+  }, [locale, messages]);
   useIso(() => {
     if (mode) setMode(mode, { animate: false, persist });
   }, [mode, persist]);
@@ -253,6 +257,14 @@ export function SatinProvider({ mode, theme, persist = false, children }) {
     else paintTheme(document.documentElement, { ...THEME_DEFAULTS, ...getTheme(), ...t });
   }, [themeKey, persist]);
   return children ?? null;
+}
+
+// 响应式多语言 Hook：读取当前语言并支持切换（setLocale("en", enPack) / setLocale("zh-CN")）
+export function useLocale() {
+  const [locale, setLocState] = useState(() => getI18nLocale());
+  useEffect(() => onLocaleChange((l) => setLocState(l)), []);
+  const updateLocale = useCallback((nameOrMessages, pack) => { setI18nLocale(nameOrMessages, pack); setLocState(getI18nLocale()); }, []);
+  return { locale, setLocale: updateLocale };
 }
 
 // 局部主题作用域：让页面某一块独立使用深浅主题 / 主色 / 圆角 / 动效节奏，不触碰根元素和 localStorage

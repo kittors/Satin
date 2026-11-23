@@ -413,8 +413,8 @@ export const CUSTOM_PAGES = [
     lead: "组件里所有给人看的文字都走同一张语言表。默认简体中文，另带英文；可以整套换、只改几条，或者加一套新的语言。",
     body: [
       ["h2", "换成英文"],
-      ["p", "英文包按需引入，不用的不打包。最好在应用启动、创建组件之前设好：已经渲染出来的组件不会自己重画。"],
-      ["code", "js", 'import { addLocale, setLocale } from "satin-ui";\nimport en from "satin-ui/locales/en";\n\naddLocale("en", en);\nsetLocale("en");'],
+      ["p", "完整支持简体中文（<code>zh-CN</code>，默认）与英文（<code>en</code>），20 个组件模块 550+ 条词条 100% 双语对齐。英文包按需引入，不用的不打包；支持一步注册并切换，或在 React / Vue 根配置中声明式设置："],
+      ["code", "js", '// 原生 / 通用：一步注册并切换到英文\nimport { setLocale } from "satin-ui";\nimport en from "satin-ui/locales/en";\n\nsetLocale("en", en);\n\n// React：\n// <SatinProvider locale="en" messages={en}><App /></SatinProvider>\n// const { locale, setLocale } = useLocale();\n\n// Vue：\n// app.use(Satin, { locale: "en", messages: en });'],
       ["h2", "只改几条"],
       ["p", "给一张消息表，在当前语言上覆盖；没给的用默认。键名按组件分文件列在包里的 <code>src/locales/zh-CN/</code>。"],
       ["code", "js", 'import { setLocale } from "satin-ui";\n\nsetLocale({ "pager.0": "上一页", "pager.1": "下一页" });'],
@@ -445,9 +445,9 @@ export const CUSTOM_PAGES = [
 export const OTHER_PAGES = [
   {
     id: "changelog", title: "更新日志", en: "Changelog",
-    lead: "还没有发布过版本。下面是第一个版本（0.1.0）准备带上的东西。",
+    lead: "正式版本发布记录（npm 包 satin-ui 与 satin-cli 同步发布）。",
     body: [
-      ["h2", "0.1.0（未发布）"],
+      ["h2", "0.1.0（首个公开发布版）"],
       ["ul", [
         "组件库从设计稿里拆成 npm 包 <code>satin-ui</code>：纯 CSS 和 ES 模块，没有构建步骤；导入没有副作用，Node 和服务端渲染里能 <code>import</code>。",
         "所有组件统一成 <code>createXxx(元素, 选项)</code>，返回 <code>update</code>、<code>destroy</code>；React、Vue 组件和自定义元素都包在它外面。",

@@ -62,17 +62,68 @@ export function mountThreadRail(host, { side = "left", max = 18, onSelect } = {}
   nav.innerHTML = '<div class="sn-rail-ticks"></div><div class="sn-rail-tip" aria-hidden="true"><span class="sn-rail-tip-txt"></span><span class="sn-rail-tip-meta sn-num"></span></div>';
   host.append(nav);
   const ticksEl = nav.firstElementChild, tipEl = nav.lastElementChild, tipTxt = tipEl.firstElementChild, tipMeta = tipEl.lastElementChild;
-  let list = [], activeId = null, hoverIdx = -1, sig = "";
+  let list = [], activeId = null, hoverIdx = -1, sig = "", hadActive = false;
+  const WAVE_R = 2.6;
+  const clearWave = () => {
+    nav.classList.remove("sn-rail-track");
+    for (const b of ticksEl.children) b.style.removeProperty("--sn-rp");
+  };
+  const applyWaveY = (clientY) => {
+    const kids = ticksEl.children;
+    if (!kids.length) return -1;
+    let nearest = -1, minDist = Infinity;
+    for (let i = 0; i < kids.length; i++) {
+      const b = kids[i], r = b.getBoundingClientRect(), cy = r.top + r.height / 2, step = r.height || 14;
+      const dist = Math.abs(cy - clientY), nd = dist / step;
+      if (dist < minDist) { minDist = dist; nearest = i; }
+      const p = nd < WAVE_R ? (0.5 + 0.5 * Math.cos((Math.PI * nd) / WAVE_R)) ** 1.35 : 0;
+      if (p > 0.005) b.style.setProperty("--sn-rp", p.toFixed(3));
+      else b.style.removeProperty("--sn-rp");
+    }
+    return nearest;
+  };
+  const applyWaveIdx = (idx) => {
+    const kids = ticksEl.children;
+    for (let i = 0; i < kids.length; i++) {
+      const nd = Math.abs(i - idx), p = nd < WAVE_R ? (0.5 + 0.5 * Math.cos((Math.PI * nd) / WAVE_R)) ** 1.35 : 0;
+      if (p > 0.005) kids[i].style.setProperty("--sn-rp", p.toFixed(3));
+      else kids[i].style.removeProperty("--sn-rp");
+    }
+  };
+  const syncNear = () => {
+    const kids = ticksEl.children;
+    let ai = -1;
+    for (let i = 0; i < kids.length; i++) if (kids[i].classList.contains("sn-on")) { ai = i; break; }
+    for (let i = 0; i < kids.length; i++) kids[i].classList.toggle("sn-near", ai >= 0 && Math.abs(i - ai) === 1);
+  };
+  const pulseTick = (btn, cls) => {
+    if (!btn || reduced()) return;
+    btn.classList.remove("sn-rail-hit", "sn-rail-pop");
+    void btn.offsetWidth;
+    btn.classList.add(cls);
+  };
   const setTip = (idx) => {
+    const wasOpen = tipEl.classList.contains("sn-on"), changed = idx !== hoverIdx;
     hoverIdx = idx;
     const it = list[idx], btn = ticksEl.children[idx];
-    if (!it || !btn) { tipEl.classList.remove("sn-on"); return; }
-    tipTxt.textContent = it.summary || "";
-    tipMeta.textContent = it.meta || "";
-    tipMeta.hidden = !it.meta;
+    if (!it || !btn) { tipEl.classList.remove("sn-on", "sn-rail-glide"); return; }
+    if (changed) {
+      tipTxt.textContent = it.summary || "";
+      tipMeta.textContent = it.meta || "";
+      tipMeta.hidden = !it.meta;
+    }
     const nr = nav.getBoundingClientRect(), br = btn.getBoundingClientRect();
-    tipEl.style.setProperty("--sn-ry", Math.round(br.top - nr.top + br.height / 2) + "px");
-    tipEl.classList.add("sn-on");
+    const ry = Math.round(br.top - nr.top + br.height / 2) + "px";
+    if (!wasOpen) {
+      // 首次出现时原地定格再淡入，避免从上次位置飞过来
+      tipEl.classList.remove("sn-rail-glide");
+      tipEl.style.setProperty("--sn-ry", ry);
+      void tipEl.offsetWidth;
+      tipEl.classList.add("sn-on");
+    } else {
+      tipEl.classList.add("sn-rail-glide");
+      tipEl.style.setProperty("--sn-ry", ry);
+    }
   };
   const setItems = (arr = []) => {
     const sliced = arr.length > max ? arr.slice(-max) : arr;
@@ -83,26 +134,55 @@ export function mountThreadRail(host, { side = "left", max = 18, onSelect } = {}
     ticksEl.innerHTML = list.map((it, i) =>
       `<button type="button" class="sn-rail-tick${it.id === activeId ? " sn-on" : ""}" data-idx="${i}" data-id="${esc(it.id)}" aria-label="${esc(it.summary)}"><i></i></button>`
     ).join("");
+    syncNear();
     if (hoverIdx >= 0) setTip(hoverIdx < list.length ? hoverIdx : -1);
   };
-  const setActive = (id) => {
+  const setActive = (id, fromClick = false) => {
     if (id === activeId) return;
     activeId = id;
-    for (const b of ticksEl.children) b.classList.toggle("sn-on", String(b.dataset.id) === String(id));
+    let activeBtn = null;
+    for (const b of ticksEl.children) {
+      const on = String(b.dataset.id) === String(id);
+      b.classList.toggle("sn-on", on);
+      if (on) activeBtn = b;
+    }
+    syncNear();
+    if (hadActive && activeBtn && !fromClick) pulseTick(activeBtn, "sn-rail-pop");
+    hadActive = true;
   };
   const setSide = (s) => {
     if (s === false || s === "off" || s === "none") { nav.classList.add("sn-off"); return; }
     nav.classList.remove("sn-off");
     nav.dataset.side = s === "right" ? "right" : "left";
   };
-  ticksEl.addEventListener("pointerover", (e) => { const b = e.target.closest(".sn-rail-tick"); if (b) setTip(Number(b.dataset.idx)); });
-  ticksEl.addEventListener("focusin", (e) => { const b = e.target.closest(".sn-rail-tick"); if (b) setTip(Number(b.dataset.idx)); });
-  nav.addEventListener("pointerleave", () => setTip(-1));
-  nav.addEventListener("focusout", (e) => { if (!nav.contains(e.relatedTarget)) setTip(-1); });
+  ticksEl.addEventListener("pointermove", (e) => {
+    if (e.pointerType === "touch") return;
+    nav.classList.add("sn-rail-track");
+    const idx = applyWaveY(e.clientY);
+    if (idx >= 0) setTip(idx);
+  });
+  ticksEl.addEventListener("pointerover", (e) => {
+    if (e.pointerType === "touch") return;
+    const b = e.target.closest(".sn-rail-tick");
+    if (!b) return;
+    nav.classList.add("sn-rail-track");
+    const idx = applyWaveY(e.clientY);
+    setTip(idx >= 0 ? idx : Number(b.dataset.idx));
+  });
+  ticksEl.addEventListener("focusin", (e) => {
+    const b = e.target.closest(".sn-rail-tick");
+    if (!b) return;
+    const idx = Number(b.dataset.idx);
+    applyWaveIdx(idx);
+    setTip(idx);
+  });
+  nav.addEventListener("pointerleave", () => { clearWave(); setTip(-1); });
+  nav.addEventListener("focusout", (e) => { if (!nav.contains(e.relatedTarget)) { clearWave(); setTip(-1); } });
+  ticksEl.addEventListener("animationend", (e) => e.target.closest(".sn-rail-tick")?.classList.remove("sn-rail-hit", "sn-rail-pop"));
   ticksEl.addEventListener("click", (e) => {
     const b = e.target.closest(".sn-rail-tick"); if (!b) return;
     const idx = Number(b.dataset.idx), it = list[idx];
-    if (it) { setActive(it.id); onSelect?.(it, idx); }
+    if (it) { setActive(it.id, true); pulseTick(b, "sn-rail-hit"); onSelect?.(it, idx); }
   });
   return { el: nav, setItems, setActive, setSide, destroy() { nav.remove(); } };
 }
@@ -127,7 +207,7 @@ export const createThreadRail = /* @__PURE__ */ defineComponent({
   },
 });
 
-// mountChat(.chat, { respond, history, hiRes, rail, meta, caret })：
+// mountChat(.chat, { respond, history, hiRes, rail, meta, actions, caret })：
 //   respond(问题, { stopped })：异步生成器，一段一段地 yield——
 //     字符串或 { text }：正文；{ think: "…" }：思考（实时读秒，结束后收起）；
 //     { tool: { id, name, label, args, status, result, ms } } / { toolUpdate: { id, status, result, ms } }：精密折叠工具调用卡片；
@@ -135,12 +215,16 @@ export const createThreadRail = /* @__PURE__ */ defineComponent({
 //     { card: [编号, 副信息, 说明, 背景] }：镜头卡片；{ image: { g } }、{ imageProgress: 0–1 }、{ imageDone: true }：生成画面。
 //   rail：false 关闭 | "left" | "right" | { side: "left" | "right", max: 18 }（默认 "left" 侧边迷你定位刻度轨）
 //   meta：{ time?: true, duration?: true, tps?: true }（消息底部悬停操作栏元信息显示开关）
+//   actions："hover"（默认：鼠标移入对应消息内容区域才显示）| "latest"（最新一条 AI 回复常显）| "always"（全部常显）| false / "none"（关闭）
 //   caret："dot" | "bar"（流式输出光标样式，默认 "dot"）
-export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railOpt = "left", meta: metaOpt, caret = "dot", composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, onMenu, onNewChat, ...view } = {}) {
+export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railOpt = "left", meta: metaOpt, actions = "hover", caret = "dot", composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, onMenu, onNewChat, ...view } = {}) {
   if (!box || box._chat) return box?._chat;
   const metaCfg = { time: true, duration: true, tps: true, ...metaOpt };
+  const normActions = (v) => (v === false || v === "none" ? "none" : v === "always" || v === "latest" ? v : "hover");
+  const setActions = (v) => { box.dataset.actions = normActions(v); };
   // 空容器：先按选项（title、status、placeholder、max……）填好标记
   if (!box.querySelector(".sn-chat-vp")) { box.classList.add("sn-chat"); box.innerHTML = chatHTML(view); injectIcons(box); }
+  setActions(actions);
   if (caret === "bar") box.dataset.caret = "bar";
   const bodyEl = $(".sn-chat-body", box), vp = $(".sn-chat-vp", box), canvas = $(".sn-chat-canvas", vp), phTop = $(".sn-chat-ph.sn-top", canvas), phBot = $(".sn-chat-ph.sn-bot", canvas);
   const jump = $("[data-chat-jump]", box), badge = $(".sn-badge", jump);
@@ -153,9 +237,9 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   // cmOpts：传给输入框的选项（upload 上传函数、attachments 预置附件）
   if (!composer._cm) mountComposer(composer, { ...cmOpts, voice: view.voice, onModelChange, onModeChange, onContextChange, onContextClick });
   const PAD_T = 12, GAP = 16; // GAP = 条目自己的下内边距（.ci 的 padding-bottom）
-  // 列表一直延伸到输入框底下（输入框浮在上面）：列表底部留出输入框那么高的地方，最后一条停在输入框上方；输入框变高时跟着让
+  // 列表一直延伸到输入框背后（零顶部白缝、零虚化渐变）：列表底部留出输入框高度 + 14px，停在最新一条时自然呼吸
   let PAD_B = 18; const foot = $(".sn-chat-foot", box);
-  const sa = scrollArea(vp, { fade: "y", size: 20 }); Object.assign(sa.box.style, { height: "100%", minHeight: "0" });
+  const sa = scrollArea(vp, { fade: "top", size: 16 }); Object.assign(sa.box.style, { height: "100%", minHeight: "0" });
   // 底部位置按算出来的内容高度，不用 scrollHeight：发送时画布在做让位动画，scrollHeight 会被 transform 临时撑大
   const maxTop = () => Math.max(0, PAD_T + off[items.length] + PAD_B - vp.clientHeight);
   // 顶栏标题下面那行只写选项 status（默认不写：AI 助手平时没什么状态可说；人和人聊天写"在线""正在输入…"，用 update({ status }) 换）。
@@ -187,7 +271,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     if (it.type === "image") return it.cap || `[${tt("chat.11")}]`;
     if (it.type === "video") return it.cap || `[${tt("chat.10")}]`;
     if (it.type === "audio") return it.name || `[${tt("chat.4")}]`;
-    if (it.type === "file") return it.name || "文件";
+    if (it.type === "file") return it.name || tt("chat.file");
     return "";
   };
   function syncRailItems() {
@@ -202,8 +286,9 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     rail.setItems(turns);
     syncRailActive();
   }
+  let railLockUntil = 0;
   function syncRailActive() {
-    if (!rail) return;
+    if (!rail || performance.now() < railLockUntil) return;
     const probe = vp.scrollTop + vp.clientHeight * .32 - PAD_T;
     let cur = null;
     for (let i = 0; i < items.length; i++) {
@@ -218,7 +303,9 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   function scrollToId(id) {
     const i = index.get(id); if (i == null) return;
     pinned = false;
-    const target = Math.max(0, Math.min(maxTop(), PAD_T + off[i] - 24));
+    railLockUntil = performance.now() + 460;
+    rail?.setActive(id);
+    const target = Math.max(0, Math.min(maxTop(), PAD_T + off[i] - Math.min(80, vp.clientHeight * .18)));
     glide(target, 380);
     setTimeout(() => {
       const el = live.get(id);
@@ -226,6 +313,9 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       el.classList.remove("sn-ci-flash"); void el.offsetWidth; el.classList.add("sn-ci-flash");
     }, reduced() ? 0 : 280);
   }
+  const unlockRail = () => { railLockUntil = 0; };
+  vp.addEventListener("wheel", unlockRail, { passive: true });
+  vp.addEventListener("touchstart", unlockRail, { passive: true });
 
   // ———— 高度：先估，渲染后按实际量出来的缓存 ————
   let colW = 600;
@@ -285,7 +375,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     else bub = `<div class="sn-bubble">${esc(it.text)}</div>`;
     const st = it.me && it.status === "fail" ? `<span class="sn-msg-state sn-bad" role="button" tabindex="0" title="${tt("chat.27")}">${STATE[it.status]}</span>` : "";
     const acts = it.status === "fail" ? tt("chat.5") : it.me ? meActsHTML(it) : it.type === "text" ? aiActsHTML(it, isLastMsg(i)) : "";
-    return `<div class="sn-msg ${it.me ? "sn-me" : "sn-ai"}${cont ? " sn-cont" : ""}${it.flying ? " sn-flying" : ""}">${bub}${st}</div>${acts}`;
+    return `<div class="sn-msg ${it.me ? "sn-me" : "sn-ai"}${cont ? " sn-cont" : ""}${it.flying ? " sn-flying" : ""}"><div class="sn-msg-col">${bub}${acts}</div>${st}</div>`;
   }
   // 历史最上面那一行：正在加载只展示动感几何微环（字留给读屏）；平时、到头了都不写字
   const moreHTML = () => more.state === "loading" ? tt("chat.6") : "";
@@ -624,8 +714,13 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   const stepHTML = (s) => `<li class="${Object.hasOwn(SI, s.s) ? "sn-" + s.s : ""}"><span class="sn-si">${SI[s.s] ?? ""}</span><span>${esc(s.t)}</span><span class="sn-sn sn-num">${esc(s.n || "")}</span></li>`;
   const cardHTML = ([n, m, t, g]) => `<div class="sn-ai-card"><i style="--sn-g:${esc(g)}"></i><div><b>${tt("chat.19")}${esc(n)}</b><span>${esc(m)}</span><span>${esc(t)}</span></div></div>`;
   canvas.addEventListener("click", (e) => {
-    const hd = e.target.closest(".sn-think-hd"); if (!hd) return; const el = hd.closest(".sn-ci"), it = el?._it; if (!it) return;
-    it.open = !it.open; hd.parentElement.classList.toggle("sn-open", it.open); userAt = performance.now();
+    const hd = e.target.closest(".sn-think-hd"); if (hd) { const el = hd.closest(".sn-ci"), it = el?._it; if (!it) return; it.open = !it.open; hd.parentElement.classList.toggle("sn-open", it.open); userAt = performance.now(); return; }
+    // 触屏无悬停设备：点按对应消息内容区展开该条操作栏，点空白处收起
+    if (typeof matchMedia === "function" && matchMedia("(hover: none)").matches && !e.target.closest("button, a, .sn-ph, .sn-ai-image, .sn-tool-hd")) {
+      const col = e.target.closest(".sn-msg-col, .sn-ai-body");
+      for (const x of canvas.querySelectorAll(".sn-act-open")) if (x !== col) x.classList.remove("sn-act-open");
+      if (col) col.classList.toggle("sn-act-open");
+    }
   });
   const liveEl = (it) => live.get(it.id) || null;
   // 匀速放字：网络来的字先进缓冲，每帧按积压多少放出几个字（每秒 45～160 个），每段新字温柔显影
@@ -637,7 +732,11 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       acc += dt / 1000 * Math.min(160, 45 + buf.length * 1.5); const n = Math.floor(acc); if (n < 1) { raf = requestAnimationFrame(tick); return; }
       acc -= n; const chunk = [...buf].slice(0, n).join(""); buf = buf.slice(chunk.length); it[key] += chunk;
       const el = liveEl(it)?.querySelector(sel);
-      if (el) { const s = document.createElement("span"); s.className = "sn-tk"; s.textContent = chunk; const c = el.querySelector(".sn-caret"); el.insertBefore(s, c); if (el.scrollHeight > el.clientHeight + 1) el.scrollTop = el.scrollHeight; }
+      if (el) {
+        const s = document.createElement("span"); s.className = "sn-tk"; s.textContent = chunk; const c = el.querySelector(".sn-caret"); el.insertBefore(s, c);
+        if (el.scrollHeight > el.clientHeight + 1) el.scrollTop = el.scrollHeight;
+        if (key === "think") el.classList.toggle("sn-think-fade", el.scrollTop > 2);
+      }
       raf = requestAnimationFrame(tick);
     };
     return {
@@ -684,6 +783,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       const el = liveEl(it), t = el?.querySelector(".sn-think");
       if (t) {
         t.classList.remove("sn-live", "sn-open");
+        const txEl = t.querySelector(".sn-think-txt"); if (txEl) { txEl.classList.remove("sn-think-fade"); txEl.scrollTop = 0; }
         const ld = t.querySelector(".sn-think-hd .sn-ld");
         if (ld) ld.outerHTML = '<span class="sn-think-dot" aria-hidden="true"></span>';
         const ttEl = t.querySelector(".sn-think-t"); if (ttEl) ttEl.textContent = tt("chat.23", { p0: fmtSec(it.secs) });
@@ -791,6 +891,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
         const t = el.querySelector(".sn-think");
         if (t?.classList.contains("sn-live")) {
           t.classList.remove("sn-live", "sn-open");
+          const txEl = t.querySelector(".sn-think-txt"); if (txEl) { txEl.classList.remove("sn-think-fade"); txEl.scrollTop = 0; }
           const ld = t.querySelector(".sn-think-hd .sn-ld"); if (ld) ld.outerHTML = '<span class="sn-think-dot" aria-hidden="true"></span>';
           const ttEl = t.querySelector(".sn-think-t"); if (ttEl) ttEl.textContent = tt("chat.23", { p0: fmtSec(it.secs || 1) });
         }
@@ -817,9 +918,17 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   const sendText = (text, opt) => { ta.value = text; return send(text, opt); };
   const scrollToOldest = () => { pinned = false; glide(0, 900); };
 
-  // ———— 尺寸变化：重估还没量过的条目，再排一次 ————
+  // ———— 尺寸变化：容器窄于 560px 自动收紧边距并隐藏刻度轨，保证消息与输入框宽度比例舒展 ————
+  const syncNarrow = () => {
+    const bw = box.clientWidth || vp.clientWidth;
+    const narrow = bw > 0 && bw < 560;
+    box.classList.toggle("sn-chat-narrow", narrow);
+    return narrow;
+  };
   new ResizeObserver(() => {
-    const w = Math.min(740, vp.clientWidth - 40); if (Math.abs(w - colW) < 2) { if (pinned) vp.scrollTop = maxTop(); render(); return; } // 输入框变高时，贴着底就继续贴底，最后一条不被挡住
+    const narrow = syncNarrow();
+    const w = Math.min(740, vp.clientWidth - (narrow ? 24 : 40));
+    if (Math.abs(w - colW) < 2) { if (pinned) vp.scrollTop = maxTop(); render(); return; } // 输入框变高时，贴着底就继续贴底，最后一条不被挡住
     colW = w; for (const it of items) { it.e = undefined; } relayout(1); if (pinned) vp.scrollTop = maxTop(); render();
   }).observe(vp);
 
@@ -855,9 +964,10 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   });
 
   // ———— 开始：停在最新一条 ————
-  colW = Math.min(740, vp.clientWidth - 40); relayout(1); // 内容一栏最宽 740（与输入框左右轴线严格对齐）
+  const initNarrow = syncNarrow();
+  colW = Math.min(740, vp.clientWidth - (initNarrow ? 24 : 40)); relayout(1); // 内容一栏最宽 740（与输入框左右轴线严格对齐）
   if (foot) {
-    const syncFoot = () => { const h = foot.offsetHeight; box.style.setProperty("--sn-foot-h", h + "px"); const nb = h + 8; if (nb === PAD_B) return; PAD_B = nb; relayout(1); if (pinned) vp.scrollTop = maxTop(); render(); };
+    const syncFoot = () => { const h = foot.offsetHeight; box.style.setProperty("--sn-foot-h", h + "px"); const nb = h + 14; if (nb === PAD_B) return; PAD_B = nb; relayout(1); if (pinned) vp.scrollTop = maxTop(); render(); };
     new ResizeObserver(syncFoot).observe(foot); syncFoot();
   }
   const toBottom = () => { vp.scrollTop = maxTop(); render(); syncRailActive(); };
@@ -868,7 +978,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   // 销毁：停掉正在生成的回答、放开实例（同一个容器可以再挂一次）。挂载时加的监听、观察器由 createChat 一起撤
   const destroy = () => { if (job) job.stop = true; job = null; rail?.destroy(); composer?._cm?.stopVoice?.(true); if (box._chat === api) delete box._chat; };
   // 程序里发一条（和用户在输入框里发一样：飞进列表、然后回复）
-  const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, scrollToId, setRail: (s) => rail?.setSide(s), destroy,
+  const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, scrollToId, setRail: (s) => rail?.setSide(s), setActions, destroy,
     fill: (text) => composer._cm?.fill(text), get emptyEl() { return emptyEl; } };
   return (box._chat = api);
 }
@@ -887,10 +997,11 @@ export const createChat = /* @__PURE__ */ defineComponent({
       onMenu: () => api.emit("menu"), onNewChat: () => api.emit("newChat") });
     const cm = () => el.querySelector(".sn-composer")?._cm;
     return {
-      send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, scrollToId: c.scrollToId, setRail: c.setRail, fill: c.fill,
+      send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, scrollToId: c.scrollToId, setRail: c.setRail, setActions: c.setActions, fill: c.fill,
       get emptyEl() { return c.emptyEl; },
       update(next, prev) {
         if (next.status !== prev.status) { const s = el.querySelector("[data-chat-status]"); if (s) s.textContent = next.status ?? ""; }
+        if (next.actions !== prev.actions) c.setActions(next.actions);
         // 底部输入框的上下文、模式、模型：只是选中项换了就只改选中（不发事件）；结构变了才换那一块
         syncComposerParts(cm(), next, prev);
       },

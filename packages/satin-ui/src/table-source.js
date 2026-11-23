@@ -4,6 +4,9 @@
 // 编辑、手动换行先在本地生效（乐观更新），再告诉"服务端"。
 // 树形模式（setTree）：后台线程按筛选、排序算好整棵树的先序（行号 + 每个节点连同下级一共几个），页面这边按展开状态把它展开成看得见的行——
 // 展开收起在页面这边同步算（不等后台线程），各列的值仍按行号懒加载；筛选时保留命中的和它的所有上级（上级临时展开，不改原来的展开状态）。
+import { scoped } from "./i18n.js";
+import I18N_GRID from "./locales/zh-CN/grid.js";
+const tt = /* @__PURE__ */ scoped(I18N_GRID);
 // 有没有筛选：搜索词，或者哪一列的筛选有值（选项下标数组非空、范围有一头）
 export const hasFilter = (q) => !!((q.q && q.q.trim()) || Object.values(q.filters || {}).some((v) => (Array.isArray(v) ? v.length : v && (v.min != null || v.max != null))));
 
@@ -34,7 +37,7 @@ export function createSource({ backend, n: n0 = 0, primary = "name", block = 100
   const rowHt = (p) => { const k = below(HP, p); return k < HP.length && HP[k] === p ? HH[k] : base; };
   function rowAtY(y) { const n = api.shown; if (n <= 0) return 0; let lo = 0, hi = n - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (rowY(m) <= y) lo = m; else hi = m - 1; } return lo; }
   // 后端出错（load 抛错、网络断了）：记下来、发 "error"，表格显示出错状态（retry() 重来）
-  const fail = (e) => { failed = e || new Error("加载失败"); busy = false; emit("error"); };
+  const fail = (e) => { failed = e || new Error(tt("grid.68")); busy = false; emit("error"); };
   // 一块到了：按视图位置记下行号，按行号记下这一行的数据
   function take(b, v) {
     pending.delete(`${v}:${(b.start / block) | 0}`); if (v !== ver) return;

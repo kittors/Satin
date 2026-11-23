@@ -3,6 +3,7 @@
 import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
 import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
 import { mountCmdk } from "../packages/satin-ui/src/overlay.js";
+import { hitAny, pushDismiss, dropDismiss } from "../packages/satin-ui/src/dismiss.js";
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { loadCatalog } from "./catalog.js";
 import { START, GUIDES } from "./pages.js";
@@ -68,16 +69,26 @@ let openThemePanel = () => {};
     bindModeSeg($('[data-th="mode"]', panel));
   };
   const place = () => { const r = btn.getBoundingClientRect(); panel.style.top = r.bottom + 8 + "px"; panel.style.right = Math.max(8, innerWidth - r.right) + "px"; };
-  const open = (on) => {
+  let dismissLayer = null;
+  const open = (on, refocus = false) => {
     // 第一次打开时才生成面板（面板平时是隐藏但占位的，里面的分段控件量得到宽度）
     if (on && !mounted) { mounted = true; mount(); }
     if (on) place();
     panel.classList.toggle("sn-open", on); btn.setAttribute("aria-expanded", String(on)); btn.classList.toggle("sn-is-open", on);
+    if (on) {
+      dismissLayer = pushDismiss({
+        panel, trigger: btn,
+        close: (rf) => open(false, rf),
+        contains: (t, path) => hitAny(t, path, [panel, btn]),
+        ignore: (t) => !!t?.closest?.(".s-appear-menu,.sn-cp-pop"),
+      });
+    } else if (dismissLayer) {
+      dropDismiss(dismissLayer); dismissLayer = null;
+      if (refocus) btn.focus({ preventScroll: true });
+    }
   };
   if (btn?.matches("[data-custom-btn]")) btn.addEventListener("click", () => open(!panel.classList.contains("sn-open")));
   if (panel && btn) openThemePanel = () => open(true);
-  document.addEventListener("pointerdown", (e) => { if (panel?.classList.contains("sn-open") && !panel.contains(e.target) && !btn.contains(e.target) && !e.target.closest?.(".s-appear-menu")) open(false); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel?.classList.contains("sn-open")) { open(false); btn.focus(); } });
   addEventListener("resize", () => panel?.classList.contains("sn-open") && place());
 }
 

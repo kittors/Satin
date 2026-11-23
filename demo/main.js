@@ -147,7 +147,7 @@ Theme.onChange((t) => { radiusSeg?.go(Math.max(0, ["6", "8", "10", "pill"].index
     panel.classList.toggle("sn-open", on); btn.setAttribute("aria-expanded", String(on)); btn.classList.toggle("sn-is-open", on);
   };
   btn.addEventListener("click", () => open(!panel.classList.contains("sn-open")));
-  document.addEventListener("pointerdown", (e) => { if (panel.classList.contains("sn-open") && !panel.contains(e.target) && !btn.contains(e.target)) open(false); });
+  document.addEventListener("pointerdown", (e) => { if (panel.classList.contains("sn-open") && !panel.contains(e.target) && !btn.contains(e.target) && !e.target.closest?.(".sn-cp-pop")) open(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel.classList.contains("sn-open")) { open(false); btn.focus(); } });
 }
 const prefIdx = ["auto", "light", "dark"].indexOf(pref);

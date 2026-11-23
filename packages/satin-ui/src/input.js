@@ -119,16 +119,25 @@ export function mountCount(input) {
 export function autoGrow(box) {
   const ta = $("textarea", box), cs = getComputedStyle(ta), lh = parseFloat(cs.lineHeight), padV = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
   const minH = (Number(ta.getAttribute("rows")) || 1) * lh + padV, maxH = (Number(box.dataset.maxLines) || 7) * lh + padV;
+  const h0 = ta.style.height, ov0 = ta.style.overflowY;
+  // 多行输入统一包进 ScrollArea（渐隐留在 textarea 内容上，滚动条独立在外层 .sn-sa，绝不被 mask-image 虚化）
+  const sa = ta.parentNode ? scrollArea(ta, { fade: "none", overscroll: "contain" }) : null;
   const mirror = document.createElement("div");
   Object.assign(mirror.style, { position: "absolute", visibility: "hidden", left: "-9999px", top: "0", boxSizing: "border-box", whiteSpace: "pre-wrap", overflowWrap: "anywhere",
     font: cs.font, lineHeight: cs.lineHeight, letterSpacing: cs.letterSpacing, padding: cs.padding });
-  document.body.append(mirror); onCleanup(() => mirror.remove()); // 组件销毁时拿掉（展示页直接 mountXxx 的不受影响）
+  document.body.append(mirror);
+  onCleanup(() => {
+    mirror.remove();
+    ta.style.height = h0; ta.style.overflowY = ov0;
+    ta.classList.remove("sn-fade-top", "sn-fade-bottom");
+    if (!ta.getAttribute("style")) ta.removeAttribute("style");
+  }); // 组件销毁或 enhance 撤销时完整还原，保证重复挂载结构逐字一致
   const edges = () => { ta.classList.toggle("sn-fade-top", ta.scrollTop > 2); ta.classList.toggle("sn-fade-bottom", ta.scrollTop + ta.clientHeight < ta.scrollHeight - 2); };
   const fit = () => {
     mirror.style.width = ta.offsetWidth + "px"; mirror.textContent = ta.value + "​";
     const h = Math.max(minH, Math.min(maxH, mirror.offsetHeight));
     if (ta.style.height !== h + "px") ta.style.height = h + "px";
-    ta.style.overflowY = mirror.offsetHeight > maxH ? "auto" : "hidden"; edges();
+    ta.style.overflowY = mirror.offsetHeight > maxH ? "auto" : "hidden"; edges(); sa?.refresh();
   };
   ta.style.height = minH + "px"; ta.addEventListener("input", fit); ta.addEventListener("scroll", edges, { passive: true });
   new ResizeObserver(() => fit()).observe(box); fit();
@@ -314,7 +323,14 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   const card = $(".sn-cm-card", box) || box;
   const ta = $("textarea", box), send = $(".sn-cm-send", box), files = $(".sn-cm-files", box), swap = $(".sn-swap", send);
   autoGrow(box); const upd = longCount(box, { showFrom: .5 });
-  if (card !== box) card.addEventListener("pointerdown", (e) => { if (e.target === card) { e.preventDefault(); ta.focus(); } });
+  // 点击输入框卡片或底栏空白区（如按钮右侧的 .sn-grow）：不拦截外部关闭逻辑，并顺滑将光标放回输入框
+  card.addEventListener("pointerdown", (e) => {
+    const t = e.target;
+    if (t === card || t === box || t.classList?.contains("sn-cm-bar") || t.classList?.contains("sn-grow")) {
+      e.preventDefault();
+      ta.focus();
+    }
+  });
   // 附件多了横向滚动：不显示滚动条（会压在附件上），只靠左右渐隐；竖滚轮也能横着滚；滚到头回弹
   scrollArea(files, { fade: "x", size: 20, bar: "none", wheel: "x", overscroll: "bounce" });
   // 就地提示：附件太大、上传失败时，在附件条下面写一行红字（留 5 秒）；同时被拒的几个合成一句

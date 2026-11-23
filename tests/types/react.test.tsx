@@ -95,15 +95,17 @@ export const chatNew = <ChatR title="新对话" empty={{ icon: "clapperboard", t
 export const chatOwnEmpty = <ChatR renderEmpty={() => <p>自己画的空状态</p>} />;
 export const composerNew = <ComposerR context={[{ text: "本地", options: [{ value: "local", label: "本地" }], value: "local" }]} onContextChange={(e) => { const v: string = e.value; void v; }} mode="只读" />;
 
-// 动感 Loader、升级版 Progress、声明式 SatinProvider / ThemeScope / useTheme、图表子路径与 ThreadRail
-import { Loader, Progress, SatinProvider, ThemeScope, useTheme } from "satin-ui/react";
+// 动感 Loader、升级版 Progress、声明式 SatinProvider / ThemeScope / useTheme / useLocale、图表子路径与 ThreadRail
+import { Loader, Progress, SatinProvider, ThemeScope, useTheme, useLocale } from "satin-ui/react";
+import en from "satin-ui/locales/en";
 import { ThreadRail } from "satin-ui/react/chat";
 import { AreaChart, BarChart, DonutChart, Chart3D, Sparkline, Icon3D } from "satin-ui/react/charts";
 export function NewApis() {
   const { mode, theme, setMode, setTheme, resetTheme } = useTheme();
-  void mode; void theme.radius;
+  const { locale, setLocale } = useLocale();
+  void mode; void theme.radius; void locale;
   return (
-    <SatinProvider mode="auto" theme={{ accent: "blue", radius: "8", line: "normal", motion: "crisp" }} persist={false}>
+    <SatinProvider mode="auto" locale="en" messages={en} theme={{ accent: "blue", radius: "8", line: "normal", motion: "crisp" }} persist={false}>
       <ThemeScope mode="dark" accent="indigo">
         <Loader variant="matrix" size="lg" speed={1.2} />
         <Loader variant="arc" size={24} color="var(--sn-accent)" />
@@ -120,7 +122,7 @@ export function NewApis() {
         <Chart3D rows={["一", "二"]} cols={["A", "B"]} values={[[1, 2], [3, 4]]} />
         <Sparkline values={[1, 3, 2, 5]} />
         <Icon3D name="layers" tone="cobalt" size="md" />
-        <button type="button" onClick={() => { setMode("dark"); setTheme({ accent: "green" }); resetTheme(); }}>切主题</button>
+        <button type="button" onClick={() => { setMode("dark"); setTheme({ accent: "green" }); resetTheme(); setLocale("zh-CN"); }}>切主题</button>
       </ThemeScope>
     </SatinProvider>
   );

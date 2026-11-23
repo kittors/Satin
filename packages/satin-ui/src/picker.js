@@ -8,16 +8,10 @@
 import { onCleanup } from "./lifecycle.js";
 import { scrollArea } from "./scroll.js";
 import { $, reduced, injectIcons } from "./core.js";
+import { hitAny, pushDismiss, dropDismiss } from "./dismiss.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/picker.js";
-// pickerHTML（文件末尾）生成标记用的文字：键接着 picker.142 往下排（中文原文先放在这里，setLocale({ "picker.143": "…" }) 照样能换；以后挪进 locales/zh-CN/picker.js）
-const MARKUP = {
-  "picker.143": "选择日期", "picker.144": "选择开始和结束日期", "picker.145": "选择日期范围", "picker.146": "选择时间", "picker.147": "选择日期和时间",
-  "picker.148": "选择省 / 市 / 区", "picker.149": "选择地址", "picker.150": "清除", "picker.151": "今天", "picker.152": "最近 7 天", "picker.153": "最近 30 天",
-  "picker.154": "本月", "picker.155": "上个月", "picker.156": "重置", "picker.157": "确定", "picker.158": "此刻", "picker.159": "时间",
-  "picker.160": "搜索省、市、区，比如：西湖", "picker.161": "搜索地址", "picker.162": "常用",
-};
-const tt = /* @__PURE__ */ scoped({ ...I18N_DEFAULTS, ...MARKUP });
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 import { svg } from "./svg.js";
 import { calendar, clock, mapPin, x as xIcon } from "./icons/index.js";
 // bindPickers(root = document, { today, now })：把 root 里写了 data-pk 的选择器都接上——
@@ -36,20 +30,48 @@ export function bindPickers(root = document, { today, now } = {}) {
   const fmtFull = (d) => tt("picker.2", { p0: fmtDay(d), p1: WK[d.getDay()] });
   const EASE = "cubic-bezier(.22,1,.36,1)";
 
-  // ———— 面板开合 ————
-  const hosts = [];
-  const close = (h, refocus) => { if (!h.classList.contains("sn-open")) return; h.classList.remove("sn-open"); if (refocus) $(".sn-pk-trigger", h).focus({ preventScroll: true }); };
+  // ———— 面板开合（统一走 dismiss.js：精准命中触发框与面板、自动上下翻转、捕获阶段外部关闭、Esc / 失焦收起） ————
+  const openState = new WeakMap();
+  const place = (h, autoCloseOnOut = false) => {
+    const p = $(".sn-pk-panel", h), trig = $(".sn-pk-trigger", h);
+    if (!p || !trig) return;
+    const hr = trig.getBoundingClientRect();
+    if (autoCloseOnOut && ((hr.width === 0 && hr.height === 0) || hr.bottom < 0 || hr.top > innerHeight)) { close(h, false); return; }
+    p.style.left = ""; p.style.right = ""; p.style.transformOrigin = "";
+    const w = p.offsetWidth, ph = p.offsetHeight, room = innerWidth - 12;
+    const roomBot = innerHeight - hr.bottom - 12, roomTop = hr.top - 12;
+    const up = roomBot < ph + 6 && roomTop > roomBot;
+    p.classList.toggle("sn-up", up);
+    // 横向放进窗口：默认和触发框左边对齐；右边出界就往左挪，最多挪到离窗口左边 12px
+    let x = 0;
+    if (hr.left + w > room) { x = Math.max(12 - hr.left, room - w - hr.left); p.style.left = x + "px"; }
+    p.style.transformOrigin = `${Math.round(Math.max(0, Math.min(w, hr.width / 2 - x)))}px ${up ? "100%" : "0%"}`;
+  };
+  const close = (h, refocus) => {
+    if (!h.classList.contains("sn-open")) return;
+    h.classList.remove("sn-open");
+    const st = openState.get(h);
+    if (st) { openState.delete(h); dropDismiss(st.layer); st.offPos(); }
+    if (refocus) $(".sn-pk-trigger", h)?.focus({ preventScroll: true });
+  };
   const open = (h) => {
-    for (const o of hosts) if (o !== h) close(o);
-    const p = $(".sn-pk-panel", h); p.style.left = ""; p.style.right = ""; p.style.transformOrigin = "";
+    const p = $(".sn-pk-panel", h), trig = $(".sn-pk-trigger", h);
     h.classList.add("sn-open"); h._onOpen?.();
-    // 横向放进窗口：默认和触发框左边对齐；右边出界就往左挪，最多挪到离窗口左边 12px。
-    // 原来只会"左对齐 / 右对齐"二选一，范围面板（约 680px）两边都放不下时会从另一边伸出去被截掉。比窗口还宽的，面板自己换成竖排（picker.css 末尾）
-    const hr = h.getBoundingClientRect(), w = p.offsetWidth, room = innerWidth - 12;
-    if (hr.left + w > room) { const x = Math.max(12 - hr.left, room - w - hr.left); p.style.left = x + "px"; p.style.transformOrigin = `${Math.round(Math.max(0, Math.min(w, hr.width / 2 - x)))}px 0`; }
+    place(h, false);
+    const onRe = () => place(h, false);
+    const onSc = (e) => { if (p && (e.target === p || p.contains?.(e.target))) return; place(h, true); };
+    addEventListener("resize", onRe);
+    addEventListener("scroll", onSc, { passive: true, capture: true });
+    const layer = pushDismiss({
+      panel: p || h,
+      trigger: trig || h,
+      close: (refocus) => close(h, refocus),
+      contains: (t, path) => hitAny(t, path, [trig, p]),
+    });
+    openState.set(h, { layer, offPos: () => { removeEventListener("resize", onRe); removeEventListener("scroll", onSc, true); } });
   };
   function host(h) {
-    hosts.push(h); const trig = $(".sn-pk-trigger", h);
+    const trig = $(".sn-pk-trigger", h);
     trig.addEventListener("click", (e) => {
       if (e.target.closest(".sn-end > .sn-b") && h.classList.contains("sn-has")) { h._clear?.(); return; }
       if (h.classList.contains("sn-open")) close(h); else open(h);
@@ -58,8 +80,8 @@ export function bindPickers(root = document, { today, now } = {}) {
       if (e.key === "Escape" && h.classList.contains("sn-open")) { e.preventDefault(); e.stopPropagation(); close(h, true); }
       if ((e.key === "ArrowDown" || e.key === "Enter") && e.target === trig && !h.classList.contains("sn-open")) { e.preventDefault(); open(h); }
     });
+    onCleanup(() => close(h, false));
   }
-  document.addEventListener("pointerdown", (e) => { for (const h of hosts) if (!h.contains(e.target)) close(h); });
   // 触发框里的值：换值时旧字淡出、新字从下面 2px 淡入；滚动时间列这类连续变化用 instant
   const setVal = (h, text, instant = false) => {
     if ((text || "") !== (h._pkv ?? "")) { h._pkv = text || ""; h.dispatchEvent(new CustomEvent("pick", { bubbles: true, detail: { text } })); } // 值变了：发 pick

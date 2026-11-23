@@ -53,11 +53,13 @@ export const Drawer: DefineComponent<{ open: boolean; title?: string }>;
 export const ThemeScope: DefineComponent<Partial<ThemeChoice> & { as?: string; mode?: "light" | "dark" }>;
 /** 响应式主题 Composable */
 export function useTheme(): { mode: Ref<"auto" | "light" | "dark">; theme: Ref<ThemeChoice>; setMode(mode: "auto" | "light" | "dark", options?: { animate?: boolean; persist?: boolean }): void; setTheme(patch: Partial<ThemeChoice>): void; resetTheme(): void };
+/** 响应式多语言 Composable */
+export function useLocale(): { locale: Ref<string>; setLocale(nameOrMessages: string | Record<string, string>, messages?: Record<string, string>): void };
 /** v-enhance：照设计稿写好的一段标记放进这个元素，挂上时接上交互、卸载时撤掉（和 <sn-enhance> 一样） */
 export const vEnhance: import("vue").ObjectDirective<HTMLElement>;
 export function toast(o: ToastOptions): ToastHandle;
 export function notify(o: NotifyOptions): import("./components").NotifyHandle;
-export interface SatinPluginOptions { mode?: "auto" | "light" | "dark"; theme?: Partial<ThemeChoice>; persist?: boolean }
+export interface SatinPluginOptions { mode?: "auto" | "light" | "dark"; theme?: Partial<ThemeChoice>; locale?: string; messages?: Record<string, string>; persist?: boolean }
 declare const plugin: Plugin<[SatinPluginOptions?]>;
 export default plugin;
 

@@ -1,7 +1,7 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from "@angular/core";
-import { createFlow } from "satin-ui/flow";
+import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from "@angular/core";
+import { createFlow, type FlowEdge, type FlowGroup, type FlowNode } from "satin-ui/flow";
 
-const groups = [
+const groups: FlowGroup[] = [
   { id: "g-model", title: "01 · 基础模型与 LoRA 栈", x: 0, y: 0, w: 516, h: 358, hue: 248 },
   { id: "g-ref", title: "02 · 场景参考与空间控图", x: 14, y: 398, w: 502, h: 378, hue: 156 },
   { id: "g-prompt", title: "03 · 提示词编码与条件控图", x: 568, y: 8, w: 572, h: 362, hue: 28 },
@@ -9,7 +9,7 @@ const groups = [
   { id: "g-detail", title: "05 · 解码、人脸精修与 4K 超分", x: 1188, y: 12, w: 548, h: 382, hue: 208 },
   { id: "g-out", title: "06 · 关键帧预览与母带导出", x: 1192, y: 422, w: 544, h: 356, hue: 184 },
 ];
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "ckpt", x: 20, y: 46, w: 224, title: "CheckpointLoaderSimple", badge: "FP8", kind: "MODEL", outputs: ["MODEL", "CLIP", "VAE"], params: [["ckpt", "flux1-dev-fp8"]] },
   { id: "clip", x: 26, y: 214, w: 214, title: "DualCLIPLoader", badge: "T5", kind: "CLIP", outputs: ["CLIP"], params: [["clip1", "t5xxl_fp8"], ["clip2", "clip_l"]] },
   { id: "lora1", x: 278, y: 46, w: 216, title: "LoraLoader · 雨夜胶片", badge: "0.82", kind: "MODEL", inputs: [{ name: "model", type: "MODEL" }, { name: "clip", type: "CLIP" }], outputs: ["MODEL", "CLIP"], params: [["lora", "rain-cinema-v2"], ["strength", "0.82"]] },
@@ -41,7 +41,7 @@ const nodes = [
   { id: "vid", x: 1500, y: 468, w: 216, title: "Wan2.1 · VideoCombine", badge: "MP4", kind: "VIDEO", inputs: [{ name: "image", type: "IMAGE" }, { name: "cond", type: "CONDITIONING" }], outputs: ["VIDEO"], params: [["frames", "81 · 24fps"], ["codec", "H.265 · 4K"]] },
   { id: "save", x: 1500, y: 642, w: 216, title: "SaveVideo · 发行母带", badge: "OUT", kind: "out", inputs: [{ name: "video", type: "VIDEO" }], params: [["format", "ProRes 422"]] },
 ];
-const edges = [
+const edges: FlowEdge[] = [
   { from: "ckpt", fromPort: "MODEL", to: "lora1", toPort: "model", type: "MODEL" },
   { from: "ckpt", fromPort: "CLIP", to: "lora1", toPort: "clip", type: "CLIP" },
   { from: "lora1", fromPort: "MODEL", to: "rr_m", toPort: "in", type: "MODEL" },
@@ -83,14 +83,15 @@ const edges = [
 
 @Component({
   selector: "demo-flowstress-many",
-  standalone: true,
   template: `<div #host></div>`,
 })
-export class DemoFlowstressMany implements AfterViewInit, OnDestroy {
-  @ViewChild("host") host!: ElementRef<HTMLElement>;
-  private inst: ReturnType<typeof createFlow> | null = null;
-  ngAfterViewInit() {
-    this.inst = createFlow(this.host.nativeElement, { groups, nodes, edges, label: "ComfyUI 影视生图生视频工作流" });
+export class FlowstressManyComponent {
+  private host = viewChild.required<ElementRef<HTMLElement>>("host");
+  constructor() {
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      const f = createFlow(this.host().nativeElement, { groups, nodes, edges, label: "ComfyUI 影视生图生视频工作流" });
+      destroyRef.onDestroy(() => f?.destroy?.());
+    });
   }
-  ngOnDestroy() { this.inst?.destroy?.(); }
 }

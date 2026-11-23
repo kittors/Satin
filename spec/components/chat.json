@@ -447,7 +447,7 @@
     },
     {
       "name": "meta",
-      "type": "boolean | { time?: boolean; latency?: boolean; tps?: boolean }",
+      "type": "boolean | { time?: boolean; duration?: boolean; latency?: boolean; tps?: boolean }",
       "default": "true",
       "required": false,
       "desc": "AI 回复底栏元信息开关：控制时间戳、首字/总耗时与生成速率（tok/s）展示。",
@@ -456,6 +456,19 @@
         "react": "meta",
         "preact": "meta",
         "vue": "meta"
+      }
+    },
+    {
+      "name": "actions",
+      "type": "\"hover\" | \"latest\" | \"always\" | false | \"none\"",
+      "default": "\"hover\"",
+      "required": false,
+      "desc": "消息操作栏显隐策略：默认仅鼠标移入对应消息内容区域时平滑显现；支持 latest（最新一条常显）、always（全部常显）或 false / none（隐藏）。",
+      "names": {
+        "js": "actions",
+        "react": "actions",
+        "preact": "actions",
+        "vue": "actions"
       }
     },
     {
@@ -628,6 +641,13 @@
       "signature": "setRail(side: \"left\" | \"right\" | \"off\" | false): void",
       "returns": "void",
       "desc": "运行时动态切换侧边定位刻度轨的位置或隐藏。"
+    },
+    {
+      "name": "setActions",
+      "kind": "method",
+      "signature": "setActions(mode: \"hover\" | \"latest\" | \"always\" | false | \"none\"): void",
+      "returns": "void",
+      "desc": "运行时动态切换消息操作栏显隐策略。"
     },
     {
       "name": "fill",

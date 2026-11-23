@@ -9,7 +9,8 @@
 .sn-box-in:focus-within { border-color: var(--sn-focus); box-shadow: 0 0 0 3px var(--sn-ring); }
 .sn-box-in.sn-over, .sn-box-in.sn-over:focus-within { border-color: var(--sn-danger); box-shadow: 0 0 0 3px var(--sn-danger-ring); }
 .sn-box-in textarea { all: unset; box-sizing: border-box; width: 100%; padding: 10px 12px 4px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); white-space: pre-wrap; overflow-wrap: anywhere;
-  resize: none; overflow-y: auto; transition: height .14s var(--sn-ease-out); scrollbar-width: thin; }
+  resize: none; overflow-y: auto; transition: height .14s var(--sn-ease-out); }
+.sn-box-in textarea:not(.sn-sa-vp) { scrollbar-width: thin; }
 .sn-box-in textarea::placeholder { color: var(--sn-label3); transition: color .24s var(--sn-ease-out); }
 /* 刚发出去：占位提示先不出来，等发出去的字离开输入框再淡入，免得两行字叠在一起 */
 .sn-box-in textarea.sn-ph-hold::placeholder { color: transparent; transition: none; }
@@ -140,6 +141,7 @@ sn-tag-input { display: block; }
 [data-theme="dark"] .sn-cm-card:focus-within,
 [data-theme="dark"] .sn-composer.sn-recording > .sn-cm-card { box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), 0 8px 24px -6px rgba(0, 0, 0, .44); }
 .sn-composer textarea { padding: 14px 16px 6px; font-size: calc(14px * var(--sn-font-scale, 1)); line-height: 22px; }
+.sn-composer .sn-sa:has(> textarea) > .sn-sa-bar.sn-y { top: 12px; bottom: 4px; right: 4px; }
 .sn-composer textarea::placeholder { color: color-mix(in srgb, var(--sn-label3) 72%, transparent); }
 .sn-composer textarea:focus::placeholder { color: color-mix(in srgb, var(--sn-label3) 50%, transparent); }
 /* 附件：图片、视频是 56px 的缩略图块；音频、文档是一条。只用中性色：文件类型靠扩展名区分，不给每种类型配颜色（04 号 §3） */
@@ -211,9 +213,9 @@ sn-tag-input { display: block; }
 .sn-composer.sn-drop:not(:has(> .sn-cm-card))::after,
 .sn-composer.sn-drop > .sn-cm-card::after { content: "松开，添加到这条消息"; position: absolute; inset: 5px; z-index: 5; display: grid; place-items: center; border: 1.5px dashed var(--sn-label3); border-radius: 19px; background: color-mix(in srgb, var(--sn-raised) 94%, transparent); font: 500 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); pointer-events: none; animation: sn-drop-in .16s var(--sn-ease-out) both; }
 @keyframes sn-drop-in { from { opacity: 0; } }
-/* 输入框里的附件菜单往上弹（输入框在页面底部） */
-.sn-inline-menu.sn-up > .sn-menu { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: 0 4px; }
-.sn-inline-menu.sn-up.sn-open > .sn-menu { translate: 0; }
+/* 输入框里的附件菜单优先往上弹（上方放不下时由 JS 切到 .sn-down 翻向下方，不死板裁切） */
+.sn-inline-menu.sn-up > .sn-menu:not(.sn-down) { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: var(--sn-menu-dx, 0px) 4px; }
+.sn-inline-menu.sn-up.sn-open > .sn-menu:not(.sn-down) { translate: var(--sn-menu-dx, 0px) 0; }
 /* 底部一行永远不折行：全员严格统一 32px 高度，左右 32×32 圆形按钮与 24px 主卡圆角形成精确同心圆（16 + 8 = 24） */
 .sn-cm-bar { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; padding: 4px 8px 8px 8px; }
 .sn-cm-bar .sn-cm-add { --sn-h: 32px; --sn-icon: 16px; width: 32px; height: 32px; border-radius: 50%; color: var(--sn-label2); }
@@ -244,7 +246,6 @@ sn-tag-input { display: block; }
 .sn-cm-pick.sn-open > .sn-cm-ctx-i { background: var(--sn-b-ghost-active); color: var(--sn-label); }
 .sn-cm-ctx-i:focus-visible { box-shadow: 0 0 0 2px var(--sn-ring); }
 /* 模式 / 权限：极简无灰框，严格统一 32px 高度（与加号/语音/发送同一基准线） */
-.sn-cm-bar:has(> .sn-cm-mode, > .sn-cm-pick[data-pick="mode"]) > .sn-inline-menu { min-width: 0; }
 .sn-cm-bar .sn-tag.sn-cm-mode { flex: none; margin-left: 2px; height: 32px; padding: 0 10px; border-radius: var(--sn-r-full); background: transparent; box-shadow: none; font: 500 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); gap: 6px; }
 .sn-cm-bar .sn-tag.sn-cm-mode.sn-warn { color: var(--sn-warning); background: transparent; }
 .sn-cm-bar .sn-tag.sn-cm-mode.sn-ok { color: var(--sn-success); background: transparent; }
@@ -279,7 +280,8 @@ sn-tag-input { display: block; }
 .sn-cm-tight .sn-cm-bar .sn-ta-count { margin-right: 2px; }
 .sn-cm-tight .sn-cm-mode { padding: 0 6px; gap: 4px; }
 .sn-cm-tight .sn-cm-bar .sn-cm-model { padding-left: 6px; padding-right: 6px; }
-.sn-cm-models.sn-inline-menu.sn-up > .sn-menu { left: auto; right: 0; min-width: 200px; transform-origin: bottom right; }
+.sn-cm-models.sn-inline-menu.sn-up > .sn-menu:not(.sn-start) { left: auto; right: 0; min-width: 200px; transform-origin: bottom right; }
+.sn-cm-models.sn-inline-menu.sn-up > .sn-menu.sn-down:not(.sn-start) { transform-origin: top right; }
 .sn-cm-model { position: relative; }
 /* 能点开的部件：按钮上的字换的时候旧字、新字各自动（要是块级才动得了），箭头点开时转过来；菜单从按钮那里缩放 + 淡入展开，收起反过来 */
 .sn-cm-lbl { display: inline-block; }

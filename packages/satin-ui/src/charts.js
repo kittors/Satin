@@ -3,6 +3,10 @@
 import { reduced } from "./core.js";
 import { icon } from "./icons.js";
 import { defineComponent } from "./lifecycle.js";
+import { scoped, intlLocale } from "./i18n.js";
+import I18N_DEFAULTS from "./locales/zh-CN/charts.js";
+
+const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 
 const EASE_OUT = (t) => 1 - (1 - t) ** 3;
 const EASE_STRONG = (t) => (t >= 1 ? 1 : 1 - (1 - t) ** 4);
@@ -12,7 +16,7 @@ const lerp = (a, b, k) => a + (b - a) * k;
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const fmtNum = (v, unit = "") => {
   if (v == null || Number.isNaN(+v)) return "—";
-  const n = +v, s = Math.abs(n) >= 1000 ? n.toLocaleString("zh-CN", { maximumFractionDigits: 1 }) : Number.isInteger(n) ? String(n) : n.toFixed(1);
+  const n = +v, s = Math.abs(n) >= 1000 ? n.toLocaleString(intlLocale(), { maximumFractionDigits: 1 }) : Number.isInteger(n) ? String(n) : n.toFixed(1);
   return unit ? `${s}${unit}` : s;
 };
 
@@ -466,7 +470,7 @@ function mountBarChart(root, opts = {}) {
       const c = T.pick(s.color, si), v = s.values?.[idx] ?? 0;
       return `<div class="sn-ch-tip-row"><i class="sn-ch-tip-dot" style="background:${c}"></i><span class="sn-ch-tip-name">${esc(s.name)}</span><span class="sn-ch-tip-val">${esc(fmtNum(v, s.unit ?? cfg.unit))}</span></div>`;
     }).filter(Boolean).join("");
-    const sub = cfg.onSelect ? `<div class="sn-ch-tip-sub">${selGrp === idx ? "再次点击取消筛选" : "点击按该类筛选"}</div>` : "";
+    const sub = cfg.onSelect ? `<div class="sn-ch-tip-sub">${selGrp === idx ? tt("charts.0") : tt("charts.1")}</div>` : "";
     tip.innerHTML = `<div class="sn-ch-tip-hd">${esc(cfg.labels[idx])}</div><div class="sn-ch-tip-rows">${rows}</div>${sub}`;
     tip.classList.add("sn-ch-vis");
     const pw = Math.max(10, stage.clientWidth - pad.l - pad.r), cx = pad.l + ((idx + 0.5) / cfg.labels.length) * pw;
@@ -514,7 +518,7 @@ export const createBarChart = /* @__PURE__ */ defineComponent({
 // 3. 环形占比图（createDonutChart）
 // =========================================================================
 function mountDonutChart(root, opts = {}) {
-  let cfg = { items: [], totalLabel: "总计", unit: "", activeIndex: -1, ...opts };
+  let cfg = { items: [], totalLabel: tt("charts.2"), unit: "", activeIndex: -1, ...opts };
   root.classList.add("sn-ch", "sn-ch-donut");
   root.innerHTML = `<div class="sn-ch-donut-wrap"><div class="sn-ch-donut-box"><canvas class="sn-ch-cv"></canvas><div class="sn-ch-donut-mid"><b class="sn-ch-donut-val"></b><span class="sn-ch-donut-lbl"></span></div></div><div class="sn-ch-donut-list"></div></div>`;
   const box = root.querySelector(".sn-ch-donut-box"), cv = root.querySelector(".sn-ch-cv"), valEl = root.querySelector(".sn-ch-donut-val"), lblEl = root.querySelector(".sn-ch-donut-lbl"), listEl = root.querySelector(".sn-ch-donut-list");
@@ -675,15 +679,15 @@ function pointInPoly(px, py, poly) {
 }
 
 const VIEWS_3D = {
-  iso: { yaw: -0.64, pitch: 0.56, label: "等轴测" },
-  top: { yaw: -0.45, pitch: 1.02, label: "俯视" },
-  front: { yaw: -0.14, pitch: 0.34, label: "正面" },
+  iso: { yaw: -0.64, pitch: 0.56 },
+  top: { yaw: -0.45, pitch: 1.02 },
+  front: { yaw: -0.14, pitch: 0.34 },
 };
 
 function mountChart3D(root, opts = {}) {
   let cfg = { rows: [], cols: [], values: [], height: 320, unit: "", rowColors: null, interactive: true, ...opts };
   root.classList.add("sn-ch", "sn-ch3d");
-  root.innerHTML = `<div class="sn-ch-top"><div class="sn-ch-legend"></div><div class="sn-ch-tools"><button type="button" class="sn-ch-btn sn-ch-on" data-v3="iso">等轴测</button><button type="button" class="sn-ch-btn" data-v3="top">俯视</button><button type="button" class="sn-ch-btn" data-v3="front">正面</button><button type="button" class="sn-ch-btn" data-v3="replay">重播</button></div></div><div class="sn-ch-stage" style="--sn-ch-h:${typeof cfg.height === "number" ? cfg.height + "px" : cfg.height}"><canvas class="sn-ch-cv"></canvas><div class="sn-ch-hint">拖拽旋转 3D 视角 · 悬停查看柱体</div><div class="sn-ch-tip" role="status" aria-live="polite"></div></div>`;
+  root.innerHTML = `<div class="sn-ch-top"><div class="sn-ch-legend"></div><div class="sn-ch-tools"><button type="button" class="sn-ch-btn sn-ch-on" data-v3="iso">${tt("charts.3")}</button><button type="button" class="sn-ch-btn" data-v3="top">${tt("charts.4")}</button><button type="button" class="sn-ch-btn" data-v3="front">${tt("charts.5")}</button><button type="button" class="sn-ch-btn" data-v3="replay">${tt("charts.6")}</button></div></div><div class="sn-ch-stage" style="--sn-ch-h:${typeof cfg.height === "number" ? cfg.height + "px" : cfg.height}"><canvas class="sn-ch-cv"></canvas><div class="sn-ch-hint">${tt("charts.7")}</div><div class="sn-ch-tip" role="status" aria-live="polite"></div></div>`;
   const legEl = root.querySelector(".sn-ch-legend"), toolsEl = root.querySelector(".sn-ch-tools"), stage = root.querySelector(".sn-ch-stage"), cv = root.querySelector(".sn-ch-cv"), tip = root.querySelector(".sn-ch-tip");
   const tr = createThemeReader(root);
   let T = tr.read(), raf = 0, dead = false;
@@ -955,7 +959,7 @@ function mountChart3D(root, opts = {}) {
       hoverKey = nextKey;
       if (found) {
         const { b, color, topC } = found;
-        tip.innerHTML = `<div class="sn-ch-tip-hd">${esc(cfg.cols[b.c])} · ${esc(cfg.rows[b.r])}</div><div class="sn-ch-tip-rows"><div class="sn-ch-tip-row"><i class="sn-ch-tip-dot" style="background:${color}"></i><span class="sn-ch-tip-name">${esc(cfg.metricLabel || "数值")}</span><span class="sn-ch-tip-val">${esc(fmtNum(b.v, cfg.unit))}</span></div></div>`;
+        tip.innerHTML = `<div class="sn-ch-tip-hd">${esc(cfg.cols[b.c])} · ${esc(cfg.rows[b.r])}</div><div class="sn-ch-tip-rows"><div class="sn-ch-tip-row"><i class="sn-ch-tip-dot" style="background:${color}"></i><span class="sn-ch-tip-name">${esc(cfg.metricLabel || tt("charts.8"))}</span><span class="sn-ch-tip-val">${esc(fmtNum(b.v, cfg.unit))}</span></div></div>`;
         tip.classList.add("sn-ch-vis");
         positionTip(tip, stage, topC.x, topC.y);
       } else {

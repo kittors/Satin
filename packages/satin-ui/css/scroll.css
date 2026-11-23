@@ -7,13 +7,13 @@
 @property --sn-sa-l { syntax: "<length>"; inherits: false; initial-value: 0px; }
 @property --sn-sa-r { syntax: "<length>"; inherits: false; initial-value: 0px; }
 @layer satin {
-.sn-sa { min-height: 0; min-width: 0; timeline-scope: --sn-sa-y, --sn-sa-x; --sn-sa-fade: 24px; }
+.sn-sa { min-height: 0; min-width: 0; isolation: isolate; timeline-scope: --sn-sa-y, --sn-sa-x; --sn-sa-fade: 24px; }
 /* 包在外面的滚动区域要做定位容器；套在元素里面的（inner：菜单、侧栏目录）不改元素自己的定位——菜单是 absolute / fixed，目录是 sticky */
 .sn-sa:not(.sn-sa-in) { position: relative; }
-.sn-sa-vp { overflow: auto; overscroll-behavior: contain; scrollbar-width: none; scroll-timeline: --sn-sa-y y, --sn-sa-x x; }
-.sn-sa-vp::-webkit-scrollbar { display: none; }
+.sn-sa-vp, .sn-sa > .sn-sa-vp { overflow: auto; overscroll-behavior: contain; scrollbar-width: none; scroll-timeline: --sn-sa-y y, --sn-sa-x x; }
+.sn-sa-vp::-webkit-scrollbar, .sn-sa > .sn-sa-vp::-webkit-scrollbar { display: none; }
 
-/* 边缘渐隐：滚动多少，渐隐带就长多宽（最多 --sa-fade），滚到头就消失 */
+/* 边缘渐隐：滚动多少，渐隐带就长多宽（最多 --sa-fade），滚到头就消失；渐隐只作用于内容视口，绝不影响独立层上的滚动条 */
 @keyframes sn-sa-t { from { --sn-sa-t: 0px; } to { --sn-sa-t: var(--sn-sa-fade, 24px); } }
 @keyframes sn-sa-b { from { --sn-sa-b: var(--sn-sa-fade, 24px); } to { --sn-sa-b: 0px; } }
 @keyframes sn-sa-l { from { --sn-sa-l: 0px; } to { --sn-sa-l: var(--sn-sa-fade, 24px); } }
@@ -21,9 +21,13 @@
 .sn-sa-vp.sn-fy { animation: sn-sa-t linear both, sn-sa-b linear both; animation-timeline: --sn-sa-y, --sn-sa-y; animation-range: 0 var(--sn-sa-fade, 24px), calc(100% - var(--sn-sa-fade, 24px)) 100%;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sn-sa-t), #000 calc(100% - var(--sn-sa-b)), transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sn-sa-t), #000 calc(100% - var(--sn-sa-b)), transparent 100%); }
+.sn-sa-vp.sn-fy.sn-no-b:not(.sn-fx) { animation: sn-sa-t linear both; animation-timeline: --sn-sa-y; animation-range: 0 var(--sn-sa-fade, 24px); }
+.sn-sa-vp.sn-fy.sn-no-t:not(.sn-fx) { animation: sn-sa-b linear both; animation-timeline: --sn-sa-y; animation-range: calc(100% - var(--sn-sa-fade, 24px)) 100%; }
 .sn-sa-vp.sn-fx { animation: sn-sa-l linear both, sn-sa-r linear both; animation-timeline: --sn-sa-x, --sn-sa-x; animation-range: 0 var(--sn-sa-fade, 24px), calc(100% - var(--sn-sa-fade, 24px)) 100%;
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--sn-sa-l), #000 calc(100% - var(--sn-sa-r)), transparent 100%);
   mask-image: linear-gradient(to right, transparent 0, #000 var(--sn-sa-l), #000 calc(100% - var(--sn-sa-r)), transparent 100%); }
+.sn-sa-vp.sn-fx.sn-no-r:not(.sn-fy) { animation: sn-sa-l linear both; animation-timeline: --sn-sa-x; animation-range: 0 var(--sn-sa-fade, 24px); }
+.sn-sa-vp.sn-fx.sn-no-l:not(.sn-fy) { animation: sn-sa-r linear both; animation-timeline: --sn-sa-x; animation-range: calc(100% - var(--sn-sa-fade, 24px)) 100%; }
 .sn-sa-vp.sn-fy.sn-fx { animation: sn-sa-t linear both, sn-sa-b linear both, sn-sa-l linear both, sn-sa-r linear both; animation-timeline: --sn-sa-y, --sn-sa-y, --sn-sa-x, --sn-sa-x;
   animation-range: 0 var(--sn-sa-fade, 24px), calc(100% - var(--sn-sa-fade, 24px)) 100%, 0 var(--sn-sa-fade, 24px), calc(100% - var(--sn-sa-fade, 24px)) 100%;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sn-sa-t), #000 calc(100% - var(--sn-sa-b)), transparent 100%), linear-gradient(to right, transparent 0, #000 var(--sn-sa-l), #000 calc(100% - var(--sn-sa-r)), transparent 100%);
@@ -32,8 +36,8 @@
 /* 只开一边：把另一边的渐隐宽度钉死为 0（动画只给开着的那边） */
 .sn-sa-vp.sn-no-t { --sn-sa-t: 0px !important; } .sn-sa-vp.sn-no-b { --sn-sa-b: 0px !important; } .sn-sa-vp.sn-no-l { --sn-sa-l: 0px !important; } .sn-sa-vp.sn-no-r { --sn-sa-r: 0px !important; }
 
-/* 悬浮滚动条：平时 5px、半透明；悬停或拖动时变 8px、加深；不滚动 0.7 秒后淡出 */
-.sn-sa-bar { position: absolute; z-index: 6; opacity: 0; transition: opacity .25s var(--sn-ease-out) .5s; touch-action: none; }
+/* 悬浮滚动条：独立于内容视口与边缘渐隐遮罩之外，永远保持清晰锐利；平时 5px、半透明；悬停或拖动时变 8px、加深；不滚动 0.7 秒后淡出 */
+.sn-sa-bar { position: absolute; z-index: 6; opacity: 0; pointer-events: auto; transition: opacity .25s var(--sn-ease-out) .5s; touch-action: none; }
 .sn-sa.sn-active > .sn-sa-bar, .sn-sa-bar.sn-drag { opacity: 1; transition-delay: 0s; transition-duration: .12s; }
 @media (hover: hover) {
 .sn-sa:hover > .sn-sa-bar { opacity: 1; transition-delay: 0s; transition-duration: .12s; } }

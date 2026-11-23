@@ -24,11 +24,12 @@ export function scrollArea(el, options = {}) {
   if (el._sa) { if (options && Object.keys(options).length) el._sa.set(options); return el._sa; } // 接过的：改选项（标记里带着 sa-vp 类、但还没接过的照常接）
   const o = { fade: "y", size: undefined, inner: false, bar: "auto", barSize: 5, barInset: 1, overscroll: "auto", wheel: "auto", ...options };
   let box, vp;
-  const elCls0 = el.className, elPad0 = el.style.padding, elOv0 = el.style.overflow, osX0 = el.style.overscrollBehaviorX, osY0 = el.style.overscrollBehaviorY; // 销毁时还原
+  const elCls0 = el.className, elPad0 = el.style.padding, elOv0 = el.style.overflow, elPos0 = el.style.position, osX0 = el.style.overscrollBehaviorX, osY0 = el.style.overscrollBehaviorY; // 销毁时还原
   if (o.inner) {
     box = el; vp = document.createElement("div");
     const cs = getComputedStyle(el);
     vp.style.padding = cs.padding; vp.style.maxHeight = "inherit"; vp.style.boxSizing = "border-box";
+    if (cs.position === "static") el.style.position = "relative";
     el.style.padding = "0"; el.style.overflow = "hidden";
     while (el.firstChild) vp.append(el.firstChild);
     el.append(vp);
@@ -63,8 +64,10 @@ export function scrollArea(el, options = {}) {
     const fy = vp.scrollHeight - vp.clientHeight, fx = vp.scrollWidth - vp.clientWidth, w = fadeW();
     $thumb(by).style.translate = `0 ${fy > 0 ? (vp.scrollTop / fy) * (geo.y.tr - geo.y.th) : 0}px`;
     $thumb(bx).style.translate = `${fx > 0 ? (vp.scrollLeft / fx) * (geo.x.tr - geo.x.th) : 0}px 0`;
-    vp.style.setProperty("--sn-sa-t", Math.min(w, vp.scrollTop) + "px"); vp.style.setProperty("--sn-sa-b", Math.min(w, Math.max(0, fy - vp.scrollTop)) + "px");
-    vp.style.setProperty("--sn-sa-l", Math.min(w, vp.scrollLeft) + "px"); vp.style.setProperty("--sn-sa-r", Math.min(w, Math.max(0, fx - vp.scrollLeft)) + "px");
+    vp.style.setProperty("--sn-sa-t", (vp.classList.contains("sn-no-t") ? 0 : Math.min(w, vp.scrollTop)) + "px");
+    vp.style.setProperty("--sn-sa-b", (vp.classList.contains("sn-no-b") ? 0 : Math.min(w, Math.max(0, fy - vp.scrollTop))) + "px");
+    vp.style.setProperty("--sn-sa-l", (vp.classList.contains("sn-no-l") ? 0 : Math.min(w, vp.scrollLeft)) + "px");
+    vp.style.setProperty("--sn-sa-r", (vp.classList.contains("sn-no-r") ? 0 : Math.min(w, Math.max(0, fx - vp.scrollLeft))) + "px");
   }
   const $thumb = (b) => b.firstElementChild;
   if (js) box.classList.add("sn-js-driven");
@@ -137,7 +140,7 @@ export function scrollArea(el, options = {}) {
     if (dead) return; dead = true;
     cancelAnimationFrame(raf); raf = 0; ela.release?.();
     by.remove(); bx.remove();
-    if (o.inner) { while (vp.firstChild) el.insertBefore(vp.firstChild, vp); vp.remove(); el.style.padding = elPad0; el.style.overflow = elOv0; }
+    if (o.inner) { while (vp.firstChild) el.insertBefore(vp.firstChild, vp); vp.remove(); el.style.padding = elPad0; el.style.overflow = elOv0; el.style.position = elPos0; }
     else if (box.parentNode) { box.parentNode.insertBefore(el, box); box.remove(); }
     if (o.inner) { el.className = elCls0; if (!elCls0) el.removeAttribute("class"); }
     else {

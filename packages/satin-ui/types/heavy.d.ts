@@ -29,7 +29,9 @@ export interface ChatProps extends ComposerParts {
   /** 侧边迷你定位刻度轨：false 关闭 | "left" | "right" | { side?: "left" | "right"; max?: number }（默认 "left"） */
   rail?: false | "left" | "right" | { side?: "left" | "right"; max?: number };
   /** 回复底栏元信息（时间戳 / 耗时 / 吞吐速率 tok/s）配置 */
-  meta?: boolean | { time?: boolean; latency?: boolean; tps?: boolean };
+  meta?: boolean | { time?: boolean; duration?: boolean; latency?: boolean; tps?: boolean };
+  /** 消息操作栏显隐策略："hover"（默认：悬停对应消息内容区才显示）| "latest"（最新一条 AI 回复常显）| "always"（全部常显）| false / "none"（隐藏） */
+  actions?: "hover" | "latest" | "always" | false | "none";
   /** 流式输出光标样式："dot" | "bar" | false */
   caret?: "dot" | "bar" | false;
 }
@@ -47,6 +49,8 @@ export interface ChatApi { send(text: string): void; receive(item: Partial<ChatI
   scrollToId(id: string | number): void;
   /** 动态切换侧边刻度轨位置或隐藏 */
   setRail(side: "left" | "right" | "off" | false): void;
+  /** 动态切换消息操作栏显隐策略 */
+  setActions(mode: "hover" | "latest" | "always" | false | "none"): void;
   /** 填一段字进底部输入框（字淡入、光标在最后），不发 */
   fill(text: string): void;
   /** 新对话那一块（empty 给 true 时自己往里画）；没有空状态时是 null */

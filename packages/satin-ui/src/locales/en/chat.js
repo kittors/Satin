@@ -28,5 +28,6 @@ export default {
   "chat.29": "Arguments",
   "chat.30": "Result",
   "chat.31": "Thread navigation",
+  "chat.file": "File",
   "chat.empty": "What can I help with?"
 };

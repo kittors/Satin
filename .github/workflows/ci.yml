@@ -20,6 +20,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm test:node
       - run: pnpm test:types
+      - run: pnpm test:cli
+      - run: pnpm build:css
       # 浏览器测试用系统里的 Chrome（GitHub 的 ubuntu 镜像自带），Playwright 只装依赖库
       - run: npx playwright install-deps chromium
       - name: 浏览器测试

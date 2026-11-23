@@ -26,6 +26,7 @@
 .sn-pk-panel { position: absolute; z-index: 30; left: 0; top: calc(100% + 6px); padding: 12px; border-radius: var(--sn-r-xl); background: var(--sn-menu-bg); box-shadow: var(--sn-menu-shadow);
   transform-origin: top left; opacity: 0; scale: .97; translate: 0 -4px; pointer-events: none; visibility: hidden;
   transition: opacity .1s var(--sn-ease-in), scale 0s linear .1s, translate 0s linear .1s, visibility 0s linear .1s; }
+.sn-pk-panel.sn-up { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: 0 4px; }
 .sn-pk.sn-open > .sn-pk-panel { opacity: 1; scale: 1; translate: 0; pointer-events: auto; visibility: visible;
   transition: opacity 0s, scale .14s var(--sn-ease-out-strong), translate .14s var(--sn-ease-out-strong), visibility 0s; }
 .sn-pk-foot { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; }

@@ -7,8 +7,8 @@
 :lang(zh) { text-autospace: normal; }
 /* 文件名、代码这类整体字符串不插空：Chrome 会在"第三集"和".mp4"之间也留空 */
 code, kbd { text-autospace: no-autospace; }
-html { scroll-behavior: smooth; scroll-padding-top: 72px; }
-body { background: var(--sn-canvas); color: var(--sn-label); font: calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; overflow-x: clip; }
+body { background: var(--sn-canvas); color: var(--sn-label); font: calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
 /* 换主题：整页旧画面和新画面交叉淡化（View Transitions），在合成线程上播；不要给每个元素加颜色过渡 */
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; animation-timing-function: var(--sn-ease-in-out); }
 }

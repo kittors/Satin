@@ -78,9 +78,11 @@ export interface DialogProps { open: boolean; onClose?(): void; title?: React.Re
 export function Dialog(p: DialogProps): React.ReactElement;
 export type DrawerProps = { open: boolean; onClose?(): void; title?: React.ReactNode; footer?: React.ReactNode; children?: React.ReactNode; className?: string };
 export function Drawer(p: DrawerProps): React.ReactElement;
-/** 应用根部装一次页面级行为，并支持声明式配置全局深浅模式与主题：<SatinProvider mode="auto" theme={{ accent: "blue", radius: "8" }}><App /></SatinProvider> */
-export interface SatinProviderProps { mode?: "auto" | "light" | "dark"; theme?: Partial<ThemeChoice>; /** 是否同步持久化到 localStorage（默认 false，不覆盖用户已选偏好） */ persist?: boolean; children?: React.ReactNode }
+/** 应用根部装一次页面级行为，并支持声明式配置全局深浅模式、主题与多语言：<SatinProvider mode="auto" locale="en" messages={en} theme={{ accent: "blue", radius: "8" }}><App /></SatinProvider> */
+export interface SatinProviderProps { mode?: "auto" | "light" | "dark"; theme?: Partial<ThemeChoice>; /** 界面语言（如 "zh-CN" | "en" | 自定义语言代码） */ locale?: string; /** 语言消息表（可传入 satin-ui/locales/en 或局部覆写表） */ messages?: Record<string, string>; /** 是否同步持久化到 localStorage（默认 false，不覆盖用户已选偏好） */ persist?: boolean; children?: React.ReactNode }
 export function SatinProvider(p: SatinProviderProps): React.ReactNode;
+/** 响应式多语言 Hook：读取当前语言并切换（支持 setLocale("en", en) / setLocale("zh-CN")） */
+export function useLocale(): { locale: string; setLocale(nameOrMessages: string | Record<string, string>, messages?: Record<string, string>): void };
 /** 局部主题作用域：<ThemeScope mode="dark" accent="blue">…</ThemeScope>，仅作用于当前容器 */
 export type ThemeScopeProps = React.HTMLAttributes<HTMLElement> & Partial<ThemeChoice> & { as?: keyof React.JSX.IntrinsicElements; mode?: "light" | "dark" };
 export const ThemeScope: React.ForwardRefExoticComponent<ThemeScopeProps & React.RefAttributes<HTMLElement>>;

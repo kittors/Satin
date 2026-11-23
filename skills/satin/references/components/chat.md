@@ -1074,7 +1074,8 @@ export default function Storyboard() {
 | `models` | `ComposerOption[]` | — | 否 | 模型选择（发送按钮左边）：每项 `{ value, label }`，label 写成"名称 · 档位"；点开往上长菜单、选中项打勾，键盘上下选、回车定；换了以后按钮上的字平滑换掉；底部一行放不下全名时按钮上只显示档位（每项的 `short`，不写就取 label 里最后一个"·"后面那段），全名在菜单里、也是读屏名。 | createXxx 选项：`models`；React：`models`；Preact：`models`；Vue：`models` |
 | `model` | `string` | models 的第一项 | 否 | 现在用的模型（models 里的 value）。<br>React、Preact：现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。<br>Vue：现在用的模型：`v-model:model` 绑定。 | createXxx 选项：`model`；React：`model`；Preact：`model`；Vue：`model（v-model:model）` |
 | `rail` | `false \| "left" \| "right" \| { side?: "left" \| "right"; max?: number }` | "left" | 否 | 侧边迷你定位刻度轨：支持放在左侧、右侧或关闭，悬停预览消息摘要、点击平滑跳转。 | createXxx 选项：`rail`；React：`rail`；Preact：`rail`；Vue：`rail` |
-| `meta` | `boolean \| { time?: boolean; latency?: boolean; tps?: boolean }` | true | 否 | AI 回复底栏元信息开关：控制时间戳、首字/总耗时与生成速率（tok/s）展示。 | createXxx 选项：`meta`；React：`meta`；Preact：`meta`；Vue：`meta` |
+| `meta` | `boolean \| { time?: boolean; duration?: boolean; latency?: boolean; tps?: boolean }` | true | 否 | AI 回复底栏元信息开关：控制时间戳、首字/总耗时与生成速率（tok/s）展示。 | createXxx 选项：`meta`；React：`meta`；Preact：`meta`；Vue：`meta` |
+| `actions` | `"hover" \| "latest" \| "always" \| false \| "none"` | "hover" | 否 | 消息操作栏显隐策略：默认仅鼠标移入对应消息内容区域时平滑显现；支持 latest（最新一条常显）、always（全部常显）或 false / none（隐藏）。 | createXxx 选项：`actions`；React：`actions`；Preact：`actions`；Vue：`actions` |
 | `caret` | `"dot" \| "bar" \| false` | "dot" | 否 | 流式输出末尾跟随光标样式：柔和呼吸圆点、竖线光标或关闭。 | createXxx 选项：`caret`；React：`caret`；Preact：`caret`；Vue：`caret` |
 | `className / style / id` | `string / CSSProperties / string` | — | 否 | 加在对话框容器上（默认高 680、最宽 840）。 | React：`className / style / id`；Preact：`class / style / id` |
 
@@ -1105,6 +1106,7 @@ export default function Storyboard() {
 | `scrollToOldest` | `scrollToOldest(): void` | 平滑滚到最早一条。 |
 | `scrollToId` | `scrollToId(id: string \| number): void` | 平滑滚动定位到指定消息 ID。 |
 | `setRail` | `setRail(side: "left" \| "right" \| "off" \| false): void` | 运行时动态切换侧边定位刻度轨的位置或隐藏。 |
+| `setActions` | `setActions(mode: "hover" \| "latest" \| "always" \| false \| "none"): void` | 运行时动态切换消息操作栏显隐策略。 |
 | `fill` | `fill(text: string): void` | 把一段字填进底部输入框（字淡入、拿到焦点、光标在最后），不发。新对话的建议点了就是这样。 |
 | `emptyEl` | `readonly emptyEl: HTMLElement \| null` | 新对话那一块的元素（empty 给 true 时自己往里画）；没有空状态时是 null。 |
 

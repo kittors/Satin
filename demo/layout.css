@@ -37,9 +37,9 @@
 .sn-lo-page { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; max-width: 960px; margin: 0 auto; }
 .sn-lo-page.sn-wide { max-width: none; }
 .sn-lo-ph { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
-.sn-lo-two { display: grid; grid-template-columns: 1fr; gap: var(--sn-gutter); }
+.sn-lo-two { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sn-gutter); }
 .sn-lo-two .sn-lo-block { height: 120px; }
-@container lo (min-width: 720px) { .sn-lo-two { grid-template-columns: 1fr 1fr; } }
+@container lo (min-width: 720px) { .sn-lo-two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .sn-lo-grid { position: absolute; z-index: 2; inset: 0 var(--sn-margin); display: none; grid-template-columns: repeat(var(--sn-cols), 1fr); gap: var(--sn-gutter); pointer-events: none; }
 .sn-lo-in.sn-show-grid .sn-lo-grid { display: grid; }
 .sn-lo-grid i { border-radius: 0 !important; background: rgba(255, 59, 48, .07); box-shadow: inset 1px 0 rgba(255, 59, 48, .22), inset -1px 0 rgba(255, 59, 48, .22); }
@@ -70,7 +70,7 @@
 @container lo (min-width: 1280px) { .sn-lo-shell { grid-template: "side top insp" 52px "side main insp" 1fr / 232px 1fr 320px; } .sn-lo-shell > .sn-lo-insp { display: flex; } }
 
 /* ———— 2. 三栏：侧栏 + 二级栏（列表）+ 详情。窄的时候只剩列表，点开详情盖上来 ———— */
-.sn-lo-split { grid-template-columns: 1fr; }
+.sn-lo-split { grid-template-columns: minmax(0, 1fr); }
 .sn-lo-list { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 12px; overflow: hidden; background: var(--sn-raised); }
 .sn-lo-list .sn-lo-search { height: 28px; margin-bottom: 8px; border-radius: 14px !important; background: var(--sn-fill-subtle); }
 .sn-lo-row { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 8px; border-radius: 8px; }
@@ -87,12 +87,12 @@
 @container lo (min-width: 1280px) { .sn-lo-split { grid-template-columns: 232px 280px 1fr; } }
 
 /* ———— 3. 卡片网格：不写死列数，最小卡宽 260 + auto-fill；列间距 16、行间距 24 ———— */
-.sn-lo-cards { grid-template-columns: 1fr; }
+.sn-lo-cards { grid-template-columns: minmax(0, 1fr); }
 .sn-lo-cardgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px 16px; }
 .sn-lo-card { display: flex; flex-direction: column; gap: 8px; padding: 10px 10px 14px; border-radius: 12px; background: var(--sn-raised); box-shadow: 0 0 0 1px var(--sn-line), 0 1px 2px rgba(0, 0, 0, .04); }
 
 /* ———— 4. 仪表盘：块按栅格列数跨（统计卡 compact 4 列 = 整行、regular 4 列 = 半行、wide 3 列 = 四分之一） ———— */
-.sn-lo-dash { grid-template-columns: 1fr; }
+.sn-lo-dash { grid-template-columns: minmax(0, 1fr); }
 .sn-lo-dgrid { display: grid; grid-template-columns: repeat(var(--sn-cols), minmax(0, 1fr)); gap: var(--sn-gutter); }
 .sn-lo-dgrid > * { grid-column: span 4; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
 .sn-lo-stat { height: 84px; } .sn-lo-stat .sn-lo-num { width: 56%; height: 20px; border-radius: 5px !important; background: color-mix(in srgb, var(--sn-label) 72%, transparent); }
@@ -106,11 +106,11 @@
 @container lo (min-width: 1200px) { .sn-lo-stat { grid-column: span 3; } .sn-lo-chart { grid-column: span 8; } .sn-lo-dlist { grid-column: span 4; } .sn-lo-dtable { grid-column: span 12; } }
 
 /* ———— 5. 阅读页：最大宽 960 居中，两边随断点留边距 ———— */
-.sn-lo-read { grid-template-columns: 1fr; }
+.sn-lo-read { grid-template-columns: minmax(0, 1fr); }
 .sn-lo-article { gap: 12px; padding-top: 16px; }
 
 /* ———— 6. 表单：最大宽 640；720 起标签在左（120），窄的时候标签在上 ———— */
-.sn-lo-form { grid-template-columns: 1fr; }
+.sn-lo-form { grid-template-columns: minmax(0, 1fr); }
 .sn-lo-formwrap { max-width: 640px; gap: 16px; padding-top: 8px; }
 .sn-lo-field { display: grid; gap: 8px; }
 .sn-lo-label { width: 72px; height: 10px; background: color-mix(in srgb, var(--sn-label) 40%, transparent); }

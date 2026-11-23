@@ -1,7 +1,7 @@
 {
   "name": "satin-cli",
   "version": "0.1.0",
-  "description": "Satin 的命令行工具：一条命令建好用 Satin 的项目（9 种框架），装好给编码助手的技能和 AGENTS.md，拷页面配方，跑去 AI 味检查，查项目配置",
+  "description": "CLI for Satin UI: scaffold apps across 9 frameworks, install AI coding skills & AGENTS.md, copy page recipes, run anti-AI-slop design audits, and verify project setup.",
   "type": "module",
   "license": "MIT",
   "homepage": "https://github.com/kittors/Satin",

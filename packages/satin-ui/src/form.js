@@ -1,4 +1,6 @@
 import { TICK, showTip, hideTip, tipTarget } from "./core.js";
+import { onCleanup } from "./lifecycle.js";
+import { hitAny, pushDismiss, dropDismiss } from "./dismiss.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/form.js";
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
@@ -21,7 +23,7 @@ export function bezier(x1, y1, x2, y2) {
   };
 }
 export const EASE_CSS = { out: "cubic-bezier(0, 0, .58, 1)", outStrong: "cubic-bezier(.22, 1, .36, 1)", overshoot: "cubic-bezier(.34, 1.56, .64, 1)", inOut: "cubic-bezier(.42, 0, .58, 1)" };
-export const EASE = { out: bezier(0, 0, .58, 1), outStrong: bezier(.22, 1, .36, 1), overshoot: bezier(.34, 1.56, .64, 1), inOut: bezier(.42, 0, .58, 1) };
+export const EASE = { out: /* @__PURE__ */ bezier(0, 0, .58, 1), outStrong: /* @__PURE__ */ bezier(.22, 1, .36, 1), overshoot: /* @__PURE__ */ bezier(.34, 1.56, .64, 1), inOut: /* @__PURE__ */ bezier(.42, 0, .58, 1) };
 const calm = () => document.documentElement.classList.contains("sn-reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;
 // 勾上那一下的"弹"：缩到 88% 再弹回，两段都用回弹曲线（Canvas 版按这个函数画）
 export const popScale = (t) => (t < .4 ? 1 - .12 * EASE.overshoot(t / .4) : .88 + .12 * EASE.overshoot((t - .4) / .6));
@@ -95,23 +97,41 @@ export const prepBusy = (btn) => { if (!btn.querySelector(".sn-label")) btn.inne
 //   菜单按钮的触发器写了 data-prefix（比如"排序："），选中后按钮文字变成 前缀 + 条目文字。
 // mountSelect(元素, { onChange(value, item) })：返回 { open(), close(refocus), value, set(value) }；选中时还在元素上发 select 事件（detail: { value, item }）
 const selects = new Set();
-// 销毁时把它从"点外面就收起"的名单里拿掉
+// 销毁时把它从登记表里拿掉
 export const forgetSelect = (api) => selects.delete(api);
 export function mountSelect(h, { onChange } = {}) {
   if (h._select) return h._select;
   const trig = h.querySelector(".sn-trigger,[data-menubtn]"), menu = h.querySelector(".sn-menu"), items = [...h.querySelectorAll(".sn-menu .sn-item")];
-  const fixedUp = !!menu?.classList.contains("sn-up"), fixedEnd = !!menu?.classList.contains("sn-end");
-  const close = (refocus) => { if (!h.classList.contains("sn-open")) return; h.classList.remove("sn-open"); trig?.setAttribute("aria-expanded", "false"); items.forEach((x) => x.classList.remove("sn-hl")); if (refocus) trig?.focus(); };
+  const preferUp = h.classList.contains("sn-up") || !!menu?.classList.contains("sn-up");
+  const preferEnd = h.classList.contains("sn-end") || h.classList.contains("sn-cm-models") || !!menu?.classList.contains("sn-end");
+  const place = (autoOut) => {
+    if (!menu || !trig?.getBoundingClientRect || !globalThis.innerHeight) return;
+    const r = trig.getBoundingClientRect(), ih = innerHeight, iw = innerWidth;
+    if (autoOut && ((!r.width && !r.height) || r.bottom < 0 || r.top > ih)) return close(false);
+    const mh = menu.offsetHeight || 160, mw = menu.offsetWidth || r.width || 160, st = r.top - 8, sb = ih - r.bottom - 8, sr = iw - r.left - 8, sl = r.right - 8;
+    const up = preferUp ? (st >= mh + 6 || st >= sb) : (sb < mh + 6 && st > sb);
+    const end = preferEnd ? (sl >= mw || sl >= sr) : (sr < mw && sl > sr);
+    const mc = menu.classList; mc.toggle("sn-up", up); mc.toggle("sn-down", !up); mc.toggle("sn-end", end); mc.toggle("sn-start", !end);
+    const x0 = end ? r.right - mw : r.left, dx = x0 < 8 ? Math.round(8 - x0) : x0 + mw > iw - 8 ? Math.round(iw - 8 - x0 - mw) : 0;
+    dx ? menu.style.setProperty("--sn-menu-dx", `${dx}px`) : menu.style.removeProperty("--sn-menu-dx");
+  };
+  const onRe = () => place(false), onSc = (e) => { if (!menu || (e.target !== menu && !menu.contains?.(e.target))) place(true); };
+  let dl = null;
+  const close = (refocus) => {
+    if (!h.classList.contains("sn-open")) return;
+    h.classList.remove("sn-open"); trig?.setAttribute("aria-expanded", "false"); items.forEach((x) => x.classList.remove("sn-hl"));
+    if (dl) { dropDismiss(dl); dl = null; }
+    globalThis.removeEventListener?.("resize", onRe); globalThis.removeEventListener?.("scroll", onSc, true);
+    menu?.style.removeProperty("--sn-menu-dx");
+    if (refocus) trig?.focus();
+  };
   const open = () => {
     for (const o of selects) if (o !== api) o.close();
-    if (menu && trig && typeof trig.getBoundingClientRect === "function" && typeof innerHeight === "number" && innerHeight > 0) {
-      const r = trig.getBoundingClientRect(), mh = menu.offsetHeight || 160, mw = menu.offsetWidth || r.width || 160;
-      const up = fixedUp || (r.bottom + 6 + mh > innerHeight - 8 && r.top - 6 - mh >= 8);
-      const end = fixedEnd || (r.left + mw > innerWidth - 8 && r.right - mw >= 8);
-      menu.classList.toggle("sn-up", up);
-      menu.classList.toggle("sn-end", end);
-    }
+    place(false);
     h.classList.add("sn-open"); trig?.setAttribute("aria-expanded", "true"); hideTip();
+    // 精准判定交互面：只认触发按钮与菜单本体，绝不把宿主容器里的多余空白区当成内部
+    dl = pushDismiss({ panel: menu || h, trigger: trig || h, close, contains: (t, p) => hitAny(t, p, [trig || h, menu]) });
+    globalThis.addEventListener?.("resize", onRe); globalThis.addEventListener?.("scroll", onSc, { passive: true, capture: true });
   };
   const valueOf = (it) => it.dataset.v ?? it.textContent.trim();
   const pick = (it, quiet) => {
@@ -130,13 +150,14 @@ export function mountSelect(h, { onChange } = {}) {
   const onKey = (e) => {
     if (!h.classList.contains("sn-open")) { if ((e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") && e.target === trig) { e.preventDefault(); open(); items[0]?.classList.add("sn-hl"); } return; }
     const i = items.findIndex((x) => x.classList.contains("sn-hl"));
-    if (e.key === "Escape") { e.preventDefault(); close(true); }
+    if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(true); }
     else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); const n = (i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length; items.forEach((x, k) => x.classList.toggle("sn-hl", k === n)); }
     else if (e.key === "Enter" && i >= 0) { e.preventDefault(); items[i].click(); }
   };
   h.addEventListener("keydown", onKey);
   const api = { el: h, open, close, get value() { const s = items.find((x) => x.classList.contains("sn-sel")); return s ? valueOf(s) : null; }, set(v) { const it = items.find((x) => valueOf(x) === String(v)); if (it) pick(it, true); } };
-  api.dispose = () => { h.removeEventListener("keydown", onKey); selects.delete(api); delete h._select; };
+  api.dispose = () => { close(false); h.removeEventListener("keydown", onKey); selects.delete(api); delete h._select; };
+  onCleanup(() => api.dispose());
   selects.add(api); h._select = api;
   return api;
 }
@@ -228,7 +249,6 @@ export function bindForms(root = document) {
 // setup() 里装一次
 export function installForms() {
 document.addEventListener("change", (e) => { const i = e.target; if (i instanceof HTMLInputElement && i.type === "checkbox" && i.checked && i.parentElement?.classList.contains("sn-check")) popCheck(i.nextElementSibling); }, true);
-document.addEventListener("pointerdown", (e) => { for (const s of selects) if (!s.el.contains(e.target)) s.close(); });
 document.addEventListener("input", (e) => { const f = e.target.closest?.(".sn-field.sn-bad"); if (f) clearFieldError(f); });
 document.addEventListener("animationend", (e) => e.target.classList?.remove("sn-shake"));
 // 点了不可用的按钮：提示写的是原因（"等附件传完再发"）才弹出来；和按钮名字一样（"发送"）就不弹——说了等于没说（触屏上点一下灰着的发送按钮也不出"发送 ⌘↵"）

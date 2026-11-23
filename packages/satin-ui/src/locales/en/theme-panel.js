@@ -12,5 +12,16 @@ export default {
   "theme-panel.9": "Radius",
   "theme-panel.10": "Reset",
   "theme-panel.11": "Line contrast",
-  "theme-panel.12": "Transitions"
+  "theme-panel.12": "Transitions",
+  "theme-panel.13": "Saturation & brightness",
+  "theme-panel.14": "Hue",
+  "theme-panel.15": "Hex color value",
+  "theme-panel.16": "Pick from screen",
+  "theme-panel.17": "Curated swatches",
+  "theme-panel.18": "Reset",
+  "theme-panel.19": "Close color picker",
+  "theme-panel.20": "Success color",
+  "theme-panel.21": "Warning color",
+  "theme-panel.22": "Danger color",
+  "theme-panel.23": "Auto-adjusted for contrast"
 };

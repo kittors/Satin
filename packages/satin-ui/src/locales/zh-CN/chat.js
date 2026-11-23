@@ -28,5 +28,6 @@ export default {
   "chat.newChat": "新对话",
   "chat.jump": "跳到最新",
   "chat.27": "发送失败，点一下重发",
+  "chat.file": "文件",
   "chat.empty": "有什么可以帮你？"
 };

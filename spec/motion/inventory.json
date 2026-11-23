@@ -1,13 +1,13 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 337,
-  "var(--sn-ease-out-strong)": 73,
+  "var(--sn-ease-out)": 355,
+  "var(--sn-ease-out-strong)": 77,
   "cubic-bezier(.55, .15, .45, .85)": 2,
-  "var(--sn-ease-overshoot)": 11,
+  "var(--sn-ease-overshoot)": 15,
   "var(--sn-ease-in-out)": 32,
   "var(--sn-ease-in)": 22,
   "ease-in": 2,
-  "linear": 37,
+  "linear": 41,
   "cubic-bezier(.3, .1, .3, 1)": 1,
   "var(--sn-ease-open)": 13,
   "cubic-bezier(.34, 1.56, .64, 1)": 1,
@@ -31,6 +31,54 @@
   {
    "file": "packages/satin-ui/css/base.css",
    "selector": ".sn-th-dot",
+   "prop": "transition",
+   "value": "box-shadow .15s var(--sn-ease-out), scale .1s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/base.css",
+   "selector": ".sn-th-pick",
+   "prop": "transition",
+   "value": "background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/base.css",
+   "selector": ".sn-cp-reset",
+   "prop": "transition",
+   "value": "background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/base.css",
+   "selector": ".sn-cp-x",
+   "prop": "transition",
+   "value": "background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/base.css",
+   "selector": ".sn-cp-cur",
+   "prop": "transition",
+   "value": "scale .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/base.css",
+   "selector": ".sn-cp-thumb",
+   "prop": "transition",
+   "value": "scale .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/base.css",
+   "selector": ".sn-cp-hex",
+   "prop": "transition",
+   "value": "box-shadow .15s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/base.css",
+   "selector": ".sn-cp-eye",
+   "prop": "transition",
+   "value": "background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), scale .1s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/base.css",
+   "selector": ".sn-cp-dot",
    "prop": "transition",
    "value": "box-shadow .15s var(--sn-ease-out), scale .1s var(--sn-ease-out)"
   },
@@ -512,13 +560,73 @@
    "file": "packages/satin-ui/css/content.css",
    "selector": ".sn-rail-tick > i",
    "prop": "transition",
-   "value": "width calc(180ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong), background-color var(--sn-dur-fast, 120ms) var(--sn-ease-out), opacity var(--sn-dur-fast, 120ms)"
+   "value": "width calc(260ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong), background-color calc(180ms * var(--sn-motion-scale, 1)) var(--sn-ease-out), transform calc(220ms * var(--sn-motion-scale, 1)) var(--sn-ease-overshoot)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-rail.sn-rail-track .sn-rail-tick > i",
+   "prop": "transition-duration",
+   "value": "calc(75ms * var(--sn-motion-scale, 1)), calc(95ms * var(--sn-motion-scale, 1)), calc(180ms * var(--sn-motion-scale, 1))"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-rail.sn-rail-track .sn-rail-tick > i",
+   "prop": "transition-timing-function",
+   "value": "var(--sn-ease-out), var(--sn-ease-out), var(--sn-ease-overshoot)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-rail-tick.sn-on > i",
+   "prop": "transition-timing-function",
+   "value": "var(--sn-ease-overshoot), var(--sn-ease-out), var(--sn-ease-overshoot)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-rail-tick.sn-rail-hit > i",
+   "prop": "animation",
+   "value": "sn-rail-hit calc(320ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-rail-tick.sn-rail-pop > i",
+   "prop": "animation",
+   "value": "sn-rail-pop calc(280ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong)"
   },
   {
    "file": "packages/satin-ui/css/content.css",
    "selector": ".sn-rail-tip",
    "prop": "transition",
-   "value": "opacity var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(180ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong)"
+   "value": "opacity var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(200ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-rail-tip.sn-rail-glide",
+   "prop": "transition",
+   "value": "top calc(170ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong), opacity var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(200ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-rail-tick > i, .sn-rail-tip",
+   "prop": "transition",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-rail-tick > i, .sn-rail-tip",
+   "prop": "animation",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-reduce-motion .sn-rail-tick > i, .sn-reduce-motion .sn-rail-tip",
+   "prop": "transition",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-reduce-motion .sn-rail-tick > i, .sn-reduce-motion .sn-rail-tip",
+   "prop": "animation",
+   "value": "none"
   },
   {
    "file": "packages/satin-ui/css/content.css",
@@ -2304,9 +2412,33 @@
   },
   {
    "file": "packages/satin-ui/css/scroll.css",
+   "selector": ".sn-sa-vp.sn-fy.sn-no-b:not(.sn-fx)",
+   "prop": "animation",
+   "value": "sn-sa-t linear both"
+  },
+  {
+   "file": "packages/satin-ui/css/scroll.css",
+   "selector": ".sn-sa-vp.sn-fy.sn-no-t:not(.sn-fx)",
+   "prop": "animation",
+   "value": "sn-sa-b linear both"
+  },
+  {
+   "file": "packages/satin-ui/css/scroll.css",
    "selector": ".sn-sa-vp.sn-fx",
    "prop": "animation",
    "value": "sn-sa-l linear both, sn-sa-r linear both"
+  },
+  {
+   "file": "packages/satin-ui/css/scroll.css",
+   "selector": ".sn-sa-vp.sn-fx.sn-no-r:not(.sn-fy)",
+   "prop": "animation",
+   "value": "sn-sa-l linear both"
+  },
+  {
+   "file": "packages/satin-ui/css/scroll.css",
+   "selector": ".sn-sa-vp.sn-fx.sn-no-l:not(.sn-fy)",
+   "prop": "animation",
+   "value": "sn-sa-r linear both"
   },
   {
    "file": "packages/satin-ui/css/scroll.css",

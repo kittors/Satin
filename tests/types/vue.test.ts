@@ -33,14 +33,17 @@ export const TreeTableVue = defineComponent({
   },
 });
 
-// 动感 Loader、升级版 Progress、ThemeScope、useTheme、图表与 ThreadRail
-import { Loader, Progress, ThemeScope, useTheme } from "satin-ui/vue";
+// 动感 Loader、升级版 Progress、ThemeScope、useTheme、useLocale、图表与 ThreadRail
+import { Loader, Progress, ThemeScope, useTheme, useLocale } from "satin-ui/vue";
+import en from "satin-ui/locales/en";
 import { Chat, ThreadRail } from "satin-ui/vue/chat";
 import { AreaChart, BarChart, DonutChart, Chart3D, Sparkline, Icon3D } from "satin-ui/vue/charts";
 export const NewApisVue = defineComponent({
   setup() {
     const { mode, theme, setMode, setTheme, resetTheme } = useTheme();
+    const { locale, setLocale } = useLocale();
     void mode.value; void theme.value.motion; void setMode; void setTheme; void resetTheme;
+    void locale.value; void setLocale("en", en);
     return () => h(ThemeScope, { mode: "dark", accent: "blue", radius: "8" }, () => [
       h(Loader, { variant: "matrix", size: "lg", speed: 1.1 }),
       h(Progress, { value: 0.65, segments: 8, tone: "ok" }),

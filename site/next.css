@@ -118,8 +118,10 @@ body.n-docs, body.n-home {
 [data-theme="dark"] .dx { --dx-bg: var(--site-surface, #121215); }
 .dx-bar { display: flex; align-items: center; gap: 12px; min-height: 34px; padding: 0 0 6px 6px; } /* 框顶一行：左边设置项，右边"在展示页打开"（不浮在预览上，免得压住演示角落里的东西） */
 .dx-bar:not(:has(.dx-ctl > *, .dx-note:not(:empty))) { display: none; } /* 没设置项也没有说明文字时藏掉，预览白盒贴齐外框顶部 */
-.dx-ctl { display: flex; align-items: center; gap: 16px; min-width: 0; flex-wrap: wrap; row-gap: 8px; } /* 设置项多、屏幕窄时折到下一行，不把整页撑宽（390 宽时对话页的框顶一行有 440 宽） */
-.dx-opt { display: flex; align-items: center; gap: 8px; font: 500 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
+.dx-ctl { display: flex; align-items: center; gap: 16px; min-width: 0; max-width: 100%; flex-wrap: wrap; row-gap: 8px; } /* 设置项多、屏幕窄时折到下一行，不把整页撑宽 */
+.dx-opt { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-width: 0; max-width: 100%; font: 500 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); }
+.dx-opt > span { white-space: nowrap; }
+.dx-opt .sn-seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 .dx-note { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 400 calc(12px * var(--fsx))/calc(16px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
 /* 预览台：纯白清透舞台，在冰雾外框内层次鲜明 */
 .dx-stage { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 240px; border-radius: 16px; background: var(--site-bg, #ffffff); box-shadow: inset 0 0 0 1px var(--site-border-subtle, var(--sn-line)); overflow: hidden; }
@@ -178,7 +180,7 @@ body.n-docs, body.n-home {
 .d-eval { margin: 20px 0; display: grid; gap: 16px; }
 .d-eval-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .d-eval-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-@media (max-width: 780px) { .d-eval-cols { grid-template-columns: 1fr; } }
+@media (max-width: 780px) { .d-eval-cols { grid-template-columns: minmax(0, 1fr); } }
 .d-eval-pane { display: flex; flex-direction: column; border-radius: var(--sn-r-lg); border: 1px solid var(--sn-line); background: var(--sn-canvas); overflow: hidden; }
 .d-eval-pane.d-eval-good { border-color: var(--sn-line-control); }
 .d-eval-hd { flex: none; height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--sn-raised); border-bottom: 1px solid var(--sn-line); }
@@ -208,7 +210,7 @@ body.n-docs, body.n-home {
 .n-docs .d-pager a .t { font: inherit; color: inherit; } /* 标题包了一层（窄屏省略号用），别吃到旧版文档页 .d-pager span 的 12px 灰字 */
 @media (max-width: 1080px) { .n-docs .d-layout { grid-template-columns: 216px minmax(0, 1fr); gap: 40px; } }
 @media (max-width: 760px) {
-  .n-docs .d-layout { grid-template-columns: 1fr; }
+  .n-docs .d-layout { grid-template-columns: minmax(0, 1fr); }
   .n-docs .d-h1 { font-size: calc(28px * var(--fsx)); line-height: calc(36px * var(--fsx)); }
   .d-head-act { display: none; }
   .dx { padding: 4px; border-radius: 18px; } .dx-stage { border-radius: 14px; }
@@ -444,7 +446,7 @@ body.n-docs, body.n-home {
 .n-form-head > div { flex: 1; display: grid; gap: 2px; }
 .n-form-head b { font: 600 calc(17px * var(--fsx))/calc(24px * var(--fsx)) var(--sn-sans); }
 .n-form-head span:not(.sn-tag) { font: 400 calc(13px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
-.n-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: end; }
+.n-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: end; }
 .n-form .sn-aside { margin-left: auto; color: var(--sn-label3); font-weight: 400; }
 .n-form .sn-lbl { display: flex; }
 .n-form-act { justify-content: flex-end; }
@@ -456,7 +458,7 @@ body.n-docs, body.n-home {
 .n-tbar .sn-th-h { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } /* 一条工具栏里不写小标题，读屏照样读得到 */
 .n-tbar .sn-th-foot { display: none; }
 .n-tbar .sn-th-st { display: flex; gap: 6px; }
-.n-tbar .sn-th-pick { font-size: 0; gap: 0; }
+.n-tbar .sn-th-pick { font-size: 0; gap: 0; padding: 3px; margin: 0; border-radius: 50%; }
 .n-tb-mode button .sn-ic { width: 14px; height: 14px; }
 .n-tbar [data-copy-vars] { margin-left: 4px; }
 .n-stage .bz-note { flex-basis: auto; }
@@ -517,10 +519,10 @@ body.n-docs, body.n-home {
 }
 @media (max-width: 860px) {
   .n-links { display: none; }
-  .n-head { grid-template-columns: 1fr; gap: 16px; }
+  .n-head { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .na-side { display: none; }
   .n-wins { inset: 40px 24px 0; }
-  .n-foot-grid { grid-template-columns: repeat(2, 1fr); }
+  .n-foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .n-hero { padding-top: 120px; } /* sp-ok: 72 的顶栏 + 48 */
@@ -538,14 +540,14 @@ body.n-docs, body.n-home {
   .n-tabs button { min-width: auto; flex: none; padding: 8px 6px 14px; }
   .n-tabpanel { border-radius: 24px; }
   .n-wins { inset: 24px 12px 0; }
-  .n-cards, .n-feats, .n-stats { grid-template-columns: 1fr; }
+  .n-cards, .n-feats, .n-stats { grid-template-columns: minmax(0, 1fr); }
   .n-stats { gap: 32px; } .n-stats a { padding: 0; box-shadow: none; }
-  .n-grid2 { grid-template-columns: 1fr; }
+  .n-grid2 { grid-template-columns: minmax(0, 1fr); }
   .n-themepanel { padding: 24px 0; }
   .n-twin { width: calc(100% - 24px); }
   .n-tbar { margin-top: 16px; justify-content: flex-start; border-radius: 20px; }
   .n-fps { height: 260px; }
-  .n-foot-grid { grid-template-columns: 1fr 1fr; }
+  .n-foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .n-foot-grid > div:first-child { grid-column: 1 / -1; }
 }
 .na-sm .sn-tag { height: 20px; padding: 0 8px; gap: 6px; font-size: calc(11px * var(--fsx)); }

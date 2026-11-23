@@ -204,12 +204,12 @@
   gap: 20px;
 }
 @container (max-width: 390px) {
-  .sn-ch-donut-wrap { grid-template-columns: 1fr; justify-items: center; gap: 14px; }
+  .sn-ch-donut-wrap { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 14px; }
   .sn-ch-donut-box { max-width: 164px; }
   .sn-ch-donut-list { width: 100%; }
 }
 @media (max-width: 520px) {
-  .sn-ch-donut-wrap { grid-template-columns: 1fr; justify-items: center; gap: 14px; }
+  .sn-ch-donut-wrap { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 14px; }
   .sn-ch-donut-box { max-width: 164px; }
   .sn-ch-donut-list { width: 100%; }
 }

@@ -12,7 +12,7 @@ import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.
 import { ICONS } from "../src/icons.js";
 import { emptyArtSvg } from "../src/empty-art.js";
 import { CHECK, removeChip, shakeInput } from "../src/form.js";
-import { scoped } from "../src/i18n.js";
+import { scoped, setLocale as setI18nLocale, getLocale as getI18nLocale, onLocaleChange } from "../src/i18n.js";
 import I18N_COMPONENTS from "../src/locales/zh-CN/components.js";
 import { wrap, cx } from "./wrap.js";
 import * as X from "./extra.js";
@@ -319,18 +319,34 @@ export function useTheme() {
   };
 }
 
+// 响应式多语言 Composable：读取当前语言并支持切换（setLocale("en", enPack) / setLocale("zh-CN")）
+export function useLocale() {
+  const locale = ref(getI18nLocale());
+  let unsub = null;
+  onMounted(() => { unsub = onLocaleChange((l) => { locale.value = l; }); });
+  onBeforeUnmount(() => { unsub?.(); unsub = null; });
+  return {
+    locale,
+    setLocale(nameOrMessages, pack) { setI18nLocale(nameOrMessages, pack); locale.value = getI18nLocale(); },
+  };
+}
+
 export const toast = (o) => (setup(), S.toast(o));
 export const notify = (o) => (setup(), S.notify(o));
-// 全局注册：app.use(Satin, { mode, theme, persist }) 以后模板直接写 <SnButton>、<SnLoader>、<SnThemeScope>……、v-enhance，并可声明式配置全局主题
+// 全局注册：app.use(Satin, { mode, theme, persist, locale, messages }) 以后模板直接写 <SnButton>、<SnLoader>、<SnThemeScope>……、v-enhance，并可声明式配置全局主题与语言
 export default {
   install(app, options) {
     for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Avatar, EmptyArt, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, Search, CountInput, LongText, Composer, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Loader, Spinner, Steps, Text, Tooltip, Dialog, Drawer, ThemeScope })) app.component("Sn" + k, c);
     app.directive("enhance", vEnhance);
     const off = setup(); app.onUnmount?.(off); // setup() 在服务端直接返回，什么都不做
-    if (options && typeof document !== "undefined") {
-      const { mode, theme, persist = false } = options;
-      if (mode) setMode(mode, { animate: false, persist });
-      if (theme) { if (persist) setThemeChoice(theme); else paintTheme(document.documentElement, { ...THEME_DEFAULTS, ...getTheme(), ...theme }); }
+    if (options) {
+      const { mode, theme, persist = false, locale, messages } = options;
+      if (locale) setI18nLocale(locale, messages);
+      else if (messages) setI18nLocale(messages);
+      if (typeof document !== "undefined") {
+        if (mode) setMode(mode, { animate: false, persist });
+        if (theme) { if (persist) setThemeChoice(theme); else paintTheme(document.documentElement, { ...THEME_DEFAULTS, ...getTheme(), ...theme }); }
+      }
     }
   },
 };

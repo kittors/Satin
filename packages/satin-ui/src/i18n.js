@@ -8,15 +8,30 @@
 const packs = { "zh-CN": {} };
 let cur = {}, lang = "zh-CN";
 const fmt = (s, params) => (params ? s.replace(/\{(\w+)\}/g, (m, k) => (k in params ? String(params[k]) : m)) : s);
+const norm = (name) => {
+  const s = String(name || "").trim();
+  if (!s) return "zh-CN";
+  if (packs[s]) return s;
+  const low = s.toLowerCase();
+  if (low === "zh" || low.startsWith("zh-cn") || low.startsWith("zh-hans")) return "zh-CN";
+  if (low === "en" || low.startsWith("en-")) return packs.en ? "en" : "zh-CN";
+  return packs[low] ? low : "zh-CN";
+};
 export const scoped = (defaults) => (key, params) => fmt(cur[key] ?? defaults[key] ?? key, params);
 const subs = new Set();
 // 全局查：当前语言里有就用，没有就原样返回键（组件内部用 scoped，不用这个）
 export const t = (key, params) => fmt(cur[key] ?? key, params);
 export function addLocale(name, messages) { packs[name] = messages; }
-// 换语言：名字（"zh-CN"、"en"、addLocale 加过的）或者一份消息表（在当前语言上覆盖）。已经渲染出来的组件不会自己重画：换语言后重新创建组件，或者在应用启动时先设好
-export function setLocale(nameOrMessages) {
-  if (typeof nameOrMessages === "string") { cur = { ...(packs[nameOrMessages] ?? {}) }; lang = packs[nameOrMessages] ? nameOrMessages : "zh-CN"; }
-  else if (nameOrMessages) cur = { ...cur, ...nameOrMessages };
+// 换语言：支持 setLocale("en", enPack) 一步注册并切换，或 setLocale("en")（已通过 addLocale 注册），或传消息表在当前语言上局部覆盖
+export function setLocale(nameOrMessages, messages) {
+  if (typeof nameOrMessages === "string") {
+    if (messages && typeof messages === "object") packs[nameOrMessages] = messages;
+    const target = norm(nameOrMessages);
+    cur = { ...(packs[target] ?? {}) };
+    lang = target;
+  } else if (nameOrMessages) {
+    cur = { ...cur, ...nameOrMessages };
+  }
   for (const f of subs) f(lang);
 }
 export const getLocale = () => lang;

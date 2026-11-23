@@ -14,6 +14,21 @@ host.querySelectorAll(".sn-item")[1].dispatchEvent(new window.Event("click", { b
 ok(got.at(-1) === "9:16 · 竖屏" && s.value === "9:16 · 竖屏", "新选项能点、onChange 收到值、实例上读到值");
 s.update({ value: "16:9 · 横屏" }); ok(s.value === "16:9 · 横屏" && host.querySelector(".sn-val").textContent === "16:9 · 横屏", "受控改值");
 s.update({ items: ["16:9 · 横屏", "1:1 · 方形"] }); ok(host.querySelectorAll(".sn-item").length === 2 && s.value === "16:9 · 横屏", "再换选项，选中值还在");
+// 浮层关闭行为：点击宿主空白区域（非触发按钮、非菜单面板）、Esc 捕获、window.blur、父子浮层不误关
+const selEl = host.querySelector(".sn-select"), trigEl = host.querySelector(".sn-trigger"), menuEl = host.querySelector(".sn-menu");
+trigEl.dispatchEvent(new window.Event("click", { bubbles: true }));
+ok(selEl.classList.contains("sn-open"), "点击触发按钮打开菜单");
+selEl.dispatchEvent(new window.Event("pointerdown", { bubbles: true }));
+ok(!selEl.classList.contains("sn-open"), "点击宿主容器空白区域（非按钮、非菜单）立刻关闭");
+trigEl.dispatchEvent(new window.Event("click", { bubbles: true }));
+menuEl.dispatchEvent(new window.Event("pointerdown", { bubbles: true }));
+ok(selEl.classList.contains("sn-open"), "点击菜单面板内部保持打开");
+const escEv = new window.Event("keydown", { bubbles: true, cancelable: true }); escEv.key = "Escape";
+document.body.dispatchEvent(escEv);
+ok(!selEl.classList.contains("sn-open"), "焦点在页面其他处按 Esc 仍能捕获并关闭");
+trigEl.dispatchEvent(new window.Event("click", { bubbles: true }));
+window.dispatchEvent(new window.Event("blur"));
+ok(!selEl.classList.contains("sn-open"), "窗口失焦（如点击 iframe 外）自动关闭");
 s.destroy(); const n = got.length; host.querySelector(".sn-item")?.dispatchEvent(new window.Event("click", { bubbles: true })); ok(got.length === n, "销毁后不再响应");
 console.log(fail ? `下拉测试：${fail} 项不通过` : "下拉测试：全部通过");
 process.exitCode = fail ? 1 : 0;

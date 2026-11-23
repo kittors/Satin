@@ -1,5 +1,7 @@
 // 简体中文（默认）：所有组件的文字合在一起（各组件自己只引自己那一份，打包时互不拖累）。
+import browser_tabs from "./zh-CN/browser-tabs.js";
 import canvas_grid from "./zh-CN/canvas-grid.js";
+import charts from "./zh-CN/charts.js";
 import chat from "./zh-CN/chat.js";
 import components from "./zh-CN/components.js";
 import feedback from "./zh-CN/feedback.js";
@@ -17,4 +19,4 @@ import picker from "./zh-CN/picker.js";
 import table from "./zh-CN/table.js";
 import theme from "./zh-CN/theme.js";
 import theme_panel from "./zh-CN/theme-panel.js";
-export default { ...canvas_grid, ...chat, ...components, ...feedback, ...flow, ...form, ...grid, ...input, ...lightbox, ...list, ...markdown, ...media, ...nav, ...overlay, ...picker, ...table, ...theme, ...theme_panel };
+export default { ...browser_tabs, ...canvas_grid, ...charts, ...chat, ...components, ...feedback, ...flow, ...form, ...grid, ...input, ...lightbox, ...list, ...markdown, ...media, ...nav, ...overlay, ...picker, ...table, ...theme, ...theme_panel };

@@ -1,7 +1,7 @@
 {
   "name": "satin-ui",
   "version": "0.1.0",
-  "description": "Satin：给 AI 和开发者用的现代 Web UI 组件与规范库——令牌、组件样式、框架无关核心、React / Vue / Svelte / Web Components 封装、十万级表格、AI 对话、图表与去 AI 味规则",
+  "description": "Zero-dependency, framework-agnostic Web UI component & design system library with first-class React, Vue, Svelte, and Web Components wrappers, W3C design tokens, 100K-row DataGrid, AI Chat, Charts, and full EN/zh-CN i18n.",
   "type": "module",
   "license": "MIT",
   "homepage": "https://github.com/kittors/Satin",
@@ -99,7 +99,10 @@
       "types": "./types/vite.d.ts",
       "default": "./vite/index.js"
     },
-    "./locales/*": "./src/locales/*.js",
+    "./locales/*": {
+      "types": "./types/locales.d.ts",
+      "default": "./src/locales/*.js"
+    },
     "./icons": {
       "types": "./types/icons.d.ts",
       "default": "./src/icons.js"

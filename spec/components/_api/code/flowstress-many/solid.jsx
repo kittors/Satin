@@ -1,4 +1,4 @@
-import { onMount, onCleanup } from "solid-js";
+import { onSettled } from "solid-js";
 import { createFlow } from "satin-ui/flow";
 
 const groups = [
@@ -83,9 +83,9 @@ const edges = [
 
 export default function Demo() {
   let host;
-  onMount(() => {
+  onSettled(() => {
     const f = createFlow(host, { groups, nodes, edges, label: "ComfyUI 影视生图生视频工作流" });
-    onCleanup(() => f?.destroy?.());
+    return () => f?.destroy?.();
   });
-  return <div ref={host} />;
+  return <div ref={(el) => (host = el)} />;
 }

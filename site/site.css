@@ -2,10 +2,10 @@
    照组件库的规矩：只动 transform / opacity；颜色只表达状态，不加光晕、彩色投影，不堆渐变；深浅两套都要好看。字号都乘 --font-scale（主题里调字号时官网跟着变）。 */
 @layer satin {
 :root { --fsx: var(--sn-font-scale, 1); --wrap: 1200px; --nav-h: 64px; }
-html { scroll-padding-top: calc(var(--nav-h) + 16px); scroll-behavior: smooth; }
+html { scroll-padding-top: calc(var(--nav-h) + 16px); scroll-behavior: smooth; overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 .sn-reduce-motion { scroll-behavior: auto; }
-body.s-body { background: var(--sn-canvas); color: var(--sn-label); font: 400 calc(15px * var(--fsx))/calc(24px * var(--fsx)) var(--sn-sans); -webkit-font-smoothing: antialiased; }
+body.s-body { background: var(--sn-canvas); color: var(--sn-label); font: 400 calc(15px * var(--fsx))/calc(24px * var(--fsx)) var(--sn-sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
 .s-wrap { width: min(100%, var(--wrap)); margin: 0 auto; padding: 0 24px; }
 a { color: inherit; }
 
@@ -329,7 +329,7 @@ html.vt-page::view-transition-new(d-main) { animation: s-vt-in 240ms var(--sn-ea
 .d-rules { margin-top: 8px; display: grid; gap: 8px; }
 .d-rules li { list-style: none; position: relative; padding-left: 20px; }
 .d-rules li::before { content: ""; position: absolute; left: 4px; top: calc(13px * var(--fsx) - 3px); width: 6px; height: 6px; border-radius: 50%; background: var(--sn-label3); }
-.d-dodont { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.d-dodont { margin-top: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .d-dodont > div { padding: 14px 16px 16px; border-radius: 12px; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); }
 .d-dodont b { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font: 500 calc(13px * var(--fsx))/calc(20px * var(--fsx)) var(--sn-sans); }
 .d-dodont b .sn-ic { width: 14px; height: 14px; }
@@ -342,7 +342,7 @@ html.vt-page::view-transition-new(d-main) { animation: s-vt-in 240ms var(--sn-ea
 .d-table tr:last-child td { box-shadow: none; }
 .d-table th { font-weight: 500; font-size: calc(12px * var(--fsx)); color: var(--sn-label3); }
 .d-swatch { display: inline-block; width: 14px; height: 14px; margin-right: 8px; vertical-align: -2px; border-radius: 4px; background: var(--sn-c); box-shadow: inset 0 0 0 1px var(--sn-line-control); }
-.d-pager { margin-top: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.d-pager { margin-top: 64px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .d-pager a { display: grid; gap: 4px; padding: 16px 20px; border-radius: 12px; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); text-decoration: none; transition: box-shadow .15s var(--sn-ease-out); }
 .d-pager a:hover { box-shadow: inset 0 0 0 1px var(--sn-card-line), inset 0 0 0 100vmax var(--sn-fill-hover); }
 .d-pager a.next { text-align: right; grid-column: 2; }
@@ -363,7 +363,7 @@ html.vt-page::view-transition-new(d-main) { animation: s-vt-in 240ms var(--sn-ea
   .d-layout { grid-template-columns: 216px minmax(0, 1fr); gap: 32px; } .d-toc { display: none; }
   .s-show { grid-template-columns: repeat(2, minmax(0, 1fr)); } .s-show .s-col:last-child { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
   .s-feats, .s-guides { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .s-theme { grid-template-columns: 1fr; }
+  .s-theme { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 760px) {
   .s-links, .s-search { display: none; } .s-burger, .s-only-m { display: inline-flex; }
@@ -373,11 +373,11 @@ html.vt-page::view-transition-new(d-main) { animation: s-vt-in 240ms var(--sn-ea
   .s-h2 { font-size: calc(30px * var(--fsx)); line-height: calc(38px * var(--fsx)); }
   .s-lead { font-size: calc(17px * var(--fsx)); line-height: calc(28px * var(--fsx)); }
   .s-sec { padding: 48px 0; }
-  .s-show, .s-show .s-col:last-child { grid-template-columns: 1fr; }
-  .s-feats, .s-guides, .s-preview-grid, .s-foot-grid, .d-dodont, .s-ix-row { grid-template-columns: 1fr; }
+  .s-show, .s-show .s-col:last-child { grid-template-columns: minmax(0, 1fr); }
+  .s-feats, .s-guides, .s-preview-grid, .s-foot-grid, .d-dodont, .s-ix-row { grid-template-columns: minmax(0, 1fr); }
   .s-ix-row { gap: 8px; } .s-index { padding: 4px 16px; }
   .s-band { padding: 28px; min-height: 320px; }
-  .d-layout { grid-template-columns: 1fr; padding: 0 16px; }
+  .d-layout { grid-template-columns: minmax(0, 1fr); padding: 0 16px; }
   .d-h1 { font-size: calc(28px * var(--fsx)); line-height: calc(36px * var(--fsx)); }
   /* 目录收进左边的抽屉 */
   .d-side { position: fixed; z-index: 35; top: var(--nav-h); left: 0; bottom: 0; width: min(300px, 86vw); max-height: calc(100vh - var(--nav-h)); max-height: calc(100dvh - var(--nav-h)); padding: 16px 12px 32px; background: var(--sn-raised); box-shadow: var(--sn-e2);
@@ -385,6 +385,6 @@ html.vt-page::view-transition-new(d-main) { animation: s-vt-in 240ms var(--sn-ea
   .d-side.sn-open { transform: none; visibility: visible; transition: transform .36s var(--sn-ease-open), visibility 0s; }
   .d-scrim { display: block; position: fixed; inset: var(--nav-h) 0 0; z-index: 34; background: var(--sn-scrim); opacity: 0; pointer-events: none; transition: opacity .2s var(--sn-ease-out); }
   .d-scrim.sn-open { opacity: 1; pointer-events: auto; }
-  .d-pager { grid-template-columns: 1fr; } .d-pager a.next { grid-column: 1; }
+  .d-pager { grid-template-columns: minmax(0, 1fr); } .d-pager a.next { grid-column: 1; }
 }
 }

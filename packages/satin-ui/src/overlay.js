@@ -1,12 +1,12 @@
 // UI 库设计稿第二批：浮层的交互。Tooltip 在 kit.js；这里是弹出面板、气泡确认、右键菜单和子菜单（安全三角区）、弹窗、抽屉、命令面板。
 // 数值照 09 号 §2、§5：子菜单 220 / 1200 / 360ms、每 80ms 复查；弹窗 320ms ease.open，关闭短三分之一；打开后焦点进去，关闭后回到按钮。
 import { $, $$, injectIcons, hideTip, resetTipLayer, reduced } from "./core.js";
+import { hitAny, pushDismiss, dropDismiss, findDismiss } from "./dismiss.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/overlay.js";
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
-// 打开中的浮层排成一摞，Esc 只关最上面那个（下拉选择自己处理 Esc）。放在模块里：命令面板单独用（官网的搜索）时也在这一摞里
-const layers = [];
-const push = (l) => layers.push(l), drop = (l) => { const i = layers.indexOf(l); if (i >= 0) layers.splice(i, 1); };
+// 打开中的浮层统一交由 dismiss.js 排栈协同（Esc 后进先出、捕获阶段点击外部、焦点移出、窗口失焦、父子浮层保护）
+const push = (l) => pushDismiss(l), drop = (l) => dropDismiss(l);
 
 
 // showModal 会让整页变成不可操作，浏览器要把整页样式重算一遍（长页面要几十毫秒）。
@@ -73,7 +73,11 @@ export function mountCmdk(groups, { onRun, placeholder, empty = (q) => tt("overl
     // 先把列表准备好（改 DOM、量位置），隔两帧再加 open 类起动画，准备工作不压住动画的第一帧
     cmIn.value = ""; filter("", true);
     twoFrames(() => { if (!cmLayer) return; cmdk.classList.add("sn-open"); cmScrim.classList.add("sn-open"); cmIn.focus({ preventScroll: true }); });
-    cmLayer = { close(refocus) { cmdk.classList.remove("sn-open"); cmScrim.classList.remove("sn-open"); drop(cmLayer); cmLayer = null; if (refocus) cmFrom?.focus?.({ preventScroll: true }); }, outside: (e) => !cmdk.contains(e.target) };
+    cmLayer = {
+      panel: cmdk, modal: true, blur: false, focusOut: false,
+      close(refocus) { cmdk.classList.remove("sn-open"); cmScrim.classList.remove("sn-open"); drop(cmLayer); cmLayer = null; if (refocus) cmFrom?.focus?.({ preventScroll: true }); },
+      contains: (t, p) => hitAny(t, p, [cmdk]),
+    };
     push(cmLayer);
   }
   function run(o) {
@@ -99,13 +103,16 @@ export function mountCmdk(groups, { onRun, placeholder, empty = (q) => tt("overl
   return { open: openCmdk, close: () => cmLayer?.close(true), toggle: () => (cmLayer ? cmLayer.close(true) : openCmdk()), input: cmIn, list: cmList };
 }
 // ———— 公开接口 1：放置浮层 ————
-// placePanel(面板, 锚点, { align: "start" | "end", gap })：默认放在锚点下方，放不下翻到上方；左右不出窗口；变换原点对着锚点
+// placePanel(面板, 锚点, { align: "start" | "end", gap })：默认放在锚点下方，放不下翻到上方（上下都紧时选余量更大一侧并锁在视口安全边内）；左右不出窗口；变换原点对着锚点
 export function placePanel(panel, anchor, { align = "start", gap = 6 } = {}) {
   const r = anchor.getBoundingClientRect(), w = panel.offsetWidth, h = panel.offsetHeight;
-  const up = r.bottom + gap + h > innerHeight - M && r.top - gap - h >= M;
+  const roomBot = innerHeight - r.bottom - M, roomTop = r.top - M;
+  const up = roomBot < h + gap && roomTop > roomBot;
   let left = align === "end" ? r.right - w : r.left;
   left = Math.max(M, Math.min(innerWidth - w - M, left));
-  panel.style.left = left + "px"; panel.style.top = (up ? r.top - gap - h : r.bottom + gap) + "px";
+  const rawTop = up ? r.top - gap - h : r.bottom + gap;
+  const top = Math.max(M, Math.min(innerHeight - h - M, rawTop));
+  panel.style.left = left + "px"; panel.style.top = top + "px";
   panel.style.transformOrigin = `${Math.max(0, Math.min(w, r.left + r.width / 2 - left))}px ${up ? h : 0}px`;
   panel.classList.toggle("sn-up", up);
 }
@@ -124,23 +131,28 @@ export function openPopover(pop, trig, { align = "start", onClose } = {}) {
   hideTip(); place(pop, trig, { align });
   pop.classList.add("sn-open"); trig.classList.add("sn-is-open"); trig.setAttribute("aria-expanded", "true");
   const layer = {
-    pop,
+    pop, panel: pop, trigger: trig,
     close(refocus) {
       pop.classList.remove("sn-open"); trig.classList.remove("sn-is-open"); trig.setAttribute("aria-expanded", "false"); drop(layer);
-      removeEventListener("resize", re); removeEventListener("scroll", re, true); pop.removeEventListener("focusout", fo);
+      removeEventListener("resize", re); removeEventListener("scroll", onSc, true);
       onClose?.(); if (refocus) trig.focus();
     },
-    outside: (e) => !pop.contains(e.target) && !trig.contains(e.target),
+    contains: (t, p) => hitAny(t, p, [pop, trig]),
   };
-  const re = () => place(pop, trig, { align });
-  const fo = (e) => { if (e.relatedTarget && !pop.contains(e.relatedTarget) && !trig.contains(e.relatedTarget)) layer.close(false); };
-  addEventListener("resize", re); addEventListener("scroll", re, true); pop.addEventListener("focusout", fo);
+  const re = () => {
+    if (!trig.isConnected) { layer.close(false); return; }
+    const r = trig.getBoundingClientRect();
+    if ((r.width === 0 && r.height === 0) || r.bottom < 0 || r.top > innerHeight) { layer.close(false); return; }
+    place(pop, trig, { align });
+  };
+  const onSc = (e) => { if (e.target === pop || pop.contains?.(e.target)) return; re(); };
+  addEventListener("resize", re); addEventListener("scroll", onSc, { passive: true, capture: true });
   push(layer);
   const first = pop.matches(".sn-popconfirm") ? $("[data-no]", pop) : $(FOCUSABLE, pop);
   requestAnimationFrame(() => first?.focus({ preventScroll: true }));
   return layer;
 }
-export const popoverOf = (pop) => layers.find((l) => l.pop === pop);
+export const popoverOf = (pop) => findDismiss((l) => l.pop === pop);
 // ———— 公开接口 3：菜单（右键菜单、菜单按钮、子菜单、安全三角区、窄处下钻） ————
 // openMenu(菜单, { trigger, anchor, align, x, y, keyboard, bound, onSelect })：
 //   anchor：贴着这个元素弹（菜单按钮）；x / y：在指针位置弹（右键菜单）；bound：菜单（连同每一层子菜单）只能待在这个容器里；
@@ -178,7 +190,11 @@ export function openMenu(rootMenu, { trigger, x, y, anchor, keyboard, align, bou
   if (keyboard) setHL(rootMenu, rows(rootMenu).find((r) => !r.classList.contains("sn-is-off")));
   sys.check = setInterval(recheck, T_CHECK);
   document.addEventListener("pointermove", onMove);
-  sys.layer = { close: (refocus) => closeMenu(refocus), outside: (e) => !sys?.chain.some((m) => m.contains(e.target)) && !(anchor && anchor.contains(e.target)) };
+  sys.layer = {
+    panel: rootMenu, trigger: anchor || trigger, focusOut: false,
+    close: (refocus) => closeMenu(refocus),
+    contains: (t, p) => hitAny(t, p, [...(sys?.chain || []), anchor]),
+  };
   push(sys.layer);
 }
 function closeFrom(level) {
@@ -352,13 +368,14 @@ export function openDrawer(drawer, { trigger, scrim, focus, onClose } = {}) {
   hideTip(); const sc = scrim || scrimEl();
   drawer.classList.add("sn-open"); sc.classList.add("sn-open");
   const layer = drLayer = {
-    drawer,
+    drawer, panel: drawer, trigger, modal: true, blur: false, focusOut: false,
     close(refocus) {
       if (drLayer !== layer) return;
       drawer.classList.remove("sn-open"); sc.classList.remove("sn-open"); drop(layer); drLayer = null; onClose?.();
       if (refocus) trigger?.focus({ preventScroll: true });
     },
-    outside: (e) => !drawer.contains(e.target) && !e.target.closest(".sn-tip,.sn-toasts,.sn-menu.sn-float"),
+    contains: (t, p) => hitAny(t, p, [drawer]),
+    ignore: (t) => !!t?.closest?.(".sn-tip,.sn-toasts"),
   };
   push(layer); setTimeout(() => (focus || drawer.querySelector(FOCUSABLE))?.focus({ preventScroll: true }), 60);
   return layer;
@@ -447,11 +464,6 @@ export { EASE_IN, IN_OUT, OUT, esc };
 // 页面级：浮层栈（Esc 关最上面那层、点外面关）、右键菜单（点条目、键盘）、失焦 / 窗口变宽变窄 / 页面滚动时收起右键菜单。setup() 里装一次
 export function installOverlays() {
 winW = innerWidth;
-document.addEventListener("keydown", (e) => {
-  if (e.key !== "Escape" || !layers.length || e.target.closest?.(".sn-select.sn-open")) return;
-  e.preventDefault(); e.stopPropagation(); layers.at(-1).close(true);
-}, true);
-document.addEventListener("pointerdown", (e) => { for (const l of [...layers].reverse()) if (l.outside?.(e)) l.close(false); }, true);
 document.addEventListener("click", (e) => { if (!sys) return; const it = e.target.closest(".sn-menu.sn-float .sn-item"); if (it && sys.chain.some((m) => m.contains(it))) activate(it); });
 document.addEventListener("keydown", (e) => {
   if (!sys) return;
@@ -462,7 +474,6 @@ document.addEventListener("keydown", (e) => {
   else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(rs[cur]); }
   else if (e.key === "Tab") { e.preventDefault(); closeMenu(true); }
 });
-addEventListener("blur", () => closeMenu(false));
 addEventListener("resize", () => { if (innerWidth === winW) return; winW = innerWidth; closeMenu(false); });
 addEventListener("scroll", (e) => { if (sys && !e.target.closest?.(".sn-menu.sn-float")) closeMenu(false); }, { passive: true, capture: true });
 }
