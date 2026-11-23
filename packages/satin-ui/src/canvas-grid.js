@@ -251,9 +251,9 @@ export function mountCanvasGrid(root, o = {}) {
     const fk = src.tree ? src.idAt(p) : p, fade = fades.get(fk), a = fade != null ? Math.min(1, (performance.now() - fade) / 120) : 1;
     if (a < 1) { g.globalAlpha = ra * (.4 + .6 * a); more = true; } else if (fade != null) fades.delete(fk);
     for (const o of L.cols) { if (o.zone !== zone || o.x + o.c.w <= x0 || o.x >= x1) continue; const da = headUI.dimNow(o.c.key, fnow); if (da < 1) g.globalAlpha *= da; if (r < 0) skel(o, y, h, p); else cell(o, y, r, p, hov, h); if (da < 1) g.globalAlpha /= da; }
-    // 主行底线精准画在 y + h - 1（展开详情时清晰分隔主行与详情面板），网格竖线只画主行高 h（绝不戳进详情区）
+    // 主行底线精准画在 y + h - 1（展开详情时清晰分隔主行与详情面板），网格竖线只画 h - 1 避开底线交点不叠色、绝不戳进详情区
     g.globalAlpha = ra; g.fillStyle = C.line; g.fillRect(x0, y + h - 1, x1 - x0, 1);
-    if (root.dataset.lines === "grid") for (const o of L.cols) { if (o.zone !== zone || o.c.type === "act") continue; const rx = o.x + o.c.w - 1; if (rx >= x0 && rx < x1) g.fillRect(rx, y, 1, h); } /* 网格：每一格右边一条线 */
+    if (root.dataset.lines === "grid") for (const o of L.cols) { if (o.zone !== zone || o.c.type === "act") continue; const rx = o.x + o.c.w - 1; if (rx >= x0 && rx < x1) g.fillRect(rx, y, 1, Math.max(0, h - 1)); } /* 网格：每一格右边一条线 */
     g.globalAlpha = 1;
   }
   function draw() {
@@ -302,7 +302,7 @@ export function mountCanvasGrid(root, o = {}) {
     const leaves = mergeFx.leaves(now), activeM = activeSelected && !rgRect() ? merges.at(active.p, active.c)?.m ?? null : null, spv = tv("mgsp", splitHover ? 1 : 0);
     if (live.length || leaves.length) for (const [zone, x0, x1] of zones) {
       if (x1 <= x0) continue; g.save(); g.beginPath(); g.rect(x0, 0, x1 - x0, Hc); g.clip();
-      // 1. 正在拆分 / 挂起溶解的旧合并块：遮罩底色平滑褪去露出独立网格，主内容优雅滑回第 1 行原位
+      // 1. 正在拆分 / 挂起溶解的旧合并块：仅内区底色平滑褪去露出独立网格（不重画外框线、不突出 border），旧居中内容轻柔淡出零重影
       for (const lv of leaves) {
         const s0 = lv.snap; if (s0.zone !== zone) continue;
         more = true;
@@ -312,14 +312,8 @@ export function mountCanvasGrid(root, o = {}) {
         const w = s0.keys.reduce((t, k) => t + (model.byKey[k]?.w || 0), 0);
         const sy0 = src.rowY(p0), sy = sy0 - st + (offs[Math.max(0, p0 - first)] ?? 0) + ty(p0), segH = src.rowY(p1) + cellH(p1) - sy0;
         if (sy + segH <= 0 || sy >= Hc || w <= 1 || segH <= 1) continue;
-        const inv = 1 - lv.q, ra = ta(p0);
-        g.globalAlpha = ra * inv; g.fillStyle = C.bg; g.fillRect(o.x, sy, w, Math.max(0, segH - 1));
-        g.globalAlpha = ra * inv * .85; g.fillStyle = C.line; g.fillRect(o.x, sy + segH - 1, w, 1);
-        if (root.dataset.lines !== "grid") g.fillRect(o.x, sy, 1, segH);
-        g.fillRect(o.x + w - 1, sy, 1, segH);
-        // 柔和外框淡出，交代合并边界优雅解除
-        const bx = o.x > 0 ? o.x - 1 : 0, by = sy > 0 ? sy - 1 : 0, bw = o.x + w - bx, bh = sy + segH - by;
-        g.globalAlpha = ra * inv * .48; g.strokeStyle = C.rgLine; g.lineWidth = 1; g.beginPath(); g.roundRect(bx + .5, by + .5, Math.max(0, bw - 1), Math.max(0, bh - 1), 2); g.stroke();
+        const inv = 1 - lv.q, ra = ta(p0), iw = Math.max(0, w - 1), ih = Math.max(0, segH - 1);
+        g.globalAlpha = ra * inv; g.fillStyle = C.bg; g.fillRect(o.x, sy, iw, ih);
         const r0 = src.rowAt(p0);
         if (r0 >= 0) {
           const h0 = cellH(p0), h1 = cellH(p1);
@@ -329,7 +323,7 @@ export function mountCanvasGrid(root, o = {}) {
           const cy = cyM + (sy + h0 / 2 - cyM) * lv.q * .65;
           const textA = Math.max(0, 1 - lv.t * 1.9);
           if (textA > .01) {
-            g.save(); g.beginPath(); g.rect(o.x, sy, w, Math.max(0, segH - 1)); g.clip();
+            g.save(); g.beginPath(); g.rect(o.x, sy, iw, ih); g.clip();
             g.globalAlpha = ra * textA * textA;
             cell({ ...o, c: { ...o.c, w } }, cy - h0 / 2, r0, p0, false, h0);
             g.restore(); font = "";
@@ -337,7 +331,7 @@ export function mountCanvasGrid(root, o = {}) {
         }
         g.globalAlpha = 1;
       }
-      // 2. 当前活跃合并块（含 260ms 聚合进场、悬停、选中柔底与「拆分」悬停内部虚线网格预览）
+      // 2. 当前活跃合并块：精准覆盖内区（w-1 × segH-1），外圈完全沿用表格单遍 1px 网格线（绝不叠色变粗、进场无突出 border）
       for (const x of live) {
         if (merges.zoneOf(x.key0) !== zone || x.p1 < first || x.p0 >= last) continue;
         const o = L.cols.find((c) => c.c.key === x.key0); if (!o) continue;
@@ -351,22 +345,19 @@ export function mountCanvasGrid(root, o = {}) {
           if (s.p1 < first || s.p0 >= last) continue;
           const sy0 = src.rowY(s.p0), sy = sy0 - st + (offs[Math.max(0, s.p0 - first)] ?? 0) + ty(s.p0), segH = src.rowY(s.p1) + cellH(s.p1) - sy0;
           if (sy + segH <= 0 || sy >= Hc) continue;
-          const ra = ta(s.p0), bgA = Math.min(1, ep * 1.18);
-          // 融合底色：进场时平滑融化内部网格线与次要单元格内容；稳定态下支持柔和悬停与选中微亮
-          g.globalAlpha = ra * bgA; g.fillStyle = C.bg; g.fillRect(o.x, sy, w, Math.max(0, segH - 1));
-          if (ep < 1) { g.globalAlpha = ra; g.fillStyle = C.bg; g.fillRect(o.x, sy, o.c.w, Math.max(0, cellH(s.p0) - 1)); } // 首格不重影
-          if (msv > .005) { g.globalAlpha = ra * bgA * msv; g.fillStyle = C.mgSel; g.fillRect(o.x, sy, w, Math.max(0, segH - 1)); }
-          if (mhv > .005) { g.globalAlpha = ra * bgA * mhv; g.fillStyle = C.hover; g.fillRect(o.x, sy, w, Math.max(0, segH - 1)); }
-          g.globalAlpha = ra * Math.min(1, ep * 1.1); g.fillStyle = C.line; g.fillRect(o.x, sy + segH - 1, w, 1);
-          if (root.dataset.lines !== "grid") g.fillRect(o.x, sy, 1, segH);
-          g.fillRect(o.x + w - 1, sy, 1, segH);
+          const ra = ta(s.p0), bgA = Math.min(1, ep * 1.18), iw = Math.max(0, w - 1), ih = Math.max(0, segH - 1);
+          // 融合底色仅盖住内部网格线与次要单元格，严丝合缝让出右/底 1px 线由原行单遍绘制
+          g.globalAlpha = ra * bgA; g.fillStyle = C.bg; g.fillRect(o.x, sy, iw, ih);
+          if (ep < 1) { g.globalAlpha = ra; g.fillStyle = C.bg; g.fillRect(o.x, sy, Math.max(0, o.c.w - 1), Math.max(0, cellH(s.p0) - 1)); } // 首格不重影
+          if (msv > .005) { g.globalAlpha = ra * bgA * msv; g.fillStyle = C.mgSel; g.fillRect(o.x, sy, iw, ih); }
+          if (mhv > .005) { g.globalAlpha = ra * bgA * mhv; g.fillStyle = C.hover; g.fillRect(o.x, sy, iw, ih); }
           // 悬停工具条「拆分」按钮时，在内容层下方柔和淡入即将切开的虚线网格预览（绝不劈穿标签与文字）
           if (spv > .01 && activeM === x.m) {
             g.save(); g.globalAlpha = ra * spv * .65; g.strokeStyle = C.rgLine; g.lineWidth = 1; g.setLineDash([3, 3]);
             g.beginPath();
-            for (let q = s.p0; q < s.p1; q++) { const ly = src.rowY(q) + cellH(q) - sy0 + sy - .5; g.moveTo(o.x + 2, ly); g.lineTo(o.x + w - 2, ly); }
+            for (let q = s.p0; q < s.p1; q++) { const ly = src.rowY(q) + cellH(q) - sy0 + sy - .5; g.moveTo(o.x + 2, ly); g.lineTo(o.x + iw - 1, ly); }
             let cx = o.x;
-            for (let ki = 0; ki < x.keys.length - 1; ki++) { cx += model.byKey[x.keys[ki]].w; g.moveTo(cx - .5, sy + 2); g.lineTo(cx - .5, sy + segH - 2); }
+            for (let ki = 0; ki < x.keys.length - 1; ki++) { cx += model.byKey[x.keys[ki]].w; g.moveTo(cx - .5, sy + 2); g.lineTo(cx - .5, sy + ih - 1); }
             g.stroke(); g.restore();
           }
           if (r0 >= 0) {
@@ -380,18 +371,10 @@ export function mountCanvasGrid(root, o = {}) {
             if (ep < 1) cy = (sy + h0 / 2) + (cy - (sy + h0 / 2)) * ep;
             const ca = s.dhBefore > 0 ? Math.min(1, s.dhBefore / Math.min(DETAIL, 48)) : 1;
             if (ca > .005) {
-              g.save(); g.beginPath(); g.rect(o.x, sy, w, Math.max(0, segH - 1)); g.clip();
+              g.save(); g.beginPath(); g.rect(o.x, sy, iw, ih); g.clip();
               g.globalAlpha = ra * ca;
               cell({ ...o, c: { ...o.c, w } }, cy - h0 / 2, r0, x.p0, false, h0);
               g.restore(); font = "";
-            }
-          }
-          // 聚合微光锁定环（进场 260ms 内柔和亮起再消散，明确传递「已融为一体」的确认手感）
-          if (ep < 1) {
-            const pulse = Math.sin(ep * Math.PI), bx = o.x > 0 ? o.x - 1 : 0, by = sy > 0 ? sy - 1 : 0, bw = o.x + w - bx, bh = sy + segH - by;
-            if (pulse > .01) {
-              g.globalAlpha = ra * pulse * .75; g.fillStyle = C.selFill; g.beginPath(); g.roundRect(bx + .75, by + .75, Math.max(0, bw - 1.5), Math.max(0, bh - 1.5), 2); g.fill();
-              g.globalAlpha = ra * pulse * .85; g.strokeStyle = C.rgLine; g.lineWidth = 1.5; g.stroke();
             }
           }
           g.globalAlpha = 1;

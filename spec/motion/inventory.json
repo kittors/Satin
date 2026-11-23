@@ -1,6 +1,6 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 324,
+  "var(--sn-ease-out)": 323,
   "var(--sn-ease-out-strong)": 68,
   "linear": 37,
   "var(--sn-ease-overshoot)": 11,
@@ -1417,12 +1417,6 @@
   },
   {
    "file": "packages/satin-ui/css/grid.css",
-   "selector": ".sn-g-mfx-pulse",
-   "prop": "animation",
-   "value": "sn-g-mpulse .26s var(--sn-ease-out) both"
-  },
-  {
-   "file": "packages/satin-ui/css/grid.css",
    "selector": ".sn-g-mfx-splitprev",
    "prop": "transition",
    "value": "opacity .14s var(--sn-ease-out)"
@@ -1495,7 +1489,7 @@
   },
   {
    "file": "packages/satin-ui/css/grid.css",
-   "selector": ".sn-g-mfx-pulse, .sn-g-mbar [data-g-merge].sn-g-mpop",
+   "selector": ".sn-g-mbar [data-g-merge].sn-g-mpop",
    "prop": "animation",
    "value": "none"
   },
@@ -2471,12 +2465,17 @@
   },
   {
    "file": "packages/satin-ui/src/grid.js",
+   "duration": "220",
+   "easing": "EASE_CSS.out"
+  },
+  {
+   "file": "packages/satin-ui/src/grid.js",
    "duration": "130",
    "easing": "EASE_CSS.out"
   },
   {
    "file": "packages/satin-ui/src/grid.js",
-   "duration": "240",
+   "duration": "220",
    "easing": "EASE_CSS.outStrong"
   },
   {

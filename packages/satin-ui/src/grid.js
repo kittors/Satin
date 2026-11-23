@@ -896,27 +896,34 @@ export function mountDataGrid(root, o = {}) {
     Object.assign(el.style, { left: x + "px", top: y0 + "px", width: w + "px", height: h + "px" });
     host.append(el);
   };
-  function spawnMergePulse(x) {
+  function spawnMergeMelt(x) {
     if (reduced()) return;
-    const s = snapMerge(x), el = document.createElement("i"); el.className = "sn-g-mfx sn-g-mfx-pulse"; el.setAttribute("aria-hidden", "true");
-    placeMfx(el, s.zone, s.x0, s.y0, s.w, s.h); mfxEls.add(el);
-    el.addEventListener("animationend", () => { el.remove(); mfxEls.delete(el); }, { once: true });
-    setTimeout(() => { if (mfxEls.has(el)) { el.remove(); mfxEls.delete(el); } }, 340);
+    const s = snapMerge(x); if (s.w <= 1 || s.h <= 1) return;
+    const lines = [];
+    for (let q = x.p0; q < x.p1; q++) lines.push(`<i class="sn-h" style="top:${src.rowY(q) + cellH(q) - s.y0 - 1}px"></i>`);
+    let cx = 0;
+    for (let i = 0; i < x.keys.length - 1; i++) { cx += model.byKey[x.keys[i]].w; lines.push(`<i class="sn-v" style="left:${cx - 1}px"></i>`); }
+    if (!lines.length) return;
+    const el = document.createElement("div"); el.className = "sn-g-mfx sn-g-mfx-melt"; el.setAttribute("aria-hidden", "true");
+    el.innerHTML = lines.join("");
+    placeMfx(el, s.zone, s.x0, s.y0, s.w - 1, s.h - 1); mfxEls.add(el);
+    const a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: EASE_CSS.out, fill: "forwards" });
+    const done = () => { el.remove(); mfxEls.delete(el); };
+    a.onfinish = done; a.oncancel = done;
   }
   function spawnSplitGhost(lv) {
     if (reduced()) return;
     const s = lv.snap; if (!s || s.h <= 1 || s.w <= 1) return;
     const el = document.createElement("div"); el.className = "sn-g-mfx sn-g-mfx-ghost"; el.setAttribute("aria-hidden", "true");
-    placeMfx(el, s.zone, s.x0, s.y0, s.w, s.h); mfxEls.add(el);
-    let bodyEl = null;
+    placeMfx(el, s.zone, s.x0, s.y0, s.w - 1, s.h - 1); mfxEls.add(el);
     if (s.html) {
-      bodyEl = document.createElement("div"); bodyEl.className = "sn-g-mfx-gbody" + (s.right ? " sn-r" : "");
+      const bodyEl = document.createElement("div"); bodyEl.className = "sn-g-mfx-gbody" + (s.right ? " sn-r" : "");
       bodyEl.style.height = s.h0 + "px"; bodyEl.innerHTML = s.html;
       el.append(bodyEl);
       const dy0 = (s.h - s.h0) / 2;
       bodyEl.animate([{ transform: `translateY(${dy0}px)`, opacity: 1 }, { transform: `translateY(${(dy0 * .35).toFixed(1)}px)`, opacity: 0 }], { duration: 130, easing: EASE_CSS.out, fill: "forwards" });
     }
-    const a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, easing: EASE_CSS.outStrong, fill: "forwards" });
+    const a = el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: EASE_CSS.outStrong, fill: "forwards" });
     const done = () => { el.remove(); mfxEls.delete(el); };
     a.onfinish = done; a.oncancel = done;
   }
@@ -958,7 +965,7 @@ export function mountDataGrid(root, o = {}) {
     if (pool.length < need) { while (pool.length < need) pool.push(makeRow()); for (const r of pool) r._p = -1; }
     const { entered, left } = mergeFx.diff(merges.active(), now, snapMerge);
     for (const lv of left) spawnSplitGhost(lv);
-    for (const x of entered) spawnMergePulse(x);
+    for (const x of entered) spawnMergeMelt(x);
     const size = pool.length, used = new Set();
     for (let p = first; p < last; p++) {
       const el = pool[p % size]; used.add(el);

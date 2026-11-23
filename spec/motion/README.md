@@ -28,9 +28,9 @@
 
 ## 实际用量
 
-样式表里的过渡 / 动画 381 处，脚本里的 WAAPI 101 处（清单见 inventory.json）。曲线用量：
+样式表里的过渡 / 动画 380 处，脚本里的 WAAPI 102 处（清单见 inventory.json）。曲线用量：
 
-- `var(--sn-ease-out)`：324
+- `var(--sn-ease-out)`：323
 - `var(--sn-ease-out-strong)`：68
 - `linear`：37
 - `var(--sn-ease-in-out)`：24

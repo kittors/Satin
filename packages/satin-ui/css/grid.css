@@ -241,12 +241,12 @@
 .sn-g-cell.sn-mg.sn-mg-hov, .sn-g-row:hover .sn-g-cell.sn-mg.sn-mg-hov { background: var(--sn-g-hover); }
 .sn-g-cell.sn-mg.sn-mg-sel.sn-mg-hov, .sn-g-row:hover .sn-g-cell.sn-mg.sn-mg-sel.sn-mg-hov { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-g-bg)); } }
 .sn-g-row.sn-g-editrow { z-index: 4; }
-/* 合并 / 拆分物理微交互合成层（只动 opacity / transform，纯合成线程 60fps；层级低于通栏详情 z-index: 6） */
+/* 合并 / 拆分物理微交互合成层（只动 opacity / transform，纯合成线程 60fps；无额外突出外框，层级低于通栏详情 z-index: 6） */
 .sn-g-mfx { position: absolute; z-index: 5; pointer-events: none; box-sizing: border-box; }
-.sn-g-mfx-pulse { border-radius: 2px; background: color-mix(in srgb, var(--sn-accent) 4.5%, transparent); box-shadow: inset 0 0 0 1.5px var(--sn-range-line); opacity: 0; animation: sn-g-mpulse .26s var(--sn-ease-out) both; }
-@keyframes sn-g-mpulse { 0% { opacity: 0; transform: scale(.992); } 36% { opacity: .88; transform: none; } 100% { opacity: 0; transform: none; } }
-.sn-g-mfx-ghost { overflow: hidden; background: var(--sn-g-bg); box-shadow: inset 1px 0 0 var(--sn-g-rowline), inset -1px -1px 0 var(--sn-g-rowline); }
-.sn-g-mfx-ghost::after { content: ""; position: absolute; inset: 0; border-radius: 2px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-range-line) 55%, transparent); }
+.sn-g-mfx-melt i { position: absolute; pointer-events: none; background: var(--sn-g-rowline); }
+.sn-g-mfx-melt i.sn-h { left: 0; right: 0; height: 1px; }
+.sn-g-mfx-melt i.sn-v { top: 0; bottom: 0; width: 1px; }
+.sn-g-mfx-ghost { overflow: hidden; background: var(--sn-g-bg); }
 .sn-g-mfx-gbody { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; padding: 0 12px; gap: 6px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); will-change: transform, opacity; }
 .sn-g-mfx-gbody.sn-r { justify-content: flex-end; }
 .sn-g-mfx-splitprev { opacity: 0; transition: opacity .14s var(--sn-ease-out); }
@@ -311,7 +311,7 @@
 .sn-g-mhint { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @media (prefers-reduced-motion: reduce) {
   .sn-g-mslot, .sn-g-hslot, .sn-g-mbar [data-g-merge], .sn-g-mfx-splitprev, .sn-g-rgbox { transition: none; animation: none; }
-  .sn-g-mfx-pulse, .sn-g-mbar [data-g-merge].sn-g-mpop { animation: none; }
+  .sn-g-mbar [data-g-merge].sn-g-mpop { animation: none; }
 }
 
 /* ———— 线：默认只有行线；切到"网格"时每一格右边也有一条（操作列除外；Canvas 版按同样的位置画） ———— */
