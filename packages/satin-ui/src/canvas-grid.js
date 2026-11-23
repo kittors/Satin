@@ -118,13 +118,20 @@ export function mountCanvasGrid(root, o = {}) {
     g.restore();
   }
 
-  // ———— 图标：把 icons.js 里的线性图标转成 Path2D ————
+  // ———— 图标：把 icons.js 里的 Solar Icons（含 line-duotone 次要笔画）转成 Path2D ————
   const ICON = {};
-  const iconOf = (name) => (ICON[name] ??= [...ICONS[name].matchAll(/<(path|circle|rect)\s([^>]*)\/>/g)].map(([, tag, attrs]) => {
+  const iconOf = (name) => (ICON[name] ??= [...(ICONS[name] || "").matchAll(/<(path|circle|rect|ellipse|line)\s([^>]*)\/>/g)].map(([, tag, attrs]) => {
     const a = Object.fromEntries([...attrs.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
-    if (tag === "path") return new Path2D(a.d); const p = new Path2D(); if (tag === "circle") p.arc(+a.cx, +a.cy, +a.r, 0, Math.PI * 2); else p.roundRect(+a.x, +a.y, +a.width, +a.height, +(a.rx || 0)); return p;
+    const duo = /\bsn-ic-d\b/.test(a.class || "");
+    if (tag === "path") return { p: new Path2D(a.d), duo };
+    const p = new Path2D();
+    if (tag === "circle") p.arc(+a.cx, +a.cy, +a.r, 0, Math.PI * 2);
+    else if (tag === "ellipse") p.ellipse(+a.cx, +a.cy, +a.rx, +a.ry, 0, 0, Math.PI * 2);
+    else if (tag === "line") { p.moveTo(+a.x1, +a.y1); p.lineTo(+a.x2, +a.y2); }
+    else p.roundRect(+a.x, +a.y, +a.width, +a.height, +(a.rx || 0));
+    return { p, duo };
   }));
-  function icon(name, x, y, size, color) { g.save(); g.translate(x, y); g.scale(size / 24, size / 24); g.strokeStyle = color; g.lineWidth = 2; g.lineCap = "round"; g.lineJoin = "round"; for (const p of iconOf(name)) g.stroke(p); g.restore(); }
+  function icon(name, x, y, size, color) { g.save(); g.translate(x, y); g.scale(size / 24, size / 24); g.strokeStyle = color; g.lineWidth = 1.6; g.lineCap = "round"; g.lineJoin = "round"; const a0 = g.globalAlpha; for (const { p, duo } of iconOf(name)) { g.globalAlpha = duo ? a0 * .48 : a0; g.stroke(p); } g.restore(); }
 
   // ———— 文字：字体切换少做；量过的宽度缓存起来；放不下就截断加省略号 ————
   // 画布上的字：字体、字号跟主题定制走（和 DOM 里的字一样乘 --font-scale）；行高不变，最大 1.14 倍在 40px 的行里放得下

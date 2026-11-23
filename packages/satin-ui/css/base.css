@@ -56,6 +56,8 @@
 :where(a[href]) { color: inherit; text-decoration-thickness: 1px; text-decoration-color: var(--sn-line-control); text-underline-offset: 3px; }
 @media (hover: hover) { :where(a[href]:hover) { text-decoration-color: currentColor; } }
 .sn-ic { flex: none; display: block; }
+/* Solar Icons line-duotone 次要笔画透明度：默认 .48 拉开双色调视觉层级；设置 --sn-ic-duo: 1 可免重绘瞬切为纯线性（Linear） */
+.sn-ic .sn-ic-d { opacity: var(--sn-ic-duo, .48); }
 /* 一行放不下就横着滑（fitScroll 包上滚动区域，加 .scroll）：滚动区域那一层在行内排版里不另起一行、能被挤窄 */
 .sn-sa:has(> .sn-seg.sn-scroll) { display: inline-block; max-width: 100%; vertical-align: middle; }
 .sn-sa:has(> .sn-tab-list.sn-scroll) { max-width: 100%; }

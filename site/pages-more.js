@@ -398,7 +398,7 @@ export const CUSTOM_PAGES = [
   },
   {
     id: "icon-usage", title: "图标", en: "Icons",
-    lead: "146 个线性图标（Lucide，ISC 许可），24px 网格、1.5px 线宽。在标记里写占位，或者在代码里直接拿 SVG。",
+    lead: "148 个 Solar Icons（480 Design，CC BY 4.0），24px 网格、1.5px 线宽、圆润轮廓；默认 line-duotone 双色调层次，可通过 --sn-ic-duo 变量免重绘切为纯线性。",
     body: [
       ["h2", "在标记里写"],
       ["p", "<code>data-i=\"名字\"</code> 是占位，<code>enhance()</code> 或 <code>injectIcons()</code> 把它换成 SVG。冒号后面写位置：<code>before</code> 放在文字前面，<code>after</code> 放在后面。"],
@@ -407,7 +407,7 @@ export const CUSTOM_PAGES = [
       ["code", "js", 'import { icon } from "satin-ui/icons";\nel.innerHTML = icon("search", 16); // <svg class="sn-ic" …>\n\n// 只引用到的几个，打包时没用到的会摇掉\nimport { plus, search } from "satin-ui/icons";'],
       ["p", "React 里用 <code>&lt;Icon name=\"search\" /&gt;</code>（<code>satin-ui/react</code>），Vue 里用 <code>&lt;SnIcon name=\"search\" /&gt;</code>。按钮组件的 <code>icon</code> 参数也是图标名。"],
       ["h2", "加自己的图标"],
-      ["p", "图标表 <code>ICONS</code> 是图标名到 SVG 内部路径的映射，往里加一项就能在 <code>data-i</code>、<code>icon()</code> 里用。路径照 Lucide 的规矩画：24×24、只描边、不填色。"],
+      ["p", "图标表 <code>ICONS</code> 是图标名到 SVG 内部路径的映射，往里加一项就能在 <code>data-i</code>、<code>icon()</code> 里用。路径照 Solar Icons 的规矩画：24×24、1.5px 线宽、圆润折角，次要笔画加 <code>class=\"sn-ic-d\"</code> 即可响应 <code>--sn-ic-duo</code> 双色调变量。"],
       ["code", "js", 'import { ICONS } from "satin-ui/icons";\n\nICONS.menu = \'<line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>\';'],
       ["p", "全部图标和怎么选，见规范里的<a href=\"#/guide/icons\">图标</a>。"],
     ],

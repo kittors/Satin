@@ -2,7 +2,7 @@
 
 export default {
   title: "图标",
-  lead: "统一的线性图标，线宽 1.5，颜色跟随文字：16 放在正文旁，20 用在工具栏，24 用在空状态。不用 emoji，不用彩色图标。",
+  lead: "统一采用 Solar Icons（480 Design，CC BY 4.0），24px 网格、1.5px 线宽、圆润轮廓，默认 line-duotone 双色调层次（--sn-ic-duo 可免重绘切纯线性），颜色跟随文字：16 放在正文旁，20 用在工具栏，24 用在空状态。不用 emoji，不用彩色图标。",
   related: [{ id: "iconbutton", diff: "只有图标的按钮见图标按钮。" }, { id: "button", diff: "按钮里的图标放在字前或字后。" }],
   dts: {}, // 基础规范：没有组件和函数，只有令牌
   types: [],

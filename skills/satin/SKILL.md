@@ -145,7 +145,7 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 |---|---|---|---|
 | 按钮 | `<Button variant="primary">` | `<button class="sn-btn sn-primary">保存</button>` | 变体由强到弱：primary、secondary、tertiary、ghost、danger、danger-soft；尺寸 `sn-sm` / `sn-lg`；**一个区域只放一个 primary** |
 | 图标按钮 | `<Button variant="ghost" icon="settings" tip="设置" />` | `<button class="sn-btn sn-ghost sn-ibtn" data-tip="设置" data-i="settings"></button>` | 只有图标时必须有 `data-tip` 或 `aria-label` |
-| 带图标的按钮 | `<Button icon="download">导出</Button>` | `data-i="download:before"` + `injectIcons()` | 图标名见 `references/icons.md`（146 个），不要用 emoji |
+| 带图标的按钮 | `<Button icon="download">导出</Button>` | `data-i="download:before"` + `injectIcons()` | 统一采用 Solar Icons（`references/icons.md`，148 个，默认 Line Duotone 双色调，`--sn-ic-duo: 1` 可免重绘切纯线性），不要用 emoji |
 | 等待 / 成功 | `<Button busy>`；`busy(btn, promise)`、`succeed(btn)` | | 300ms 内完成不转圈 |
 | 输入框 + 标签 + 说明 + 错误 | `<Field label help error={错误}><Input /></Field>`（Vue `<SnField :error>`） | `fieldHTML({ label, control: inputHTML(), help, error })` | 错误写在字段下面，不弹窗；`validateForm(form, 规则)` 一次校验。手写标记时：字段加 `sn-bad`，错误写成 `<div class="sn-err"><span>错误文字</span></div>` |
 | 密码框（显示 / 隐藏、大写提示）、邮箱框 | `<Password label value onChange />`、`<Email … />`（Vue `<SnPassword v-model>`、`<SnEmail v-model>`） | `createPassword(空容器, { label, id })`、`createEmail`；注册页密码 `meter: true` 出强度条 | 不要自己做眼睛按钮 |
@@ -262,7 +262,7 @@ createTable(document.getElementById("projects"), {
 3. **不加彩色投影**；卡片不加阴影（阴影只给菜单、弹窗这类浮层），悬停不上浮。
 4. **彩色只表达状态**：成功、警告、失败、进行中；不拿颜色做装饰，一页里彩色越少越好。
 5. **间距只取刻度**（4 的倍数为主：4/8/12/16/20/24/32/40/48/64），字号只取排版层级，字重只用 400/500/600。
-6. **不用 emoji 当图标**，不用 ✨🚀 这类"AI 图标"；图标统一用 Satin 的线性图标。
+6. **不用 emoji 当图标**，不用 ✨🚀 这类"AI 图标"；图标统一用 Satin 内置的 Solar Icons（圆润轮廓 + Line Duotone 双色调层次）。
 7. **文案说人话**：按钮写动作（"删除项目"不写"确定"）；不写"赋能""极致""一站式""释放潜能"这类营销腔；不用"欢迎回来！👋"。
 8. **不堆卡片**：卡片里不再套卡片；仪表盘不做一墙 KPI 卡片（3～4 个指标放一排就够）。
 9. **用真实内容**：像样的名字、数字、日期（"雨夜车站""¥1,280.00""3 分钟前"），不写"Lorem ipsum""示例文本""用户1"。

@@ -151,7 +151,7 @@ w("rules.md", rl);
 
 // ———— 图标 ————
 const { ICONS } = await import(path.join(ROOT, "packages/satin-ui/src/icons.js"));
-w("icons.md", `# 图标（${Object.keys(ICONS).length} 个，线性、1.5 线宽）\n\n标记里写 \`data-i="名字"\`（在文字前：\`data-i="名字:before"\`，后：\`:after\`）再调 \`injectIcons()\`；JS 里 \`icon("名字")\` 得到 SVG 字符串；React \`<Icon name="名字" />\`、按钮 \`icon="名字"\`。不要用 emoji 当图标。\n\n` + Object.keys(ICONS).map((k) => `\`${k}\``).join(" ") + "\n");
+w("icons.md", `# 图标（${Object.keys(ICONS).length} 个，Solar Icons · Line Duotone 双色调，1.5 线宽）\n\n全套采用开源 Solar Icons（480 Design，CC BY 4.0）：24px 网格、圆润轮廓、默认 line-duotone 双色调视觉层级（次要笔画透明度由 CSS 变量 \`--sn-ic-duo\` 控制，默认 \`.48\`，设为 \`1\` 可免重绘切为纯线性 Linear）。\n\n标记里写 \`data-i="名字"\`（在文字前：\`data-i="名字:before"\`，后：\`:after\`）再调 \`injectIcons()\`；JS 里 \`icon("名字")\` 得到 SVG 字符串；React \`<Icon name="名字" />\`、按钮 \`icon="名字"\`。不要用 emoji 当图标。\n\n` + Object.keys(ICONS).map((k) => `\`${k}\``).join(" ") + "\n");
 
 // ———— 页面配方 ————
 const REC = path.join(ROOT, "spec/recipes");

@@ -1203,7 +1203,7 @@ export const API = {
     ["toast(选项)", ["选项", "取值", "说明"], [
       ["kind", '"status" | "action" | "progress"', "状态（3 秒）/ 操作（倒计时环 + 按钮，5 秒）/ 进度（直到 update 成结果）"],
       ["text", "文字", "文件名会自动包起来，不被拆开"],
-      ["icon / tone", 'lucide 图标名 / "ok" | "info" | "danger"', "状态类默认对勾"],
+      ["icon / tone", 'Solar 图标名 / "ok" | "info" | "danger"', "状态类默认对勾"],
       ["action", "{ label, run(t) }", "按钮"],
       ["progress", "0 ~ 1", "进度"],
       ["duration", "毫秒", "多久收起（悬停、聚焦时暂停计时）"],
@@ -1214,7 +1214,7 @@ export const API = {
   ],
   notify: [
     ["notify(选项)", ["选项", "说明"], [
-      ["icon / tone", 'lucide 图标名 / "ok" | "bad" | "warn" | ""'],
+      ["icon / tone", 'Solar 图标名 / "ok" | "bad" | "warn" | ""'],
       ["title / body / time", "标题、正文（文件名不拆开）、时间（默认现在）"],
       ["actions", "[{ label, variant, run(card) }]：按钮；没写 run 就是关闭"],
     ]],
