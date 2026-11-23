@@ -31,7 +31,7 @@ export const CountInput: React.ForwardRefExoticComponent<Base & Controlled<strin
 /** 长文本：随内容长高、用量环；value + onChange 受控，onSubmit（⌘↵）；id 写在 textarea 上 */
 export const LongText: React.ForwardRefExoticComponent<Base & Controlled<string> & { max?: number; maxLines?: number; rows?: number; placeholder?: string; hint?: string; label?: string; name?: string; onChange?(value: string): void; onSubmit?(value: string): void } & React.RefAttributes<SatinInstance>>;
 /** 提示词输入框：onSend 返回 Promise 时发送后进入"生成中"，结束回到可发送；send 是发送按钮的名字 */
-export type ComposerProps = Base & ComposerParts & ComposerPartEvents & { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; upload?(file: File, progress: (p: number) => void): Promise<unknown>; onSend?(message: { text: string; files: HTMLElement[] }): void | Promise<unknown>; onStop?(): void };
+export type ComposerProps = Base & ComposerParts & ComposerPartEvents & { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; upload?(file: File, progress: (p: number) => void): Promise<unknown>; onSend?(message: { text: string; files: HTMLElement[] }): void | Promise<unknown>; onStop?(): void };
 export const Composer: React.ForwardRefExoticComponent<ComposerProps & React.RefAttributes<SatinInstance>>;
 export const Email: React.ForwardRefExoticComponent<Base & Controlled<string> & { label?: string; help?: string; name?: string; placeholder?: string; size?: "sm" | "lg" | "xl"; autocomplete?: string; onChange?(value: string): void } & React.RefAttributes<SatinInstance>>;
 /** 日期、时间、地址选择器的属性：kind 选种类；onChange 拿到 { text }（触发框里显示的文字）。没有 value：现在只能读出选中的结果 */

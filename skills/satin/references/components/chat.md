@@ -1065,6 +1065,7 @@ export default function Storyboard() {
 | `max` | `number` | 500 | 否 | 输入框最多几个字。 | createXxx 选项：`max`；React：`max`；Preact：`max`；Vue：`max` |
 | `maxLines` | `number` | 5 | 否 | 输入框最多长到几行，再多在框里滚。 | createXxx 选项：`maxLines`；React：`maxLines`；Preact：`maxLines`；Vue：`maxLines（模板里写 max-lines）` |
 | `attach` | `boolean` | true | 否 | 输入框带不带附件按钮。 | createXxx 选项：`attach`；React：`attach`；Preact：`attach`；Vue：`attach` |
+| `voice` | `boolean` | true | 否 | 输入框带不带语音输入按钮（支持实时声波与语音转写交互）。 | createXxx 选项：`voice`；React：`voice`；Preact：`voice`；Vue：`voice` |
 | `composer` | `{ upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: Partial<Record<"img" \| "vid" \| "aud" \| "doc", (counter: { n: number }) => ComposerAttachment>> }` | — | 否 | 底部输入框的选项：upload 真上传（不给是演示用的假进度）、attachments 附件菜单每一项（img / vid / aud / doc）点了以后给出的附件（演示、自己接选择器时用）。 | createXxx 选项：`composer`；React：`composer`；Preact：`composer`；Vue：`composer` |
 | `hiRes` | `(bg: string) => string` | 原样 | 否 | 点开看大图时用的高清背景（缩略图的 g 换成大图）。 | createXxx 选项：`hiRes`；React：`hiRes`；Preact：`hiRes`；Vue：`hiRes（模板里写 hi-res）` |
 | `empty` | `ChatEmpty \| boolean` | 对话图标 + "有什么可以帮你？" | 否 | 新对话：还没有消息时消息区正中的样子——`{ icon, title, subtitle, suggestions }`（单色图标、标题、说明、2～4 个建议，点建议填进输入框、不直接发）。第一次露出来时依次淡入；第一条消息进来（发出或收到）就淡出，输入框不动。不写也有默认的；`false` 不要；要自己画见插槽 empty。只在创建时用。 | createXxx 选项：`empty`；React：`empty`；Preact：`empty`；Vue：`empty` |

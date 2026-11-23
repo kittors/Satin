@@ -43,11 +43,18 @@ export const cmModeHTML = (mode) => {
   return `<div class="sn-select sn-inline-menu sn-up sn-cm-pick" data-pick="mode"><button type="button" class="sn-tag sn-cm-mode${TONES[tone] || ""}" data-menubtn aria-haspopup="menu"><i></i><span class="sn-cm-lbl">${attr(cur.label)}</span>${caret}</button>${menuHTML(m.options, cur, true)}</div>`;
 };
 // 模型按钮在窄的时候（底部一行放不下全名）只显示档位：每项可以给 short，不给就取 label 里最后一个"·"后面那段；全名在菜单里、也是按钮的读屏名
+// 宽屏下按最后一个"·"拆成两段色阶（主名深色 + 档位浅灰），textContent 依然完整一致
 const shortOf = (m) => String(m.short ?? String(m.label).split(/\s*·\s*/).pop());
+const modelLabelHTML = (label) => {
+  const s = String(label ?? ""), i = s.lastIndexOf("·");
+  if (i <= 0 || i >= s.length - 1) return attr(s);
+  const a = s.slice(0, i).trimEnd(), b = s.slice(i);
+  return `<span class="sn-cm-m1">${attr(a)}</span><span class="sn-cm-m2"> ${attr(b)}</span>`;
+};
 export const cmModelsHTML = (models, model) => {
   if (!models?.length) return "";
   const cur = optOf(models, model);
-  return `<div class="sn-select sn-inline-menu sn-up sn-cm-pick sn-cm-models" data-pick="model"><button type="button" class="sn-btn sn-ghost sn-sm sn-cm-model" data-menubtn data-cm-models aria-haspopup="menu" aria-label="${attr(cur.label)}" data-tip="${attr(tt("input.model"))}"><span class="sn-cm-lbl">${attr(cur.label)}</span><span class="sn-cm-lbl sn-cm-lbl-s" aria-hidden="true">${attr(shortOf(cur))}</span>${caret}</button>` +
+  return `<div class="sn-select sn-inline-menu sn-up sn-cm-pick sn-cm-models" data-pick="model"><button type="button" class="sn-btn sn-ghost sn-sm sn-cm-model" data-menubtn data-cm-models aria-haspopup="menu" aria-label="${attr(cur.label)}" data-tip="${attr(tt("input.model"))}"><span class="sn-cm-lbl">${modelLabelHTML(cur.label)}</span><span class="sn-cm-lbl sn-cm-lbl-s" aria-hidden="true">${attr(shortOf(cur))}</span>${caret}</button>` +
     menuHTML(models, cur).replace(/data-v="([^"]*)">/g, (m0, v) => { const o = models.find((x) => attr(x.value) === v); return `data-v="${v}" data-short="${attr(o ? shortOf(o) : "")}">`; }) + `</div>`;
 };
 const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
@@ -65,12 +72,13 @@ export function syncComposerParts(k, n, p) {
 }
 // 按钮上的字换了：旧字往上淡出、新字从下面淡入（只动透明度和位移）；减少动态效果时直接换
 const OUT_STRONG = "cubic-bezier(.22,1,.36,1)";
-function swapLabel(lbl, text, animate = true) {
+function swapLabel(lbl, text, animate = true, html) {
   if (!lbl || lbl.textContent === text) return;
-  if (!animate || reduced() || !lbl.isConnected) { lbl.textContent = text; return; }
+  const apply = () => { if (html != null) lbl.innerHTML = html; else lbl.textContent = text; };
+  if (!animate || reduced() || !lbl.isConnected) { apply(); return; }
   const old = lbl.cloneNode(true); old.setAttribute("aria-hidden", "true");
   Object.assign(old.style, { position: "absolute", left: lbl.offsetLeft + "px", top: lbl.offsetTop + "px", pointerEvents: "none" });
-  lbl.parentElement.append(old); lbl.textContent = text;
+  lbl.parentElement.append(old); apply();
   old.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-6px)" }], { duration: 140, easing: EASE_IN, fill: "forwards" }).onfinish = () => old.remove();
   lbl.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 220, delay: 40, easing: OUT_STRONG, fill: "backwards" });
 }
@@ -299,12 +307,14 @@ export function mountStepper(st, { onChange } = {}) {
 //   onStop()：生成中点停止；upload(file, onProgress) 返回 Promise：真上传（不给就是演示用的假进度）。
 //   不给 onSend、写了 data-external：发送 / 停止改成在容器上发 compose / compose-stop 事件（对话组件就这样接）。
 //   返回 { setBusy(on), clear({ smooth }), files() }
-export function mountComposer(box, { onSend, onStop, upload: realUpload, attachments, onModelChange, onModeChange, onContextChange, onContextClick } = {}) {
+export function mountComposer(box, { onSend, onStop, upload: realUpload, attachments, voice, onModelChange, onModeChange, onContextChange, onContextClick } = {}) {
   if (box._cm) return box._cm;
   // 输入框里的菜单（附件、模型）自己接上：用 createComposer / createChat 渲染出来的输入框，页面不一定调过 bindForms；已经接过的不重复接
   for (const h of box.querySelectorAll(".sn-select")) mountSelect(h);
+  const card = $(".sn-cm-card", box) || box;
   const ta = $("textarea", box), send = $(".sn-cm-send", box), files = $(".sn-cm-files", box), swap = $(".sn-swap", send);
   autoGrow(box); const upd = longCount(box, { showFrom: .5 });
+  if (card !== box) card.addEventListener("pointerdown", (e) => { if (e.target === card) { e.preventDefault(); ta.focus(); } });
   // 附件多了横向滚动：不显示滚动条（会压在附件上），只靠左右渐隐；竖滚轮也能横着滚；滚到头回弹
   scrollArea(files, { fade: "x", size: 20, bar: "none", wheel: "x", overscroll: "bounce" });
   // 就地提示：附件太大、上传失败时，在附件条下面写一行红字（留 5 秒）；同时被拒的几个合成一句
@@ -327,6 +337,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     retip(send); // 提示正开着（指针停在按钮上）就当场换成新状态的字
   };
   const setBusy = (on) => {
+    if (on && voiceState.on) stopVoice(false);
     busy = on; box.classList.toggle("sn-busy", on && !external); send.classList.toggle("sn-busy", on); swap.classList.toggle("sn-on", on); ta.readOnly = on && !external;
     send.setAttribute("aria-label", on ? tt("input.17") : idleLabel); send.dataset.tip = on ? tt("input.17") : idleLabel;
     // 生成中 ⌘↵ 停不了（键盘只晃一下停止按钮），提示里就不带快捷键；回到能发送再带上
@@ -336,6 +347,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   const reset = () => { setBusy(false); ta.focus({ preventScroll: true }); };
   // 键盘提交：生成中不停止也不发送（停止是破坏性操作，只能点按钮），只轻轻晃一下停止按钮提示
   const start = (fromKey = false) => {
+    if (voiceState.on) stopVoice(false);
     if (busy && fromKey === true) { nudge(send); return; }
     if (busy) { if (onStop) onStop(); else if (external) box.dispatchEvent(new CustomEvent("compose-stop")); reset(); return; }
     if (!send.classList.contains("sn-ready")) { if (box.classList.contains("sn-over")) nudge($(".sn-ta-count", box)); else ta.focus(); return; }
@@ -361,7 +373,177 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     }
     ta.dispatchEvent(new Event("input"));
   };
-  box._cm = { setBusy, clear, files: kept };
+  // ———— 语音输入：一键开麦 / 再点停止，按钮原地切换为 4 根灵动微声纹，文字实时落入输入框（零冗余确认/取消弹窗） ————
+  const voiceEnabled = voice !== false && box.dataset.voice !== "off";
+  const bar = $(".sn-cm-bar", box);
+  let micBtn = $("[data-cm-voice]", box);
+  if (voiceEnabled && !micBtn && bar && send) {
+    micBtn = document.createElement("button");
+    micBtn.type = "button"; micBtn.className = "sn-btn sn-ghost sn-sm sn-ibtn sn-cm-mic";
+    micBtn.setAttribute("data-cm-voice", ""); micBtn.dataset.tip = tt("input.voice");
+    micBtn.setAttribute("aria-label", tt("input.voice")); micBtn.setAttribute("aria-pressed", "false");
+    micBtn.innerHTML = `<span class="sn-swap"><span class="sn-a" data-i="mic"></span><span class="sn-b"><span class="sn-cm-vw" aria-hidden="true"><i></i><i></i><i></i><i></i></span></span></span>`;
+    send.before(micBtn); injectIcons(micBtn);
+  }
+  const VBARS = 4;
+  const micSwap = micBtn && $(".sn-swap", micBtn), vBars = micBtn ? $$(".sn-cm-vw i", micBtn) : [];
+  const voiceState = { on: false, base: "", sep: "", final: "", interim: "", t0: 0, raf: 0, demoT: 0, demoIdx: 0, demoPos: 0, demoText: "", rec: null, stream: null, actx: null, analyser: null, freq: null, levels: new Float32Array(VBARS) };
+  const applyVoiceText = (str) => {
+    ta.value = voiceState.base + (str ? voiceState.sep + str : "");
+    ta.dispatchEvent(new Event("input", { bubbles: true }));
+    ta.scrollTop = ta.scrollHeight;
+  };
+  const stopVoiceMedia = () => {
+    cancelAnimationFrame(voiceState.raf); voiceState.raf = 0;
+    clearTimeout(voiceState.demoT); voiceState.demoT = 0;
+    try { voiceState.rec?.abort?.(); } catch { /* ignore */ }
+    voiceState.rec = null;
+    if (voiceState.stream) { for (const tr of voiceState.stream.getTracks()) tr.stop(); voiceState.stream = null; }
+    if (voiceState.actx) { voiceState.actx.close?.().catch?.(() => {}); voiceState.actx = null; }
+    voiceState.analyser = null; voiceState.freq = null;
+  };
+  const runDemoDictation = () => {
+    if (!voiceState.on || voiceState.demoT) return;
+    const pool = [tt("input.voiceDemo0"), tt("input.voiceDemo1"), tt("input.voiceDemo2")];
+    voiceState.demoText = pool[voiceState.demoIdx++ % pool.length];
+    voiceState.demoPos = 0;
+    const step = () => {
+      if (!voiceState.on) return;
+      const take = 1 + ((voiceState.demoPos * 7) % 3);
+      voiceState.demoPos = Math.min(voiceState.demoText.length, voiceState.demoPos + take);
+      voiceState.final = voiceState.demoText.slice(0, voiceState.demoPos);
+      applyVoiceText(voiceState.final);
+      if (voiceState.demoPos < voiceState.demoText.length) {
+        const ch = voiceState.final.at(-1);
+        const pause = /[，。、,.]/.test(ch) ? 240 : 90 + ((voiceState.demoPos * 19) % 65);
+        voiceState.demoT = setTimeout(step, pause);
+      } else {
+        voiceState.demoT = setTimeout(() => { if (voiceState.on) stopVoice(false); }, 500);
+      }
+    };
+    voiceState.demoT = setTimeout(step, 300);
+  };
+  const animateWave = (now) => {
+    if (!voiceState.on) return;
+    voiceState.raf = requestAnimationFrame(animateWave);
+    if (reduced()) {
+      const st = [.45, .85, .65, .45];
+      for (let i = 0; i < VBARS; i++) vBars[i].style.transform = `scaleY(${st[i]})`;
+      return;
+    }
+    const t = (now - voiceState.t0) * .001;
+    let hasAudio = false;
+    if (voiceState.analyser && voiceState.freq) {
+      voiceState.analyser.getByteFrequencyData(voiceState.freq);
+      let sum = 0;
+      for (let k = 2; k < 24; k++) sum += voiceState.freq[k];
+      hasAudio = sum > 24;
+    }
+    const WEIGHT = [.68, 1, .92, .68], PHASE = [0, 1.7, 3.3, 4.9];
+    for (let i = 0; i < VBARS; i++) {
+      let target;
+      if (hasAudio) {
+        const idx = 3 + i * 5;
+        target = Math.min(1, .28 + (voiceState.freq[idx] / 190) * WEIGHT[i]);
+      } else {
+        const wave = .54 + .32 * Math.sin(t * 7.2 + PHASE[i]) + .14 * Math.cos(t * 11.4 - PHASE[i]);
+        target = Math.max(.26, Math.min(1, (.24 + wave * .76) * WEIGHT[i]));
+      }
+      const prev = voiceState.levels[i] || .35;
+      const cur = prev + (target - prev) * .32;
+      voiceState.levels[i] = cur;
+      vBars[i].style.transform = `scaleY(${cur.toFixed(3)})`;
+    }
+  };
+  function stopVoice(cancel = false) {
+    if (!voiceState.on) return;
+    voiceState.on = false;
+    stopVoiceMedia();
+    box.classList.remove("sn-recording");
+    micBtn?.classList.remove("sn-on");
+    micSwap?.classList.remove("sn-on");
+    if (micBtn) {
+      micBtn.setAttribute("aria-pressed", "false");
+      micBtn.setAttribute("aria-label", tt("input.voice"));
+      micBtn.dataset.tip = tt("input.voice");
+      retip(micBtn);
+    }
+    if (cancel) {
+      ta.value = voiceState.base;
+      ta.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    ta.focus({ preventScroll: true });
+    const n = ta.value.length; ta.setSelectionRange(n, n);
+    sync();
+  }
+  function startVoice() {
+    if (!voiceEnabled || busy) return;
+    if (voiceState.on) { stopVoice(false); return; }
+    voiceState.on = true;
+    voiceState.base = ta.value;
+    voiceState.sep = ta.value && !/[\s，。！？,.!?]$/.test(ta.value) ? " " : "";
+    voiceState.final = ""; voiceState.interim = ""; voiceState.demoText = "";
+    voiceState.t0 = performance.now();
+    voiceState.levels.fill(.35);
+    box.classList.add("sn-recording");
+    micBtn?.classList.add("sn-on");
+    micSwap?.classList.add("sn-on");
+    if (micBtn) {
+      micBtn.setAttribute("aria-pressed", "true");
+      micBtn.setAttribute("aria-label", tt("input.voiceStop"));
+      micBtn.dataset.tip = tt("input.voiceStop");
+      retip(micBtn);
+    }
+    voiceState.raf = requestAnimationFrame(animateWave);
+
+    // 优先接真实麦克风 + Web Speech API；无权限 / 非安全源 / 不支持时无缝切入拟真听写体验
+    const SR = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    let speechStarted = false;
+    if (SR) {
+      try {
+        const rec = new SR();
+        rec.lang = document.documentElement.lang || "zh-CN";
+        rec.continuous = true; rec.interimResults = true;
+        rec.onresult = (ev) => {
+          if (!voiceState.on) return;
+          clearTimeout(voiceState.demoT); voiceState.demoT = 0;
+          let fin = "", inter = "";
+          for (let i = 0; i < ev.results.length; i++) {
+            const r = ev.results[i];
+            if (r.isFinal) fin += r[0].transcript; else inter += r[0].transcript;
+          }
+          voiceState.final = fin; voiceState.interim = inter;
+          applyVoiceText((fin + inter).trim());
+        };
+        rec.onerror = () => { if (voiceState.on && !voiceState.final && !voiceState.interim) runDemoDictation(); };
+        rec.start(); voiceState.rec = rec; speechStarted = true;
+      } catch { speechStarted = false; }
+    }
+    if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+        if (!voiceState.on) { for (const tr of stream.getTracks()) tr.stop(); return; }
+        voiceState.stream = stream;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) {
+          const actx = new AC(), src = actx.createMediaStreamSource(stream), analyser = actx.createAnalyser();
+          analyser.fftSize = 64; analyser.smoothingTimeConstant = .72;
+          src.connect(analyser);
+          voiceState.actx = actx; voiceState.analyser = analyser; voiceState.freq = new Uint8Array(analyser.frequencyBinCount);
+        }
+        if (!speechStarted) runDemoDictation();
+      }).catch(() => {
+        if (voiceState.on && !voiceState.final && !voiceState.interim) runDemoDictation();
+      });
+    } else if (!speechStarted) {
+      runDemoDictation();
+    }
+  }
+  micBtn?.addEventListener("click", () => startVoice());
+  box.addEventListener("keydown", (e) => {
+    if (voiceState.on && e.key === "Escape") { e.preventDefault(); e.stopPropagation(); stopVoice(false); }
+  });
+  onCleanup(() => stopVoice(true));
+  box._cm = { setBusy, clear, files: kept, startVoice, stopVoice };
   // 填一段字进输入框（新对话的建议、程序里预填）：长高、计数、发送按钮跟着变，光标放到最后；字淡入
   box._cm.fill = (text) => {
     ta.value = String(text ?? ""); ta.dispatchEvent(new Event("input", { bubbles: true })); ta.focus({ preventScroll: true }); const n = ta.value.length; ta.setSelectionRange(n, n);
@@ -372,7 +554,6 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   // 底部一行不折行，发送按钮永远在最右：放不下全名（全名被省略了、或者一行撑出去了）就收起——模型只显示档位（"精细"），
   // 风格这种文字按钮收成图标；再放不下（320 宽这种，档位也被省略了）：底部一行收紧一点（左右留白、用量环和权限标签的间距），一般就够了
   const cut = (el) => el && el.scrollWidth > el.clientWidth + 0.5;
-  const bar = $(".sn-cm-bar", box);
   const over = () => cut(bar) || [...box.querySelectorAll(".sn-cm-bar .sn-cm-lbl:not(.sn-cm-lbl-s)")].some((l) => l.offsetParent && cut(l));
   const fitModel = () => {
     if (!bar || !box.querySelector(".sn-cm-bar .sn-cm-lbl")) return;
@@ -384,7 +565,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   // 老写法（设计稿里的标记）：风格按钮、模型按钮的字直接写在按钮里——包成能收起的两段（风格：图标 + 字；模型：全名 + 档位），一行放不下时收起
   const styleBtn0 = $("[data-cm-style]", box), modelBtn0 = $("[data-cm-model]", box);
   if (styleBtn0 && !styleBtn0.querySelector(".sn-cm-lbl")) { const t = styleBtn0.textContent; styleBtn0.innerHTML = `<span class="sn-cm-ic" data-i="palette" aria-hidden="true"></span><span class="sn-cm-lbl"></span>`; styleBtn0.lastChild.textContent = t; if (!styleBtn0.getAttribute("aria-label")) styleBtn0.setAttribute("aria-label", t); injectIcons(styleBtn0); }
-  if (modelBtn0 && !modelBtn0.querySelector(".sn-cm-lbl")) { const tn = modelBtn0.firstChild; if (tn?.nodeType === 3) { const full = tn.textContent.trim(), l = document.createElement("span"), s = document.createElement("span"); l.className = "sn-cm-lbl"; l.textContent = full; s.className = "sn-cm-lbl sn-cm-lbl-s"; s.setAttribute("aria-hidden", "true"); s.textContent = shortOf({ label: full }); tn.replaceWith(l, s); if (!modelBtn0.getAttribute("aria-label")) modelBtn0.setAttribute("aria-label", full); } }
+  if (modelBtn0 && !modelBtn0.querySelector(".sn-cm-lbl")) { const tn = modelBtn0.firstChild; if (tn?.nodeType === 3) { const full = tn.textContent.trim(), l = document.createElement("span"), s = document.createElement("span"); l.className = "sn-cm-lbl"; l.innerHTML = modelLabelHTML(full); s.className = "sn-cm-lbl sn-cm-lbl-s"; s.setAttribute("aria-hidden", "true"); s.textContent = shortOf({ label: full }); tn.replaceWith(l, s); if (!modelBtn0.getAttribute("aria-label")) modelBtn0.setAttribute("aria-label", full); } }
   if (bar && box.querySelector(".sn-cm-bar .sn-cm-lbl")) { new ResizeObserver(fitModel).observe(box); fitModel(); }
   const choose = (pick, v, quiet) => {
     const items = [...pick.querySelectorAll(".sn-menu .sn-item")], it = items.find((x) => x.dataset.v === String(v)); if (!it) return false;
@@ -393,7 +574,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     if (pick.dataset.pick === "model") {
       // 全名、档位两个都换（看得见的那个带动画），读屏名跟着全名；换完量一下全名放不放得下
       const compact = box.classList.contains("sn-cm-compact");
-      swapLabel(btn.querySelector(".sn-cm-lbl:not(.sn-cm-lbl-s)"), full, !quiet && !compact);
+      swapLabel(btn.querySelector(".sn-cm-lbl:not(.sn-cm-lbl-s)"), full, !quiet && !compact, modelLabelHTML(full));
       swapLabel(btn.querySelector(".sn-cm-lbl-s"), it.dataset.short || full, !quiet && compact);
       btn.setAttribute("aria-label", full); fitModel();
     } else swapLabel(btn.querySelector(".sn-cm-lbl"), full, !quiet);
@@ -487,9 +668,20 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     const ap = e.target.closest(".sn-ap"); if (ap) { toggleAudio(ap.closest(".sn-cm-file")); return; }
     const f = e.target.closest(".sn-cm-file.sn-fail"); if (f) upload(f);
   });
-  // 附件菜单（[data-add] 的条目）：点了以后由 attachments[键](计数器) 给出一个附件 { kind: img | vid | aud | doc, name, size, g（缩略图背景）, dur, ext, seed, failAt, bad }
+  // 附件菜单（[data-add] 的条目）：优先用 attachments[键](计数器)；未传演示回调时打开原生系统文件选择器，真选本地文件
   const counter = { get n() { return fileN; }, set n(v) { fileN = v; } };
-  box.addEventListener("click", (e) => { const it = e.target.closest(".sn-menu .sn-item[data-add]"); if (it && box.contains(it) && attachments?.[it.dataset.add]) addFile(attachments[it.dataset.add](counter)); });
+  const ACCEPT = { img: "image/*", vid: "video/*", aud: "audio/*", doc: ".pdf,.doc,.docx,.txt,.md,.csv,.json" };
+  box.addEventListener("click", (e) => {
+    const it = e.target.closest(".sn-menu .sn-item[data-add]");
+    if (!it || !box.contains(it)) return;
+    const k = it.dataset.add;
+    if (attachments?.[k]) { addFile(attachments[k](counter)); return; }
+    if (!ACCEPT[k]) return;
+    const inp = document.createElement("input");
+    inp.type = "file"; inp.multiple = true; inp.accept = ACCEPT[k];
+    inp.onchange = () => { for (const file of inp.files || []) addReal(file); };
+    inp.click();
+  });
   // 真文件：拖进来、粘贴。图片直接用本地预览；音视频读一下时长
   const kindOf = (file) => (file.type.startsWith("image/") ? "img" : file.type.startsWith("video/") ? "vid" : file.type.startsWith("audio/") ? "aud" : "doc");
   const clock = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;

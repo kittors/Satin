@@ -662,7 +662,8 @@ export default function PromptParts() {
 | `placeholder` | `string` | "" | 否 | 空着时的提示：写个例子。 | createXxx 选项：`placeholder`；React：`placeholder`；Preact：`placeholder`；Vue：`placeholder` |
 | `max` | `number` | 500 | 否 | 字数上限（右下角的用量环）。 | createXxx 选项：`max`；React：`max`；Preact：`max`；Vue：`max` |
 | `maxLines` | `number` | 5 | 否 | 最多长到几行，再多在里面滚。 | createXxx 选项：`maxLines`；React：`maxLines`；Preact：`maxLines`；Vue：`maxLines（模板里写 max-lines）` |
-| `attach` | `boolean` | true | 否 | 左下角的 +（加图片、视频、音频、文档）。 | createXxx 选项：`attach`；React：`attach`；Preact：`attach`；Vue：`attach` |
+| `attach` | `boolean` | true | 否 | 左下角的 +（加图片、视频、音频、文档；未配演示回调时自动唤起系统文件选择器）。 | createXxx 选项：`attach`；React：`attach`；Preact：`attach`；Vue：`attach` |
+| `voice` | `boolean` | true | 否 | 发送键左侧的一键语音输入按钮：点击原地切换为动态微声纹并实时听写进输入框，再点一下或直接点发送即可停止，零多余确认步骤。 | createXxx 选项：`voice`；React：`voice`；Preact：`voice`；Vue：`voice` |
 | `send` | `string` | "发送" | 否 | 发送按钮的名字（读屏、提示里）："生成"。 | createXxx 选项：`send`；React：`send`；Preact：`send`；Vue：`send` |
 | `upload` | `(file: File, progress: (p: number) => void) => Promise<unknown>` | 演示用的假进度 | 否 | 真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。 | createXxx 选项：`upload`；React：`upload`；Preact：`upload`；Vue：`upload` |
 | `external` | `boolean` | false | 否 | 发送由外面接管（对话组件里用），发送后不在这里清空。 | createXxx 选项：`external` |
@@ -690,6 +691,8 @@ export default function PromptParts() {
 | `clear` | `clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void` | 清空（`smooth` 时文字淡出、框缩回去）。 |
 | `files` | `files(): HTMLElement[]` | 现在的附件（缩略图元素）。 |
 | `fill` | `fill(text: string): void` | 把一段字填进输入框（字淡入、拿到焦点、光标在最后），不发。 |
+| `startVoice` | `startVoice(): void` | 开始语音输入（展开实时动态声波与实时听写）。 |
+| `stopVoice` | `stopVoice(cancel?: boolean): void` | 结束语音输入；cancel 为 true 时放弃本次听写并恢复原文本。 |
 
 所有组件都有：`el`、`update(选项)`、`destroy()`、`on(事件, 回调)`、`off(事件, 回调)`。
 
@@ -697,7 +700,7 @@ export default function PromptParts() {
 
 | 签名 | 从哪引 | 说明 |
 |---|---|---|
-| `composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string` | `satin-ui` | 拼出提示词输入框的标记（服务端渲染、模板里用）。 |
+| `composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string` | `satin-ui` | 拼出提示词输入框的标记（服务端渲染、模板里用）。 |
 
 ## 样式定制
 

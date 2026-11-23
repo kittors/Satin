@@ -36,13 +36,13 @@ const chatEmptyHTML = (e, hide) => {
     (o.suggestions?.length ? `<div class="sn-chat-sugs">${o.suggestions.map((t) => `<button type="button" class="sn-chat-sug">${esc(t)}</button>`).join("")}</div>` : "") +
     `</div>`;
 };
-export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true, empty: em, history, context, mode, models, model, menu, newChat } = {}) => {
+export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true, voice = true, empty: em, history, context, mode, models, model, menu, newChat } = {}) => {
   const empty = emptyOf(em);
   // 顶栏两侧（可选）：左边会话列表、右边新对话，像 ChatGPT / Codex 的手机端；单色细线图标，点了发 menu / newChat
   const hb = (on, k, ic, label) => (on ? `<button type="button" class="sn-btn sn-ghost sn-ibtn sn-chat-hb" data-chat-${k} data-tip="${esc(label)}" aria-label="${esc(label)}" data-i="${ic}"></button>` : "");
   return `<div class="sn-chat-hd${menu || newChat ? " sn-has-btns" : ""}">${hb(menu, "menu", "menu", tt("chat.menu"))}<div class="sn-tx"><b>${esc(title)}</b><span class="sn-sub"><span data-chat-status>${esc(status ?? "")}</span></span></div>${hb(newChat, "new", "square-pen", tt("chat.newChat"))}</div>` +
   `<div class="sn-chat-body"><div class="sn-chat-vp"><div class="sn-chat-canvas"><div class="sn-chat-ph sn-top"></div><div class="sn-chat-ph sn-bot"></div></div></div><button class="sn-chat-jump" data-chat-jump aria-label="${esc(tt("chat.jump"))}"><span data-i="arrow-down"></span><span class="sn-badge" hidden>0</span></button>${chatEmptyHTML(empty, !!history)}</div>` +
-  `<div class="sn-chat-foot">${composerHTML({ placeholder, max, maxLines, attach, external: true, context, mode, models, model, fresh: !!empty })}</div>`;
+  `<div class="sn-chat-foot">${composerHTML({ placeholder, max, maxLines, attach, voice, external: true, context, mode, models, model, fresh: !!empty })}</div>`;
 };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -71,7 +71,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   let emptyGone = !emptyEl;
   // 底部的提示词输入框（data-external：发送 / 停止交给对话）：还没人接就在这里接上——页面不用再调 bindInputs。
   // cmOpts：传给输入框的选项（upload 上传函数、attachments 预置附件）
-  if (!composer._cm) mountComposer(composer, { ...cmOpts, onModelChange, onModeChange, onContextChange, onContextClick });
+  if (!composer._cm) mountComposer(composer, { ...cmOpts, voice: view.voice, onModelChange, onModeChange, onContextChange, onContextClick });
   const PAD_T = 12, GAP = 16; // GAP = 条目自己的下内边距（.ci 的 padding-bottom）
   // 列表一直延伸到输入框底下（输入框浮在上面）：列表底部留出输入框那么高的地方，最后一条停在输入框上方；输入框变高时跟着让
   let PAD_B = 18; const foot = $(".sn-chat-foot", box);
@@ -606,7 +606,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   new IntersectionObserver((es, io) => { if (es.some((x) => x.isIntersecting)) { toBottom(); requestAnimationFrame(toBottom); io.disconnect(); } }).observe(box);
   void $$; void injectIcons; void toast;
   // 销毁：停掉正在生成的回答、放开实例（同一个容器可以再挂一次）。挂载时加的监听、观察器由 createChat 一起撤
-  const destroy = () => { if (job) job.stop = true; job = null; if (box._chat === api) delete box._chat; };
+  const destroy = () => { if (job) job.stop = true; job = null; composer?._cm?.stopVoice?.(true); if (box._chat === api) delete box._chat; };
   // 程序里发一条（和用户在输入框里发一样：飞进列表、然后回复）
   const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, destroy,
     fill: (text) => composer._cm?.fill(text), get emptyEl() { return emptyEl; } };

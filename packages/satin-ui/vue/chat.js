@@ -9,7 +9,7 @@ import { defineComponent, h, ref, computed, shallowRef, onMounted, Teleport } fr
 import { createChat } from "../src/chat.js";
 import { wrap } from "./wrap.js";
 
-const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model", "menu", "newChat"];
+const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "voice", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model", "menu", "newChat"];
 const Base = /* @__PURE__ */ wrap(createChat, { name: "SnChatInstance", props: KEYS, events: ["modelChange", "modeChange", "contextChange", "contextClick", "menu", "newChat"], modelEvent: null });
 export const Chat = /* @__PURE__ */ defineComponent({
   name: "SnChat", inheritAttrs: false,

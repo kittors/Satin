@@ -35,4 +35,9 @@ export default {
   "input.32": "分镜模型 · {p0}",
   "input.ctx": "上下文",
   "input.model": "换模型",
+  "input.voice": "语音输入",
+  "input.voiceStop": "停止语音输入",
+  "input.voiceDemo0": "把第三集开头车站外的雨夜色调再压冷一点，镜头慢慢推近到候车厅门口",
+  "input.voiceDemo1": "给这一段加上低沉的钢琴伴奏和远处列车进站的环境声",
+  "input.voiceDemo2": "把雨夜站台的画面比例调成宽银幕电影感，保留人物脸上的车灯反光",
 };

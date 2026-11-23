@@ -37,7 +37,8 @@ export default {
     { name: "placeholder", type: "string", default: "\"\"", required: false, desc: "空着时的提示：写个例子。", names: { js: "placeholder", react: "placeholder", preact: "placeholder", vue: "placeholder" } },
     { name: "max", type: "number", default: "500", required: false, desc: "字数上限（右下角的用量环）。", names: { js: "max", react: "max", preact: "max", vue: "max" } },
     { name: "maxLines", type: "number", default: "5", required: false, desc: "最多长到几行，再多在里面滚。", names: { js: "maxLines", react: "maxLines", preact: "maxLines", vue: "maxLines（模板里写 max-lines）" } },
-    { name: "attach", type: "boolean", default: "true", required: false, desc: "左下角的 +（加图片、视频、音频、文档）。", names: { js: "attach", react: "attach", preact: "attach", vue: "attach" } },
+    { name: "attach", type: "boolean", default: "true", required: false, desc: "左下角的 +（加图片、视频、音频、文档；未配演示回调时自动唤起系统文件选择器）。", names: { js: "attach", react: "attach", preact: "attach", vue: "attach" } },
+    { name: "voice", type: "boolean", default: "true", required: false, desc: "发送键左侧的一键语音输入按钮：点击原地切换为动态微声纹并实时听写进输入框，再点一下或直接点发送即可停止，零多余确认步骤。", names: { js: "voice", react: "voice", preact: "voice", vue: "voice" } },
     { name: "send", type: "string", default: "\"发送\"", required: false, desc: "发送按钮的名字（读屏、提示里）：\"生成\"。", names: { js: "send", react: "send", preact: "send", vue: "send" } },
     { name: "upload", type: "(file: File, progress: (p: number) => void) => Promise<unknown>", default: "演示用的假进度", required: false,
       desc: "真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。", names: { js: "upload", react: "upload", preact: "upload", vue: "upload" } },
@@ -61,9 +62,11 @@ export default {
     { name: "clear", kind: "method", signature: "clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void", returns: "void", desc: "清空（`smooth` 时文字淡出、框缩回去）。" },
     { name: "files", kind: "method", signature: "files(): HTMLElement[]", returns: "HTMLElement[]", desc: "现在的附件（缩略图元素）。" },
     { name: "fill", kind: "method", signature: "fill(text: string): void", returns: "void", desc: "把一段字填进输入框（字淡入、拿到焦点、光标在最后），不发。" },
+    { name: "startVoice", kind: "method", signature: "startVoice(): void", returns: "void", desc: "开始语音输入（展开实时动态声波与实时听写）。" },
+    { name: "stopVoice", kind: "method", signature: "stopVoice(cancel?: boolean): void", returns: "void", desc: "结束语音输入；cancel 为 true 时放弃本次听写并恢复原文本。" },
   ],
   functions: [
-    { name: "composerHTML", signature: "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string", returns: "string", from: "satin-ui", desc: "拼出提示词输入框的标记（服务端渲染、模板里用）。" },
+    { name: "composerHTML", signature: "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string", returns: "string", from: "satin-ui", desc: "拼出提示词输入框的标记（服务端渲染、模板里用）。" },
   ],
   cssVars: [
     { name: "--sn-field", desc: "输入框底色", default: "白（深色主题深灰）", token: true },

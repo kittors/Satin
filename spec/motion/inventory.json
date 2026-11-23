@@ -1,7 +1,7 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 306,
-  "var(--sn-ease-out-strong)": 61,
+  "var(--sn-ease-out)": 311,
+  "var(--sn-ease-out-strong)": 62,
   "linear": 37,
   "var(--sn-ease-overshoot)": 11,
   "var(--sn-ease-in-out)": 24,
@@ -1555,6 +1555,18 @@
   },
   {
    "file": "packages/satin-ui/css/input.css",
+   "selector": ".sn-composer",
+   "prop": "transition",
+   "value": "box-shadow .2s var(--sn-ease-out), background-color .16s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/input.css",
+   "selector": ".sn-cm-card",
+   "prop": "transition",
+   "value": "box-shadow .2s var(--sn-ease-out), background-color .16s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/input.css",
    "selector": ".sn-cm-file .sn-x",
    "prop": "transition",
    "value": "background-color .12s, color .12s, opacity .14s var(--sn-ease-out), scale .2s var(--sn-ease-out-strong), transform .1s var(--sn-ease-out)"
@@ -1597,7 +1609,7 @@
   },
   {
    "file": "packages/satin-ui/css/input.css",
-   "selector": ".sn-composer.sn-drop::after",
+   "selector": ".sn-composer.sn-drop:not(:has(> .sn-cm-card))::after, .sn-composer.sn-drop > .sn-cm-card::after",
    "prop": "animation",
    "value": "sn-drop-in .16s var(--sn-ease-out) both"
   },
@@ -1609,7 +1621,7 @@
   },
   {
    "file": "packages/satin-ui/css/input.css",
-   "selector": ".sn-cm-pick > .sn-cm-mode",
+   "selector": ".sn-cm-bar .sn-cm-pick > .sn-tag.sn-cm-mode",
    "prop": "transition",
    "value": "background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out), transform .12s var(--sn-ease-out)"
   },
@@ -1630,6 +1642,18 @@
    "selector": ".sn-cm-pick.sn-open > .sn-menu",
    "prop": "transition",
    "value": "opacity .14s var(--sn-ease-out), scale .2s var(--sn-ease-out-strong), translate .2s var(--sn-ease-out-strong), visibility 0s"
+  },
+  {
+   "file": "packages/satin-ui/css/input.css",
+   "selector": ".sn-cm-mic .sn-swap > *",
+   "prop": "transition",
+   "value": "opacity .16s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/input.css",
+   "selector": ".sn-cm-mic .sn-swap > *",
+   "prop": "transition",
+   "value": "none"
   },
   {
    "file": "packages/satin-ui/css/input.css",

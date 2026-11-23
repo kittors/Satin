@@ -16,7 +16,7 @@ export interface ChatHistory { initial(): ChatItem[]; older?(): ChatItem[] | Pro
 export interface ChatProps extends ComposerParts {
   /** 接模型的口子：异步生成器一段段 yield 字符串（或 { text } / { think } / { step } …），或直接返回一整段 */
   respond?(text: string, ctx: { /** 用户点了"停止"以后变成 true（每次读都是现在的值） */ readonly stopped: boolean }): AsyncIterable<unknown> | Promise<string> | string;
-  history?: ChatHistory; title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean;
+  history?: ChatHistory; title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean;
   /** 新对话：还没有消息时消息区正中的样子。不写有一个默认的（对话图标 + "有什么可以帮你？"）；true 只留空容器（自己画进 emptyEl）；false 不要 */
   empty?: ChatEmpty | boolean;
   /** 底部输入框的选项（输入框还没接上时用）：upload 上传函数；attachments 附件菜单每一项（img / vid / aud / doc）点了以后给出的附件 */
@@ -44,7 +44,7 @@ export interface ChatApi { send(text: string): void; receive(item: Partial<ChatI
 export function mountChat(box: HTMLElement, o?: ChatOptions): ChatApi & { destroy(): void };
 /** 对话（统一写法）：空容器按选项渲染；update({ status }) 改顶栏状态；destroy 停掉生成中的回答、撤掉监听、清空容器 */
 export const createChat: SatinFactory<ChatOptions, ChatApi>;
-export function chatHTML(o?: { title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean; menu?: boolean; newChat?: boolean }): string;
+export function chatHTML(o?: { title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; menu?: boolean; newChat?: boolean }): string;
 export interface FlowPort { name: string; type?: string }
 export interface FlowGroup { id: string; title: string; x: number; y: number; w: number; h: number; hue?: number; color?: string }
 export type FlowEdge = [string, string] | { from: string; to: string; fromPort?: string; toPort?: string; type?: string };

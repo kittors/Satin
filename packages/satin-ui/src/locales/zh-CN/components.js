@@ -28,4 +28,5 @@ export default {
   "components.19": "清除",
   "components.dropTitle": "把文件拖到这里，或者",
   "components.dropPick": "选择文件",
+  "components.voice": "语音输入",
 };

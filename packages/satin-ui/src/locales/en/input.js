@@ -35,4 +35,9 @@ export default {
   "input.32": "Storyboard model · {p0}",
   "input.ctx": "Context",
   "input.model": "Switch model",
+  "input.voice": "Voice input",
+  "input.voiceStop": "Stop voice input",
+  "input.voiceDemo0": "Make the opening rainy station scene cooler and push the camera slowly toward the entrance",
+  "input.voiceDemo1": "Add a quiet piano theme with distant train ambience in the background",
+  "input.voiceDemo2": "Switch the platform shot to anamorphic widescreen while keeping the headlight reflection",
 };

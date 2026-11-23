@@ -211,12 +211,25 @@
       "type": "boolean",
       "default": "true",
       "required": false,
-      "desc": "左下角的 +（加图片、视频、音频、文档）。",
+      "desc": "左下角的 +（加图片、视频、音频、文档；未配演示回调时自动唤起系统文件选择器）。",
       "names": {
         "js": "attach",
         "react": "attach",
         "preact": "attach",
         "vue": "attach"
+      }
+    },
+    {
+      "name": "voice",
+      "type": "boolean",
+      "default": "true",
+      "required": false,
+      "desc": "发送键左侧的一键语音输入按钮：点击原地切换为动态微声纹并实时听写进输入框，再点一下或直接点发送即可停止，零多余确认步骤。",
+      "names": {
+        "js": "voice",
+        "react": "voice",
+        "preact": "voice",
+        "vue": "voice"
       }
     },
     {
@@ -428,12 +441,26 @@
       "signature": "fill(text: string): void",
       "returns": "void",
       "desc": "把一段字填进输入框（字淡入、拿到焦点、光标在最后），不发。"
+    },
+    {
+      "name": "startVoice",
+      "kind": "method",
+      "signature": "startVoice(): void",
+      "returns": "void",
+      "desc": "开始语音输入（展开实时动态声波与实时听写）。"
+    },
+    {
+      "name": "stopVoice",
+      "kind": "method",
+      "signature": "stopVoice(cancel?: boolean): void",
+      "returns": "void",
+      "desc": "结束语音输入；cancel 为 true 时放弃本次听写并恢复原文本。"
     }
   ],
   "functions": [
     {
       "name": "composerHTML",
-      "signature": "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string",
+      "signature": "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string",
       "returns": "string",
       "from": "satin-ui",
       "desc": "拼出提示词输入框的标记（服务端渲染、模板里用）。"

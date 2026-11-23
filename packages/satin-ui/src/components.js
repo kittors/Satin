@@ -286,23 +286,25 @@ export const createLongText = /* @__PURE__ */ defineComponent({ name: "longtext"
   ta.addEventListener("input", () => { if (!quiet.on) api.emit("change", ta.value); });
   return { update(n, p) { if (n.value != null && n.value !== p.value && n.value !== ta.value) quietInput(ta, n.value, quiet); }, get value() { return ta.value; }, focus: () => ta.focus() };
 } });
-// 提示词输入框的标记（和设计稿一样）：附件菜单（图片、视频、音频、文档）、自动长高的输入框、用量环、发送 / 停止按钮。
+// 提示词输入框的标记（和设计稿一样）：顶上可选双层上下文托盘、独立纯净大圆角主输入卡（附件区、自动长高输入框、模式/权限、模型双色阶选择、用量环、语音输入、发送 / 停止按钮）。
 // external：发送由外面接管（对话框里用），不在这里清空。图标是 data-i，挂载时换成 SVG
-// 新对话那一套（可选，不给时标记和原来一模一样）：context 顶上的上下文栏、mode 模式 / 权限标签、models / model 模型选择；
+// 新对话那一套（可选，不给时标记依然干净）：context 顶上的上下文托盘、mode 模式 / 权限、models / model 模型选择、voice 语音输入（默认开启）；
 // 用了其中任何一样（或 fresh：对话里的新对话）输入框带 sn-cm-new——没写内容时提示原因、点附件缩略图看大图、发送按钮的图标随可发状态放大
-export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach = true, send = tt("components.12"), external, context, mode, models, model, fresh } = {}) =>
-  `<div class="sn-box-in sn-composer${fresh || context?.length || mode || models?.length ? " sn-cm-new" : ""}${context?.length ? " sn-has-ctx" : ""}" data-composer${external ? " data-external" : ""} data-max="${+max}" data-max-lines="${+maxLines}">${cmContextHTML(context)}<div class="sn-cm-files"></div><textarea rows="1" placeholder="${esc(placeholder)}"></textarea><div class="sn-cm-bar">` +
-  (attach ? `<div class="sn-select sn-inline-menu sn-up"><button class="sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add" data-menubtn data-cm-attach data-tip="${esc(tt("components.6"))}" aria-label="${esc(tt("components.7"))}" data-i="plus"></button><div class="sn-menu" role="menu" style="min-width:208px"><div class="sn-item" data-add="img" data-i="image:before">${esc(tt("components.8"))}<span class="sn-key">JPG · PNG</span></div><div class="sn-item" data-add="vid" data-i="film:before">${esc(tt("components.9"))}<span class="sn-key">MP4 · MOV</span></div><div class="sn-item" data-add="aud" data-i="audio-lines:before">${esc(tt("components.10"))}<span class="sn-key">MP3 · WAV</span></div><div class="sn-item" data-add="doc" data-i="file-text:before">${esc(tt("components.11"))}<span class="sn-key">PDF · DOCX</span></div></div></div>` : "") +
-  cmModeHTML(mode) + `<span class="sn-grow"></span>${cmModelsHTML(models, model)}<span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg></span><button class="sn-cm-send" aria-label="${esc(send)}" data-tip="${esc(send)}" data-kbd="⌘↵"><span class="sn-swap"><span class="sn-a" data-i="arrow-up"></span><span class="sn-b"><span class="sn-stop"></span></span></span></button></div></div>`;
+export const composerHTML = ({ placeholder = "", max = 500, maxLines = 5, attach = true, voice = true, send = tt("components.12"), external, context, mode, models, model, fresh } = {}) =>
+  `<div class="sn-box-in sn-composer${fresh || context?.length || mode || models?.length ? " sn-cm-new" : ""}${context?.length ? " sn-has-ctx" : ""}" data-composer${external ? " data-external" : ""}${voice === false ? ' data-voice="off"' : ""} data-max="${+max}" data-max-lines="${+maxLines}">${cmContextHTML(context)}<div class="sn-cm-card"><div class="sn-cm-files"></div><textarea rows="1" placeholder="${esc(placeholder)}"></textarea><div class="sn-cm-bar">` +
+  (attach ? `<div class="sn-select sn-inline-menu sn-up"><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add" data-menubtn data-cm-attach data-tip="${esc(tt("components.6"))}" aria-label="${esc(tt("components.7"))}" data-i="plus"></button><div class="sn-menu" role="menu" style="min-width:208px"><div class="sn-item" data-add="img" data-i="image:before">${esc(tt("components.8"))}<span class="sn-key">JPG · PNG</span></div><div class="sn-item" data-add="vid" data-i="film:before">${esc(tt("components.9"))}<span class="sn-key">MP4 · MOV</span></div><div class="sn-item" data-add="aud" data-i="audio-lines:before">${esc(tt("components.10"))}<span class="sn-key">MP3 · WAV</span></div><div class="sn-item" data-add="doc" data-i="file-text:before">${esc(tt("components.11"))}<span class="sn-key">PDF · DOCX</span></div></div></div>` : "") +
+  cmModeHTML(mode) + `<span class="sn-grow"></span>${cmModelsHTML(models, model)}<span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg></span>` +
+  (voice !== false ? `<button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn sn-cm-mic" data-cm-voice data-tip="${esc(tt("components.voice"))}" aria-label="${esc(tt("components.voice"))}" aria-pressed="false"><span class="sn-swap"><span class="sn-a" data-i="mic"></span><span class="sn-b"><span class="sn-cm-vw" aria-hidden="true"><i></i><i></i><i></i><i></i></span></span></span></button>` : "") +
+  `<button type="button" class="sn-cm-send" aria-label="${esc(send)}" data-tip="${esc(send)}" data-kbd="⌘↵"><span class="sn-swap"><span class="sn-a" data-i="arrow-up"></span><span class="sn-b"><span class="sn-stop"></span></span></span></button></div></div></div>`;
 export const createComposer = /* @__PURE__ */ defineComponent({ name: "composer", html: (o) => composerHTML(o), mount(el, o, api) {
   injectIcons(el);
-  const c = mountComposer(el, { onSend: (m) => api.emit("send", m), onStop: () => api.emit("stop"), upload: o.upload,
+  const c = mountComposer(el, { onSend: (m) => api.emit("send", m), onStop: () => api.emit("stop"), upload: o.upload, voice: o.voice,
     onModelChange: (v) => api.emit("modelChange", v), onModeChange: (v) => api.emit("modeChange", v),
     onContextChange: (e) => api.emit("contextChange", { ...e, item: api.options.context?.[e.index] }), onContextClick: (index) => api.emit("contextClick", { index, item: api.options.context?.[index] }) });
   return ext(c, {
     fill: (text) => el._cm.fill(text),
     update(n, p) { syncComposerParts(el._cm, n, p); },
-    destroy() { for (const h of el.querySelectorAll(".sn-select")) h._select?.dispose?.(); delete el._cm; },
+    destroy() { el._cm?.stopVoice?.(true); for (const h of el.querySelectorAll(".sn-select")) h._select?.dispose?.(); delete el._cm; },
   });
 } });
 

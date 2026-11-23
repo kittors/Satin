@@ -324,6 +324,19 @@
       }
     },
     {
+      "name": "voice",
+      "type": "boolean",
+      "default": "true",
+      "required": false,
+      "desc": "输入框带不带语音输入按钮（支持实时声波与语音转写交互）。",
+      "names": {
+        "js": "voice",
+        "react": "voice",
+        "preact": "voice",
+        "vue": "voice"
+      }
+    },
+    {
       "name": "composer",
       "type": "{ upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: Partial<Record<\"img\" | \"vid\" | \"aud\" | \"doc\", (counter: { n: number }) => ComposerAttachment>> }",
       "default": "—",

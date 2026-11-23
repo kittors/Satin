@@ -28,4 +28,5 @@ export default {
   "components.19": "Clear",
   "components.dropTitle": "Drop files here, or",
   "components.dropPick": "choose files",
+  "components.voice": "Voice input",
 };

@@ -104,9 +104,44 @@ sn-tag-input { display: block; }
 .sn-st-val:focus-visible { box-shadow: 0 0 0 2px var(--sn-focus); }
 .sn-st-unit { margin: 0 6px 0 -2px; font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
 
-/* ———— 提示词输入框（AI 生成用）———— */
-.sn-composer { max-width: 640px; border-radius: min(calc(var(--sn-btn-r) + 4px), 20px); }
-.sn-composer textarea { padding: 12px 14px 4px; font-size: calc(14px * var(--sn-font-scale, 1)); line-height: 22px; }
+/* ———— 提示词输入框（AI 生成与对话用：双层叠靠上下文托盘 + 纯净大圆角主浮卡 + 克制微浮影聚焦态 + 语音输入）———— */
+.sn-composer { max-width: 640px; border-radius: 22px; background: var(--sn-raised); border: 0;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 9%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055), 0 1px 2px rgba(0, 0, 0, .025);
+  transition: box-shadow .2s var(--sn-ease-out), background-color .16s var(--sn-ease-out); }
+@media (hover: hover) {
+.sn-composer:hover { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 13%, transparent), 0 3px 14px -3px rgba(0, 0, 0, .065), 0 1px 3px rgba(0, 0, 0, .03); } }
+.sn-composer:focus-within { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 18%, transparent), 0 6px 22px -6px rgba(0, 0, 0, .085), 0 1px 3px rgba(0, 0, 0, .035); }
+.sn-composer.sn-over, .sn-composer.sn-over:focus-within { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-danger) 75%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055); }
+[data-theme="dark"] .sn-composer { background: var(--sn-overlay); box-shadow: 0 0 0 1px rgba(255, 255, 255, .095), 0 4px 16px -4px rgba(0, 0, 0, .34); }
+@media (hover: hover) {
+[data-theme="dark"] .sn-composer:hover { box-shadow: 0 0 0 1px rgba(255, 255, 255, .14), 0 6px 20px -4px rgba(0, 0, 0, .38); } }
+[data-theme="dark"] .sn-composer:focus-within { box-shadow: 0 0 0 1px rgba(255, 255, 255, .21), 0 8px 24px -6px rgba(0, 0, 0, .44); }
+/* 双层叠靠模式：外层作为透明布局壳，上下文托盘微内缩叠置于上方，主输入卡独立呈现完整 22px 大圆角与克制浮影 */
+.sn-composer:has(> .sn-cm-card),
+.sn-composer:has(> .sn-cm-card):hover,
+.sn-composer:has(> .sn-cm-card):focus-within,
+.sn-composer:has(> .sn-cm-card).sn-over,
+.sn-composer:has(> .sn-cm-card).sn-over:focus-within,
+.sn-composer:has(> .sn-cm-card).sn-drop,
+[data-theme="dark"] .sn-composer:has(> .sn-cm-card),
+[data-theme="dark"] .sn-composer:has(> .sn-cm-card):hover,
+[data-theme="dark"] .sn-composer:has(> .sn-cm-card):focus-within { background: transparent; border: 0; box-shadow: none; border-radius: 0; cursor: default; }
+.sn-cm-card { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr); border-radius: 22px; background: var(--sn-raised); cursor: text;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 9%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055), 0 1px 2px rgba(0, 0, 0, .025);
+  transition: box-shadow .2s var(--sn-ease-out), background-color .16s var(--sn-ease-out); }
+@media (hover: hover) {
+.sn-cm-card:hover { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 13%, transparent), 0 3px 14px -3px rgba(0, 0, 0, .065), 0 1px 3px rgba(0, 0, 0, .03); } }
+.sn-cm-card:focus-within { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 15%, transparent), 0 5px 18px -6px rgba(0, 0, 0, .08), 0 1px 3px rgba(0, 0, 0, .03); }
+.sn-composer.sn-recording > .sn-cm-card { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 16%, transparent), 0 5px 18px -6px rgba(0, 0, 0, .08), 0 1px 3px rgba(0, 0, 0, .03); }
+.sn-composer.sn-over > .sn-cm-card, .sn-composer.sn-over > .sn-cm-card:focus-within { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-danger) 75%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055); }
+[data-theme="dark"] .sn-cm-card { background: var(--sn-overlay); box-shadow: 0 0 0 1px rgba(255, 255, 255, .095), 0 4px 16px -4px rgba(0, 0, 0, .34); }
+@media (hover: hover) {
+[data-theme="dark"] .sn-cm-card:hover { box-shadow: 0 0 0 1px rgba(255, 255, 255, .14), 0 6px 20px -4px rgba(0, 0, 0, .38); } }
+[data-theme="dark"] .sn-cm-card:focus-within,
+[data-theme="dark"] .sn-composer.sn-recording > .sn-cm-card { box-shadow: 0 0 0 1px rgba(255, 255, 255, .21), 0 8px 24px -6px rgba(0, 0, 0, .44); }
+.sn-composer textarea { padding: 14px 18px 8px; font-size: calc(14px * var(--sn-font-scale, 1)); line-height: 22px; }
+.sn-composer textarea::placeholder { color: color-mix(in srgb, var(--sn-label3) 72%, transparent); }
+.sn-composer textarea:focus::placeholder { color: color-mix(in srgb, var(--sn-label3) 50%, transparent); }
 /* 附件：图片、视频是 56px 的缩略图块；音频、文档是一条。只用中性色：文件类型靠扩展名区分，不给每种类型配颜色（04 号 §3） */
 .sn-cm-files { position: relative; display: flex; flex-wrap: nowrap; align-items: flex-end; gap: 8px; padding: 12px 12px 2px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .sn-cm-files:empty { display: none; }
@@ -171,15 +206,18 @@ sn-tag-input { display: block; }
 .sn-cm-note p { display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 14px 0; font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-danger); }
 .sn-cm-note .sn-ic { width: 14px; height: 14px; flex: none; }
 /* 拖文件进来：整框出现虚线放置区和一句提示 */
-.sn-composer.sn-drop { border-color: var(--sn-focus); box-shadow: 0 0 0 3px var(--sn-ring); }
-.sn-composer.sn-drop::after { content: "松开，添加到这条消息"; position: absolute; inset: 5px; z-index: 5; display: grid; place-items: center; border: 1.5px dashed var(--sn-label3); border-radius: calc(min(calc(var(--sn-btn-r) + 4px), 20px) - 4px); background: color-mix(in srgb, var(--sn-field) 94%, transparent); font: 500 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); pointer-events: none; animation: sn-drop-in .16s var(--sn-ease-out) both; }
+.sn-composer.sn-drop:not(:has(> .sn-cm-card)) { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--sn-label) 26%, transparent), 0 6px 20px -6px rgba(0, 0, 0, .09); }
+.sn-composer.sn-drop > .sn-cm-card { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--sn-label) 26%, transparent), 0 6px 20px -6px rgba(0, 0, 0, .09); }
+.sn-composer.sn-drop:not(:has(> .sn-cm-card))::after,
+.sn-composer.sn-drop > .sn-cm-card::after { content: "松开，添加到这条消息"; position: absolute; inset: 5px; z-index: 5; display: grid; place-items: center; border: 1.5px dashed var(--sn-label3); border-radius: 17px; background: color-mix(in srgb, var(--sn-raised) 94%, transparent); font: 500 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); pointer-events: none; animation: sn-drop-in .16s var(--sn-ease-out) both; }
 @keyframes sn-drop-in { from { opacity: 0; } }
 /* 输入框里的附件菜单往上弹（输入框在页面底部） */
 .sn-inline-menu.sn-up > .sn-menu { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: 0 4px; }
 .sn-inline-menu.sn-up.sn-open > .sn-menu { translate: 0; }
 /* 底部一行永远不折行：发送按钮永远在最右；中间放不下就收起（风格收成图标、模型只显示档位，见下面 sn-cm-compact） */
-.sn-cm-bar { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; padding: 4px 8px 8px; }
-/* 触屏：底部那排最左边的"添加"看得见的 28，点击区用透明伪元素扩到 44 × 44，样子不变（右边紧挨着的按钮在它上面一层，重叠的那条归右边的按钮） */
+.sn-cm-bar { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; padding: 4px 10px 10px 12px; }
+.sn-cm-add { width: 30px; height: 30px; border-radius: 50%; color: var(--sn-label2); }
+/* 触屏：底部那排最左边的"添加"看得见的 30，点击区用透明伪元素扩到 44 × 44，样子不变（右边紧挨着的按钮在它上面一层，重叠的那条归右边的按钮） */
 @media (pointer: coarse) { .sn-cm-add::after { content: ""; position: absolute; inset: 50% auto auto 50%; width: 44px; height: 44px; translate: -50% -50%; } }
 /* 老写法（设计稿里的标记）：风格、模型按钮不缩、字不裁（overflow: hidden 会把 line-height: 1 的字裁掉一行像素），一行撑出去了就整体收起 */
 .sn-cm-bar > .sn-cm-chip { flex: none; }
@@ -189,10 +227,13 @@ sn-tag-input { display: block; }
 .sn-cm-compact .sn-cm-bar > .sn-cm-chip { flex: none; padding-left: 8px; padding-right: 8px; }
 .sn-cm-bar > .sn-inline-menu { flex: none; }
 .sn-cm-bar .sn-grow { flex: 1; }
-.sn-cm-bar .sn-ta-count { margin-right: 6px; font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
-/* ———— 提示词输入框的可选部件（新对话那一套）：上下文栏、模式 / 权限标签、模型选择 ———— */
-/* 上下文栏：贴在输入框顶上的一条浅灰（项目文件夹、本地、分支……），和输入框是一整块；项多了折行（不做横向滚动：滚动容器会把往上长的菜单裁掉） */
-.sn-cm-ctx { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-width: 0; padding: 6px 8px; border-radius: inherit; border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: var(--sn-fill-subtle); }
+.sn-cm-bar .sn-ta-count { margin-right: 4px; font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
+/* ———— 提示词输入框的可选部件（新对话那一套）：双层上下文托盘、极简无框模式/权限、双色阶模型选择、语音输入 ———— */
+/* 上下文托盘：微内缩贴靠在主输入卡正上方（左右各让出 14px，被主卡大圆角自然托起），淡灰柔和不抢戏 */
+.sn-cm-ctx { position: relative; z-index: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-width: 0; padding: 6px 10px; border-radius: 16px 16px 0 0; background: color-mix(in srgb, var(--sn-label) 3.8%, var(--sn-raised)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-label) 6%, transparent); }
+.sn-composer:has(> .sn-cm-card) > .sn-cm-ctx { margin: 0 14px -16px; padding: 6px 10px 22px; }
+[data-theme="dark"] .sn-cm-ctx { background: color-mix(in srgb, #fff 4%, var(--sn-raised)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07); }
+@media (max-width: 480px) { .sn-composer:has(> .sn-cm-card) > .sn-cm-ctx { margin: 0 10px -14px; padding: 5px 8px 19px; } }
 .sn-cm-ctx > .sn-select { flex: none; min-width: 0; }
 .sn-cm-ctx-i { all: unset; box-sizing: border-box; position: relative; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border-radius: var(--sn-r-sm); font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); white-space: nowrap; cursor: pointer;
   transition: background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out), transform .12s var(--sn-ease-out); }
@@ -202,20 +243,27 @@ sn-tag-input { display: block; }
 .sn-cm-ctx-i:active { transform: scale(var(--sn-press)); }
 .sn-cm-pick.sn-open > .sn-cm-ctx-i { background: var(--sn-b-ghost-active); color: var(--sn-label); }
 .sn-cm-ctx-i:focus-visible { box-shadow: 0 0 0 2px var(--sn-ring); }
-/* 模式 / 权限：和标签（.sn-tag）一样，状态只用小圆点的颜色表示（附件菜单那一格本来按下拉的最小宽度 180 占位，有标签时收窄，标签紧跟着加号） */
+/* 模式 / 权限：极简无灰框（平时只用克制语义字色表达状态，悬停或展开菜单才浮现柔和胶囊底） */
 .sn-cm-bar:has(> .sn-cm-mode, > .sn-cm-pick[data-pick="mode"]) > .sn-inline-menu { min-width: 0; }
-.sn-cm-mode { flex: none; margin-left: 2px; }
+.sn-cm-bar .sn-tag.sn-cm-mode { flex: none; margin-left: 2px; height: 28px; padding: 0 8px; border-radius: var(--sn-r-full); background: transparent; box-shadow: none; font: 500 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); gap: 5px; }
+.sn-cm-bar .sn-tag.sn-cm-mode.sn-warn { color: var(--sn-warning); background: transparent; }
+.sn-cm-bar .sn-tag.sn-cm-mode.sn-ok { color: var(--sn-success); background: transparent; }
+.sn-cm-bar .sn-tag.sn-cm-mode.sn-bad { color: var(--sn-danger); background: transparent; }
+.sn-cm-bar .sn-tag.sn-cm-mode.sn-need { color: var(--sn-label2); background: transparent; }
+.sn-cm-bar .sn-tag.sn-cm-mode > i { width: 5px; height: 5px; opacity: .78; }
 .sn-cm-pick[data-pick="mode"] { flex: none; min-width: 0; margin-left: 2px; }
-.sn-cm-pick > .sn-cm-mode { position: relative; margin: 0; border: 0; cursor: pointer; transition: background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out), transform .12s var(--sn-ease-out); }
+.sn-cm-bar .sn-cm-pick > .sn-tag.sn-cm-mode { position: relative; margin: 0; border: 0; cursor: pointer; transition: background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out), transform .12s var(--sn-ease-out); }
 @media (hover: hover) {
-.sn-cm-pick > .sn-cm-mode:hover { background: var(--sn-fill-active); color: var(--sn-label); } }
-.sn-cm-pick > .sn-cm-mode:active { transform: scale(var(--sn-press)); }
-.sn-cm-pick.sn-open > .sn-cm-mode { background: var(--sn-fill-active); color: var(--sn-label); }
-.sn-cm-pick > .sn-cm-mode:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--sn-ring); }
+.sn-cm-bar .sn-cm-pick > .sn-tag.sn-cm-mode:hover { background: var(--sn-b-ghost-hover); } }
+.sn-cm-bar .sn-cm-pick > .sn-tag.sn-cm-mode:active { transform: scale(var(--sn-press)); }
+.sn-cm-bar .sn-cm-pick.sn-open > .sn-tag.sn-cm-mode { background: var(--sn-b-ghost-active); }
+.sn-cm-bar .sn-cm-pick > .sn-tag.sn-cm-mode:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--sn-ring); }
 .sn-cm-dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--sn-label3); }
 .sn-cm-dot.sn-ok { background: var(--sn-success); } .sn-cm-dot.sn-warn { background: var(--sn-warning); } .sn-cm-dot.sn-bad { background: var(--sn-danger); } .sn-cm-dot.sn-need { background: var(--sn-accent); }
-/* 模型选择：按钮在右边（名称 · 档位 ▾），菜单贴着按钮右边往上长 */
+/* 模型选择：主名深色清晰 + 档位温润浅灰，菜单贴着按钮右边往上长 */
 .sn-cm-models { flex: none; min-width: 0; }
+.sn-cm-m1 { color: var(--sn-label); font-weight: 500; }
+.sn-cm-m2 { color: var(--sn-label3); font-weight: 400; }
 /* 新对话那一套的底部一行不折行（窄屏上发送按钮掉到第二行很难看）：放不下时模型名字先省略 */
 .sn-cm-new .sn-cm-bar { flex-wrap: nowrap; }
 .sn-cm-new .sn-cm-models { flex: 0 1 auto; }
@@ -235,22 +283,34 @@ sn-tag-input { display: block; }
 /* 能点开的部件：按钮上的字换的时候旧字、新字各自动（要是块级才动得了），箭头点开时转过来；菜单从按钮那里缩放 + 淡入展开，收起反过来 */
 .sn-cm-lbl { display: inline-block; }
 .sn-cm-caret { display: inline-grid; place-items: center; margin-right: -2px; }
-.sn-cm-caret .sn-ic { width: 12px; height: 12px; opacity: .6; transition: rotate .22s var(--sn-ease-out-strong); }
-.sn-cm-model .sn-cm-caret .sn-ic { width: 14px; height: 14px; }
+.sn-cm-caret .sn-ic { width: 12px; height: 12px; opacity: .52; transition: rotate .22s var(--sn-ease-out-strong); }
+.sn-cm-model .sn-cm-caret .sn-ic { width: 13px; height: 13px; }
 .sn-cm-pick.sn-open .sn-cm-caret .sn-ic { rotate: 180deg; }
 .sn-cm-pick > .sn-menu { transition: opacity .12s var(--sn-ease-in), scale .12s var(--sn-ease-in), translate .12s var(--sn-ease-in), visibility 0s linear .12s; }
 .sn-cm-pick.sn-open > .sn-menu { transition: opacity .14s var(--sn-ease-out), scale .2s var(--sn-ease-out-strong), translate .2s var(--sn-ease-out-strong), visibility 0s; }
 .sn-cm-pick .sn-menu .sn-item .sn-tx { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 语音输入按钮：极简一键开关，录音中在按钮原地切为 4 根细腻动态声纹（整条底栏零跳动、零多余确认/取消按钮） */
+.sn-cm-mic { width: 30px; height: 30px; border-radius: 50%; flex: none; color: var(--sn-label3); }
+@media (hover: hover) {
+.sn-cm-mic:hover { color: var(--sn-label); } }
+.sn-cm-mic .sn-ic { width: 16px; height: 16px; }
+.sn-cm-mic .sn-swap > * { display: grid; place-items: center; transition: opacity .16s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong); }
+.sn-cm-mic .sn-swap > .sn-b, .sn-cm-mic .sn-swap.sn-on > .sn-a { transform: scale(.65); }
+.sn-cm-mic .sn-swap.sn-on > .sn-b { transform: none; }
+.sn-cm-mic.sn-on { background: var(--sn-fill-active); color: var(--sn-label); }
+.sn-cm-vw { display: inline-flex; align-items: center; gap: 2px; height: 14px; }
+.sn-cm-vw i { display: block; width: 1.5px; height: 14px; flex: none; border-radius: 1px; background: currentColor; transform: scaleY(.35); will-change: transform; }
+.sn-composer.sn-busy .sn-cm-mic { opacity: .35; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .sn-cm-mic .sn-swap > * { transition: none; } }
 /* 新对话那一套的发送按钮：能发的时候图标从 .86 放大到 1（灰 → 主色的底色过渡照原来的） */
 .sn-cm-new .sn-cm-send .sn-swap { scale: .86; transition: scale .24s var(--sn-ease-out-strong); }
 .sn-cm-new .sn-cm-send:is(.sn-ready, .sn-busy) .sn-swap { scale: 1; }
 @media (prefers-reduced-motion: reduce) { .sn-cm-ctx-i:active, .sn-cm-pick > .sn-cm-mode:active { transform: none; } .sn-cm-caret .sn-ic, .sn-cm-new .sn-cm-send .sn-swap { transition: none; } }
-/* 发送 / 停止：能发和生成中都是中性的实心圆（墨色底、白字；深色主题反过来），不跟着主题色走——换成红色主题时停止看着像出错，停止不是危险操作。
-   箭头和方块交叉淡入淡出加缩放（出去的缩到 .6、进来的从 .6 放大到 1，160～200ms），底色过渡 160ms，按下缩到 .96；生成进度在消息区里表达，按钮外面不套转圈 */
-.sn-cm-send { --sn-send-bg: var(--sn-label); --sn-send-on: var(--sn-raised); all: unset; box-sizing: border-box; position: relative; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
-  background: var(--sn-fill-active); color: var(--sn-label-off); transition: background-color .16s var(--sn-ease-out), color .16s var(--sn-ease-out), transform .1s var(--sn-ease-out); }
-:where([data-theme="dark"]) .sn-cm-send { --sn-send-on: var(--sn-canvas); }
-@media (prefers-color-scheme: dark) { :where(:root:not([data-theme])) .sn-cm-send { --sn-send-on: var(--sn-canvas); } }
+/* 发送 / 停止：空着时温和浅灰圆；能发和生成中是中性的实心圆（墨色底、白字；深色主题反过来），干净利落 */
+.sn-cm-send { --sn-send-bg: var(--sn-label); --sn-send-on: var(--sn-raised); all: unset; box-sizing: border-box; position: relative; width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  background: color-mix(in srgb, var(--sn-label) 14%, transparent); color: color-mix(in srgb, var(--sn-raised) 92%, var(--sn-label3)); transition: background-color .16s var(--sn-ease-out), color .16s var(--sn-ease-out), transform .1s var(--sn-ease-out); }
+:where([data-theme="dark"]) .sn-cm-send { --sn-send-on: var(--sn-canvas); background: rgba(255, 255, 255, .14); color: rgba(255, 255, 255, .42); }
+@media (prefers-color-scheme: dark) { :where(:root:not([data-theme])) .sn-cm-send { --sn-send-on: var(--sn-canvas); background: rgba(255, 255, 255, .14); color: rgba(255, 255, 255, .42); } }
 .sn-cm-send.sn-ready { background: var(--sn-send-bg); color: var(--sn-send-on); }
 .sn-cm-send .sn-swap > * { transition: opacity .16s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong); }
 .sn-cm-send .sn-swap > .sn-b, .sn-cm-send .sn-swap.sn-on > .sn-a { transform: scale(.6); }

@@ -148,5 +148,6 @@ export const ICONS = {
   "thumbs-up": "<path d=\"M3 10.2v11.3\" class=\"sn-ic-d\"/><path d=\"M14 5.2q.1-1-.1-2\"/><path d=\"M8.6 22q-1.5-.1-1.7-1.5L6.1 11q0-.8.6-1.4l1.4-1.3q1-.8 1.8-2 .4-.7.6-1.6l.5-1.9q0-.5.7-.8h1.1q1 .3 1.1 1.1\"/><path d=\"m14 5.2-.7 4q0 1 .9 1h5.1\"/><path d=\"M19.3 10.2c1 0 1.9 1 1.7 2l-.7 4a7 7 0 01-7 5.8H8.5\"/>",
   "thumbs-down": "<path d=\"M3 2.5v11.3\" class=\"sn-ic-d\"/><path d=\"M14 18.8q.1 1-.1 2\"/><path d=\"M8.6 2q-1.5.2-1.7 1.5L6.1 13q0 .8.6 1.4l1.4 1.3q1 .8 1.8 2 .4.7.6 1.6l.5 1.9q0 .5.7.8h1.1q1-.3 1.1-1.1\"/><path d=\"m14 18.8-.7-4q0-1 .9-1h5.1\"/><path d=\"M19.3 13.8c1 0 1.9-1 1.7-2l-.7-4a7 7 0 00-7-5.8H8.5\"/>",
   "square": "<path d=\"M12 22c-4.7 0-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2s7 0 8.5 1.5C22 4.9 22 7.3 22 12s0 7-1.5 8.5C19.1 22 16.7 22 12 22Z\"/>",
+  "mic": "<rect x=\"9\" y=\"2.5\" width=\"6\" height=\"11\" rx=\"3\"/><path d=\"M5.5 10.5a6.5 6.5 0 0013 0\" class=\"sn-ic-d\"/><path d=\"M12 17v4.5M9 21.5h6\" class=\"sn-ic-d\"/>",
 };
 export const icon = (name, size = 16) => `<svg class="sn-ic" data-icon="${name}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ""}</svg>`;
