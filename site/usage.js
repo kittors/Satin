@@ -176,7 +176,7 @@ export const WIN = {
   table: { title: "项目列表" },
   flow: { title: "流程图" },
   flowstress: { title: "ComfyUI 分布式生成集群 — 10,000 个异构节点" },
-  chat: { title: "分镜讨论", flush: true },
+  chat: { all: true, titles: ["分镜讨论 · 历史对话", "分镜讨论 · 新对话"], flush: true },
   md: { title: "README.md" },
   vlist: { title: "素材库" },
 };

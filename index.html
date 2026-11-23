@@ -50,7 +50,7 @@
   // 只嵌一个演示（&demo=N）：别的演示、小标题都藏起来（文档页把小标题写在框外面）；选中的那一个在 DOMContentLoaded 时标上 .only
   const ONE = new URLSearchParams(location.search).get("demo");
   if (ONE != null) st.textContent += `${S}>h3,${S}>.demo:not(.only){display:none!important}${S}>.demo.only{margin-top:0!important;padding-top:24px!important}`;
-  if (new URLSearchParams(location.search).get("flush")) st.textContent += `${S}>.demo{padding:0!important}${S}>.demo>:only-child{border-radius:0!important;box-shadow:none!important;max-width:none!important}`;
+  if (new URLSearchParams(location.search).get("flush")) st.textContent += `${S}>.demo,${S}>.demo.only{padding:0!important}${S}>.demo>:only-child{border-radius:0!important;box-shadow:none!important;max-width:none!important}${S}>.demo>.sn-chat{height:600px!important}${S}>.demo>.sn-chat::after{display:none!important}`;
   if (new URLSearchParams(location.search).get("win")) st.textContent += `${S}>[class$="-cfg"]{display:none!important}${S}>.demo,${S}>:not(h2,h3,p,.rules,[class$="-cfg"]){margin:0!important;border-radius:0!important;box-shadow:none!important}${S}>.demo>:is(.sn-player,.sn-audio-row){margin-inline:auto}`;
   // 和库样式在同一个层里（@layer satin），层内顺序和原来一样：优先级不变
   st.textContent = "@layer satin{" + st.textContent + "}";

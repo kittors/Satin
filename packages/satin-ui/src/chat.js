@@ -411,8 +411,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   }
   const imgHTML = (m) => `<div class="sn-ai-image${m.done ? " sn-done" : ""}"><span class="sn-blur" style="--sn-g:${esc(m.g)}"></span><span class="sn-pic" style="--sn-g:${esc(m.g)}"></span><span class="sn-gen-l"><span class="sn-spinner"></span>${tt("chat.12")} <b class="sn-num">${Math.round(m.p * 100)}%</b></span></div>`;
   const STOPPED = tt("chat.13");
-  // 回复下面一排操作：复制、赞、踩、重新生成、更多，最后是时间（和 ChatGPT 一样，图标小、灰、悬停才有底）
-  const ACTS = `<div class="sn-ai-acts"><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="copy" data-tip="${tt("chat.14")}" aria-label="${tt("chat.14")}"><span class="sn-swap"><span class="sn-a">${icon("copy", 16)}</span><span class="sn-b">${icon("check", 16)}</span></span></button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="up" data-tip="${tt("chat.15")}" aria-label="${tt("chat.15")}">${icon("thumbs-up", 16)}</button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="down" data-tip="${tt("chat.16")}" aria-label="${tt("chat.16")}">${icon("thumbs-down", 16)}</button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-tip="${tt("chat.17")}" aria-label="${tt("chat.17")}">${icon("refresh-cw", 16)}</button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-tip="${tt("chat.18")}" aria-label="${tt("chat.18")}">${icon("ellipsis", 16)}</button><span class="sn-ai-time sn-num">${new Date().toTimeString().slice(0, 5)}</span></div>`;
+  // 回复下面一排操作：复制、赞、踩、重新生成、更多，最后是时间（统一 28×28 按钮 + 14px 图标）
+  const ACTS = `<div class="sn-ai-acts"><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="copy" data-tip="${tt("chat.14")}" aria-label="${tt("chat.14")}"><span class="sn-swap"><span class="sn-a">${icon("copy", 14)}</span><span class="sn-b">${icon("check", 14)}</span></span></button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="up" data-tip="${tt("chat.15")}" aria-label="${tt("chat.15")}">${icon("thumbs-up", 14)}</button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="down" data-tip="${tt("chat.16")}" aria-label="${tt("chat.16")}">${icon("thumbs-down", 14)}</button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-tip="${tt("chat.17")}" aria-label="${tt("chat.17")}">${icon("refresh-cw", 14)}</button><button class="sn-btn sn-ghost sn-sm sn-ibtn" data-tip="${tt("chat.18")}" aria-label="${tt("chat.18")}">${icon("ellipsis", 14)}</button><span class="sn-ai-time sn-num">${new Date().toTimeString().slice(0, 5)}</span></div>`;
   // 复制：图标换成对勾（.swap 的转换），1.5 秒后换回；赞 / 踩：按下的那个留着底色，再点取消
   canvas.addEventListener("click", (e) => {
     const b = e.target.closest(".sn-ai-acts [data-act]"); if (!b) return;
@@ -560,7 +560,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
 
   // ———— 尺寸变化：重估还没量过的条目，再排一次 ————
   new ResizeObserver(() => {
-    const w = Math.min(760, vp.clientWidth - 40); if (Math.abs(w - colW) < 2) { if (pinned) vp.scrollTop = maxTop(); render(); return; } // 输入框变高时，贴着底就继续贴底，最后一条不被挡住
+    const w = Math.min(740, vp.clientWidth - 40); if (Math.abs(w - colW) < 2) { if (pinned) vp.scrollTop = maxTop(); render(); return; } // 输入框变高时，贴着底就继续贴底，最后一条不被挡住
     colW = w; for (const it of items) { it.e = undefined; } relayout(1); if (pinned) vp.scrollTop = maxTop(); render();
   }).observe(vp);
 
@@ -596,7 +596,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, composer: c
   });
 
   // ———— 开始：停在最新一条 ————
-  colW = Math.min(760, vp.clientWidth - 40); relayout(1); // 内容一栏最宽 760（和 .ci 的左右留白一致）
+  colW = Math.min(740, vp.clientWidth - 40); relayout(1); // 内容一栏最宽 740（与输入框左右轴线严格对齐）
   if (foot) {
     const syncFoot = () => { const h = foot.offsetHeight; box.style.setProperty("--sn-foot-h", h + "px"); const nb = h + 8; if (nb === PAD_B) return; PAD_B = nb; relayout(1); if (pinned) vp.scrollTop = maxTop(); render(); };
     new ResizeObserver(syncFoot).observe(foot); syncFoot();

@@ -319,25 +319,28 @@
 @media (prefers-reduced-motion: reduce) { .sn-flow-edges .sn-light { animation: none !important; opacity: 0 !important; } }
 .sn-reduce-motion .sn-flow-edges .sn-light { animation: none !important; opacity: 0 !important; }
 
-/* ———— 对话：ChatGPT / Codex 的样子 ————
-   不放头像；用户是浅灰气泡（靠右），助手直接是正文（靠左），内容居中一栏最宽 760；回复下面一排操作和时间；
-   回到底部的圆键在输入框上方正中；输入框一整块大圆角，消息从它上面淡出去。没有分隔线。 */
+/* ———— 对话：精修极简 AI 对话体验 ————
+   不放头像；用户是温润浅灰气泡（靠右），助手直接是正文（靠左），消息栏与输入坞严格共享 740px 居中轴线；
+   顶栏克制极淡细分割线稳住层次；空状态采用微浮圆角徽章 + 描边建议胶囊；所有圆按钮严格统一 32px 尺寸栅格。 */
 .sn-chat { border: 0; background: var(--sn-raised); } /* 外圈 1px 的线画在 ::after 上（见下面"输入框浮在列表上面"那段），只画一次 */
-.sn-chat-hd { height: 52px; padding: 0 20px; background: transparent; }
-.sn-chat-hd b { font-size: calc(14px * var(--sn-font-scale, 1)); }
-/* 顶栏两侧的按钮（menu、newChat 选项）：单色细线图标、ghost，按下有反馈（sn-btn 自带）；标题夹在中间 */
-.sn-chat-hd.sn-has-btns { padding-left: 8px; padding-right: 8px; gap: 4px; } /* 只写左右：手机上顶栏的 padding-top（让出刘海、灵动岛）不能被盖掉 */
-.sn-chat-hd.sn-has-btns .sn-tx { flex: 1; min-width: 0; padding: 0 8px; }
-.sn-chat-hd .sn-chat-hb { --sn-h: 36px; flex: none; width: 36px; }
-.sn-chat-hd .sn-chat-hb .sn-ic { width: 20px; height: 20px; }
-.sn-ci { padding: 0 max(20px, calc((100% - 760px) / 2)) 16px; }
+.sn-chat-hd { position: relative; z-index: 2; height: 48px; padding: 0 18px; background: color-mix(in srgb, var(--sn-raised) 92%, transparent); box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--sn-line) 72%, transparent); }
+.sn-chat-hd b { font-size: calc(14px * var(--sn-font-scale, 1)); letter-spacing: -.01em; color: var(--sn-label); }
+.sn-chat-hd .sn-sub { align-items: center; gap: 5px; font-size: calc(11.5px * var(--sn-font-scale, 1)); line-height: calc(15px * var(--sn-font-scale, 1)); }
+/* 顶栏两侧的按钮（menu、newChat 选项）：与输入底栏严格统一 32×32 圆形尺寸、16px 图标；标题夹在中间 */
+.sn-chat-hd.sn-has-btns { padding-left: 10px; padding-right: 10px; gap: 6px; } /* 只写左右：手机上顶栏的 padding-top（让出刘海、灵动岛）不能被盖掉 */
+.sn-chat-hd.sn-has-btns .sn-tx { flex: 1; min-width: 0; padding: 0 6px; }
+.sn-chat-hd .sn-chat-hb { --sn-h: 32px; --sn-icon: 16px; flex: none; width: 32px; height: 32px; border-radius: 50%; }
+.sn-chat-hd .sn-chat-hb .sn-ic { width: 16px; height: 16px; }
+.sn-ci { padding: 0 max(20px, calc((100% - 740px) / 2)) 16px; }
 :where(.sn-chat) .sn-msg { gap: 8px; }
 .sn-msg .sn-av, .sn-msg .sn-av-gap { display: none; }
-:where(.sn-chat) .sn-bubble { font-size: calc(15px * var(--sn-font-scale, 1)); line-height: calc(24px * var(--sn-font-scale, 1)); }
-.sn-msg.sn-me .sn-bubble { max-width: min(560px, 78%); padding: 10px 16px; border-radius: 20px; background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-raised)); color: var(--sn-label); }
+:where(.sn-chat) .sn-bubble { font-size: calc(14.5px * var(--sn-font-scale, 1)); line-height: calc(23px * var(--sn-font-scale, 1)); }
+.sn-msg.sn-me .sn-bubble { max-width: min(540px, 78%); padding: 10px 15px; border-radius: 20px; background: color-mix(in srgb, var(--sn-label) 5.5%, var(--sn-raised)); color: var(--sn-label); }
+[data-theme="dark"] .sn-msg.sn-me .sn-bubble { background: color-mix(in srgb, #fff 9%, var(--sn-raised)); }
 .sn-msg.sn-me.sn-cont .sn-bubble { border-top-right-radius: 20px; }
-.sn-msg.sn-ai .sn-bubble, .sn-ai-text { font-size: calc(15px * var(--sn-font-scale, 1)); line-height: calc(26px * var(--sn-font-scale, 1)); }
+.sn-msg.sn-ai .sn-bubble, .sn-ai-text { font-size: calc(14.5px * var(--sn-font-scale, 1)); line-height: calc(24.5px * var(--sn-font-scale, 1)); }
 .sn-ai-body { max-width: none; gap: 12px; }
+.sn-day { height: 22px; padding: 0 10px; border-radius: var(--sn-r-full); background: color-mix(in srgb, var(--sn-label) 4.5%, transparent); font: 500 calc(11.5px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-msg.sn-me .sn-bubble.sn-aud .sn-ap, .sn-fx-me .sn-bubble.sn-aud .sn-ap { background: var(--sn-accent); color: var(--sn-on-primary); }
 .sn-msg.sn-me .sn-bubble.sn-aud .sn-wf i, .sn-fx-me .sn-bubble.sn-aud .sn-wf i { background: var(--sn-fill-active); }
 .sn-msg.sn-me .sn-bubble.sn-aud .sn-wf .sn-wf-on i, .sn-fx-me .sn-bubble.sn-aud .sn-wf .sn-wf-on i { background: var(--sn-label); }
@@ -346,33 +349,39 @@
 .sn-bubble.sn-img .sn-ph { border-radius: 16px; }
 .sn-bubble.sn-img .sn-cap2 { padding: 8px 2px 0; color: var(--sn-label3); }
 /* 发出去的那一下：影子从一开始就是浅灰气泡的样子 */
-.sn-fx-clip > .sn-fx-bg { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-raised)); }
+.sn-fx-clip > .sn-fx-bg { background: color-mix(in srgb, var(--sn-label) 5.5%, var(--sn-raised)); }
+[data-theme="dark"] .sn-fx-clip > .sn-fx-bg { background: color-mix(in srgb, #fff 9%, var(--sn-raised)); }
 .sn-fx-clip > .sn-bubble, .sn-fx-src { color: var(--sn-label); }
-.sn-fx-g.sn-card > .sn-bubble { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-raised)); color: var(--sn-label); }
+.sn-fx-g.sn-card > .sn-bubble { background: color-mix(in srgb, var(--sn-label) 5.5%, var(--sn-raised)); color: var(--sn-label); }
 /* ———— 新对话（createChat 的 empty）————
-   还没有消息时，消息区（输入框上面那一片）正中：单色图标、标题、副标题、几个建议胶囊（点了填进输入框）；
-   发出第一条就淡出（只动透明度和位移），输入框原地不动。不加光晕、渐变，颜色只用文字的三档灰 */
-.sn-chat-empty { position: absolute; z-index: 1; inset: 0 0 var(--sn-foot-h, 0px); display: flex; flex-direction: column; align-items: center; justify-content: center; justify-content: safe center; padding: 24px 24px 40px; text-align: center; pointer-events: none; } /* safe：框太矮装不下时从上往下排，不往上顶到顶栏后面 */
+   还没有消息时，消息区正中：48×48 微浮圆角图标徽章 + 克制标题/副标题 + 洁净描边建议胶囊（点了填进输入框）；
+   发出第一条就淡出（只动透明度和位移），输入框原地不动。零彩色渐变、零光晕。 */
+.sn-chat-empty { position: absolute; z-index: 1; inset: 0 0 var(--sn-foot-h, 0px); display: flex; flex-direction: column; align-items: center; justify-content: center; justify-content: safe center; padding: 24px 24px 32px; text-align: center; pointer-events: none; } /* safe：框太矮装不下时从上往下排，不往上顶到顶栏后面 */
 .sn-chat-empty[hidden] { display: none; }
 .sn-chat-empty > * { pointer-events: auto; }
-.sn-chat-empty-ic { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 18px; color: var(--sn-label3); }
-.sn-chat-empty-ic .sn-ic { width: 44px; height: 44px; stroke-width: 1; }
-.sn-chat-empty-t { margin: 0; max-width: 560px; font: 600 calc(24px * var(--sn-font-scale, 1))/calc(32px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.01em; color: var(--sn-label); text-wrap: balance; }
-.sn-chat-empty-sub { margin: 8px 0 0; max-width: 440px; font: 400 calc(14px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); text-wrap: balance; }
-.sn-chat-sugs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 560px; margin-top: 28px; }
-.sn-chat-sug { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: var(--sn-r-full); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2); background: var(--sn-fill-subtle); cursor: pointer;
-  transition: background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong); }
-/* 悬停：浅底加深、往上浮 1px；按下缩到 .98 */
+.sn-chat-empty-ic { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 16px; border-radius: 14px; background: var(--sn-raised); color: var(--sn-label2);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-label) 8%, transparent), 0 2px 8px -2px rgba(0, 0, 0, .06); }
+[data-theme="dark"] .sn-chat-empty-ic { background: color-mix(in srgb, #fff 5%, var(--sn-raised)); color: var(--sn-label); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 4px 12px -2px rgba(0, 0, 0, .35); }
+.sn-chat-empty-ic .sn-ic { width: 22px; height: 22px; stroke-width: 1.6; }
+.sn-chat-empty-t { margin: 0; max-width: 560px; font: 600 calc(22px * var(--sn-font-scale, 1))/calc(30px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.02em; color: var(--sn-label); text-wrap: balance; }
+.sn-chat-empty-sub { margin: 6px 0 0; max-width: 440px; font: 400 calc(13.5px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); text-wrap: balance; }
+.sn-chat-sugs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 580px; margin-top: 24px; }
+.sn-chat-sug { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: var(--sn-r-full); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label2);
+  background: var(--sn-raised); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-label) 10%, transparent), 0 1px 2px rgba(0, 0, 0, .03); cursor: pointer;
+  transition: background-color .15s var(--sn-ease-out), color .15s var(--sn-ease-out), box-shadow .15s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong); }
+[data-theme="dark"] .sn-chat-sug { background: color-mix(in srgb, #fff 4.5%, var(--sn-raised)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1); }
+/* 悬停：描边柔和加深、极轻上浮 1px；按下缩到 .98 */
 @media (hover: hover) {
-.sn-chat-sug:hover { background: var(--sn-fill-active); color: var(--sn-label); transform: translateY(-1px); } }
-.sn-chat-sug:active { transform: scale(.98); transition-duration: .15s, .15s, .08s; }
+.sn-chat-sug:hover { background: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); color: var(--sn-label); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-label) 18%, transparent), 0 2px 6px -1px rgba(0, 0, 0, .06); transform: translateY(-1px); }
+[data-theme="dark"] .sn-chat-sug:hover { background: color-mix(in srgb, #fff 8%, var(--sn-raised)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18); } }
+.sn-chat-sug:active { transform: scale(.98); transition-duration: .15s, .15s, .15s, .08s; }
 .sn-chat-sug:focus-visible { box-shadow: 0 0 0 3px var(--sn-ring); }
 /* 进场前先藏着（JS 在第一次露出来时依次淡入）；减少动态效果时不加这个类 */
 .sn-chat-empty.sn-enter-wait > *, .sn-chat-empty.sn-enter-wait .sn-chat-sug { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .sn-chat-sug, .sn-chat-sug:hover, .sn-chat-sug:active { transform: none; } }
 @media (max-width: 480px) {
-  .sn-chat-empty { padding: 16px 16px 28px; }
-  .sn-chat-empty-ic { width: 40px; height: 40px; margin-bottom: 14px; } .sn-chat-empty-ic .sn-ic { width: 40px; height: 40px; }
+  .sn-chat-empty { padding: 16px 16px 24px; }
+  .sn-chat-empty-ic { width: 42px; height: 42px; border-radius: 12px; margin-bottom: 14px; } .sn-chat-empty-ic .sn-ic { width: 20px; height: 20px; }
   .sn-chat-empty-t { font-size: calc(20px * var(--sn-font-scale, 1)); line-height: calc(28px * var(--sn-font-scale, 1)); }
   .sn-chat-sugs { margin-top: 20px; }
 }
@@ -382,48 +391,52 @@
   .sn-chat-empty-ic { display: none; }
   .sn-chat-sugs { margin-top: 16px; }
 }
-/* 回复下面的操作：图标灰、悬停才有底；赞 / 踩按下后留底色；时间在最后 */
+/* 回复下面的操作：严格统一 28×28 按钮 + 14px 图标，灰态悬停出底；赞 / 踩按下后留底色；时间在最后 */
 .sn-ai-acts { display: flex; align-items: center; gap: 2px; margin-left: -6px; }
-.sn-ai-acts .sn-btn { --sn-fg: var(--sn-label3); }
+.sn-ai-acts .sn-btn { --sn-h: 28px; --sn-icon: 14px; --sn-r: 8px; width: 28px; height: 28px; --sn-fg: var(--sn-label3); }
+.sn-ai-acts .sn-btn .sn-ic { width: 14px; height: 14px; }
 .sn-ai-acts .sn-btn.sn-is-on { --sn-fg: var(--sn-label); --sn-bg: var(--sn-b-ghost-active); }
-.sn-ai-time { margin-left: 8px; font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
+.sn-ai-time { margin-left: 8px; font: 400 calc(11.5px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
 /* 新消息出现：从下面 6px 升上来、淡入（只动里面那一层，外层的位置由列表算） */
 .sn-ci.sn-reveal > .sn-msg { animation: sn-msg-in .34s var(--sn-ease-out-strong) both; }
 @keyframes sn-msg-in { from { opacity: 0; transform: translateY(6px); } }
-/* 正在思考：字的透明度慢慢起伏，不用一道光扫过去 */
+/* 正在思考：字的透明度慢慢起伏，展开正文左侧保留克制 2px 细竖导引线 */
+.sn-think-hd { height: 28px; margin-left: -8px; padding: 0 8px; border-radius: var(--sn-r-full); font-size: calc(12.5px * var(--sn-font-scale, 1)); gap: 5px; }
 .sn-think.sn-live .sn-think-t { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--sn-label3); animation: sn-think-pulse 1.6s var(--sn-ease-in-out) infinite; }
 @keyframes sn-think-pulse { 50% { opacity: .45; } }
-.sn-think-txt { box-shadow: none; padding-left: 0; }
-/* 回到底部：输入框上方正中的一颗圆键 */
-.sn-chat-jump { left: 50%; right: auto; bottom: 12px; translate: -50% 8px; background: var(--sn-raised); box-shadow: 0 0 0 1px var(--sn-line), 0 6px 16px -6px rgba(0, 0, 0, .2); }
+.sn-think-txt { padding-left: 12px; box-shadow: inset 2px 0 0 var(--sn-line); }
+/* 回到底部：严格统一 32×32 圆形按钮 + 16px 图标，位于输入框正上方中轴 */
+.sn-chat-jump { left: 50%; right: auto; bottom: 12px; width: 32px; height: 32px; translate: -50% 8px; background: var(--sn-raised); box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 10%, transparent), 0 4px 14px -4px rgba(0, 0, 0, .14); }
+.sn-chat-jump .sn-ic { width: 16px; height: 16px; }
+@media (hover: hover) {
+.sn-chat-jump:hover { background: var(--sn-fill-hover-solid); } }
 .sn-chat-jump.sn-on { translate: -50% 0; }
 /* 消息从输入框上面淡出去 */
 .sn-chat-body::after { content: ""; position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; height: 24px; pointer-events: none; background: linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised)); }
-.sn-chat-foot { padding: 0 max(16px, calc((100% - 792px) / 2)) 16px; background: transparent; }
-.sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)) { border: 0; border-radius: 22px; background: var(--sn-raised); box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 9%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055), 0 1px 2px rgba(0, 0, 0, .025); }
+.sn-chat-foot { padding: 0 max(16px, calc((100% - 740px) / 2)) 14px; background: transparent; }
+.sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)) { border: 0; border-radius: 24px; background: var(--sn-raised); box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 9%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055), 0 1px 2px rgba(0, 0, 0, .025); }
 @media (hover: hover) {
 .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):hover { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 13%, transparent), 0 3px 14px -3px rgba(0, 0, 0, .065), 0 1px 3px rgba(0, 0, 0, .03); } }
-.sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):focus-within { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 18%, transparent), 0 6px 22px -6px rgba(0, 0, 0, .085), 0 1px 3px rgba(0, 0, 0, .035); }
+.sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):focus-within { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 17%, transparent), 0 6px 20px -6px rgba(0, 0, 0, .085), 0 1px 3px rgba(0, 0, 0, .035); }
 [data-theme="dark"] .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)) { background: var(--sn-overlay); box-shadow: 0 0 0 1px rgba(255, 255, 255, .095), 0 4px 16px -4px rgba(0, 0, 0, .34); }
-[data-theme="dark"] .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):focus-within { box-shadow: 0 0 0 1px rgba(255, 255, 255, .21), 0 8px 24px -6px rgba(0, 0, 0, .44); }
-.sn-chat-foot .sn-composer textarea { padding: 14px 18px 8px; font-size: calc(15px * var(--sn-font-scale, 1)); line-height: calc(24px * var(--sn-font-scale, 1)); }
-.sn-chat-foot .sn-cm-bar { padding: 4px 10px 10px 12px; gap: 4px; }
-.sn-cm-add .sn-ic { width: 18px; height: 18px; }
+[data-theme="dark"] .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):focus-within { box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), 0 8px 24px -6px rgba(0, 0, 0, .44); }
+.sn-chat-foot .sn-composer textarea { padding: 14px 16px 6px; font-size: calc(14.5px * var(--sn-font-scale, 1)); line-height: calc(22px * var(--sn-font-scale, 1)); }
+.sn-chat-foot .sn-cm-bar { padding: 4px 8px 8px 8px; gap: 4px; }
 .sn-cm-chip, .sn-cm-model { --sn-fg: var(--sn-label2); }
 .sn-cm-model .sn-ic { width: 14px; height: 14px; opacity: .6; }
 .sn-chat-cfg { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 16px 0 0; }
 .sn-chat-cfg .sn-cap { margin-right: 4px; font: 500 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
 
-/* 输入框浮在列表上面：列表一直延伸到底，输入框上方 32px 淡出（底色从透明到聊天框底色），消息滑到输入框后面消失 */
+/* 输入框浮在列表上面：列表一直延伸到底，输入框上方 24px 淡出（底色从透明到聊天框底色），消息滑到输入框后面消失 */
 .sn-chat { grid-template-rows: auto minmax(0, 1fr); }
 .sn-chat-body::after { display: none; }
-.sn-chat-foot { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; padding-top: 32px; pointer-events: none;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised) 32px); }
+.sn-chat-foot { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; padding-top: 24px; pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised) 24px); }
 .sn-chat-foot > * { pointer-events: auto; }
 .sn-chat-foot { will-change: transform; } /* 自己一个合成层：列表在下面滚时不用重画这一段淡出 */
 /* 外圈 1px 的线画在最上面一层：画在 .sn-chat 自己身上（内阴影）会被输入框那一段的底色（淡出）盖住，左、右、下三边断开 */
 .sn-chat::after { content: ""; position: absolute; inset: 0; z-index: 7; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--sn-card-line); pointer-events: none; }
-.sn-chat-jump { bottom: calc(var(--sn-foot-h, 120px) + 4px); }
+.sn-chat-jump { bottom: calc(var(--sn-foot-h, 120px) + 6px); }
 /* 手机上（竖屏窄于 640；横屏矮于 500、窄于 960）对话铺满，不是一张卡片：去掉圆角和外圈的线；顶栏像手机应用的导航栏（标题居中、让出刘海）；输入框贴底、让出底部安全区。
    横屏时刘海、圆角在左右两边：整个对话左右让出安全区（底色照样铺到边上）。参照 ChatGPT、Codex 的手机端。设计稿的演示在 demo/doc.css 里照旧画成卡片 */
 @media (max-width: 640px), (orientation: landscape) and (max-height: 500px) and (max-width: 960px) {
