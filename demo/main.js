@@ -21,6 +21,7 @@ import { initMarkdown } from "./sections/markdown.js";
 import { initCanvasGrid } from "./sections/canvas-grid.js";
 import { initCharts } from "./sections/charts.js";
 import { initLoadingMotion } from "./sections/loading-motion.js";
+import { initFeel } from "./sections/feel.js";
 import { initEditorial } from "./sections/editorial.js";
 import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
 import * as Theme from "../packages/satin-ui/src/theme.js";
@@ -161,7 +162,7 @@ addEventListener("storage", (e) => {
   pref = e.newValue || "auto"; themeSeg?.go(Math.max(0, ["auto", "light", "dark"].indexOf(pref)), false, true); applyTheme(!EMBED);
 });
 { const s = $('[data-seg="iconsize"]'); if (s) initSeg(s, (v) => paintIcons(Number(v))); }
-for (const s of $$(".doc-main .sn-seg[data-seg]")) if (!["theme", "iconsize", "toastpos", "safade", "navfx", "nfstyle", "sabar", "saover", "ctxbound", "ctxsize", "spdensity", "lomode", "gmode", "cgmode", "gsb", "cgsb", "glines", "cglines", "tlines", "mdcode", "mdimg", "mdtable", "mdview", "lmdelay", "charea", "ch3d", "ldsize", "ldspeed", "ldtone", "chatrail"].includes(s.dataset.seg)) initSeg(s);
+for (const s of $$(".doc-main .sn-seg[data-seg]")) if (!["theme", "iconsize", "toastpos", "safade", "navfx", "nfstyle", "sabar", "saover", "ctxbound", "ctxsize", "spdensity", "lomode", "gmode", "cgmode", "gsb", "cgsb", "glines", "cglines", "tlines", "mdcode", "mdimg", "mdtable", "mdview", "lmnav", "lmdelay", "charea", "ch3d", "ldsize", "ldspeed", "ldtone", "chatrail"].includes(s.dataset.seg)) initSeg(s);
 $("#reduce")?.addEventListener("change", (e) => root.classList.toggle("sn-reduce-motion", e.target.checked));
 // 动效曲线：点一下，圆点按这条曲线走到另一头；再点回来
 for (const c of $$(".curve")) c.addEventListener("click", () => {
@@ -192,6 +193,7 @@ if (need("md")) initMarkdown({ $, initSeg });
 if (need("cgrid")) initCanvasGrid({ $, $$, injectIcons, initSeg, reduced });
 if (need("charts") || need("icons")) initCharts({ $, $$, initSeg });
 if (need("loadingmotion")) initLoadingMotion({ $, $$, initSeg, reduced });
+if (need("feel")) initFeel({ $, $$, injectIcons, reduced, ...forms });
 if (need("editorial")) initEditorial({ $, $$ });
 // 最后统一把会溢出滚动的地方换成滚动区域（菜单、命令面板、通知列表、抽屉、目录，以及带 data-sa 的元素）
 initScroll({ $, $$, initSeg });

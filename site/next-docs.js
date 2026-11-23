@@ -5,6 +5,7 @@ import { onMode } from "./shell.js";
 import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { bindOverlays } from "../packages/satin-ui/src/overlay.js";
+import { openLightbox } from "../packages/satin-ui/src/lightbox.js";
 import { loadCatalog } from "./catalog.js";
 import { codePanel, mountCode, fmtHTML } from "./code.js";
 import { deviceHTML, mountDevices } from "./device.js";
@@ -50,6 +51,170 @@ const snippet = (lang, src, cap = "") => codePanel([{ name: cap, lang, code: src
 let h2n = 0;
 const cell = (c) => (/^[\w.-]+\.(css|js)$/.test(c) ? `<code>${c}</code>` : c);
 const anchor = (id, t) => `<h2 id="${id}"><a class="d-anchor" href="#" data-anchor="${id}" aria-label="这一节的链接" data-i="link"></a>${t}</h2>`;
+// 判断整列是否为纯数值/百分比/评分数据（自动应用 Satin 表格规范：右对齐 + 等宽数字 .sn-r.sn-num）
+const NUM_CELL_RE = /^[+\-–—−]?\d[\d.,/%]*(\s*(?:\/\s*\d+|分钟|秒|项|份|%|分))?$/;
+const isNumCol = (rows, colIdx) => colIdx > 0 && rows.length > 0 && rows.every((r) => {
+  const s = plainOf(String(r[colIdx] ?? "")).trim();
+  return !s || s === "—" || NUM_CELL_RE.test(s);
+});
+
+// 评测结果页交互式实拍对照数据（终版 b5 真实实跑截图与检查器数据，来源 eval/results.md）
+const EVAL_CASES = {
+  auth: {
+    label: "登录注册",
+    model: "gpt-6-luna",
+    fws: {
+      react: {
+        without: { stat: "76 源码错 · 18 页面错 · 2/5", note: "绿调品牌色、装饰插画卡片与英文宣传语，无深色模式" },
+        with: { stat: "0 源码错 · 0 页面错 · 5/5", note: "居中极简表单，深色手机整屏铺满无外框" },
+      },
+      vue: {
+        without: { stat: "95 源码错 · 15 页面错 · 2/5", note: "渐变装饰圆、头像社交证明与英文眉题，无深色模式" },
+        with: { stat: "0 源码错 · 0 页面错 · 4/5", note: "布局克制清晰，浅色桌面与深色手机完整适配" },
+      },
+      html: {
+        without: { stat: "60 源码错 · 9 页面错 · 2/5", note: "左半屏蓝青渐变与装饰圆，深色模式缺失" },
+        with: { stat: "0 源码错 · 0 页面错 · 5/5", note: "纯 HTML 下深浅主题与手机端均干净克制，0 报错" },
+      },
+    },
+  },
+  dashboard: {
+    label: "数据概览",
+    model: "gpt-6.1-terra",
+    fws: {
+      react: {
+        without: { stat: "129 源码错 · 15 页面错 · 2/5", note: "紫色品牌、大号环形图与彩色图标卡片，无深色模式" },
+        with: { stat: "0 源码错 · 0 页面错 · 5/5", note: "四指标横排、语义状态条与预设头像动态，深色手机 2×2 规整" },
+      },
+      vue: {
+        without: { stat: "133 源码错 · 16 页面错 · 2/5", note: "多色图标指标卡、紫色主调与英文眉题，无深色模式" },
+        with: { stat: "0 源码错 · 0 页面错 · 5/5", note: "数据层级清晰克制，浅色桌面与深色手机均 0 报错" },
+      },
+      html: {
+        without: { stat: "94 源码错 · 15 页面错 · 2/5", note: "大号甜甜圈图、彩色指标与无深色手机" },
+        with: { stat: "0 源码错 · 0 页面错 · 5/5", note: "纯 HTML 完整呈现指标、状态条与深色手机适配，0 报错" },
+      },
+    },
+  },
+  settings: {
+    label: "账户设置",
+    model: "gpt-6-luna",
+    fws: {
+      react: {
+        without: { stat: "139 源码错 · 15 页面错 · 2/5", note: "珊瑚色品牌、装饰星形图标与英文眉题，无深色模式" },
+        with: { stat: "0 源码错 · 0 页面错 · 5/5", note: "分组清晰、表单与开关克制，深色手机铺满无瑕疵" },
+      },
+      vue: {
+        without: { stat: "128 源码错 · 15 页面错 · 2/5", note: "紫色强调、装饰图标与彩色分组，手机侧栏挤占空间" },
+        with: { stat: "0 源码错 · 0 页面错 · 5/5", note: "开关、分段控件与危险操作分区明确，深浅双端 0 报错" },
+      },
+      html: {
+        without: { stat: "90 源码错 · 12 页面错 · 3/5", note: "绿色品牌按钮与 WORKSPACE 英文眉题，无深色模式" },
+        with: { stat: "0 源码错 · 0 页面错 · 5/5", note: "纯 HTML 控件完整，深浅双主题与手机单栏自然贴合" },
+      },
+    },
+  },
+  chat: {
+    label: "AI 对话",
+    model: "gpt-6-luna",
+    fws: {
+      react: {
+        without: { stat: "52 源码错 · 11 页面错 · 3/5", note: "顶栏带在线状态绿点，无深色模式且手机未铺满" },
+        with: { stat: "0 源码错 · 2 页面错 · 4/5", note: "纯净无头像助手正文与统一大圆角输入框，深色手机铺满" },
+      },
+      vue: {
+        without: { stat: "66 源码错 · 10 页面错 · 2/5", note: "紫色消息气泡与 ✦ 魔法棒头像，无深色模式" },
+        with: { stat: "0 源码错 · 3 页面错 · 4/5", note: "中性墨色对话流清晰克制，浅色与深色手机体验一致" },
+      },
+      html: {
+        without: { stat: "64 源码错 · 12 页面错 · 2/5", note: "紫色气泡、emoji 问候语与在线绿点，无深色模式" },
+        with: { stat: "0 源码错 · 2 页面错 · 4/5", note: "纯 HTML 对话布局简洁克制，深色手机整屏铺满" },
+      },
+    },
+  },
+};
+
+function evalShowcaseHTML() {
+  return `<div class="d-eval" data-eval-showcase>
+    <div class="d-eval-bar">
+      <div class="sn-seg sn-sm" data-eval-scene role="tablist" aria-label="评测场景">
+        <span class="sn-thumb"></span>
+        <button type="button" data-v="auth">登录注册</button>
+        <button type="button" data-v="dashboard">数据概览</button>
+        <button type="button" data-v="settings">账户设置</button>
+        <button type="button" data-v="chat">AI 对话</button>
+      </div>
+      <div class="sn-seg sn-sm" data-eval-fw role="tablist" aria-label="前端框架">
+        <span class="sn-thumb"></span>
+        <button type="button" data-v="react">React</button>
+        <button type="button" data-v="vue">Vue</button>
+        <button type="button" data-v="html">HTML</button>
+      </div>
+    </div>
+    <div class="d-eval-cols" data-eval-cols></div>
+  </div>`;
+}
+
+function mountEvalShowcase(scope) {
+  for (const box of $$("[data-eval-showcase]", scope)) {
+    if (box._evalWired) continue;
+    box._evalWired = true;
+    const cols = $("[data-eval-cols]", box);
+    const sceneSeg = $("[data-eval-scene]", box);
+    const fwSeg = $("[data-eval-fw]", box);
+    const curFwId = getFw()?.id;
+    let scene = "auth";
+    let fw = ["react", "vue", "html"].includes(curFwId) ? curFwId : "react";
+    const fwLabel = { react: "React", vue: "Vue", html: "纯 HTML" };
+
+    const render = () => {
+      const cfg = EVAL_CASES[scene];
+      const info = cfg.fws[fw];
+      const base = `assets/eval/b5/${scene}-${fw}`;
+      const cards = [
+        { key: "without", title: "没有技能", cls: "", data: info.without },
+        { key: "with", title: "有 Satin 技能", cls: " d-eval-good", data: info.with },
+      ];
+      cols.innerHTML = cards.map((c, idx) => `
+        <div class="d-eval-pane${c.cls}">
+          <div class="d-eval-hd">
+            <b>${c.title}</b>
+            <span class="d-eval-stat">${c.data.stat}</span>
+          </div>
+          <div class="d-eval-media">
+            <button type="button" class="d-eval-shot d-eval-desk" data-eval-zoom="${idx * 2}" aria-label="放大查看${c.title}浅色桌面">
+              <img src="${base}-${c.key}-desktop.jpg" alt="${cfg.label} · ${fwLabel[fw]} · ${c.title}（浅色桌面）" loading="lazy" decoding="async">
+              <span class="d-eval-cap">浅色桌面</span>
+            </button>
+            <button type="button" class="d-eval-shot d-eval-mob" data-eval-zoom="${idx * 2 + 1}" aria-label="放大查看${c.title}深色手机">
+              <img src="${base}-${c.key}-mobile.jpg" alt="${cfg.label} · ${fwLabel[fw]} · ${c.title}（深色手机）" loading="lazy" decoding="async">
+              <span class="d-eval-cap">深色手机</span>
+            </button>
+          </div>
+          <p class="d-eval-note">${c.data.note}</p>
+        </div>`).join("");
+
+      const shots = $$("[data-eval-zoom]", cols);
+      const lbItems = [
+        { bg: `url("${base}-without-desktop.jpg") center / cover`, ratio: 458 / 378, alt: `${cfg.label} · ${fwLabel[fw]} · 没有技能（浅色桌面）` },
+        { bg: `url("${base}-without-mobile.jpg") center / cover`, ratio: 168 / 378, alt: `${cfg.label} · ${fwLabel[fw]} · 没有技能（深色手机）` },
+        { bg: `url("${base}-with-desktop.jpg") center / cover`, ratio: 458 / 378, alt: `${cfg.label} · ${fwLabel[fw]} · 有 Satin 技能（浅色桌面）` },
+        { bg: `url("${base}-with-mobile.jpg") center / cover`, ratio: 168 / 378, alt: `${cfg.label} · ${fwLabel[fw]} · 有 Satin 技能（深色手机）` },
+      ];
+      shots.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.dataset.evalZoom);
+          openLightbox(lbItems, i, { thumbOf: (k) => shots[k] });
+        });
+      });
+    };
+
+    render();
+    initSeg(sceneSeg, (v) => { scene = v; render(); }, 0);
+    initSeg(fwSeg, (v) => { fw = v; render(); }, ["react", "vue", "html"].indexOf(fw));
+  }
+}
+
 const BLOCK = {
   h2: (t) => anchor("s" + ++h2n, t),
   p: (h) => `<p>${h}</p>`,
@@ -60,10 +225,14 @@ const BLOCK = {
   fw: (map) => `<div class="d-fw" data-fwb="${FWB.push(map) - 1}">${renderFwb(map)}</div>`,
   fwname: () => `<b data-fw-name>${esc(getFw().name + (getEnv() ? " · " + getEnv().name : ""))}</b>`,
   tokens: () => '<div data-async="tokens"></div>',
+  evalShowcase: () => evalShowcaseHTML(),
   img: (src, w, h, cap) => `<figure class="d-fig"><img src="${src}" width="${w}" height="${h}" alt="${esc(cap)}" loading="lazy" decoding="async"><figcaption>${cap}</figcaption></figure>`,
   do: (yes, no) => `<div class="d-dodont"><div class="do"><b><span data-i="check"></span>这样做</b><p>${yes}</p></div><div class="dont"><b><span data-i="x"></span>不要</b><p>${no}</p></div></div>`,
-  // 每格带上表头（data-l）：窄屏（< 640）表格改成一行一块，第一格当标题，后面每格前面一行小字写这一列叫什么（next.css），不横着滑
-  table: (head, rows) => `<div class="d-tablewrap"><table class="d-table"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => `<td data-l="${esc(plainOf(head[i] ?? ""))}">${cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`,
+  // 统一采用 Satin 标准表格组件（.sn-tbl-wrap > .sn-tbl-sc > table.sn-tbl）：闭合圆角外框、干净表头、纯数值列自动等宽右对齐，窄屏自动折叠为卡片行
+  table: (head, rows) => {
+    const nums = head.map((_, i) => isNumCol(rows, i));
+    return `<div class="sn-tbl-wrap d-tablewrap"><div class="sn-tbl-sc"><table class="sn-tbl d-table"><thead><tr>${head.map((h, i) => `<th${nums[i] ? ' class="sn-r"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => `<td${nums[i] ? ' class="sn-r sn-num"' : ""} data-l="${esc(plainOf(head[i] ?? ""))}">${cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  },
 };
 const blocks = (list) => list.map(([k, ...a]) => BLOCK[k](...a)).join("");
 
@@ -316,7 +485,7 @@ onFw(() => {
   fillAll();
   for (const el of $$(".d-fw[data-fwb]", main)) { el.innerHTML = renderFwb(FWB[+el.dataset.fwb]); injectIcons(el); mountCode(el); mountFwButtons(el); }
   for (const el of $$("[data-fw-name]", main)) el.textContent = getFw().name + (getEnv() ? " · " + getEnv().name : "");
-  for (const el of $$(".d-fwr[data-fwr]", main)) { el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); mountFwButtons(el); nbProse(el); for (const w of $$(".d-tablewrap", el)) scrollArea(w, { fade: "x", size: 20 }); }
+  for (const el of $$(".d-fwr[data-fwr]", main)) { el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); mountFwButtons(el); nbProse(el); for (const w of $$(".d-tablewrap > .sn-tbl-sc", el)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 }); }
 });
 // 计算样式拿来判断空白要不要留：在演示文档里找同样标签、同样类名的元素
 const liveOf = (doc, el) => { if (!doc || !el.classList?.length) return null; try { return doc.querySelector(el.localName + "." + [...el.classList].map((c) => CSS.escape(c)).join(".")); } catch { return null; } };
@@ -623,7 +792,17 @@ function watchFloats(f, doc, { anchored = true } = {}) {
 // 窗口里的演示：展示页那一块的设置行（分段控件）挪到框顶上，点了转给 iframe 里原来那个按钮
 function mirrorCtl(box, doc, id) {
   const sec = doc.getElementById(id); if (!sec) return;
-  const rows = [...sec.children].filter((r) => r.matches('[class$="-cfg"]') && r.querySelector(".sn-seg[data-seg], button"));
+  const only = sec.querySelector(":scope > .demo.only");
+  let rows;
+  if (only) {
+    // 窗口里只显示某一个演示（&demo=N）：只抓紧邻在这个演示上面的设置行，不把别的演示的设置行串进来
+    rows = [];
+    for (let el = only.previousElementSibling; el && !el.classList.contains("demo") && el.tagName !== "H3"; el = el.previousElementSibling) {
+      if (el.matches('[class$="-cfg"]') && el.querySelector(".sn-seg[data-seg], button")) rows.unshift(el);
+    }
+  } else {
+    rows = [...sec.children].filter((r) => r.matches('[class$="-cfg"]') && r.querySelector(".sn-seg[data-seg], button"));
+  }
   if (!rows.length) return;
   const bar = $(".dx-bar", box), slot = $(".dx-ctl", bar), note = $(".dx-note", bar);
   slot.innerHTML = rows.map((r, k) => {
@@ -652,7 +831,7 @@ function usage(id) {
       const name = part.match(/^([A-Za-z]\w*)\s*\(/)?.[1] || part.match(/^([A-Z][A-Z0-9_]+)(?![\w-])/)?.[1];
       if (name) (mods.get(m) || mods.set(m, []).get(m)).push(name);
     }
-    h += `<p>能直接调用的：</p><div class="d-tablewrap"><table class="d-table"><thead><tr><th>用法</th><th>模块</th></tr></thead><tbody>${u.api.map(([fn, m]) => `<tr><td><code>${esc(fn)}</code></td><td><code>${m}</code></td></tr>`).join("")}</tbody></table></div>`;
+    h += `<p>能直接调用的：</p><div class="sn-tbl-wrap d-tablewrap"><div class="sn-tbl-sc"><table class="sn-tbl d-table"><thead><tr><th>用法</th><th>模块</th></tr></thead><tbody>${u.api.map(([fn, m]) => `<tr><td><code>${esc(fn)}</code></td><td><code>${m}</code></td></tr>`).join("")}</tbody></table></div></div>`;
     if (mods.size && !EX[id]) h += snippet("js", [...mods].map(([m, ns]) => `import { ${[...new Set(ns)].join(", ")} } from "${m}";`).join("\n"));
   }
   if (u.js) h += `<p>交互：${u.js}。</p>`;
@@ -889,7 +1068,7 @@ const nbName = (html) => html.replace(/<code>([^<]*)<\/code>/g, (_, t) => { cons
 // 桌面上按内容排（table-layout: auto）：名称、类型、默认值这几列跟着内容走——每列至少和它最长的那一小截代码一样宽（代码不从名字中间断开）；
 // 说明那列要 40%，内容实在挤时浏览器先让前面几列拿够最长那截，说明拿剩下的（原来固定排法下窄列里的代码被从中间断开）
 const colgroup = (head, cols) => `<colgroup>${head.map((_, i) => (cols[i] === "d" ? '<col style="width:40%">' : "<col>")).join("")}</colgroup>`;
-const apiTbl = (head, rows, cols) => `<div class="d-tablewrap"><table class="d-table d-api">${colgroup(head, cols)}<thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => {
+const apiTbl = (head, rows, cols) => `<div class="sn-tbl-wrap d-tablewrap"><div class="sn-tbl-sc"><table class="sn-tbl d-table d-api">${colgroup(head, cols)}<thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => {
   const sum = [];
   const tds = r.map((c, i) => {
     const [k, label] = cols[i].split(":"), v = k === "m" ? nbCode(String(c ?? "")) : k === "n" ? nbName(String(c ?? "")) : String(c ?? "");
@@ -899,7 +1078,7 @@ const apiTbl = (head, rows, cols) => `<div class="d-tablewrap"><table class="d-t
   }).join("");
   const plain = (s) => String(s).replace(/<[^>]+>/g, "").trim(), long = plain(r[0]).length + plain(sum.join(" · ")).length > 30;
   return `<tr>${tds}${sum.length ? `<td class="d-k-sum${long ? " d-k-long" : ""}">${sum.join('<i class="d-k-dot">·</i>')}</td>` : ""}</tr>`;
-}).join("")}</tbody></table></div>`;
+}).join("")}</tbody></table></div></div>`;
 const md = (t) => md2html(String(t ?? ""));
 // 契约里提到的另一项（相近组件、别用时改用什么）：是组件就链到组件页；基础那几项（颜色、间距、布局……）没有组件页，链到规范里同名的那页
 function refOf(id) {
@@ -1012,14 +1191,14 @@ const ASYNC = {
     const cnt = $("[data-n-rules]", main); if (cnt) cnt.textContent = String(rules.length);
     // 规则文件还没给名字加反引号的，先按样子认出令牌名（--sn-…）、类名（sn-…）、路径（references/…）当代码；已经有反引号的照原样
     const codeify = (t) => (/`/.test(t) ? t : t.replace(/(--sn-[A-Za-z0-9-]+(?:\/[a-z0-9]+)*(?:…\d+)?|(?<![\w-])sn-[a-z][\w-]*\*?|references\/[\w./-]+|SKILL\.md)/g, "`$1`"));
-    const table = (list) => BLOCK.table(["规则", "查法", "怎么改"], list.map((r) => [`<b>${esc(r.title)}</b><br><code>${esc(r.id)}</code>`, how(r), md2html(codeify(r.fix || "")).replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="d-table"', 'class="d-table d-rules"');
+    const table = (list) => BLOCK.table(["规则", "查法", "怎么改"], list.map((r) => [`<b>${esc(r.title)}</b><br><code>${esc(r.id)}</code>`, how(r), md2html(codeify(r.fix || "")).replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="sn-tbl d-table"', 'class="sn-tbl d-table d-rules"');
     // 按七个根源组织（主会话 11-22）：规则文件给了根源（roots：编号、名字、自检问题）就先列根源和"先问自己"的问题；
     // 规则带 root 字段就按根源分组，一类一张表；都还没有时照旧一张表。root 可以写编号、名字或者 { id }
     const NAMES = ["自说自话", "假", "照搬", "堆信号", "语义错位", "只在理想条件下成立", "生硬"];
     const noOf = (v) => { if (v == null) return null; if (typeof v === "object") return noOf(v.id ?? v.no ?? v.name); if (/^\d+$/.test(String(v))) return +v; const i = NAMES.indexOf(String(v)); return i < 0 ? null : i + 1; };
     const roots = (Array.isArray(data.roots) ? data.roots : data.roots ? Object.entries(data.roots).map(([id, v]) => (typeof v === "string" ? { id, name: v } : { id, ...v })) : [])
       .map((r, i) => ({ no: noOf(r.id ?? r.no) ?? i + 1, name: r.name || r.title || NAMES[i], ask: r.ask || r.question || r.check || "" }));
-    const head = roots.length ? BLOCK.table(["根源", "先问自己"], roots.map((r) => [`<span class="d-nw"><b>${r.no} ${esc(r.name)}</b></span>`, md2html(r.ask || "").replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="d-table"', 'class="d-table d-roots"') : "";
+    const head = roots.length ? BLOCK.table(["根源", "先问自己"], roots.map((r) => [`<span class="d-nw"><b>${r.no} ${esc(r.name)}</b></span>`, md2html(r.ask || "").replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="sn-tbl d-table"', 'class="sn-tbl d-table d-roots"') : "";
     if (!rules.some((r) => noOf(r.root) != null)) return head + table(rules);
     const groups = (roots.length ? roots : NAMES.map((name, i) => ({ no: i + 1, name }))).map((g) => ({ ...g, list: rules.filter((r) => noOf(r.root) === g.no) }));
     const rest = rules.filter((r) => !groups.some((g) => g.list.includes(r)));
@@ -1065,8 +1244,8 @@ async function fillAsync(scope, base) {
   }
   if (curPage?.hash !== base) return; // 载入期间已经换页了
   for (const [el, html] of results) el.outerHTML = html;
-  injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main); mountDevices(main); mountPhoneToggles(main); fitRecipes(main); nbProse(main); balanceCards(main);
-  for (const w of $$(".d-tablewrap", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
+  injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main); mountDevices(main); mountPhoneToggles(main); mountEvalShowcase(main); fitRecipes(main); nbProse(main); balanceCards(main);
+  for (const w of $$(".d-tablewrap > .sn-tbl-sc", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
   for (const box of $$(".dx:not([data-wired])", main)) { box.dataset.wired = ""; wireDemo(box, cat.byId[box.dataset.demo]); }
   pump();
   await fillAll();
@@ -1208,8 +1387,8 @@ async function swapPage(pg, part, inVT = false) {
     const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
     const enterCls = !wasFirst && !inVT && !reduced() ? " d-page-enter" : "";
     main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}${pg.kind === "recipe" ? " d-rpage" : ""}${pg.p?.id === "mobile" ? " d-devpage" : ""}${enterCls}">${body}${pager(pg)}</article>`;
-    injectIcons(main); mountCode(main); mountFwButtons(main); mountDevices(main); mountPhoneToggles(main); fitRecipes(main); nbProse(main); balanceCards(main);
-    for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
+    injectIcons(main); mountCode(main); mountFwButtons(main); mountDevices(main); mountPhoneToggles(main); mountEvalShowcase(main); fitRecipes(main); nbProse(main); balanceCards(main);
+    for (const w of $$(".d-tablewrap > .sn-tbl-sc", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：与组件库一致挂在 .sn-tbl-sc 内部
     wireWalls(main);
     for (const box of $$(".dx", main)) { box.dataset.wired = ""; wireDemo(box, pg.c || cat.byId[box.dataset.demo]); }
     document.title = `${pg.title} · Satin`;

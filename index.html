@@ -87,7 +87,7 @@
 <div class="doc">
 <nav class="doc-nav" aria-label="目录">
   <p>基础</p>
-  <a href="#color">颜色</a><a href="#type">排版</a><a href="#spacing">间距</a><a href="#layout">布局</a><a href="#space">圆角与线</a><a href="#elevation">阴影与层级</a><a href="#motion">动效曲线</a><a href="#loadingmotion">内容加载与过渡</a><a href="#icons">图标</a>
+  <a href="#color">颜色</a><a href="#type">排版</a><a href="#spacing">间距</a><a href="#layout">布局</a><a href="#space">圆角与线</a><a href="#elevation">阴影与层级</a><a href="#motion">动效曲线</a><a href="#loadingmotion">内容加载与过渡</a><a href="#icons">图标</a><a href="#feel" data-parity-appended>交互质感</a>
   <p>按钮</p>
   <a href="#button">按钮</a><a href="#iconbutton">纯图标按钮</a><a href="#link">文字链接</a><a href="#compound">组合按钮</a><a href="#chip">切换芯片</a>
   <p>表单</p>
@@ -270,52 +270,42 @@
   <!-- ———— 内容加载与过渡 ———— -->
   <section class="spec" id="loadingmotion">
     <h2>内容加载与过渡<small>Loading &amp; transitions</small></h2>
-    <p>消灭「点一下先白屏闪空壳，几十毫秒后再硬砸进 DOM」的割裂体验。本官网文档页切换已完整实装悬停预取、180ms 原子提交宽限期、300/500ms 骨架防闪律与微位移交叉显影。</p>
-    <h3>路由切换体验对比（点左侧目录项切换，调不同延迟感受差距）</h3>
+    <p>切换内容时不立刻清空画面：300ms 内返回直接原位交叉显影；超时才展示逐行对齐的同构骨架，且至少驻留 500ms 防闪，全程容器高度不变。</p>
     <div class="demo">
       <div class="lm-cmp" id="lmCompare">
         <div class="lm-bar">
-          <div class="lm-navs" role="tablist" aria-label="切换页面">
-            <button type="button" class="sn-btn sn-ghost sn-sm sn-on" data-lm-nav="button">按钮</button>
-            <button type="button" class="sn-btn sn-ghost sn-sm" data-lm-nav="grid">数据表格</button>
-            <button type="button" class="sn-btn sn-ghost sn-sm" data-lm-nav="charts">数据图表与 3D</button>
+          <div class="sn-seg sn-sm" data-seg="lmnav" role="tablist" aria-label="切换分集">
+            <span class="sn-thumb"></span>
+            <button type="button" data-v="ep3">第三集</button>
+            <button type="button" data-v="ep4">第四集</button>
+            <button type="button" data-v="ep5">第五集</button>
           </div>
           <div class="lm-delay">
-            <span class="sn-cap">模拟网络</span>
-            <div class="sn-seg sn-sm" data-seg="lmdelay"><span class="sn-thumb"></span><button data-v="80">80ms</button><button data-v="240">240ms</button><button data-v="620">620ms</button></div>
+            <span class="sn-cap">模拟延迟</span>
+            <div class="sn-seg sn-sm" data-seg="lmdelay" role="tablist" aria-label="模拟延迟">
+              <span class="sn-thumb"></span>
+              <button type="button" data-v="160">160ms</button>
+              <button type="button" data-v="420">420ms</button>
+              <button type="button" data-v="850">850ms</button>
+            </div>
           </div>
         </div>
         <div class="lm-cols">
           <div class="lm-pane">
-            <div class="lm-pane-hd"><b>传统方式（清空 → 砸屏）</b><span class="sn-note" data-lm-raw-stat>点击上方页签对比</span></div>
-            <div class="lm-pane-bd" data-lm-raw></div>
+            <div class="lm-hd"><b>直接清空</b><span class="lm-stat" data-lm-raw-stat>160ms</span></div>
+            <div class="lm-bd" data-lm-raw></div>
           </div>
           <div class="lm-pane lm-pane-good">
-            <div class="lm-pane-hd"><b>Satin（原子提交 + 同构骨架显影）</b><span class="sn-note" data-lm-satin-stat>零白闪 · 平滑落定</span></div>
-            <div class="lm-pane-bd" data-lm-satin></div>
+            <div class="lm-hd"><b>Satin 过渡</b><span class="lm-stat" data-lm-satin-stat>160ms</span></div>
+            <div class="lm-bd" data-lm-satin></div>
           </div>
         </div>
-      </div>
-    </div>
-    <h3>300ms 宽限与 500ms 最小驻留实验</h3>
-    <div class="demo">
-      <div class="lm-grace" id="lmGrace">
-        <div class="row" style="gap:8px;flex-wrap:wrap">
-          <button type="button" class="sn-btn sn-secondary sn-sm" data-lm-run="120">快速响应（120ms · 不出骨架）</button>
-          <button type="button" class="sn-btn sn-secondary sn-sm" data-lm-run="420">临界耗时（420ms · 驻留满 500ms）</button>
-          <button type="button" class="sn-btn sn-secondary sn-sm" data-lm-run="900">慢速请求（900ms · 平滑交叉）</button>
-        </div>
-        <div class="lm-timeline">
-          <span data-lm-step="0">就绪</span><span data-lm-step="1">0–300ms 静默宽限</span><span data-lm-step="2">≥ 500ms 同构骨架</span><span data-lm-step="3">交叉淡入落定</span>
-        </div>
-        <div class="lm-stage" data-lm-stage></div>
-        <p class="sn-note" data-lm-log style="margin-top:8px">点击上方按钮模拟不同耗时下的状态流转。</p>
       </div>
     </div>
     <ul class="rules">
-      <li>导航悬停（<code>pointerenter</code> / <code>focusin</code>）静默预取目标元数据，在用户点击落定前完成 90% 的数据就绪。</li>
-      <li>路由切换设置 180ms 原子提交宽限期：数据及时到位则连同正文、右侧目录一次性提交过渡，杜绝空壳闪烁。</li>
-      <li>局部异步加载 300ms 内完成绝不展示转圈或骨架；一旦露出骨架至少平稳驻留 500ms，再用 <code>opacity</code> + <code>translateY(6px)</code> 平滑交叉显影。</li>
+      <li>导航悬停（<code>pointerenter</code> / <code>focusin</code>）静默预取目标数据，在点击落定前完成准备。</li>
+      <li>路由切换设置 180ms 原子提交宽限期：数据及时到位则连同正文与目录一次性提交过渡，不闪空壳。</li>
+      <li>局部加载 300ms 内完成不显示骨架；超过 300ms 才展示与真列表尺寸一致的同构骨架，并至少驻留 500ms，最后通过 <code>opacity</code> 与 4px 位移平滑交叉显影，外框高度始终锁定不变。</li>
     </ul>
   </section>
 
@@ -329,6 +319,68 @@
     </div>
     <h3>3D 立体质感图标（移动鼠标体验陀螺仪倾角视差与动态镜面高光）</h3>
     <div class="demo"><div id="icons3dDemo"></div></div>
+  </section>
+
+  <!-- ———— 交互质感 ———— -->
+  <section class="spec" id="feel" data-parity-appended>
+    <h2>交互质感<small>Interaction feel</small></h2>
+    <p>把悬停按压、半路打断、4px 起拖与乐观回退放进四个可动手试的真实交互，直接感受手感差异。</p>
+    <div class="demo">
+      <div class="fl-grid" id="feelLab">
+        <div class="fl-pane">
+          <div class="fl-hd"><b>悬停与按下</b><span class="fl-stat" data-fl-press-stat>按钮 97% · 行不缩放</span></div>
+          <div class="fl-bd fl-bd-press">
+            <div class="fl-btns">
+              <button type="button" class="sn-btn sn-primary sn-sm" data-fl-primary>保存修改</button>
+              <button type="button" class="sn-btn sn-secondary sn-sm">另存副本</button>
+            </div>
+            <button type="button" class="fl-list-row" data-fl-row aria-pressed="false">
+              <b>第三集 · 雨夜车站</b>
+              <span class="sn-num">12 个镜头</span>
+            </button>
+          </div>
+        </div>
+        <div class="fl-pane">
+          <div class="fl-hd"><b>中途打断</b><span class="fl-stat" data-fl-int-stat>快速连点体验折返</span></div>
+          <div class="fl-bd fl-bd-int">
+            <div class="fl-seg" role="tablist" aria-label="视图切换">
+              <span class="fl-seg-thumb" data-fl-thumb aria-hidden="true"></span>
+              <button type="button" role="tab" data-fl-tab="0" aria-selected="true" class="sn-on">分镜</button>
+              <button type="button" role="tab" data-fl-tab="1" aria-selected="false">时间线</button>
+              <button type="button" role="tab" data-fl-tab="2" aria-selected="false">调色</button>
+              <button type="button" role="tab" data-fl-tab="3" aria-selected="false">混音</button>
+            </div>
+            <div class="fl-track" data-fl-track aria-hidden="true">
+              <span class="fl-puck" data-fl-puck></span>
+            </div>
+          </div>
+        </div>
+        <div class="fl-pane fl-pane-drag">
+          <div class="fl-hd"><b>拖拽重排</b><span class="fl-stat" data-fl-drag-stat>拖过 4px 浮起 · Esc 取消</span></div>
+          <div class="fl-bd fl-bd-drag">
+            <div class="sn-drag-list fl-drag-list" data-fl-drag></div>
+          </div>
+        </div>
+        <div class="fl-pane">
+          <div class="fl-hd"><b>乐观更新</b><span class="fl-stat" data-fl-opt-stat>先响应再保存</span></div>
+          <div class="fl-bd fl-bd-opt">
+            <div class="sn-opt-row fl-opt-row" data-fl-opt-row>
+              <span class="sn-nm">雨夜车站 · 精选场次</span>
+              <button type="button" class="sn-btn sn-secondary sn-sm fl-star" data-fl-star aria-pressed="false">
+                <span data-i="star"></span>
+                <span class="sn-num" data-fl-num>18</span>
+              </button>
+            </div>
+            <label class="sn-check fl-fail" data-c><input type="checkbox" data-fl-fail>模拟保存失败（抖动并回退）</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul class="rules">
+      <li>按钮按压缩至 97%（100ms），列表行只叠底色不缩放；键盘聚焦仅在 <code>:focus-visible</code> 显示 2px 焦点环。</li>
+      <li>连续切换目标时从此刻实时坐标接续过渡，绝不跳回起点或排队等待。</li>
+      <li>拖拽满 4px 才浮起并实时补位，按 Esc 原路取消；乐观操作保存失败时左右轻抖两下并恢复原状。</li>
+    </ul>
   </section>
 
   <!-- ———— 按钮 ———— -->
@@ -1041,7 +1093,8 @@
   <section class="spec" id="chat">
     <h2>聊天与 AI 对话<small>Chat</small></h2>
     <p>超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条；已经载入的消息滚得再快、拖滚动条拖得再猛，都直接显示真内容，不换骨架，也不露白。发送时，输入框里的字原地变成气泡，果断地飞进它在列表里的位置（一起步就是高速，再柔和停住），图片、视频的缩略图边飞边放大，音频、文档整条飞过去，原来的消息同时往上让位。AI 回复先思考（灰字流出，想完自动收起，可以点开看），再列出步骤，再逐词流出正文、镜头卡片和生成的画面；生成中发送按钮变成"停止"。</p>
-    <div class="sn-chat-cfg"><span class="sn-cap">演示</span><button class="sn-btn sn-secondary sn-sm" data-chat-sim="stream" data-i="play:before">体验流式与工具调用</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="top" data-i="arrow-up:before">快速滚到最早</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="incoming">模拟收到消息</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="fail">模拟发送失败</button><span class="sn-cap" style="margin-left:auto">刻度轨</span><div class="sn-seg sn-sm" data-seg="chatrail"><span class="sn-thumb"></span><button data-v="left">左侧</button><button data-v="right">右侧</button><button data-v="off">隐藏</button></div></div>
+    <div class="sn-chat-cfg"><span class="sn-cap">演示</span><button class="sn-btn sn-secondary sn-sm" data-chat-sim="stream" data-i="play:before">体验流式与工具调用</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="top" data-i="arrow-up:before">快速滚到最早</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="incoming">模拟收到消息</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="fail">模拟发送失败</button></div>
+    <div class="sn-chat-cfg"><span class="sn-cap">刻度轨</span><div class="sn-seg sn-sm" data-seg="chatrail"><span class="sn-thumb"></span><button data-v="left">左侧</button><button data-v="right">右侧</button><button data-v="off">隐藏</button></div></div>
     <div class="demo">
       <div class="sn-chat" id="chatBox">
         <div class="sn-chat-hd"><div class="sn-tx"><b>分镜助手</b><span class="sn-sub"><span data-chat-status></span></span></div></div>

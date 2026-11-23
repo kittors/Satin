@@ -1,6 +1,6 @@
-# 图标（149 个，Solar Icons · Line Duotone 双色调，1.5 线宽）
+# 图标（149 个，Solar Icons · 均匀等重纯线性，1.5 线宽）
 
-全套采用开源 Solar Icons（480 Design，CC BY 4.0）：24px 网格、圆润轮廓、默认 line-duotone 双色调视觉层级（次要笔画透明度由 CSS 变量 `--sn-ic-duo` 控制，默认 `.48`，设为 `1` 可免重绘切为纯线性 Linear）。
+全套采用开源 Solar Icons（480 Design，CC BY 4.0）：24px 网格、圆润轮廓、默认均匀等重纯线性（次要笔画带 `sn-ic-d`，通过 CSS 变量 `--sn-ic-duo` 默认 `1`，按需设 `< 1` 可免重绘切双色调层次），12–14px 自动光学线宽补偿。
 
 标记里写 `data-i="名字"`（在文字前：`data-i="名字:before"`，后：`:after`）再调 `injectIcons()`；JS 里 `icon("名字")` 得到 SVG 字符串；React `<Icon name="名字" />`、按钮 `icon="名字"`。不要用 emoji 当图标。
 

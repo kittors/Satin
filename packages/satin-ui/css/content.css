@@ -320,9 +320,10 @@
 .sn-reduce-motion .sn-flow-edges .sn-light { animation: none !important; opacity: 0 !important; }
 
 /* ———— 对话：精修极简 AI 对话体验 ————
-   不放头像；用户是温润浅灰气泡（靠右），助手直接是正文（靠左），消息栏与输入坞严格共享 740px 居中轴线；
+   不放头像；用户是温润浅灰气泡（靠右），助手直接是正文（靠左），消息栏与输入坞共享同一条 --sn-chat-px 左右轴线（严格同宽）；
    顶栏克制极淡细分割线稳住层次；空状态采用微浮圆角徽章 + 描边建议胶囊；所有圆按钮严格统一 32px 尺寸栅格。 */
-.sn-chat { border: 0; background: var(--sn-raised); } /* 外圈 1px 的线画在 ::after 上（见下面"输入框浮在列表上面"那段），只画一次 */
+.sn-chat { --sn-chat-px: max(20px, calc((100% - 740px) / 2)); border: 0; background: var(--sn-raised); } /* 外圈 1px 的线画在 ::after 上，只画一次 */
+.sn-chat:has(.sn-rail:not(.sn-off):not([hidden])) { --sn-chat-px: max(44px, calc((100% - 740px) / 2)); }
 .sn-chat-hd { position: relative; z-index: 2; height: 48px; padding: 0 18px; background: color-mix(in srgb, var(--sn-raised) 92%, transparent); box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--sn-line) 72%, transparent); }
 .sn-chat-hd b { font-size: calc(14px * var(--sn-font-scale, 1)); letter-spacing: -.01em; color: var(--sn-label); }
 .sn-chat-hd .sn-sub { align-items: center; gap: 5px; font-size: calc(11.5px * var(--sn-font-scale, 1)); line-height: calc(15px * var(--sn-font-scale, 1)); }
@@ -331,7 +332,7 @@
 .sn-chat-hd.sn-has-btns .sn-tx { flex: 1; min-width: 0; padding: 0 6px; }
 .sn-chat-hd .sn-chat-hb { --sn-h: 32px; --sn-icon: 16px; flex: none; width: 32px; height: 32px; border-radius: 50%; }
 .sn-chat-hd .sn-chat-hb .sn-ic { width: 16px; height: 16px; }
-.sn-ci { padding: 0 max(20px, calc((100% - 740px) / 2)) 16px; }
+.sn-ci { padding: 0 var(--sn-chat-px) 16px; }
 :where(.sn-chat) .sn-msg { gap: 8px; }
 .sn-msg .sn-av, .sn-msg .sn-av-gap { display: none; }
 :where(.sn-chat) .sn-bubble { font-size: calc(14.5px * var(--sn-font-scale, 1)); line-height: calc(23px * var(--sn-font-scale, 1)); }
@@ -480,8 +481,6 @@
 /* 点击刻度轨定位后的柔和聚焦提示 */
 .sn-ci.sn-ci-flash > .sn-msg .sn-bubble, .sn-ci.sn-ci-flash > .sn-msg .sn-ai-body { animation: sn-ci-pulse .9s var(--sn-ease-out); }
 @keyframes sn-ci-pulse { 0% { box-shadow: 0 0 0 0 transparent; } 22% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--sn-accent) 32%, transparent); } 100% { box-shadow: 0 0 0 0 transparent; } }
-/* 给有侧边刻度轨的大容器微调左右内边距，确保消息轴线完全不和刻度线重叠 */
-.sn-chat-body:has(> .sn-rail:not(.sn-off):not([hidden])) .sn-ci { padding-left: max(44px, calc((100% - 740px) / 2)); padding-right: max(44px, calc((100% - 740px) / 2)); }
 
 /* 新消息出现：从下面 6px 升上来、淡入（只动里面那一层，外层的位置由列表算） */
 .sn-ci.sn-reveal > .sn-msg { animation: sn-msg-in .34s var(--sn-ease-out-strong) both; }
@@ -494,7 +493,7 @@
 .sn-chat-jump.sn-on { translate: -50% 0; }
 /* 消息从输入框上面淡出去 */
 .sn-chat-body::after { content: ""; position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; height: 24px; pointer-events: none; background: linear-gradient(to bottom, color-mix(in srgb, var(--sn-raised) 0%, transparent), var(--sn-raised)); }
-.sn-chat-foot { padding: 0 max(16px, calc((100% - 740px) / 2)) 14px; background: transparent; }
+.sn-chat-foot { padding: 0 var(--sn-chat-px) 14px; background: transparent; }
 .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)) { border: 0; border-radius: 24px; background: var(--sn-raised); box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 9%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055), 0 1px 2px rgba(0, 0, 0, .025); }
 @media (hover: hover) {
 .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):hover { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 13%, transparent), 0 3px 14px -3px rgba(0, 0, 0, .065), 0 1px 3px rgba(0, 0, 0, .03); } }

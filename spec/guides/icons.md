@@ -1,8 +1,8 @@
 # 图标（Icons）
 
-> 统一采用 Solar Icons（480 Design，CC BY 4.0），24px 网格、1.5px 线宽、圆润轮廓，默认 line-duotone 双色调层次（--sn-ic-duo 可免重绘切纯线性），颜色跟随文字。
+> 统一采用 Solar Icons（480 Design，CC BY 4.0），24px 网格、1.5px 线宽、圆润轮廓；
 
-统一采用 Solar Icons（480 Design，CC BY 4.0），24px 网格、1.5px 线宽、圆润轮廓，默认 line-duotone 双色调层次（--sn-ic-duo 可免重绘切纯线性），颜色跟随文字。16 放在正文旁，20 用在工具栏，24 用在空状态。不用 emoji，不用彩色图标。
+统一采用 Solar Icons（480 Design，CC BY 4.0），24px 网格、1.5px 线宽、圆润轮廓；默认均匀等重纯线性（按需设 --sn-ic-duo < 1 可免重绘切双色调），小尺寸自动光学线宽补偿，颜色跟随文字。16 放在正文旁，20 用在工具栏，24 用在空状态。不用 emoji，不用彩色图标。
 
 ## 放在哪
 

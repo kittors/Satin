@@ -60,8 +60,10 @@
 :where(a[href]) { color: inherit; text-decoration-thickness: 1px; text-decoration-color: var(--sn-line-control); text-underline-offset: 3px; }
 @media (hover: hover) { :where(a[href]:hover) { text-decoration-color: currentColor; } }
 .sn-ic { flex: none; display: block; }
-/* Solar Icons line-duotone 次要笔画透明度：默认 .72 兼顾层次与小尺寸清晰度；设置 --sn-ic-duo: 1 可免重绘瞬切为纯线性（Linear） */
-.sn-ic .sn-ic-d { opacity: var(--sn-ic-duo, .72); }
+/* Solar Icons 默认采用均匀等重的纯线性（1），避免小尺寸浅灰按钮里部分笔画发虚断层；按需设 --sn-ic-duo（如 .55）可免重绘切为双色调 */
+.sn-ic .sn-ic-d { opacity: var(--sn-ic-duo, 1); }
+/* 12–14px 小尺寸图标光学线宽补偿（1.72 × 14/24 ≈ 1.0px 物理整像素），消除亚像素发虚 */
+.sn-ic[width="14"], .sn-ic[width="13"], .sn-ic[width="12"] { stroke-width: 1.72; }
 /* 一行放不下就横着滑（fitScroll 包上滚动区域，加 .scroll）：滚动区域那一层在行内排版里不另起一行、能被挤窄 */
 .sn-sa:has(> .sn-seg.sn-scroll) { display: inline-block; max-width: 100%; vertical-align: middle; }
 .sn-sa:has(> .sn-tab-list.sn-scroll) { max-width: 100%; }

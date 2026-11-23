@@ -1,193 +1,205 @@
 // 内容加载与过渡演示（规范页 #/guide/loading-motion）：
-// 1. 路由切换对比（传统空壳硬砸 vs Satin 悬停预取 + 180ms 原子提交 + 同构骨架防闪交叉显影）
-// 2. 300ms 宽限期与 500ms 最小驻留互动实验（实时阶段状态提示）
-export function initLoadingMotion({ $, $$, initSeg, reduced }) {
-  const root = $("#loadingmotion");
-  if (!root) return;
+// 左侧演示直接清空再硬切的闪屏问题；右侧演示 300ms 宽限、同构圆角骨架（.sn-sk）、≥ 500ms 防闪驻留与零跳动交叉显影。
+import { PHOTOS } from "../data.js";
 
-  const PAGES = {
-    button: {
-      crumb: "按钮 · Button",
-      title: "按钮",
-      lead: "扁平纯色面配 1px 细边，6 种变体按主次递减；悬停叠底、按下微缩至 97%。",
-      chips: ["主按钮", "次按钮", "文字按钮", "危险操作"],
-      meta: "6 种变体 · 3 档尺寸 · 完整等待/成功态",
-      code: '<Button variant="primary" icon="plus">新建项目</Button>',
-    },
-    grid: {
-      crumb: "数据展示 · Data Grid",
-      title: "数据表格",
-      lead: "十万行与一百万行使用同一套交互模型：按需渲染可视行，固定列、合并格与展开详情严丝合缝。",
-      chips: ["100,000 行", "固定首末列", "树形嵌套", "多行合并"],
-      meta: "p95 帧间隔 15.8ms · 支持键盘导航与单格编辑",
-      code: "createCanvasGrid(el, { columns, dataSource, rowHeight: 36 });",
-    },
-    charts: {
-      crumb: "数据展示 · Charts & 3D",
-      title: "数据图表与 3D 视觉",
-      lead: "零第三方依赖 Canvas 引擎，内置曲线描边入场、阻尼准星跟手、分组聚焦与 360° 立体柱阵。",
-      chips: ["趋势面积图", "分组柱状图", "环形占比", "3D 立体柱阵"],
-      meta: "自适应深浅主题 · Retina 2x 清晰渲染",
-      code: "createChart3D(el, { rows, cols, values, unit: \"镜头\" });",
-    },
-  };
+const GRACE_MS = 300;
+const MIN_HOLD_MS = 500;
 
-  // ———— 演示 1：路由切换体验实时对比 ————
+const PHOTO_URLS = PHOTOS.map((bg) => {
+  const m = bg.match(/url\('([^']+)'\)/);
+  return m ? m[1].replace("w=720", "w=240") : "";
+});
+
+const EPISODES = {
+  ep3: [
+    { img: PHOTO_URLS[0], title: "01 · 车站外，雨刚停", sub: "远景 · 5200K 冷调", dur: "00:04" },
+    { img: PHOTO_URLS[1], title: "02 · 林夏走进候车厅", sub: "全景 · 缓推", dur: "00:06" },
+    { img: PHOTO_URLS[2], title: "03 · 站台上的末班车", sub: "中景 · 固定", dur: "00:05" },
+  ],
+  ep4: [
+    { img: PHOTO_URLS[3], title: "04 · 车窗里的雨滴倒影", sub: "近景 · 浅景深", dur: "00:05" },
+    { img: PHOTO_URLS[4], title: "05 · 检票口广播响起", sub: "中景 · 跟拍", dur: "00:04" },
+    { img: PHOTO_URLS[5], title: "06 · 渐远的车尾灯", sub: "远景 · 静止", dur: "00:07" },
+  ],
+  ep5: [
+    { img: PHOTO_URLS[2], title: "07 · 黎明前的旧街巷口", sub: "全景 · 手持", dur: "00:05" },
+    { img: PHOTO_URLS[0], title: "08 · 便利店门口的暖光", sub: "中景 · 推镜", dur: "00:04" },
+    { img: PHOTO_URLS[4], title: "09 · 靠海公路第一班车", sub: "远景 · 航拍", dur: "00:06" },
+  ],
+};
+
+// 骨架条宽度与真列表标题/副标题长度一致，确保切换瞬间零视觉跳跃
+const SKEL_WIDTHS = [
+  [58, 36],
+  [50, 28],
+  [64, 32],
+];
+
+const listHTML = (rows) => rows.map((r) => `
+  <div class="lm-row">
+    <span class="lm-thumb">${r.img ? `<img src="${r.img}" alt="" decoding="async">` : ""}</span>
+    <span class="lm-txt"><b>${r.title}</b><span>${r.sub}</span></span>
+    <time class="lm-dur">${r.dur}</time>
+  </div>`).join("");
+
+const skelHTML = () => SKEL_WIDTHS.map(([w1, w2]) => `
+  <div class="lm-row" aria-hidden="true">
+    <span class="sn-sk lm-sk-thumb"></span>
+    <span class="lm-txt">
+      <span class="sn-sk lm-sk-t" style="width:${w1}%"></span>
+      <span class="sn-sk lm-sk-s" style="width:${w2}%"></span>
+    </span>
+    <span class="sn-sk lm-sk-d"></span>
+  </div>`).join("");
+
+export function initLoadingMotion({ $, initSeg, reduced }) {
   const cmp = $("#lmCompare");
-  if (cmp) {
-    let delayMs = 240;
-    let curKey = "button";
-    let seq = 0;
+  if (!cmp) return;
 
-    const rawBody = $("[data-lm-raw]", cmp);
-    const satBody = $("[data-lm-satin]", cmp);
-    const rawStat = $("[data-lm-raw-stat]", cmp);
-    const satStat = $("[data-lm-satin-stat]", cmp);
-    const navBtns = $$("[data-lm-nav]", cmp);
-
-    const cardHTML = (p, animClass = "") => `
-      <div class="sn-lm-doc ${animClass}">
-        <div class="sn-lm-crumb">${p.crumb}</div>
-        <div class="sn-lm-h">${p.title}</div>
-        <p class="sn-lm-p">${p.lead}</p>
-        <div class="sn-lm-chips">${p.chips.map((c) => `<span class="sn-tag">${c}</span>`).join("")}</div>
-        <div class="sn-lm-code"><code>${p.code.replace(/[<>&]/g, (ch) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[ch])}</code></div>
-        <div class="sn-lm-meta">${p.meta}</div>
-      </div>`;
-
-    const skelHTML = () => `
-      <div class="sn-lm-skel" aria-hidden="true">
-        <span class="sn-skel sn-lm-sk-sm" style="width:32%"></span>
-        <span class="sn-skel sn-lm-sk-lg" style="width:46%"></span>
-        <span class="sn-skel sn-lm-sk-md" style="width:94%"></span>
-        <span class="sn-skel sn-lm-sk-md" style="width:76%"></span>
-        <div class="sn-lm-sk-row"><span class="sn-skel"></span><span class="sn-skel"></span><span class="sn-skel"></span></div>
-        <span class="sn-skel sn-lm-sk-box"></span>
-      </div>`;
-
-    rawBody.innerHTML = cardHTML(PAGES[curKey]);
-    satBody.innerHTML = cardHTML(PAGES[curKey]);
-
-    const seg = $('[data-seg="lmdelay"]', cmp);
-    if (seg) initSeg(seg, (v) => { delayMs = Number(v); }, 1);
-
-    const go = (key) => {
-      if (key === curKey) return;
-      curKey = key;
-      const my = ++seq;
-      navBtns.forEach((b) => b.classList.toggle("sn-on", b.dataset.lmNav === key));
-      const target = PAGES[key];
-
-      // 左边：传统方式 —— 立即清空成白屏 + 转圈，数据回来直接硬砸进 DOM，高度跳动
-      rawStat.textContent = `清空等待 ${delayMs}ms…`;
-      rawBody.innerHTML = `<div class="sn-lm-blank"><span class="sn-spinner"></span>加载中…</div>`;
-      setTimeout(() => {
-        if (seq !== my) return;
-        rawBody.innerHTML = cardHTML(target);
-        rawStat.textContent = "白屏闪烁 → 直接砸入（生硬）";
-      }, delayMs);
-
-      // 右边：Satin 方式 —— 180ms 内直接原子提交微位移显影；超时才出同构骨架且至少平稳驻留 360ms 再交叉替换
-      const ATOMIC_GRACE = 180;
-      const MIN_HOLD = 360;
-      let showedSkel = false;
-      let skelAt = 0;
-
-      if (delayMs <= ATOMIC_GRACE) {
-        satStat.textContent = `原子宽限中（≤ ${ATOMIC_GRACE}ms 不出骨架）…`;
-        setTimeout(() => {
-          if (seq !== my) return;
-          satBody.innerHTML = cardHTML(target, reduced() ? "" : "sn-lm-enter");
-          satStat.textContent = `0 闪屏 · ${delayMs}ms 原子平滑显影`;
-        }, delayMs);
-      } else {
-        satStat.textContent = "等待 180ms 宽限…";
-        setTimeout(() => {
-          if (seq !== my) return;
-          showedSkel = true;
-          skelAt = performance.now();
-          satBody.innerHTML = skelHTML();
-          satStat.textContent = "同构骨架平稳占位（至少驻留 360ms）…";
-        }, ATOMIC_GRACE);
-
-        setTimeout(() => {
-          if (seq !== my) return;
-          const finish = () => {
-            if (seq !== my) return;
-            satBody.innerHTML = cardHTML(target, reduced() ? "" : "sn-lm-enter");
-            satStat.textContent = "同构骨架 → 零抖动交叉显影";
-          };
-          if (showedSkel) {
-            const left = Math.max(0, MIN_HOLD - (performance.now() - skelAt));
-            setTimeout(finish, left);
-          } else {
-            finish();
-          }
-        }, delayMs);
-      }
-    };
-
-    navBtns.forEach((b) => b.addEventListener("click", () => go(b.dataset.lmNav)));
+  // 预热缩略图到浏览器缓存，避免首次切分集时图片晚加载导致额外闪烁
+  for (const url of PHOTO_URLS) {
+    if (!url) continue;
+    const im = new Image();
+    im.decoding = "async";
+    im.src = url;
   }
 
-  // ———— 演示 2：300ms 宽限期与 500ms 最小驻留互动实验 ————
-  const rule = $("#lmGrace");
-  if (rule) {
-    const stage = $("[data-lm-stage]", rule);
-    const log = $("[data-lm-log]", rule);
-    const steps = $$("[data-lm-step]", rule);
-    let runSeq = 0;
+  let curKey = "ep3";
+  let delayMs = 160;
+  let seq = 0;
+  const timers = new Set();
 
-    const mark = (idx) => steps.forEach((s, i) => s.classList.toggle("sn-on", i === idx));
-    const renderReal = (ms, note) => `
-      <div class="sn-lm-card ${reduced() ? "" : "sn-lm-enter"}">
-        <div class="sn-row sn-between"><b>第三集 · 渲染队列状态</b><span class="sn-tag sn-ok"><i></i>已同步</span></div>
-        <p class="sn-t-callout sn-c-secondary" style="margin-top:6px">本次模拟耗时 <b class="sn-num">${ms}ms</b> — ${note}</p>
-      </div>`;
+  const rawBody = $("[data-lm-raw]", cmp);
+  const satBody = $("[data-lm-satin]", cmp);
+  const rawStat = $("[data-lm-raw-stat]", cmp);
+  const satStat = $("[data-lm-satin-stat]", cmp);
 
-    stage.innerHTML = renderReal(120, "点击上方三种耗时，观察加载态出现与防闪时机。");
-    mark(0);
+  const later = (fn, ms) => {
+    const id = setTimeout(() => { timers.delete(id); fn(); }, ms);
+    timers.add(id);
+    return id;
+  };
+  const clearTimers = () => {
+    for (const id of timers) clearTimeout(id);
+    timers.clear();
+  };
 
-    for (const btn of $$("[data-lm-run]", rule)) {
-      btn.addEventListener("click", () => {
-        const ms = Number(btn.dataset.lmRun);
-        const my = ++runSeq;
-        const t0 = performance.now();
-        let skelShownAt = 0;
+  // 双层绝对定位先快隐后轻出：彻底避免半透明旧字与新骨架叠影重影，且容器高度严格锁定不变
+  const mountLayer = (host, html, { kind = "list", animate = true } = {}) => {
+    const prevLayers = [...host.querySelectorAll(".lm-layer")];
+    const next = document.createElement("div");
+    next.className = "lm-layer";
+    next.innerHTML = html;
 
-        mark(1);
-        log.textContent = `0ms：发起请求（预计 ${ms}ms），300ms 宽限期内保持原内容静止…`;
-
-        const graceT = setTimeout(() => {
-          if (runSeq !== my) return;
-          skelShownAt = performance.now();
-          mark(2);
-          stage.innerHTML = `<div class="sn-lm-card sn-lm-skel-card" aria-hidden="true"><span class="sn-skel" style="width:42%;height:18px"></span><span class="sn-skel" style="width:82%;height:14px;margin-top:10px"></span></div>`;
-          log.textContent = "300ms：尚未返回，展示同构骨架并锁定最少 500ms 驻留…";
-        }, 300);
-
-        setTimeout(() => {
-          if (runSeq !== my) return;
-          clearTimeout(graceT);
-          const done = () => {
-            if (runSeq !== my) return;
-            const total = Math.round(performance.now() - t0);
-            mark(3);
-            const note = skelShownAt
-              ? `骨架驻留满 500ms 后交叉替换为真内容（总视觉时长 ${total}ms，零高频闪烁）`
-              : "在 300ms 宽限期内直接完成，全程未闪现任何骨架或转圈";
-            stage.innerHTML = renderReal(ms, note);
-            log.textContent = `${total}ms：完成过渡。`;
-          };
-          if (skelShownAt) {
-            const remain = Math.max(0, 500 - (performance.now() - skelShownAt));
-            if (remain > 0) log.textContent = `${ms}ms：数据已就绪，补足剩余 ${Math.round(remain)}ms 驻留防闪…`;
-            setTimeout(done, remain);
-          } else {
-            done();
-          }
-        }, ms);
-      });
+    if (!animate || reduced() || !prevLayers.length) {
+      host.replaceChildren(next);
+      return;
     }
+
+    host.append(next);
+
+    for (const old of prevLayers) {
+      old.classList.add("lm-leaving");
+      const out = old.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: 95, easing: "cubic-bezier(.42, 0, 1, 1)", fill: "forwards" },
+      );
+      out.onfinish = () => old.remove();
+    }
+
+    if (kind === "skel") {
+      next.animate(
+        [{ opacity: 0 }, { opacity: 1 }],
+        { duration: 170, delay: 55, easing: "cubic-bezier(0, 0, .58, 1)", fill: "backwards" },
+      );
+      return;
+    }
+
+    const rows = [...next.querySelectorAll(".lm-row")];
+    rows.forEach((row, i) => {
+      row.animate(
+        [
+          { opacity: 0, transform: "translateY(4px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        {
+          duration: 210,
+          delay: 45 + i * 32,
+          easing: "cubic-bezier(.22, 1, .36, 1)",
+          fill: "backwards",
+        },
+      );
+    });
+  };
+
+  // 初始静态画面
+  mountLayer(rawBody, listHTML(EPISODES[curKey]), { animate: false });
+  mountLayer(satBody, listHTML(EPISODES[curKey]), { animate: false });
+
+  const go = (key) => {
+    if (!EPISODES[key] || key === curKey) return;
+    curKey = key;
+    const my = ++seq;
+    clearTimers();
+
+    const target = EPISODES[key];
+    const t0 = performance.now();
+
+    // 左栏：直接清空为纯空白等待，返回后无过渡硬切
+    rawStat.textContent = "等待中";
+    rawBody.innerHTML = `<div class="lm-layer lm-blank"><span class="sn-spinner" aria-hidden="true"></span></div>`;
+    later(() => {
+      if (seq !== my) return;
+      mountLayer(rawBody, listHTML(target), { animate: false });
+      rawStat.textContent = `硬切 · ${delayMs}ms`;
+    }, delayMs);
+
+    // 右栏：300ms 宽限期内保留原列表；超时后淡入同构骨架并至少驻留 500ms，最后平滑交叉显影
+    let skelAt = 0;
+    satStat.textContent = delayMs <= GRACE_MS ? "保持原内容" : "宽限中";
+
+    const graceTimer = delayMs > GRACE_MS
+      ? later(() => {
+          if (seq !== my) return;
+          skelAt = performance.now();
+          mountLayer(satBody, skelHTML(), { kind: "skel", animate: true });
+          satStat.textContent = "同构骨架";
+        }, GRACE_MS)
+      : 0;
+
+    later(() => {
+      if (seq !== my) return;
+      if (graceTimer) { clearTimeout(graceTimer); timers.delete(graceTimer); }
+
+      const commit = (padded) => {
+        if (seq !== my) return;
+        const elapsed = Math.round(performance.now() - t0);
+        mountLayer(satBody, listHTML(target), { kind: "list", animate: true });
+        satStat.textContent = !skelAt
+          ? `直切 · ${delayMs}ms`
+          : padded
+            ? `防闪驻留 · ${elapsed}ms`
+            : `交叉落定 · ${elapsed}ms`;
+      };
+
+      if (skelAt) {
+        const remain = Math.max(0, MIN_HOLD_MS - (performance.now() - skelAt));
+        if (remain > 0) later(() => commit(true), remain);
+        else commit(false);
+      } else {
+        commit(false);
+      }
+    }, delayMs);
+  };
+
+  const navSeg = $('[data-seg="lmnav"]', cmp);
+  const delaySeg = $('[data-seg="lmdelay"]', cmp);
+  if (navSeg) initSeg(navSeg, (v) => go(v), 0);
+  if (delaySeg) {
+    initSeg(delaySeg, (v) => {
+      delayMs = Number(v);
+      rawStat.textContent = `${delayMs}ms`;
+      satStat.textContent = `${delayMs}ms`;
+    }, 0);
   }
 }

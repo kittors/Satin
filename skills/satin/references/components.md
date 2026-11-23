@@ -13,8 +13,9 @@
 | [`space`](components/space.md) | 圆角、线与材质 · 04 号 §4–§5 | 圆角 6 档、线条粗细 4 档、毛玻璃虚化 3 档、功能渐变仅限 3 种——全部统一由令牌控制，并可在右上角「主题定制」或代码里自由调整 |
 | [`elevation`](components/elevation.md) | 阴影与层级 · 04 号 §6 | 三层：卡片（只靠描边和明度差）、浮层（菜单、Popover、通知）、对话框 |
 | [`motion`](components/motion.md) | 动效曲线 · 09 号 §1 | 全系统只有这几条曲线 |
-| [`loadingmotion`](components/loadingmotion.md) | 内容加载与过渡 · Loading & transitions | 消灭「点一下先白屏闪空壳，几十毫秒后再硬砸进 DOM」的割裂体验 |
+| [`loadingmotion`](components/loadingmotion.md) | 内容加载与过渡 · Loading & transitions | 切换内容时不立刻清空画面：300ms 内返回直接原位交叉显影 |
 | [`icons`](components/icons.md) | 图标 · 04 号 §7 | 统一采用 Solar Icons（24px 网格、1.5px 线宽、圆润轮廓），全部消除重影与断线毛刺，颜色跟随文字 |
+| [`feel`](components/feel.md) | 交互质感 · Interaction feel | 把悬停按压、半路打断、4px 起拖与乐观回退放进四个可动手试的真实交互，直接感受手感差异 |
 
 ## 按钮
 
