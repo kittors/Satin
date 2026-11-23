@@ -299,9 +299,9 @@ export function mountTable(wrap, o0 = {}, emit) {
   wrap.classList.toggle("sn-tbl-fill", !!o.fill);
   wrap.classList.toggle("sn-has-pin", M.hasPin);
   if (o.maxHeight != null) { const v = px(o.maxHeight); if (wrap.style.getPropertyValue("--sn-tbl-max") !== v) wrap.style.setProperty("--sn-tbl-max", v); }
-  // 限高以后在框里滚：表头吸附在上面，滚动条用组件库的（悬停、滚动时出现，不占位置；不加边缘渐隐，免得表头被淡掉）；fill / 固定列走原生滚动区保证 sticky 贴边零抖动
-  if (o.maxHeight != null && !o.fill && !M.hasPin) scrollArea($(".sn-tbl-sc", wrap), { fade: "none" });
+  // 表格内置封装 Satin 滚动区域：隐藏丑陋原生滚动条、启用细腻悬浮细条；横向锁死不回弹且不误触浏览器左右滑动返回；竖向滚到头停住不拉扯 sticky 表头；不加边缘渐隐免得表头和固定列被淡掉
   const scEl = $(".sn-tbl-sc", wrap);
+  const saInst = scEl ? scrollArea(scEl, { fade: "none", overscroll: "auto" }) : null;
   let pgCfg = normPageCfg(o.pagination), pgPage = pgCfg?.page ?? 1, pgSize = pgCfg?.pageSize ?? 10, pgInst = null, psInst = null, footEl = $(":scope > .sn-tbl-foot", wrap), pgTotalItems = 0;
   let table, thead, tbody, emptyRow, all, TR = new Map();
   const refs = () => {
@@ -350,7 +350,7 @@ export function mountTable(wrap, o0 = {}, emit) {
   let lay = null, dragNow = null, colLand = null, foot = null, selTd = null, editing = null, lastRegs = [];
   const footOf = () => $(":scope > tfoot > tr", table);
   // 限高/填满且在 .sn-tbl-sc 内竖向滚动时，thead/tfoot 靠原生 position:sticky 吸附，绝不对 tfoot tr 做 translate（否则叠加 sticky 飞到表中央或掉出底部）
-  const isScrollY = () => !!scEl && (o.maxHeight != null || !!o.fill || scEl.classList.contains("sn-sa-vp")) && /(auto|scroll)/.test(getComputedStyle(scEl).overflowY);
+  const isScrollY = () => !!scEl && (o.maxHeight != null || !!o.fill || scEl.scrollHeight > scEl.clientHeight + 1) && /(auto|scroll)/.test(getComputedStyle(scEl).overflowY);
   const isFootSticky = (f) => !!f?.firstElementChild && isScrollY() && getComputedStyle(f.firstElementChild).position === "sticky";
   function regions(vs) { const regs = regionsOf(vs.map((r) => nodeOf(r).row), M.dcols0, order, o); for (const g of regs) { addMK(g.k); if (g.cs > 1) for (let j = order.indexOf(g.k); j < order.indexOf(g.k) + g.cs; j++) CSK.add(order[j]); } return regs; }
   function applyMerge(vs, regs) {
@@ -1043,6 +1043,7 @@ export function mountTable(wrap, o0 = {}, emit) {
     refs(); fixMixed(); bind(); paintRenders(); remember();
     if (!o.loading && !o.error) relayout(applyVis, { instant: true }); else syncFooter();
     if (M.hasPin) syncPinned();
+    saInst?.refresh();
   }
   // 数据换了：同一批节点（键和上级都一样）就只换数据变了的行的格子、行移到新位置；否则整表重画（展开、勾选按 rowKey 带过去）
   function setData(list) {
@@ -1136,9 +1137,11 @@ export function mountTable(wrap, o0 = {}, emit) {
         relayout(fq || reopen ? () => { applyVis(); if (fq) syncEmpty(); } : undefined);
       }
       if (M.hasPin) syncPinned();
+      saInst?.refresh();
     },
     destroy() {
       psInst?.dispose(); psInst = null;
+      saInst?.destroy();
       if (lay) { clearLay(lay); lay = null; } dragNow?.flush(); colLand?.(); stopCW?.(); cancelAnimationFrame(colRaf); ro?.disconnect(); unbind();
     },
   };

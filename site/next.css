@@ -1,16 +1,47 @@
 /* Satin 官网新版（设计稿）：首页、文档共用。确认后并进 site.css。
    规矩照旧：动画只动 transform / opacity / filter（代码区展开收起的高度过渡和组件库 Markdown 代码块同一个做法）；
    颜色只表达状态——例外两处：代码高亮（是信息）、macOS 窗口的红黄绿三个按钮（照系统画）。 */
-/* ———— 1. 代码块 ———— */
+/* ———— 0. 官网通透配色体系（仅作用于官网首页与文档壳层，不动组件库内部 --sn-canvas） ———— */
 @layer satin {
-.cx { --cx-fg: #3f3f46; --cx-ln: #b4b4bb; --cx-pun: #a1a1aa; --cx-bg: var(--dx-bg, var(--cx-solo));
-  --sn-t-kw: #d6336c; --sn-t-str: #0369a1; --sn-t-num: #0369a1; --sn-t-com: #a1a1aa; --sn-t-fn: #7c3aed; --sn-t-typ: #7c3aed; --sn-t-prop: #52525b; --sn-t-attr: #7c3aed; --sn-t-tag: #d6336c;
-  --cx-solo: color-mix(in srgb, var(--sn-label) 5%, var(--sn-canvas));
+body.n-docs, body.n-home {
+  --site-bg: #ffffff;
+  --site-surface: #f7f8fa;
+  --site-surface-2: #eff1f5;
+  --site-border: #e5e7ec;
+  --site-border-subtle: #eff1f4;
+  background: var(--site-bg);
+}
+[data-theme="dark"] body.n-docs, [data-theme="dark"] body.n-home {
+  --site-bg: #09090b;
+  --site-surface: #121215;
+  --site-surface-2: #1c1c21;
+  --site-border: rgba(255, 255, 255, .10);
+  --site-border-subtle: rgba(255, 255, 255, .07);
+}
+.n-docs .s-nav { background: color-mix(in srgb, var(--site-bg) 88%, transparent); box-shadow: inset 0 -1px 0 var(--site-border-subtle); }
+.n-docs .s-search { background: var(--site-surface); box-shadow: inset 0 0 0 1px var(--site-border); }
+.n-docs .s-search:hover { background: var(--site-surface-2); }
+.n-docs .d-side a:hover { background: var(--site-surface); }
+.n-docs .d-side a[aria-current] { background: var(--site-surface-2); color: var(--sn-label); font-weight: 500; }
+.n-docs .s-fw-side { background: var(--site-bg); box-shadow: inset 0 0 0 1px var(--site-border); }
+.n-docs .d-card, .n-docs .d-dodont > div { background: var(--site-bg); box-shadow: inset 0 0 0 1px var(--site-border); }
+@media (hover: hover) { .n-docs .d-card:hover { background: var(--site-surface); } }
+.n-docs .d-pager a { background: var(--site-surface); box-shadow: inset 0 0 0 1px var(--site-border); }
+.n-docs .d-pager a:hover { background: var(--site-surface-2); }
+.n-home .n-card { background: var(--site-bg); box-shadow: inset 0 0 0 1px var(--site-border), 0 1px 3px rgba(15, 23, 42, .04); }
+.n-home .n-stage { background: var(--site-surface); box-shadow: inset 0 0 0 1px var(--site-border-subtle); }
+.n-home .n-fps { background: var(--site-surface); box-shadow: inset 0 0 0 1px var(--site-border); }
+
+/* ———— 1. 代码块 ———— */
+.cx { --cx-fg: #27272a; --cx-ln: #a1a1aa; --cx-pun: #8e8e93; --cx-bg: var(--dx-bg, var(--cx-solo));
+  --sn-t-kw: #be185d; --sn-t-str: #0369a1; --sn-t-num: #0369a1; --sn-t-com: #8e8e93; --sn-t-fn: #6d28d9; --sn-t-typ: #6d28d9; --sn-t-prop: #3f3f46; --sn-t-attr: #6d28d9; --sn-t-tag: #be185d;
+  --cx-solo: var(--site-surface, #f7f8fa);
   position: relative; color: var(--cx-fg); }
 [data-theme="dark"] .cx { --cx-fg: #e4e4e7; --cx-ln: #52525b; --cx-pun: #71717a;
   --sn-t-kw: #f38ba8; --sn-t-str: #7cc4ff; --sn-t-num: #7cc4ff; --sn-t-com: #71717a; --sn-t-fn: #c4b5fd; --sn-t-typ: #c4b5fd; --sn-t-prop: #a1a1aa; --sn-t-attr: #c4b5fd; --sn-t-tag: #f38ba8;
-  --cx-solo: color-mix(in srgb, var(--sn-label) 8%, var(--sn-canvas)); }
-.cx.solo { margin-top: 12px; border-radius: 16px; background: var(--cx-solo); --cx-bg: var(--cx-solo); }
+  --cx-solo: var(--site-surface, #121215); }
+.cx.solo { margin-top: 12px; border-radius: 16px; background: var(--cx-solo); box-shadow: inset 0 0 0 1px var(--site-border, var(--sn-line)); overflow: hidden; --cx-bg: var(--cx-solo); }
+.cx.solo .cx-hd { box-shadow: inset 0 -1px 0 var(--site-border-subtle, var(--sn-line)); }
 .cx .sn-t-kw, .cx .sn-t-lit { color: var(--sn-t-kw); } .cx .sn-t-str { color: var(--sn-t-str); } .cx .sn-t-num { color: var(--sn-t-num); } .cx .sn-t-com { color: var(--sn-t-com); }
 .cx .sn-t-fn { color: var(--sn-t-fn); } .cx .sn-t-typ { color: var(--sn-t-typ); } .cx .sn-t-prop, .cx .sn-t-var { color: var(--sn-t-prop); }
 .cx .sn-t-attr, .cx .sn-t-dec, .cx .sn-t-sel { color: var(--sn-t-attr); } .cx .sn-t-tag { color: var(--sn-t-tag); } .cx .sn-t-op, .cx .sn-t-pun { color: var(--cx-pun); }
@@ -83,19 +114,19 @@
 
 /* ———— 3. 文档：演示框 ———— */
 .n-docs .d-demo { display: none; }
-.dx { --dx-bg: color-mix(in srgb, var(--sn-label) 5%, var(--sn-canvas)); margin-top: 16px; padding: 6px; border-radius: 22px; background: var(--dx-bg); }
-[data-theme="dark"] .dx { --dx-bg: color-mix(in srgb, var(--sn-label) 8%, var(--sn-canvas)); }
+.dx { --dx-bg: var(--site-surface, #f7f8fa); margin-top: 16px; padding: 6px; border-radius: 22px; background: var(--dx-bg); box-shadow: inset 0 0 0 1px var(--site-border, var(--sn-line)); }
+[data-theme="dark"] .dx { --dx-bg: var(--site-surface, #121215); }
 .dx-bar { display: flex; align-items: center; gap: 12px; min-height: 34px; padding: 0 0 6px 6px; } /* 框顶一行：左边设置项，右边"在展示页打开"（不浮在预览上，免得压住演示角落里的东西） */
 .dx-bar:not(:has(.dx-ctl > *, .dx-note:not(:empty))) { display: none; } /* 没设置项也没有说明文字时藏掉，预览白盒贴齐外框顶部 */
 .dx-ctl { display: flex; align-items: center; gap: 16px; min-width: 0; flex-wrap: wrap; row-gap: 8px; } /* 设置项多、屏幕窄时折到下一行，不把整页撑宽（390 宽时对话页的框顶一行有 440 宽） */
 .dx-opt { display: flex; align-items: center; gap: 8px; font: 500 calc(12px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
 .dx-note { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 400 calc(12px * var(--fsx))/calc(16px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
-/* 预览台：和页面同一个底色，组件放在正中 */
-.dx-stage { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 240px; border-radius: 16px; background: var(--sn-canvas); overflow: hidden; }
+/* 预览台：纯白清透舞台，在冰雾外框内层次鲜明 */
+.dx-stage { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 240px; border-radius: 16px; background: var(--site-bg, #ffffff); box-shadow: inset 0 0 0 1px var(--site-border-subtle, var(--sn-line)); overflow: hidden; }
 .dx-stage > .d-frame { width: 100%; }
 .dx-open { margin-left: auto; flex: none; }
 /* 窗口：直接作为 .dx-stage 主体呈现（不再套多余的照片壁纸背景层），16px 圆角与外框 .dx(22px - 6px) 严格同心 */
-.dx.is-win .dx-stage { padding: 0; min-height: 0; background: transparent; overflow: visible; }
+.dx.is-win .dx-stage { padding: 0; min-height: 0; background: transparent; box-shadow: none; overflow: visible; }
 .dx.is-win .mac { width: 100%; --mac-r: 16px; box-shadow: 0 0 0 1px var(--sn-card-line), 0 1px 2px rgba(0, 0, 0, .04); }
 [data-theme="dark"] .dx.is-win .mac { box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
 .dx-wall { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s var(--sn-ease-out); }
@@ -130,10 +161,11 @@
 .n-docs .d-main a.d-anchor { text-decoration: none; }
 .n-docs .d-main h2 + p { margin-top: 4px; }
 .n-docs .d-main p + .cx.solo, .n-docs .d-main .cx.solo + .cx.solo { margin-top: 12px; }
-.n-docs .d-tablewrap { border-radius: 16px; box-shadow: none; background: var(--dx-bg, color-mix(in srgb, var(--sn-label) 5%, var(--sn-canvas))); padding: 4px; }
-[data-theme="dark"] .n-docs .d-tablewrap { background: color-mix(in srgb, var(--sn-label) 8%, var(--sn-canvas)); }
-.n-docs .d-table { border-radius: 12px; overflow: hidden; background: var(--sn-canvas); }
-.n-docs .d-table th { background: transparent; }
+.n-docs .d-tablewrap { border-radius: 14px; box-shadow: inset 0 0 0 1px var(--site-border, var(--sn-line)); background: var(--site-bg, #ffffff); padding: 0; overflow: hidden; }
+[data-theme="dark"] .n-docs .d-tablewrap { background: var(--site-surface, #121215); }
+.n-docs .d-table { border-radius: 0; overflow: hidden; background: transparent; }
+.n-docs .d-table th { background: var(--site-surface, #f7f8fa); }
+[data-theme="dark"] .n-docs .d-table th { background: rgba(255, 255, 255, .03); }
 /* 左边目录：开始、规范两组带图标；侧栏本身已是低饱和灰字，把双色调次笔画调至 .92 防止 16px 图标发虚断线 */
 .n-docs .d-side a .sn-ic { width: 16px; height: 16px; margin-right: 10px; color: var(--sn-label3); flex: none; --sn-ic-duo: .92; }
 .n-docs .d-side a[aria-current] .sn-ic { color: var(--sn-label); }
@@ -546,7 +578,7 @@ html.dx-fs { padding-right: var(--fs-sbw, 0px); }
   .n-end > :not(.s-mb) { display: none; }
   /* 滚下去以后：轻微半透明的底 + 一条细线 */
   .s-nav::before, .n-nav::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .2s var(--sn-ease-out);
-    background: color-mix(in srgb, var(--sn-canvas) 86%, transparent); -webkit-backdrop-filter: saturate(1.6) blur(16px); backdrop-filter: saturate(1.6) blur(16px); box-shadow: inset 0 -1px 0 var(--sn-line); }
+    background: color-mix(in srgb, var(--site-bg, var(--sn-canvas)) 88%, transparent); -webkit-backdrop-filter: saturate(1.6) blur(16px); backdrop-filter: saturate(1.6) blur(16px); box-shadow: inset 0 -1px 0 var(--site-border-subtle, var(--sn-line)); }
   .s-nav.scrolled::before, .n-nav.island::before { opacity: 1; }
   /* 文档页：左边目录收进抽屉，正文一栏 */
   .n-docs .d-side { display: none; }
@@ -664,10 +696,14 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .d-rstage-mobile .s-devbox { margin: 0; }
 .d-rframe { height: 640px; overflow: hidden; background: var(--sn-canvas); }
 .d-rframe iframe { display: block; width: 100%; height: 100%; border: 0; }
-/* 内容页配方：预览框跟着内容长高（fitRecipes 量好设 iframe 的高度），框里不出滚动条；app 式配方还是固定高度 */
-.d-rframe[data-fit="content"] { height: auto; }
-.d-rframe[data-fit="content"] iframe { height: 640px; }
-.d-rcode { margin-top: 12px; }
+/* 内容页配方：高度上限 680px（不超过时精准贴合内容，超过时窗内平滑滚动）；app 式配方固定 640px */
+.d-rframe[data-fit="content"] { height: auto; max-height: 680px; }
+.d-rframe[data-fit="content"] iframe { height: 640px; max-height: 680px; }
+/* 配方独立代码展示区：清晰独立的圆角卡片容器 + 顶部分割线，彻底与页面背景拉开层次 */
+.d-rcode { margin-top: 14px; border-radius: 16px; background: var(--site-surface, #f7f8fa); box-shadow: inset 0 0 0 1px var(--site-border, var(--sn-line)); overflow: hidden; --dx-bg: var(--site-surface, #f7f8fa); }
+.d-rcode .cx { --cx-bg: var(--site-surface, #f7f8fa); }
+.d-rcode .cx-hd { min-height: 44px; padding: 6px 10px 6px 12px; box-shadow: inset 0 -1px 0 var(--site-border-subtle, var(--sn-line)); background: color-mix(in srgb, var(--site-bg, #ffffff) 48%, transparent); }
+.d-rcode .cx-tabs button[aria-selected="true"] { background: var(--site-bg, #ffffff); box-shadow: inset 0 0 0 1px var(--site-border, var(--sn-line)); }
 .d-err { color: var(--sn-danger); }
 /* 顶栏的外观分段控件（跟随系统 / 浅色 / 深色） */
 .s-mode-seg .sn-ic { width: 15px; height: 15px; }

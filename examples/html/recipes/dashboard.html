@@ -1,9 +1,9 @@
 <sn-enhance id="demo-dashboard">
   <div class="sn-page">
     <header class="sn-page-hd">
-      <div>
+      <div style="min-width:0;flex:1">
         <h1>渲染与创作效能</h1>
-        <p id="dbRange">11&nbsp;月&nbsp;17&nbsp;日 – 11&nbsp;月&nbsp;23&nbsp;日 · 全部业务线</p>
+        <p id="dbRange" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">11.17 – 11.23 · 全部业务线</p>
       </div>
       <div class="sn-acts" style="flex-wrap:wrap">
         <sn-select id="dbLine" value="all" items="[{&quot;value&quot;:&quot;all&quot;,&quot;label&quot;:&quot;全部业务线&quot;},{&quot;value&quot;:&quot;drama&quot;,&quot;label&quot;:&quot;剧集分镜&quot;},{&quot;value&quot;:&quot;ad&quot;,&quot;label&quot;:&quot;商业短片&quot;},{&quot;value&quot;:&quot;anime&quot;,&quot;label&quot;:&quot;二维动画&quot;}]"></sn-select>
@@ -89,32 +89,34 @@
           <div id="dbBar"></div>
         </section>
       </div>
-      <div class="sn-with-aside" style="--sn-aside: 340px">
+      <div class="sn-with-aside" style="--sn-aside: 288px">
         <section class="sn-panel sn-flush">
           <div class="sn-panel-hd" style="padding: var(--sn-sp-16) var(--sn-sp-20) var(--sn-sp-12)">
-            <div>
+            <div style="min-width:0;flex:1">
               <h2>重点项目效能明细</h2>
-              <p id="dbTblHint">全部 6&nbsp;个项目 · 支持图表联动与关键词筛选</p>
+              <p id="dbTblHint" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">全部 6&nbsp;个项目 · 支持图表联动与关键词筛选</p>
             </div>
-            <div class="sn-row sn-gap-8">
+            <div class="sn-row sn-gap-8" style="flex:none">
               <button type="button" class="sn-btn sn-ghost sn-sm" id="dbReset" hidden>重置筛选</button>
-              <input class="sn-input sn-sm" id="dbSearch" type="search" placeholder="搜索项目或导演…" style="width: 168px">
+              <input class="sn-input sn-sm" id="dbSearch" type="search" placeholder="搜索项目或导演…" style="width: 156px">
             </div>
           </div>
-          <div class="sn-tbl-wrap sn-plain">
-            <table class="sn-tbl">
-              <thead>
-                <tr>
-                  <th>项目</th>
-                  <th>题材</th>
-                  <th>状态</th>
-                  <th class="sn-num" style="text-align:right">镜头</th>
-                  <th class="sn-num" style="text-align:right">通过率</th>
-                  <th class="sn-num" style="text-align:right">均耗</th>
-                </tr>
-              </thead>
-              <tbody id="dbRows"></tbody>
-            </table>
+          <div class="sn-tbl-wrap sn-plain" style="min-height: 320px">
+            <div class="sn-tbl-sc" id="dbTblSc">
+              <table class="sn-tbl">
+                <thead>
+                  <tr>
+                    <th>项目</th>
+                    <th>题材</th>
+                    <th>状态</th>
+                    <th class="sn-num" style="text-align:right">镜头</th>
+                    <th class="sn-num" style="text-align:right">通过率</th>
+                    <th class="sn-num" style="text-align:right">均耗时</th>
+                  </tr>
+                </thead>
+                <tbody id="dbRows"></tbody>
+              </table>
+            </div>
           </div>
         </section>
         <section class="sn-panel">
@@ -151,16 +153,17 @@
 <script type="module">
   import { defineElements } from "satin-ui/elements";
   import { injectIcons } from "satin-ui";
-  import { busy, succeed, toast, createNumberFlow } from "satin-ui/components";
+  import { busy, succeed, toast, createNumberFlow, createScrollArea } from "satin-ui/components";
   import { createAreaChart, createBarChart, createDonutChart, createChart3D, createSparkline } from "satin-ui/charts";
 
   defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
   const root = document.getElementById("demo-dashboard");
   injectIcons();
+  createScrollArea(root.querySelector("#dbTblSc"), { fade: "none", overscroll: "auto" });
 
   const DATASET = {
     "本周": {
-      range: "11 月 17 日 – 11 月 23 日",
+      range: "11.17 – 11.23",
       kpis: [
         { val: 1784, delta: "+14.2%", spk: [168, 214, 196, 268, 312, 284, 342] },
         { val: 84.6, fmt: (v) => v.toFixed(1) + "%", delta: "+3.8%", spk: [79, 81, 80, 83, 85, 84, 86] },
@@ -182,7 +185,7 @@
       c3d: [[72, 94, 88, 126, 148, 112], [56, 78, 108, 118, 134, 96], [42, 64, 74, 92, 106, 84]],
     },
     "本月": {
-      range: "2026 年 11 月 1 日 – 11 月 23 日",
+      range: "11.01 – 11.23",
       kpis: [
         { val: 6230, delta: "+21.6%", spk: [1120, 1480, 1690, 1940] },
         { val: 86.1, fmt: (v) => v.toFixed(1) + "%", delta: "+5.1%", spk: [81, 83, 85, 87] },
@@ -204,7 +207,7 @@
       c3d: [[96, 118, 132, 154, 176, 140], [74, 98, 124, 146, 158, 122], [62, 82, 94, 116, 128, 104]],
     },
     "本季": {
-      range: "2026 年 Q4（9 月 – 11 月）",
+      range: "2026 Q4（9 – 11 月）",
       kpis: [
         { val: 18420, delta: "+38.4%", spk: [4280, 5610, 6230, 7480] },
         { val: 87.9, fmt: (v) => v.toFixed(1) + "%", delta: "+7.4%", spk: [78, 82, 86, 88] },
@@ -229,12 +232,12 @@
 
   const LINE_SCALE = { all: [1, "全部业务线"], drama: [0.62, "剧集分镜"], ad: [0.44, "商业短片"], anime: [0.51, "二维动画"] };
   const PROJECTS = [
-    { name: "雨夜车站 · 第 3 集", owner: "林夏", line: "drama", genre: "电影感", status: "已完成", tone: "sn-ok", shots: 48, rate: "93.8%", avg: "1 分 38 秒" },
-    { name: "风起长街 · 预告片", owner: "周屿", line: "ad", genre: "纪录", status: "生成中", tone: "sn-run", shots: 32, rate: "84.4%", avg: "1 分 49 秒" },
-    { name: "星河渡口 · 先导集", owner: "许诺", line: "anime", genre: "动画", status: "待审核", tone: "sn-warn", shots: 64, rate: "87.5%", avg: "1 分 56 秒" },
-    { name: "霓虹脉搏 · 视觉单曲", owner: "苏婉", line: "ad", genre: "MV", status: "已完成", tone: "sn-ok", shots: 28, rate: "92.9%", avg: "1 分 31 秒" },
-    { name: "海雾尽头 · 第 1 集", owner: "程橙", line: "drama", genre: "短剧", status: "生成中", tone: "sn-run", shots: 56, rate: "81.2%", avg: "2 分 04 秒" },
-    { name: "旧城回声 · 复原篇", owner: "陈默", line: "drama", genre: "纪录", status: "失败重试", tone: "sn-bad", shots: 19, rate: "68.4%", avg: "2 分 36 秒" },
+    { name: "雨夜车站 · 第 3 集", owner: "林夏", line: "drama", genre: "电影感", status: "已完成", tone: "sn-ok", shots: 48, rate: "93.8%", avg: "1分38秒" },
+    { name: "风起长街 · 预告片", owner: "周屿", line: "ad", genre: "纪录", status: "生成中", tone: "sn-run", shots: 32, rate: "84.4%", avg: "1分49秒" },
+    { name: "星河渡口 · 先导集", owner: "许诺", line: "anime", genre: "动画", status: "待审核", tone: "sn-warn", shots: 64, rate: "87.5%", avg: "1分56秒" },
+    { name: "霓虹脉搏 · 视觉单曲", owner: "苏婉", line: "ad", genre: "MV", status: "已完成", tone: "sn-ok", shots: 28, rate: "92.9%", avg: "1分31秒" },
+    { name: "海雾尽头 · 第 1 集", owner: "程橙", line: "drama", genre: "短剧", status: "生成中", tone: "sn-run", shots: 56, rate: "81.2%", avg: "2分04秒" },
+    { name: "旧城回声 · 复原篇", owner: "陈默", line: "drama", genre: "纪录", status: "失败重试", tone: "sn-bad", shots: 19, rate: "68.4%", avg: "2分36秒" },
   ];
 
   let period = "本周", line = "all", filterStatus = "", filterGenre = "", query = "";

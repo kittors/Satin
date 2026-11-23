@@ -134,13 +134,14 @@
 html.sn-reduce-motion .sn-md-img::before { animation: none !important; }
 
 /* ———— 演示 ———— */
-.sn-md-cfg { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 20px; }
+.sn-md-cfg { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 16px; }
+.sn-md-cfg-g { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
 .sn-md-demo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; } /* 只有一列也写成 minmax(0, 1fr)：长代码、宽表格在自己的框里横着滚，不把整块撑出容器 */
 .sn-md-demo[data-view="doc"] .sn-md-src, .sn-md-demo[data-view="src"] .sn-md-doc, .sn-md-demo[data-view="doc"] .sn-sa:has(> .sn-md-src) { display: none; } /* 源码框包了滚动区域：藏外面那一层 */
 .sn-md-demo[data-view="split"] { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .sn-md-doc { max-width: 760px; }
-.sn-md-demo .sn-md-doc { max-height: 720px; } /* 预览限高，在里面的滚动视口里滚（kit-md.js 用 scrollArea 套的） */
-.sn-md-src { display: block; width: 100%; height: 720px; padding: 16px; resize: vertical; border: 1px solid var(--sn-line); border-radius: var(--sn-r-md); outline: none; background: var(--sn-md-code-bg, var(--sn-raised)); font: 400 calc(12.5px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label); }
+.sn-md-demo .sn-md-doc { max-height: 480px; } /* 预览限高在一屏内舒适阅读，在里面的滚动视口里滚（kit-md.js 用 scrollArea 套的） */
+.sn-md-src { display: block; width: 100%; height: 480px; padding: 16px; resize: vertical; border: 1px solid var(--sn-line); border-radius: var(--sn-r-md); outline: none; background: var(--sn-md-code-bg, var(--sn-raised)); font: 400 calc(12.5px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label); }
 .sn-md-src:focus { border-color: var(--sn-focus); box-shadow: 0 0 0 3px var(--sn-ring); }
 
 /* 视频、音频：组件库的播放器和音频条（kit-media.js）；视频撑满正文宽度，音频条居中 */
@@ -190,7 +191,7 @@ html.sn-reduce-motion .sn-md-img::before { animation: none !important; }
 /* 并排视图：演示框窄于 640 时预览和源码上下叠（源码在下） */
 @container demo (max-width: 640px) {
   .sn-md-demo[data-view="split"] { grid-template-columns: minmax(0, 1fr); }
-  .sn-md-demo[data-view="split"] .sn-md-doc { max-height: 560px; }
-  .sn-md-demo[data-view="split"] .sn-md-src { height: 360px; }
+  .sn-md-demo[data-view="split"] .sn-md-doc { max-height: 420px; }
+  .sn-md-demo[data-view="split"] .sn-md-src { height: 320px; }
 }
 }

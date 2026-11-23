@@ -1,13 +1,13 @@
 # 数据分析仪表盘
 
-面向「AI 影视创作与渲染集群」的真实业务数据分析工作台：从顶栏周期与业务线筛选，到带迷你火花线的 4 项核心指标面板、平滑趋势面积图、可点击联动筛选的环形状态图、可 360° 拖拽旋转的 3D 时空算力柱阵图、题材交付对比柱状图，再到实时联动过滤的项目效能明细表与团队动态流。整页零第三方图表依赖，深浅双主题与多端响应式全部开箱即用。
+多维联动的数据分析仪表盘：指标火花线、趋势与状态图表、3D 算力分布及明细表。
 
 ```html
 <div class="sn-page">
   <header class="sn-page-hd">
-    <div>
+    <div style="min-width:0;flex:1">
       <h1>渲染与创作效能</h1>
-      <p id="dbRange">11&nbsp;月&nbsp;17&nbsp;日 – 11&nbsp;月&nbsp;23&nbsp;日 · 全部业务线</p>
+      <p id="dbRange" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">11.17 – 11.23 · 全部业务线</p>
     </div>
     <div class="sn-acts" style="flex-wrap:wrap">
       <sn-select id="dbLine" value="all" items='[{"value":"all","label":"全部业务线"},{"value":"drama","label":"剧集分镜"},{"value":"ad","label":"商业短片"},{"value":"anime","label":"二维动画"}]'></sn-select>
@@ -77,22 +77,24 @@
     </div>
 
     <!-- 第 4 层：联动项目效能明细表 + 团队动态与异常追踪 -->
-    <div class="sn-with-aside" style="--sn-aside: 340px">
+    <div class="sn-with-aside" style="--sn-aside: 288px">
       <section class="sn-panel sn-flush">
         <div class="sn-panel-hd" style="padding: var(--sn-sp-16) var(--sn-sp-20) var(--sn-sp-12)">
-          <div><h2>重点项目效能明细</h2><p id="dbTblHint">全部 6&nbsp;个项目 · 支持图表联动与关键词筛选</p></div>
-          <div class="sn-row sn-gap-8">
+          <div style="min-width:0;flex:1"><h2>重点项目效能明细</h2><p id="dbTblHint" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">全部 6&nbsp;个项目 · 支持图表联动与关键词筛选</p></div>
+          <div class="sn-row sn-gap-8" style="flex:none">
             <button type="button" class="sn-btn sn-ghost sn-sm" id="dbReset" hidden>重置筛选</button>
-            <input class="sn-input sn-sm" id="dbSearch" type="search" placeholder="搜索项目或导演…" style="width: 168px">
+            <input class="sn-input sn-sm" id="dbSearch" type="search" placeholder="搜索项目或导演…" style="width: 156px">
           </div>
         </div>
-        <div class="sn-tbl-wrap sn-plain">
-          <table class="sn-tbl">
-            <thead>
-              <tr><th>项目</th><th>题材</th><th>状态</th><th class="sn-num" style="text-align:right">镜头</th><th class="sn-num" style="text-align:right">通过率</th><th class="sn-num" style="text-align:right">均耗</th></tr>
-            </thead>
-            <tbody id="dbRows"></tbody>
-          </table>
+        <div class="sn-tbl-wrap sn-plain" style="min-height: 320px">
+          <div class="sn-tbl-sc" id="dbTblSc">
+            <table class="sn-tbl">
+              <thead>
+                <tr><th>项目</th><th>题材</th><th>状态</th><th class="sn-num" style="text-align:right">镜头</th><th class="sn-num" style="text-align:right">通过率</th><th class="sn-num" style="text-align:right">均耗时</th></tr>
+              </thead>
+              <tbody id="dbRows"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -111,14 +113,15 @@
 
 <script type="module">
   import { injectIcons } from "satin-ui";
-  import { busy, succeed, toast, createNumberFlow } from "satin-ui/components";
+  import { busy, succeed, toast, createNumberFlow, createScrollArea } from "satin-ui/components";
   import { createAreaChart, createBarChart, createDonutChart, createChart3D, createSparkline } from "satin-ui/charts";
 
   injectIcons();
+  createScrollArea(document.getElementById("dbTblSc"), { fade: "none", overscroll: "auto" });
 
   const DATASET = {
     "本周": {
-      range: "11 月 17 日 – 11 月 23 日",
+      range: "11.17 – 11.23",
       kpis: [
         { val: 1784, delta: "+14.2%", spk: [168, 214, 196, 268, 312, 284, 342] },
         { val: 84.6, fmt: (v) => v.toFixed(1) + "%", delta: "+3.8%", spk: [79, 81, 80, 83, 85, 84, 86] },
@@ -140,7 +143,7 @@
       c3d: [[72, 94, 88, 126, 148, 112], [56, 78, 108, 118, 134, 96], [42, 64, 74, 92, 106, 84]],
     },
     "本月": {
-      range: "2026 年 11 月 1 日 – 11 月 23 日",
+      range: "11.01 – 11.23",
       kpis: [
         { val: 6230, delta: "+21.6%", spk: [1120, 1480, 1690, 1940] },
         { val: 86.1, fmt: (v) => v.toFixed(1) + "%", delta: "+5.1%", spk: [81, 83, 85, 87] },
@@ -162,7 +165,7 @@
       c3d: [[96, 118, 132, 154, 176, 140], [74, 98, 124, 146, 158, 122], [62, 82, 94, 116, 128, 104]],
     },
     "本季": {
-      range: "2026 年 Q4（9 月 – 11 月）",
+      range: "2026 Q4（9 – 11 月）",
       kpis: [
         { val: 18420, delta: "+38.4%", spk: [4280, 5610, 6230, 7480] },
         { val: 87.9, fmt: (v) => v.toFixed(1) + "%", delta: "+7.4%", spk: [78, 82, 86, 88] },
@@ -187,12 +190,12 @@
 
   const LINE_SCALE = { all: [1, "全部业务线"], drama: [0.62, "剧集分镜"], ad: [0.44, "商业短片"], anime: [0.51, "二维动画"] };
   const PROJECTS = [
-    { name: "雨夜车站 · 第 3 集", owner: "林夏", line: "drama", genre: "电影感", status: "已完成", tone: "sn-ok", shots: 48, rate: "93.8%", avg: "1 分 38 秒" },
-    { name: "风起长街 · 预告片", owner: "周屿", line: "ad", genre: "纪录", status: "生成中", tone: "sn-run", shots: 32, rate: "84.4%", avg: "1 分 49 秒" },
-    { name: "星河渡口 · 先导集", owner: "许诺", line: "anime", genre: "动画", status: "待审核", tone: "sn-warn", shots: 64, rate: "87.5%", avg: "1 分 56 秒" },
-    { name: "霓虹脉搏 · 视觉单曲", owner: "苏婉", line: "ad", genre: "MV", status: "已完成", tone: "sn-ok", shots: 28, rate: "92.9%", avg: "1 分 31 秒" },
-    { name: "海雾尽头 · 第 1 集", owner: "程橙", line: "drama", genre: "短剧", status: "生成中", tone: "sn-run", shots: 56, rate: "81.2%", avg: "2 分 04 秒" },
-    { name: "旧城回声 · 复原篇", owner: "陈默", line: "drama", genre: "纪录", status: "失败重试", tone: "sn-bad", shots: 19, rate: "68.4%", avg: "2 分 36 秒" },
+    { name: "雨夜车站 · 第 3 集", owner: "林夏", line: "drama", genre: "电影感", status: "已完成", tone: "sn-ok", shots: 48, rate: "93.8%", avg: "1分38秒" },
+    { name: "风起长街 · 预告片", owner: "周屿", line: "ad", genre: "纪录", status: "生成中", tone: "sn-run", shots: 32, rate: "84.4%", avg: "1分49秒" },
+    { name: "星河渡口 · 先导集", owner: "许诺", line: "anime", genre: "动画", status: "待审核", tone: "sn-warn", shots: 64, rate: "87.5%", avg: "1分56秒" },
+    { name: "霓虹脉搏 · 视觉单曲", owner: "苏婉", line: "ad", genre: "MV", status: "已完成", tone: "sn-ok", shots: 28, rate: "92.9%", avg: "1分31秒" },
+    { name: "海雾尽头 · 第 1 集", owner: "程橙", line: "drama", genre: "短剧", status: "生成中", tone: "sn-run", shots: 56, rate: "81.2%", avg: "2分04秒" },
+    { name: "旧城回声 · 复原篇", owner: "陈默", line: "drama", genre: "纪录", status: "失败重试", tone: "sn-bad", shots: 19, rate: "68.4%", avg: "2分36秒" },
   ];
 
   let period = "本周", line = "all", filterStatus = "", filterGenre = "", query = "";
@@ -300,62 +303,15 @@
 </script>
 ```
 
-## 业务场景与决策目标
+## 结构与联动要点
 
-这份落地案例不是为了堆砌图表，而是面向 **AI 影视创作与渲染平台负责人 / 制片总监** 每天早会的 3 个真实决策问题：
-
-- **产能是否健康**：本周/本月生成的总镜头数与「首镜一次通过率」是否同步走高？如果镜头量涨了但采纳率跌了，说明模型提示词或资产库出现了返工。
-- **算力瓶颈在哪里**：上海、杭州、深圳三个 GPU 渲染集群在周一至周六的吞吐热力分布是否均衡？哪一天、哪个机房出现排队积压？
-- **哪些项目正在掉队**：在 128 个进行中的项目里，哪几个停在「待审核」或「失败重试」，负责人是谁，是否需要立刻介入？
-
-> **设计核心结论**：好的数据分析页在 3 秒内让负责人看到「异常与趋势」，10 秒内通过一次点击下钻到「具体责任人与具体项目」，绝不让用户在一堆装饰性卡片里翻找答案。
-
-## F 型四层信息架构拆解
-
-整个页面严格遵循自上而下、从宏观到微观的 **F 型四层阅读动线**，每一层只承担单一职责，不互相抢焦点：
-
-| 层级 | 区块与骨架类 | 解决的问题 | 关键交互与微动效 |
-| :--- | :--- | :--- | :--- |
-| **顶栏控制层** | `.sn-page-hd` + `.sn-acts` | 锁定全局时间窗口与业务线视角 | 业务线 `<sn-select>`、周期 `<sn-segmented>` 全局联动，导出按钮带 300ms/500ms 等待与成功态 |
-| **第 1 层 · 指标层** | `.sn-panel` → `.sn-stats` | 3 秒扫读 4 个北极星指标与走势方向 | 数字仅 22px 等宽（`tabular-nums`）配 NumberFlow 局部翻滚，底部嵌 30px 迷你火花线 |
-| **第 2 层 · 核心趋势与构成** | `.sn-with-aside`（左趋势 + 右环形） | 看整体走势与项目状态占比 | 面积图支持平滑 Morph 与阻尼准星；点击环形分片直接筛选下方明细表 |
-| **第 3 层 · 空间热力与题材对比** | `.sn-with-aside`（左 3D 柱阵 + 右柱状） | 看「机房 × 日期」三维算力峰值与题材交付对比 | 3D 柱阵支持 360° 拖拽惯性旋转与三视角飞行；点击题材柱组同样联动明细表 |
-| **第 4 层 · 行动与追踪层** | `.sn-with-aside`（左明细表 + 右动态流） | 从宏观洞察一键落到可执行的项目与负责人 | 表格用 `.sn-panel.sn-flush` + `.sn-tbl-wrap.sn-plain` 杜绝卡片套边框，动态流全用 `<sn-avatar>` |
-
-## 图表选型与 3D 视觉引入边界
-
-很多数据分析页显得混乱、像 AI 拼出来的模板，根源在于**乱选图表**（比如把 3 个状态画成雷达图，或把普通折线硬做成 3D 饼图导致角度畸变）。本案例严格遵守以下选型边界：
-
-| 数据维度特征 | 选用组件 | 引入理由与克制约束 |
+| 层级 | 区块与组件 | 作用与关键交互 |
 | :--- | :--- | :--- |
-| **KPI 迷你走势** | `createSparkline` | 仅表达近 7 天/4 周的方向感，不画坐标轴与网格，保持卡片轻盈 |
-| **时间序列双指标对比** | `createAreaChart` | Monotone Hermite 平滑曲线绝不过冲歪曲单调数据，切换周期时 420ms 形变插值 |
-| **4 类以内状态占比** | `createDonutChart` | 环心动态联动选中分片数值与占比，悬停外扩 4px 并柔和压暗非焦点弧段 |
-| **离散类目本期 vs 上期** | `createBarChart` | 35ms 交错弹簧生长，悬停聚焦组顶自动浮现精准数值，点击驱动全局筛选 |
-| **双维度 × 强度热力结构** | `createChart3D` | **仅在需要同时呈现「集群 × 日期 × 吞吐高度」三维分布时引入 3D**；配有「俯视 / 正面」一键视角避免透视遮挡 |
+| **顶栏筛选** | `.sn-page-hd` + `<sn-select>` / `<sn-segmented>` | 切换业务线与周期时全局驱动所有图表平滑 Morph，单行锁定防页头跳动 |
+| **核心指标** | `.sn-panel` → `.sn-stats` + `createNumberFlow` + `createSparkline` | 4 项关键指标合并一张面板，22px 等宽数字配迷你趋势线，零彩色发光卡 |
+| **趋势与状态** | `createAreaChart` + `createDonutChart` | 面积图支持图例开关与阻尼准星；点击环形分片直接筛选下方明细表 |
+| **3D 与对比** | `createChart3D` + `createBarChart` | 3D 柱阵仅用于「集群 × 日期 × 吞吐」三维分布，支持拖拽与视角切换；柱组点击同样联动明细表 |
+| **明细与动态** | `.sn-panel.sn-flush` → `.sn-tbl-wrap.sn-plain` + `<sn-avatar>` | 表格无双层套框、内置 Satin 滚动条与零回弹；动态流统一使用预设头像组件 |
 
-## 单向筛选联动与状态机设计
-
-页面所有筛选器（业务线、周期、环形图状态分片、柱状图题材组、搜索框）遵循**单一数据源（Single Source of Truth）**流转：
-
-- **全局重算（业务线 / 周期变更）**：统一调用 `applyFilters()`，依次驱动 4 组 NumberFlow 与 Sparkline、面积图、环形图、3D 柱阵、分组柱状图执行平滑 `update()` Morph 过渡，并同步刷新页头范围说明。
-- **局部下钻（图表点击 / 关键词输入）**：点击环形图「失败重试」或柱状图「纪录」时，仅更新筛选状态并调用 `renderRows()` 重绘明细表，同时自动浮现「重置筛选」幽灵按钮与状态说明栏，避免误操作迷路。
-- **空状态兜底**：当组合筛选命中 0 条项目时，表格内部就地展示安静的空态说明，不折叠表头，杜绝页面高度塌陷。
-
-## 去 AI 味设计规范对照
-
-本落地页已通过 Satin 检查器全部静态与视觉规范核验，以下 5 处关键细节最容易区分「真实成熟产品」与「AI 模板」：
-
-| 常见 AI 模板毛病 | 本落地案例的 Satin 规范实现 |
-| :--- | :--- |
-| 放 8 张大字号彩色渐变 KPI 卡片，每张左上角配一个彩色发光圆角图标 | 4 个指标合在一个 `.sn-panel` 的 `.sn-stats` 内，22px 等宽数字 + 迷你火花线，零彩色背景块 |
-| 卡片里再套一层带边框和圆角的表格容器 | 左栏明细表用 `.sn-panel.sn-flush` 包裹 `.sn-tbl-wrap.sn-plain`，消除双层套框 |
-| 每个状态都堆高饱和彩色底色胶囊（绿底、蓝底、黄底、红底） | 统一使用 `.sn-tag` 中性浅底，仅靠前置 6px 状态语义圆点（`sn-ok / sn-run / sn-warn / sn-bad`）区分 |
-| 团队动态里用单字圆圈头像（“林”“周”），名字全部加粗 | 全量采用 `<sn-avatar seed="…" name="…" decorative>`，正文保持 400 字重、时间用三级灰 |
-| 使用原生 `<select>` 下拉框与硬编码色值（切换深色主题图表发白失明） | 全量使用 Satin `<sn-select>` 与 `--sn-*` 令牌；所有 Canvas 图表监听 `data-theme` 变化即时重绘 |
-
-## 响应式布局与 Canvas 高分屏工程要点
-
-- **三档容器自适应**：宽屏（≥ 1200px）保持 `.sn-stats` 1×4 排布与双栏 `.sn-with-aside` 并排；平板（< 720px）`.sn-stats` 自动收成 2×2（绝不出现 3 + 1 孤儿项）；手机（< 640px）页头自动贴顶居中、周期分段撑满、面板铺满并去圆角描边，两栏图表平滑堆叠。
-- **高分屏 Retina 清晰度**：`satin-ui/charts` 内部封装了 `setupCanvas` 与 `ResizeObserver`，自动按 `Math.min(2, devicePixelRatio)` 缩放像素缓冲并监听容器宽度变化重绘，在 2x/3x 屏与窄屏旋转下文字、坐标线、3D 棱线始终锐利无锯齿。
-- **零空转功耗**：所有微动效（描边入场、阻尼准星、3D 拖拽惯性）仅在动画进行中申请 `requestAnimationFrame`，落定后立刻停止调度，空闲 CPU 占用为 0%。
+- **单向状态流**：业务线 / 周期变更统一调用 `applyFilters()` 全局平滑重绘；环形图 / 柱状图点击与关键词输入局部筛选明细表，命中 0 条时就地显示安静空态且不塌陷高度。
+- **响应式与高分屏**：`satin-ui/charts` 自动按 `Math.min(2, devicePixelRatio)` 渲染并监听深浅主题实时重绘；空闲时零 `requestAnimationFrame` 功耗。

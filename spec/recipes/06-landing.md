@@ -1,8 +1,6 @@
 # 落地页
 
-结构：顶栏 → 首屏（一句话说清做什么 + 一句副标题 + 一主一次两个按钮 + 一张真实的图）→ 3 个功能点 → 一段真实的使用场景或数字 → 页脚。
-不要：渐变背景、发光、玻璃拟态卡片、满屏 emoji、"赋能 / 一站式 / 释放潜能"、居中堆叠八个功能卡片、假的客户 logo 墙。
-彩色只给主按钮（默认墨色）；首屏的字号用 `sn-t-display`，正文 `sn-t-body`，不要自己放大到 72px。
+克制清晰的产品落地页：一句话价值主张、真实实景图与三列核心特性。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -33,6 +31,6 @@
 <footer class="sn-page sn-wide sn-t-caption sn-c-tertiary" style="padding-block: var(--sn-sp-24) var(--sn-sp-40)">© 2026 分镜工作台 · <a class="sn-link" href="/pricing">价格</a> · <a class="sn-link" href="/docs">文档</a> · <a class="sn-link" href="/privacy">隐私</a> · <a class="sn-link" href="/terms">条款</a></footer>
 ```
 
-功能点用 `--sn-min: max(200px, 30%)`：宽屏、平板都是一行 3 个，手机一个一行，不会排成 2 + 1。
-手机上（窄于 640）：顶栏只留名字和右边的"登录""免费试用"，锚点链接（`.sn-hide-phone`）藏起来——价格、文档在页脚里也有；首屏（标题、按钮、图）和功能点一栏往下排，左右留 16。页脚上面不画分隔线，靠留白和小一号的字分开。
-首屏的图要真实：上线时放真实的产品截图（或用 Satin 搭一个真实的界面再截），配方里先用一张片场照片（Unsplash 外链，写好 `aspect-ratio` 免得载入时页面跳）；不要用插画、渐变色块或灰块占位。功能点的图标用 Satin 的线性图标，不加彩色底。
+功能点用 `--sn-min: max(200px, 30%)` 保证桌面一行三列、手机自动单列，不出现 2 + 1 孤儿项；首屏标题用 `sn-t-display`，不手写超大字号、不堆渐变发光与假客户墙。
+手机上（窄于 640）：顶栏自动隐藏中间锚点（`.sn-hide-phone`）只留品牌与登录/试用按钮，页脚靠留白和小一号字自然分隔。
+首屏配图使用真实产品截图或实景照片并固定 `aspect-ratio` 防止加载跳动，特性图标统一采用 Satin 细线单色图标不加彩色底盒。

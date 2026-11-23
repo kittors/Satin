@@ -1,8 +1,6 @@
 # 登录 / 注册
 
-结构：整屏一个面板 → 标题 + 一句说明 → 字段 → 撑满的主按钮 → 次要链接（`.sn-auth-ft`）。
-宽屏上是屏幕正中一张 400 宽的卡片；手机上（窄于 640）不是卡片：整屏铺满面板的底色（html、body 也换成这个颜色，四周不露灰），标题在上面，"还没有账号？注册"贴在屏幕底部、让出底部横条。
-不要左右分屏放插画、不要渐变或照片背景、不要"欢迎回来！👋"。错误写在字段下面；密码框带显隐按钮；按钮在请求时用 busy。
+居中卡片式登录与注册页，移动端自动铺满全屏并将次要入口贴底。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -25,7 +23,7 @@
 </main>
 ```
 
-登录页是进入应用的第一屏，手机上不放导航栏；从别的页面弹出来登录时，在面板最前面放一个关闭按钮（`<button class="sn-btn sn-ghost sn-ibtn sn-lg" data-i="x" aria-label="关闭"></button>`）。主按钮紧跟在字段下面：键盘弹出来时还看得见。
-密码框也可以不手写：`createPassword(空容器, { label: "密码", id: "l-pwd" })` 直接渲染整个字段（显示 / 隐藏、大写锁定提示都带着；注册页加 `meter: true` 出强度条），邮箱同理 `createEmail`；手写的标记用 `enhance()` 接上眼睛按钮；注册页要强度提示时加 `.sn-pw-meter`，标记见 `references/components/special.md`。复选框可以用 `checkHTML({ label, checked })` 生成，React 写 `<Checkbox label="30 天内保持登录" defaultChecked />`。
-注册页一样的结构：名字、邮箱、密码三个字段 + "创建账号"，底部换成"已经有账号？登录"；验证码用 `<sn-otp length="6">` / `<Otp length={6} />`。
-提交：`validateForm(form, 规则)` 过了再 `busy(按钮, 请求)`；失败把服务端的原因写到对应字段下面（`setFieldError(字段, "邮箱或密码不对")`），不要弹窗。
+宽屏为屏幕居中 400px 卡片，手机上（窄于 640）自动整屏铺满面板底色、次要链接贴底避让安全区；不加左右分屏插画、渐变照片底或"欢迎回来！"套话。
+登录页首屏不放导航栏，从别处弹出时在面板前加关闭按钮；主按钮紧跟字段下方确保键盘弹出时仍可见。
+密码与邮箱可直接用 `createPassword` / `createEmail` 生成（支持显隐、大写锁定提示与注册强度条）；注册页验证码用 `<sn-otp length="6">` / `<Otp length={6} />`。
+提交先 `validateForm(form, rules)` 再 `busy(按钮, 请求)`，服务端错误用 `setFieldError` 写在对应字段下方而不弹窗。

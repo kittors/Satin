@@ -1,7 +1,6 @@
 # 设置页
 
-结构：单栏窄页面 → 页头（只有标题）→ 若干组设置（左边标题和一句说明，右边字段）→ 需要提交的那一组自己带保存按钮。
-立即生效的选项用开关（不需要保存按钮）；需要提交的放进表单，按钮在组的右下。不要每组一张卡片再套卡片。说明只写标题没说的事，不要"这里是你的设置"。
+单栏窄版设置页：按分组左右排布，即时开关免提交，表单组自带保存。
 
 ```html
 <div class="sn-page sn-narrow">
@@ -38,7 +37,7 @@
 </div>
 ```
 
-手机上（窄于 640）：页头变成吸顶的导航栏（标题居中）；面板本身不画底，每组 `.sn-setting` 是一条铺满左右的白底（一组一块，像 iOS 的分组列表，不是整页装在一张卡片里），组里标题、说明在上，字段在下。设置页在手机上通常是一个标签页的根页面，不放返回；从别的页面点进来时在标题前面加 `<a class="sn-nav-back" href="…" data-i="chevron-left:before">我的</a>`。
-校验：`validateForm(form, { name: (v) => !v.trim() && "名字不能为空", mail: (v) => !/^\S+@\S+\.\S+$/.test(v) && "邮箱格式不对" })`，错误写在字段下面。
-保存：`busy(按钮, 请求)`，成功 `toast({ text: "已保存", icon: "check" })`。React 里字段用 `<Field label error><Input /></Field>`。
-另一种写法（手机上、条目多时）：设置列表 `.sn-set-list > .sn-set-row`，见 `references/components/list.md`。
+即时生效的选项用开关（无需保存按钮），需提交的放进表单并把保存按钮放在组右下角；不要每组卡片套卡片。
+手机上（窄于 640）：页头吸顶居中，每组 `.sn-setting` 自动展开为通栏分组白块；二级进入时在标题前放 `<a class="sn-nav-back" href="…" data-i="chevron-left:before">我的</a>`。
+校验用 `validateForm(form, rules)`，保存用 `busy(按钮, 请求)` 并在成功后 `toast({ text: "已保存", icon: "check" })`。
+条目较多的纯移动端设置页可使用 `.sn-set-list > .sn-set-row`，见 `references/components/list.md`。

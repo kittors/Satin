@@ -2,23 +2,9 @@
 
 先照着搭骨架，再换成自己的内容。每份都用 Satin 的骨架类和组件，不需要自己写布局和颜色。
 
-## 后台列表（三层工作台 + Chrome 弧形多页签 + 可收起侧栏 + 占满高度产品级表格）
+## 后台列表
 
-结构：三层表面配色外壳 `.sn-app.sn-workbench` → 左侧可收起展开侧栏 `.sn-side`（顶部必配 `[data-collapse]` 收起按钮与 `⌘\` 快捷键）→ 右侧工作台外壳 `.sn-app-shell`（顶部 Chrome 弧形多页签 `.sn-btabs` + 下方圆角主工作板 `.sn-work-body`）→ 一屏工作页 `.sn-page.sn-work`：页头（标题、数量、主按钮）→ 工具条 `.sn-filters`（搜索、筛选、次要操作）→ 占满底部剩余高度的主角表格 `.sn-tbl-wrap.sn-tbl-fill`（标配复选框 + 左右固定列 + 贴底分页栏）。
-
-**三层表面配色规范**（全部由令牌自动适配深浅色，禁止手写色值）：
-- **Layer 0 壳层 / 顶部弧形页签槽**（`--sn-shell`）：浅色 `#ebebf0` / 深色 `#09090b`；
-- **Layer 1 侧边栏**（`--sn-side-bg`）：浅色 `#f2f2f5` / 深色 `#0d0d10`，选中项用 `--sn-side-active`；
-- **Layer 2 主内容圆角工作板**（`--sn-workspace`）：浅色 `#ffffff` / 深色 `#16161a`（左侧 1px `--sn-workspace-line` 极细分隔），与激活的 Chrome 弧形页签 **100% 同色无缝融合**；内部表格/卡片用 `--sn-raised`，浮层用 `--sn-overlay`。
-
-**主角表格占满底部剩余高度原则**：当表格下方没有其他内容区块占位时，用 `.sn-page.sn-work` + `createTable(..., { fill: true, selectable: true, pagination: ... })`（或标记 `.sn-tbl-wrap.sn-tbl-fill`）。数据少时表格白卡自然延展到底（不拉伸行高、不画假空行、分页栏稳稳贴底不悬空）；数据多时表头吸顶、表体内部滚、分页栏贴底不动；极矮窗口自动降级整区滚动。
-
-**后台工作台必须具备的产品级交互（不要偷懒省略）**：
-1. **侧栏收起 / 展开**：`.sn-side-top` 必放 `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" data-i="panel-left" aria-label="收起侧栏"></button>`；收起至 56px 时图标严格居中、分组标题化为短横线、待办徽标缩为精致圆点并自动出反色 Tooltip。
-2. **多选与批量操作**：列表页默认 `selectable: true`（表头三态全选 + 行勾选），勾选后在分页栏上方浮出 `.sn-bulk` 批量操作条（批量导出 / 归档 / 删除 / 取消选择）。
-3. **左右固定列**：宽表（≥ 6 列）将主键列设为 `fixed: "left"`（勾选列自动跟左固定），操作列设为 `type: "actions", fixed: "right"`，横向滚离边缘时自动浮现柔和边缘投影。
-4. **贴底分页**：传 `pagination: { pageSize: 12, pageSizes: [10, 20, 50] }`，总条数、每页条数与滑动正圆页码稳稳落底。
-5. **真实头像与状态**：负责人列用 `<sn-avatar>`（React `<Avatar>` / Vue `<SnAvatar>`）加 `decorative`，严禁拿姓氏首字配彩底；状态用 `.sn-tag` 中性淡灰底 + 6px 语义彩点；数字列右对齐等宽数字。
+三层工作台布局：可收起侧栏、弧形多页签与占满剩余高度的数据表格。
 
 ```html
 <div class="sn-app sn-workbench" data-navfx="slide">
@@ -91,14 +77,17 @@
 </script>
 ```
 
-手机上（窄于 640）：侧栏藏起来，换成最后那个底部标签栏 `.sn-tabbar`（和侧栏同样几项，名字缩成两个字；宽屏不显示），像手机应用一样在底部切换、让出底部横条；一屏锁高自动解除为自然滚动。
-侧栏：`enhance()` 已经接上（选中滑块、收起按钮、⌘\）；布局窄于 720（竖着的平板）自动收成图标栏，`<div class="sn-app sn-workbench" data-collapse-below="0">` 不收。框架里用 `createSidebar(el, { collapseBelow: 720 })`。
-没有数据时用 `empty: ({ filtered }) => ...` 说明原因并给下一步操作；加载中传 `loading: true`（显示骨架行，不整页转圈）；删除用弹窗确认并写清影响范围，成功后 `toast({ text: "已删除「长夜」", action: { label: "撤销", run } })`。
+## 结构与交互要点
+
+- **三层表面令牌**：壳层与页签槽 `--sn-shell` → 侧栏 `--sn-side-bg` → 主内容圆角工作板 `--sn-workspace`（与激活页签同色无缝融合，禁止手写色值）。
+- **占满剩余高度表格**：`.sn-page.sn-work` 搭配 `createTable(..., { fill: true, selectable: true, pagination })`；数据少时白卡延展到底、分页栏贴底不悬空，数据多时表头吸顶内部滚动。
+- **侧栏与批量交互**：顶部 `[data-collapse]` 支持 `⌘\` 收起至 56px 图标栏；多选自动浮出 `.sn-bulk` 批量操作条；宽表主键左固定、操作右固定，内置 Satin 悬浮细滚动条且横滑不回弹。
+- **多端自适应**：窄于 720px 侧栏自动收为图标栏（`data-collapse-below="0"` 可关）；窄于 640px 切换底部 `.sn-tabbar` 并解除一屏锁高。
+- **状态兜底**：空态用 `empty: ({ filtered }) => ...`，加载传 `loading: true`（骨架行），删除需二次确认并附可撤销 `toast`。
 
 ## 设置页
 
-结构：单栏窄页面 → 页头（只有标题）→ 若干组设置（左边标题和一句说明，右边字段）→ 需要提交的那一组自己带保存按钮。
-立即生效的选项用开关（不需要保存按钮）；需要提交的放进表单，按钮在组的右下。不要每组一张卡片再套卡片。说明只写标题没说的事，不要"这里是你的设置"。
+单栏窄版设置页：按分组左右排布，即时开关免提交，表单组自带保存。
 
 ```html
 <div class="sn-page sn-narrow">
@@ -135,16 +124,14 @@
 </div>
 ```
 
-手机上（窄于 640）：页头变成吸顶的导航栏（标题居中）；面板本身不画底，每组 `.sn-setting` 是一条铺满左右的白底（一组一块，像 iOS 的分组列表，不是整页装在一张卡片里），组里标题、说明在上，字段在下。设置页在手机上通常是一个标签页的根页面，不放返回；从别的页面点进来时在标题前面加 `<a class="sn-nav-back" href="…" data-i="chevron-left:before">我的</a>`。
-校验：`validateForm(form, { name: (v) => !v.trim() && "名字不能为空", mail: (v) => !/^\S+@\S+\.\S+$/.test(v) && "邮箱格式不对" })`，错误写在字段下面。
-保存：`busy(按钮, 请求)`，成功 `toast({ text: "已保存", icon: "check" })`。React 里字段用 `<Field label error><Input /></Field>`。
-另一种写法（手机上、条目多时）：设置列表 `.sn-set-list > .sn-set-row`，见 `references/components/list.md`。
+即时生效的选项用开关（无需保存按钮），需提交的放进表单并把保存按钮放在组右下角；不要每组卡片套卡片。
+手机上（窄于 640）：页头吸顶居中，每组 `.sn-setting` 自动展开为通栏分组白块；二级进入时在标题前放 `<a class="sn-nav-back" href="…" data-i="chevron-left:before">我的</a>`。
+校验用 `validateForm(form, rules)`，保存用 `busy(按钮, 请求)` 并在成功后 `toast({ text: "已保存", icon: "check" })`。
+条目较多的纯移动端设置页可使用 `.sn-set-list > .sn-set-row`，见 `references/components/list.md`。
 
 ## 登录 / 注册
 
-结构：整屏一个面板 → 标题 + 一句说明 → 字段 → 撑满的主按钮 → 次要链接（`.sn-auth-ft`）。
-宽屏上是屏幕正中一张 400 宽的卡片；手机上（窄于 640）不是卡片：整屏铺满面板的底色（html、body 也换成这个颜色，四周不露灰），标题在上面，"还没有账号？注册"贴在屏幕底部、让出底部横条。
-不要左右分屏放插画、不要渐变或照片背景、不要"欢迎回来！👋"。错误写在字段下面；密码框带显隐按钮；按钮在请求时用 busy。
+居中卡片式登录与注册页，移动端自动铺满全屏并将次要入口贴底。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -167,21 +154,21 @@
 </main>
 ```
 
-登录页是进入应用的第一屏，手机上不放导航栏；从别的页面弹出来登录时，在面板最前面放一个关闭按钮（`<button class="sn-btn sn-ghost sn-ibtn sn-lg" data-i="x" aria-label="关闭"></button>`）。主按钮紧跟在字段下面：键盘弹出来时还看得见。
-密码框也可以不手写：`createPassword(空容器, { label: "密码", id: "l-pwd" })` 直接渲染整个字段（显示 / 隐藏、大写锁定提示都带着；注册页加 `meter: true` 出强度条），邮箱同理 `createEmail`；手写的标记用 `enhance()` 接上眼睛按钮；注册页要强度提示时加 `.sn-pw-meter`，标记见 `references/components/special.md`。复选框可以用 `checkHTML({ label, checked })` 生成，React 写 `<Checkbox label="30 天内保持登录" defaultChecked />`。
-注册页一样的结构：名字、邮箱、密码三个字段 + "创建账号"，底部换成"已经有账号？登录"；验证码用 `<sn-otp length="6">` / `<Otp length={6} />`。
-提交：`validateForm(form, 规则)` 过了再 `busy(按钮, 请求)`；失败把服务端的原因写到对应字段下面（`setFieldError(字段, "邮箱或密码不对")`），不要弹窗。
+宽屏为屏幕居中 400px 卡片，手机上（窄于 640）自动整屏铺满面板底色、次要链接贴底避让安全区；不加左右分屏插画、渐变照片底或"欢迎回来！"套话。
+登录页首屏不放导航栏，从别处弹出时在面板前加关闭按钮；主按钮紧跟字段下方确保键盘弹出时仍可见。
+密码与邮箱可直接用 `createPassword` / `createEmail` 生成（支持显隐、大写锁定提示与注册强度条）；注册页验证码用 `<sn-otp length="6">` / `<Otp length={6} />`。
+提交先 `validateForm(form, rules)` 再 `busy(按钮, 请求)`，服务端错误用 `setFieldError` 写在对应字段下方而不弹窗。
 
 ## 数据分析仪表盘
 
-面向「AI 影视创作与渲染集群」的真实业务数据分析工作台：从顶栏周期与业务线筛选，到带迷你火花线的 4 项核心指标面板、平滑趋势面积图、可点击联动筛选的环形状态图、可 360° 拖拽旋转的 3D 时空算力柱阵图、题材交付对比柱状图，再到实时联动过滤的项目效能明细表与团队动态流。整页零第三方图表依赖，深浅双主题与多端响应式全部开箱即用。
+多维联动的数据分析仪表盘：指标火花线、趋势与状态图表、3D 算力分布及明细表。
 
 ```html
 <div class="sn-page">
   <header class="sn-page-hd">
-    <div>
+    <div style="min-width:0;flex:1">
       <h1>渲染与创作效能</h1>
-      <p id="dbRange">11&nbsp;月&nbsp;17&nbsp;日 – 11&nbsp;月&nbsp;23&nbsp;日 · 全部业务线</p>
+      <p id="dbRange" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">11.17 – 11.23 · 全部业务线</p>
     </div>
     <div class="sn-acts" style="flex-wrap:wrap">
       <sn-select id="dbLine" value="all" items='[{"value":"all","label":"全部业务线"},{"value":"drama","label":"剧集分镜"},{"value":"ad","label":"商业短片"},{"value":"anime","label":"二维动画"}]'></sn-select>
@@ -251,22 +238,24 @@
     </div>
 
     <!-- 第 4 层：联动项目效能明细表 + 团队动态与异常追踪 -->
-    <div class="sn-with-aside" style="--sn-aside: 340px">
+    <div class="sn-with-aside" style="--sn-aside: 288px">
       <section class="sn-panel sn-flush">
         <div class="sn-panel-hd" style="padding: var(--sn-sp-16) var(--sn-sp-20) var(--sn-sp-12)">
-          <div><h2>重点项目效能明细</h2><p id="dbTblHint">全部 6&nbsp;个项目 · 支持图表联动与关键词筛选</p></div>
-          <div class="sn-row sn-gap-8">
+          <div style="min-width:0;flex:1"><h2>重点项目效能明细</h2><p id="dbTblHint" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">全部 6&nbsp;个项目 · 支持图表联动与关键词筛选</p></div>
+          <div class="sn-row sn-gap-8" style="flex:none">
             <button type="button" class="sn-btn sn-ghost sn-sm" id="dbReset" hidden>重置筛选</button>
-            <input class="sn-input sn-sm" id="dbSearch" type="search" placeholder="搜索项目或导演…" style="width: 168px">
+            <input class="sn-input sn-sm" id="dbSearch" type="search" placeholder="搜索项目或导演…" style="width: 156px">
           </div>
         </div>
-        <div class="sn-tbl-wrap sn-plain">
-          <table class="sn-tbl">
-            <thead>
-              <tr><th>项目</th><th>题材</th><th>状态</th><th class="sn-num" style="text-align:right">镜头</th><th class="sn-num" style="text-align:right">通过率</th><th class="sn-num" style="text-align:right">均耗</th></tr>
-            </thead>
-            <tbody id="dbRows"></tbody>
-          </table>
+        <div class="sn-tbl-wrap sn-plain" style="min-height: 320px">
+          <div class="sn-tbl-sc" id="dbTblSc">
+            <table class="sn-tbl">
+              <thead>
+                <tr><th>项目</th><th>题材</th><th>状态</th><th class="sn-num" style="text-align:right">镜头</th><th class="sn-num" style="text-align:right">通过率</th><th class="sn-num" style="text-align:right">均耗时</th></tr>
+              </thead>
+              <tbody id="dbRows"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -285,14 +274,15 @@
 
 <script type="module">
   import { injectIcons } from "satin-ui";
-  import { busy, succeed, toast, createNumberFlow } from "satin-ui/components";
+  import { busy, succeed, toast, createNumberFlow, createScrollArea } from "satin-ui/components";
   import { createAreaChart, createBarChart, createDonutChart, createChart3D, createSparkline } from "satin-ui/charts";
 
   injectIcons();
+  createScrollArea(document.getElementById("dbTblSc"), { fade: "none", overscroll: "auto" });
 
   const DATASET = {
     "本周": {
-      range: "11 月 17 日 – 11 月 23 日",
+      range: "11.17 – 11.23",
       kpis: [
         { val: 1784, delta: "+14.2%", spk: [168, 214, 196, 268, 312, 284, 342] },
         { val: 84.6, fmt: (v) => v.toFixed(1) + "%", delta: "+3.8%", spk: [79, 81, 80, 83, 85, 84, 86] },
@@ -314,7 +304,7 @@
       c3d: [[72, 94, 88, 126, 148, 112], [56, 78, 108, 118, 134, 96], [42, 64, 74, 92, 106, 84]],
     },
     "本月": {
-      range: "2026 年 11 月 1 日 – 11 月 23 日",
+      range: "11.01 – 11.23",
       kpis: [
         { val: 6230, delta: "+21.6%", spk: [1120, 1480, 1690, 1940] },
         { val: 86.1, fmt: (v) => v.toFixed(1) + "%", delta: "+5.1%", spk: [81, 83, 85, 87] },
@@ -336,7 +326,7 @@
       c3d: [[96, 118, 132, 154, 176, 140], [74, 98, 124, 146, 158, 122], [62, 82, 94, 116, 128, 104]],
     },
     "本季": {
-      range: "2026 年 Q4（9 月 – 11 月）",
+      range: "2026 Q4（9 – 11 月）",
       kpis: [
         { val: 18420, delta: "+38.4%", spk: [4280, 5610, 6230, 7480] },
         { val: 87.9, fmt: (v) => v.toFixed(1) + "%", delta: "+7.4%", spk: [78, 82, 86, 88] },
@@ -361,12 +351,12 @@
 
   const LINE_SCALE = { all: [1, "全部业务线"], drama: [0.62, "剧集分镜"], ad: [0.44, "商业短片"], anime: [0.51, "二维动画"] };
   const PROJECTS = [
-    { name: "雨夜车站 · 第 3 集", owner: "林夏", line: "drama", genre: "电影感", status: "已完成", tone: "sn-ok", shots: 48, rate: "93.8%", avg: "1 分 38 秒" },
-    { name: "风起长街 · 预告片", owner: "周屿", line: "ad", genre: "纪录", status: "生成中", tone: "sn-run", shots: 32, rate: "84.4%", avg: "1 分 49 秒" },
-    { name: "星河渡口 · 先导集", owner: "许诺", line: "anime", genre: "动画", status: "待审核", tone: "sn-warn", shots: 64, rate: "87.5%", avg: "1 分 56 秒" },
-    { name: "霓虹脉搏 · 视觉单曲", owner: "苏婉", line: "ad", genre: "MV", status: "已完成", tone: "sn-ok", shots: 28, rate: "92.9%", avg: "1 分 31 秒" },
-    { name: "海雾尽头 · 第 1 集", owner: "程橙", line: "drama", genre: "短剧", status: "生成中", tone: "sn-run", shots: 56, rate: "81.2%", avg: "2 分 04 秒" },
-    { name: "旧城回声 · 复原篇", owner: "陈默", line: "drama", genre: "纪录", status: "失败重试", tone: "sn-bad", shots: 19, rate: "68.4%", avg: "2 分 36 秒" },
+    { name: "雨夜车站 · 第 3 集", owner: "林夏", line: "drama", genre: "电影感", status: "已完成", tone: "sn-ok", shots: 48, rate: "93.8%", avg: "1分38秒" },
+    { name: "风起长街 · 预告片", owner: "周屿", line: "ad", genre: "纪录", status: "生成中", tone: "sn-run", shots: 32, rate: "84.4%", avg: "1分49秒" },
+    { name: "星河渡口 · 先导集", owner: "许诺", line: "anime", genre: "动画", status: "待审核", tone: "sn-warn", shots: 64, rate: "87.5%", avg: "1分56秒" },
+    { name: "霓虹脉搏 · 视觉单曲", owner: "苏婉", line: "ad", genre: "MV", status: "已完成", tone: "sn-ok", shots: 28, rate: "92.9%", avg: "1分31秒" },
+    { name: "海雾尽头 · 第 1 集", owner: "程橙", line: "drama", genre: "短剧", status: "生成中", tone: "sn-run", shots: 56, rate: "81.2%", avg: "2分04秒" },
+    { name: "旧城回声 · 复原篇", owner: "陈默", line: "drama", genre: "纪录", status: "失败重试", tone: "sn-bad", shots: 19, rate: "68.4%", avg: "2分36秒" },
   ];
 
   let period = "本周", line = "all", filterStatus = "", filterGenre = "", query = "";
@@ -474,71 +464,22 @@
 </script>
 ```
 
-## 业务场景与决策目标
+## 结构与联动要点
 
-这份落地案例不是为了堆砌图表，而是面向 **AI 影视创作与渲染平台负责人 / 制片总监** 每天早会的 3 个真实决策问题：
-
-- **产能是否健康**：本周/本月生成的总镜头数与「首镜一次通过率」是否同步走高？如果镜头量涨了但采纳率跌了，说明模型提示词或资产库出现了返工。
-- **算力瓶颈在哪里**：上海、杭州、深圳三个 GPU 渲染集群在周一至周六的吞吐热力分布是否均衡？哪一天、哪个机房出现排队积压？
-- **哪些项目正在掉队**：在 128 个进行中的项目里，哪几个停在「待审核」或「失败重试」，负责人是谁，是否需要立刻介入？
-
-> **设计核心结论**：好的数据分析页在 3 秒内让负责人看到「异常与趋势」，10 秒内通过一次点击下钻到「具体责任人与具体项目」，绝不让用户在一堆装饰性卡片里翻找答案。
-
-## F 型四层信息架构拆解
-
-整个页面严格遵循自上而下、从宏观到微观的 **F 型四层阅读动线**，每一层只承担单一职责，不互相抢焦点：
-
-| 层级 | 区块与骨架类 | 解决的问题 | 关键交互与微动效 |
-| :--- | :--- | :--- | :--- |
-| **顶栏控制层** | `.sn-page-hd` + `.sn-acts` | 锁定全局时间窗口与业务线视角 | 业务线 `<sn-select>`、周期 `<sn-segmented>` 全局联动，导出按钮带 300ms/500ms 等待与成功态 |
-| **第 1 层 · 指标层** | `.sn-panel` → `.sn-stats` | 3 秒扫读 4 个北极星指标与走势方向 | 数字仅 22px 等宽（`tabular-nums`）配 NumberFlow 局部翻滚，底部嵌 30px 迷你火花线 |
-| **第 2 层 · 核心趋势与构成** | `.sn-with-aside`（左趋势 + 右环形） | 看整体走势与项目状态占比 | 面积图支持平滑 Morph 与阻尼准星；点击环形分片直接筛选下方明细表 |
-| **第 3 层 · 空间热力与题材对比** | `.sn-with-aside`（左 3D 柱阵 + 右柱状） | 看「机房 × 日期」三维算力峰值与题材交付对比 | 3D 柱阵支持 360° 拖拽惯性旋转与三视角飞行；点击题材柱组同样联动明细表 |
-| **第 4 层 · 行动与追踪层** | `.sn-with-aside`（左明细表 + 右动态流） | 从宏观洞察一键落到可执行的项目与负责人 | 表格用 `.sn-panel.sn-flush` + `.sn-tbl-wrap.sn-plain` 杜绝卡片套边框，动态流全用 `<sn-avatar>` |
-
-## 图表选型与 3D 视觉引入边界
-
-很多数据分析页显得混乱、像 AI 拼出来的模板，根源在于**乱选图表**（比如把 3 个状态画成雷达图，或把普通折线硬做成 3D 饼图导致角度畸变）。本案例严格遵守以下选型边界：
-
-| 数据维度特征 | 选用组件 | 引入理由与克制约束 |
+| 层级 | 区块与组件 | 作用与关键交互 |
 | :--- | :--- | :--- |
-| **KPI 迷你走势** | `createSparkline` | 仅表达近 7 天/4 周的方向感，不画坐标轴与网格，保持卡片轻盈 |
-| **时间序列双指标对比** | `createAreaChart` | Monotone Hermite 平滑曲线绝不过冲歪曲单调数据，切换周期时 420ms 形变插值 |
-| **4 类以内状态占比** | `createDonutChart` | 环心动态联动选中分片数值与占比，悬停外扩 4px 并柔和压暗非焦点弧段 |
-| **离散类目本期 vs 上期** | `createBarChart` | 35ms 交错弹簧生长，悬停聚焦组顶自动浮现精准数值，点击驱动全局筛选 |
-| **双维度 × 强度热力结构** | `createChart3D` | **仅在需要同时呈现「集群 × 日期 × 吞吐高度」三维分布时引入 3D**；配有「俯视 / 正面」一键视角避免透视遮挡 |
+| **顶栏筛选** | `.sn-page-hd` + `<sn-select>` / `<sn-segmented>` | 切换业务线与周期时全局驱动所有图表平滑 Morph，单行锁定防页头跳动 |
+| **核心指标** | `.sn-panel` → `.sn-stats` + `createNumberFlow` + `createSparkline` | 4 项关键指标合并一张面板，22px 等宽数字配迷你趋势线，零彩色发光卡 |
+| **趋势与状态** | `createAreaChart` + `createDonutChart` | 面积图支持图例开关与阻尼准星；点击环形分片直接筛选下方明细表 |
+| **3D 与对比** | `createChart3D` + `createBarChart` | 3D 柱阵仅用于「集群 × 日期 × 吞吐」三维分布，支持拖拽与视角切换；柱组点击同样联动明细表 |
+| **明细与动态** | `.sn-panel.sn-flush` → `.sn-tbl-wrap.sn-plain` + `<sn-avatar>` | 表格无双层套框、内置 Satin 滚动条与零回弹；动态流统一使用预设头像组件 |
 
-## 单向筛选联动与状态机设计
-
-页面所有筛选器（业务线、周期、环形图状态分片、柱状图题材组、搜索框）遵循**单一数据源（Single Source of Truth）**流转：
-
-- **全局重算（业务线 / 周期变更）**：统一调用 `applyFilters()`，依次驱动 4 组 NumberFlow 与 Sparkline、面积图、环形图、3D 柱阵、分组柱状图执行平滑 `update()` Morph 过渡，并同步刷新页头范围说明。
-- **局部下钻（图表点击 / 关键词输入）**：点击环形图「失败重试」或柱状图「纪录」时，仅更新筛选状态并调用 `renderRows()` 重绘明细表，同时自动浮现「重置筛选」幽灵按钮与状态说明栏，避免误操作迷路。
-- **空状态兜底**：当组合筛选命中 0 条项目时，表格内部就地展示安静的空态说明，不折叠表头，杜绝页面高度塌陷。
-
-## 去 AI 味设计规范对照
-
-本落地页已通过 Satin 检查器全部静态与视觉规范核验，以下 5 处关键细节最容易区分「真实成熟产品」与「AI 模板」：
-
-| 常见 AI 模板毛病 | 本落地案例的 Satin 规范实现 |
-| :--- | :--- |
-| 放 8 张大字号彩色渐变 KPI 卡片，每张左上角配一个彩色发光圆角图标 | 4 个指标合在一个 `.sn-panel` 的 `.sn-stats` 内，22px 等宽数字 + 迷你火花线，零彩色背景块 |
-| 卡片里再套一层带边框和圆角的表格容器 | 左栏明细表用 `.sn-panel.sn-flush` 包裹 `.sn-tbl-wrap.sn-plain`，消除双层套框 |
-| 每个状态都堆高饱和彩色底色胶囊（绿底、蓝底、黄底、红底） | 统一使用 `.sn-tag` 中性浅底，仅靠前置 6px 状态语义圆点（`sn-ok / sn-run / sn-warn / sn-bad`）区分 |
-| 团队动态里用单字圆圈头像（“林”“周”），名字全部加粗 | 全量采用 `<sn-avatar seed="…" name="…" decorative>`，正文保持 400 字重、时间用三级灰 |
-| 使用原生 `<select>` 下拉框与硬编码色值（切换深色主题图表发白失明） | 全量使用 Satin `<sn-select>` 与 `--sn-*` 令牌；所有 Canvas 图表监听 `data-theme` 变化即时重绘 |
-
-## 响应式布局与 Canvas 高分屏工程要点
-
-- **三档容器自适应**：宽屏（≥ 1200px）保持 `.sn-stats` 1×4 排布与双栏 `.sn-with-aside` 并排；平板（< 720px）`.sn-stats` 自动收成 2×2（绝不出现 3 + 1 孤儿项）；手机（< 640px）页头自动贴顶居中、周期分段撑满、面板铺满并去圆角描边，两栏图表平滑堆叠。
-- **高分屏 Retina 清晰度**：`satin-ui/charts` 内部封装了 `setupCanvas` 与 `ResizeObserver`，自动按 `Math.min(2, devicePixelRatio)` 缩放像素缓冲并监听容器宽度变化重绘，在 2x/3x 屏与窄屏旋转下文字、坐标线、3D 棱线始终锐利无锯齿。
-- **零空转功耗**：所有微动效（描边入场、阻尼准星、3D 拖拽惯性）仅在动画进行中申请 `requestAnimationFrame`，落定后立刻停止调度，空闲 CPU 占用为 0%。
+- **单向状态流**：业务线 / 周期变更统一调用 `applyFilters()` 全局平滑重绘；环形图 / 柱状图点击与关键词输入局部筛选明细表，命中 0 条时就地显示安静空态且不塌陷高度。
+- **响应式与高分屏**：`satin-ui/charts` 自动按 `Math.min(2, devicePixelRatio)` 渲染并监听深浅主题实时重绘；空闲时零 `requestAnimationFrame` 功耗。
 
 ## AI 对话
 
-结构：对话框占满一屏：顶栏（左边会话列表、中间标题、右边新对话）→ 消息区（虚拟列表、流式输出、跳到最新）→ 底部提示词输入框（附件、用量环、发送 / 停止）。对话框的顶栏就是页面标题，外面不再放同名的页头；顶栏不写"在线"这类状态，思考、步骤、正文在消息里自己会显示。
-用 `satin-ui/chat` 的 `createChat`，不要自己写消息气泡和滚动：它已经处理了流式输出匀速放字、贴底跟随、往上翻加载历史、发送动画、减少动态效果。
-外面一层 `.sn-page.sn-screen`（整屏页面）：桌面上四周留白，对话填满一屏，整页不滚；手机上（窄于 640）页面没有边距，html、body 的底色跟对话一样，对话铺满整个屏幕——顶栏紧贴状态栏、输入框在底部横条上面，左右贴边，四周不露灰。
+全屏 AI 对话界面：顶栏会话切换、流式消息区与底部提示词输入框。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -565,21 +506,14 @@
 </script>
 ```
 
-`viewport-fit=cover` 一定要写：不写的话 iPhone 上页面不延伸到状态栏和底部横条后面，上下各露一条浏览器的底色。状态栏、横条让出来的高度由对话自己加（`env(safe-area-inset-*)`），外面不要再垫内边距。
-对话放在别的布局里（侧栏右边的主区、弹窗里）时，给它的容器一个高度（`flex: 1` 或者 `height: 100%`）就行，对话填满容器，不写死高度。
-顶栏两侧的按钮：`menu: true` 左边出"会话列表"、`newChat: true` 右边出"新对话"，点了发 `menu` / `newChat` 事件（选项里写 `onMenu` / `onNewChat`）；手机上三栏、标题居中，按钮 40×40。不要的话不写这两项，顶栏只剩标题。
-React：`import { Chat } from "satin-ui/react/chat"`，然后 `<Chat title="分镜助手" menu newChat onMenu={openList} onNewChat={startNew} respond={respond} />`，挂载、卸载都处理好了。
-Vue：`import { Chat } from "satin-ui/vue/chat"`，然后 `<Chat title="分镜助手" menu new-chat @menu="openList" @new-chat="startNew" :respond="respond" />`。
-自己在 `useEffect` / `onMounted` 里调 `createChat(空 div, 选项)` 也行，卸载时一定调返回值的 `destroy()`。
-只要一个输入框（不要对话列表）：`createComposer(空容器, { placeholder, onSend({ text, files }) })`（React 里同样在 effect 里调）。
-消息里有 Markdown：助手回复按 Markdown 渲染（代码块、表格、公式），不用自己处理。
-回复直接给结果：不复述用户的话，不用"好的！""当然可以！"开头；演示用的假回复也一样。
+用 `satin-ui/chat` 的 `createChat`（React `<Chat>` / Vue `<SnChat>`）自动处理匀速流式输出、贴底跟随、历史分页、Markdown/公式渲染与安全区留白，无需手写气泡和滚动。
+外层 `.sn-page.sn-screen` + `viewport-fit=cover`：桌面四周留白填满一屏，手机自动贴边铺满全屏；嵌入侧栏主区或弹窗时只给容器 `flex: 1` 或 `height: 100%`。
+顶栏自带标题、左侧会话菜单（`menu: true`）与右侧新对话（`newChat: true`），外面不再重复放同名页头。
+只需底部输入框时可用 `createComposer(el, { placeholder, onSend })`。
 
 ## 落地页
 
-结构：顶栏 → 首屏（一句话说清做什么 + 一句副标题 + 一主一次两个按钮 + 一张真实的图）→ 3 个功能点 → 一段真实的使用场景或数字 → 页脚。
-不要：渐变背景、发光、玻璃拟态卡片、满屏 emoji、"赋能 / 一站式 / 释放潜能"、居中堆叠八个功能卡片、假的客户 logo 墙。
-彩色只给主按钮（默认墨色）；首屏的字号用 `sn-t-display`，正文 `sn-t-body`，不要自己放大到 72px。
+克制清晰的产品落地页：一句话价值主张、真实实景图与三列核心特性。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -610,13 +544,13 @@ Vue：`import { Chat } from "satin-ui/vue/chat"`，然后 `<Chat title="分镜�
 <footer class="sn-page sn-wide sn-t-caption sn-c-tertiary" style="padding-block: var(--sn-sp-24) var(--sn-sp-40)">© 2026 分镜工作台 · <a class="sn-link" href="/pricing">价格</a> · <a class="sn-link" href="/docs">文档</a> · <a class="sn-link" href="/privacy">隐私</a> · <a class="sn-link" href="/terms">条款</a></footer>
 ```
 
-功能点用 `--sn-min: max(200px, 30%)`：宽屏、平板都是一行 3 个，手机一个一行，不会排成 2 + 1。
-手机上（窄于 640）：顶栏只留名字和右边的"登录""免费试用"，锚点链接（`.sn-hide-phone`）藏起来——价格、文档在页脚里也有；首屏（标题、按钮、图）和功能点一栏往下排，左右留 16。页脚上面不画分隔线，靠留白和小一号的字分开。
-首屏的图要真实：上线时放真实的产品截图（或用 Satin 搭一个真实的界面再截），配方里先用一张片场照片（Unsplash 外链，写好 `aspect-ratio` 免得载入时页面跳）；不要用插画、渐变色块或灰块占位。功能点的图标用 Satin 的线性图标，不加彩色底。
+功能点用 `--sn-min: max(200px, 30%)` 保证桌面一行三列、手机自动单列，不出现 2 + 1 孤儿项；首屏标题用 `sn-t-display`，不手写超大字号、不堆渐变发光与假客户墙。
+手机上（窄于 640）：顶栏自动隐藏中间锚点（`.sn-hide-phone`）只留品牌与登录/试用按钮，页脚靠留白和小一号字自然分隔。
+首屏配图使用真实产品截图或实景照片并固定 `aspect-ratio` 防止加载跳动，特性图标统一采用 Satin 细线单色图标不加彩色底盒。
 
 ## 移动端 H5 下单
 
-极简舒展的现代移动端结算页：大留白呼吸感、明确的视觉主角与克制的信息密度。整屏仅由三张大圆角纯净白卡片（收货人、商品主角、三行极简纯文字订单摘要）与饱满的底部操作栏构成——彻底摒弃「每行套灰底装饰小方盒图标」「把十余项表单强塞进一屏」「通栏白纸切灰条」等典型 AI 味毛病。
+舒展留白的移动端结算页：三张白卡片承托收货、商品与摘要，底部操作栏固定。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -758,8 +692,7 @@ if (root) {
 
 ## 表单向导（多步）
 
-结构：页头（返回 + 标题）→ 步骤条 → 当前这一步的字段（一个面板）→ 底部"上一步"（左，ghost）+"下一步"（右，primary）；最后一步主按钮写具体动作（"创建项目"）。
-每一步只问一类事；进入下一步前校验当前这一步，错误写在字段下面；返回上一步不丢已填的内容。不要把所有步骤做成一个超长表单，也不要每步一个弹窗。步骤条已经写了有哪几步，页头不再写一遍。
+分步表单向导：顶部步骤进度、单面板聚焦当前步、底部固定上/下一步操作。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -779,13 +712,13 @@ if (root) {
 </div>
 ```
 
-外层 `.sn-page.sn-narrow.sn-screen`（整屏页面）、表单面板加 `.sn-grow`：手机上（窄于 640）页头变成吸顶的导航栏（"‹ 全部项目"在左、标题居中），表单面板铺满左右、一直撑到屏幕底部，"上一步 / 下一步"那一排（`.sn-bottom-bar`，留在 form 里面，回车也能提交）贴底、让出底部横条；宽屏上是一栏窄页面里的一个面板，按钮那一排就是面板的最后一行。
-步骤条用 `stepsHTML({ steps: ["基本信息", "导入原文", "生成设置"], current: 1 })` 生成（React `<Steps steps={[...]} current={1} />`），换步时重新生成。
-步骤之间换内容不要整页闪：只换面板里的字段，面板高度用 `transition: height` 不行（会卡），直接换即可；减少动态效果时也一样。
+每步只聚焦一类信息，进入下一步前校验当前步并保留返回状态，最后一步主按钮写具体动作（如"创建项目"）。
+外层 `.sn-page.sn-narrow.sn-screen` 配表单 `.sn-grow`：手机上页头吸顶居中、面板铺满屏高、`.sn-bottom-bar` 稳稳贴底并保留在 `<form>` 内支持回车提交。
+步骤条可用 `stepsHTML({ steps, current })` / `<Steps>` 生成，切换步骤直接替换面板内字段，不对高度做卡顿过渡。
 
 ## 404 页面
 
-极简、大留白的整页 404 方案：剔除一切多余的参数栏、外框和卡片堆砌，整屏居中只留三个层次——几何 `4` 与中央 6 叶片机械光圈 `0` 组成的视觉雕塑、一句平静的说明，以及「回到首页 / 返回上一页」两颗操作按钮。指针滑过时镜片轻柔追焦，点击光圈或按空格键触发机械叶片收合彩蛋，藏巧于简。
+极简整页 404：互动机械光圈视觉雕塑、一句清晰提示与首页/返回双按钮。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">

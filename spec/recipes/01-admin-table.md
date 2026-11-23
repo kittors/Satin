@@ -1,20 +1,6 @@
-# 后台列表（三层工作台 + Chrome 弧形多页签 + 可收起侧栏 + 占满高度产品级表格）
+# 后台列表
 
-结构：三层表面配色外壳 `.sn-app.sn-workbench` → 左侧可收起展开侧栏 `.sn-side`（顶部必配 `[data-collapse]` 收起按钮与 `⌘\` 快捷键）→ 右侧工作台外壳 `.sn-app-shell`（顶部 Chrome 弧形多页签 `.sn-btabs` + 下方圆角主工作板 `.sn-work-body`）→ 一屏工作页 `.sn-page.sn-work`：页头（标题、数量、主按钮）→ 工具条 `.sn-filters`（搜索、筛选、次要操作）→ 占满底部剩余高度的主角表格 `.sn-tbl-wrap.sn-tbl-fill`（标配复选框 + 左右固定列 + 贴底分页栏）。
-
-**三层表面配色规范**（全部由令牌自动适配深浅色，禁止手写色值）：
-- **Layer 0 壳层 / 顶部弧形页签槽**（`--sn-shell`）：浅色 `#ebebf0` / 深色 `#09090b`；
-- **Layer 1 侧边栏**（`--sn-side-bg`）：浅色 `#f2f2f5` / 深色 `#0d0d10`，选中项用 `--sn-side-active`；
-- **Layer 2 主内容圆角工作板**（`--sn-workspace`）：浅色 `#ffffff` / 深色 `#16161a`（左侧 1px `--sn-workspace-line` 极细分隔），与激活的 Chrome 弧形页签 **100% 同色无缝融合**；内部表格/卡片用 `--sn-raised`，浮层用 `--sn-overlay`。
-
-**主角表格占满底部剩余高度原则**：当表格下方没有其他内容区块占位时，用 `.sn-page.sn-work` + `createTable(..., { fill: true, selectable: true, pagination: ... })`（或标记 `.sn-tbl-wrap.sn-tbl-fill`）。数据少时表格白卡自然延展到底（不拉伸行高、不画假空行、分页栏稳稳贴底不悬空）；数据多时表头吸顶、表体内部滚、分页栏贴底不动；极矮窗口自动降级整区滚动。
-
-**后台工作台必须具备的产品级交互（不要偷懒省略）**：
-1. **侧栏收起 / 展开**：`.sn-side-top` 必放 `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\" data-i="panel-left" aria-label="收起侧栏"></button>`；收起至 56px 时图标严格居中、分组标题化为短横线、待办徽标缩为精致圆点并自动出反色 Tooltip。
-2. **多选与批量操作**：列表页默认 `selectable: true`（表头三态全选 + 行勾选），勾选后在分页栏上方浮出 `.sn-bulk` 批量操作条（批量导出 / 归档 / 删除 / 取消选择）。
-3. **左右固定列**：宽表（≥ 6 列）将主键列设为 `fixed: "left"`（勾选列自动跟左固定），操作列设为 `type: "actions", fixed: "right"`，横向滚离边缘时自动浮现柔和边缘投影。
-4. **贴底分页**：传 `pagination: { pageSize: 12, pageSizes: [10, 20, 50] }`，总条数、每页条数与滑动正圆页码稳稳落底。
-5. **真实头像与状态**：负责人列用 `<sn-avatar>`（React `<Avatar>` / Vue `<SnAvatar>`）加 `decorative`，严禁拿姓氏首字配彩底；状态用 `.sn-tag` 中性淡灰底 + 6px 语义彩点；数字列右对齐等宽数字。
+三层工作台布局：可收起侧栏、弧形多页签与占满剩余高度的数据表格。
 
 ```html
 <div class="sn-app sn-workbench" data-navfx="slide">
@@ -87,6 +73,10 @@
 </script>
 ```
 
-手机上（窄于 640）：侧栏藏起来，换成最后那个底部标签栏 `.sn-tabbar`（和侧栏同样几项，名字缩成两个字；宽屏不显示），像手机应用一样在底部切换、让出底部横条；一屏锁高自动解除为自然滚动。
-侧栏：`enhance()` 已经接上（选中滑块、收起按钮、⌘\）；布局窄于 720（竖着的平板）自动收成图标栏，`<div class="sn-app sn-workbench" data-collapse-below="0">` 不收。框架里用 `createSidebar(el, { collapseBelow: 720 })`。
-没有数据时用 `empty: ({ filtered }) => ...` 说明原因并给下一步操作；加载中传 `loading: true`（显示骨架行，不整页转圈）；删除用弹窗确认并写清影响范围，成功后 `toast({ text: "已删除「长夜」", action: { label: "撤销", run } })`。
+## 结构与交互要点
+
+- **三层表面令牌**：壳层与页签槽 `--sn-shell` → 侧栏 `--sn-side-bg` → 主内容圆角工作板 `--sn-workspace`（与激活页签同色无缝融合，禁止手写色值）。
+- **占满剩余高度表格**：`.sn-page.sn-work` 搭配 `createTable(..., { fill: true, selectable: true, pagination })`；数据少时白卡延展到底、分页栏贴底不悬空，数据多时表头吸顶内部滚动。
+- **侧栏与批量交互**：顶部 `[data-collapse]` 支持 `⌘\` 收起至 56px 图标栏；多选自动浮出 `.sn-bulk` 批量操作条；宽表主键左固定、操作右固定，内置 Satin 悬浮细滚动条且横滑不回弹。
+- **多端自适应**：窄于 720px 侧栏自动收为图标栏（`data-collapse-below="0"` 可关）；窄于 640px 切换底部 `.sn-tabbar` 并解除一屏锁高。
+- **状态兜底**：空态用 `empty: ({ filtered }) => ...`，加载传 `loading: true`（骨架行），删除需二次确认并附可撤销 `toast`。

@@ -109,7 +109,8 @@ export function scrollArea(el, options = {}) {
   // auto 的竖向平时交给外层；一次滚动在区域里开始时，elastic 在这次滚动里临时改成 none（holding），滚动结束后回到这里的设定
   function axes() {
     const sx = vp.scrollWidth > vp.clientWidth + 1, sy = vp.scrollHeight > vp.clientHeight + 1, m = o.overscroll;
-    vp.style.overscrollBehaviorX = m === "chain" || !sx ? "auto" : "none";
+    const isTbl = vp.classList.contains("sn-tbl-sc");
+    vp.style.overscrollBehaviorX = isTbl ? "none" : (m === "chain" || !sx ? "auto" : "none");
     vp.style.overscrollBehaviorY = ela.holding() ? "none" : m === "chain" || m === "auto" || !sy ? "auto" : "none";
   }
   // ———— 应用配置（创建时一次；以后 set() 再调） ————

@@ -158,7 +158,8 @@ function inset(box) {
     let st = d.getElementById("s-dev-inset"); if (!st) { st = d.createElement("style"); st.id = "s-dev-inset"; d.head.append(st); }
     const t = box.__top || 0;
     st.textContent = "*{scrollbar-width:none!important}*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}"
-      + (t ? `html{padding-top:${t}px!important;scroll-padding-top:${t}px}` : "");
+      + "html,body{overscroll-behavior:none!important}"
+      + (t ? `html{padding-top:${t}px!important;scroll-padding-top:${t}px}.sn-page.sn-screen,.sn-auth,.sn-e404{min-height:calc(100dvh - ${t}px)!important}.sn-page-hd{top:${t}px!important}` : "");
   } catch {}
 }
 // iframe 里滚动、改尺寸、内容换了（play.html 是 load 以后才把示例插进来的）时重新取上下两条的颜色（一帧最多一次）

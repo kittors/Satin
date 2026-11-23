@@ -133,7 +133,9 @@ function demoBox(id, { code = true, n } = {}) {
 addEventListener("message", (e) => {
   if (e.origin !== location.origin || !e.data?.satinEmbed) return;
   for (const f of frames) if (f.contentWindow === e.source) {
-    const box = f.parentElement, h = Math.max(Number(box.dataset.min), Math.ceil(e.data.h)); keepH(f, h);
+    // 窗口样式的完整演示设 640px 高度上限，避免在文档页里把窗口拉成长条迫使用户连续滚屏
+    const box = f.parentElement, cap = box.closest(".dx.is-win") ? 640 : Infinity;
+    const h = Math.min(cap, Math.max(Number(box.dataset.min), Math.ceil(e.data.h))); keepH(f, h);
     if (box.classList.contains("sn-ready")) { box.style.setProperty("--sn-h", h + "px"); reAnchor(); continue; }
     try { f.__code?.(f.contentDocument); } catch {} // 代码面板在演示露出来之前就换成生成出来的结构
     loaded(f);
@@ -808,9 +810,31 @@ function fitRecipes(scope) {
   }
   for (const box of $$('.d-rframe[data-fit="content"]:not([data-fitted])', scope)) {
     box.dataset.fitted = ""; const f = $("iframe", box); let ro = null;
-    const set = () => { try { const d = f.contentDocument; if (!d || !d.body) return; const h = Math.ceil(d.documentElement.scrollHeight); if (h && Math.abs(f.offsetHeight - h) > 1) f.style.height = h + "px"; } catch {} };
+    const MAX_H = 680;
+    const set = () => {
+      try {
+        const d = f.contentDocument; if (!d || !d.body) return;
+        const rawH = Math.ceil(d.documentElement.scrollHeight);
+        if (!rawH) return;
+        const h = Math.min(MAX_H, rawH);
+        const over = rawH > MAX_H + 2;
+        d.documentElement.style.overflowX = "hidden";
+        d.documentElement.style.overflowY = over ? "auto" : "hidden";
+        d.documentElement.style.overscrollBehavior = over ? "contain" : "";
+        if (Math.abs(f.offsetHeight - h) > 1) f.style.height = h + "px";
+      } catch {}
+    };
     f.addEventListener("load", () => {
-      try { const d = f.contentDocument, w = f.contentWindow; d.documentElement.style.overflow = "hidden"; if (ro) ro.disconnect(); ro = new w.ResizeObserver(set); ro.observe(d.body); } catch {}
+      try {
+        const d = f.contentDocument, w = f.contentWindow;
+        if (!d.getElementById("sn-rframe-sb")) {
+          const st = d.createElement("style");
+          st.id = "sn-rframe-sb";
+          st.textContent = "html{scrollbar-width:thin;scrollbar-color:var(--sn-sa-thumb) transparent}html::-webkit-scrollbar{width:6px;height:6px}html::-webkit-scrollbar-thumb{background:var(--sn-sa-thumb);border-radius:99px}html::-webkit-scrollbar-track{background:transparent}";
+          d.head.append(st);
+        }
+        if (ro) ro.disconnect(); ro = new w.ResizeObserver(set); ro.observe(d.body);
+      } catch {}
       set();
     });
   }
