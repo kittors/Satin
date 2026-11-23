@@ -29,8 +29,40 @@
 </main>
 <script type="module">
 import { setup, enhance } from "satin-ui";
+import { toast } from "satin-ui/components";
 import { defineElements } from "satin-ui/elements";
 setup(); defineElements(); enhance();
+/* satin-preview-guard:start */
+// 配方预览沙箱保护：拦截占位站内链接与 iframe 内误退父页，避免点击示例路由（/signup、/pricing、/projects 等）在静态预览里报 404
+document.addEventListener("click", (e) => {
+  if (e.defaultPrevented) return;
+  const back = e.target.closest?.("[data-nf-back]");
+  if (back && window !== window.top) { e.preventDefault(); e.stopImmediatePropagation(); toast({ text: "预览演示 · 返回上一页", tone: "info" }); return; }
+  const a = e.target.closest?.("a[href]");
+  if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
+  const href = a.getAttribute("href") || "";
+  if (/^(?:https?:|mailto:|tel:|javascript:)/i.test(href)) return;
+  e.preventDefault();
+  if (href.startsWith("#")) {
+    if (href.length > 1) document.getElementById(href.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  if (a.closest(".sn-side-nav, .sn-tabbar")) {
+    for (const nav of document.querySelectorAll(".sn-side-nav, .sn-tabbar")) {
+      for (const item of nav.querySelectorAll("a[href]")) {
+        const on = item.getAttribute("href") === href;
+        item.classList.toggle("sn-on", on);
+        if (on) item.setAttribute("aria-current", "page"); else item.removeAttribute("aria-current");
+      }
+    }
+    const label = a.querySelector(".sn-lbl")?.textContent?.trim() || a.textContent.trim();
+    if (label) toast({ text: "预览演示 · 已切换至「" + label + "」", tone: "info" });
+    return;
+  }
+  toast({ text: "预览演示 · 目标路由 " + href, tone: "info" });
+}, true);
+document.addEventListener("submit", (e) => { if (!e.defaultPrevented) { e.preventDefault(); toast({ text: "预览演示 · 表单已提交", tone: "info" }); } });
+/* satin-preview-guard:end */
 document.documentElement.dataset.ready = "1";
 </script>
 </body>

@@ -1,6 +1,6 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 311,
+  "var(--sn-ease-out)": 306,
   "var(--sn-ease-out-strong)": 61,
   "linear": 37,
   "var(--sn-ease-overshoot)": 11,
@@ -2155,73 +2155,49 @@
   },
   {
    "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-e404-rec",
-   "prop": "transition",
-   "value": "background-color .18s var(--sn-ease-out), transform .18s var(--sn-ease-out)"
-  },
-  {
-   "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-e404-copybtn",
-   "prop": "transition",
-   "value": "color .15s var(--sn-ease-out), background-color .15s var(--sn-ease-out)"
-  },
-  {
-   "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-e404-flash",
-   "prop": "transition",
-   "value": "opacity .22s var(--sn-ease-out)"
-  },
-  {
-   "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-e404-frame.sn-shutter .sn-e404-flash",
-   "prop": "transition-duration",
-   "value": ".05s"
-  },
-  {
-   "file": "packages/satin-ui/css/shell.css",
    "selector": ".sn-e404-lens",
    "prop": "transition",
-   "value": "border-color .18s var(--sn-ease-out), transform .16s var(--sn-ease-out)"
+   "value": "border-color .2s var(--sn-ease-out), transform .16s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/shell.css",
    "selector": ".sn-e404-dial",
    "prop": "transition",
-   "value": "transform .42s var(--sn-ease-out-strong)"
+   "value": "transform .48s var(--sn-ease-out-strong)"
   },
   {
    "file": "packages/satin-ui/css/shell.css",
    "selector": ".sn-e404-iris-wrap",
    "prop": "transition",
-   "value": "transform .2s var(--sn-ease-out)"
+   "value": "transform .24s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/shell.css",
    "selector": ".sn-e404-blades",
    "prop": "transition",
-   "value": "transform .36s var(--sn-ease-out-strong)"
+   "value": "transform .38s var(--sn-ease-out-strong)"
   },
   {
    "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-e404-frame.sn-shutter .sn-e404-blades",
+   "selector": ".sn-e404.sn-shutter .sn-e404-blades",
    "prop": "transition-duration",
    "value": ".11s"
   },
   {
    "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-e404-frame.sn-shutter .sn-e404-blades",
+   "selector": ".sn-e404.sn-shutter .sn-e404-blades",
    "prop": "transition-timing-function",
    "value": "var(--sn-ease-in)"
   },
   {
    "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-e404-link .sn-e404-link-arr",
+   "selector": ".sn-e404-dot",
    "prop": "transition",
-   "value": "transform .18s var(--sn-ease-out), color .18s var(--sn-ease-out)"
+   "value": "fill .2s var(--sn-ease-out), transform .2s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/shell.css",
-   "selector": ".sn-e404-dial, .sn-e404-iris-wrap, .sn-e404-blades, .sn-e404-flash, .sn-e404-lens",
+   "selector": ".sn-e404-dial, .sn-e404-iris-wrap, .sn-e404-blades, .sn-e404-dot, .sn-e404-lens",
    "prop": "transition",
    "value": "none"
   }

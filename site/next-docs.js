@@ -1,12 +1,10 @@
 // 文档（新版设计稿）：一页里切换（地址 #/…，冒号后面是页内小节：#/c/button:usage）。左边目录、中间内容、右边本页目录。
 // 组件页的标题、说明、要点、演示源码都读组件展示页（catalog.js），演示本身用 iframe 嵌展示页的那一块（?embed=区块）。
-// 演示框：外层浅灰框 → 里面是预览台（像应用的组件放进 macOS 窗口，背后是桌面壁纸）→ 下面是代码（默认露 8 行，展开看全部）。
+// 演示框：外层浅灰框 → 里面是预览台（像应用的组件以同心圆角 macOS 窗口作为舞台主体，无多余壁纸层）→ 下面是代码（默认露 8 行，展开看全部）。
 import { onMode } from "./shell.js";
 import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { bindOverlays } from "../packages/satin-ui/src/overlay.js";
-import { copied } from "../packages/satin-ui/src/form.js";
-import { numberFlow } from "../packages/satin-ui/src/number.js";
 import { loadCatalog } from "./catalog.js";
 import { codePanel, mountCode, fmtHTML } from "./code.js";
 import { deviceHTML, mountDevices } from "./device.js";
@@ -14,7 +12,6 @@ import { docPages, sectionsOf, NAV_OF, RECIPES } from "./nav-pages.js";
 import { mountMobileNav } from "./mnav.js";
 import { USAGE, TALL, EX, WIN } from "./usage.js";
 import { EXAMPLES, API } from "./examples.js";
-import { img } from "./media.js";
 import { variants, demoCSS, guessInline, guessFlex } from "./variants.js";
 import { getFw, getEnv, onFw, setFw, fwButtonHTML, mountFwButtons, parseHash, hashOf, syncURL, followURL, envTab, setEnvTab } from "./fwpref.js";
 import { FRAMEWORKS } from "./frameworks.js";
@@ -106,15 +103,28 @@ function shownSoon(ms) {
 }
 const sigOf = (files) => { const s = JSON.stringify(files); let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33) ^ s.charCodeAt(i); return (h >>> 0).toString(36); };
 const MAC = (title, inner) => `<div class="mac"><div class="mac-bar"><span class="mac-lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="mac-title">${esc(title)}</span></div><div class="mac-body">${inner}</div></div>`;
-// n：第几个演示（组件页每个演示一个框；不给 n 就嵌整块，规范页用）。像应用的那一块（WIN，默认最后一个演示）放进 macOS 窗口
+const MAC_BROWSER = (url, inner, openHref) => `<div class="mac"><div class="mac-bar"><span class="mac-lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="mac-url"><span data-i="lock"></span><span>${esc(url)}</span></span>${openHref ? `<a class="mac-open" href="${esc(openHref)}" target="_blank" rel="noopener" data-tip="新窗口打开" aria-label="在新窗口打开独立预览"><span data-i="arrow-up-right"></span></a>` : ""}</div><div class="mac-body">${inner}</div></div>`;
+const RECIPE_URL = {
+  "admin-table": "studio.satin.dev/projects",
+  settings: "studio.satin.dev/settings",
+  auth: "studio.satin.dev/login",
+  dashboard: "studio.satin.dev/analytics",
+  chat: "studio.satin.dev/chat",
+  landing: "satin.dev",
+  "mobile-order": "m.satin.dev/order",
+  wizard: "studio.satin.dev/projects/new",
+  "not-found": "studio.satin.dev/projects/shot-404",
+};
+// n：第几个演示（组件页每个演示一个框；不给 n 就嵌整块，规范页用）。像应用的那一块（WIN，默认最后一个演示）放进干净的 macOS 窗口
 const winAt = (c, w) => (w?.demo ?? Math.max(0, (c?.demos.length || 1) - 1));
 function demoBox(id, { code = true, n } = {}) {
   if (USAGE[id]?.demoOnly) code = false; // 展示页自己的演示：没有能抄的代码
-  const c = cat.byId[id], w0 = WIN[id], w = w0 && (n == null || n === winAt(c, w0)) ? w0 : null, min = TALL[id] || 0; // 不给保底高度：内容比预览框矮时由预览框上下居中，不把空白都堆在下面
+  const c = cat.byId[id], w0 = WIN[id], w = w0 && (w0.all || n == null || n === winAt(c, w0)) ? w0 : null, min = TALL[id] || 0; // 不给保底高度：内容比预览框矮时由预览框上下居中，不把空白都堆在下面
+  const wTitle = w ? (w.titles?.[n ?? 0] || w.title || c?.name || "") : "";
   const frame = `<div class="d-frame" style="--sn-h:${Math.max(min, w ? 320 : 120)}px" data-min="${min}"><div class="d-load" aria-hidden="true"><div class="d-load-bars"><i></i><i></i></div></div><iframe title="${esc(c?.name || "")}演示" data-src="../index.html?embed=${id}${n != null ? "&demo=" + n : ""}${w ? "&win=1" : ""}${w?.flush ? "&flush=1" : ""}${TALL[id] ? "&center=1" : ""}"></iframe></div>`;
   return `<div class="dx${w ? " is-win" : ""}" data-demo="${id}"${n != null ? ` data-n="${n}"` : ""}>
     <div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div>
-    <div class="dx-stage">${w ? `<img class="dx-wall" src="${img("mist", 1800, 70)}" alt="" decoding="async">` : ""}${w ? MAC(w.title, frame) : frame}</div>
+    <div class="dx-stage">${w ? MAC(wTitle, frame) : frame}</div>
     ${code && c ? `<div class="dx-code" data-slug="${c.id}-${n ?? 0}"><div class="dx-cx"></div></div>` : ""}
   </div>`;
 }
@@ -137,7 +147,10 @@ addEventListener("message", (e) => {
 let anchorTo = null;
 const reAnchor = () => { if (!anchorTo) return; const el = document.getElementById(anchorTo); if (el) el.scrollIntoView({ behavior: "instant", block: "start" }); };
 for (const ev of ["wheel", "touchstart", "keydown", "pointerdown"]) addEventListener(ev, () => { anchorTo = null; }, { passive: true });
-onMode((t) => { for (const f of frames) try { f.contentDocument.documentElement.dataset.theme = t; } catch {} });
+onMode((t) => {
+  for (const f of frames) try { f.contentDocument.documentElement.dataset.theme = t; } catch {}
+  for (const f of $$(".d-rframe iframe, .d-rprev iframe, .s-devbox iframe", main)) try { f.contentDocument.documentElement.dataset.theme = t; } catch {}
+});
 addEventListener("resize", () => { for (const f of frames) try { f.contentDocument.documentElement.style.setProperty("--sn-vh", innerHeight + "px"); } catch {} });
 // 演示里的视频、图片进全屏：Chrome 全屏期间把整页的滚动条收起（文档根元素滚不动了），页面变宽，居中的内容横着挪半个滚动条宽（7.5px），
 // 退出全屏回来那一下看得见（巡检"开关浮层时页面左右跳"，原版就有）。平时一直记着滚动条多宽；进全屏时右边补上同样宽的内边距（和锁滚动 dx-lock 一个办法），退出时撤掉
@@ -673,10 +686,15 @@ function overviewPage(pg) {
 // 配方总览：9 种页面，每张卡片上是这一页缩小的实时预览（滚到附近才载入）
 const RSUB = { "admin-table": "侧栏 + 搜索筛选 + 表格 + 分页", settings: "单栏窄页面，左边标题、右边字段", auth: "整屏居中一个面板：字段 + 撑满的主按钮", dashboard: "KPI 火花线 + 面积/环形/3D 立体算力图 + 联动明细表",
   chat: "对话框占满主区：消息区 + 提示词输入框", landing: "首屏 + 3 个功能点 + 真实场景 + 页脚", "mobile-order": "单栏 + 底部贴边的操作栏", wizard: "步骤条 + 当前一步的字段 + 上一步 / 下一步",
-  "not-found": "可互动光学取景器 404：跟手追焦 6 叶片光圈 + 快门重拍 + 快捷直达" };
+  "not-found": "极简居中留白 + 互动 6 叶片机械光圈 404" };
 function recipesPage(pg) {
   return head(pg, "配方总览", `配方 <span>Recipes</span>`, "9 种常见页面的骨架：先照着搭结构，再换成自己的内容。只用 Satin 的骨架类和组件，不用自己写布局和颜色。每一种都有实时预览和代码，代码可以切换 HTML、React、Vue。")
-    + `<div class="d-cards d-rcards">${RECIPES.map((r) => `<a class="d-card d-rcard" href="#/recipe/${r.id}"><span class="d-rprev" aria-hidden="true"><iframe src="../tests/recipes/${r.id}.html" loading="lazy" tabindex="-1" title=""></iframe></span><b>${esc(r.title)}</b><span>${esc(RSUB[r.id] || "")}</span></a>`).join("")}</div>`;
+    + `<div class="d-cards d-rcards">${RECIPES.map((r) => {
+      const inner = r.mobile
+        ? `<span class="d-rprev-phone"><span class="d-rprev-body" data-rprev-w="390"><iframe src="../tests/recipes/${r.id}.html" loading="lazy" tabindex="-1" title=""></iframe></span></span>`
+        : `<span class="d-rprev-win"><span class="d-rprev-bar"><i></i><i></i><i></i></span><span class="d-rprev-body" data-rprev-w="1280"><iframe src="../tests/recipes/${r.id}.html" loading="lazy" tabindex="-1" title=""></iframe></span></span>`;
+      return `<a class="d-card d-rcard" href="#/recipe/${r.id}"><span class="d-rprev${r.mobile ? " d-rprev-m" : ""}" aria-hidden="true">${inner}</span><b>${esc(r.title)}</b><span>${esc(RSUB[r.id] || "")}</span></a>`;
+    }).join("")}</div>`;
 }
 // 单个配方：原文（spec/recipes/*.md）载好后填进来——说明、实时预览、代码、详尽案例介绍或补充说明
 function recipePage(pg) {
@@ -756,16 +774,38 @@ const PLAY_LY_ID = {
   banner: "wide", tabs: "wide",
 };
 const playLayout = (id, slug) => (slug in PLAY_LY_SLUG ? PLAY_LY_SLUG[slug] : PLAY_LY_ID[id] || "");
+// 契约示例里本身是「完整工作台 / 大型应用 / 全幅画布」的演示：直接以干净的 macOS 窗口作为舞台主体（无多余外层壁纸，应用类 flush 贴齐内壁）
+const PLAY_WIN = {
+  "sidebar-basic": { title: "Satin — 侧栏布局", flush: true },
+  "sidebar-controlled": { title: "Satin — 全部项目", flush: true },
+  "sidebar-fx": { title: "Satin — 导航动效", flush: true },
+  "chat-basic": { title: "分镜助手", flush: true },
+  "chat-new": { title: "新对话", flush: true },
+  "chat-history": { title: "分镜讨论 · 第三集", flush: true },
+  "chat-rich": { title: "思考与分镜生成", flush: true },
+  "flow-basic": { title: "工作流画布", flush: true },
+  "flow-branch": { title: "分叉与汇合", flush: true },
+  "flow-tidy": { title: "自动整理流程", flush: true },
+  "grid-remote": { title: "数据表格 — 100,000 行" },
+  "cgrid-million": { title: "Canvas 表格 — 1,000,000 行" },
+  "md-basic": { title: "README.md" },
+  "md-stream": { title: "AI 流式文档" },
+};
 // 契约示例的演示框：现场演示就是纯 HTML 示例那份代码本身（examples/html/play.html?demo=<slug>），代码块读当前框架的同名文件
 function playBox(c, ex) {
-  const ly = playLayout(c.id, ex.slug);
-  const frame = `<div class="d-frame" style="--sn-h:120px" data-min="0"><div class="d-load" aria-hidden="true"><div class="d-load-bars"><i></i><i></i></div></div><iframe title="${esc(ex.title)}演示" data-src="../examples/html/play.html?demo=${ex.slug}${ly ? "&layout=" + ly : ""}"></iframe></div>`;
-  return `<div class="dx" data-demo="${c.id}" data-play="${ex.slug}"${/手机/.test(ex.title) ? ` data-phone="${esc(ex.title)}"` : ""}><div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div><div class="dx-stage">${frame}</div><div class="dx-code" data-slug="${ex.slug}"><div class="dx-cx"></div></div></div>`;
+  const ly = playLayout(c.id, ex.slug), w = PLAY_WIN[ex.slug];
+  const frame = `<div class="d-frame" style="--sn-h:${w ? 320 : 120}px" data-min="0"><div class="d-load" aria-hidden="true"><div class="d-load-bars"><i></i><i></i></div></div><iframe title="${esc(ex.title)}演示" data-src="../examples/html/play.html?demo=${ex.slug}${ly ? "&layout=" + ly : ""}${w?.flush ? "&flush=1" : ""}"></iframe></div>`;
+  return `<div class="dx${w ? " is-win" : ""}" data-demo="${c.id}" data-play="${ex.slug}"${/手机/.test(ex.title) ? ` data-phone="${esc(ex.title)}"` : ""}><div class="dx-bar"><div class="dx-ctl"></div><span class="dx-note"></span></div><div class="dx-stage">${w ? MAC(w.title, frame) : frame}</div><div class="dx-code" data-slug="${ex.slug}"><div class="dx-cx"></div></div></div>`;
 }
 const tbl = (head, rows) => BLOCK.table(head, rows);
 // 契约示例里带"手机"的（比如"手机上：底部操作栏"）：示例框顶上一个"在手机上看"开关，打开后同一份演示放进设备框（device.js）；手机上（≤ 860px）不出这个开关
-// 内容页配方的预览框跟着内容长高：iframe 载好以后量文档高度，内容变了（图片、字体载好，折叠展开）再量；框里不出滚动条
+// 配方预览：iframe 载好同步深浅主题；内容页配方跟着内容长高（框里不出滚动条）
 function fitRecipes(scope) {
+  for (const f of $$(".d-rframe iframe, .d-rprev iframe", scope)) {
+    if (f._rtheme) continue; f._rtheme = 1;
+    const sync = () => { try { if (root.dataset.theme) f.contentDocument.documentElement.dataset.theme = root.dataset.theme; } catch {} };
+    f.addEventListener("load", sync); sync();
+  }
   for (const box of $$('.d-rframe[data-fit="content"]:not([data-fitted])', scope)) {
     box.dataset.fitted = ""; const f = $("iframe", box); let ro = null;
     const set = () => { try { const d = f.contentDocument; if (!d || !d.body) return; const h = Math.ceil(d.documentElement.scrollHeight); if (h && Math.abs(f.offsetHeight - h) > 1) f.style.height = h + "px"; } catch {} };
@@ -929,13 +969,14 @@ const ASYNC = {
     return contractHTML(cat.byId[id], k);
   },
   async recipe(id) {
-    const r = RECIPES.find((x) => x.id === id), d = READY_CACHE.get(`recipe:${id}`) || await prefetchAsync("recipe", id);
+    const r = RECIPES.find((x) => x.id === id), d = READY_CACHE.get(`recipe:${id}`) || await prefetchAsync("recipe", id), url = RECIPE_URL[id] || `studio.satin.dev/${id}`;
     const lead = $("[data-async-lead]", main); if (lead) lead.outerHTML = md2html(d.lead.join(" "));
-    // 手机页面（mobile）：桌面上放进设备框；原来的整宽预览留着（手机上显示，示例生成器也读它），桌面上藏起来
-    // 桌面页面：预览上面一个"在手机上看"开关，打开后同一个页面放进设备框（mountPhoneToggles）
-    return anchor("preview", "预览") + (r.mobile ? `<div class="d-rdev">${deviceHTML({ src: `../tests/recipes/${id}.html`, title: `${r.title}预览`, fit: "block", maxH: 780, under: true })}</div>` : `<div class="d-rwrap" data-rphone="${id}" data-title="${esc(r.title)}"><div class="d-rbar"></div>`)
-      // 预览框分两类：app 式（对话、向导、后台列表、登录——整页就是一个应用，自己占满一屏）固定高度；内容页（仪表盘、落地页、设置、下单）和内容一样高，框里不出滚动条（fitRecipes）
-      + `<div class="d-rframe${r.mobile ? " d-rframe-m" : ""}" data-fit="${r.shell ? "fixed" : "content"}"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>` + (r.mobile ? "" : "</div>")
+    const frame = `<div class="d-rframe${r.mobile ? " d-rframe-m" : ""}" data-fit="${r.shell ? "fixed" : "content"}"><iframe src="../tests/recipes/${id}.html" title="${esc(r.title)}预览"></iframe></div>`;
+    // 手机页面（mobile）：居中放在柔和浅底手机设备框里；桌面页面：满宽干净的 macOS 浏览器窗口，无多余外层背景，并支持一键切手机真机框或新标签打开
+    const preview = r.mobile
+      ? `<div class="d-rdev"><div class="d-rstage d-rstage-mobile">${deviceHTML({ src: `../tests/recipes/${id}.html`, title: `${r.title}预览`, fit: "block", maxH: 780, under: true })}</div></div>${frame}`
+      : `<div class="d-rwrap" data-rphone="${id}" data-title="${esc(r.title)}"><div class="d-rbar"></div><div class="d-rstage">${MAC_BROWSER(url, frame, `../tests/recipes/${id}.html`)}</div></div>`;
+    return anchor("preview", "预览") + preview
       + anchor("code", "代码") + `<div class="dx-code d-rcode" data-recipe="${id}" data-fold="24"><div class="dx-cx"></div></div>`
       + renderRecipeAfter(d.afterRaw);
   },
@@ -973,8 +1014,8 @@ const ASYNC = {
     return [...byCat].map(([c, list], i) => anchor("t" + i, `${esc(NAMES[c] || c)}<span class="d-h2-sub">${list.length}</span>`) + BLOCK.table(["变量", "浅色", "深色", "说明"], list.map(([v, t]) => [`<code>${esc(v)}</code>`, `<code>${esc(val(L[v]?.value ?? t.value))}</code>`, `<code>${esc(val(D[v]?.value ?? t.value))}</code>`, esc(t.desc)]))).join("");
   },
 };
-// 配方卡片上的缩小预览：iframe 按 1280 宽排版，再按卡片宽度缩小
-const fitPrev = () => { for (const pv of $$(".d-rprev", main)) pv.style.setProperty("--k", pv.clientWidth / 1280); };
+// 配方卡片上的缩小预览：桌面按 1280 宽排版、手机按 390 宽排版，再按迷你窗口内宽等比缩小
+const fitPrev = () => { for (const pv of $$(".d-rprev-body", main)) pv.style.setProperty("--k", pv.clientWidth / (Number(pv.dataset.rprevW) || 1280)); };
 addEventListener("resize", fitPrev);
 // 窗口式演示背后的壁纸：载好了再淡入（.ld）。换页时接一遍；契约页的"完整演示"是后来异步填进来的，fillAsync 里再接一遍（不接就一直透明）
 const wireWalls = (scope) => { for (const w of $$(".dx-wall:not(.ld)", scope)) { if (w._wall) continue; w._wall = 1; const ok = () => w.classList.add("ld"); if (w.complete && w.naturalWidth) ok(); else w.addEventListener("load", ok, { once: true }); } };
@@ -1097,72 +1138,52 @@ async function route() {
   if (part) { const el = document.getElementById(part); if (el) el.scrollIntoView({ behavior: reduced() ? "instant" : "smooth", block: "start" }); }
 }
 let nfAbort = null;
-function renderNotFound(rawPath) {
-  const safePath = esc(rawPath || "#/404");
-  const ticks = Array.from({ length: 24 }, (_, i) => i % 6 === 0
-    ? `<line class="sn-e404-tick-major" x1="70" y1="6" x2="70" y2="15"${i ? ` transform="rotate(${i * 15} 70 70)"` : ""}/>`
-    : `<line class="sn-e404-tick" x1="70" y1="8" x2="70" y2="13" transform="rotate(${i * 15} 70 70)"/>`).join("");
+function renderNotFound() {
+  const ticks = Array.from({ length: 12 }, (_, i) => i % 3 === 0
+    ? `<line class="sn-e404-tick-major" x1="70" y1="8" x2="70" y2="15"${i ? ` transform="rotate(${i * 30} 70 70)"` : ""}/>`
+    : `<line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(${i * 30} 70 70)"/>`).join("");
   const blades = [0, 60, 120, 180, 240, 300].map((a, i) =>
-    `<path class="${i % 2 ? "sn-e404-blade-alt" : "sn-e404-blade"}" d="M58 49 H118 V18 H58 Z"${a ? ` transform="rotate(${a} 70 70)"` : ""}/>`).join("");
-  const digit4 = `<svg class="sn-e404-digit" viewBox="0 0 88 124" aria-hidden="true"><path class="sn-e404-digit-ghost" d="M55 17 L13 78 V91 H55 V113 H71 V91 H83 V77 H71 V17 Z M55 39 V77 H29 Z" transform="translate(4 4)"/><path class="sn-e404-digit-solid" fill-rule="evenodd" d="M55 17 L13 78 V91 H55 V113 H71 V91 H83 V77 H71 V17 Z M55 39 V77 H29 Z"/></svg>`;
+    `<path class="${i % 2 ? "sn-e404-blade-alt" : "sn-e404-blade"}" d="M58 51 H118 V18 H58 Z"${a ? ` transform="rotate(${a} 70 70)"` : ""}/>`).join("");
+  const digit4 = `<svg class="sn-e404-digit" viewBox="0 0 88 124" aria-hidden="true"><path class="sn-e404-digit-solid" fill-rule="evenodd" d="M55 17 L13 78 V91 H55 V113 H71 V91 H83 V77 H71 V17 Z M55 39 V77 H29 Z"/></svg>`;
   return `<div class="sn-e404 sn-e404-inline" data-nf-root><div class="sn-e404-wrap">`
-    + `<section class="sn-e404-frame" data-nf-frame aria-label="404 光学取景器">`
-    + `<div class="sn-e404-hud"><div class="sn-e404-hud-l"><i class="sn-e404-rec" aria-hidden="true"></i><span class="sn-e404-tag">FRAME 404</span>`
-    + `<span class="sn-e404-path"><code data-nf-path>${safePath}</code><button type="button" class="sn-e404-copybtn" data-nf-copy data-tip="复制路径" aria-label="复制当前路径"><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button></span></div>`
-    + `<span class="sn-e404-coord" data-nf-coord aria-hidden="true">X +00 · Y +00</span></div>`
-    + `<div class="sn-e404-stage" data-nf-stage><i class="sn-e404-corner sn-tl" aria-hidden="true"></i><i class="sn-e404-corner sn-tr" aria-hidden="true"></i><i class="sn-e404-corner sn-bl" aria-hidden="true"></i><i class="sn-e404-corner sn-br" aria-hidden="true"></i><div class="sn-e404-flash" aria-hidden="true"></div>`
-    + `<div class="sn-e404-trio">${digit4}<button type="button" class="sn-e404-lens" data-nf-lens aria-label="点击对焦快门，重新拍摄当前空帧"><svg class="sn-e404-lens-svg" viewBox="0 0 140 140" aria-hidden="true"><defs><clipPath id="sn-e404-doc-clip"><circle cx="70" cy="70" r="44"/></clipPath></defs><g class="sn-e404-dial">${ticks}<polygon class="sn-e404-mark" points="70,18 67,13 73,13"/></g><g class="sn-e404-iris-wrap"><circle class="sn-e404-barrel" cx="70" cy="70" r="44"/><g clip-path="url(#sn-e404-doc-clip)"><g class="sn-e404-blades">${blades}</g></g><path class="sn-e404-reticle" d="M60 65 V60 H65 M75 60 H80 V65 M80 75 V80 H75 M65 80 H60 V75"/><circle class="sn-e404-dot" cx="70" cy="70" r="2"/></g></svg></button>${digit4}</div></div>`
-    + `<div class="sn-e404-bar"><span class="sn-e404-note" data-nf-note aria-live="polite">第 1 镜 · 已对焦，但这一页不在当前时间线上。</span><span class="sn-e404-meta"><span class="sn-e404-specs">F/2.8 · 24 FPS</span><span class="sn-e404-take">TAKE <span data-nf-take>01</span></span></span></div></section>`
-    + `<div class="sn-e404-head"><h1>这一页不在这个镜头里</h1><p>地址可能写错了，或者这一页改了名字。</p></div>`
-    + `<div class="sn-e404-acts"><a class="sn-btn sn-primary" href="#/intro" data-i="house:before">回到介绍</a><button type="button" class="sn-btn sn-secondary" data-nf-back data-i="arrow-left:before">返回上一页</button><button type="button" class="sn-btn sn-ghost" data-nf-shutter data-i="rotate-cw:before">重新对焦<kbd class="sn-kbd">Space</kbd></button></div>`
-    + `<nav class="sn-e404-links" aria-label="常用入口">`
-    + `<a class="sn-card sn-bordered sn-sm sn-interactive sn-e404-link" href="#/components"><div class="sn-e404-link-top"><span class="sn-e404-link-ic" data-i="layout-grid"></span><b>组件总览</b><span class="sn-e404-link-arr" data-i="arrow-up-right"></span></div><p>64 个即用组件与 7 框架示例</p></a>`
-    + `<a class="sn-card sn-bordered sn-sm sn-interactive sn-e404-link" href="#/recipe/not-found"><div class="sn-e404-link-top"><span class="sn-e404-link-ic" data-i="rows-3"></span><b>404 页面配方</b><span class="sn-e404-link-arr" data-i="arrow-up-right"></span></div><p>查看本页完整代码与设计说明</p></a>`
-    + `<a class="sn-card sn-bordered sn-sm sn-interactive sn-e404-link" href="#/guide/principles"><div class="sn-e404-link-top"><span class="sn-e404-link-ic" data-i="book-open"></span><b>设计规范</b><span class="sn-e404-link-arr" data-i="arrow-up-right"></span></div><p>令牌、动效与去 AI 味准则</p></a>`
-    + `</nav></div></div>`;
+    + `<div class="sn-e404-trio" aria-label="404">${digit4}<button type="button" class="sn-e404-lens" data-nf-lens aria-label="点击触发光圈快门"><svg class="sn-e404-lens-svg" viewBox="0 0 140 140" aria-hidden="true"><defs><clipPath id="sn-e404-doc-clip"><circle cx="70" cy="70" r="42"/></clipPath></defs><g class="sn-e404-dial">${ticks}</g><g class="sn-e404-iris-wrap"><circle class="sn-e404-barrel" cx="70" cy="70" r="42"/><g clip-path="url(#sn-e404-doc-clip)"><g class="sn-e404-blades">${blades}</g></g><circle class="sn-e404-dot" cx="70" cy="70" r="2.2"/></g></svg></button>${digit4}</div>`
+    + `<div class="sn-e404-head"><h1>这一页不在镜头里</h1><p>你访问的地址可能已移动或失效。</p></div>`
+    + `<div class="sn-e404-acts"><a class="sn-btn sn-primary" href="#/intro">回到介绍</a><button type="button" class="sn-btn sn-secondary" data-nf-back>返回上一页</button></div>`
+    + `</div></div>`;
 }
 function wireNotFound(scope) {
   nfAbort?.abort();
   const ac = new AbortController(); nfAbort = ac;
   const { signal } = ac;
-  const frame = $("[data-nf-frame]", scope), stage = $("[data-nf-stage]", scope), coord = $("[data-nf-coord]", scope), noteEl = $("[data-nf-note]", scope), takeEl = $("[data-nf-take]", scope), pathEl = $("[data-nf-path]", scope);
-  if (!frame || !stage) return;
-  const NOTES = ["已对焦，但这一页不在当前时间线上。", "切换广角复核，场记表里没有这个编号。", "镜面干净，只是你要找的那场戏还没开机。", "光线与构图正常，唯独目标地址缺席。", "连续空拍多次，建议直接回到有画面的一页。"];
-  let take = 1, rot = 0, timer = 0;
-  const nf = takeEl ? numberFlow(takeEl, { value: 1, style: "roll", format: (v) => String(Math.round(v)).padStart(2, "0") }) : null;
+  const nfRoot = $("[data-nf-root]", scope);
+  if (!nfRoot) return;
+  let rot = 0, timer = 0;
   const shoot = () => {
-    take += 1; rot += 30;
-    frame.style.setProperty("--sn-e404-rot", rot + "deg");
-    frame.classList.remove("sn-shutter"); void frame.offsetWidth; frame.classList.add("sn-shutter");
-    clearTimeout(timer); timer = setTimeout(() => frame.classList.remove("sn-shutter"), 180);
-    nf?.set(take);
-    if (noteEl) noteEl.textContent = `第 ${take} 镜 · ${NOTES[(take - 1) % NOTES.length]}`;
+    rot += 30;
+    nfRoot.style.setProperty("--sn-e404-rot", rot + "deg");
+    nfRoot.classList.remove("sn-shutter"); void nfRoot.offsetWidth; nfRoot.classList.add("sn-shutter");
+    clearTimeout(timer); timer = setTimeout(() => nfRoot.classList.remove("sn-shutter"), 180);
   };
   $("[data-nf-lens]", scope)?.addEventListener("click", shoot, { signal });
-  $("[data-nf-shutter]", scope)?.addEventListener("click", shoot, { signal });
   $("[data-nf-back]", scope)?.addEventListener("click", () => { if (history.length > 1) history.back(); else location.hash = "#/intro"; }, { signal });
-  const copyBtn = $("[data-nf-copy]", scope);
-  copyBtn?.addEventListener("click", () => { navigator.clipboard?.writeText(pathEl?.textContent?.trim() || location.hash).catch(() => {}); copied(copyBtn); }, { signal });
-  const fmt = (n) => (n >= 0 ? "+" : "-") + String(Math.abs(Math.round(n))).padStart(2, "0");
-  stage.addEventListener("pointermove", (e) => {
-    const r = stage.getBoundingClientRect(), nx = ((e.clientX - r.left) / r.width - 0.5) * 2, ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
-    frame.style.setProperty("--sn-e404-x", (nx * 8).toFixed(1) + "px"); frame.style.setProperty("--sn-e404-y", (ny * 8).toFixed(1) + "px");
-    if (coord) coord.textContent = `X ${fmt(nx * 48)} · Y ${fmt(ny * 32)}`;
+  nfRoot.addEventListener("pointermove", (e) => {
+    const r = nfRoot.getBoundingClientRect(), nx = ((e.clientX - r.left) / r.width - 0.5) * 2, ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    nfRoot.style.setProperty("--sn-e404-x", (nx * 5).toFixed(1) + "px"); nfRoot.style.setProperty("--sn-e404-y", (ny * 5).toFixed(1) + "px");
   }, { signal });
-  stage.addEventListener("pointerleave", () => { frame.style.setProperty("--sn-e404-x", "0px"); frame.style.setProperty("--sn-e404-y", "0px"); if (coord) coord.textContent = "X +00 · Y +00"; }, { signal });
+  nfRoot.addEventListener("pointerleave", () => { nfRoot.style.setProperty("--sn-e404-x", "0px"); nfRoot.style.setProperty("--sn-e404-y", "0px"); }, { signal });
   document.addEventListener("keydown", (e) => { if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "")) { e.preventDefault(); shoot(); } }, { signal });
 }
 async function swapPage(pg, part, inVT = false) {
   curPage = pg; frames.clear(); resetQueue(); h2n = 0; nfAbort?.abort(); nfAbort = null;
   const wasFirst = first;
   if (!pg) {
-    main.innerHTML = renderNotFound(location.hash || "#/404");
+    main.innerHTML = renderNotFound();
     injectIcons(main); wireNotFound(main);
-    tocVp.innerHTML = ""; document.title = "404 · 这一页不在这个镜头里 · Satin";
+    tocVp.innerHTML = ""; document.title = "404 · 这一页不在镜头里 · Satin";
   } else {
     const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
     const enterCls = !wasFirst && !inVT && !reduced() ? " d-page-enter" : "";
-    main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}${pg.p?.id === "mobile" ? " d-devpage" : ""}${enterCls}">${body}${pager(pg)}</article>`;
+    main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}${pg.kind === "recipe" ? " d-rpage" : ""}${pg.p?.id === "mobile" ? " d-devpage" : ""}${enterCls}">${body}${pager(pg)}</article>`;
     injectIcons(main); mountCode(main); mountFwButtons(main); mountDevices(main); mountPhoneToggles(main); fitRecipes(main); nbProse(main); balanceCards(main);
     for (const w of $$(".d-tablewrap", main)) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：横着滚用滚动区域
     wireWalls(main);

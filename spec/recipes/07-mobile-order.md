@@ -1,62 +1,129 @@
 # 移动端 H5 下单
 
-结构：导航栏（返回 + 标题）→ 收货地址 → 商品和规格、数量 → 配送时间、优惠券 → 备注 → 支付方式 → 费用明细 → 底部贴边操作栏（合计 + 主按钮）。
-外层 `.sn-page.sn-narrow.sn-screen`（整屏页面）：手机上（窄于 640）页头变成吸顶的导航栏，各块白底铺满左右（不是四周留白的圆角卡片），`.sn-bottom-bar` 贴在屏幕底部、让出底部横条，键盘弹出时停在键盘上面，内容不会被它盖住；宽屏上同一份标记是一栏窄页面，操作栏就是内容末尾的一行。
-手机上：可点区域至少 44×44（`sn-btn sn-lg` 高 40，再加外边距；图标按钮用 `sn-lg`）；输入框字号不小于 16px 防止 iOS 放大（触屏上 `sn-input` 已经是 16px）。
+现代 iOS Inset Grouped 风格移动端结算页：柔和浅灰画布 + 大圆角纯净白分组卡片 + 圆形柔底返回按钮 + 紧凑轻盈胶囊规格与实时总价联动 + 饱满圆润的底部操作栏。彻底告别「白纸通栏切灰条」「桌面大框硬搬手机」「重复占位图标」与「底栏截断最后一行」等典型 AI 味反模式。
 
 ```html
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<main class="sn-page sn-narrow sn-screen">
-  <header class="sn-page-hd"><a class="sn-nav-back" href="/cart" data-i="chevron-left:before">购物车</a><div><h1>确认订单</h1></div></header>
-  <div class="sn-stack sn-gap-12">
+<style>
+.sn-ord-note { all: unset; box-sizing: border-box; flex: 1; min-width: 0; text-align: right; font: 400 calc(14px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sn-ord-note::placeholder { color: var(--sn-label-off); }
+.sn-ord-hr { height: 1px; margin: var(--sn-sp-10) 0; background: var(--sn-line); }
+.sn-ord-sum { padding: var(--sn-sp-2) var(--sn-sp-4) 0; display: grid; gap: var(--sn-sp-4); font-size: calc(12.5px * var(--sn-font-scale, 1)); }
+.sn-ord-bar-meta { display: grid; gap: 2px; }
+.sn-ord-bar-meta small { font: 400 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
+</style>
+<main class="sn-page sn-narrow sn-screen" data-order-root>
+  <header class="sn-page-hd">
+    <a class="sn-nav-back sn-nav-circle" href="/cart" aria-label="返回购物车" data-i="arrow-left"></a>
+    <div><h1>确认订单</h1></div>
+  </header>
+
+  <div class="sn-stack sn-gap-8">
     <section class="sn-panel sn-flush">
       <div class="sn-set-list" style="border: 0; border-radius: 0">
-        <div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="map-pin"></span><div class="sn-tx"><b>林夏 138 0000 1234</b><span>上海市徐汇区漕溪北路 88&nbsp;号 12&nbsp;楼</span></div><span class="sn-end" data-i="chevron-right"></span></div>
+        <div class="sn-set-row" tabindex="0">
+          <span class="sn-ico" data-i="map-pin"></span>
+          <div class="sn-tx"><b>林夏 · 138 0000 1234</b><span>上海市徐汇区漕溪北路 88&nbsp;号 12&nbsp;楼</span></div>
+          <span class="sn-end" data-i="chevron-right"></span>
+        </div>
       </div>
     </section>
+
     <section class="sn-panel">
-      <div class="sn-row sn-gap-12">
-        <img src="https://images.unsplash.com/photo-1534105615256-13940a56ff44?auto=format&fit=crop&w=160&h=160&q=80" alt="" width="64" height="64" style="border-radius: var(--sn-r-md); object-fit: cover">
-        <div class="sn-grow"><b>折叠台灯</b><div class="sn-t-caption sn-c-tertiary">三档亮度 · USB-C 充电</div></div>
-        <b class="sn-num">¥189.00</b>
+      <div class="sn-row sn-gap-12" style="align-items: flex-start">
+        <img src="https://images.unsplash.com/photo-1534105615256-13940a56ff44?auto=format&fit=crop&w=200&h=200&q=85" alt="折叠台灯" width="76" height="76" style="border-radius: var(--sn-r-lg); object-fit: cover; flex: none">
+        <div class="sn-grow" style="display: grid; gap: 4px; min-width: 0">
+          <div class="sn-row sn-between" style="align-items: baseline">
+            <b>折叠台灯</b>
+            <b class="sn-num" data-ord-unit>¥189</b>
+          </div>
+          <span class="sn-t-caption sn-c-tertiary">三档调光 · USB-C 磁吸快充</span>
+          <div class="sn-row sn-gap-8" style="margin-top: 6px" role="radiogroup" aria-label="选择颜色" data-ord-colors>
+            <button type="button" class="sn-chip sn-on" aria-checked="true" role="radio" data-color="暖白">暖白</button>
+            <button type="button" class="sn-chip" aria-checked="false" role="radio" data-color="冷白">冷白</button>
+            <button type="button" class="sn-chip" aria-checked="false" role="radio" data-color="胡桃木">胡桃木</button>
+          </div>
+        </div>
       </div>
-      <div class="sn-form" style="max-width: none; margin-top: var(--sn-sp-20)">
-        <div class="sn-field"><span class="sn-lbl">颜色</span><sn-segmented items='["暖白","冷白","木纹"]' value="暖白"></sn-segmented></div>
-        <div class="sn-row sn-between"><span class="sn-lbl">数量</span><sn-stepper value="1" min="1" max="9" unit="件"></sn-stepper></div>
+      <div class="sn-ord-hr"></div>
+      <div class="sn-row sn-between">
+        <span class="sn-t-body sn-c-secondary">购买数量</span>
+        <sn-stepper value="1" min="1" max="9" unit="件" data-ord-qty></sn-stepper>
       </div>
     </section>
+
     <section class="sn-panel sn-flush">
       <div class="sn-set-list" style="border: 0; border-radius: 0">
-        <div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="clock"></span><div class="sn-tx"><b>配送时间</b></div><span class="sn-val">明天 9:00–12:00</span><span class="sn-end" data-i="chevron-right"></span></div>
-        <div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="tag"></span><div class="sn-tx"><b>优惠券</b></div><span class="sn-val">满 150 减 20</span><span class="sn-end" data-i="chevron-right"></span></div>
+        <div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="clock"></span><div class="sn-tx"><b>配送时间</b></div><span class="sn-val">明天 09:00–12:00</span><span class="sn-end" data-i="chevron-right"></span></div>
+        <div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="tag"></span><div class="sn-tx"><b>优惠券</b></div><span class="sn-val sn-num sn-c-success">−¥20</span><span class="sn-end" data-i="chevron-right"></span></div>
+        <label class="sn-set-row" for="o-note"><span class="sn-ico" data-i="pencil"></span><div class="sn-tx" style="flex: none"><b>订单备注</b></div><input class="sn-ord-note" id="o-note" type="text" placeholder="选填，如放门口无需致电"></label>
       </div>
     </section>
-    <section class="sn-panel">
-      <div class="sn-field"><label class="sn-lbl" for="o-note">备注 <span class="sn-opt">可选</span></label><textarea class="sn-input" id="o-note" rows="2" placeholder="比如：放门口，不用打电话"></textarea></div>
-    </section>
+
     <section class="sn-panel sn-flush">
       <div class="sn-set-list" role="radiogroup" aria-label="支付方式" style="border: 0; border-radius: 0">
-        <label class="sn-set-row"><span class="sn-ico" data-i="credit-card"></span><div class="sn-tx"><b>微信支付</b></div><span class="sn-radio"><input type="radio" name="pay" checked><span class="sn-box"></span></span></label>
-        <label class="sn-set-row"><span class="sn-ico" data-i="credit-card"></span><div class="sn-tx"><b>支付宝</b></div><span class="sn-radio"><input type="radio" name="pay"><span class="sn-box"></span></span></label>
+        <label class="sn-set-row"><span class="sn-ico" data-i="message-circle"></span><div class="sn-tx"><b>微信支付</b><span>推荐 · 极速免密</span></div><span class="sn-radio"><input type="radio" name="pay" checked><span class="sn-box"></span></span></label>
+        <label class="sn-set-row"><span class="sn-ico" data-i="shield"></span><div class="sn-tx"><b>支付宝</b><span>支持花呗与余额</span></div><span class="sn-radio"><input type="radio" name="pay"><span class="sn-box"></span></span></label>
       </div>
     </section>
-    <section class="sn-panel">
-      <div class="sn-stack sn-gap-8">
-        <div class="sn-row sn-between"><span class="sn-c-secondary">商品</span><span class="sn-num">¥189.00</span></div>
-        <div class="sn-row sn-between"><span class="sn-c-secondary">运费</span><span class="sn-num">¥0.00</span></div>
-        <div class="sn-row sn-between"><span class="sn-c-secondary">优惠</span><span class="sn-num sn-c-success">−¥20.00</span></div>
-      </div>
-    </section>
+
+    <div class="sn-ord-sum">
+      <div class="sn-row sn-between"><span class="sn-c-tertiary">商品小计</span><span class="sn-num sn-c-secondary" data-ord-sub>¥189.00</span></div>
+      <div class="sn-row sn-between"><span class="sn-c-tertiary">运费</span><span class="sn-c-secondary">免运费</span></div>
+      <div class="sn-row sn-between"><span class="sn-c-tertiary">优惠立减</span><span class="sn-num sn-c-success">−¥20.00</span></div>
+    </div>
   </div>
+
   <div class="sn-bottom-bar">
-    <div class="sn-grow"><span class="sn-t-caption sn-c-tertiary">合计</span> <b class="sn-t-title2 sn-num">¥169.00</b></div>
-    <button class="sn-btn sn-primary sn-lg">提交订单</button>
+    <div class="sn-grow sn-ord-bar-meta">
+      <small>应付金额</small>
+      <b class="sn-t-title2 sn-num" data-ord-total>¥169.00</b>
+    </div>
+    <button type="button" class="sn-btn sn-primary sn-lg" data-ord-submit>立即支付</button>
   </div>
 </main>
+<script type="module">
+import { busy, toast } from "satin-ui/components";
+
+const root = document.querySelector("[data-order-root]");
+if (root) {
+  const UNIT = 189, OFF = 20;
+  const subEl = root.querySelector("[data-ord-sub]");
+  const totEl = root.querySelector("[data-ord-total]");
+  const qtyEl = root.querySelector("[data-ord-qty]");
+  const sync = () => {
+    const q = Math.max(1, Number(qtyEl?.getAttribute("value") || qtyEl?.value || 1));
+    const sub = UNIT * q;
+    if (subEl) subEl.textContent = "¥" + sub.toFixed(2);
+    if (totEl) totEl.textContent = "¥" + Math.max(0, sub - OFF).toFixed(2);
+  };
+  qtyEl?.addEventListener("change", sync);
+  qtyEl?.addEventListener("input", sync);
+
+  const colors = root.querySelector("[data-ord-colors]");
+  colors?.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-color]");
+    if (!btn) return;
+    for (const b of colors.querySelectorAll("button[data-color]")) {
+      const on = b === btn;
+      b.classList.toggle("sn-on", on);
+      b.setAttribute("aria-checked", String(on));
+    }
+  });
+
+  const submitBtn = root.querySelector("[data-ord-submit]");
+  submitBtn?.addEventListener("click", () => {
+    busy(submitBtn, new Promise((r) => setTimeout(r, 600)).then(() => {
+      toast({ text: "订单已创建，正在拉起支付", tone: "success" });
+    }));
+  });
+}
+</script>
 ```
 
-`.sn-bottom-bar` 放在 `.sn-screen` 里面（最后一个），不要再自己写 `position: fixed` 和给页面垫底部内边距：贴底、安全区、内容不被盖住都由骨架类处理。
-商品图用真实的照片（这里是 Unsplash 的外链，上线换成自己的商品图），不要灰块占位。数量用紧凑的步进器放在这一行右边，标签在左，不要拉成整行宽。
-金额右对齐、用等宽数字（`sn-num`）；规格写在选择器里，商品名就不再带"· 暖白"，同一件事不说两遍。支付方式只有两三种时直接列出来单选（整行可点），不用再点进去选。
-提交时 `busy(按钮, 请求)`；失败用 `toast({ text: "库存不足，换个颜色试试", tone: "danger" })`，不要 `alert()`。
-地址、配送时间、优惠券的选择用底部抽屉（`openDrawer`）或选择器（`createPicker`），不要跳新页面再跳回来。
+## 移动端 UI 设计要点（反 AI 味清单）
+
+- **现代分组卡片（Inset Grouped）**：手机屏使用柔和浅灰画布 + 16px 大圆角白卡片分组，彻底摒弃满屏白纸加灰横杠的老旧表格观感。
+- **圆形返回按钮与安全区**：左侧用 38px 圆形柔底箭头按钮代替紧贴顶部的裸文字返回，留白充裕，内容永远不被状态栏或底部操作栏截断。
+- **移动端专属轻控件**：规格用紧凑胶囊标签，备注收拢在分组卡片内的单行无硬框输入条，绝不把通栏大分段栏或笨重多行文本框生搬进手机。
+- **拒绝重复假图标**：支付方式与各类目各用语义准确的差异化图标，金额统一右对齐等宽数字并随数量实时联动。

@@ -168,7 +168,7 @@ bindIcons3D(el);`,
 //   box.innerHTML = checkHTML({ label: "自动保存草稿", checked: true }) + switchHTML({ label: "生成完成后提醒我" });`,
 };
 
-// 像一个应用的演示（侧栏布局、表格、流程图、对话……）放进 macOS 窗口里展示：标题栏写窗口名，背后是桌面壁纸
+// 像一个应用的演示（侧栏布局、表格、流程图、对话……）放进干净的 macOS 窗口里展示（无多余外层壁纸，与 .dx 同心贴合）
 export const WIN = {
   sidebar: { title: "Satin — 全部项目" },
   grid: { title: "数据表格 — 100,000 行" },

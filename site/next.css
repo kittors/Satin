@@ -55,11 +55,20 @@
 .cx-more.sn-up .sn-ic { transform: rotate(180deg); }
 
 /* ———— 2. macOS 窗口 ———— */
-.mac { --mac-bar: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); position: relative; border-radius: 12px; background: var(--sn-raised); overflow: hidden; isolation: isolate;
-  box-shadow: 0 0 0 .5px rgba(0, 0, 0, .22), 0 2px 4px rgba(0, 0, 0, .06), 0 28px 56px -16px rgba(0, 0, 0, .38); }
-[data-theme="dark"] .mac { --mac-bar: color-mix(in srgb, #fff 5%, var(--sn-raised)); box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .16), 0 0 0 .5px rgba(0, 0, 0, .9), 0 28px 64px -16px rgba(0, 0, 0, .8); }
-.mac-bar { position: relative; z-index: 1; height: 38px; display: flex; align-items: center; justify-content: center; padding: 0 80px; background: var(--mac-bar); }
+.mac { --mac-r: 14px; --mac-bar: color-mix(in srgb, var(--sn-label) 2.5%, var(--sn-raised)); position: relative; border-radius: var(--mac-r); background: var(--sn-raised); overflow: clip; isolation: isolate;
+  box-shadow: 0 0 0 .5px rgba(0, 0, 0, .18), 0 2px 6px rgba(0, 0, 0, .06), 0 24px 52px -16px rgba(0, 0, 0, .36); }
+[data-theme="dark"] .mac { --mac-bar: color-mix(in srgb, #fff 4%, var(--sn-raised)); box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .14), 0 0 0 .5px rgba(0, 0, 0, .85), 0 24px 56px -16px rgba(0, 0, 0, .78); }
+.mac-bar { position: relative; z-index: 1; height: 38px; display: flex; align-items: center; justify-content: center; padding: 0 84px; border-radius: var(--mac-r) var(--mac-r) 0 0; background: var(--mac-bar); box-shadow: inset 0 -1px 0 var(--sn-line); }
 .mac-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 600 calc(13px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label2); }
+/* 浏览器窗口地址胶囊与右上角新标签打开按钮 */
+.mac-url { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; height: 24px; padding: 0 12px; border-radius: 7px; background: color-mix(in srgb, var(--sn-label) 5.5%, transparent); font: 400 calc(11.5px * var(--fsx))/1 var(--sn-mono); color: var(--sn-label2); }
+.mac-url .sn-ic { width: 11px; height: 11px; flex: none; color: var(--sn-label3); }
+.mac-url span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mac-open { position: absolute; right: 8px; top: 50%; translate: 0 -50%; width: 26px; height: 26px; display: inline-grid; place-items: center; border-radius: 6px; color: var(--sn-label3); text-decoration: none; transition: color .15s var(--sn-ease-out), background-color .15s var(--sn-ease-out); }
+.n-docs .d-main a.mac-open { text-decoration: none; color: var(--sn-label3); }
+@media (hover: hover) { .mac-open:hover, .n-docs .d-main a.mac-open:hover { color: var(--sn-label); background: var(--sn-fill-hover); } }
+.mac-open:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 1px; }
+.mac-open .sn-ic { width: 14px; height: 14px; }
 /* 红黄绿：12px、间隔 8px；指针移到这一组上时出现符号（和系统一样） */
 .mac-lights { position: absolute; left: 14px; top: 50%; translate: 0 -50%; display: flex; gap: 8px; }
 .mac-lights i { position: relative; width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .16); }
@@ -70,7 +79,7 @@
 .mac-lights i:nth-child(2) { --sn-g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.3 4h5.4' stroke='%23000' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E"); }
 .mac-lights i:nth-child(3) { --sn-g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M2 1.6h3.2a1.2 1.2 0 0 1 1.2 1.2V6zM6 6.4H2.8A1.2 1.2 0 0 1 1.6 5.2V2z' fill='%23000'/%3E%3C/svg%3E"); }
 .mac-lights:hover i::after { opacity: 1; }
-.mac-body { position: relative; }
+.mac-body { position: relative; border-radius: 0 0 var(--mac-r) var(--mac-r); overflow: hidden; }
 
 /* ———— 3. 文档：演示框 ———— */
 .n-docs .d-demo { display: none; }
@@ -85,8 +94,10 @@
 .dx-stage { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 240px; border-radius: 16px; background: var(--sn-canvas); overflow: hidden; }
 .dx-stage > .d-frame { width: 100%; }
 .dx-open { margin-left: auto; flex: none; }
-/* 窗口：背后是一张桌面壁纸，窗口四周留出桌面 */
-.dx.is-win .dx-stage { padding: 40px; min-height: 0; background: #8a98a0; }
+/* 窗口：直接作为 .dx-stage 主体呈现（不再套多余的照片壁纸背景层），16px 圆角与外框 .dx(22px - 6px) 严格同心 */
+.dx.is-win .dx-stage { padding: 0; min-height: 0; background: transparent; overflow: visible; }
+.dx.is-win .mac { width: 100%; --mac-r: 16px; box-shadow: 0 0 0 1px var(--sn-card-line), 0 1px 2px rgba(0, 0, 0, .04); }
+[data-theme="dark"] .dx.is-win .mac { box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
 .dx-wall { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s var(--sn-ease-out); }
 .dx-wall.ld { opacity: 1; }
 [data-theme="dark"] .dx-wall { filter: brightness(.62) saturate(.9); }
@@ -139,7 +150,7 @@
   .n-docs .d-h1 { font-size: calc(28px * var(--fsx)); line-height: calc(36px * var(--fsx)); }
   .d-head-act { display: none; }
   .dx { padding: 4px; border-radius: 18px; } .dx-stage { border-radius: 14px; }
-  .dx.is-win .dx-stage { padding: 40px 12px 16px; }
+  .dx.is-win .dx-stage { padding: 0; border-radius: 14px; } .dx.is-win .mac { --mac-r: 14px; }
   .dx-bar { flex-wrap: wrap; } .dx-note { flex-basis: 100%; white-space: normal; }
   .cx .sn-l::before { padding: 0 12px 0 10px; }
 }
@@ -491,7 +502,8 @@
    2026-11-21 主会话看图确认是毛病：深色下 iframe 元素也写 dark，两边一致就没有这层底，框里整块是预览框的底色，铺满窗口时也透明，原来那条补色规则不要了。
    浅色下 iframe 还是 normal，和原来一像素不差 */
 [data-theme="dark"] .dx .d-frame iframe { color-scheme: dark; }
-.mac:has(iframe.global) { isolation: auto; } /* 窗口样式的演示铺满窗口时：窗口自己的层叠上下文会把画布压在页头下面，先放开 */
+.mac:has(iframe.global) { overflow: visible; isolation: auto; } /* 窗口样式的演示铺满窗口时：放开裁剪与层叠上下文，防止全屏浮层被压在页头下面 */
+.mac:has(iframe.global) .mac-body { overflow: visible; }
 /* 弹窗、看图时锁住整页：常显的滚动条收起，同时在右边补上滚动条那么宽的内边距（--sbw，锁之前量好），页面一像素都不挪、演示不重新排版。
    不用 scrollbar-gutter: stable 留着滚动条的位置：留着的那一条遮罩盖不到，看图时窗口右边一直亮着一条（2026-11-20 看图边界测试逐帧抓到） */
 html.dx-lock { overflow: hidden; padding-right: var(--sbw, 0px); }
@@ -619,19 +631,38 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .d-cards[style*="--l"] > * { grid-column: span var(--sp, 1); }
 .d-card { display: grid; align-content: start; gap: 4px; padding: 14px 16px 16px; border-radius: 12px; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); text-decoration: none; color: var(--sn-label); transition: background-color .15s var(--sn-ease-out); }
 .n-docs .d-main a.d-card, .n-docs .d-main a.sn-card { text-decoration: none; color: var(--sn-label); }
-.n-docs .d-main .sn-e404-head p { font-size: calc(13px * var(--fsx)); line-height: calc(20px * var(--fsx)); color: var(--sn-label2); }
-.n-docs .d-main .sn-e404-link p { font-size: calc(12px * var(--fsx)); line-height: calc(18px * var(--fsx)); color: var(--sn-label3); }
+.n-docs .d-main .sn-e404-head p { font-size: calc(14px * var(--fsx)); line-height: calc(22px * var(--fsx)); color: var(--sn-label3); }
 @media (hover: hover) { .d-card:hover { background: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); } }
 .d-card:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--sn-card-line), 0 0 0 2px var(--sn-focus); }
 .d-card b { font: 600 calc(15px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); }
 .d-card small { font: 400 calc(12px * var(--fsx))/calc(16px * var(--fsx)) var(--sn-mono); color: var(--sn-label3); }
 .d-card > span { margin-top: 4px; font: 400 calc(13px * var(--fsx))/calc(20px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-.d-rcards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
-.d-rcard { padding: 8px 8px 14px; }
+.d-rcards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 272px), 1fr)); gap: 16px; }
+.d-rcard { padding: 8px 8px 14px; border-radius: 18px; }
 .d-rcard b, .d-rcard > span:last-child { padding: 0 8px; }
-.d-rprev { position: relative; display: block; aspect-ratio: 16 / 10; margin-bottom: 8px; overflow: hidden; border-radius: 8px; background: var(--sn-canvas); box-shadow: inset 0 0 0 1px var(--sn-line); }
-.d-rprev iframe { position: absolute; top: 0; left: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; transform: scale(var(--k, .2)); pointer-events: none; }
-.d-rframe { margin-top: 12px; height: 640px; overflow: hidden; border-radius: 16px; background: var(--sn-canvas); box-shadow: inset 0 0 0 1px var(--sn-card-line); }
+/* 配方总览缩略卡片：干净浅底（10px 圆角与外卡片 18px - 8px 严格同心）+ 迷你 macOS 窗口 / 迷你手机框 */
+.d-rprev { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 10; margin-bottom: 10px; padding: 12px 12px 0; overflow: hidden; border-radius: 10px; background: var(--sn-fill-subtle); }
+[data-theme="dark"] .d-rprev { background: color-mix(in srgb, var(--sn-label) 6%, var(--sn-canvas)); }
+.d-rprev.d-rprev-m { padding: 10px 12px 0; }
+.d-rprev-win { width: 100%; height: 100%; display: flex; flex-direction: column; border-radius: 8px 8px 0 0; overflow: hidden; background: var(--sn-raised); box-shadow: 0 0 0 1px var(--sn-card-line), 0 6px 16px -6px rgba(0, 0, 0, .12); }
+[data-theme="dark"] .d-rprev-win { box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 8px 20px -6px rgba(0, 0, 0, .55); }
+.d-rprev-bar { flex: none; height: 15px; padding: 0 7px; display: flex; align-items: center; gap: 3.5px; background: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); border-bottom: .5px solid var(--sn-line); }
+.d-rprev-bar i { width: 4.5px; height: 4.5px; border-radius: 50%; background: #ff5f57; }
+.d-rprev-bar i:nth-child(2) { background: #febc2e; }
+.d-rprev-bar i:nth-child(3) { background: #28c840; }
+.d-rprev-body { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; background: var(--sn-canvas); }
+.d-rprev-body iframe { position: absolute; top: 0; left: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; transform: scale(var(--k, .2)); pointer-events: none; }
+.d-rprev-phone { width: 92px; height: 100%; display: flex; flex-direction: column; border-radius: 14px 14px 0 0; padding: 5px 5px 0; background: #1c1c1e; box-shadow: 0 0 0 .5px rgba(255, 255, 255, .16), 0 8px 18px -6px rgba(0, 0, 0, .28); }
+.d-rprev-phone .d-rprev-body { border-radius: 9px 9px 0 0; }
+.d-rprev-phone .d-rprev-body iframe { width: 390px; height: 844px; }
+/* 配方详情页舞台：直接满宽呈现干净的 macOS 浏览器窗口，无多余外层背景与照片壁纸 */
+.n-docs .d-page.d-rpage { max-width: 1000px; }
+.d-rstage { margin-top: 12px; }
+.d-rstage .mac { width: 100%; --mac-r: 16px; box-shadow: 0 0 0 1px var(--sn-card-line), 0 12px 32px -12px rgba(0, 0, 0, .09), 0 2px 6px rgba(0, 0, 0, .04); }
+[data-theme="dark"] .d-rstage .mac { box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 18px 40px -14px rgba(0, 0, 0, .65); }
+.d-rstage-mobile { display: flex; justify-content: center; padding: 8px 0 16px; }
+.d-rstage-mobile .s-devbox { margin: 0; }
+.d-rframe { height: 640px; overflow: hidden; background: var(--sn-canvas); }
 .d-rframe iframe { display: block; width: 100%; height: 100%; border: 0; }
 /* 内容页配方：预览框跟着内容长高（fitRecipes 量好设 iframe 的高度），框里不出滚动条；app 式配方还是固定高度 */
 .d-rframe[data-fit="content"] { height: auto; }
@@ -641,7 +672,7 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 /* 顶栏的外观分段控件（跟随系统 / 浅色 / 深色） */
 .s-mode-seg .sn-ic { width: 15px; height: 15px; }
 .s-mode-seg button { padding: 0 8px; }
-@media (max-width: 860px) { .s-nav .s-mode-seg { display: none; } .d-rframe { height: 560px; } }
+@media (max-width: 860px) { .s-nav .s-mode-seg { display: none; } .d-rframe { height: 560px; } .d-rstage .mac { --mac-r: 14px; } .mac-bar { padding: 0 64px; } }
 
 /* 演示框的代码区：写法切换（HTML / React / Vue / 自定义元素）在代码上面一行 */
 .dx-vars { display: flex; align-items: center; gap: 8px; padding: 10px 10px 2px; overflow-x: auto; scrollbar-width: none; }
@@ -811,8 +842,13 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .s-dev-item .s-dev-ck .sn-ic { width: 16px; height: 16px; color: var(--sn-label); }
 .s-dev-item.sn-sel .s-dev-ck { opacity: 1; }
 .s-devfit { position: relative; }
+/* 现代全面屏采用纯净无粗黑框的屏幕浮雕（柔和扩散影 + 1px 细腻硬件边缘）；仅 iPhone SE 保留经典机身边框 */
 .s-dev { position: absolute; left: 0; top: 0; transform-origin: 0 0; width: calc(var(--dw) + var(--bl) + var(--br)); height: calc(var(--dh) + var(--bt) + var(--bb));
-  border-radius: calc(var(--dr) + var(--bt)); background: #1c1c1e; box-shadow: var(--sn-e1); transition: opacity .14s var(--sn-ease-out); }
+  border-radius: calc(var(--dr) + var(--bt)); background: transparent;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .07), 0 2px 6px rgba(0, 0, 0, .04), 0 24px 60px -16px rgba(0, 0, 0, .14);
+  transition: opacity .14s var(--sn-ease-out); }
+[data-theme="dark"] .s-dev { box-shadow: 0 0 0 1px rgba(255, 255, 255, .14), 0 28px 64px -16px rgba(0, 0, 0, .72); }
+.s-dev[data-kind="home"] { background: #1c1c1e; }
 .s-dev.s-dev-out { opacity: 0; }
 /* 屏幕：iframe 放在安全区以内，让出来的那一圈是页面自己的底色（--s-page，device.js 从页面里读） */
 .s-dev-screen { position: absolute; left: var(--bl); top: var(--bt); width: var(--dw); height: var(--dh); border-radius: var(--dr); overflow: hidden; background: var(--s-page, var(--sn-canvas)); }
@@ -828,27 +864,26 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 /* 内容页（.s-under，device.js 按调用方的 under 加）：iframe 顶到屏幕最上沿（页面里让出了状态栏那么高），状态栏那一条压在页面上面——
    页面底色、略透一点，带模糊（像 iOS 的状态栏）：往上滚的内容滑进去是糊开的一片，不跟时间、信号叠成两层字。只在竖屏、有状态栏的机型上 */
 .s-dev.s-under .s-dev-screen::before { z-index: 1; background: color-mix(in srgb, var(--s-band-t, var(--s-page, var(--sn-canvas))) 82%, transparent); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
-/* 状态栏（竖屏）：时间、信号、Wi-Fi、电量，正文色，不加底；字号照真机。压在页面和上面那条底色上面 */
+/* 状态栏（竖屏）：时间、信号、Wi-Fi、电量，正文色，不加底；字号与灵动岛比例精准对齐 */
 .s-dev-sb { position: absolute; z-index: 2; left: 0; right: 0; top: 0; height: var(--sb-h); display: none; align-items: center; color: var(--sn-label); pointer-events: none; user-select: none; font-variant-numeric: tabular-nums; }
 .s-dev.s-has-sb .s-dev-sb { display: grid; }
 .s-dev-sb svg { display: block; flex: none; }
-.s-sb-ic { display: flex; align-items: flex-end; gap: 5px; } /* 图标都是 12 高、底边对齐 */
-.s-dev[data-kind="island"] .s-dev-sb { top: 11px; height: 37px; grid-template-columns: minmax(0, 1fr) 126px minmax(0, 1fr); justify-items: center; font: 600 17px/1 var(--sn-sans); letter-spacing: -.01em; }
+.s-sb-ic { display: flex; align-items: center; gap: 5.5px; }
+.s-dev[data-kind="island"] .s-dev-sb { top: 12px; height: 31px; grid-template-columns: minmax(0, 1fr) 114px minmax(0, 1fr); justify-items: center; font: 600 15.5px/1 var(--sn-sans); letter-spacing: -.015em; }
 .s-dev[data-kind="island"] .s-sb-ic { grid-column: 3; }
-.s-dev[data-kind="home"] .s-dev-sb { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding: 0 6px; font: 600 12px/1 var(--sn-sans); }
+.s-dev[data-kind="home"] .s-dev-sb { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding: 0 8px; font: 600 12px/1 var(--sn-sans); }
 .s-dev[data-kind="home"] .s-sb-ic { gap: 5px; }
 .s-dev[data-kind="home"] .s-sb-r { justify-self: end; }
-.s-dev[data-kind="punch"] .s-dev-sb { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 2px 20px 0; font: 500 14px/1 var(--sn-sans); }
+.s-dev[data-kind="punch"] .s-dev-sb { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 2px 22px 0; font: 500 14px/1 var(--sn-sans); }
 .s-dev[data-kind="punch"] .s-sb-ic { justify-self: end; gap: 6px; }
-/* 灵动岛、打孔、横条指示、Home 键压在一切上面（z-index 3）：内容页上面那条半透明模糊带（z 1）、时间图标（z 2）都在它下面——
-   不然模糊带盖住灵动岛，灵动岛糊成一团灰（主会话 11-22 转达用户截图）。灵动岛永远是清楚的黑色胶囊 */
+/* 灵动岛、打孔、横条指示、Home 键压在一切上面（z-index 3） */
 .s-dev > i { position: absolute; z-index: 3; display: none; pointer-events: none; }
-/* iPhone：灵动岛（126 × 37，离顶 11）、底部横条（134 × 5，离底 8）；横屏时岛在左边、横条变长 */
-.s-dev[data-kind="island"] .s-dev-cut { display: block; left: 50%; top: calc(var(--bt) + 11px); width: 126px; height: 37px; margin-left: -63px; border-radius: 19px; background: #000; }
-.s-dev[data-kind="island"].s-land .s-dev-cut { left: calc(var(--bl) + 11px); top: 50%; width: 37px; height: 126px; margin: -63px 0 0; }
-.s-dev[data-kind="island"] .s-dev-ind { display: block; left: 50%; bottom: calc(var(--bb) + 8px); width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: rgba(0, 0, 0, .8); }
-.s-dev[data-kind="island"].s-land .s-dev-ind { width: 220px; margin-left: -110px; }
-[data-theme="dark"] .s-dev[data-kind="island"] .s-dev-ind { background: rgba(255, 255, 255, .75); }
+/* iPhone：修长克制的灵动岛（112 × 31，离顶 12）、底部横条（130 × 4.5，离底 9） */
+.s-dev[data-kind="island"] .s-dev-cut { display: block; left: 50%; top: calc(var(--bt) + 12px); width: 112px; height: 31px; margin-left: -56px; border-radius: 16px; background: #0a0a0c; }
+.s-dev[data-kind="island"].s-land .s-dev-cut { left: calc(var(--bl) + 12px); top: 50%; width: 31px; height: 112px; margin: -56px 0 0; }
+.s-dev[data-kind="island"] .s-dev-ind { display: block; left: 50%; bottom: calc(var(--bb) + 9px); width: 130px; height: 4.5px; margin-left: -65px; border-radius: 3px; background: rgba(0, 0, 0, .82); }
+.s-dev[data-kind="island"].s-land .s-dev-ind { width: 210px; margin-left: -105px; }
+[data-theme="dark"] .s-dev[data-kind="island"] .s-dev-ind { background: rgba(255, 255, 255, .78); }
 /* 安卓打孔屏：前摄一个小圆孔（横屏时在左边）；底部一条手势条（比 iPhone 的横条短、细） */
 .s-dev[data-kind="punch"] .s-dev-cut { display: block; left: 50%; top: calc(var(--bt) + 12px); width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #000; }
 .s-dev[data-kind="punch"].s-land .s-dev-cut { left: calc(var(--bl) + 12px); top: 50%; margin: -6px 0 0; }
@@ -895,12 +930,12 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .dx-phone-btn[aria-pressed="true"] { --sn-bg: var(--sn-fill-active); --sn-fg: var(--sn-label); }
 @media (max-width: 860px) { .dx-phone-btn { display: none; } .dx.dx-phone .dx-stage > .d-frame { display: block; } .dx.dx-phone .dx-stage > .s-devbox { display: none; } }
 .d-devpage .d-table td:first-child { white-space: normal; } /* 这一页正文那栏让出了设备框的位置，表格第一列也要能折行，不然"处理"那列被挤到要横滑 */
-/* 桌面配方的"在手机上看"：开关在预览上面一行；开着时整宽预览藏起来（还在页面里），换成设备框；手机上不出开关 */
-.d-rbar { display: flex; justify-content: flex-end; margin-top: var(--sn-sp-12); }
+/* 桌面配方的"在手机上看"：开关在预览上面一行；开着时自然壁纸桌面窗口藏起来（还在页面里），换成设备框；手机上不出开关 */
+.d-rbar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: var(--sn-sp-12); }
 .d-rwrap:not(.d-rphone) > .s-devbox { display: none; }
-.d-rwrap.d-rphone > .d-rframe { display: none; }
-.d-rwrap.d-rphone > .s-devbox { margin-top: var(--sn-sp-8); }
-@media (max-width: 860px) { .d-rbar { display: none; } .d-rwrap.d-rphone > .d-rframe { display: block; } .d-rwrap.d-rphone > .s-devbox { display: none; } }
+.d-rwrap.d-rphone > .d-rstage { display: none; }
+.d-rwrap.d-rphone > .s-devbox { margin-top: var(--sn-sp-12); }
+@media (max-width: 860px) { .d-rbar { display: none; } .d-rwrap.d-rphone > .d-rstage { display: block; } .d-rwrap.d-rphone > .s-devbox { display: none; } }
 
 /* ———— 12. 内容加载与过渡体系（实装于官网文档页切换与演示框加载） ———— */
 /* 文档页正文原子提交后的柔和显影：只动 opacity 与微小位移（5px），拒绝白屏硬砸 */

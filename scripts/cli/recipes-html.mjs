@@ -14,6 +14,7 @@ for (const id of ids) {
   if (!fs.existsSync(file)) { console.log(`  ✗ 没有 ${path.relative(ROOT, file)}（先跑 node scripts/skill/recipes-render.mjs）`); process.exitCode = 1; continue; }
   let html = fs.readFileSync(file, "utf8");
   const title = (html.match(/<title>配方 · ([^<]+)<\/title>/) || [, id])[1];
+  html = html.replace(/import \{ toast \} from "satin-ui\/components";\n/, "").replace(/\/\* satin-preview-guard:start \*\/[\s\S]*?\/\* satin-preview-guard:end \*\/\n?/, "");
   html = html.replaceAll("../../packages/satin-ui/", "/node_modules/satin-ui/").replace(/<title>配方 · ([^<]+)<\/title>/, "<title>$1</title>");
   if (html.includes("../../")) { console.log(`  ✗ ${id}：换完路径还有指向仓库的相对路径`); process.exitCode = 1; continue; }
   const dir = path.join(OUT, id, "html");

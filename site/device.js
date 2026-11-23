@@ -23,31 +23,31 @@ export const DEVICES = [
   { id: "android-360", name: "安卓 360 × 800", w: 360, h: 800, r: 24, kind: "punch", safe: { p: [32, 0, 16, 0], l: [0, 0, 16, 32] } },
 ];
 const byId = Object.fromEntries(DEVICES.map((d) => [d.id, d]));
-// 边框厚度：现代机型四周一样；SE 上下宽（放听筒、Home 键）
-const bezel = (d, land) => (d.kind === "home" ? (land ? [16, 72, 16, 72] : [72, 16, 72, 16]) : [10, 10, 10, 10]);
+// 边框厚度：现代全面屏采用极简无粗黑框的纯净屏幕硬件轮廓（对标现代作品集级展示壳）；SE 保留经典上下额头与 Home 键
+const bezel = (d, land) => (d.kind === "home" ? (land ? [12, 64, 12, 64] : [64, 12, 64, 12]) : [0, 0, 0, 0]);
 const KEY = "satin-device";
 const pref = () => { try { const v = JSON.parse(localStorage.getItem(KEY) || "{}"); return { id: byId[v.id] ? v.id : "iphone-15", land: !!v.land }; } catch { return { id: "iphone-15", land: false }; } };
 const save = (p) => { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch {} };
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 let n = 0;
-// 状态栏（竖屏）：iPhone 时间在灵动岛左边那块的正中、图标在右边那块；SE 时间居中、信号在左、电量在右；安卓时间靠左、图标靠右。图形只用 currentColor
-// 三个图标一样高（12）、底边对齐、间距统一（iPhone 5px、安卓 6px），视觉分量相当：
-// · 信号：4 格等宽（3）、顶部圆角、高度递增（4.5 → 12）
-// · Wi-Fi：以底部一点为圆心的三层——最下面一个小扇形，上面两段同心弧（粗 2、端点圆），上宽下窄，±45°；层与层间隔一样（1.5）
-// · 电量：描边的圆角矩形（描边淡一点），里面一截电量（约 3/4，不是整块实心），右边一个小凸头
-// 安卓（Material）同样的标准：Wi-Fi 是一整块扇形、信号是直角三角形（拐角都是圆的），电池竖着、描边 + 电量 + 顶上凸头
-const SVG = (w, h, vb, body) => `<svg width="${w}" height="${h}" viewBox="${vb}" fill="currentColor" aria-hidden="true">${body}</svg>`;
-const bar = (x, y) => `<path d="M${x} 12V${y + 1}a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1V12Z"/>`;
+// 状态栏（竖屏）：全套采用纯 fill 闭环实心矢量路径（零 stroke、配 geometricPrecision），彻底消除在任意非整数 transform: scale() 下的毛刺、发虚与切顶
+const SVG = (w, h, vb, body) => `<svg width="${w}" height="${h}" viewBox="${vb}" fill="currentColor" shape-rendering="geometricPrecision" aria-hidden="true">${body}</svg>`;
 const IOS = {
-  sig: SVG(17, 12, "0 0 17 12", bar(0, 7.5) + bar(4.67, 5.5) + bar(9.33, 3) + bar(14, 0)),
-  wifi: SVG(18, 12, "0 0 18 12", '<path d="M9 11.1 6.1 8.2a4.1 4.1 0 0 1 5.8 0Z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>'
-    + '<path d="M4 6.6a7.1 7.1 0 0 1 10 0M1.5 4.1a10.6 10.6 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'),
-  bat: SVG(27, 12, "0 0 27 12", '<rect x=".5" y=".5" width="23" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="15" height="8" rx="2"/><path d="M25 4v4c.9-.3 1.5-1.1 1.5-2S25.9 4.3 25 4Z" opacity=".45"/>'),
+  // 信号：4 根圆润递增实心柱（17 × 12）
+  sig: SVG(17, 12, "0 0 17 12", '<rect x="0.5" y="7.5" width="3" height="4.5" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="9.5" y="3" width="3" height="9" rx="1"/><rect x="14" y="0.5" width="3" height="11.5" rx="1"/>'),
+  // Wi-Fi：3 层纯实心闭环圆角扇弧 + 底部圆点（18 × 13，顶距留足 1.2px 绝不切头，零 stroke 零毛刺）
+  wifi: SVG(18, 13, "0 0 18 13", '<path d="M2.47 3.84A9.4 9.4 0 0 1 15.53 3.84A0.95 0.95 0 0 1 14.21 5.21A7.5 7.5 0 0 0 3.79 5.21A0.95 0.95 0 0 1 2.47 3.84Z"/>'
+    + '<path d="M4.98 6.44A5.78 5.78 0 0 1 13.02 6.44A0.93 0.93 0 0 1 11.72 7.78A3.92 3.92 0 0 0 6.28 7.78A0.93 0.93 0 0 1 4.98 6.44Z"/>'
+    + '<circle cx="9" cy="10.6" r="1.45"/>'),
+  // 电量：纯 fill evenodd 镂空圆角外框 + 饱满圆角满电电芯 + 圆润正极凸耳（27 × 13，零 stroke）
+  bat: SVG(27, 13, "0 0 27 13", '<path fill-rule="evenodd" d="M3.8 0.5H20.2A3.3 3.3 0 0 1 23.5 3.8V9.2A3.3 3.3 0 0 1 20.2 12.5H3.8A3.3 3.3 0 0 1 0.5 9.2V3.8A3.3 3.3 0 0 1 3.8 0.5ZM3.8 1.6A2.2 2.2 0 0 0 1.6 3.8V9.2A2.2 2.2 0 0 0 3.8 11.4H20.2A2.2 2.2 0 0 0 22.4 9.2V3.8A2.2 2.2 0 0 0 20.2 1.6Z" opacity=".38"/>'
+    + '<rect x="2.5" y="2.5" width="19" height="8" rx="1.8"/>'
+    + '<path d="M24.6 4.4V8.6C25.55 8.28 26.2 7.46 26.2 6.5S25.55 4.72 24.6 4.4Z" opacity=".42"/>'),
 };
 const DROID = {
-  wifi: SVG(16, 12, "0 0 16 12", '<path d="M8 11.3.9 4.3a10 10 0 0 1 14.2 0Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>'),
-  sig: SVG(12, 12, "0 0 12 12", '<path d="M11.4 .9v10.5H.9Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>'),
-  bat: SVG(8, 12, "0 0 8 12", '<rect x="2.5" y="0" width="3" height="1.6" rx=".6"/><rect x=".5" y="1.5" width="7" height="10" rx="1.6" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="5" width="4" height="5" rx=".8"/>'),
+  wifi: SVG(16, 12, "0 0 16 12", '<path d="M8 11.2 1.2 4.4A9.8 9.8 0 0 1 14.8 4.4Z"/>'),
+  sig: SVG(12, 12, "0 0 12 12", '<path d="M11.2 1.2V11.2H1.2Z"/>'),
+  bat: SVG(8, 12, "0 0 8 12", '<rect x="2.5" y="0.2" width="3" height="1.5" rx="0.5"/><path fill-rule="evenodd" d="M1.8 1.8H6.2A1.3 1.3 0 0 1 7.5 3.1V10.5A1.3 1.3 0 0 1 6.2 11.8H1.8A1.3 1.3 0 0 1 0.5 10.5V3.1A1.3 1.3 0 0 1 1.8 1.8ZM1.8 2.8A0.3 0.3 0 0 0 1.5 3.1V10.5A0.3 0.3 0 0 0 1.8 10.8H6.2A0.3 0.3 0 0 0 6.5 10.5V3.1A0.3 0.3 0 0 0 6.2 2.8Z" opacity=".42"/><rect x="2" y="4.8" width="4" height="5.5" rx="0.6"/>'),
 };
 const sbHTML = (kind) => kind === "island" ? `<span class="s-sb-t">9:41</span><span class="s-sb-ic">${IOS.sig}${IOS.wifi}${IOS.bat}</span>`
   : kind === "home" ? `<span class="s-sb-ic s-sb-l">${IOS.sig}${IOS.wifi}</span><span class="s-sb-t">9:41</span><span class="s-sb-ic s-sb-r">${IOS.bat}</span>`
@@ -199,4 +199,15 @@ export function mountDevices(scope = document) {
 addEventListener("resize", () => { for (const b of boxes) if (b.isConnected) fit(b); else boxes.delete(b); });
 // 换深浅：设备里的页面同源，直接改它的 data-theme（localStorage 也是同一份，重新载入时也对）
 // 页面换底色可能带过渡：换完马上读一次，过渡走完再读一次
-onMode((t) => { for (const b of boxes) { if (!b.isConnected) continue; try { $("iframe", b).contentDocument.documentElement.dataset.theme = t; } catch {} syncBg(b); setTimeout(() => syncBg(b), 400); } });
+const syncThemeAll = (t) => {
+  for (const b of boxes) {
+    if (!b.isConnected) continue;
+    try { if (t) $("iframe", b).contentDocument.documentElement.dataset.theme = t; } catch {}
+    syncBg(b);
+    setTimeout(() => syncBg(b), 400);
+  }
+};
+onMode(syncThemeAll);
+if (typeof MutationObserver === "function") {
+  new MutationObserver(() => syncThemeAll(document.documentElement.dataset.theme)).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
