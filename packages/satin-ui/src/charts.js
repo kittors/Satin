@@ -320,6 +320,7 @@ function mountAreaChart(root, opts = {}) {
 
 export const createAreaChart = /* @__PURE__ */ defineComponent({
   name: "area-chart",
+  html: () => '<div class="sn-ch-host"></div>',
   mount(el, o) { return mountAreaChart(el, o); },
 });
 
@@ -505,6 +506,7 @@ function mountBarChart(root, opts = {}) {
 
 export const createBarChart = /* @__PURE__ */ defineComponent({
   name: "bar-chart",
+  html: () => '<div class="sn-ch-host"></div>',
   mount(el, o) { return mountBarChart(el, o); },
 });
 
@@ -656,6 +658,7 @@ function mountDonutChart(root, opts = {}) {
 
 export const createDonutChart = /* @__PURE__ */ defineComponent({
   name: "donut-chart",
+  html: () => '<div class="sn-ch-host"></div>',
   mount(el, o) { return mountDonutChart(el, o); },
 });
 
@@ -983,6 +986,7 @@ function mountChart3D(root, opts = {}) {
 
 export const createChart3D = /* @__PURE__ */ defineComponent({
   name: "chart-3d",
+  html: () => '<div class="sn-ch-host"></div>',
   mount(el, o) { return mountChart3D(el, o); },
 });
 
@@ -1039,6 +1043,7 @@ function mountSparkline(root, opts = {}) {
 
 export const createSparkline = /* @__PURE__ */ defineComponent({
   name: "sparkline",
+  html: () => '<div class="sn-ch-host"></div>',
   mount(el, o) { return mountSparkline(el, o); },
 });
 

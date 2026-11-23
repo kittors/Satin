@@ -94,3 +94,34 @@ export const chatNew = <ChatR title="新对话" empty={{ icon: "clapperboard", t
   context={[{ icon: "folder", text: "雨夜车站" }]} mode={{ label: "完全访问", tone: "warn" }} models={[{ value: "fine", label: "分镜模型 · 精细" }]} model="fine" onModelChange={(v) => { const s: string = v; void s; }} />;
 export const chatOwnEmpty = <ChatR renderEmpty={() => <p>自己画的空状态</p>} />;
 export const composerNew = <ComposerR context={[{ text: "本地", options: [{ value: "local", label: "本地" }], value: "local" }]} onContextChange={(e) => { const v: string = e.value; void v; }} mode="只读" />;
+
+// 动感 Loader、升级版 Progress、声明式 SatinProvider / ThemeScope / useTheme、图表子路径与 ThreadRail
+import { Loader, Progress, SatinProvider, ThemeScope, useTheme } from "satin-ui/react";
+import { ThreadRail } from "satin-ui/react/chat";
+import { AreaChart, BarChart, DonutChart, Chart3D, Sparkline, Icon3D } from "satin-ui/react/charts";
+export function NewApis() {
+  const { mode, theme, setMode, setTheme, resetTheme } = useTheme();
+  void mode; void theme.radius;
+  return (
+    <SatinProvider mode="auto" theme={{ accent: "blue", radius: "8", line: "normal", motion: "crisp" }} persist={false}>
+      <ThemeScope mode="dark" accent="indigo">
+        <Loader variant="matrix" size="lg" speed={1.2} />
+        <Loader variant="arc" size={24} color="var(--sn-accent)" />
+        {/* @ts-expect-error 不存在的 loader 变体要报错 */}
+        <Loader variant="spin-fake" />
+        <Progress value={0.68} segments={8} tone="ok" />
+        <Progress value={0.75} ring svg showValue size="lg" />
+        <Progress value={0.42} active height={6} />
+        <ChatR title="助手" rail="left" meta={{ time: true, latency: true, tps: true }} caret="dot" />
+        <ThreadRail side="right" max={12} onSelect={(e) => void e.item.summary} />
+        <AreaChart labels={["1", "2"]} series={[{ name: "镜头", values: [12, 24] }]} height={220} />
+        <BarChart labels={["A", "B"]} series={[{ name: "完成", values: [5, 9] }]} onSelect={(l) => void l} />
+        <DonutChart items={[{ label: "已完成", value: 42 }]} totalLabel="总镜头" />
+        <Chart3D rows={["一", "二"]} cols={["A", "B"]} values={[[1, 2], [3, 4]]} />
+        <Sparkline values={[1, 3, 2, 5]} />
+        <Icon3D name="layers" tone="cobalt" size="md" />
+        <button type="button" onClick={() => { setMode("dark"); setTheme({ accent: "green" }); resetTheme(); }}>切主题</button>
+      </ThemeScope>
+    </SatinProvider>
+  );
+}

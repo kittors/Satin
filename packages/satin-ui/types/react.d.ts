@@ -1,6 +1,7 @@
 // satin-ui/react
 import type * as React from "react";
-import type { SatinInstance, Item, AvatarOptions, EmptyArtOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions, TableColumn, TableCellContext, TableApi, ComposerParts, ComposerPartEvents } from "./components";
+import type { SatinInstance, Item, AvatarOptions, EmptyArtOptions, ProgressOptions, LoaderOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions, TableColumn, TableCellContext, TableApi, ComposerParts, ComposerPartEvents } from "./components";
+import type { ThemeChoice } from "./theme";
 type Base = { className?: string; style?: React.CSSProperties; id?: string };
 type Controlled<T, K extends string = "value"> = { [P in K]?: T } & { [P in `default${Capitalize<K>}`]?: T };
 type Ref = React.Ref<SatinInstance | null>;
@@ -61,8 +62,11 @@ export const Switch: React.ForwardRefExoticComponent<SwitchProps & React.RefAttr
 /** 芯片：onChange（受控时再给 selected）或 defaultSelected 给了是能切换的筛选芯片（button）；removable 是能移除的标签（收起动画放完才调 onRemove）；都没给只显示（selected 决定选中的样子） */
 export type ChipProps = Omit<React.HTMLAttributes<HTMLElement>, "onChange"> & { selected?: boolean; defaultSelected?: boolean; onChange?(selected: boolean): void; removable?: boolean; onRemove?(): void; removeLabel?: string };
 export const Chip: React.ForwardRefExoticComponent<ChipProps & React.RefAttributes<HTMLElement>>;
-export type ProgressProps = { /** 0～1；不给是不知道还要多久 */ value?: number; ring?: boolean; size?: "lg"; /** 读屏读出来的名字 */ label?: string; className?: string };
+export type ProgressProps = ProgressOptions & { /** 读屏读出来的名字 */ label?: string; className?: string; style?: React.CSSProperties };
 export function Progress(p: ProgressProps): React.ReactElement;
+/** 动感几何加载器：<Loader variant="matrix" size="lg" />，8 款物理微动效，全面支持 size / color / speed 定制 */
+export type LoaderProps = LoaderOptions & { className?: string; style?: React.CSSProperties };
+export function Loader(p?: LoaderProps): React.ReactElement;
 export function Spinner(p: { size?: "lg"; /** 读屏读出来的名字，默认"加载中" */ label?: string; className?: string }): React.ReactElement;
 export function Steps(p: { steps: React.ReactNode[]; current?: number; className?: string }): React.ReactElement;
 export function Text(p: React.HTMLAttributes<HTMLElement> & { as?: keyof React.JSX.IntrinsicElements; level?: "display" | "title1" | "title2" | "title3" | "body" | "bodyStrong" | "callout" | "caption" | "micro" | "code"; tone?: "primary" | "secondary" | "tertiary" | "off" | "danger" | "success" | "warning"; num?: boolean; truncate?: boolean }): React.ReactElement;
@@ -74,8 +78,14 @@ export interface DialogProps { open: boolean; onClose?(): void; title?: React.Re
 export function Dialog(p: DialogProps): React.ReactElement;
 export type DrawerProps = { open: boolean; onClose?(): void; title?: React.ReactNode; footer?: React.ReactNode; children?: React.ReactNode; className?: string };
 export function Drawer(p: DrawerProps): React.ReactElement;
-/** 应用根部装一次页面级行为（Tooltip、浮层栈、Esc 关浮层……）：createRoot(el).render(<SatinProvider><App /></SatinProvider>)；不放也行（组件第一次挂载时自己装） */
-export function SatinProvider(p: { children?: React.ReactNode }): React.ReactNode;
+/** 应用根部装一次页面级行为，并支持声明式配置全局深浅模式与主题：<SatinProvider mode="auto" theme={{ accent: "blue", radius: "8" }}><App /></SatinProvider> */
+export interface SatinProviderProps { mode?: "auto" | "light" | "dark"; theme?: Partial<ThemeChoice>; /** 是否同步持久化到 localStorage（默认 false，不覆盖用户已选偏好） */ persist?: boolean; children?: React.ReactNode }
+export function SatinProvider(p: SatinProviderProps): React.ReactNode;
+/** 局部主题作用域：<ThemeScope mode="dark" accent="blue">…</ThemeScope>，仅作用于当前容器 */
+export type ThemeScopeProps = React.HTMLAttributes<HTMLElement> & Partial<ThemeChoice> & { as?: keyof React.JSX.IntrinsicElements; mode?: "light" | "dark" };
+export const ThemeScope: React.ForwardRefExoticComponent<ThemeScopeProps & React.RefAttributes<HTMLElement>>;
+/** 响应式主题 Hook：读写深浅模式与主色 / 圆角 / 线条 / 动效令牌 */
+export function useTheme(): { mode: "auto" | "light" | "dark"; theme: ThemeChoice; setMode(mode: "auto" | "light" | "dark", options?: { animate?: boolean; persist?: boolean }): void; setTheme(patch: Partial<ThemeChoice>): void; resetTheme(): void };
 export function toast(o: ToastOptions): ToastHandle;
 export function notify(o: NotifyOptions): import("./components").NotifyHandle;
 export function useSatin(): React.MutableRefObject<SatinInstance | null>;

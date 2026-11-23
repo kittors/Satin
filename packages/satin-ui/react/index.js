@@ -9,6 +9,7 @@ import { createElement as h, forwardRef, useEffect, useRef, useState, useId, use
 import { createRoot } from "react-dom/client";
 import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
+import { get as getTheme, set as setThemeChoice, reset as resetThemeChoice, paint as paintTheme, applyTheme, onChange as onThemeChange, getMode, setMode, DEFAULTS as THEME_DEFAULTS } from "../src/theme.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
 import { initSeg } from "../src/core.js";
 import { ICONS } from "../src/icons.js";
@@ -158,12 +159,44 @@ export const Chip = /* @__PURE__ */ forwardRef(function Chip({ selected, default
   }
   return h("span", { ...rest, ref: setRefs, className: cx("sn-chip", on && "sn-on", className) }, children);
 });
-// 进度：value 0～1，不给是不知道还要多久；读屏：role="progressbar"、aria-valuenow（百分数），label 是读出来的名字
+// 进度：value 0～1，不给是不确定双段变速条；支持 active 微光、tone 状态色、segments 分段刻度、ring / svg 圆头数值环、height 自定义粗细
 const progressAria = (value, label) => ({ role: "progressbar", "aria-label": label, ...(value == null ? {} : { "aria-valuenow": Math.round(value * 100), "aria-valuemin": 0, "aria-valuemax": 100 }) });
-export function Progress({ value, ring, size, label, className }) {
+export function Progress({ value, ring, svg: svgRing, size, tone, active, segments, showValue, height, label, className, style }) {
+  const tn = tone && tone !== "run" ? `sn-${tone}` : "";
+  if (segments > 0) {
+    const p = Math.max(0, Math.min(1, value ?? 0)), filled = Math.floor(p * segments), partial = p > 0 && p < 1 && filled < segments;
+    return h("div", { className: cx("sn-pseg", tn, className), style: height ? { ...style, "--sn-p-h": `${height}px` } : style, ...progressAria(p, label) },
+      Array.from({ length: segments }, (_, i) => h("i", { key: i, className: i < filled ? "sn-done" : i === filled && partial ? "sn-cur" : undefined })));
+  }
+  if (ring && (svgRing || showValue)) {
+    const p = Math.max(0, Math.min(1, value ?? 0)), v = String(+p).replace(/^0\./, ".");
+    return h("span", { className: cx("sn-pring-svg", size && size !== "md" && `sn-${size}`, tn, className), style: { ...style, "--sn-p": v }, ...progressAria(p, label) },
+      h("svg", { viewBox: "0 0 36 36", "aria-hidden": "true" },
+        h("circle", { className: "sn-pr-tr", cx: 18, cy: 18, r: 15.9 }),
+        h("circle", { className: "sn-pr-fg", cx: 18, cy: 18, r: 15.9, pathLength: 100 })),
+      showValue ? h("b", null, `${Math.round(p * 100)}%`) : null);
+  }
   const v = value == null ? undefined : String(+value).replace(/^0\./, ".");
-  return ring ? h("span", { className: cx("sn-pring", size === "lg" && "sn-lg", className), style: { "--sn-p": v ?? "0" }, ...progressAria(value ?? 0, label) })
-    : h("div", { className: cx("sn-pbar", value == null && "sn-indet", className), style: v != null ? { "--sn-p": v } : undefined, ...progressAria(value, label) }, h("i"));
+  if (ring) return h("span", { className: cx("sn-pring", size === "lg" && "sn-lg", className), style: { ...style, "--sn-p": v ?? "0" }, ...progressAria(value ?? 0, label) });
+  const barStyle = { ...style, ...(v != null ? { "--sn-p": v } : null), ...(height ? { "--sn-p-h": `${height}px` } : null) };
+  return h("div", { className: cx("sn-pbar", value == null && "sn-indet", active && "sn-active", size && size !== "md" && `sn-${size}`, tn, className), style: Object.keys(barStyle).length ? barStyle : undefined, ...progressAria(value, label) }, h("i"));
+}
+// 动感几何加载器：8 款纯 CSS/SVG 物理动效（matrix / dots / arc / orbit / bars / grid / radar / morph），全面支持 size / color / speed 定制
+const LD_NODES = {
+  matrix: () => Array.from({ length: 9 }, (_, i) => h("i", { key: i })),
+  dots: () => Array.from({ length: 3 }, (_, i) => h("i", { key: i })),
+  arc: () => [h("svg", { key: "s", viewBox: "0 0 24 24", "aria-hidden": "true" }, h("circle", { className: "sn-ld-tr", cx: 12, cy: 12, r: 9 }), h("circle", { className: "sn-ld-hd", cx: 12, cy: 12, r: 9 }))],
+  orbit: () => [h("i", { key: 0 }), h("i", { key: 1 })],
+  bars: () => Array.from({ length: 4 }, (_, i) => h("i", { key: i })),
+  grid: () => Array.from({ length: 4 }, (_, i) => h("i", { key: i })),
+  radar: () => [h("i", { key: 0 }), h("i", { key: 1 }), h("b", { key: 2 })],
+  morph: () => [h("i", { key: 0 })],
+};
+export function Loader({ variant = "matrix", size, color, speed, label, className, style }) {
+  const v = Object.hasOwn(LD_NODES, variant) ? variant : "matrix";
+  const st = { ...style, ...(typeof size === "number" ? { "--sn-ld-size": `${size}px` } : null), ...(color ? { "--sn-ld-color": color } : null), ...(speed != null && speed !== 1 ? { "--sn-ld-speed": String(speed) } : null) };
+  return h("span", { className: cx("sn-ld", `sn-ld-${v}`, typeof size === "string" && size !== "md" && `sn-${size}`, className), role: "status", style: Object.keys(st).length ? st : undefined },
+    ...LD_NODES[v](), h("span", { className: "sn-sr" }, label ?? tt("components.loading")));
 }
 export function Spinner({ size, label, className }) { return h("span", { className: cx("sn-spinner", size === "lg" && "sn-lg", className), role: "status", "aria-label": label ?? tt("components.loading") }); }
 export function Steps({ steps = [], current = 0, className }) {
@@ -205,12 +238,43 @@ export function Drawer({ open, onClose, title, children, footer, className }) {
     h("div", { className: "sn-bd" }, children), footer ? h("div", { className: "sn-ft" }, footer) : null);
 }
 
-// ———— 应用根部：页面级行为（Tooltip、浮层栈、Esc 关浮层、复选框的弹跳……）装一次 ————
-// 放在应用最外面：createRoot(el).render(<SatinProvider><App /></SatinProvider>)。
-// 不放也能用（任何一个 Satin 组件第一次挂载时会自己装上），放了以后 Toast、通知、纯类名写的按钮这些从第一帧起就有完整的行为；卸载时撤掉
-export function SatinProvider({ children }) {
+// ———— 应用根部：页面级行为装一次，并支持声明式配置全局深浅模式与主题（对标 ConfigProvider） ————
+// 用法：<SatinProvider mode="auto" theme={{ accent: "blue", radius: "8", line: "normal", motion: "crisp" }}><App /></SatinProvider>
+export function SatinProvider({ mode, theme, persist = false, children }) {
+  const themeKey = theme ? JSON.stringify(theme) : "";
   useIso(() => setup(), []);
+  useIso(() => {
+    if (mode) setMode(mode, { animate: false, persist });
+  }, [mode, persist]);
+  useIso(() => {
+    if (!themeKey) return;
+    const t = JSON.parse(themeKey);
+    if (persist) setThemeChoice(t);
+    else paintTheme(document.documentElement, { ...THEME_DEFAULTS, ...getTheme(), ...t });
+  }, [themeKey, persist]);
   return children ?? null;
+}
+
+// 局部主题作用域：让页面某一块独立使用深浅主题 / 主色 / 圆角 / 动效节奏，不触碰根元素和 localStorage
+export const ThemeScope = /* @__PURE__ */ forwardRef(function ThemeScope({ as = "div", mode, accent, custom, font, scale, radius, line, motion, success, warning, danger, className, style, children, ...rest }, ref) {
+  const own = useRef(null);
+  const setRefs = (n) => { own.current = n; if (typeof ref === "function") ref(n); else if (ref) ref.current = n; };
+  useIso(() => {
+    const el = own.current; if (!el) return;
+    return applyTheme(el, { mode, accent, custom, font, scale, radius, line, motion, success, warning, danger });
+  }, [mode, accent, custom, font, scale, radius, line, motion, success, warning, danger]);
+  return h(as, { ...rest, ref: setRefs, className, style }, children);
+});
+
+// 响应式主题 Hook：读取当前主题与深浅模式，并提供 setMode / setTheme / resetTheme
+export function useTheme() {
+  const [theme, setState] = useState(() => (typeof document === "undefined" ? { ...THEME_DEFAULTS } : getTheme()));
+  const [mode, setModeState] = useState(() => (typeof document === "undefined" ? "auto" : getMode()));
+  useEffect(() => onThemeChange((t) => setState(t)), []);
+  const updateMode = useCallback((m, opts) => { setMode(m, opts); setModeState(m); }, []);
+  const updateTheme = useCallback((patch) => { setThemeChoice(patch); setState(getTheme()); }, []);
+  const reset = useCallback(() => { resetThemeChoice(); setState(getTheme()); }, []);
+  return { mode, theme, setMode: updateMode, setTheme: updateTheme, resetTheme: reset };
 }
 
 // ———— 命令式：Toast、通知 ————

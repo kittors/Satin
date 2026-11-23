@@ -485,9 +485,15 @@ export default function ExportProgress() {
 |---|---|---|---|---|---|
 | `value` | `number` | 不给是不定进度 | 否 | 进度 0～1；不给时进度条来回走（不知道还要多久）。 | React：`value`；Preact：`value`；Vue：`value`；纯 HTML：`--sn-p（0～1）+ aria-valuenow（百分数）` |
 | `ring` | `boolean` | false | 否 | 换成进度环：放在缩略图、按钮、列表行里。 | React：`ring`；Preact：`ring`；Vue：`ring`；纯 HTML：`.sn-pring` |
-| `size` | `"lg"` | — | 否 | 大一号的进度环、转圈。 | React：`size`；Preact：`size`；Vue：`size`；纯 HTML：`sn-lg` |
+| `svg` | `boolean` | false | 否 | 配合 ring 使用，改用圆头 SVG 矢量环（支持中心数值与平滑弧长过渡）。 | React：`svg`；Preact：`svg`；Vue：`svg`；纯 HTML：`.sn-pring-svg` |
+| `size` | `"sm" \| "md" \| "lg"` | "md" | 否 | 尺寸档位（小 / 中 / 大）。 | React：`size`；Preact：`size`；Vue：`size`；纯 HTML：`sn-sm / sn-lg` |
+| `tone` | `"run" \| "ok" \| "warn" \| "bad"` | "run" | 否 | 状态语义色：运行中、成功、提醒、失败。 | React：`tone`；Preact：`tone`；Vue：`tone`；纯 HTML：`sn-ok / sn-warn / sn-bad` |
+| `active` | `boolean` | false | 否 | 线性进度条开启柔和流光扫过动效。 | React：`active`；Preact：`active`；Vue：`active`；纯 HTML：`sn-active` |
+| `segments` | `number` | — | 否 | 分段刻度条段数（如 8），逐段点亮并带当前段微脉冲。 | React：`segments`；Preact：`segments`；Vue：`segments`；纯 HTML：`.sn-pseg` |
+| `showValue` | `boolean` | false | 否 | 配合 ring 使用，在圆头 SVG 进度环中心显示等宽百分比数字。 | React：`showValue`；Preact：`showValue`；Vue：`showValue`；纯 HTML：`.sn-pring-svg > b` |
+| `height` | `number` | — | 否 | 自定义进度条或分段条高度（像素，写入 --sn-p-h）。 | React：`height`；Preact：`height`；Vue：`height`；纯 HTML：`--sn-p-h` |
 | `label` | `string` | — | 否 | 读屏读出来的名字："导出进度"。 | React：`label`；Preact：`label`；Vue：`label`；纯 HTML：`aria-label` |
-| `className` | `string` | — | 否 | 加在进度条、进度环上的类名。 | React：`className`；Preact：`class` |
+| `className / style` | `string / CSSProperties` | — | 否 | 加在进度条、进度环上的类名和内联样式。 | React：`className / style`；Preact：`class / style` |
 
 ## 事件
 
@@ -524,7 +530,7 @@ export default function ExportProgress() {
 
 ## 导出的类型
 
-`ProgressProps`、`ProgressCardApi`
+`ProgressProps`、`ProgressOptions`、`ProgressTone`、`ProgressCardApi`
 
 ## 键盘
 

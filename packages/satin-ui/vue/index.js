@@ -7,6 +7,7 @@ import * as Vue from "vue";
 import { defineComponent, h, ref, onMounted, onBeforeUnmount, watch, cloneVNode, mergeProps } from "vue";
 import * as S from "../src/components.js";
 import { setup } from "../src/setup.js";
+import { get as getTheme, set as setThemeChoice, reset as resetThemeChoice, paint as paintTheme, applyTheme, onChange as onThemeChange, getMode, setMode, DEFAULTS as THEME_DEFAULTS } from "../src/theme.js";
 import { openDialog, closeDialog, wireDialog, openDrawer } from "../src/overlay.js";
 import { ICONS } from "../src/icons.js";
 import { emptyArtSvg } from "../src/empty-art.js";
@@ -184,11 +185,57 @@ export const Chip = /* @__PURE__ */ defineComponent({
     };
   },
 });
-// 读屏：role="progressbar"、aria-valuenow（百分数），label 是读出来的名字
+// 读屏：role="progressbar"、aria-valuenow（百分数），label 是读出来的名字；完整支持 active 微光、tone 状态色、segments 分段刻度、svg 圆头数值环、height
 const progressAria = (value, label) => ({ role: "progressbar", "aria-label": label, ...(value == null ? {} : { "aria-valuenow": Math.round(value * 100), "aria-valuemin": 0, "aria-valuemax": 100 }) });
 export const Progress = /* @__PURE__ */ defineComponent({
-  name: "SnProgress", props: { value: Number, ring: Boolean, size: String, label: String },
-  setup(p) { return () => { const v = p.value == null ? undefined : String(+p.value).replace(/^0\./, "."); return p.ring ? h("span", { class: cx("sn-pring", p.size === "lg" && "sn-lg"), style: { "--sn-p": v ?? "0" }, ...progressAria(p.value ?? 0, p.label) }) : h("div", { class: cx("sn-pbar", p.value == null && "sn-indet"), ...progressAria(p.value, p.label), style: v != null ? { "--sn-p": v } : undefined }, [h("i")]); }; },
+  name: "SnProgress",
+  props: { value: Number, ring: Boolean, svg: Boolean, size: String, tone: String, active: Boolean, segments: Number, showValue: Boolean, height: Number, label: String },
+  setup(p) {
+    return () => {
+      const tn = p.tone && p.tone !== "run" ? `sn-${p.tone}` : "";
+      if (p.segments > 0) {
+        const val = Math.max(0, Math.min(1, p.value ?? 0)), filled = Math.floor(val * p.segments), partial = val > 0 && val < 1 && filled < p.segments;
+        return h("div", { class: cx("sn-pseg", tn), style: p.height ? { "--sn-p-h": `${p.height}px` } : undefined, ...progressAria(val, p.label) },
+          Array.from({ length: p.segments }, (_, i) => h("i", { key: i, class: i < filled ? "sn-done" : i === filled && partial ? "sn-cur" : undefined })));
+      }
+      if (p.ring && (p.svg || p.showValue)) {
+        const val = Math.max(0, Math.min(1, p.value ?? 0)), v = String(+val).replace(/^0\./, ".");
+        return h("span", { class: cx("sn-pring-svg", p.size && p.size !== "md" && `sn-${p.size}`, tn), style: { "--sn-p": v }, ...progressAria(val, p.label) }, [
+          h("svg", { viewBox: "0 0 36 36", "aria-hidden": "true" }, [
+            h("circle", { class: "sn-pr-tr", cx: 18, cy: 18, r: 15.9 }),
+            h("circle", { class: "sn-pr-fg", cx: 18, cy: 18, r: 15.9, pathLength: 100 }),
+          ]),
+          p.showValue ? h("b", `${Math.round(val * 100)}%`) : null,
+        ]);
+      }
+      const v = p.value == null ? undefined : String(+p.value).replace(/^0\./, ".");
+      if (p.ring) return h("span", { class: cx("sn-pring", p.size === "lg" && "sn-lg"), style: { "--sn-p": v ?? "0" }, ...progressAria(p.value ?? 0, p.label) });
+      const st = { ...(v != null ? { "--sn-p": v } : null), ...(p.height ? { "--sn-p-h": `${p.height}px` } : null) };
+      return h("div", { class: cx("sn-pbar", p.value == null && "sn-indet", p.active && "sn-active", p.size && p.size !== "md" && `sn-${p.size}`, tn), ...progressAria(p.value, p.label), style: Object.keys(st).length ? st : undefined }, [h("i")]);
+    };
+  },
+});
+// 动感几何加载器：8 款纯 CSS/SVG 物理动效（matrix / dots / arc / orbit / bars / grid / radar / morph）
+const LD_NODES = {
+  matrix: () => Array.from({ length: 9 }, (_, i) => h("i", { key: i })),
+  dots: () => Array.from({ length: 3 }, (_, i) => h("i", { key: i })),
+  arc: () => [h("svg", { key: "s", viewBox: "0 0 24 24", "aria-hidden": "true" }, [h("circle", { class: "sn-ld-tr", cx: 12, cy: 12, r: 9 }), h("circle", { class: "sn-ld-hd", cx: 12, cy: 12, r: 9 })])],
+  orbit: () => [h("i", { key: 0 }), h("i", { key: 1 })],
+  bars: () => Array.from({ length: 4 }, (_, i) => h("i", { key: i })),
+  grid: () => Array.from({ length: 4 }, (_, i) => h("i", { key: i })),
+  radar: () => [h("i", { key: 0 }), h("i", { key: 1 }), h("b", { key: 2 })],
+  morph: () => [h("i", { key: 0 })],
+};
+export const Loader = /* @__PURE__ */ defineComponent({
+  name: "SnLoader",
+  props: { variant: { type: String, default: "matrix" }, size: { type: [String, Number], default: undefined }, color: String, speed: Number, label: String },
+  setup(p) {
+    return () => {
+      const v = Object.hasOwn(LD_NODES, p.variant) ? p.variant : "matrix";
+      const st = { ...(typeof p.size === "number" ? { "--sn-ld-size": `${p.size}px` } : null), ...(p.color ? { "--sn-ld-color": p.color } : null), ...(p.speed != null && p.speed !== 1 ? { "--sn-ld-speed": String(p.speed) } : null) };
+      return h("span", { class: cx("sn-ld", `sn-ld-${v}`, typeof p.size === "string" && p.size !== "md" && `sn-${p.size}`), role: "status", style: Object.keys(st).length ? st : undefined }, [...LD_NODES[v](), h("span", { class: "sn-sr" }, p.label ?? tt("components.loading"))]);
+    };
+  },
 });
 export const Spinner = /* @__PURE__ */ defineComponent({ name: "SnSpinner", props: { size: String, label: String }, setup: (p) => () => h("span", { class: cx("sn-spinner", p.size === "lg" && "sn-lg"), role: "status", "aria-label": p.label ?? tt("components.loading") }) });
 export const Steps = /* @__PURE__ */ defineComponent({
@@ -242,15 +289,49 @@ export const vEnhance = {
   beforeUnmount(el) { const f = el._snEnhance; el._snEnhance = null; f?.(); },
 };
 
+// 局部主题作用域：<SnThemeScope mode="dark" accent="blue">…</SnThemeScope>
+export const ThemeScope = /* @__PURE__ */ defineComponent({
+  name: "SnThemeScope",
+  props: { as: { type: String, default: "div" }, mode: String, accent: String, custom: String, font: String, scale: String, radius: String, line: String, motion: String, success: String, warning: String, danger: String },
+  setup(p, { slots }) {
+    const el = ref(null); let off = null;
+    const sync = () => { off?.(); if (el.value) off = applyTheme(el.value, { mode: p.mode, accent: p.accent, custom: p.custom, font: p.font, scale: p.scale, radius: p.radius, line: p.line, motion: p.motion, success: p.success, warning: p.warning, danger: p.danger }); };
+    onMounted(sync);
+    watch(() => [p.mode, p.accent, p.custom, p.font, p.scale, p.radius, p.line, p.motion, p.success, p.warning, p.danger], sync);
+    onBeforeUnmount(() => { off?.(); off = null; });
+    return () => h(p.as, { ref: el }, slots.default?.());
+  },
+});
+
+// 响应式主题 Composable：读写深浅模式与主色/圆角/线条/动效令牌
+export function useTheme() {
+  const theme = ref(typeof document === "undefined" ? { ...THEME_DEFAULTS } : getTheme());
+  const mode = ref(typeof document === "undefined" ? "auto" : getMode());
+  let unsub = null;
+  onMounted(() => { unsub = onThemeChange((t) => { theme.value = t; }); });
+  onBeforeUnmount(() => { unsub?.(); unsub = null; });
+  return {
+    mode,
+    theme,
+    setMode(m, opts) { setMode(m, opts); mode.value = m; },
+    setTheme(patch) { setThemeChoice(patch); theme.value = getTheme(); },
+    resetTheme() { resetThemeChoice(); theme.value = getTheme(); },
+  };
+}
+
 export const toast = (o) => (setup(), S.toast(o));
 export const notify = (o) => (setup(), S.notify(o));
-// 全局注册：app.use(Satin) 以后模板里直接写 <SnButton>、<SnSegmented v-model="x" />、<SnDatePicker>……、v-enhance，同时装好页面级行为（Tooltip、浮层栈、Esc 关闭，和 setup() 一样；应用卸载时撤掉）。
-// 数据表格这类重组件不在这里注册：import { DataGrid } from "satin-ui/vue/grid"
+// 全局注册：app.use(Satin, { mode, theme, persist }) 以后模板直接写 <SnButton>、<SnLoader>、<SnThemeScope>……、v-enhance，并可声明式配置全局主题
 export default {
-  install(app) {
-    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Avatar, EmptyArt, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, Search, CountInput, LongText, Composer, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Spinner, Steps, Text, Tooltip, Dialog, Drawer })) app.component("Sn" + k, c);
+  install(app, options) {
+    for (const [k, c] of Object.entries({ ...X, Table, Password, Email, Avatar, EmptyArt, Segmented, Slider, Select, Otp, Tabs, Pager, Collapse, TagInput, Stepper, Search, CountInput, LongText, Composer, NumberFlow, DatePicker, Icon, Button, Input, Field, Checkbox, Radio, Switch, Chip, Progress, Loader, Spinner, Steps, Text, Tooltip, Dialog, Drawer, ThemeScope })) app.component("Sn" + k, c);
     app.directive("enhance", vEnhance);
     const off = setup(); app.onUnmount?.(off); // setup() 在服务端直接返回，什么都不做
+    if (options && typeof document !== "undefined") {
+      const { mode, theme, persist = false } = options;
+      if (mode) setMode(mode, { animate: false, persist });
+      if (theme) { if (persist) setThemeChoice(theme); else paintTheme(document.documentElement, { ...THEME_DEFAULTS, ...getTheme(), ...theme }); }
+    }
   },
 };
 // 菜单、右键菜单、Popover、命令面板、看图、上传、侧栏、无限列表、滚动区域、视频、音频（vue/extra.js）

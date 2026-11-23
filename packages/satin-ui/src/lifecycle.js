@@ -126,7 +126,7 @@ export function defineComponent({ name, html, mount, defaults = {} }) {
     return self;
   }
   // 直接调 createXxx.html(选项) 也要带上默认值（React / Vue 封装、服务端渲染都这么调；不合并的话少给一个选项就出错）
-  create.html = typeof html === "function" ? (o = {}) => html({ ...defaults, ...o }) : html;
+  create.html = typeof html === "function" ? (o = {}) => html({ ...defaults, ...o }) : () => '<div class="sn-box-host"></div>';
   create.componentName = name;
   return create;
 }

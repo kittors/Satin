@@ -49,6 +49,9 @@ export default {
     { name: "mode", type: "ComposerMode | string", default: "—", required: false, desc: "底部一行加号旁边的模式 / 权限标签：`{ label, tone }`，tone 用状态色的小圆点（ok 绿、warn 橙、bad 红、need 主色）；给了 `options`（`[{ value, label, tone }]`）和 `value` 点开是菜单，选了发 `modeChange`。", names: { js: "mode", react: "mode", preact: "mode", vue: "mode" } },
     { name: "models", type: "ComposerOption[]", default: "—", required: false, desc: "模型选择（发送按钮左边）：每项 `{ value, label }`，label 写成\"名称 · 档位\"；点开往上长菜单、选中项打勾，键盘上下选、回车定；换了以后按钮上的字平滑换掉；底部一行放不下全名时按钮上只显示档位（每项的 `short`，不写就取 label 里最后一个\"·\"后面那段），全名在菜单里、也是读屏名。", names: { js: "models", react: "models", preact: "models", vue: "models" } },
     { name: "model", type: "string", default: "models 的第一项", required: false, desc: "现在用的模型（models 里的 value）。", descBy: { react: "现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。", preact: "现在用的模型（models 里的 value）；受控：在 onModelChange 里改它。", vue: "现在用的模型：`v-model:model` 绑定。" }, names: { js: "model", react: "model", preact: "model", vue: "model（v-model:model）" } },
+    { name: "rail", type: 'false | "left" | "right" | { side?: "left" | "right"; max?: number }', default: '"left"', required: false, desc: "侧边迷你定位刻度轨：支持放在左侧、右侧或关闭，悬停预览消息摘要、点击平滑跳转。", names: { js: "rail", react: "rail", preact: "rail", vue: "rail" } },
+    { name: "meta", type: "boolean | { time?: boolean; latency?: boolean; tps?: boolean }", default: "true", required: false, desc: "AI 回复底栏元信息开关：控制时间戳、首字/总耗时与生成速率（tok/s）展示。", names: { js: "meta", react: "meta", preact: "meta", vue: "meta" } },
+    { name: "caret", type: '"dot" | "bar" | false', default: '"dot"', required: false, desc: "流式输出末尾跟随光标样式：柔和呼吸圆点、竖线光标或关闭。", names: { js: "caret", react: "caret", preact: "caret", vue: "caret" } },
     { name: "className / style / id", type: "string / CSSProperties / string", default: "—", required: false, desc: "加在对话框容器上（默认高 680、最宽 840）。", names: { react: "className / style / id", preact: "class / style / id" } },
   ],
   events: [
@@ -67,6 +70,8 @@ export default {
     { name: "receive", kind: "method", signature: "receive(item: Partial<ChatItem>): unknown", returns: "ChatItem", desc: "收到一条对方的消息（比如别的协作者，从服务器推过来的）；不贴底时\"跳到最新\"上加未读数。" },
     { name: "sendText", kind: "method", signature: "sendText(text: string, o?: { fail?: boolean }): unknown", returns: "unknown", desc: "发一条（不走 respond）。注意：\"发送中 → 已送达\"现在是库里定时器做的，没有接真实发送结果；fail: true 显示发送失败、点感叹号重发。" },
     { name: "scrollToOldest", kind: "method", signature: "scrollToOldest(): void", returns: "void", desc: "平滑滚到最早一条。" },
+    { name: "scrollToId", kind: "method", signature: "scrollToId(id: string | number): void", returns: "void", desc: "平滑滚动定位到指定消息 ID。" },
+    { name: "setRail", kind: "method", signature: 'setRail(side: "left" | "right" | "off" | false): void', returns: "void", desc: "运行时动态切换侧边定位刻度轨的位置或隐藏。" },
     { name: "fill", kind: "method", signature: "fill(text: string): void", returns: "void", desc: "把一段字填进底部输入框（字淡入、拿到焦点、光标在最后），不发。新对话的建议点了就是这样。" },
     { name: "emptyEl", kind: "property", signature: "readonly emptyEl: HTMLElement | null", returns: "HTMLElement | null", desc: "新对话那一块的元素（empty 给 true 时自己往里画）；没有空状态时是 null。" },
   ],

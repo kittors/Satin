@@ -87,7 +87,10 @@ export function satinDependency(abs, flag) {
   const dest = path.join(abs, ".satin"); fs.mkdirSync(dest, { recursive: true });
   const r = spawnSync("npm", ["pack", "--json", "--pack-destination", dest], { cwd: SATIN_UI_DIR, encoding: "utf8", shell: process.platform === "win32" });
   let file = null;
-  try { file = JSON.parse(r.stdout)[0]?.filename; } catch { /* 下面报错 */ }
+  try {
+    const out = r.stdout || "", i = out.indexOf("[");
+    file = JSON.parse(i >= 0 ? out.slice(i) : out)[0]?.filename;
+  } catch { /* 下面报错 */ }
   if (r.status !== 0 || !file) throw new Error(`把本地的 satin-ui 打成包没成功（npm pack）：${(r.stderr || r.stdout || "").trim().split("\n").slice(-3).join(" ")}。可以用 --satin 指定依赖写法，比如 --satin file:../Satin/packages/satin-ui`);
   return { spec: `file:.satin/${path.basename(file)}`, local: true };
 }

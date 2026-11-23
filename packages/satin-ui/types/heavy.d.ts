@@ -26,6 +26,12 @@ export interface ChatProps extends ComposerParts {
   menu?: boolean;
   /** 顶栏右边放"新对话"按钮（单色图标），点了发 newChat */
   newChat?: boolean;
+  /** 侧边迷你定位刻度轨：false 关闭 | "left" | "right" | { side?: "left" | "right"; max?: number }（默认 "left"） */
+  rail?: false | "left" | "right" | { side?: "left" | "right"; max?: number };
+  /** 回复底栏元信息（时间戳 / 耗时 / 吞吐速率 tok/s）配置 */
+  meta?: boolean | { time?: boolean; latency?: boolean; tps?: boolean };
+  /** 流式输出光标样式："dot" | "bar" | false */
+  caret?: "dot" | "bar" | false;
 }
 /** createChat 的选项：上面那些 + 输入框部件的事件回调 + 顶栏按钮的回调 */
 export interface ChatOptions extends ChatProps, ComposerPartEvents {
@@ -37,10 +43,19 @@ export interface ChatOptions extends ChatProps, ComposerPartEvents {
 /** 新对话的样子：图标（单色，图标名）、标题、说明、2～4 个建议（点了填进输入框） */
 export interface ChatEmpty { icon?: string; title?: string; subtitle?: string; suggestions?: string[] }
 export interface ChatApi { send(text: string): void; receive(item: Partial<ChatItem>): unknown; sendText(text: string, o?: { fail?: boolean }): unknown; scrollToOldest(): void;
+  /** 滚动定位到某条消息 */
+  scrollToId(id: string | number): void;
+  /** 动态切换侧边刻度轨位置或隐藏 */
+  setRail(side: "left" | "right" | "off" | false): void;
   /** 填一段字进底部输入框（字淡入、光标在最后），不发 */
   fill(text: string): void;
   /** 新对话那一块（empty 给 true 时自己往里画）；没有空状态时是 null */
   readonly emptyEl: HTMLElement | null }
+export interface ThreadRailItem { id: string | number; summary: string; meta?: string }
+export interface ThreadRailOptions { side?: "left" | "right"; max?: number; onSelect?(detail: { item: ThreadRailItem; index: number }): void }
+export interface ThreadRailApi { setItems(items: ThreadRailItem[]): void; setActive(id: string | number): void; setSide(side: "left" | "right" | "off" | false): void; destroy(): void }
+export function mountThreadRail(host: HTMLElement, o?: { side?: "left" | "right"; max?: number; onSelect?(item: ThreadRailItem, index: number): void }): ThreadRailApi;
+export const createThreadRail: SatinFactory<ThreadRailOptions, ThreadRailApi>;
 export function mountChat(box: HTMLElement, o?: ChatOptions): ChatApi & { destroy(): void };
 /** 对话（统一写法）：空容器按选项渲染；update({ status }) 改顶栏状态；destroy 停掉生成中的回答、撤掉监听、清空容器 */
 export const createChat: SatinFactory<ChatOptions, ChatApi>;

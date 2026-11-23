@@ -32,3 +32,27 @@ export const TreeTableVue = defineComponent({
     return () => h(Table, { columns: [{ key: "name", title: "项目", merge: true }, { key: "act", type: "actions" }], data: [{ id: "p1", name: "雨夜车站", children: [{ id: "p1.e1", name: "第 1 集" }] }], modelValue: keys.value, expanded: open.value, "onUpdate:expanded": (k: string[]) => (open.value = k), lines: "grid", draggableRows: true, draggableColumns: true, error: false, spans: () => [{ row: 0, key: "name", rowSpan: 2 }] });
   },
 });
+
+// 动感 Loader、升级版 Progress、ThemeScope、useTheme、图表与 ThreadRail
+import { Loader, Progress, ThemeScope, useTheme } from "satin-ui/vue";
+import { Chat, ThreadRail } from "satin-ui/vue/chat";
+import { AreaChart, BarChart, DonutChart, Chart3D, Sparkline, Icon3D } from "satin-ui/vue/charts";
+export const NewApisVue = defineComponent({
+  setup() {
+    const { mode, theme, setMode, setTheme, resetTheme } = useTheme();
+    void mode.value; void theme.value.motion; void setMode; void setTheme; void resetTheme;
+    return () => h(ThemeScope, { mode: "dark", accent: "blue", radius: "8" }, () => [
+      h(Loader, { variant: "matrix", size: "lg", speed: 1.1 }),
+      h(Progress, { value: 0.65, segments: 8, tone: "ok" }),
+      h(Progress, { value: 0.8, ring: true, svg: true, showValue: true }),
+      h(Chat, { title: "助手", rail: "left", meta: { tps: true }, caret: "dot" }),
+      h(ThreadRail, { side: "left", max: 16 }),
+      h(AreaChart, { labels: ["1", "2"], series: [{ name: "镜头", values: [10, 20] }] }),
+      h(BarChart, { labels: ["A"], series: [{ name: "完成", values: [6] }] }),
+      h(DonutChart, { items: [{ label: "完成", value: 12 }] }),
+      h(Chart3D, { rows: ["一"], cols: ["A"], values: [[1]] }),
+      h(Sparkline, { values: [1, 2, 4] }),
+      h(Icon3D, { name: "layers", tone: "obsidian" }),
+    ]);
+  },
+});

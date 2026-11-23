@@ -36,9 +36,15 @@ export default {
   props: [
     { name: "value", type: "number", default: "不给是不定进度", required: false, desc: "进度 0～1；不给时进度条来回走（不知道还要多久）。", names: { react: "value", preact: "value", vue: "value", html: "--sn-p（0～1）+ aria-valuenow（百分数）" } },
     { name: "ring", type: "boolean", default: "false", required: false, desc: "换成进度环：放在缩略图、按钮、列表行里。", names: { react: "ring", preact: "ring", vue: "ring", html: ".sn-pring" } },
-    { name: "size", type: '"lg"', default: "—", required: false, desc: "大一号的进度环、转圈。", names: { react: "size", preact: "size", vue: "size", html: "sn-lg" } },
+    { name: "svg", type: "boolean", default: "false", required: false, desc: "配合 ring 使用，改用圆头 SVG 矢量环（支持中心数值与平滑弧长过渡）。", names: { react: "svg", preact: "svg", vue: "svg", html: ".sn-pring-svg" } },
+    { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', required: false, desc: "尺寸档位（小 / 中 / 大）。", names: { react: "size", preact: "size", vue: "size", html: "sn-sm / sn-lg" } },
+    { name: "tone", type: '"run" | "ok" | "warn" | "bad"', default: '"run"', required: false, desc: "状态语义色：运行中、成功、提醒、失败。", names: { react: "tone", preact: "tone", vue: "tone", html: "sn-ok / sn-warn / sn-bad" } },
+    { name: "active", type: "boolean", default: "false", required: false, desc: "线性进度条开启柔和流光扫过动效。", names: { react: "active", preact: "active", vue: "active", html: "sn-active" } },
+    { name: "segments", type: "number", default: "—", required: false, desc: "分段刻度条段数（如 8），逐段点亮并带当前段微脉冲。", names: { react: "segments", preact: "segments", vue: "segments", html: ".sn-pseg" } },
+    { name: "showValue", type: "boolean", default: "false", required: false, desc: "配合 ring 使用，在圆头 SVG 进度环中心显示等宽百分比数字。", names: { react: "showValue", preact: "showValue", vue: "showValue", html: ".sn-pring-svg > b" } },
+    { name: "height", type: "number", default: "—", required: false, desc: "自定义进度条或分段条高度（像素，写入 --sn-p-h）。", names: { react: "height", preact: "height", vue: "height", html: "--sn-p-h" } },
     { name: "label", type: "string", default: "—", required: false, desc: "读屏读出来的名字：\"导出进度\"。", names: { react: "label", preact: "label", vue: "label", html: "aria-label" } },
-    { name: "className", type: "string", default: "—", required: false, desc: "加在进度条、进度环上的类名。", names: { react: "className", preact: "class" } },
+    { name: "className / style", type: "string / CSSProperties", default: "—", required: false, desc: "加在进度条、进度环上的类名和内联样式。", names: { react: "className / style", preact: "class / style" } },
   ],
   events: [
     { name: "cancel", payload: "—", when: "导出卡片上点\"取消\"（同时在卡片上冒泡 sn-cancel）。", names: { js: "onCancel", react: "—", vue: "—", html: "sn-cancel" } },
@@ -63,7 +69,7 @@ export default {
     { name: ".sn-spinner / .sn-spinner.sn-lg", desc: "转圈" },
     { name: ".sn-pcard", desc: "导出卡片（图标、标题、百分数、进度条、副标题、取消 / 打开）" },
   ],
-  types: ["ProgressProps", "ProgressCardApi"],
+  types: ["ProgressProps", "ProgressOptions", "ProgressTone", "ProgressCardApi"],
   keyboard: [{ keys: "—", does: "进度只显示；导出卡片里的\"取消\"\"打开\"是普通按钮。" }],
   a11y: {
     roles: ["进度条、进度环 `role=\"progressbar\"`，`aria-valuenow` 是百分数；不定进度不写 valuenow。", "转圈 `role=\"status\"`，`aria-label` 默认\"加载中\"。"],

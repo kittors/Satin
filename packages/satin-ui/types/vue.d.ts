@@ -1,6 +1,7 @@
 // satin-ui/vue
-import type { DefineComponent, Plugin } from "vue";
-import type { Item, AvatarOptions, EmptyArtOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, TableOptions, ComposerParts } from "./components";
+import type { DefineComponent, Plugin, Ref } from "vue";
+import type { Item, AvatarOptions, EmptyArtOptions, ProgressOptions, LoaderOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, TableOptions, ComposerParts } from "./components";
+import type { ThemeChoice } from "./theme";
 type C<P> = DefineComponent<P & { modelValue?: any }>;
 export const Password: C<{ value?: string; label?: string; help?: string; name?: string; id?: string; placeholder?: string; meter?: boolean; size?: "sm" | "lg" | "xl"; autocomplete?: string }>;
 export const Search: DefineComponent<{ search?(q: string): number | unknown[] | Promise<number | unknown[]>; debounce?: number; placeholder?: string; label?: string; kbd?: string | false; id?: string; name?: string; size?: "sm" | "lg" | "xl" }>;
@@ -38,7 +39,9 @@ export const Radio: C<{ value?: string | number; name?: string; label?: string; 
 export const Switch: C<{ label?: string; disabled?: boolean }>;
 /** 芯片：v-model（布尔）给了是能切换的筛选芯片；removable 是能移除的标签（@remove 在收起动画放完以后发）；selected 只显示选中的样子 */
 export const Chip: DefineComponent<{ modelValue?: boolean; selected?: boolean; removable?: boolean; removeLabel?: string }>;
-export const Progress: DefineComponent<{ value?: number; ring?: boolean; size?: "lg"; label?: string }>;
+export const Progress: DefineComponent<ProgressOptions & { label?: string }>;
+/** 动感几何加载器：<SnLoader variant="matrix" size="lg" /> */
+export const Loader: DefineComponent<LoaderOptions>;
 export const Spinner: DefineComponent<{ size?: "lg"; label?: string }>;
 export const Steps: DefineComponent<{ steps: string[]; current?: number }>;
 export const Text: DefineComponent<{ as?: string; level?: string; tone?: string; num?: boolean; truncate?: boolean }>;
@@ -46,11 +49,16 @@ export const Tooltip: DefineComponent<{ text: string; kbd?: string }>;
 /** 弹窗：v-model:open；@close 关完以后、@submit 表单提交；guard 拦下关闭；footerClass 加在底栏上；#footer 插槽放按钮 */
 export const Dialog: DefineComponent<{ open: boolean; title?: string; description?: string; icon?: string; guard?(close: () => void): void; footerClass?: string }>;
 export const Drawer: DefineComponent<{ open: boolean; title?: string }>;
+/** 局部主题作用域：<SnThemeScope mode="dark" accent="blue">…</SnThemeScope> */
+export const ThemeScope: DefineComponent<Partial<ThemeChoice> & { as?: string; mode?: "light" | "dark" }>;
+/** 响应式主题 Composable */
+export function useTheme(): { mode: Ref<"auto" | "light" | "dark">; theme: Ref<ThemeChoice>; setMode(mode: "auto" | "light" | "dark", options?: { animate?: boolean; persist?: boolean }): void; setTheme(patch: Partial<ThemeChoice>): void; resetTheme(): void };
 /** v-enhance：照设计稿写好的一段标记放进这个元素，挂上时接上交互、卸载时撤掉（和 <sn-enhance> 一样） */
 export const vEnhance: import("vue").ObjectDirective<HTMLElement>;
 export function toast(o: ToastOptions): ToastHandle;
 export function notify(o: NotifyOptions): import("./components").NotifyHandle;
-declare const plugin: Plugin;
+export interface SatinPluginOptions { mode?: "auto" | "light" | "dark"; theme?: Partial<ThemeChoice>; persist?: boolean }
+declare const plugin: Plugin<[SatinPluginOptions?]>;
 export default plugin;
 
 /** 把任意 createXxx（包括重组件）包成 Vue 组件：props 列出要传给组件的选项名 */

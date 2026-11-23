@@ -21,12 +21,18 @@ const SKIP_FILE = /(^|\/)(packages\/satin-ui\/css|node_modules\/satin-ui)\/|\.mi
 
 export function listFiles(inputs) {
   const out = [];
-  const rec = (p) => {
+  const rec = (p, root) => {
     let st; try { st = fs.statSync(p); } catch { return; }
-    if (st.isDirectory()) { if (SKIP_DIR.test(p + "/")) return; for (const f of fs.readdirSync(p)) rec(path.join(p, f)); return; }
-    if (EXT.test(p) && !SKIP_FILE.test(p) && st.size < 1.5e6) out.push(p);
+    if (st.isDirectory()) {
+      const rel = path.relative(root, p).split(path.sep).join("/");
+      if (rel && SKIP_DIR.test(rel + "/")) return;
+      for (const f of fs.readdirSync(p)) rec(path.join(p, f), root);
+      return;
+    }
+    const rel = path.relative(root, p).split(path.sep).join("/");
+    if (EXT.test(p) && !SKIP_FILE.test(p) && (!rel || !SKIP_DIR.test(rel)) && st.size < 1.5e6) out.push(p);
   };
-  for (const i of inputs) rec(path.resolve(i));
+  for (const i of inputs) { const abs = path.resolve(i); rec(abs, abs); }
   return out;
 }
 

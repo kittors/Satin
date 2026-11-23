@@ -194,7 +194,14 @@ export function inputHTML(o?: { value?: string; placeholder?: string; size?: "sm
 /** 字段：标签 + 控件 + 说明 + 错误。error 不传就没有错误区；传字符串就有（空字符串 = 先占好位置，之后 setFieldError 展开）；name 写成 data-f，给 validateForm 找规则 */
 export function fieldHTML(o?: { label?: string; control?: string; help?: string; error?: string; id?: string; name?: string }): string;
 export function chipHTML(o?: { text?: string; on?: boolean; removable?: boolean }): string;
-export function progressHTML(o?: { value?: number; ring?: boolean; size?: "lg" }): string;
+export type ProgressTone = "run" | "ok" | "warn" | "bad";
+export interface ProgressOptions { value?: number; ring?: boolean; svg?: boolean; size?: "sm" | "md" | "lg"; tone?: ProgressTone; active?: boolean; segments?: number; showValue?: boolean; height?: number }
+export function progressHTML(o?: ProgressOptions): string;
+export type LoaderVariant = "matrix" | "dots" | "arc" | "orbit" | "bars" | "grid" | "radar" | "morph";
+export interface LoaderOptions { variant?: LoaderVariant; size?: "xs" | "sm" | "md" | "lg" | "xl" | number; color?: string; speed?: number; label?: string }
+export const LOADER_VARIANTS: readonly LoaderVariant[];
+export function loaderHTML(o?: LoaderOptions): string;
+export const createLoader: SatinFactory<LoaderOptions, Record<string, never>>;
 export function spinnerHTML(o?: { size?: "lg" }): string;
 export function stepsHTML(o?: { steps?: string[]; current?: number }): string;
 export function setStep(steps: HTMLElement, index: number): number;

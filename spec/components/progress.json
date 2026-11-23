@@ -168,16 +168,94 @@
       }
     },
     {
-      "name": "size",
-      "type": "\"lg\"",
-      "default": "—",
+      "name": "svg",
+      "type": "boolean",
+      "default": "false",
       "required": false,
-      "desc": "大一号的进度环、转圈。",
+      "desc": "配合 ring 使用，改用圆头 SVG 矢量环（支持中心数值与平滑弧长过渡）。",
+      "names": {
+        "react": "svg",
+        "preact": "svg",
+        "vue": "svg",
+        "html": ".sn-pring-svg"
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\" | \"lg\"",
+      "default": "\"md\"",
+      "required": false,
+      "desc": "尺寸档位（小 / 中 / 大）。",
       "names": {
         "react": "size",
         "preact": "size",
         "vue": "size",
-        "html": "sn-lg"
+        "html": "sn-sm / sn-lg"
+      }
+    },
+    {
+      "name": "tone",
+      "type": "\"run\" | \"ok\" | \"warn\" | \"bad\"",
+      "default": "\"run\"",
+      "required": false,
+      "desc": "状态语义色：运行中、成功、提醒、失败。",
+      "names": {
+        "react": "tone",
+        "preact": "tone",
+        "vue": "tone",
+        "html": "sn-ok / sn-warn / sn-bad"
+      }
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "线性进度条开启柔和流光扫过动效。",
+      "names": {
+        "react": "active",
+        "preact": "active",
+        "vue": "active",
+        "html": "sn-active"
+      }
+    },
+    {
+      "name": "segments",
+      "type": "number",
+      "default": "—",
+      "required": false,
+      "desc": "分段刻度条段数（如 8），逐段点亮并带当前段微脉冲。",
+      "names": {
+        "react": "segments",
+        "preact": "segments",
+        "vue": "segments",
+        "html": ".sn-pseg"
+      }
+    },
+    {
+      "name": "showValue",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "配合 ring 使用，在圆头 SVG 进度环中心显示等宽百分比数字。",
+      "names": {
+        "react": "showValue",
+        "preact": "showValue",
+        "vue": "showValue",
+        "html": ".sn-pring-svg > b"
+      }
+    },
+    {
+      "name": "height",
+      "type": "number",
+      "default": "—",
+      "required": false,
+      "desc": "自定义进度条或分段条高度（像素，写入 --sn-p-h）。",
+      "names": {
+        "react": "height",
+        "preact": "height",
+        "vue": "height",
+        "html": "--sn-p-h"
       }
     },
     {
@@ -194,14 +272,14 @@
       }
     },
     {
-      "name": "className",
-      "type": "string",
+      "name": "className / style",
+      "type": "string / CSSProperties",
       "default": "—",
       "required": false,
-      "desc": "加在进度条、进度环上的类名。",
+      "desc": "加在进度条、进度环上的类名和内联样式。",
       "names": {
-        "react": "className",
-        "preact": "class"
+        "react": "className / style",
+        "preact": "class / style"
       }
     }
   ],
@@ -300,6 +378,8 @@
   ],
   "types": [
     "ProgressProps",
+    "ProgressOptions",
+    "ProgressTone",
     "ProgressCardApi"
   ],
   "keyboard": [

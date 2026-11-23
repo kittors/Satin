@@ -89,6 +89,24 @@ export const loaderHTML = ({ variant = "matrix", size, color, speed, label = "Lo
   const st = [typeof size === "number" ? `--sn-ld-size:${size}px` : "", color ? `--sn-ld-color:${color}` : "", speed != null && speed !== 1 ? `--sn-ld-speed:${speed}` : ""].filter(Boolean).join(";");
   return `<span class="${cx("sn-ld", `sn-ld-${v}`, typeof size === "string" && size !== "md" && `sn-${size}`)}" role="status"${st ? ` style="${st}"` : ""}>${LD_BODY[v]}<span class="sn-sr">${esc(label)}</span></span>`;
 };
+export const createLoader = /* @__PURE__ */ defineComponent({
+  name: "loader",
+  defaults: { variant: "matrix", label: "Loading" },
+  html: loaderHTML,
+  mount(el, o) {
+    let opts = { ...o };
+    return {
+      update(next) {
+        opts = { ...opts, ...next };
+        const tmp = document.createElement("div");
+        tmp.innerHTML = loaderHTML(opts);
+        const n = tmp.firstElementChild;
+        if (n) { el.className = n.className; el.setAttribute("style", n.getAttribute("style") || ""); el.innerHTML = n.innerHTML; }
+      },
+      destroy() {},
+    };
+  },
+});
 export const spinnerHTML = ({ size } = {}) => `<span class="${cx("sn-spinner", size === "lg" && "sn-lg")}"></span>`;
 
 // 按钮的等待、成功、复制：在已有按钮上用

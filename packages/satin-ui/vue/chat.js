@@ -6,11 +6,12 @@
 // 新对话：:empty="{ icon, title, subtitle, suggestions }"；要自己画就写 #empty 插槽（画进空状态那一块，第一条消息进来时一起淡出）。
 // 底部输入框：context（@context-change、@context-click）、mode（@mode-change）、models、v-model:model
 import { defineComponent, h, ref, computed, shallowRef, onMounted, Teleport } from "vue";
-import { createChat } from "../src/chat.js";
+import { createChat, createThreadRail } from "../src/chat.js";
 import { wrap } from "./wrap.js";
 
-const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "voice", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model", "menu", "newChat"];
+const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "voice", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model", "menu", "newChat", "rail", "meta", "caret"];
 const Base = /* @__PURE__ */ wrap(createChat, { name: "SnChatInstance", props: KEYS, events: ["modelChange", "modeChange", "contextChange", "contextClick", "menu", "newChat"], modelEvent: null });
+export const ThreadRail = /* @__PURE__ */ wrap(createThreadRail, { name: "SnThreadRail", props: ["side", "max"], events: ["select"], modelEvent: null });
 export const Chat = /* @__PURE__ */ defineComponent({
   name: "SnChat", inheritAttrs: false,
   props: Object.fromEntries(KEYS.map((k) => [k, { type: null, default: undefined }])),
