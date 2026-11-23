@@ -618,7 +618,9 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .d-cards[style*="--l"] { grid-template-columns: repeat(var(--l), minmax(0, 1fr)); }
 .d-cards[style*="--l"] > * { grid-column: span var(--sp, 1); }
 .d-card { display: grid; align-content: start; gap: 4px; padding: 14px 16px 16px; border-radius: 12px; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line); text-decoration: none; color: var(--sn-label); transition: background-color .15s var(--sn-ease-out); }
-.n-docs .d-main a.d-card { text-decoration: none; color: var(--sn-label); }
+.n-docs .d-main a.d-card, .n-docs .d-main a.sn-card { text-decoration: none; color: var(--sn-label); }
+.n-docs .d-main .sn-e404-head p { font-size: calc(13px * var(--fsx)); line-height: calc(20px * var(--fsx)); color: var(--sn-label2); }
+.n-docs .d-main .sn-e404-link p { font-size: calc(12px * var(--fsx)); line-height: calc(18px * var(--fsx)); color: var(--sn-label3); }
 @media (hover: hover) { .d-card:hover { background: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); } }
 .d-card:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--sn-card-line), 0 0 0 2px var(--sn-focus); }
 .d-card b { font: 600 calc(15px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); }

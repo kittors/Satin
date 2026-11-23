@@ -17,14 +17,13 @@ export default function Settings() {
         <header class="sn-page-hd">
           <div>
             <h1>设置</h1>
-            <p>账户、通知和默认的生成参数</p>
           </div>
         </header>
         <div class="sn-panel">
           <section class="sn-setting">
             <div>
               <h3>个人资料</h3>
-              <p>团队成员会看到你的名字和头像。</p>
+              <p>团队成员会看到你的名字。</p>
             </div>
             <form class="sn-form" novalidate>
               <div class="sn-field" data-f="name">
@@ -50,7 +49,7 @@ export default function Settings() {
           <section class="sn-setting">
             <div>
               <h3>通知</h3>
-              <p>改了马上生效。</p>
+              <p>发到上面的邮箱，改了马上生效。</p>
             </div>
             <div class="sn-stack sn-gap-12">
               <label class="sn-switch"><input type="checkbox" role="switch" checked /><span class="sn-track">
@@ -68,6 +67,15 @@ export default function Settings() {
             </div>
             <div>
               <sn-segmented items='["16:9 横屏","9:16 竖屏","1:1 方形"]' value="16:9 横屏"></sn-segmented>
+            </div>
+          </section>
+          <section class="sn-setting">
+            <div>
+              <h3>导出格式</h3>
+              <p>点“导出”时默认生成的文件。</p>
+            </div>
+            <div>
+              <sn-segmented items='["PDF 分镜本","Excel 拍摄表"]' value="PDF 分镜本"></sn-segmented>
             </div>
           </section>
           <section class="sn-setting">

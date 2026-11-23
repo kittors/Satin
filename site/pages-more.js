@@ -138,7 +138,7 @@ export const AI_PAGES = [
       ["h2", "技能里有什么"],
       ["table", ["文件", "内容"], [
         ["<code>SKILL.md</code>", "主文档：怎么装、页面配方一览、\"要做什么 → 用什么\"选择表、页面骨架类、常用令牌、硬规则、常见错误、怎么自查"],
-        ["<code>references/</code>", "按需读的参考：61 个区块（53 个组件 + 8 块基础）各一份、令牌全表、去 AI 味规则全文、图标名、8 种页面配方、手机和 H5"],
+        ["<code>references/</code>", "按需读的参考：64 个区块各一份、令牌全表、去 AI 味规则全文、图标名、9 种页面配方、手机和 H5"],
         ["<code>scripts/check.mjs</code>", "检查器：<code>static</code> 查源码，<code>dom</code> 在浏览器里量页面（见<a href=\"#/checker\">检查器</a>）"],
         ["<code>AGENTS.snippet.md</code>", "放进项目 <code>AGENTS.md</code> 或 <code>CLAUDE.md</code> 的一段话（见<a href=\"#/agents\">AGENTS.md</a>）"],
       ]],
@@ -238,7 +238,7 @@ export const INTRO = {
       "<b>深浅两套主题</b>：每个颜色都有两套取值；主色、状态色、字体、字号随时可调，所有组件立即跟着变。",
       "<b>一份写清楚数值的规范</b>：颜色、排版、间距、圆角、动效曲线和时长、交互质感、去 AI 感、可访问性。组件页里的\"要点\"就是它的验收标准。",
       "<b>给 AI 用的技能和检查器</b>：见<a href=\"#/ai\">安装与用法</a>、<a href=\"#/checker\">检查器</a>；效果见<a href=\"#/eval\">评测结果</a>。",
-      "<b>8 种页面配方</b>：后台列表、设置页、登录注册、仪表盘、AI 对话、落地页、移动端下单、表单向导，照着搭骨架再换内容（见<a href=\"#/recipes\">配方</a>）。",
+      "<b>9 种页面配方</b>：后台列表、设置页、登录注册、仪表盘、AI 对话、落地页、移动端下单、表单向导、404 页面，照着搭骨架再换内容（见<a href=\"#/recipes\">配方</a>）。",
     ]],
     ["h2", "设计取向"],
     T0.body.find((b) => b[0] === "do"),
@@ -314,7 +314,7 @@ export const CLI_PAGE = {
     })[id] + "\n\n起步页：页头、一个输入框、一个分段控件、一个主按钮，深浅两套主题都对。"]])],
     ["h2", "页面配方"],
     ["code", "sh", "satin add --list\nsatin add settings"],
-    ["p", "8 种页面配方：后台列表、设置页、登录注册、仪表盘、AI 对话、落地页、移动端下单、表单向导。纯 HTML 项目拷成根目录下的一张页面（比如 <code>settings.html</code>）；Vite 类的写法拷进 <code>src/recipes/&lt;配方&gt;/</code>，Next.js、Nuxt 拷进 <code>app/recipes/&lt;配方&gt;/</code>（Next.js 还会建好路由）。"],
+    ["p", "9 种页面配方：后台列表、设置页、登录注册、仪表盘、AI 对话、落地页、移动端下单、表单向导、404 页面。纯 HTML 项目拷成根目录下的一张页面（比如 <code>settings.html</code>）；Vite 类的写法拷进 <code>src/recipes/&lt;配方&gt;/</code>，Next.js、Nuxt 拷进 <code>app/recipes/&lt;配方&gt;/</code>（Next.js 还会建好路由）。"],
     ["h2", "常见问题"],
     ["ul", [
       "<b>能在已有项目里用吗？</b>能。在项目根目录运行 <code>satin skill</code> 装技能和说明，<code>satin doctor</code> 看还差什么，照着修法改。",
@@ -451,9 +451,10 @@ export const OTHER_PAGES = [
   },
 ];
 
-// ———— 配方：8 种页面（spec/recipes/*.md），每页实时预览 + 代码 ————
+// ———— 配方：9 种页面（spec/recipes/*.md），每页实时预览 + 代码 ————
 export const RECIPES = [
   ["admin-table", "01-admin-table.md", "后台列表"], ["settings", "02-settings.md", "设置页"], ["auth", "03-auth.md", "登录注册"], ["dashboard", "04-dashboard.md", "仪表盘"],
   ["chat", "05-chat.md", "AI 对话"], ["landing", "06-landing.md", "落地页"], ["mobile-order", "07-mobile-order.md", "移动端下单"], ["wizard", "08-wizard.md", "表单向导"],
-].map(([id, file, title]) => ({ id, file, title, mobile: id === "mobile-order", shell: ["chat", "wizard", "admin-table", "auth"].includes(id) }));
+  ["not-found", "09-not-found.md", "404 页面"],
+].map(([id, file, title]) => ({ id, file, title, mobile: id === "mobile-order", shell: ["chat", "wizard", "admin-table", "auth", "not-found"].includes(id) }));
 // mobile：手机页面，预览默认放进设备框（device.js）；shell：app 式配方（整页就是一个应用、自己占满一屏，页面本身不该滚），预览框固定高度——别的是内容页，预览框和内容一样高

@@ -118,7 +118,7 @@ for (const theme of ["light", "dark"]) for (const [dev, tag] of DEVS) for (const
 }
 // ———— 1b. 桌面配方"在手机上看"：内容页（仪表盘、落地页、设置）内容滑到状态栏底下，app 式页面（对话、向导、后台列表、登录）从状态栏下面开始；
 //          页面往上滚 140px 再查一遍、拍屏幕上面那一块（看状态栏那条的底色和模糊，时间图标不跟内容叠成两层字）
-const RECIPES_UNDER = [["dashboard", true], ["landing", true], ["settings", true], ["chat", false], ["wizard", false], ["admin-table", false], ["auth", false]];
+const RECIPES_UNDER = [["dashboard", true], ["landing", true], ["settings", true], ["chat", false], ["wizard", false], ["admin-table", false], ["auth", false], ["not-found", false]];
 for (const theme of ["light", "dark"]) for (const [dev, tag] of [["iphone-15", "iphone15"], ["pixel-7", "pixel7"], ["iphone-se", "se"]]) {
   const ctx = await ctxOf(1440, 900, theme, dev, false), p = await ctx.newPage(), errs = [];
   p.on("pageerror", (e) => errs.push(e.message.slice(0, 140)));

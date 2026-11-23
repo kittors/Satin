@@ -112,7 +112,7 @@ if (!ONLY || ONLY.split(",").includes("recipes")) {
     await page.goto(`${BASE}/site/next-docs.html#/recipe/${id}`, { waitUntil: "load" });
     // 等预览 iframe 载好（按真实排版判断空白）：最多 30 秒
     let r = null;
-    for (let i = 0; i < 60; i++) { r = await page.evaluate(() => window.__satinRecipeFiles?.()).catch(() => null); if (r?.ready) break; await sleep(500); }
+    for (let i = 0; i < 60; i++) { r = await page.evaluate(() => window.__satinRecipeFiles?.()).catch(() => null); if (r?.id === id && r.ready) break; await sleep(500); }
     if (r) recipes.push(r);
     console.log(`配方 ${id.padEnd(12)} ${r?.ready ? "" : "（预览没载好，按标签猜的空白）"}`);
   }

@@ -5,6 +5,8 @@ import { onMode } from "./shell.js";
 import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui/src/core.js";
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { bindOverlays } from "../packages/satin-ui/src/overlay.js";
+import { copied } from "../packages/satin-ui/src/form.js";
+import { numberFlow } from "../packages/satin-ui/src/number.js";
 import { loadCatalog } from "./catalog.js";
 import { codePanel, mountCode, fmtHTML } from "./code.js";
 import { deviceHTML, mountDevices } from "./device.js";
@@ -668,11 +670,12 @@ function overviewPage(pg) {
   return head(pg, "组件总览", `组件 <span>Components</span>`, `${cat.components.length} 个组件，按类别分组。点一张卡片进到组件页：现场演示、HTML / React / Vue / 自定义元素四种写法的代码、参数和要点。颜色、排版这些基础在<a href="#/guide/color">规范</a>里。`)
     + groups.map((g, i) => anchor("g" + i, `${esc(g.name)}<span class="d-h2-sub">${g.items.length}</span>`) + `<div class="d-cards">${g.items.map((c) => `<a class="d-card" href="#/c/${c.id}"><b>${esc(c.name)}</b><small>${esc(c.en.split(" · ")[0])}</small><span>${esc(plain(c.desc))}</span></a>`).join("")}</div>`).join("");
 }
-// 配方总览：8 种页面，每张卡片上是这一页缩小的实时预览（滚到附近才载入）
+// 配方总览：9 种页面，每张卡片上是这一页缩小的实时预览（滚到附近才载入）
 const RSUB = { "admin-table": "侧栏 + 搜索筛选 + 表格 + 分页", settings: "单栏窄页面，左边标题、右边字段", auth: "整屏居中一个面板：字段 + 撑满的主按钮", dashboard: "KPI 火花线 + 面积/环形/3D 立体算力图 + 联动明细表",
-  chat: "对话框占满主区：消息区 + 提示词输入框", landing: "首屏 + 3 个功能点 + 真实场景 + 页脚", "mobile-order": "单栏 + 底部贴边的操作栏", wizard: "步骤条 + 当前一步的字段 + 上一步 / 下一步" };
+  chat: "对话框占满主区：消息区 + 提示词输入框", landing: "首屏 + 3 个功能点 + 真实场景 + 页脚", "mobile-order": "单栏 + 底部贴边的操作栏", wizard: "步骤条 + 当前一步的字段 + 上一步 / 下一步",
+  "not-found": "可互动光学取景器 404：跟手追焦 6 叶片光圈 + 快门重拍 + 快捷直达" };
 function recipesPage(pg) {
-  return head(pg, "配方总览", `配方 <span>Recipes</span>`, "8 种常见页面的骨架：先照着搭结构，再换成自己的内容。只用 Satin 的骨架类和组件，不用自己写布局和颜色。每一种都有实时预览和代码，代码可以切换 HTML、React、Vue。")
+  return head(pg, "配方总览", `配方 <span>Recipes</span>`, "9 种常见页面的骨架：先照着搭结构，再换成自己的内容。只用 Satin 的骨架类和组件，不用自己写布局和颜色。每一种都有实时预览和代码，代码可以切换 HTML、React、Vue。")
     + `<div class="d-cards d-rcards">${RECIPES.map((r) => `<a class="d-card d-rcard" href="#/recipe/${r.id}"><span class="d-rprev" aria-hidden="true"><iframe src="../tests/recipes/${r.id}.html" loading="lazy" tabindex="-1" title=""></iframe></span><b>${esc(r.title)}</b><span>${esc(RSUB[r.id] || "")}</span></a>`).join("")}</div>`;
 }
 // 单个配方：原文（spec/recipes/*.md）载好后填进来——说明、实时预览、代码、详尽案例介绍或补充说明
@@ -1093,12 +1096,69 @@ async function route() {
   }
   if (part) { const el = document.getElementById(part); if (el) el.scrollIntoView({ behavior: reduced() ? "instant" : "smooth", block: "start" }); }
 }
+let nfAbort = null;
+function renderNotFound(rawPath) {
+  const safePath = esc(rawPath || "#/404");
+  const ticks = Array.from({ length: 24 }, (_, i) => i % 6 === 0
+    ? `<line class="sn-e404-tick-major" x1="70" y1="6" x2="70" y2="15"${i ? ` transform="rotate(${i * 15} 70 70)"` : ""}/>`
+    : `<line class="sn-e404-tick" x1="70" y1="8" x2="70" y2="13" transform="rotate(${i * 15} 70 70)"/>`).join("");
+  const blades = [0, 60, 120, 180, 240, 300].map((a, i) =>
+    `<path class="${i % 2 ? "sn-e404-blade-alt" : "sn-e404-blade"}" d="M58 49 H118 V18 H58 Z"${a ? ` transform="rotate(${a} 70 70)"` : ""}/>`).join("");
+  const digit4 = `<svg class="sn-e404-digit" viewBox="0 0 88 124" aria-hidden="true"><path class="sn-e404-digit-ghost" d="M55 17 L13 78 V91 H55 V113 H71 V91 H83 V77 H71 V17 Z M55 39 V77 H29 Z" transform="translate(4 4)"/><path class="sn-e404-digit-solid" fill-rule="evenodd" d="M55 17 L13 78 V91 H55 V113 H71 V91 H83 V77 H71 V17 Z M55 39 V77 H29 Z"/></svg>`;
+  return `<div class="sn-e404 sn-e404-inline" data-nf-root><div class="sn-e404-wrap">`
+    + `<section class="sn-e404-frame" data-nf-frame aria-label="404 光学取景器">`
+    + `<div class="sn-e404-hud"><div class="sn-e404-hud-l"><i class="sn-e404-rec" aria-hidden="true"></i><span class="sn-e404-tag">FRAME 404</span>`
+    + `<span class="sn-e404-path"><code data-nf-path>${safePath}</code><button type="button" class="sn-e404-copybtn" data-nf-copy data-tip="复制路径" aria-label="复制当前路径"><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button></span></div>`
+    + `<span class="sn-e404-coord" data-nf-coord aria-hidden="true">X +00 · Y +00</span></div>`
+    + `<div class="sn-e404-stage" data-nf-stage><i class="sn-e404-corner sn-tl" aria-hidden="true"></i><i class="sn-e404-corner sn-tr" aria-hidden="true"></i><i class="sn-e404-corner sn-bl" aria-hidden="true"></i><i class="sn-e404-corner sn-br" aria-hidden="true"></i><div class="sn-e404-flash" aria-hidden="true"></div>`
+    + `<div class="sn-e404-trio">${digit4}<button type="button" class="sn-e404-lens" data-nf-lens aria-label="点击对焦快门，重新拍摄当前空帧"><svg class="sn-e404-lens-svg" viewBox="0 0 140 140" aria-hidden="true"><defs><clipPath id="sn-e404-doc-clip"><circle cx="70" cy="70" r="44"/></clipPath></defs><g class="sn-e404-dial">${ticks}<polygon class="sn-e404-mark" points="70,18 67,13 73,13"/></g><g class="sn-e404-iris-wrap"><circle class="sn-e404-barrel" cx="70" cy="70" r="44"/><g clip-path="url(#sn-e404-doc-clip)"><g class="sn-e404-blades">${blades}</g></g><path class="sn-e404-reticle" d="M60 65 V60 H65 M75 60 H80 V65 M80 75 V80 H75 M65 80 H60 V75"/><circle class="sn-e404-dot" cx="70" cy="70" r="2"/></g></svg></button>${digit4}</div></div>`
+    + `<div class="sn-e404-bar"><span class="sn-e404-note" data-nf-note aria-live="polite">第 1 镜 · 已对焦，但这一页不在当前时间线上。</span><span class="sn-e404-meta"><span class="sn-e404-specs">F/2.8 · 24 FPS</span><span class="sn-e404-take">TAKE <span data-nf-take>01</span></span></span></div></section>`
+    + `<div class="sn-e404-head"><h1>这一页不在这个镜头里</h1><p>地址可能写错了，或者这一页改了名字。</p></div>`
+    + `<div class="sn-e404-acts"><a class="sn-btn sn-primary" href="#/intro" data-i="house:before">回到介绍</a><button type="button" class="sn-btn sn-secondary" data-nf-back data-i="arrow-left:before">返回上一页</button><button type="button" class="sn-btn sn-ghost" data-nf-shutter data-i="rotate-cw:before">重新对焦<kbd class="sn-kbd">Space</kbd></button></div>`
+    + `<nav class="sn-e404-links" aria-label="常用入口">`
+    + `<a class="sn-card sn-bordered sn-sm sn-interactive sn-e404-link" href="#/components"><div class="sn-e404-link-top"><span class="sn-e404-link-ic" data-i="layout-grid"></span><b>组件总览</b><span class="sn-e404-link-arr" data-i="arrow-up-right"></span></div><p>64 个即用组件与 7 框架示例</p></a>`
+    + `<a class="sn-card sn-bordered sn-sm sn-interactive sn-e404-link" href="#/recipe/not-found"><div class="sn-e404-link-top"><span class="sn-e404-link-ic" data-i="rows-3"></span><b>404 页面配方</b><span class="sn-e404-link-arr" data-i="arrow-up-right"></span></div><p>查看本页完整代码与设计说明</p></a>`
+    + `<a class="sn-card sn-bordered sn-sm sn-interactive sn-e404-link" href="#/guide/principles"><div class="sn-e404-link-top"><span class="sn-e404-link-ic" data-i="book-open"></span><b>设计规范</b><span class="sn-e404-link-arr" data-i="arrow-up-right"></span></div><p>令牌、动效与去 AI 味准则</p></a>`
+    + `</nav></div></div>`;
+}
+function wireNotFound(scope) {
+  nfAbort?.abort();
+  const ac = new AbortController(); nfAbort = ac;
+  const { signal } = ac;
+  const frame = $("[data-nf-frame]", scope), stage = $("[data-nf-stage]", scope), coord = $("[data-nf-coord]", scope), noteEl = $("[data-nf-note]", scope), takeEl = $("[data-nf-take]", scope), pathEl = $("[data-nf-path]", scope);
+  if (!frame || !stage) return;
+  const NOTES = ["已对焦，但这一页不在当前时间线上。", "切换广角复核，场记表里没有这个编号。", "镜面干净，只是你要找的那场戏还没开机。", "光线与构图正常，唯独目标地址缺席。", "连续空拍多次，建议直接回到有画面的一页。"];
+  let take = 1, rot = 0, timer = 0;
+  const nf = takeEl ? numberFlow(takeEl, { value: 1, style: "roll", format: (v) => String(Math.round(v)).padStart(2, "0") }) : null;
+  const shoot = () => {
+    take += 1; rot += 30;
+    frame.style.setProperty("--sn-e404-rot", rot + "deg");
+    frame.classList.remove("sn-shutter"); void frame.offsetWidth; frame.classList.add("sn-shutter");
+    clearTimeout(timer); timer = setTimeout(() => frame.classList.remove("sn-shutter"), 180);
+    nf?.set(take);
+    if (noteEl) noteEl.textContent = `第 ${take} 镜 · ${NOTES[(take - 1) % NOTES.length]}`;
+  };
+  $("[data-nf-lens]", scope)?.addEventListener("click", shoot, { signal });
+  $("[data-nf-shutter]", scope)?.addEventListener("click", shoot, { signal });
+  $("[data-nf-back]", scope)?.addEventListener("click", () => { if (history.length > 1) history.back(); else location.hash = "#/intro"; }, { signal });
+  const copyBtn = $("[data-nf-copy]", scope);
+  copyBtn?.addEventListener("click", () => { navigator.clipboard?.writeText(pathEl?.textContent?.trim() || location.hash).catch(() => {}); copied(copyBtn); }, { signal });
+  const fmt = (n) => (n >= 0 ? "+" : "-") + String(Math.abs(Math.round(n))).padStart(2, "0");
+  stage.addEventListener("pointermove", (e) => {
+    const r = stage.getBoundingClientRect(), nx = ((e.clientX - r.left) / r.width - 0.5) * 2, ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    frame.style.setProperty("--sn-e404-x", (nx * 8).toFixed(1) + "px"); frame.style.setProperty("--sn-e404-y", (ny * 8).toFixed(1) + "px");
+    if (coord) coord.textContent = `X ${fmt(nx * 48)} · Y ${fmt(ny * 32)}`;
+  }, { signal });
+  stage.addEventListener("pointerleave", () => { frame.style.setProperty("--sn-e404-x", "0px"); frame.style.setProperty("--sn-e404-y", "0px"); if (coord) coord.textContent = "X +00 · Y +00"; }, { signal });
+  document.addEventListener("keydown", (e) => { if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "")) { e.preventDefault(); shoot(); } }, { signal });
+}
 async function swapPage(pg, part, inVT = false) {
-  curPage = pg; frames.clear(); resetQueue(); h2n = 0;
+  curPage = pg; frames.clear(); resetQueue(); h2n = 0; nfAbort?.abort(); nfAbort = null;
   const wasFirst = first;
   if (!pg) {
-    main.innerHTML = `<div class="d-404"><h1 class="d-h1">没有这一页</h1><p class="d-lead">地址可能写错了，或者这一页改了名字。</p><a class="sn-btn sn-secondary" href="#/intro">回到介绍</a></div>`;
-    tocVp.innerHTML = ""; document.title = "没有这一页 · Satin";
+    main.innerHTML = renderNotFound(location.hash || "#/404");
+    injectIcons(main); wireNotFound(main);
+    tocVp.innerHTML = ""; document.title = "404 · 这一页不在这个镜头里 · Satin";
   } else {
     const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
     const enterCls = !wasFirst && !inVT && !reduced() ? " d-page-enter" : "";

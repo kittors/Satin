@@ -1,4 +1,3 @@
-"use client"; // Next.js 里是客户端组件（用到了 useEffect）；Vite 里这一行没有影响
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
 import { Segmented } from "satin-ui/react";
@@ -16,14 +15,13 @@ export default function Settings() {
         <header className="sn-page-hd">
           <div>
             <h1>设置</h1>
-            <p>账户、通知和默认的生成参数</p>
           </div>
         </header>
         <div className="sn-panel">
           <section className="sn-setting">
             <div>
               <h3>个人资料</h3>
-              <p>团队成员会看到你的名字和头像。</p>
+              <p>团队成员会看到你的名字。</p>
             </div>
             <form className="sn-form" noValidate>
               <div className="sn-field" data-f="name">
@@ -49,7 +47,7 @@ export default function Settings() {
           <section className="sn-setting">
             <div>
               <h3>通知</h3>
-              <p>改了马上生效。</p>
+              <p>发到上面的邮箱，改了马上生效。</p>
             </div>
             <div className="sn-stack sn-gap-12">
               <label className="sn-switch"><input type="checkbox" role="switch" defaultChecked /><span className="sn-track">
@@ -67,6 +65,15 @@ export default function Settings() {
             </div>
             <div>
               <Segmented items={["16:9 横屏","9:16 竖屏","1:1 方形"]} defaultValue="16:9 横屏" />
+            </div>
+          </section>
+          <section className="sn-setting">
+            <div>
+              <h3>导出格式</h3>
+              <p>点“导出”时默认生成的文件。</p>
+            </div>
+            <div>
+              <Segmented items={["PDF 分镜本","Excel 拍摄表"]} defaultValue="PDF 分镜本" />
             </div>
           </section>
           <section className="sn-setting">

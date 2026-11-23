@@ -293,8 +293,8 @@ html.vt-page::view-transition-new(d-main) { animation: s-vt-in 240ms var(--sn-ea
 .d-main ul.d-list { margin-top: 8px; padding-left: 20px; display: grid; gap: 6px; }
 .d-main b { color: var(--sn-label); font-weight: 500; }
 .d-main code:not(pre code) { padding: 1px 6px; border-radius: var(--sn-r-xs); background: var(--sn-fill-subtle); font: 400 .88em/1 var(--sn-mono); color: var(--sn-label); }
-.d-main a:not(.sn-btn):not(.d-pager a) { color: var(--sn-label); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--sn-line-control); }
-.d-main a:not(.sn-btn):not(.d-pager a):hover { text-decoration-color: currentColor; }
+.d-main a:not(.sn-btn):not(.sn-card):not(.d-pager a) { color: var(--sn-label); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--sn-line-control); }
+.d-main a:not(.sn-btn):not(.sn-card):not(.d-pager a):hover { text-decoration-color: currentColor; }
 .d-inline-ic .sn-ic { width: 14px; height: 14px; vertical-align: -2px; }
 
 /* 演示：预览 / 代码 */
