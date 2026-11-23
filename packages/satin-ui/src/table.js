@@ -349,6 +349,9 @@ export function mountTable(wrap, o0 = {}, emit) {
   const easeOut = (t) => 1 - (1 - t) ** 4, easeOpen = bezier(.32, .72, 0, 1); /* 推开 / 合上和侧栏开合同一条曲线（--ease-open）：起步快，不会先空一下 */
   let lay = null, dragNow = null, colLand = null, foot = null, selTd = null, editing = null, lastRegs = [];
   const footOf = () => $(":scope > tfoot > tr", table);
+  // 限高/填满且在 .sn-tbl-sc 内竖向滚动时，thead/tfoot 靠原生 position:sticky 吸附，绝不对 tfoot tr 做 translate（否则叠加 sticky 飞到表中央或掉出底部）
+  const isScrollY = () => !!scEl && (o.maxHeight != null || !!o.fill || scEl.classList.contains("sn-sa-vp")) && /(auto|scroll)/.test(getComputedStyle(scEl).overflowY);
+  const isFootSticky = (f) => !!f?.firstElementChild && isScrollY() && getComputedStyle(f.firstElementChild).position === "sticky";
   function regions(vs) { const regs = regionsOf(vs.map((r) => nodeOf(r).row), M.dcols0, order, o); for (const g of regs) { addMK(g.k); if (g.cs > 1) for (let j = order.indexOf(g.k); j < order.indexOf(g.k) + g.cs; j++) CSK.add(order[j]); } return regs; }
   function applyMerge(vs, regs) {
     for (const k of MK) for (const td of $$(`td[data-c="${CSS.escape(k)}"]`, tbody)) { td.rowSpan = 1; td.hidden = false; td.classList.remove("sn-mg", "sn-mg-x", "sn-mg-y", "sn-mg-o"); }
@@ -360,26 +363,40 @@ export function mountTable(wrap, o0 = {}, emit) {
     lastRegs = regs;
     if (selTd?.hidden) { const on = wrap.classList.contains("sn-sel-on"), i = vs.indexOf(selTd.closest("tr")), g = regs.find((x) => i >= x.a && i < x.b && coversCol(x, selTd.dataset.c, order)); selectTd(g ? cellOf(vs[g.a], g.k) : null); wrap.classList.toggle("sn-sel-on", on && !!selTd); } /* 选中的格子被并进去了：选合并后的那一格（选中框原来收着就还收着） */
   }
-  // 合并块第一格的内容要往下挪多少才在整块正中（每帧按当前行高算：拖行高、切密度时也对）
-  const spanOff = (vs, g) => { let s = 0; for (let k = g.a; k < g.b; k++) s += vs[k].offsetHeight; return (s - vs[g.a].offsetHeight) / 2; };
+  // 合并块第一格的内容要往下挪多少才在整块正中（每帧按当前行高算；限高滚动表同时与 CSS position:sticky 区间对齐，避免撞进表头腰斩或结束跳变）
+  const spanOff = (vs, g, stk) => {
+    let s = 0; for (let k = g.a; k < g.b; k++) s += vs[k].offsetHeight;
+    const h0 = vs[g.a].offsetHeight, mid = (s - h0) / 2;
+    if (!stk) return mid;
+    const topY = stk.top, rel1 = stk.rel1;
+    let y = topY + rel1 + mid;
+    if (y < stk.minY) y = Math.min(topY + s - h0 + rel1, stk.minY);
+    if (y > stk.maxY) y = Math.max(topY + rel1, stk.maxY);
+    return y - (topY + rel1);
+  };
+  const rowContentOp = (r) => {
+    const v = parseFloat(r.style.getPropertyValue("--sn-row-op"));
+    return Number.isFinite(v) ? v : +getComputedStyle(r).opacity;
+  };
   function measure() {
     const m = new Map();
     for (const r of rowsOf()) {
       if (r.hidden || r.classList.contains("leaving")) continue; /* 正在被盖住的行不算"原来就在"：中途又要它出来，就接着现在露出来的那一截再推开 */
-      const e = { y: r.getBoundingClientRect().top, op: +getComputedStyle(r).opacity, mc: null };
+      const e = { y: r.getBoundingClientRect().top, op: rowContentOp(r), mc: null };
       if (r !== emptyRow && MK.length) { e.mc = {}; for (const k of MK) { const td = cellOf(r, k), c = !td || td.hidden ? null : td.firstElementChild; e.mc[k] = { cy: c ? c.getBoundingClientRect().top : null, cop: c ? +getComputedStyle(c).opacity : 0, reg: !!td && (td.hidden || td.rowSpan > 1 || td.classList.contains("sn-mg-x")) }; } }
       m.set(r, e);
     }
-    foot = footOf(); m.foot = foot ? foot.getBoundingClientRect().top : 0; m.h = wrap.getBoundingClientRect().height; m.leaving = new Set($$(":scope > tr.leaving", tbody)); /* 正在被盖住的行：再出来时接着现在露出的那一截，不重新淡入 */
+    foot = footOf(); m.foot = foot ? foot.getBoundingClientRect().top : 0; m.h = wrap.getBoundingClientRect().height; m.scH = scEl ? scEl.getBoundingClientRect().height : 0;
+    m.leaving = new Map($$(":scope > tr.leaving", tbody).map((r) => [r, rowContentOp(r)])); /* 正在被盖住的行：再出来时接着现在的透明度，不闪爆 */
     return m;
   }
   const clearLay = (l) => {
     cancelAnimationFrame(l.raf);
     for (const it of l.items) { it.el.style.translate = ""; it.el.style.opacity = ""; }
-    for (const c of l.clips) { c.r.style.clipPath = ""; c.r.style.translate = ""; c.r.style.opacity = ""; c.r.classList.remove("adding", "leaving"); }
+    for (const c of l.clips) { c.r.style.clipPath = ""; c.r.style.translate = ""; c.r.style.opacity = ""; c.r.style.removeProperty("--sn-row-op"); c.r.classList.remove("adding", "leaving"); }
     for (const r of l.movers) r.classList.remove("sn-moving");
     for (const r of l.tops) r.classList.remove("sn-mg-top");
-    if (l.hAnim) wrap.style.height = "";
+    if (l.hAnim) { wrap.style.height = ""; if (l.hAnim.sc) scEl.style.height = ""; }
   };
   function stopLay() { // 停在终点：清掉偏移和裁切；被盖住的行真正藏起来；该合并的合并
     const l = lay; if (!l) return; lay = null; clearLay(l); for (const r of l.gone) r.hidden = true; applyMerge(l.vs, l.regs);
@@ -393,14 +410,30 @@ export function mountTable(wrap, o0 = {}, emit) {
     if (reduced() || op.instant) { applyMerge(vs, regs); return; }
     applyMerge(vs, regs.filter((g) => g.b - g.a < 2)); // 过渡期间只留横着的合并（同一行里，跟着这一行走）；竖着的先拆开，到位再合
     const regK = new Map(); for (const g of regs) if (g.b - g.a > 1) { if (!regK.has(g.k)) regK.set(g.k, new Map()); for (let k = g.a; k < g.b; k++) regK.get(g.k).set(k, g); }
-    const items = [], clips = [], tops = [], movers = [], DUR = 300; let gone = [], hAnim = null, mv = null;
+    // 先把过渡态合并类（sn-mg-x / sn-mg-y / sn-mg-o）打好，再做任何 getBoundingClientRect() 布局读取，彻底消除合并格在强制重排瞬间触发 hover/kid 闪灰过渡
+    const gonePre = op.rows !== false ? [...m.keys()].filter((r) => r.hidden) : [];
+    for (const r of gonePre) for (const k of MK) { const td = cellOf(r, k), wc = m.get(r)?.mc?.[k]; if (!td || !wc?.reg) continue; td.classList.add("sn-mg-x", "sn-mg-y"); if (td.firstElementChild && (wc.cy == null || wc.cop < .5)) td.firstElementChild.style.opacity = "0"; }
+    vs.forEach((r, i) => {
+      const was = m.get(r);
+      for (const k of MK) {
+        const td = cellOf(r, k); if (!td) continue;
+        const g = regK.get(k)?.get(i), wc = was?.mc?.[k];
+        if (g) { td.classList.add("sn-mg-x"); if (i < g.b - 1) td.classList.add("sn-mg-y"); if (g.a !== i && td.firstElementChild && !wc?.cy) td.firstElementChild.style.opacity = "0"; }
+        // 大合并块收拢成单行时：过渡期内容正从下方滑回本行，先隐藏本格底线并与下方收拢区统一底色，避免底线横穿正在上滑的头像/文字
+        else if (wc?.reg && wc.cy != null && wc.cy - was.y > 22 && gonePre.length) td.classList.add("sn-mg-x", "sn-mg-y");
+        if (wc?.reg) td.classList.add("sn-mg-o");
+      }
+    });
+    const items = [], clips = [], tops = [], movers = [], DUR = 300; let gone = [], hAnim = null, mv = null, fy = null;
+    const scrollY = isScrollY(), footSticky = isFootSticky(foot);
     const all = rowsOf(), shown = all.filter((r) => !r.hidden);
     if (op.rows !== false) {
-      // 最后的样子：每一行、合计行在哪，外框多高
-      const fy = new Map(shown.map((r) => [r, r.getBoundingClientRect().top])), ffoot = foot ? foot.getBoundingClientRect().top : 0, h1 = wrap.getBoundingClientRect().height;
+      // 最后的样子：每一行、合计行在哪，外框与滚动区多高
+      fy = new Map(shown.map((r) => [r, r.getBoundingClientRect().top]));
+      const ffoot = foot && !footSticky ? foot.getBoundingClientRect().top : 0, h1 = wrap.getBoundingClientRect().height, scH1 = scEl ? scEl.getBoundingClientRect().height : 0;
       // 原来看得见、现在要藏起来的行：先留在原处占着位置，等下面的行滑上来盖住再藏
-      gone = [...m.keys()].filter((r) => r.hidden); for (const r of gone) { r.hidden = false; r.classList.add("leaving"); }
-      const live = all.filter((r) => !r.hidden), ly = new Map(live.map((r) => [r, r.getBoundingClientRect().top])), lfoot = foot ? foot.getBoundingClientRect().top : 0; /* 过渡期间的排版（要藏的行还占着位置）：位移都相对它算 */
+      gone = gonePre; for (const r of gone) { r.hidden = false; r.classList.add("leaving"); }
+      const live = all.filter((r) => !r.hidden), ly = new Map(live.map((r) => [r, r.getBoundingClientRect().top])), lfoot = foot && !footSticky ? foot.getBoundingClientRect().top : 0; /* 过渡期间的排版（要藏的行还占着位置）：位移都相对它算 */
       mv = new Map(); let k = 0;
       for (const r of live) {
         const was = m.get(r), L = ly.get(r);
@@ -408,8 +441,8 @@ export function mountTable(wrap, o0 = {}, emit) {
         else if (was) mv.set(r, { y0: was.y - L, y1: fy.get(r) - L, kind: "stay" });
         else mv.set(r, { y0: fy.get(r) - L, y1: fy.get(r) - L, kind: "add" });
       }
-      if (foot) mv.set(foot, { y0: m.foot - lfoot, y1: ffoot - lfoot, kind: "stay" });
-      // 留下来的行（和合计行）：从看到的位置滑到最后的位置；滑动的行压在新出现 / 要藏的行上面
+      if (foot && !footSticky) mv.set(foot, { y0: m.foot - lfoot, y1: ffoot - lfoot, kind: "stay" });
+      // 留下来的行（非吸底时含合计行）：从看到的位置滑到最后的位置；滑动的行压在新出现 / 要藏的行上面
       for (const [r, v] of mv) {
         if (v.kind !== "stay" || (Math.abs(v.y0) < .5 && Math.abs(v.y1) < .5)) continue;
         const d = op.stagger && Math.abs(v.y1 - v.y0) > .5 ? Math.min(k++ * op.stagger, 120) : 0;
@@ -417,27 +450,34 @@ export function mountTable(wrap, o0 = {}, emit) {
         if (r !== foot) { r.classList.add("sn-moving"); movers.push(r); }
       }
       // 新出现的、要藏起来的行：挂在它上面最近的那一行"留下来的"行下面一起走（不和上面的行拉开、也不叠上去），
-      // 被它下面最近的那一行"留下来的"行（或合计行）盖住多少就裁掉多少——推开时一点点露出来，合上时一点点被盖住（下面什么都没有时由外框的高度过渡裁）
-      const below = new Map(); let ref = foot;
+      // 被它下面最近的那一行"留下来的"行（非吸底时或合计行）盖住多少就裁掉多少；可推合的只淡化单元格内容（保留连续网格线，彻底消除半截残影与断线白洞）
+      const below = new Map(); let ref = footSticky ? null : foot;
       for (let i = live.length - 1; i >= 0; i--) { const r = live[i]; below.set(r, ref); if (mv.get(r).kind === "stay") ref = r; }
-      let anchor = null;
+      let anchor = null, addSeq = 0;
       for (const r of live) {
-        const v = mv.get(r); if (v.kind === "stay") { anchor = r; continue; }
+        const v = mv.get(r); if (v.kind === "stay") { anchor = r; addSeq = 0; continue; }
         const rf = below.get(r), av = anchor ? mv.get(anchor) : null, base = v.kind === "add" ? v.y1 : v.y0, aRef = av ? (v.kind === "add" ? av.y1 : av.y0) : 0;
-        const c = { r, ref: rf, anchor, base, aRef, kind: v.kind, top: ly.get(r), h: r.getBoundingClientRect().height, refTop: rf ? (rf === foot ? lfoot : ly.get(rf)) : 0, op0: 1, op1: 1, d: 0 };
-        // 盖不住 / 推不开的（比如筛选时一行换成另一行，下面那一行不动）：要藏的淡出、新出现的淡入，同一个位置不会叠着两行字
+        const c = { r, ref: rf, anchor, base, aRef, kind: v.kind, top: ly.get(r), h: r.getBoundingClientRect().height, refTop: rf ? (rf === foot ? lfoot : ly.get(rf)) : 0, op0: 1, op1: 1, d: 0, contentOnly: false };
         const at = (aY, rY) => Math.max(0, Math.min(c.h, c.refTop + rY - (c.top + base + (av ? aY - aRef : 0))));
         const rv = rf ? mv.get(rf) : null;
-        // 要藏的行：下面的行滑上来盖住它的同时 120ms 淡掉（不再是一整行字被"帘子"一点点盖住）；
-        // 新出现的行：下面的行滑开、它露出来的同时淡入（40ms 后开始、200ms）。盖不住 / 推不开的（筛选时一行换成另一行）新的等 100ms 再进来，同一个位置不会两行字都看得清
-        if (v.kind === "gone") { c.op0 = 1; c.op1 = 0; }
-        if (v.kind === "add" && !m.leaving.has(r)) { c.op0 = 0; c.op1 = 1; c.d = rv && at(av?.y0 ?? 0, rv.y0) > 1 ? 100 : 40; }
+        const swapped = !rv || (v.kind === "gone" ? at(av?.y1 ?? 0, rv.y1) > 1 : at(av?.y0 ?? 0, rv.y0) > 1); // 盖不住 / 推不开的（比如筛选时一行换成另一行，下面那一行不动）
+        c.contentOnly = !swapped;
+        if (v.kind === "gone") { c.op0 = m.get(r)?.op ?? 1; c.op1 = 0; }
+        if (v.kind === "add") {
+          const prevOp = m.leaving.get(r);
+          c.op0 = prevOp != null ? prevOp : 0;
+          c.op1 = 1;
+          c.d = prevOp != null ? 0 : (swapped ? 100 : Math.min(addSeq++ * 16, 64));
+        }
         r.classList.add(v.kind === "add" ? "adding" : "leaving"); clips.push(c);
       }
-      if (Math.abs(h1 - m.h) > .5) hAnim = { h0: m.h, h1 };
+      if (Math.abs(h1 - m.h) > .5) hAnim = { h0: m.h, h1, sc: scEl && Math.abs(scH1 - m.scH) > .5 ? { h0: m.scH, h1: scH1 } : null };
       mv.forEach((v) => (v.cur = v.y0));
     }
-    // 合并块的内容
+    // 合并块的内容（限高滚动表同步计算与 CSS position:sticky 一致的视口夹紧目标，确保动画与落位 0 跳变、不撞表头腰斩）
+    const scRect = scrollY ? scEl.getBoundingClientRect() : null;
+    const headH = scrollY ? (thead?.getBoundingClientRect().height || 40) : 0;
+    const footH = scrollY && footSticky ? (foot.firstElementChild.getBoundingClientRect().height || 44) : 0;
     vs.forEach((r, i) => {
       const was = m.get(r); let d = 0;
       if (op.rows === false && was) { // 拖的这一组的行由调用方（拖行）接着管：这里只接着做完下级相对它的那一点偏移；这一组以外还在过渡的行，从看到的位置接着滑到位
@@ -448,36 +488,54 @@ export function mountTable(wrap, o0 = {}, emit) {
       for (const k of MK) {
         const td = cellOf(r, k), c = td && !td.hidden ? td.firstElementChild : null; if (!c) continue;
         const g = regK.get(k)?.get(i), keep = !g || g.a === i, wc = was?.mc?.[k], seen = !!wc && wc.cy != null;
-        const it = { el: c, g: keep ? g : null, y0: 0, op0: seen ? wc.cop : 0, op1: keep ? 1 : 0, d, dur: DUR, e: easeOpen };
-        const rel1 = c.getBoundingClientRect().top - r.getBoundingClientRect().top; /* 内容在这一行里的位置（相对行，和行自己的位移无关） */
-        const tg = it.g ? spanOff(vs, it.g) : 0; it.y0 = seen ? (wc.cy - was.y) - rel1 : tg;
+        const cr = c.getBoundingClientRect(), rr = r.getBoundingClientRect(), rel1 = cr.top - rr.top; /* 内容在这一行里的位置（相对行，和行自己的位移无关） */
+        let stk = null;
+        if (keep && g && scrollY && scRect) {
+          const finTop = (fy?.get(r) ?? rr.top) - scRect.top, ch = cr.height || 20, pad = Math.max(8, rel1);
+          stk = { top: finTop, rel1, ch, minY: headH + pad, maxY: scRect.height - footH - pad - ch };
+        }
+        const it = { el: c, g: keep ? g : null, stk, y0: 0, op0: seen ? wc.cop : 0, op1: keep ? 1 : 0, d, dur: DUR, e: easeOpen, unmgTd: !g && td.classList.contains("sn-mg-y") ? td : null };
+        const tg = it.g ? spanOff(vs, it.g, it.stk) : 0; it.y0 = seen ? (wc.cy - was.y) - rel1 : tg;
+        if (it.unmgTd && it.y0 <= 4) { it.unmgTd.classList.remove("sn-mg-y"); it.unmgTd = null; }
         if (Math.abs(it.y0) > .05 || Math.abs(tg) > .05 || it.op0 < 1 || it.op1 < 1) items.push(it);
-        if (it.g && it.g.b - it.g.a > 1 && !tops.includes(r)) { r.classList.add("sn-mg-top"); tops.push(r); } /* 内容会伸到下面几行去：这一行压在上面 */
+        // 只要内容在起点或终点伸出本行范围（含大合并块收成单行），所在行必须压在合并块其他行上方，防止被下方的 leaving 行横劈腰斩
+        if (((it.g && it.g.b - it.g.a > 1) || Math.abs(it.y0) > .5 || Math.abs(tg) > .5) && !tops.includes(r)) { r.classList.add("sn-mg-top"); tops.push(r); }
       }
     });
-    for (const r of gone) for (const k of MK) { const td = cellOf(r, k), wc = m.get(r)?.mc?.[k]; if (!td || !wc?.reg) continue; td.classList.add("sn-mg-x", "sn-mg-y"); const c = td.firstElementChild; if (c && (wc.cy == null || wc.cop < .5)) items.push({ el: c, g: null, y0: 0, op0: 0, op1: 0, d: 0, dur: DUR, e: easeOpen }); } /* 要藏的行原来在合并块里：过渡中还像块里那样不画线、不显示自己的那一份 */
-    vs.forEach((r, i) => { for (const k of MK) { const td = cellOf(r, k); if (!td) continue; const g = regK.get(k)?.get(i); if (g) { td.classList.add("sn-mg-x"); if (i < g.b - 1) td.classList.add("sn-mg-y"); } if (m.get(r)?.mc?.[k]?.reg) td.classList.add("sn-mg-o"); } }); // 过渡期间先模仿合并后的样子
+    for (const r of gone) for (const k of MK) { const td = cellOf(r, k), wc = m.get(r)?.mc?.[k]; if (!td || !wc?.reg) continue; const c = td.firstElementChild; if (c && (wc.cy == null || wc.cop < .5)) items.push({ el: c, g: null, y0: 0, op0: 0, op1: 0, d: 0, dur: DUR, e: easeOpen }); } /* 要藏的行原来在合并块里：过渡中不显示自己的那一份 */
     if (!items.length && !clips.length && !hAnim) { for (const r of gone) { r.hidden = true; r.classList.remove("leaving"); } applyMerge(vs, regs); return; }
     lay = { items, clips, tops, movers, gone, mv, hAnim, vs, regs, t0: performance.now(), raf: 0 };
-    if (hAnim) wrap.style.height = hAnim.h0 + "px";
+    if (hAnim) { wrap.style.height = hAnim.h0 + "px"; if (hAnim.sc) scEl.style.height = hAnim.sc.h0 + "px"; }
     paintLay(lay, lay.t0); lay.raf = requestAnimationFrame(tickLay); // 起点这一帧就画好
   }
   function paintLay(l, now) {
-    const tg = l.items.map((it) => (it.g ? spanOff(l.vs, it.g) : 0)); let busy = false; // 先读（行高），再写
+    const tg = l.items.map((it) => (it.g ? spanOff(l.vs, it.g, it.stk) : 0)); let busy = false; // 先读（行高），再写
     l.items.forEach((it, j) => {
       const p = Math.max(0, Math.min(1, (now - l.t0 - it.d) / it.dur)); if (p < 1) busy = true;
       const e = it.e(p), y = it.row ? it.y0 + (it.y1 - it.y0) * e : it.y0 + (tg[j] - it.y0) * e, op = it.op0 + (it.op1 - it.op0) * (it.op1 < it.op0 ? Math.min(1, p / .6) : e);
       if (it.row && l.mv?.has(it.el)) l.mv.get(it.el).cur = y;
+      if (it.unmgTd && y <= 4) { it.unmgTd.classList.remove("sn-mg-y"); it.unmgTd = null; }
       it.el.style.translate = Math.abs(y) < .05 ? "" : `0 ${y}px`; it.el.style.opacity = op >= .999 ? "" : op.toFixed(3);
     });
-    // 新出现 / 要藏的行：跟着上面那一行走；下面那一行（或合计行）这一帧的顶 - 这一行这一帧的顶 = 还露在外面的高度
+    // 新出现 / 要藏的行：跟着上面那一行走；下面那一行（或非吸底合计行）这一帧的顶 - 这一行这一帧的顶 = 还露在外面的高度
     for (const c of l.clips) {
       const y = c.base + (c.anchor ? l.mv.get(c.anchor).cur - c.aRef : 0), top = c.top + y, edge = c.ref ? c.refTop + (l.mv.get(c.ref)?.cur ?? 0) : Infinity, vis = Math.max(0, Math.min(c.h, edge - top));
       c.r.style.translate = Math.abs(y) < .05 ? "" : `0 ${y}px`;
       c.r.style.clipPath = vis >= c.h - .25 ? "" : `inset(0 0 ${(c.h - vis).toFixed(2)}px 0)`;
-      if (c.op0 !== c.op1) { const out = c.op1 < c.op0, p = Math.max(0, Math.min(1, (now - l.t0 - c.d) / (out ? 120 : 200))); if (p < 1) busy = true; const op = out ? 1 - p : easeOut(p); c.r.style.opacity = op >= .999 ? "" : op.toFixed(3); }
+      if (c.op0 !== c.op1) {
+        const out = c.op1 < c.op0, dur = out ? 95 : 185, p = Math.max(0, Math.min(1, (now - l.t0 - c.d) / dur));
+        if (p < 1) busy = true;
+        const op = out ? c.op0 * (1 - p) * (1 - p) : c.op0 + (c.op1 - c.op0) * easeOut(p);
+        if (c.contentOnly) { c.r.style.opacity = ""; if (op >= .999) c.r.style.removeProperty("--sn-row-op"); else c.r.style.setProperty("--sn-row-op", op.toFixed(3)); }
+        else { c.r.style.removeProperty("--sn-row-op"); c.r.style.opacity = op >= .999 ? "" : op.toFixed(3); }
+      }
     }
-    if (l.hAnim) { const p = Math.max(0, Math.min(1, (now - l.t0) / 300)); if (p < 1) busy = true; wrap.style.height = (l.hAnim.h0 + (l.hAnim.h1 - l.hAnim.h0) * easeOpen(p)).toFixed(2) + "px"; }
+    if (l.hAnim) {
+      const p = Math.max(0, Math.min(1, (now - l.t0) / 300)); if (p < 1) busy = true;
+      const e = easeOpen(p);
+      wrap.style.height = (l.hAnim.h0 + (l.hAnim.h1 - l.hAnim.h0) * e).toFixed(2) + "px";
+      if (l.hAnim.sc) scEl.style.height = (l.hAnim.sc.h0 + (l.hAnim.sc.h1 - l.hAnim.sc.h0) * e).toFixed(2) + "px";
+    }
     return busy;
   }
   function tickLay(now) {
@@ -501,12 +559,32 @@ export function mountTable(wrap, o0 = {}, emit) {
       const start = (pgPage - 1) * pgSize;
       pageTop = new Set(matchedTop.slice(start, start + pgSize).map((nd) => nd.key));
     }
-    const walk = (nd, shown) => {
-      const tr = TR.get(nd.key), inPage = !pageTop || nd.lv > 0 || pageTop.has(nd.key), vis = shown && test(nd) && inPage, op = isOpen(nd), kids = nd.kids; tr.hidden = !vis;
-      const showKids = vis && op && kids.some(test); tr.classList.toggle("sn-open", showKids); $(".sn-exp", tr)?.setAttribute("aria-expanded", String(showKids));
-      for (const k of kids) walk(k, vis && op);
+    // 精准树形引导线：anc 记录祖先 0..lv-2 后面是否仍有兄弟，直接父层 lv-1 在末项收口于行中 50%，绝不戳穿撞上后面的同级箭头或无关行
+    const setTreeGuides = (tr, lv, anc, isLast) => {
+      if (!M.T.tree || !M.prim) return;
+      const td = cellOf(tr, M.prim); if (!td) return;
+      if (lv <= 0) { td.style.removeProperty("--sn-tbg"); return; }
+      const segs = [];
+      for (let d = 0; d < lv; d++) {
+        const x = 3.5 + d * 24;
+        if (d === lv - 1) segs.push(`linear-gradient(var(--sn-tree-line),var(--sn-tree-line)) ${x}px 0/1px ${isLast ? "50%" : "100%"} no-repeat`);
+        else if (anc[d]) segs.push(`linear-gradient(var(--sn-tree-line),var(--sn-tree-line)) ${x}px 0/1px 100% no-repeat`);
+      }
+      const bg = segs.length ? segs.join(",") : "none";
+      if (td.style.getPropertyValue("--sn-tbg") !== bg) td.style.setProperty("--sn-tbg", bg);
     };
-    for (const nd of T.top) walk(nd, true);
+    const walk = (nd, shown, anc, isLast) => {
+      const tr = TR.get(nd.key), inPage = !pageTop || nd.lv > 0 || pageTop.has(nd.key), vis = shown && test(nd) && inPage, op = isOpen(nd), kids = nd.kids; tr.hidden = !vis;
+      const visKids = vis && op ? kids.filter(test) : [];
+      const showKids = visKids.length > 0; tr.classList.toggle("sn-open", showKids); $(".sn-exp", tr)?.setAttribute("aria-expanded", String(showKids));
+      if (vis) setTreeGuides(tr, nd.lv, anc, isLast);
+      const nextAnc = nd.lv === 0 ? [] : [...anc, !isLast];
+      const lastVis = visKids.at(-1);
+      for (const k of kids) walk(k, vis && op, nextAnc, k === lastVis);
+    };
+    const visTop = T.top.filter((nd) => (!pageTop || pageTop.has(nd.key)) && test(nd));
+    const lastTop = visTop.at(-1);
+    for (const nd of T.top) walk(nd, true, [], nd === lastTop);
     syncFooter();
   }
   // ———— 固定列位置与离边投影 ————

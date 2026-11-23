@@ -91,11 +91,11 @@ for (const b of $$("[data-copy-cmd]")) b.addEventListener("click", async () => {
   if (reduced()) runs.forEach((r) => r.still());
   else {
     runs.forEach((r) => r.show());
-    let timers = [], on = false;
+    let timers = [], on = false, inView = false;
     const start = () => { if (on) return; on = true; timers = runs.map((r) => setTimeout(() => { r.show(); timers.push(setInterval(r.show, 3000)); }, 3000 + r.offset)); };
     const stop = () => { on = false; timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); timers = []; };
-    new IntersectionObserver(([e]) => (e.isIntersecting && !document.hidden ? start() : stop())).observe($(".n-h1"));
-    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    new IntersectionObserver(([e]) => { inView = e.isIntersecting; inView && !document.hidden ? start() : stop(); }).observe($(".n-h1"));
+    document.addEventListener("visibilitychange", () => (!document.hidden && inView ? start() : stop()));
   }
 }
 
@@ -241,12 +241,18 @@ const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="s
   };
   onMode((t) => { for (const f of frames) try { f.contentDocument.documentElement.dataset.theme = t; } catch {} });
   let cur = -1, auto = !reduced(), bar = null, hover = false, seen = false;
+  const outT = new Map();
   const go = (i, user) => {
     if (user) { auto = false; bar?.cancel(); bar = null; }
     if (i === cur) return;
     const prev = ws[cur]; cur = i; load(i);
-    if (prev) { prev.classList.remove("sn-cur"); prev.classList.add("sn-out"); setTimeout(() => prev.classList.remove("sn-out"), 260); }
-    ws[i].classList.remove("warm"); ws[i].classList.add("sn-cur");
+    if (prev) {
+      prev.classList.remove("sn-cur"); prev.classList.add("sn-out");
+      clearTimeout(outT.get(prev));
+      outT.set(prev, setTimeout(() => { prev.classList.remove("sn-out"); outT.delete(prev); }, 260));
+    }
+    clearTimeout(outT.get(ws[i])); outT.delete(ws[i]);
+    ws[i].classList.remove("warm", "sn-out"); ws[i].classList.add("sn-cur");
     tabs.forEach((t, k) => t.setAttribute("aria-selected", String(k === i)));
     bar?.cancel(); bar = null;
     if (auto) {
@@ -255,7 +261,7 @@ const TAG = { ok: '<span class="sn-tag">已采用</span>', need: '<span class="s
       if (hover || !seen) bar.pause();
     }
     // 下一个等页面空下来再在后台载（iframe 和这一页共用主线程，不能挤在动画里载），载好后先画一遍（几乎透明），切过去时不用现画
-    const nx = (i + 1) % tabs.length; (window.requestIdleCallback || ((f) => setTimeout(f, 1200)))(() => { load(nx); ws[nx].classList.add("warm"); }, { timeout: 4000 });
+    const nx = (i + 1) % tabs.length; (window.requestIdleCallback || ((f) => setTimeout(f, 1200)))(() => { load(nx); if (nx !== cur) ws[nx].classList.add("warm"); }, { timeout: 4000 });
   };
   tabs.forEach((t, i) => t.addEventListener("click", () => go(i, true)));
   $("[data-tabs]").addEventListener("keydown", (e) => {

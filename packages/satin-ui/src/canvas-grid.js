@@ -74,8 +74,8 @@ export function mountCanvasGrid(root, o = {}) {
   };
   const readColors = () => { readShape(); readFont(); readAv(); C = { field: col("var(--sn-field)"), onPrimary: col("var(--sn-on-primary)"), ghostHover: col("var(--sn-b-ghost-hover)"), fillHover: col("var(--sn-fill-hover)"), bg: col("var(--sn-g-bg)"), hover: col("var(--sn-g-hover)"), sel: col("var(--sn-g-selbg)"), selHover: col("var(--sn-g-selhover)"), line: col("var(--sn-g-rowline)"), lineC: col("var(--sn-line-control)"), label: col("var(--sn-label)"), label2: col("var(--sn-label2)"), label3: col("var(--sn-label3)"), fillS: col("var(--sn-fill-subtle)"), fillA: col("var(--sn-fill-active)"), raised: col("var(--sn-raised)"), accent: col("var(--sn-accent)"), success: col("var(--sn-success)"), warning: col("var(--sn-warning)"), focus: col("var(--sn-focus)"), ring: col("var(--sn-ring)"), flash: col("var(--sn-g-flash)"), selLine: col("var(--sn-sel-ring)"), gapBg: col("color-mix(in srgb, var(--sn-label) 5%, var(--sn-g-bg))"), gapLine: col("color-mix(in srgb, var(--sn-label) 12%, transparent)"), tree: col("var(--sn-tree-line)"), selFill: col("color-mix(in srgb, var(--sn-label) 4%, transparent)"), rgFill: col("color-mix(in srgb, var(--sn-label) 7%, transparent)"), rgLine: col("var(--sn-range-line)"), dtBg: col("color-mix(in srgb, var(--sn-label) 2%, var(--sn-g-bg))"), dark: document.documentElement.dataset.theme === "dark" }; tw.clear(); schedule(); };
   // 圆角：复选框用 --r-xs；图标按钮、展开箭头的悬停底照着组件库按钮的实际圆角（顶栏切"圆角"时跟着变）
-  const shapeProbe = document.createElement("button"); shapeProbe.className = "sn-btn sn-ghost sn-sm sn-ibtn"; shapeProbe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none"; shapeProbe.tabIndex = -1; root.append(shapeProbe);
-  let rXS = 4, rBtn = 6, rSM = 6; function readShape() { const cs = getComputedStyle(document.documentElement); rXS = parseFloat(cs.getPropertyValue("--sn-r-xs")) || 4; rSM = parseFloat(cs.getPropertyValue("--sn-r-sm")) || 6; rBtn = Math.min(14, parseFloat(getComputedStyle(shapeProbe).borderTopLeftRadius) || 6); }
+  const shapeProbe = document.createElement("button"); shapeProbe.className = "sn-btn sn-ghost sn-sm sn-ibtn"; shapeProbe.style.cssText = "position:absolute;top:0;left:0;visibility:hidden;pointer-events:none"; shapeProbe.tabIndex = -1; root.append(shapeProbe);
+  let rXS = 4, rBtn = 6, rSM = 6, icDuo = .48; function readShape() { const cs = getComputedStyle(document.documentElement); rXS = parseFloat(cs.getPropertyValue("--sn-r-xs")) || 4; rSM = parseFloat(cs.getPropertyValue("--sn-r-sm")) || 6; rBtn = Math.min(14, parseFloat(getComputedStyle(shapeProbe).borderTopLeftRadius) || 6); const d = parseFloat(cs.getPropertyValue("--sn-ic-duo")); icDuo = Number.isFinite(d) ? Math.max(0, Math.min(1, d)) : .48; }
   // 深浅、圆角、主题定制（主色 / 状态色 / 字体 / 字号都写在根元素的 style 上）变了：颜色、形状、字体重新读，重画
   new MutationObserver(() => { readColors(); schedule(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-radius", "style"] });
 
@@ -101,10 +101,13 @@ export function mountCanvasGrid(root, o = {}) {
     if (p !== hoverP) { const r0 = src.rowAt(hoverP), r1 = src.rowAt(p); if (fade) { if (r0 >= 0) fx("h" + r0, 1, 0, 100); if (r1 >= 0) fx("h" + r1, 0, 1, 100); } else { TW.delete("h" + r0); TW.delete("h" + r1); } hoverP = p; schedule(); }
     if (z !== hz) { if (hz) fx("z" + hz, 1, 0, 120); if (z) fx("z" + z, 0, 1, 120); hz = z; }
   }
-  // 线性图标：可以转、可以在两个颜色之间过渡（两遍描边按比例叠）
+  // 线性图标（Solar Icons line-duotone）：可以转、可以在两个颜色之间过渡（两遍描边按比例叠，次要笔画乘 --sn-ic-duo）
   function icon2(name, x, y, size, c0, c1, v, rot = 0) {
-    g.save(); g.translate(x + size / 2, y + size / 2); if (rot) g.rotate(rot); g.translate(-size / 2, -size / 2); g.scale(size / 24, size / 24); g.lineWidth = 2; g.lineCap = "round"; g.lineJoin = "round";
-    const a0 = g.globalAlpha; if (v < 1) { g.strokeStyle = c0; g.globalAlpha = a0 * (1 - v); for (const p of iconOf(name)) g.stroke(p); } if (v > 0) { g.strokeStyle = c1; g.globalAlpha = a0 * v; for (const p of iconOf(name)) g.stroke(p); } g.restore();
+    g.save(); g.translate(x + size / 2, y + size / 2); if (rot) g.rotate(rot); g.translate(-size / 2, -size / 2); g.scale(size / 24, size / 24); g.lineWidth = 1.5; g.lineCap = "round"; g.lineJoin = "round";
+    const a0 = g.globalAlpha, parts = iconOf(name);
+    if (v < 1) { g.strokeStyle = c0; for (const { p, duo } of parts) { g.globalAlpha = a0 * (1 - v) * (duo ? icDuo : 1); g.stroke(p); } }
+    if (v > 0) { g.strokeStyle = c1; for (const { p, duo } of parts) { g.globalAlpha = a0 * v * (duo ? icDuo : 1); g.stroke(p); } }
+    g.restore();
   }
   // 复选框：和组件库的 .check 一样——16px、--r-xs 圆角、--field 底、1px 描边（悬停变深），勾上变 --accent、勾从起笔处画出来，勾上那一下缩到 88% 再弹回
   function drawCheck(bx, by, r) {
@@ -120,7 +123,7 @@ export function mountCanvasGrid(root, o = {}) {
 
   // ———— 图标：把 icons.js 里的 Solar Icons（含 line-duotone 次要笔画）转成 Path2D ————
   const ICON = {};
-  const iconOf = (name) => (ICON[name] ??= [...(ICONS[name] || "").matchAll(/<(path|circle|rect|ellipse|line)\s([^>]*)\/>/g)].map(([, tag, attrs]) => {
+  const iconOf = (name) => (ICON[name] ??= [...(ICONS[name] || "").replace(/<g[^>]*\bsn-ic-d\b[^>]*>([\s\S]*?)<\/g>/g, (_, inner) => inner.replace(/\/>/g, ' class="sn-ic-d"/>')).matchAll(/<(path|circle|rect|ellipse|line)\s([^>]*)\/>/g)].map(([, tag, attrs]) => {
     const a = Object.fromEntries([...attrs.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
     const duo = /\bsn-ic-d\b/.test(a.class || "");
     if (tag === "path") return { p: new Path2D(a.d), duo };
@@ -131,7 +134,7 @@ export function mountCanvasGrid(root, o = {}) {
     else p.roundRect(+a.x, +a.y, +a.width, +a.height, +(a.rx || 0));
     return { p, duo };
   }));
-  function icon(name, x, y, size, color) { g.save(); g.translate(x, y); g.scale(size / 24, size / 24); g.strokeStyle = color; g.lineWidth = 1.6; g.lineCap = "round"; g.lineJoin = "round"; const a0 = g.globalAlpha; for (const { p, duo } of iconOf(name)) { g.globalAlpha = duo ? a0 * .48 : a0; g.stroke(p); } g.restore(); }
+  function icon(name, x, y, size, color) { g.save(); g.translate(x, y); g.scale(size / 24, size / 24); g.strokeStyle = color; g.lineWidth = 1.5; g.lineCap = "round"; g.lineJoin = "round"; const a0 = g.globalAlpha; for (const { p, duo } of iconOf(name)) { g.globalAlpha = duo ? a0 * icDuo : a0; g.stroke(p); } g.restore(); }
 
   // ———— 文字：字体切换少做；量过的宽度缓存起来；放不下就截断加省略号 ————
   // 画布上的字：字体、字号跟主题定制走（和 DOM 里的字一样乘 --font-scale）；行高不变，最大 1.14 倍在 40px 的行里放得下
@@ -153,7 +156,8 @@ export function mountCanvasGrid(root, o = {}) {
     let lx = 0, rx = W - model.rightW();
     for (const o of out) { if (o.zone === "L") { o.x = lx; lx += o.c.w; } else if (o.zone === "R" && sticky) { o.x = rx; rx += o.c.w; } }
     for (const o of out) if (o.zone === "M") o.x += headUI.offNow(o.c.key, fnow); /* 换位置：中间列从看到的位置滑到新位置（和表头同一个时间、同一条曲线） */
-    return { cols: out, lw: model.leftW(), rw: sticky ? model.rightW() : 0 };
+    const lw = model.leftW(), rw = model.rightW();
+    return { cols: out, lw, rw: sticky ? rw : 0, rx0: sticky ? W - rw : Math.max(lw, gw - rw), rx1: sticky ? W : Math.min(W, gw) };
   }
 
   // ———— 画 ————
@@ -240,7 +244,7 @@ export function mountCanvasGrid(root, o = {}) {
     const st = vp.scrollTop, n = src.shown, first = Math.max(0, src.rowAtY(st) - 1), last = Math.min(n, src.rowAtY(st + Hc) + 2);
     src.ensure(first, last); if (src.mode === "append" && last >= n - 4) src.more();
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.textBaseline = "middle"; g.fillStyle = C.bg; g.fillRect(0, 0, W, Hc);
-    const L = layout(), zones = [["M", L.lw, W - L.rw], ["L", 0, L.lw], ["R", W - L.rw, W]]; drawn = []; // drawn：这一帧画出来的行（行号、y、高），逐帧检查用
+    const L = layout(), zones = [["M", L.lw, W - L.rw], ["L", 0, L.lw], ["R", L.rx0, L.rx1]]; drawn = []; // drawn：这一帧画出来的行（行号、y、高），逐帧检查用
     const ddt = drag ? (drag.anim ? Math.min(34, now - drag.lt) : 16.7) : 0; if (drag) { drag.lt = now; drag.anim = false; } // 让位缓动的时间间隔由拖拽自己记：上一帧没在动（拿起前隔几帧才画一次），这一步按一帧算，不会一下走两帧的量
     // 拖行：空位（落点）先走——只有它一个值缓动，别的行按空位摆（rowOffset）；被拖的行跟手，松手后缓动落进空位（取消就回原处）
     if (drag) {

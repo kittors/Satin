@@ -48,8 +48,8 @@ export function scrollArea(el, options = {}) {
     const ch = vp.clientHeight, sh = vp.scrollHeight, cw = vp.clientWidth, sw = vp.scrollWidth;
     by.hidden = sh <= ch + 1; bx.hidden = sw <= cw + 1;
     box.classList.toggle("sn-ov-y", !by.hidden); box.classList.toggle("sn-ov-x", !bx.hidden); // 常驻（gutter）模式按这两个类留出滚动条那一条
-    if (!by.hidden) { const tr = ch - 6, th = Math.max(24, tr * ch / sh); geo.y = { th, tr }; by.style.setProperty("--sn-thumb", th + "px"); by.style.setProperty("--sn-track", tr + "px"); }
-    if (!bx.hidden) { const tr = cw - 6, th = Math.max(24, tr * cw / sw); geo.x = { th, tr }; bx.style.setProperty("--sn-thumb", th + "px"); bx.style.setProperty("--sn-track", tr + "px"); }
+    if (!by.hidden) { const tr = Math.max(24, by.clientHeight || (ch - 6)), th = Math.max(24, Math.min(tr, tr * ch / sh)); geo.y = { th, tr }; by.style.setProperty("--sn-thumb", th + "px"); by.style.setProperty("--sn-track", tr + "px"); }
+    if (!bx.hidden) { const tr = Math.max(24, bx.clientWidth || (cw - 6)), th = Math.max(24, Math.min(tr, tr * cw / sw)); geo.x = { th, tr }; bx.style.setProperty("--sn-thumb", th + "px"); bx.style.setProperty("--sn-track", tr + "px"); }
     if (js) paint();
     axes();
   };

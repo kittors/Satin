@@ -19,10 +19,22 @@
 .sn-tbl td { height: var(--sn-rh); padding: 0 12px; background-color: var(--sn-raised); box-shadow: inset 0 -1px 0 var(--sn-line); transition: height .24s var(--sn-ease-in-out), background-color .1s var(--sn-ease-out); white-space: nowrap; }
 /* 最后一行（看得见的最后一行：收起的下级、空状态行藏着时不算）不画底线——下面要么是合计行（它自己画上线，吸附在底部时也要这条线），要么是外框 */
 .sn-tbl tbody tr:nth-last-child(1 of :not([hidden])) td { box-shadow: none; }
-/* 限高滚动：表头、合计行吸附；层级高过拖起来的行 */
+/* 限高滚动：表头、合计行吸附；层级高过拖起来的行；表内悬浮滚动条避让表头/合计行且仅在滚动或悬停轨道时显现，不压数字列 */
 .sn-tbl-sc { max-height: var(--sn-tbl-max, none); height: var(--sn-tbl-h, auto); }
 .sn-tbl-sc .sn-tbl thead th { position: sticky; top: 0; z-index: 4; }
 .sn-tbl-sc .sn-tbl tfoot td { position: sticky; bottom: 0; z-index: 4; }
+.sn-tbl-wrap > .sn-sa { --sn-sa-bar: 4px; --sn-sa-inset: 2px; }
+.sn-tbl-wrap > .sn-sa > .sn-sa-bar.sn-y { top: 42px; bottom: 4px; }
+.sn-tbl-wrap:has(tfoot) > .sn-sa > .sn-sa-bar.sn-y { bottom: 46px; }
+@media (hover: hover) {
+.sn-tbl-wrap > .sn-sa:hover:not(.sn-active) > .sn-sa-bar:not(:hover):not(.sn-drag) { opacity: 0; } }
+/* 展开/收起可推合过渡：保留单元格背景与网格线完整连续，只平滑淡隐/淡显行内内容，彻底消除半截复选框/胶囊硬切与断线白洞 */
+.sn-tbl tbody tr:is(.adding, .leaving) > td { color: color-mix(in srgb, var(--sn-label) calc(var(--sn-row-op, 1) * 100%), transparent); }
+.sn-tbl tbody tr:is(.adding, .leaving) > td.sn-muted { color: color-mix(in srgb, var(--sn-label3) calc(var(--sn-row-op, 1) * 100%), transparent); }
+.sn-tbl tbody tr:is(.adding, .leaving) > td > *,
+.sn-tbl tbody tr:is(.adding, .leaving) > td.sn-acts .sn-btn,
+.sn-tbl tbody tr:is(.adding, .leaving) > td::before,
+.sn-tbl tbody tr.sn-open:is(.adding, .leaving) > td::after { opacity: var(--sn-row-op, 1); }
 @media (hover: hover) {
 .sn-tbl tbody tr:not(.sn-tbl-empty):hover td { background: var(--sn-fill-hover-solid); } } /* 格子的底都不透明（悬停、选中也是）：行和行、列和列交叉时一个盖住另一个，不叠字 */
 /* 有批量操作条时，表格底部让出位置，条不压住最后一行 */
@@ -459,9 +471,13 @@
 .sn-tbl .sn-exp { margin: 0 -4px 0 -6px; } /* 展开箭头本身是共用的 .disc（buttons.css） */
 .sn-tbl .sn-cnt { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 .sn-tbl tr.sn-kid td { background: color-mix(in srgb, var(--sn-label) 1.5%, var(--sn-raised)); }
-.sn-tbl tbody tr td.sn-mg, .sn-tbl tbody tr.sn-sel td.sn-mg, .sn-tbl tbody tr td.sn-mg-x, .sn-tbl tbody tr.sn-sel td.sn-mg-x { background: var(--sn-raised); }
+.sn-tbl tbody tr td.sn-mg, .sn-tbl tbody tr.sn-sel td.sn-mg, .sn-tbl tbody tr td.sn-mg-x, .sn-tbl tbody tr.sn-sel td.sn-mg-x { background: var(--sn-raised); transition-property: height; }
 @media (hover: hover) {
-.sn-tbl tbody tr:hover td.sn-mg, .sn-tbl tbody tr:hover td.sn-mg-x { background: var(--sn-raised); } } /* 合并的负责人格子不跟着某一行变色；mg-x 是过渡期间先模仿合并后的样子 */
+.sn-tbl tbody tr:not(.sn-tbl-empty):hover td.sn-mg, .sn-tbl tbody tr:not(.sn-tbl-empty):hover td.sn-mg-x { background: var(--sn-raised); } } /* 合并的负责人格子不跟着某一行变色且不做背景色过渡，杜绝过渡瞬间闪灰横条 */
+/* 限高滚动表中的长合并块：内容在可视区间内优雅吸附于表头下方与合计行上方，既保持自然居中又永不被表头腰斩 */
+.sn-tbl-sc .sn-tbl tbody td.sn-mg > :first-child { position: sticky; top: calc(40px + (var(--sn-rh, 48px) - 20px) / 2); bottom: calc((var(--sn-rh, 48px) - 20px) / 2); }
+.sn-tbl-wrap.sn-tbl-fill .sn-tbl-sc .sn-tbl tbody td.sn-mg > :first-child { top: calc(42px + (var(--sn-rh, 48px) - 20px) / 2); }
+.sn-tbl-sc:has(tfoot) .sn-tbl tbody td.sn-mg > :first-child { bottom: calc(44px + (var(--sn-rh, 48px) - 20px) / 2); }
 .sn-tbl td.sn-mg-y { box-shadow: none; } /* 过渡期间合并块里不画行线 */
 .sn-tbl-wrap.sn-sel-on .sn-tbl td.sn-on.sn-mg-x, .sn-tbl-wrap.sn-sel-on .sn-tbl td.sn-on.sn-mg-o { border-radius: 0; box-shadow: inset 1px 0 0 var(--sn-line), inset -1px -1px 0 var(--sn-line); background: var(--sn-raised); } /* 过渡期间合并块的选中框先不画，到位再出来 */
 .sn-tbl-wrap.sn-sel-on .sn-tbl td.sn-on.sn-mg-x.sn-mg-y { box-shadow: inset 1px 0 0 var(--sn-line), inset -1px 0 0 var(--sn-line); }
@@ -519,8 +535,9 @@
 /* 树形的那一列（格子里 .sn-name 打头是展开箭头或小圆点，哪一列都行，不认列名；固定列本身 position:sticky 已是定位包含块，不被 relative 覆盖） */
 .sn-tbl td:not(.sn-pin-l, .sn-pin-r):has(> .sn-name > :is(.sn-exp, .sn-leaf)) { position: relative; }
 .sn-tbl td > .sn-name:has(> :is(.sn-exp, .sn-leaf)) { padding-left: calc(var(--sn-lv, 0) * 24px); }
-.sn-tbl tr.sn-kid td:has(> .sn-name > :is(.sn-exp, .sn-leaf))::before { content: ""; position: absolute; top: 0; bottom: 0; left: 12px; width: calc(var(--sn-lv) * 24px); background: repeating-linear-gradient(90deg, transparent 0 3.5px, var(--sn-tree-line) 3.5px 4.5px, transparent 4.5px 24px); pointer-events: none; }
-.sn-tbl tr.sn-open > td:has(> .sn-name > .sn-exp)::after { content: ""; position: absolute; left: calc(15.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); pointer-events: none; } /* 展开着的那一行：从展开箭头下面接到行底，和下级的层级线连上 */
+.sn-tbl tr.sn-kid td:has(> .sn-name > :is(.sn-exp, .sn-leaf))::before { content: ""; position: absolute; top: 0; bottom: 0; left: 12px; width: calc(var(--sn-lv) * 24px); background: var(--sn-tbg, repeating-linear-gradient(90deg, transparent 0 3.5px, var(--sn-tree-line) 3.5px 4.5px, transparent 4.5px 24px)); pointer-events: none; }
+.sn-tbl tr > td:has(> .sn-name > .sn-exp)::after { content: ""; position: absolute; left: calc(15.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); pointer-events: none; transform-origin: top; scale: 1 0; opacity: 0; transition: scale .2s var(--sn-ease-open), opacity .16s var(--sn-ease-out); } /* 展开着的那一行：随箭头旋转同步生长出连接竖线，收起时柔和收回 */
+.sn-tbl tr.sn-open > td:has(> .sn-name > .sn-exp)::after { scale: 1 1; opacity: 1; }
 .sn-tbl .sn-leaf { flex: none; display: grid; place-items: center; width: 20px; height: 20px; margin: 0 -4px 0 -6px; }
 .sn-tbl .sn-leaf::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--sn-line-control); }
 
