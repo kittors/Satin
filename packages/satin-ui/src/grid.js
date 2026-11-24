@@ -7,6 +7,7 @@
 // - 行：拖左边的把手换位置（其他行让位，拖到边上自动滚），Alt + 上下键也能挪；勾选（Shift 连选，表头全选）；
 // - 格子：单击选中，方向键、Tab、Home/End、PageUp/PageDown 移动；双击、回车、F2 或直接打字开始编辑；回车、Tab 提交，Esc 取消；不合法就红框加一句原因，不提交。
 import { $, injectIcons, initSeg, reduced, retip } from "./core.js";
+import { computeFloating } from "./floating.js";
 import { normCols, optionOf, optionValue, optionLabels, textOf, parseEdit, editText, parseRange, rangeText, ownerSeed } from "./table-data.js";
 import { presetAvatar } from "./avatar-presets.js";
 import { gridBars } from "./grid-bars.js";
@@ -48,11 +49,20 @@ export function columnModel(cols = []) {
 const pops = new Set(); // 开着的弹层：表格销毁时一起关
 export const closeGridPops = () => { for (const p of [...pops]) p.close(); };
 function popover(rect, html, cls = "") {
-  const el = document.createElement("div"); el.className = `sn-menu sn-float sn-open sn-g-pop ${cls}`; el.innerHTML = html; document.body.append(el);
-  const w = el.offsetWidth, h = el.offsetHeight, below = rect.bottom + 4 + h <= innerHeight - 8;
-  el.style.left = Math.max(8, Math.min(innerWidth - w - 8, rect.left)) + "px"; el.style.top = (below ? rect.bottom + 4 : Math.max(8, rect.top - 4 - h)) + "px";
+  const el = document.createElement("div"); el.className = `sn-menu sn-float sn-g-pop ${cls}`; el.innerHTML = html; document.body.append(el);
+  const pos = computeFloating(el, rect, { gap: 4, margin: 8 });
+  el.style.left = pos.left + "px"; el.style.top = pos.top + "px";
+  el.style.transformOrigin = `${pos.ox}px ${pos.oy}px`;
+  el.classList.toggle("sn-up", pos.up);
+  requestAnimationFrame(() => { if (pops.has(api)) el.classList.add("sn-open"); });
   let onClose = null;
-  const close = () => { if (!pops.delete(api)) return; el.remove(); removeEventListener("pointerdown", out, true); removeEventListener("keydown", key, true); onClose?.(); };
+  const close = () => {
+    if (!pops.delete(api)) return;
+    removeEventListener("pointerdown", out, true); removeEventListener("keydown", key, true);
+    el.classList.remove("sn-open");
+    if (reduced()) el.remove(); else setTimeout(() => el.remove(), 180);
+    onClose?.();
+  };
   const out = (e) => { if (!el.contains(e.target)) close(); };
   const key = (e) => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); } };
   setTimeout(() => { if (pops.has(api)) { addEventListener("pointerdown", out, true); addEventListener("keydown", key, true); } });

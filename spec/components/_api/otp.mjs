@@ -3,8 +3,8 @@ import { code } from "./_code.mjs";
 
 export default {
   title: "验证码",
-  lead: "一格一个数字：输入后自动跳到下一格，退格回到上一格，粘贴一串数字自动分到各格；填满时告诉你。",
-  whenToUse: ["短信、邮件验证码，4 到 8 位数字。", "两步验证的动态口令。"],
+  lead: "一格一个数字：输入后自动跳到下一格，退格回到上一格，粘贴一串数字自动分到各格；支持密码隐藏（掩码）与明密文切换，填满时告诉你。",
+  whenToUse: ["短信、邮件验证码，4 到 8 位数字。", "两步验证的动态口令，或需要掩码隐藏的 6 位数字安全码 / 支付密码。"],
   whenNotToUse: [{ text: "密码、长口令：用密码框。", use: "input" }, { text: "任意长度的数字：用输入框。", use: "input" }],
   related: [{ id: "input", diff: "输入框适合任意长度的文字；验证码是固定位数、一格一个。" }, { id: "field", diff: "验证码放进字段里，上面写标签、下面写说明和错误。" }],
   import: {
@@ -29,6 +29,10 @@ export default {
   props: [
     { name: "length", type: "number", default: "6", required: false, desc: "位数（4–8）。",
       names: { js: "length", react: "length", vue: "length", svelte: "length", preact: "length", element: "length", markup: "几个 <input class=\"sn-otp-cell\">", html: "length" } },
+    { name: "mask", type: "boolean", default: "false", required: false, desc: "开启密码隐藏（掩码圆点显示），防窥屏。",
+      names: { js: "mask", react: "mask", vue: "mask", svelte: "mask", preact: "mask", element: "mask", markup: "data-mask", html: "mask" } },
+    { name: "reveal", type: "boolean", default: "同 mask", required: false, desc: "是否显示右侧眼睛显隐切换按钮；开启 mask 时默认显示，传 false 可强制始终隐藏。",
+      names: { js: "reveal", react: "reveal", vue: "reveal", svelte: "reveal", preact: "reveal", element: "reveal", markup: "data-reveal", html: "reveal" } },
   ],
   events: [
     { name: "complete", payload: "string", when: "每一格都填上了，参数是整串数字（拿去校验）。",
@@ -37,11 +41,13 @@ export default {
   slots: [],
   methods: [
     { name: "value", kind: "property", signature: "readonly value: string", returns: "string", desc: "现在填了的数字。" },
+    { name: "masked", kind: "property", signature: "readonly masked: boolean", returns: "boolean", desc: "当前是否处于密码隐藏（掩码）状态。" },
+    { name: "setMask", kind: "method", signature: "setMask(masked: boolean): void", returns: "void", desc: "程序切换掩码隐藏或明文显示。" },
     { name: "clear", kind: "method", signature: "clear(): void", returns: "void", desc: "清空、焦点回到第一格（校验失败时用）。" },
   ],
   functions: [],
   cssVars: [{ name: "--sn-otp-w", desc: "每一格的宽度", default: "44px" }],
-  classes: [{ name: ".sn-otp", desc: "验证码" }, { name: ".sn-otp-cell", desc: "每一格（一个 input，inputmode=\"numeric\"）" }, { name: ".sn-otp.sn-bad", desc: "校验失败：整排抖一下、标红" }],
+  classes: [{ name: ".sn-otp", desc: "验证码" }, { name: ".sn-otp.sn-masked", desc: "密码隐藏（掩码）模式" }, { name: ".sn-otp-eye", desc: "明密文切换眼睛按钮" }, { name: ".sn-otp-cell", desc: "每一格（一个 input，inputmode=\"numeric\"）" }, { name: ".sn-otp.sn-bad", desc: "校验失败：整排抖一下、标红" }],
   types: ["OtpOptions"],
   keyboard: [
     { keys: "数字", does: "填进这一格，跳到下一格。" },
@@ -65,5 +71,6 @@ export default {
     { slug: "otp-complete", title: "填满时校验", why: "每一格都填上就拿整串数字去校验，不用再点\"确定\"。",
       html: `<div class="sn-stack sn-gap-8"><sn-otp length="6"></sn-otp><span class="sn-help">输入 6 位验证码</span></div>`, code: code("otp-complete") },
     { slug: "otp-length", title: "4 位", why: "位数按发出去的验证码定。", html: `<sn-otp length="4"></sn-otp>`, code: code("otp-length") },
+    { slug: "otp-mask", title: "密码隐藏（掩码）", why: "加上 mask 开启密码隐藏，默认自带右侧眼睛按钮切换明文与密文；适合安全验证码、支付密码与隐私口令。", html: `<sn-otp length="6" mask></sn-otp>`, code: code("otp-mask") },
   ],
 };

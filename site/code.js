@@ -111,5 +111,5 @@ document.addEventListener("click", (e) => {
     return;
   }
   const b = e.target.closest(".cx-copy");
-  if (b) navigator.clipboard.writeText(cur(cx).dataset.src).then(() => copied(b), () => {});
+  if (b) navigator.clipboard?.writeText(cur(cx).dataset.src).then(() => copied(b), () => {});
 });

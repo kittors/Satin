@@ -22,7 +22,7 @@ export interface SatinIntrinsicElements {
   "sn-segmented": SatinCustomElementProps & { items?: string; value?: string; size?: "sm" | "md"; label?: string };
   "sn-slider": SatinCustomElementProps & { value?: number | string; min?: number | string; max?: number | string; step?: number | string; label?: string };
   "sn-select": SatinCustomElementProps & { items?: string; value?: string; placeholder?: string; label?: string };
-  "sn-otp": SatinCustomElementProps & { length?: number | string; value?: string };
+  "sn-otp": SatinCustomElementProps & { length?: number | string; value?: string; mask?: boolean | string; reveal?: boolean | string };
   "sn-tabs": SatinCustomElementProps & { tabs?: string; value?: number | string };
   "sn-pager": SatinCustomElementProps & { total?: number | string; page?: number | string; count?: number | string };
   "sn-collapse": SatinCustomElementProps & { items?: string; open?: string; single?: boolean | string };

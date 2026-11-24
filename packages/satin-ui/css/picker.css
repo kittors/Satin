@@ -3,18 +3,22 @@
 /* ———— 触发框 ———— */
 @layer satin {
 .sn-pk { position: relative; display: inline-block; min-width: 220px; }
-.sn-pk-trigger { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 9px 1.5px 11px; border-radius: var(--sn-btn-r); /* sp-ok: 左 11 右 9 加 1px 边框和图标留白，底 1.5 让字视觉居中 */
+.sn-pk-trigger { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 8px 1.5px 12px; border-radius: var(--sn-btn-r); /* sp-ok: 左 12 右 8 加 1px 边框与尾部按钮对齐，底 1.5 让字视觉居中 */
   font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); cursor: pointer; background: var(--sn-field); border: 1px solid var(--sn-line-control); box-shadow: var(--sn-field-inset);
   transition: border-color .15s var(--sn-ease-out), box-shadow .15s var(--sn-ease-out); }
+:is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-pk-trigger { padding: 0 10px 1.5px 14px; }
 @media (hover: hover) {
 .sn-pk-trigger:hover { border-color: var(--sn-line-control-hover); } }
 .sn-pk-trigger:focus-visible, .sn-pk.sn-open > .sn-pk-trigger { border-color: var(--sn-focus); box-shadow: var(--sn-field-inset), 0 0 0 3px var(--sn-ring); }
 .sn-pk-trigger .sn-val { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
 .sn-pk-trigger .sn-val.sn-ph { color: var(--sn-label3); }
-.sn-pk-trigger .sn-end { width: 18px; height: 18px; flex: none; color: var(--sn-label3); }
+.sn-pk-trigger .sn-end { position: relative; width: 24px; height: 24px; margin-right: -3px; flex: none; color: var(--sn-label3); }
 .sn-pk-trigger .sn-end .sn-ic { width: 15px; height: 15px; }
-/* 有值时悬停：右边的图标换成清除（×），点一下清空 */
-.sn-pk-trigger .sn-end > .sn-b { border-radius: 50%; cursor: pointer; }
+.sn-pk-trigger .sn-end > .sn-a { pointer-events: none; }
+/* 有值时悬停：右边的图标换成清除（×），24×24 视觉圆 + 伪元素热区覆盖右侧末端，一击必中且不误弹面板 */
+.sn-pk-trigger .sn-end > .sn-b { position: relative; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; pointer-events: none; }
+.sn-pk-trigger .sn-end > .sn-b::after { content: ""; position: absolute; inset: -4px -10px -4px -4px; }
+.sn-pk.sn-has > .sn-pk-trigger .sn-end > .sn-b { pointer-events: auto; }
 @media (hover: hover) {
 .sn-pk-trigger .sn-end > .sn-b:hover { color: var(--sn-label); background: var(--sn-b-ghost-hover); } }
 @media (hover: hover) {
@@ -22,13 +26,15 @@
 @media (hover: hover) {
 .sn-pk.sn-has:hover > .sn-pk-trigger .sn-end > .sn-b { opacity: 1; transform: none; } }
 
-/* ———— 面板 ———— */
+/* ———— 面板（与下拉菜单统一双向微动效） ———— */
 .sn-pk-panel { position: absolute; z-index: 30; left: 0; top: calc(100% + 6px); padding: 12px; border-radius: var(--sn-r-xl); background: var(--sn-menu-bg); box-shadow: var(--sn-menu-shadow);
-  transform-origin: top left; opacity: 0; scale: .97; translate: 0 -4px; pointer-events: none; visibility: hidden;
-  transition: opacity .1s var(--sn-ease-in), scale 0s linear .1s, translate 0s linear .1s, visibility 0s linear .1s; }
-.sn-pk-panel.sn-up { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: 0 4px; }
-.sn-pk.sn-open > .sn-pk-panel { opacity: 1; scale: 1; translate: 0; pointer-events: auto; visibility: visible;
-  transition: opacity 0s, scale .14s var(--sn-ease-out-strong), translate .14s var(--sn-ease-out-strong), visibility 0s; }
+  transform-origin: top left; opacity: 0; scale: .96; translate: var(--sn-pk-dx, 0px) calc(var(--sn-pk-dy, 0px) - 6px); pointer-events: none; visibility: hidden;
+  transition: opacity .16s var(--sn-ease-in), scale .16s var(--sn-ease-in), translate .16s var(--sn-ease-in), visibility 0s linear .16s; }
+.sn-pk-panel.sn-up { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: var(--sn-pk-dx, 0px) calc(var(--sn-pk-dy, 0px) + 6px); }
+.sn-pk-panel.sn-end { left: auto; right: 0; transform-origin: top right; }
+.sn-pk-panel.sn-up.sn-end { transform-origin: bottom right; }
+.sn-pk.sn-open > .sn-pk-panel { opacity: 1; scale: 1; translate: var(--sn-pk-dx, 0px) var(--sn-pk-dy, 0px); pointer-events: auto; visibility: visible;
+  transition: opacity .16s var(--sn-ease-out), scale .22s var(--sn-ease-out-strong), translate .22s var(--sn-ease-out-strong), visibility 0s; }
 .sn-pk-foot { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; }
 .sn-pk-foot .sn-grow { flex: 1; }
 .sn-pk-foot .sn-note { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); font-variant-numeric: tabular-nums; }
@@ -86,7 +92,7 @@
    用背景画的话，选中那几帧是白底白字、取消时是黑底黑字，数字会闪没；预览日挪走时还会留一个白圆慢慢淡掉。内阴影不过渡，和文字同一帧到位 */
 .sn-cal-grid .sn-d.sn-sel::before { box-shadow: inset 0 0 0 20px var(--sn-label); }
 /* 选中：圆从 92% 轻轻放大到原大，150ms，只是一个"按下去了"的回应，不弹 */
-.sn-cal-grid .sn-d.sn-sel.sn-pop::before { animation: sn-d-pop .15s var(--sn-ease-out); }
+.sn-cal-grid .sn-d.sn-sel.sn-d-pop::before { animation: sn-d-pop .15s var(--sn-ease-out); }
 /* 预览中的结束日：一圈 1.5px 描边，圆里填面板底色盖住半边带子；点下去一帧填成实心，再轻轻放大 */
 .sn-cal-grid .sn-d.sn-hv::before { box-shadow: inset 0 0 0 1.5px var(--sn-label), inset 0 0 0 20px var(--sn-menu-bg); }
 @keyframes sn-d-pop { from { scale: .92; } }
@@ -130,7 +136,7 @@
 .sn-pk-dt .sn-tside .sn-cap { height: 32px; display: flex; align-items: center; margin-bottom: 6px; font: 600 calc(14px * var(--sn-font-scale, 1))/1 var(--sn-sans); }
 
 /* ———— 地址：搜索 + 常用 + 省市区三级标签 ———— */
-.sn-rg { width: 352px; }
+.sn-pk-panel.sn-rg { width: 352px; }
 .sn-rg-hot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 8px; font: 400 calc(12px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
 .sn-rg-hot button { all: unset; height: 24px; padding: 0 10px; border-radius: var(--sn-r-full); font: 400 calc(12px * var(--sn-font-scale, 1))/calc(24px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); background: var(--sn-fill-subtle); cursor: pointer; transition: background-color .12s, color .12s, transform .1s var(--sn-ease-out); }
 @media (hover: hover) {

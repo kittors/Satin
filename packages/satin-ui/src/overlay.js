@@ -2,6 +2,7 @@
 // 数值照 09 号 §2、§5：子菜单 220 / 1200 / 360ms、每 80ms 复查；弹窗 320ms ease.open，关闭短三分之一；打开后焦点进去，关闭后回到按钮。
 import { $, $$, injectIcons, hideTip, resetTipLayer, reduced } from "./core.js";
 import { hitAny, pushDismiss, dropDismiss, findDismiss } from "./dismiss.js";
+import { computeFloating, getViewportBounds, isAnchorOutOfView } from "./floating.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/overlay.js";
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
@@ -103,18 +104,14 @@ export function mountCmdk(groups, { onRun, placeholder, empty = (q) => tt("overl
   return { open: openCmdk, close: () => cmLayer?.close(true), toggle: () => (cmLayer ? cmLayer.close(true) : openCmdk()), input: cmIn, list: cmList };
 }
 // ———— 公开接口 1：放置浮层 ————
-// placePanel(面板, 锚点, { align: "start" | "end", gap })：默认放在锚点下方，放不下翻到上方（上下都紧时选余量更大一侧并锁在视口安全边内）；左右不出窗口；变换原点对着锚点
+// placePanel(面板, 锚点, { align: "start" | "center" | "end", gap })：统一交由 floating.js 智能定位，自动避让固定顶栏、四边防溢出、空间不足自动翻转、变换原点对准锚点
 export function placePanel(panel, anchor, { align = "start", gap = 6 } = {}) {
-  const r = anchor.getBoundingClientRect(), w = panel.offsetWidth, h = panel.offsetHeight;
-  const roomBot = innerHeight - r.bottom - M, roomTop = r.top - M;
-  const up = roomBot < h + gap && roomTop > roomBot;
-  let left = align === "end" ? r.right - w : r.left;
-  left = Math.max(M, Math.min(innerWidth - w - M, left));
-  const rawTop = up ? r.top - gap - h : r.bottom + gap;
-  const top = Math.max(M, Math.min(innerHeight - h - M, rawTop));
-  panel.style.left = left + "px"; panel.style.top = top + "px";
-  panel.style.transformOrigin = `${Math.max(0, Math.min(w, r.left + r.width / 2 - left))}px ${up ? h : 0}px`;
-  panel.classList.toggle("sn-up", up);
+  const pos = computeFloating(panel, anchor, { align, gap, margin: M });
+  panel.style.left = pos.left + "px";
+  panel.style.top = pos.top + "px";
+  panel.style.transformOrigin = `${pos.ox}px ${pos.oy}px`;
+  panel.classList.toggle("sn-up", pos.up);
+  return pos;
 }
 // 焦点圈在一个容器里（抽屉、弹窗之外的模态面板）
 const trap = (box, e) => {
@@ -134,19 +131,17 @@ export function openPopover(pop, trig, { align = "start", onClose } = {}) {
     pop, panel: pop, trigger: trig,
     close(refocus) {
       pop.classList.remove("sn-open"); trig.classList.remove("sn-is-open"); trig.setAttribute("aria-expanded", "false"); drop(layer);
-      removeEventListener("resize", re); removeEventListener("scroll", onSc, true);
+      removeEventListener("resize", re); removeEventListener("scroll", onSc, true); removeEventListener("satin-reposition", re);
       onClose?.(); if (refocus) trig.focus();
     },
     contains: (t, p) => hitAny(t, p, [pop, trig]),
   };
   const re = () => {
-    if (!trig.isConnected) { layer.close(false); return; }
-    const r = trig.getBoundingClientRect();
-    if ((r.width === 0 && r.height === 0) || r.bottom < 0 || r.top > innerHeight) { layer.close(false); return; }
+    if (!trig.isConnected || isAnchorOutOfView(trig)) { layer.close(false); return; }
     place(pop, trig, { align });
   };
   const onSc = (e) => { if (e.target === pop || pop.contains?.(e.target)) return; re(); };
-  addEventListener("resize", re); addEventListener("scroll", onSc, { passive: true, capture: true });
+  addEventListener("resize", re); addEventListener("scroll", onSc, { passive: true, capture: true }); addEventListener("satin-reposition", re);
   push(layer);
   const first = pop.matches(".sn-popconfirm") ? $("[data-no]", pop) : $(FOCUSABLE, pop);
   requestAnimationFrame(() => first?.focus({ preventScroll: true }));
@@ -171,14 +166,27 @@ let sys = null;
 const rows = (m) => $$(".sn-item", m).filter((x) => !x.classList.contains("sn-back") || m.classList.contains("sn-drill"));
 // 返回行只在下钻时算一行
 const setHL = (m, it) => rows(m).forEach((x) => x.classList.toggle("sn-hl", x === it));
-// 菜单能待的范围：默认整个窗口；传了 bound（某个容器），就只能待在容器和窗口的交集里。四边各留 8px
-const area = (bound) => { const r = bound?.getBoundingClientRect(); return { l: Math.max(0, r ? r.left : 0) + M, t: Math.max(0, r ? r.top : 0) + M, r: Math.min(innerWidth, r ? r.right : innerWidth) - M, b: Math.min(innerHeight, r ? r.bottom : innerHeight) - M }; };
-const fitHeight = (m, A) => { m.style.maxHeight = Math.min(420, A.b - A.t) + "px"; };
+// 菜单能待的范围：默认整个安全视口（自动避让顶栏与嵌入宿主边界）；传了 bound（某个容器），就取容器与安全视口的交集。四边各留 8px
+const area = (bound) => {
+  const b = getViewportBounds(M), r = bound?.getBoundingClientRect();
+  return {
+    l: r ? Math.max(b.left, r.left + M) : b.left,
+    t: r ? Math.max(b.top, r.top + M) : b.top,
+    r: r ? Math.min(b.right, r.right - M) : b.right,
+    b: r ? Math.min(b.bottom, r.bottom - M) : b.bottom,
+  };
+};
+const fitHeight = (m, A) => { m.style.maxHeight = Math.min(420, Math.max(120, A.b - A.t)) + "px"; };
 // 比范围还高：限高，在菜单里滚动（菜单本来就是滚动区域）
 export function openMenu(rootMenu, { trigger, x, y, anchor, keyboard, align, bound, onSelect } = {}) {
   closeMenu(false); hideTip();
-  sys = { chain: [rootMenu], owner: new Map(), trigger, onSelect, pts: [], last: 0, holding: false, openT: 0, closeT: 0, closeLevel: -1, check: 0, level: 0, dragging: false, area: area(bound) };
-  if (anchor) { rootMenu.style.maxHeight = ""; place(rootMenu, anchor, { align }); anchor.classList.add("sn-is-open"); anchor.setAttribute("aria-expanded", "true"); }
+  sys = { chain: [rootMenu], owner: new Map(), trigger, onSelect, pts: [], last: 0, holding: false, openT: 0, closeT: 0, closeLevel: -1, check: 0, level: 0, dragging: false, area: area(bound), offRepos: null };
+  if (anchor) {
+    rootMenu.style.maxHeight = ""; place(rootMenu, anchor, { align }); anchor.classList.add("sn-is-open"); anchor.setAttribute("aria-expanded", "true");
+    const onRepos = () => { if (sys && anchor.isConnected) { sys.area = area(bound); place(rootMenu, anchor, { align }); } };
+    addEventListener("satin-reposition", onRepos);
+    sys.offRepos = () => removeEventListener("satin-reposition", onRepos);
+  }
   else {
     const A = sys.area; fitHeight(rootMenu, A);
     const w = rootMenu.offsetWidth, h = rootMenu.offsetHeight, fx = x + w > A.r && (x - w >= A.l || x > (A.l + A.r) / 2), fy = y + h > A.b && (y - h >= A.t || y > (A.t + A.b) / 2);
@@ -212,7 +220,7 @@ function closeFrom(level) {
 }
 export function closeMenu(refocus) {
   if (!sys) return;
-  const s = sys; clearTimeout(s.openT); clearTimeout(s.closeT); clearInterval(s.check);
+  const s = sys; clearTimeout(s.openT); clearTimeout(s.closeT); clearInterval(s.check); s.offRepos?.();
   closeFrom(0); document.removeEventListener("pointermove", onMove); drop(s.layer);
   s.trigger?.classList.remove("sn-is-open", "sn-active"); s.trigger?.setAttribute("aria-expanded", "false");
   sys = null; if (refocus) s.trigger?.focus({ preventScroll: true });
@@ -327,7 +335,9 @@ const dlgFrom = new Map();
 // 所以先把弹窗以透明的状态放上去、等这次重算的那一帧过去，再起动画：动画的每一帧都是空闲帧，开头不被吞掉。
 // 动画只用 transform 和 opacity（合成线程），原点只往按钮那边偏三分之一、从 0.96 放大：看得出从哪来，又不会"飞"过来。
 export function openDialog(d, trig) {
-  resetTipLayer(); d.style.opacity = "0"; d.showModal(); dlgFrom.set(d, trig);
+  resetTipLayer();
+  d._drag = { x: 0, y: 0 }; d.style.translate = ""; d.classList.remove("sn-dragging");
+  d.style.opacity = "0"; d.showModal(); dlgFrom.set(d, trig);
   ($("input:not([type=checkbox])", d) || $(".sn-ft .sn-primary", d))?.focus({ preventScroll: true });
   twoFrames(() => {
     // 从触发按钮那边"长"出来：缩放原点朝按钮偏三分之一；没有触发按钮（程序打开）就从正中
@@ -338,20 +348,79 @@ export function openDialog(d, trig) {
     d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: reduced() ? 150 : 140, easing: OUT });
   });
 }
-// 收起：先播完（只动 transform 和 opacity），再 close()；close() 引起的整页重算发生在弹窗消失之后，看不见
+// 收起：先播完（只动 transform 和 opacity，独立 translate 保持在拖动后的位置，原地微缩淡出），再 close() 并复位位移
 export async function closeDialog(d, refocus = true) {
-  if (d.closing) return; d.closing = true; d.classList.remove("sn-shown"); hideTip();
+  if (d.closing) return; d.closing = true; d.classList.remove("sn-shown", "sn-dragging"); hideTip();
   const a = [d.animate([{ opacity: 1 }, { opacity: 0 }], { duration: reduced() ? 150 : 180, easing: EASE_IN, fill: "forwards" })];
   if (!reduced()) a.push(d.animate([{ transform: "none" }, { transform: "scale(.97)" }], { duration: 180, easing: EASE_IN, fill: "forwards" }));
-  await Promise.all(a.map((x) => x.finished)); d.close(); a.forEach((x) => x.cancel()); d.closing = false;
+  await Promise.all(a.map((x) => x.finished)); d.close(); a.forEach((x) => x.cancel());
+  d._drag = { x: 0, y: 0 }; d.style.translate = ""; d.closing = false;
   d.dispatchEvent(new Event("reset-demo")); if (refocus) dlgFrom.get(d)?.focus({ preventScroll: true });
 }
 const nudge = (d) => !reduced() && d.animate([{ transform: "none", transformOrigin: "50% 50%" }, { transform: "scale(1.015)", transformOrigin: "50% 50%" }, { transform: "none", transformOrigin: "50% 50%" }], { duration: 260, easing: OUT });
+const DLG_NO_DRAG = "button, a, input, textarea, select, [role='button'], [data-x], [data-cancel], [data-no-drag]";
 export function wireDialog(d) {
   if (d._wired) return; d._wired = true;
+  d._drag = { x: 0, y: 0 };
+  let dg = null;
+  const clampDrag = (x, y, base) => {
+    const pad = 8, minVisX = Math.min(96, base.w), minVisY = 56;
+    const minX = pad - base.left - Math.max(0, base.w - minVisX);
+    const maxX = innerWidth - pad - base.left - minVisX;
+    const minY = pad - base.top;
+    const maxY = innerHeight - minVisY - base.top;
+    return {
+      x: Math.round(Math.max(Math.min(minX, maxX), Math.min(Math.max(minX, maxX), x))),
+      y: Math.round(Math.max(Math.min(minY, maxY), Math.min(Math.max(minY, maxY), y))),
+    };
+  };
   d.addEventListener("pointerdown", (e) => {
-    if (e.target !== d) return; const r = d.getBoundingClientRect();
-    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) nudge(d);
+    if (e.target === d) {
+      const r = d.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) nudge(d);
+      return;
+    }
+    // 按住标题栏（.sn-hd）即可拖动弹窗；设 data-draggable="false" 可显式关闭
+    if (e.button !== 0 || d.dataset.draggable === "false" || !d.open || d.closing) return;
+    const hd = e.target.closest?.(".sn-hd");
+    if (!hd || !d.contains(hd) || e.target.closest?.(DLG_NO_DRAG)) return;
+    const cur = d._drag || { x: 0, y: 0 }, r = d.getBoundingClientRect();
+    dg = { id: e.pointerId, hd, sx: e.clientX, sy: e.clientY, ox: cur.x, oy: cur.y, moved: false, base: { left: r.left - cur.x, top: r.top - cur.y, w: r.width, h: r.height } };
+  });
+  d.addEventListener("pointermove", (e) => {
+    if (!dg || e.pointerId !== dg.id) return;
+    const dx = e.clientX - dg.sx, dy = e.clientY - dg.sy;
+    if (!dg.moved) {
+      if (Math.hypot(dx, dy) < 3) return;
+      dg.moved = true;
+      d.classList.add("sn-dragging");
+      try { d.setPointerCapture?.(e.pointerId); } catch {}
+    }
+    const next = clampDrag(dg.ox + dx, dg.oy + dy, dg.base);
+    d._drag = next;
+    d.style.translate = `${next.x}px ${next.y}px`;
+  });
+  const endDrag = (e) => {
+    if (!dg || e.pointerId !== dg.id) return;
+    const was = dg; dg = null;
+    if (was.moved) {
+      d.classList.remove("sn-dragging");
+      try { d.releasePointerCapture?.(e.pointerId); } catch {}
+    }
+  };
+  d.addEventListener("pointerup", endDrag);
+  d.addEventListener("pointercancel", endDrag);
+  // 双击标题栏平滑复位回视口正中
+  d.addEventListener("dblclick", (e) => {
+    if (d.dataset.draggable === "false" || !d.open || d.closing) return;
+    const hd = e.target.closest?.(".sn-hd");
+    if (!hd || !d.contains(hd) || e.target.closest?.(DLG_NO_DRAG)) return;
+    const cur = d._drag;
+    if (!cur || (cur.x === 0 && cur.y === 0)) return;
+    const from = `${cur.x}px ${cur.y}px`;
+    d._drag = { x: 0, y: 0 };
+    d.style.translate = "";
+    if (!reduced()) d.animate([{ translate: from }, { translate: "0px 0px" }], { duration: 220, easing: "cubic-bezier(.22,1,.36,1)" });
   });
   d.addEventListener("cancel", (e) => { e.preventDefault(); d.dispatchEvent(new Event("ask-close")); });
   d.addEventListener("ask-close", () => (d.guard ? d.guard() : closeDialog(d)));

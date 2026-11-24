@@ -1,6 +1,9 @@
 import { TICK, showTip, hideTip, tipTarget } from "./core.js";
 import { onCleanup } from "./lifecycle.js";
 import { hitAny, pushDismiss, dropDismiss } from "./dismiss.js";
+import { computeFloating, isAnchorOutOfView } from "./floating.js";
+import { svg } from "./svg.js";
+import { eye, eyeOff } from "./icons/index.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/form.js";
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
@@ -106,14 +109,12 @@ export function mountSelect(h, { onChange } = {}) {
   const preferEnd = h.classList.contains("sn-end") || h.classList.contains("sn-cm-models") || !!menu?.classList.contains("sn-end");
   const place = (autoOut) => {
     if (!menu || !trig?.getBoundingClientRect || !globalThis.innerHeight) return;
-    const r = trig.getBoundingClientRect(), ih = innerHeight, iw = innerWidth;
-    if (autoOut && ((!r.width && !r.height) || r.bottom < 0 || r.top > ih)) return close(false);
-    const mh = menu.offsetHeight || 160, mw = menu.offsetWidth || r.width || 160, st = r.top - 8, sb = ih - r.bottom - 8, sr = iw - r.left - 8, sl = r.right - 8;
-    const up = preferUp ? (st >= mh + 6 || st >= sb) : (sb < mh + 6 && st > sb);
-    const end = preferEnd ? (sl >= mw || sl >= sr) : (sr < mw && sl > sr);
-    const mc = menu.classList; mc.toggle("sn-up", up); mc.toggle("sn-down", !up); mc.toggle("sn-end", end); mc.toggle("sn-start", !end);
-    const x0 = end ? r.right - mw : r.left, dx = x0 < 8 ? Math.round(8 - x0) : x0 + mw > iw - 8 ? Math.round(iw - 8 - x0 - mw) : 0;
-    dx ? menu.style.setProperty("--sn-menu-dx", `${dx}px`) : menu.style.removeProperty("--sn-menu-dx");
+    if (autoOut && isAnchorOutOfView(trig)) return close(false);
+    const pos = computeFloating(menu, trig, { preferUp, preferEnd, gap: 6, margin: 8 });
+    const mc = menu.classList; mc.toggle("sn-up", pos.up); mc.toggle("sn-down", !pos.up); mc.toggle("sn-end", pos.end); mc.toggle("sn-start", !pos.end);
+    pos.dx ? menu.style.setProperty("--sn-menu-dx", `${pos.dx}px`) : menu.style.removeProperty("--sn-menu-dx");
+    pos.dy ? menu.style.setProperty("--sn-menu-dy", `${pos.dy}px`) : menu.style.removeProperty("--sn-menu-dy");
+    menu.style.transformOrigin = `${pos.ox}px ${pos.oy}px`;
   };
   const onRe = () => place(false), onSc = (e) => { if (!menu || (e.target !== menu && !menu.contains?.(e.target))) place(true); };
   let dl = null;
@@ -121,8 +122,7 @@ export function mountSelect(h, { onChange } = {}) {
     if (!h.classList.contains("sn-open")) return;
     h.classList.remove("sn-open"); trig?.setAttribute("aria-expanded", "false"); items.forEach((x) => x.classList.remove("sn-hl"));
     if (dl) { dropDismiss(dl); dl = null; }
-    globalThis.removeEventListener?.("resize", onRe); globalThis.removeEventListener?.("scroll", onSc, true);
-    menu?.style.removeProperty("--sn-menu-dx");
+    globalThis.removeEventListener?.("resize", onRe); globalThis.removeEventListener?.("scroll", onSc, true); globalThis.removeEventListener?.("satin-reposition", onRe);
     if (refocus) trig?.focus();
   };
   const open = () => {
@@ -131,7 +131,7 @@ export function mountSelect(h, { onChange } = {}) {
     h.classList.add("sn-open"); trig?.setAttribute("aria-expanded", "true"); hideTip();
     // 精准判定交互面：只认触发按钮与菜单本体，绝不把宿主容器里的多余空白区当成内部
     dl = pushDismiss({ panel: menu || h, trigger: trig || h, close, contains: (t, p) => hitAny(t, p, [trig || h, menu]) });
-    globalThis.addEventListener?.("resize", onRe); globalThis.addEventListener?.("scroll", onSc, { passive: true, capture: true });
+    globalThis.addEventListener?.("resize", onRe); globalThis.addEventListener?.("scroll", onSc, { passive: true, capture: true }); globalThis.addEventListener?.("satin-reposition", onRe);
   };
   const valueOf = (it) => it.dataset.v ?? it.textContent.trim();
   const pick = (it, quiet) => {
@@ -185,11 +185,37 @@ export function validateForm(form, rules) {
 }
 // 禁用的按钮（aria-disabled="true"）：点了不响应，只把原因（data-tip）亮出来
 // ———— 验证码 ————
-// mountOtp(容器, { onComplete(code) })：自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入；填满时回调。返回 { value, clear() }
-export function mountOtp(box, { onComplete } = {}) {
+// 密码掩码切换按钮（SSR 与运行时共用）：掩码时显示睁眼图标（点一下显示明文），明文时显示闭眼图标（点一下隐藏）
+export const otpEyeHTML = (masked = false) =>
+  `<button type="button" class="sn-eye sn-otp-eye" data-otp-eye aria-label="${masked ? tt("form.2") : tt("form.1")}" aria-pressed="${String(!masked)}"><span class="sn-swap${masked ? "" : " sn-on"}"><span class="sn-a">${svg(eye, 16, "eye")}</span><span class="sn-b">${svg(eyeOff, 16, "eye-off")}</span></span></button>`;
+
+const optFlag = (v) => v === "" || (v != null && v !== false && v !== "false");
+
+// mountOtp(容器, { onComplete(code), mask, reveal })：自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入；支持密码掩码隐藏与眼睛显隐切换；填满时回调。返回 { value, masked, setMask(on), clear() }
+export function mountOtp(box, { onComplete, mask, reveal } = {}) {
   if (box._otp) return box._otp;
   const cells = [...box.querySelectorAll("input")], pop = (c) => { c.classList.remove("sn-typed"); void c.offsetWidth; c.classList.add("sn-typed"); };
   const code = () => cells.map((c) => c.value).join(""), done = () => { const v = code(); if (v.length === cells.length) { onComplete?.(v); box.dispatchEvent(new CustomEvent("complete", { bubbles: true, detail: { code: v } })); } };
+  let isMasked = mask !== undefined ? optFlag(mask) : (box.hasAttribute("data-mask") && box.getAttribute("data-mask") !== "false");
+  const wantReveal = reveal !== undefined ? optFlag(reveal) : (box.hasAttribute("data-reveal") ? box.getAttribute("data-reveal") !== "false" : isMasked);
+  let eyeBtn = box.querySelector("[data-otp-eye], .sn-otp-eye"), injectedEye = false;
+  if (wantReveal && !eyeBtn) {
+    box.insertAdjacentHTML("beforeend", otpEyeHTML(isMasked));
+    eyeBtn = box.querySelector("[data-otp-eye]");
+    injectedEye = true;
+  }
+  const syncMask = (on) => {
+    isMasked = !!on;
+    box.classList.toggle("sn-masked", isMasked);
+    for (const c of cells) c.type = isMasked ? "password" : "text";
+    if (eyeBtn) {
+      eyeBtn.querySelector(".sn-swap")?.classList.toggle("sn-on", !isMasked);
+      eyeBtn.setAttribute("aria-label", isMasked ? tt("form.2") : tt("form.1"));
+      eyeBtn.setAttribute("aria-pressed", String(!isMasked));
+    }
+  };
+  syncMask(isMasked);
+  if (eyeBtn) eyeBtn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); syncMask(!isMasked); });
   cells.forEach((c, i) => {
     c.addEventListener("input", () => { c.value = c.value.replace(/\D/g, "").slice(-1); if (c.value) { pop(c); cells[i + 1]?.focus(); done(); } });
     c.addEventListener("keydown", (e) => {
@@ -202,7 +228,13 @@ export function mountOtp(box, { onComplete } = {}) {
     });
     c.addEventListener("focus", () => c.select());
   });
-  return (box._otp = { get value() { return code(); }, clear() { cells.forEach((c) => (c.value = "")); cells[0]?.focus(); } });
+  onCleanup(() => { if (injectedEye) eyeBtn?.remove(); });
+  return (box._otp = {
+    get value() { return code(); },
+    get masked() { return isMasked; },
+    setMask: syncMask,
+    clear() { cells.forEach((c) => (c.value = "")); cells[0]?.focus(); },
+  });
 }
 // ———— 芯片 ————
 // 筛选芯片：.chip[data-toggle]，点了切换 .on（aria-pressed 跟着变）；
@@ -226,14 +258,14 @@ export function bindForms(root = document) {
   // root 自己符合也算（组件只接自己这一个，不去动旁边的）；document 没有 matches，照旧只找里面的
   const all = (q) => [...(root.matches?.(q) ? [root] : []), ...root.querySelectorAll(q)];
   bindSelects(root);
-  for (const b of all("[data-copy]")) if (once(b)) b.addEventListener("click", async () => { const v = b.dataset.copy; if (v) try { await navigator.clipboard.writeText(v); } catch {} copied(b); });
+  for (const b of all("[data-copy]")) if (once(b)) b.addEventListener("click", async () => { const v = b.dataset.copy; if (v) try { await navigator.clipboard?.writeText(v); } catch {} copied(b); });
   for (const c of all(".sn-chip[data-toggle]")) if (once(c)) { c.setAttribute("aria-pressed", String(c.classList.contains("sn-on"))); c.addEventListener("click", () => { const on = c.classList.toggle("sn-on"); c.setAttribute("aria-pressed", String(on)); }); }
   for (const row of all('[data-chips="removable"]')) if (once(row)) row.addEventListener("click", (e) => { const x = e.target.closest(".sn-chip .sn-x"); if (x && row.contains(x)) removeChip(x.closest(".sn-chip")); });
   for (const w of all("[data-clearable]")) if (once(w)) {
     const input = w.querySelector("input"), sync = () => w.classList.toggle("sn-filled", !!input.value);
     input.addEventListener("input", sync); sync();
-    // 清空后补发一次 input 事件，搜索结果、字数这些跟着输入框走的东西一起归零
-    w.querySelector(".sn-clear")?.addEventListener("click", () => { input.value = ""; input.dispatchEvent(new Event("input", { bubbles: true })); sync(); input.focus(); });
+    // 清空后补发一次 input 事件，搜索结果、字数这些跟着输入框走的东西一起归零；阻断冒泡防误触父级浮层触发器
+    w.querySelector(".sn-clear")?.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); input.value = ""; input.dispatchEvent(new Event("input", { bubbles: true })); sync(); input.focus(); });
   }
   for (const b of all("[data-eye]")) if (once(b)) b.addEventListener("click", () => {
     const input = b.closest(".sn-ib").querySelector("input"), on = input.type === "password";

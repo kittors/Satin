@@ -2,14 +2,14 @@
 
 > 组件 id：`otp`　分组：表单
 
-6 格，输入后自动跳到下一格；退格回到上一格；粘贴一串数字会自动分到各格。填进去的数字从下面淡入上来。
+6 格，输入后自动跳到下一格；退格回到上一格；粘贴一串数字会自动分到各格。支持密码隐藏（掩码）模式与显隐切换，适合支付密码、安全口令等隐私场景。
 
-**一格一个数字：输入后自动跳到下一格，退格回到上一格，粘贴一串数字自动分到各格；填满时告诉你。**
+**一格一个数字：输入后自动跳到下一格，退格回到上一格，粘贴一串数字自动分到各格；支持密码隐藏（掩码）与明密文切换，填满时告诉你。**
 
 ## 什么时候用
 
 - 短信、邮件验证码，4 到 8 位数字。
-- 两步验证的动态口令。
+- 两步验证的动态口令，或需要掩码隐藏的 6 位数字安全码 / 支付密码。
 
 ## 什么时候别用
 
@@ -333,11 +333,90 @@ export default function ShortCode() {
 }
 ```
 
+### 密码隐藏（掩码）
+
+加上 mask 开启密码隐藏，默认自带右侧眼睛按钮切换明文与密文；适合安全验证码、支付密码与隐私口令。
+
+```html
+<sn-otp length="6" mask></sn-otp>
+```
+
+纯 HTML 的写法：
+
+```html
+<sn-otp length="6" mask></sn-otp>
+```
+
+React 的写法：
+
+```tsx
+import { Otp } from "satin-ui/react";
+
+export default function MaskedOtp() {
+  return <Otp length={6} mask />;
+}
+```
+
+Vue 的写法：
+
+```vue
+<script setup lang="ts">
+import { Otp } from "satin-ui/vue";
+</script>
+
+<template>
+  <Otp :length="6" mask />
+</template>
+```
+
+Svelte 的写法：
+
+```svelte
+<script lang="ts">
+  import Otp from "satin-ui/svelte/Otp.svelte";
+</script>
+
+<Otp length={6} mask />
+```
+
+Angular 的写法：
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+
+@Component({
+  selector: "demo-otp-mask",
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>
+  template: `<sn-otp length="6" mask></sn-otp>`,
+})
+export class OtpMaskComponent {}
+```
+
+Solid 的写法：
+
+```tsx
+export default function MaskedOtp() {
+  return <sn-otp length="6" mask></sn-otp>;
+}
+```
+
+Preact 的写法：
+
+```tsx
+import { Otp } from "satin-ui/react";
+
+export default function MaskedOtp() {
+  return <Otp length={6} mask />;
+}
+```
+
 ## 属性
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
 | `length` | `number` | 6 | 否 | 位数（4–8）。 | createXxx 选项：`length`；React：`length`；Vue：`length`；Svelte：`length`；Preact：`length`；自定义元素：`length`；标记：`几个 <input class="sn-otp-cell">`；纯 HTML：`length` |
+| `mask` | `boolean` | false | 否 | 开启密码隐藏（掩码圆点显示），防窥屏。 | createXxx 选项：`mask`；React：`mask`；Vue：`mask`；Svelte：`mask`；Preact：`mask`；自定义元素：`mask`；标记：`data-mask`；纯 HTML：`mask` |
+| `reveal` | `boolean` | 同 mask | 否 | 是否显示右侧眼睛显隐切换按钮；开启 mask 时默认显示，传 false 可强制始终隐藏。 | createXxx 选项：`reveal`；React：`reveal`；Vue：`reveal`；Svelte：`reveal`；Preact：`reveal`；自定义元素：`reveal`；标记：`data-reveal`；纯 HTML：`reveal` |
 
 ## 事件
 
@@ -350,6 +429,8 @@ export default function ShortCode() {
 | 名称 | 签名 | 说明 |
 |---|---|---|
 | `value` | `readonly value: string` | 现在填了的数字。 |
+| `masked` | `readonly masked: boolean` | 当前是否处于密码隐藏（掩码）状态。 |
+| `setMask` | `setMask(masked: boolean): void` | 程序切换掩码隐藏或明文显示。 |
 | `clear` | `clear(): void` | 清空、焦点回到第一格（校验失败时用）。 |
 
 所有组件都有：`el`、`update(选项)`、`destroy()`、`on(事件, 回调)`、`off(事件, 回调)`。
@@ -363,6 +444,8 @@ export default function ShortCode() {
 | 类名 / 属性 | 作用 |
 |---|---|
 | `.sn-otp` | 验证码 |
+| `.sn-otp.sn-masked` | 密码隐藏（掩码）模式 |
+| `.sn-otp-eye` | 明密文切换眼睛按钮 |
 | `.sn-otp-cell` | 每一格（一个 input，inputmode="numeric"） |
 | `.sn-otp.sn-bad` | 校验失败：整排抖一下、标红 |
 

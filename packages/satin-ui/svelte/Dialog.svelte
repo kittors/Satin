@@ -11,7 +11,7 @@
   import { openDialog, closeDialog, wireDialog } from "../src/overlay.js";
   import Icon from "./Icon.svelte";
 
-  let { open = $bindable(false), title, description, icon, guard, onclose, onsubmit, footerClass = "", class: className = "", children, footer, ...rest } = $props();
+  let { open = $bindable(false), title, description, icon, guard, onclose, onsubmit, footerClass = "", draggable = true, class: className = "", children, footer, ...rest } = $props();
   const tid = $props.id();
   let el;
 
@@ -30,7 +30,7 @@
   });
 </script>
 
-<dialog bind:this={el} class={className ? `sn-dlg ${className}` : "sn-dlg"} aria-labelledby={title ? tid : undefined} {...rest}>
+<dialog bind:this={el} class={className ? `sn-dlg ${className}` : "sn-dlg"} aria-labelledby={title ? tid : undefined} data-draggable={draggable === false ? "false" : undefined} {...rest}>
   <form method="dialog" {onsubmit}>
     {#if title || description || icon}
       <div class="sn-hd">

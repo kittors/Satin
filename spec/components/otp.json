@@ -5,7 +5,7 @@
   "en": "OTP",
   "group": "表单",
   "specRef": "",
-  "summary": "6 格，输入后自动跳到下一格；退格回到上一格；粘贴一串数字会自动分到各格。填进去的数字从下面淡入上来。",
+  "summary": "6 格，输入后自动跳到下一格；退格回到上一格；粘贴一串数字会自动分到各格。支持密码隐藏（掩码）模式与显隐切换，适合支付密码、安全口令等隐私场景。",
   "acceptance": [],
   "api": [
     {
@@ -20,12 +20,20 @@
           "空容器按它渲染几格（默认 6）"
         ],
         [
+          "mask",
+          "开启密码隐藏（掩码圆点显示，默认 false）"
+        ],
+        [
+          "reveal",
+          "是否显示右侧眼睛显隐切换按钮（开启 mask 时默认为 true）"
+        ],
+        [
           "onComplete",
           "(code) => {}：填满时调（同时在容器上发 complete、sn-complete 事件）"
         ],
         [
-          "返回 value / clear()",
-          "现在填了的 / 清空"
+          "返回 value / masked / setMask(on) / clear()",
+          "当前值 / 是否掩码 / 切换掩码 / 清空"
         ]
       ]
     }
@@ -36,7 +44,7 @@
     ],
     "api": [
       [
-        "createOtp(容器, { length, onComplete })",
+        "createOtp(容器, { length, mask, reveal, onComplete })",
         "satin-ui/components"
       ]
     ]
@@ -49,7 +57,7 @@
   "demos": [
     {
       "caption": "",
-      "html": "<div class=\"sn-otp\" data-otp><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 1 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 2 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 3 位\"><span class=\"sn-gap\"></span><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 4 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 5 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 6 位\"></div>"
+      "html": "<div class=\"grid-m lc\">\n      <span class=\"sn-cap\">标准验证码</span>\n      <div class=\"sn-otp\" data-otp><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 1 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 2 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 3 位\"><span class=\"sn-gap\"></span><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 4 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 5 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 6 位\"></div>\n      <span class=\"sn-cap\">密码隐藏（掩码）</span>\n      <div class=\"sn-otp\" data-otp data-mask><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 1 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 2 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 3 位\"><span class=\"sn-gap\"></span><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 4 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 5 位\"><input inputmode=\"numeric\" maxlength=\"1\" aria-label=\"第 6 位\"></div>\n    </div>"
     }
   ],
   "states": [],
@@ -71,10 +79,10 @@
   "mobile": [],
   "contract": 1,
   "title": "验证码",
-  "lead": "一格一个数字：输入后自动跳到下一格，退格回到上一格，粘贴一串数字自动分到各格；填满时告诉你。",
+  "lead": "一格一个数字：输入后自动跳到下一格，退格回到上一格，粘贴一串数字自动分到各格；支持密码隐藏（掩码）与明密文切换，填满时告诉你。",
   "whenToUse": [
     "短信、邮件验证码，4 到 8 位数字。",
-    "两步验证的动态口令。"
+    "两步验证的动态口令，或需要掩码隐藏的 6 位数字安全码 / 支付密码。"
   ],
   "whenNotToUse": [
     {
@@ -137,6 +145,40 @@
         "markup": "几个 <input class=\"sn-otp-cell\">",
         "html": "length"
       }
+    },
+    {
+      "name": "mask",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "开启密码隐藏（掩码圆点显示），防窥屏。",
+      "names": {
+        "js": "mask",
+        "react": "mask",
+        "vue": "mask",
+        "svelte": "mask",
+        "preact": "mask",
+        "element": "mask",
+        "markup": "data-mask",
+        "html": "mask"
+      }
+    },
+    {
+      "name": "reveal",
+      "type": "boolean",
+      "default": "同 mask",
+      "required": false,
+      "desc": "是否显示右侧眼睛显隐切换按钮；开启 mask 时默认显示，传 false 可强制始终隐藏。",
+      "names": {
+        "js": "reveal",
+        "react": "reveal",
+        "vue": "reveal",
+        "svelte": "reveal",
+        "preact": "reveal",
+        "element": "reveal",
+        "markup": "data-reveal",
+        "html": "reveal"
+      }
     }
   ],
   "events": [
@@ -167,6 +209,20 @@
       "desc": "现在填了的数字。"
     },
     {
+      "name": "masked",
+      "kind": "property",
+      "signature": "readonly masked: boolean",
+      "returns": "boolean",
+      "desc": "当前是否处于密码隐藏（掩码）状态。"
+    },
+    {
+      "name": "setMask",
+      "kind": "method",
+      "signature": "setMask(masked: boolean): void",
+      "returns": "void",
+      "desc": "程序切换掩码隐藏或明文显示。"
+    },
+    {
       "name": "clear",
       "kind": "method",
       "signature": "clear(): void",
@@ -186,6 +242,14 @@
     {
       "name": ".sn-otp",
       "desc": "验证码"
+    },
+    {
+      "name": ".sn-otp.sn-masked",
+      "desc": "密码隐藏（掩码）模式"
+    },
+    {
+      "name": ".sn-otp-eye",
+      "desc": "明密文切换眼睛按钮"
     },
     {
       "name": ".sn-otp-cell",
@@ -293,6 +357,21 @@
         "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-length\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `<sn-otp length=\"4\"></sn-otp>`,\n})\nexport class OtpLengthComponent {}\n",
         "solid": "export default function ShortCode() {\n  return <sn-otp length=\"4\"></sn-otp>;\n}\n",
         "preact": "import { Otp } from \"satin-ui/react\";\n\nexport default function ShortCode() {\n  return <Otp length={4} />;\n}\n"
+      }
+    },
+    {
+      "slug": "otp-mask",
+      "title": "密码隐藏（掩码）",
+      "why": "加上 mask 开启密码隐藏，默认自带右侧眼睛按钮切换明文与密文；适合安全验证码、支付密码与隐私口令。",
+      "html": "<sn-otp length=\"6\" mask></sn-otp>",
+      "code": {
+        "html": "<sn-otp length=\"6\" mask></sn-otp>\n",
+        "react": "import { Otp } from \"satin-ui/react\";\n\nexport default function MaskedOtp() {\n  return <Otp length={6} mask />;\n}\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length=\"6\" mask />\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n</script>\n\n<Otp length={6} mask />\n",
+        "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-mask\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `<sn-otp length=\"6\" mask></sn-otp>`,\n})\nexport class OtpMaskComponent {}\n",
+        "solid": "export default function MaskedOtp() {\n  return <sn-otp length=\"6\" mask></sn-otp>;\n}\n",
+        "preact": "import { Otp } from \"satin-ui/react\";\n\nexport default function MaskedOtp() {\n  return <Otp length={6} mask />;\n}\n"
       }
     }
   ]

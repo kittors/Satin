@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import { setup, enhance } from "satin-ui";
 import { createOtp, toast } from "satin-ui/components";
+import "./otp-0.css";
 
 export default function OtpDemo0() {
   const ref = useRef<HTMLDivElement>(null);
@@ -21,14 +22,27 @@ export default function OtpDemo0() {
   }, []);
   return (
     <div ref={ref}>
-      <div className="sn-otp" data-otp="">
-        <input inputMode="numeric" maxLength={1} aria-label="第 1 位" />
-        <input inputMode="numeric" maxLength={1} aria-label="第 2 位" />
-        <input inputMode="numeric" maxLength={1} aria-label="第 3 位" />
-        <span className="sn-gap"></span>
-        <input inputMode="numeric" maxLength={1} aria-label="第 4 位" />
-        <input inputMode="numeric" maxLength={1} aria-label="第 5 位" />
-        <input inputMode="numeric" maxLength={1} aria-label="第 6 位" />
+      <div className="grid-m lc">
+        <span className="sn-cap">标准验证码</span>
+        <div className="sn-otp" data-otp="">
+          <input inputMode="numeric" maxLength={1} aria-label="第 1 位" />
+          <input inputMode="numeric" maxLength={1} aria-label="第 2 位" />
+          <input inputMode="numeric" maxLength={1} aria-label="第 3 位" />
+          <span className="sn-gap"></span>
+          <input inputMode="numeric" maxLength={1} aria-label="第 4 位" />
+          <input inputMode="numeric" maxLength={1} aria-label="第 5 位" />
+          <input inputMode="numeric" maxLength={1} aria-label="第 6 位" />
+        </div>
+        <span className="sn-cap">密码隐藏（掩码）</span>
+        <div className="sn-otp" data-otp="" data-mask="">
+          <input inputMode="numeric" maxLength={1} aria-label="第 1 位" />
+          <input inputMode="numeric" maxLength={1} aria-label="第 2 位" />
+          <input inputMode="numeric" maxLength={1} aria-label="第 3 位" />
+          <span className="sn-gap"></span>
+          <input inputMode="numeric" maxLength={1} aria-label="第 4 位" />
+          <input inputMode="numeric" maxLength={1} aria-label="第 5 位" />
+          <input inputMode="numeric" maxLength={1} aria-label="第 6 位" />
+        </div>
       </div>
     </div>
   );

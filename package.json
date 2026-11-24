@@ -10,7 +10,7 @@
     "test:node": "node scripts/test/imports.mjs && node scripts/test/i18n-shadow.mjs && node scripts/test/i18n-completeness.mjs && node scripts/test/prefix-leaks.mjs && node scripts/test/node-import.mjs && node scripts/test/sync.mjs && node scripts/test/ssr.mjs && node scripts/test/table.mjs && node scripts/test/select.mjs && node scripts/test/factories.mjs && node scripts/skill/recipes-render.mjs && node scripts/test/enhance.mjs && node scripts/test/size.mjs && node skills/satin/scripts/check.test.mjs --static-only && node scripts/test/contracts.mjs && node scripts/test/grid-api.mjs",
     "test:types": "tsc -p tests/types && node scripts/test/examples-ts.mjs",
     "test:cli": "node --test \"packages/satin-cli/test/*.test.mjs\"",
-    "test:browser": "node scripts/test/lifecycle.mjs && node scripts/test/md-xss.mjs && node scripts/test/chat-xss.mjs && node scripts/test/wrappers.mjs && node scripts/test/controlled.mjs && node scripts/test/fit-scroll.mjs",
+    "test:browser": "node scripts/test/lifecycle.mjs && node scripts/test/md-xss.mjs && node scripts/test/chat-xss.mjs && node scripts/test/wrappers.mjs && node scripts/test/controlled.mjs && node scripts/test/fit-scroll.mjs && node scripts/test/ui-interactions.mjs",
     "test:tokens": "node scripts/tokens/check.mjs --prefix sn-",
     "build:examples": "node scripts/examples/build.mjs",
     "check:examples": "node scripts/examples/check.mjs",

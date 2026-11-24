@@ -172,16 +172,6 @@ export default function EditorialDemo0() {
                       <i></i>
                       <i></i>
                       <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
                     </div>
                     <div className="sn-wv sn-pv">
                       <i></i>
@@ -219,28 +209,8 @@ export default function EditorialDemo0() {
                       <i></i>
                       <i></i>
                       <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
                     </div>
                     <div className="sn-wv sn-lit">
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
                       <i></i>
                       <i></i>
                       <i></i>

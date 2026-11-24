@@ -708,20 +708,20 @@
 /* ———— 侧边迷你定位刻度轨 + 悬停摘要浮窗（Thread Rail / Minimap）————
    全部通过 --sn-rail-* 变量可定制；支持 data-side="left" | "right" 左右切换；
    交互包含：连续指针磁吸波浪（--sn-rp）、激活邻域弧度与弹性伸展、点击微弹回馈、摘要浮窗纵滑追踪 */
-.sn-rail { --sn-rail-w: 12px; --sn-rail-w-on: 24px; --sn-rail-h: var(--sn-bw-accent, 2px); --sn-rail-gap: 6px; --sn-rail-color: color-mix(in srgb, var(--sn-label) 22%, transparent); --sn-rail-active: var(--sn-label); --sn-rail-tip-r: var(--sn-r-lg); --sn-rail-tip-w: 256px; --sn-rail-tip-bg: color-mix(in srgb, var(--sn-overlay) 90%, transparent); --sn-rail-blur: var(--sn-blur-md);
+nav.sn-rail { --sn-rail-w: 12px; --sn-rail-w-on: 24px; --sn-rail-h: var(--sn-bw-accent, 2px); --sn-rail-gap: 6px; --sn-rail-color: color-mix(in srgb, var(--sn-label) 22%, transparent); --sn-rail-active: var(--sn-label); --sn-rail-tip-r: var(--sn-r-lg); --sn-rail-tip-w: 256px; --sn-rail-tip-bg: color-mix(in srgb, var(--sn-overlay) 90%, transparent); --sn-rail-blur: var(--sn-blur-md);
   position: absolute; top: 50%; left: 10px; z-index: 8; transform: translateY(calc(-50% - var(--sn-foot-h, 80px) * .25)); display: flex; align-items: center; pointer-events: auto; }
-.sn-rail[data-side="right"] { left: auto; right: 10px; }
-.sn-rail.sn-off, .sn-rail[hidden] { display: none; }
+nav.sn-rail[data-side="right"] { left: auto; right: 10px; }
+nav.sn-rail.sn-off, nav.sn-rail[hidden] { display: none; }
 .sn-rail-ticks { display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 8px 6px 8px 4px; touch-action: none; }
-.sn-rail[data-side="right"] .sn-rail-ticks { align-items: flex-end; padding: 8px 4px 8px 6px; }
+nav.sn-rail[data-side="right"] .sn-rail-ticks { align-items: flex-end; padding: 8px 4px 8px 6px; }
 .sn-rail-tick { all: unset; box-sizing: border-box; --sn-rp: 0; display: flex; align-items: center; justify-content: flex-start; width: calc(var(--sn-rail-w-on) + 8px); height: calc(var(--sn-rail-h) + var(--sn-rail-gap) * 2); cursor: pointer; }
-.sn-rail[data-side="right"] .sn-rail-tick { justify-content: flex-end; }
+nav.sn-rail[data-side="right"] .sn-rail-tick { justify-content: flex-end; }
 .sn-rail-tick > i { display: block; width: calc(var(--sn-rail-w) + (var(--sn-rail-w-on) - var(--sn-rail-w)) * var(--sn-rp)); height: var(--sn-rail-h); border-radius: 999px; transform-origin: left center;
   background: color-mix(in srgb, var(--sn-rail-active) calc(22% + 78% * var(--sn-rp)), transparent);
   transition: width calc(260ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong), background-color calc(180ms * var(--sn-motion-scale, 1)) var(--sn-ease-out), transform calc(220ms * var(--sn-motion-scale, 1)) var(--sn-ease-overshoot); }
-.sn-rail[data-side="right"] .sn-rail-tick > i { transform-origin: right center; }
+nav.sn-rail[data-side="right"] .sn-rail-tick > i { transform-origin: right center; }
 /* 指针连续划过时缩短过渡以实现零滞后磁吸波浪；离开时自动恢复弹性缓落 */
-.sn-rail.sn-rail-track .sn-rail-tick > i { transition-duration: calc(75ms * var(--sn-motion-scale, 1)), calc(95ms * var(--sn-motion-scale, 1)), calc(180ms * var(--sn-motion-scale, 1)); transition-timing-function: var(--sn-ease-out), var(--sn-ease-out), var(--sn-ease-overshoot); }
+nav.sn-rail.sn-rail-track .sn-rail-tick > i { transition-duration: calc(75ms * var(--sn-motion-scale, 1)), calc(95ms * var(--sn-motion-scale, 1)), calc(180ms * var(--sn-motion-scale, 1)); transition-timing-function: var(--sn-ease-out), var(--sn-ease-out), var(--sn-ease-overshoot); }
 /* 静息态视觉坡度：激活刻度周边 ±1 格微微探出并提亮，形成柔和的标尺重心 */
 .sn-rail-tick.sn-near > i { width: max(calc(var(--sn-rail-w) + 3px), calc(var(--sn-rail-w) + (var(--sn-rail-w-on) - var(--sn-rail-w)) * var(--sn-rp))); background: color-mix(in srgb, var(--sn-rail-active) calc(38% + 62% * var(--sn-rp)), transparent); }
 .sn-rail-tick.sn-on > i { width: max(calc(var(--sn-rail-w-on) - 2px), calc(var(--sn-rail-w) + (var(--sn-rail-w-on) - var(--sn-rail-w)) * var(--sn-rp))); background: var(--sn-rail-active); transition-timing-function: var(--sn-ease-overshoot), var(--sn-ease-out), var(--sn-ease-overshoot); }
@@ -740,7 +740,7 @@
   display: flex; align-items: baseline; gap: 8px; pointer-events: none; opacity: 0;
   transition: opacity var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(200ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong); }
 .sn-rail-tip.sn-rail-glide { transition: top calc(170ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong), opacity var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(200ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong); }
-.sn-rail[data-side="right"] .sn-rail-tip { left: auto; right: calc(100% + 6px); transform: translateY(-50%) translateX(6px) scale(.96); }
+nav.sn-rail[data-side="right"] .sn-rail-tip { left: auto; right: calc(100% + 6px); transform: translateY(-50%) translateX(6px) scale(.96); }
 .sn-rail-tip.sn-on { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
 .sn-rail-tip-txt { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(19px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: calc(var(--sn-rail-tip-w) - 56px); }
 .sn-rail-tip-meta { flex: none; font: 400 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-mono); color: var(--sn-label3); }
@@ -749,7 +749,7 @@
   .sn-rail-tip { transform: translateY(-50%) !important; }
 }
 .sn-reduce-motion .sn-rail-tick > i, .sn-reduce-motion .sn-rail-tip { transition: none !important; animation: none !important; }
-@media (max-width: 640px) { .sn-rail { display: none; } }
+@media (max-width: 640px) { nav.sn-rail { display: none; } }
 
 /* 点击刻度轨定位后的柔和聚焦提示 */
 .sn-ci.sn-ci-flash > .sn-msg .sn-bubble, .sn-ci.sn-ci-flash > .sn-msg .sn-ai-body { animation: sn-ci-pulse .9s var(--sn-ease-out); }

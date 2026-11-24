@@ -63,8 +63,8 @@ export interface SliderOptions { value?: number; max?: number; label?: string; o
 export const createSlider: SatinFactory<SliderOptions, { readonly value: number }>;
 export interface SelectOptions { items?: Item[]; value?: string; placeholder?: string; label?: string; onChange?(value: string): void }
 export const createSelect: SatinFactory<SelectOptions, { readonly value: string | null; open(): void; close(refocus?: boolean): void }>;
-export interface OtpOptions { length?: number; onComplete?(code: string): void }
-export const createOtp: SatinFactory<OtpOptions, { readonly value: string; clear(): void }>;
+export interface OtpOptions { length?: number; /** 密码隐藏模式（掩码圆点显示） */ mask?: boolean; /** 是否显示明文/密文切换眼睛按钮（开启 mask 时默认为 true） */ reveal?: boolean; onComplete?(code: string): void }
+export const createOtp: SatinFactory<OtpOptions, { readonly value: string; readonly masked: boolean; setMask(masked: boolean): void; clear(): void }>;
 export interface TabsOptions { tabs?: { label: string; badge?: string | number; content?: string; html?: string }[]; value?: number; onChange?(index: number): void }
 export const createTabs: SatinFactory<TabsOptions, { readonly value: number; select(index: number): void }>;
 /** Chrome 浏览器式平滑弧形页标签的一项 */

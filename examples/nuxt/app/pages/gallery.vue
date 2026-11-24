@@ -91,9 +91,6 @@ import VlistDemo0 from "../demos/vlist-0.vue";
 import ChatDemo0 from "../demos/chat-0.vue";
 import ChatDemo1 from "../demos/chat-1.vue";
 import MdDemo0 from "../demos/md-0.vue";
-import EditorialHotspot from "../demos/editorial-hotspot.vue";
-import EditorialCompare from "../demos/editorial-compare.vue";
-import EditorialBasic from "../demos/editorial-basic.vue";
 import EditorialDemo0 from "../demos/editorial-0.vue";
 import FlowDemo0 from "../demos/flow-0.vue";
 import ImageDemo0 from "../demos/image-0.vue";
@@ -163,6 +160,9 @@ import DialogControlled from "../demos/dialog-controlled.vue";
 import DrawerBasic from "../demos/drawer-basic.vue";
 import DrawerControlled from "../demos/drawer-controlled.vue";
 import DrawerFooter from "../demos/drawer-footer.vue";
+import EditorialBasic from "../demos/editorial-basic.vue";
+import EditorialCompare from "../demos/editorial-compare.vue";
+import EditorialHotspot from "../demos/editorial-hotspot.vue";
 import EmptyBasic from "../demos/empty-basic.vue";
 import EmptySearch from "../demos/empty-search.vue";
 import EmptyError from "../demos/empty-error.vue";
@@ -221,6 +221,7 @@ import OptimisticPending from "../demos/optimistic-pending.vue";
 import OtpBasic from "../demos/otp-basic.vue";
 import OtpComplete from "../demos/otp-complete.vue";
 import OtpLength from "../demos/otp-length.vue";
+import OtpMask from "../demos/otp-mask.vue";
 import PickerBasic from "../demos/picker-basic.vue";
 import PickerRange from "../demos/picker-range.vue";
 import PickerTime from "../demos/picker-time.vue";
@@ -553,9 +554,6 @@ import VlistRetry from "../demos/vlist-retry.vue";
   </section>
   <section id="editorial">
     <h2>图文编排与内容张力</h2>
-    <div class="demo" data-demo="editorial-hotspot"><DemoGuard slug="editorial-hotspot"><EditorialHotspot /></DemoGuard></div>
-    <div class="demo" data-demo="editorial-compare"><DemoGuard slug="editorial-compare"><EditorialCompare /></DemoGuard></div>
-    <div class="demo" data-demo="editorial-basic"><DemoGuard slug="editorial-basic"><EditorialBasic /></DemoGuard></div>
     <div class="demo" data-demo="editorial-0"><DemoGuard slug="editorial-0"><EditorialDemo0 /></DemoGuard></div>
   </section>
   <section id="flow">
@@ -701,6 +699,12 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <div class="demo" data-demo="drawer-controlled"><DemoGuard slug="drawer-controlled"><DrawerControlled /></DemoGuard></div>
     <div class="demo" data-demo="drawer-footer"><DemoGuard slug="drawer-footer"><DrawerFooter /></DemoGuard></div>
   </section>
+  <section id="editorial">
+    <h2>图文编排与内容张力</h2>
+    <div class="demo" data-demo="editorial-basic"><DemoGuard slug="editorial-basic"><EditorialBasic /></DemoGuard></div>
+    <div class="demo" data-demo="editorial-compare"><DemoGuard slug="editorial-compare"><EditorialCompare /></DemoGuard></div>
+    <div class="demo" data-demo="editorial-hotspot"><DemoGuard slug="editorial-hotspot"><EditorialHotspot /></DemoGuard></div>
+  </section>
   <section id="empty">
     <h2>空状态</h2>
     <div class="demo" data-demo="empty-basic"><DemoGuard slug="empty-basic"><EmptyBasic /></DemoGuard></div>
@@ -812,6 +816,7 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <div class="demo" data-demo="otp-basic"><DemoGuard slug="otp-basic"><OtpBasic /></DemoGuard></div>
     <div class="demo" data-demo="otp-complete"><DemoGuard slug="otp-complete"><OtpComplete /></DemoGuard></div>
     <div class="demo" data-demo="otp-length"><DemoGuard slug="otp-length"><OtpLength /></DemoGuard></div>
+    <div class="demo" data-demo="otp-mask"><DemoGuard slug="otp-mask"><OtpMask /></DemoGuard></div>
   </section>
   <section id="picker">
     <h2>日期、时间、地址</h2>

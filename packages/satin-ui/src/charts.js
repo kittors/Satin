@@ -518,7 +518,7 @@ export const createBarChart = /* @__PURE__ */ defineComponent({
 // 3. 环形占比图（createDonutChart）
 // =========================================================================
 function mountDonutChart(root, opts = {}) {
-  let cfg = { items: [], totalLabel: tt("charts.2"), unit: "", activeIndex: -1, ...opts };
+  let cfg = { items: [], totalLabel: opts.totalLabel ?? opts.centerLabel ?? tt("charts.2"), unit: "", activeIndex: -1, ...opts };
   root.classList.add("sn-ch", "sn-ch-donut");
   root.innerHTML = `<div class="sn-ch-donut-wrap"><div class="sn-ch-donut-box"><canvas class="sn-ch-cv"></canvas><div class="sn-ch-donut-mid"><b class="sn-ch-donut-val"></b><span class="sn-ch-donut-lbl"></span></div></div><div class="sn-ch-donut-list"></div></div>`;
   const box = root.querySelector(".sn-ch-donut-box"), cv = root.querySelector(".sn-ch-cv"), valEl = root.querySelector(".sn-ch-donut-val"), lblEl = root.querySelector(".sn-ch-donut-lbl"), listEl = root.querySelector(".sn-ch-donut-list");

@@ -17,7 +17,7 @@ const COMPONENTS = {
   loader: [S.createLoader, ["variant", "size", "color", "speed", "label"]],
   slider: [S.createSlider, ["value", "max", "label"]],
   select: [S.createSelect, ["items", "value", "placeholder", "label"]],
-  otp: [S.createOtp, ["length"]],
+  otp: [S.createOtp, ["length", "mask", "reveal"]],
   tabs: [S.createTabs, ["tabs", "value"]],
   pager: [S.createPager, ["total", "page", "count"]],
   collapse: [S.createCollapse, ["items", "single", "open"]],

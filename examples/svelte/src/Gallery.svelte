@@ -89,9 +89,6 @@
   import ChatDemo0 from "./demos/chat-0.svelte";
   import ChatDemo1 from "./demos/chat-1.svelte";
   import MdDemo0 from "./demos/md-0.svelte";
-  import EditorialHotspot from "./demos/editorial-hotspot.svelte";
-  import EditorialCompare from "./demos/editorial-compare.svelte";
-  import EditorialBasic from "./demos/editorial-basic.svelte";
   import EditorialDemo0 from "./demos/editorial-0.svelte";
   import FlowDemo0 from "./demos/flow-0.svelte";
   import ImageDemo0 from "./demos/image-0.svelte";
@@ -161,6 +158,9 @@
   import DrawerBasic from "./demos/drawer-basic.svelte";
   import DrawerControlled from "./demos/drawer-controlled.svelte";
   import DrawerFooter from "./demos/drawer-footer.svelte";
+  import EditorialBasic from "./demos/editorial-basic.svelte";
+  import EditorialCompare from "./demos/editorial-compare.svelte";
+  import EditorialHotspot from "./demos/editorial-hotspot.svelte";
   import EmptyBasic from "./demos/empty-basic.svelte";
   import EmptySearch from "./demos/empty-search.svelte";
   import EmptyError from "./demos/empty-error.svelte";
@@ -219,6 +219,7 @@
   import OtpBasic from "./demos/otp-basic.svelte";
   import OtpComplete from "./demos/otp-complete.svelte";
   import OtpLength from "./demos/otp-length.svelte";
+  import OtpMask from "./demos/otp-mask.svelte";
   import PickerBasic from "./demos/picker-basic.svelte";
   import PickerRange from "./demos/picker-range.svelte";
   import PickerTime from "./demos/picker-time.svelte";
@@ -550,9 +551,6 @@
   </section>
   <section id="editorial">
     <h2>图文编排与内容张力</h2>
-    <div class="demo" data-demo="editorial-hotspot"><svelte:boundary onerror={(e) => console.error("演示 editorial-hotspot 出错：", e)}><EditorialHotspot />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
-    <div class="demo" data-demo="editorial-compare"><svelte:boundary onerror={(e) => console.error("演示 editorial-compare 出错：", e)}><EditorialCompare />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
-    <div class="demo" data-demo="editorial-basic"><svelte:boundary onerror={(e) => console.error("演示 editorial-basic 出错：", e)}><EditorialBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="editorial-0"><svelte:boundary onerror={(e) => console.error("演示 editorial-0 出错：", e)}><EditorialDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="flow">
@@ -698,6 +696,12 @@
     <div class="demo" data-demo="drawer-controlled"><svelte:boundary onerror={(e) => console.error("演示 drawer-controlled 出错：", e)}><DrawerControlled />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="drawer-footer"><svelte:boundary onerror={(e) => console.error("演示 drawer-footer 出错：", e)}><DrawerFooter />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
+  <section id="editorial">
+    <h2>图文编排与内容张力</h2>
+    <div class="demo" data-demo="editorial-basic"><svelte:boundary onerror={(e) => console.error("演示 editorial-basic 出错：", e)}><EditorialBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="editorial-compare"><svelte:boundary onerror={(e) => console.error("演示 editorial-compare 出错：", e)}><EditorialCompare />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="editorial-hotspot"><svelte:boundary onerror={(e) => console.error("演示 editorial-hotspot 出错：", e)}><EditorialHotspot />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+  </section>
   <section id="empty">
     <h2>空状态</h2>
     <div class="demo" data-demo="empty-basic"><svelte:boundary onerror={(e) => console.error("演示 empty-basic 出错：", e)}><EmptyBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
@@ -809,6 +813,7 @@
     <div class="demo" data-demo="otp-basic"><svelte:boundary onerror={(e) => console.error("演示 otp-basic 出错：", e)}><OtpBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="otp-complete"><svelte:boundary onerror={(e) => console.error("演示 otp-complete 出错：", e)}><OtpComplete />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="otp-length"><svelte:boundary onerror={(e) => console.error("演示 otp-length 出错：", e)}><OtpLength />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="otp-mask"><svelte:boundary onerror={(e) => console.error("演示 otp-mask 出错：", e)}><OtpMask />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="picker">
     <h2>日期、时间、地址</h2>

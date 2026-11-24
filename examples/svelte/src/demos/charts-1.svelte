@@ -1,13 +1,49 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
+  import { createBarChart, createDonutChart } from "satin-ui/charts";
+  import "satin-ui/css/charts.css";
   import "./charts-1.css";
 
   let root!: HTMLDivElement;
   onMount(() => {
     if (!root) return;
     const unsetup = setup();
-    const off = enhance(root);
+    const off = enhance(root, (root: any) => {
+      // 分组对比柱状图 + 环形占比图：悬停压暗非焦点，点击柱组或环段可联动筛选
+      const barEl = root.querySelector("#chBar");
+      const donutEl = root.querySelector("#chDonut");
+      const noteEl = root.querySelector("#chLinkNote");
+      if (barEl && donutEl) {
+        const barChart = createBarChart(barEl, {
+          labels: ["纪录", "电影感", "动画", "MV", "短剧"],
+          unit: " 镜",
+          height: 236,
+          series: [
+            { name: "本周交付", color: "blue", values: [420, 580, 360, 290, 470] },
+            { name: "上周交付", color: "muted", values: [350, 490, 310, 260, 390] },
+          ],
+          onSelect: (label?: any) => {
+            if (noteEl) noteEl.textContent = label ? `已聚焦「${label}」题材（再次点击取消筛选）` : "点击柱组或环段可聚焦联动查看";
+          },
+        });
+        createDonutChart(donutEl, {
+          size: 164,
+          totalLabel: "项目总数",
+          unit: " 个",
+          items: [
+            { label: "已完成", value: 64, color: "success" },
+            { label: "生成中", value: 32, color: "blue" },
+            { label: "待审核", value: 24, color: "warning" },
+            { label: "重试队列", value: 8, color: "danger" },
+          ],
+          onSelect: (item?: any) => {
+            if (noteEl) noteEl.textContent = item ? `已筛选「${item.label}」状态：共 ${item.value} 个项目` : "点击柱组或环段可聚焦联动查看";
+          },
+        });
+        root.querySelector("[data-ch-bar-replay]")?.addEventListener("click", () => barChart.replay());
+      }
+    });
     return () => { off(); unsetup(); };
   });
 </script>
@@ -18,66 +54,7 @@
     <button type="button" class="sn-btn sn-ghost sn-sm" data-ch-bar-replay="" data-i="refresh-cw:before">重播生长</button>
   </div>
   <div class="ch-demo-2col">
-    <div id="chBar">
-      <div class="sn-ch-host sn-ch sn-ch-bar">
-        <div class="sn-ch-top">
-          <div class="sn-ch-legend">
-            <button type="button" class="sn-ch-leg" data-si="0" aria-pressed="true">
-              <i class="sn-ch-leg-dot"></i>
-              <span class="sn-ch-leg-lbl">本周交付</span>
-            </button>
-            <button type="button" class="sn-ch-leg" data-si="1" aria-pressed="true">
-              <i class="sn-ch-leg-dot"></i>
-              <span class="sn-ch-leg-lbl">上周交付</span>
-            </button>
-          </div>
-        </div>
-        <div class="sn-ch-stage">
-          <canvas class="sn-ch-cv" width="404" height="236"></canvas>
-          <div class="sn-ch-tip" role="status" aria-live="polite"></div>
-        </div>
-        <i></i>
-      </div>
-    </div>
-    <div id="chDonut">
-      <div class="sn-ch-host sn-ch sn-ch-donut">
-        <div class="sn-ch-donut-wrap">
-          <div class="sn-ch-donut-box">
-            <canvas class="sn-ch-cv" width="196" height="196"></canvas>
-            <div class="sn-ch-donut-mid">
-              <b class="sn-ch-donut-val">128 个</b>
-              <span class="sn-ch-donut-lbl">总计</span>
-            </div>
-          </div>
-          <div class="sn-ch-donut-list">
-            <button type="button" class="sn-ch-donut-item" data-di="0">
-              <i></i>
-              <span>已完成</span>
-              <b>64 个</b>
-              <small>50%</small>
-            </button>
-            <button type="button" class="sn-ch-donut-item" data-di="1">
-              <i></i>
-              <span>生成中</span>
-              <b>32 个</b>
-              <small>25%</small>
-            </button>
-            <button type="button" class="sn-ch-donut-item" data-di="2">
-              <i></i>
-              <span>待审核</span>
-              <b>24 个</b>
-              <small>19%</small>
-            </button>
-            <button type="button" class="sn-ch-donut-item" data-di="3">
-              <i></i>
-              <span>重试队列</span>
-              <b>8 个</b>
-              <small>6%</small>
-            </button>
-          </div>
-        </div>
-        <i></i>
-      </div>
-    </div>
+    <div id="chBar"></div>
+    <div id="chDonut"></div>
   </div>
 </div>

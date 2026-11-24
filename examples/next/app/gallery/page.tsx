@@ -90,9 +90,6 @@ import VlistDemo0 from "../demos/vlist-0";
 import ChatDemo0 from "../demos/chat-0";
 import ChatDemo1 from "../demos/chat-1";
 import MdDemo0 from "../demos/md-0";
-import EditorialHotspot from "../demos/editorial-hotspot";
-import EditorialCompare from "../demos/editorial-compare";
-import EditorialBasic from "../demos/editorial-basic";
 import EditorialDemo0 from "../demos/editorial-0";
 import FlowDemo0 from "../demos/flow-0";
 import ImageDemo0 from "../demos/image-0";
@@ -162,6 +159,9 @@ import DialogControlled from "../demos/dialog-controlled";
 import DrawerBasic from "../demos/drawer-basic";
 import DrawerControlled from "../demos/drawer-controlled";
 import DrawerFooter from "../demos/drawer-footer";
+import EditorialBasic from "../demos/editorial-basic";
+import EditorialCompare from "../demos/editorial-compare";
+import EditorialHotspot from "../demos/editorial-hotspot";
 import EmptyBasic from "../demos/empty-basic";
 import EmptySearch from "../demos/empty-search";
 import EmptyError from "../demos/empty-error";
@@ -220,6 +220,7 @@ import OptimisticPending from "../demos/optimistic-pending";
 import OtpBasic from "../demos/otp-basic";
 import OtpComplete from "../demos/otp-complete";
 import OtpLength from "../demos/otp-length";
+import OtpMask from "../demos/otp-mask";
 import PickerBasic from "../demos/picker-basic";
 import PickerRange from "../demos/picker-range";
 import PickerTime from "../demos/picker-time";
@@ -552,9 +553,6 @@ export default function Gallery() {
       </section>
       <section id="editorial">
         <h2>图文编排与内容张力</h2>
-        <div className="demo" data-demo="editorial-hotspot"><Guard slug="editorial-hotspot"><EditorialHotspot /></Guard></div>
-        <div className="demo" data-demo="editorial-compare"><Guard slug="editorial-compare"><EditorialCompare /></Guard></div>
-        <div className="demo" data-demo="editorial-basic"><Guard slug="editorial-basic"><EditorialBasic /></Guard></div>
         <div className="demo" data-demo="editorial-0"><Guard slug="editorial-0"><EditorialDemo0 /></Guard></div>
       </section>
       <section id="flow">
@@ -700,6 +698,12 @@ export default function Gallery() {
         <div className="demo" data-demo="drawer-controlled"><Guard slug="drawer-controlled"><DrawerControlled /></Guard></div>
         <div className="demo" data-demo="drawer-footer"><Guard slug="drawer-footer"><DrawerFooter /></Guard></div>
       </section>
+      <section id="editorial">
+        <h2>图文编排与内容张力</h2>
+        <div className="demo" data-demo="editorial-basic"><Guard slug="editorial-basic"><EditorialBasic /></Guard></div>
+        <div className="demo" data-demo="editorial-compare"><Guard slug="editorial-compare"><EditorialCompare /></Guard></div>
+        <div className="demo" data-demo="editorial-hotspot"><Guard slug="editorial-hotspot"><EditorialHotspot /></Guard></div>
+      </section>
       <section id="empty">
         <h2>空状态</h2>
         <div className="demo" data-demo="empty-basic"><Guard slug="empty-basic"><EmptyBasic /></Guard></div>
@@ -811,6 +815,7 @@ export default function Gallery() {
         <div className="demo" data-demo="otp-basic"><Guard slug="otp-basic"><OtpBasic /></Guard></div>
         <div className="demo" data-demo="otp-complete"><Guard slug="otp-complete"><OtpComplete /></Guard></div>
         <div className="demo" data-demo="otp-length"><Guard slug="otp-length"><OtpLength /></Guard></div>
+        <div className="demo" data-demo="otp-mask"><Guard slug="otp-mask"><OtpMask /></Guard></div>
       </section>
       <section id="picker">
         <h2>日期、时间、地址</h2>

@@ -67,6 +67,9 @@ export default {
       desc: "关之前拦一下（Esc、取消、×）：比如填了内容就先在底栏问一句。组件给的 close 调了才真关；手写标记里 guard 不带参数，确认要关时自己调 `closeDialog(弹窗)`。",
       example: "guard={(close) => (dirty ? setAsking(true) : close())}",
       names: { react: "guard", vue: "guard", svelte: "guard", preact: "guard", markup: "弹窗元素的 guard 属性：dialog.guard = () => {}", html: "弹窗元素的 guard 属性：dialog.guard = () => {}" } },
+    { name: "draggable", type: "boolean", default: "true", required: false,
+      desc: "是否允许按住标题栏（.sn-hd）拖动弹窗；双击标题栏自动复位回正中。",
+      names: { react: "draggable", vue: "draggable", svelte: "draggable", preact: "draggable", markup: 'data-draggable="false"（关闭）', html: 'data-draggable="false"（关闭）' } },
   ],
   events: [
     { name: "close", payload: "—", when: "关完以后：Esc、取消、`data-x`、程序关都算。",

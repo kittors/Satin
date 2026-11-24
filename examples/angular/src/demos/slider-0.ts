@@ -41,10 +41,13 @@ export class SliderDemo0Component {
   ngAfterViewInit() {
     const unsetup = setup();
     const done = enhance(this.root.nativeElement, (root: any) => {
-      const slider = createSlider(root.querySelector("[data-slider]"), {
-        onChange: (value?: any) => console.log("当前值", value),
-      });
-      slider.update({ value: 60 }); // 从外面改值
+      const sliderEl = root.querySelector("[data-slider]");
+      if (sliderEl) {
+        const slider = createSlider(sliderEl, {
+          onChange: (value?: any) => console.log("当前值", value),
+        });
+        slider.update({ value: 60 }); // 从外面改值
+      }
     });
     this.off = () => { done(); unsetup(); };
   }

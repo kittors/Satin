@@ -3,6 +3,7 @@
 import { scrollArea } from "./scroll.js";
 import { track, onCleanup } from "./lifecycle.js";
 import { icon } from "./icons.js";
+import { computeFloating } from "./floating.js";
 export const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 // 根元素：在 Node / SSR 里导入时没有 document，这里是 undefined（只在浏览器里调用的函数才用到它）
 export const root = typeof document !== "undefined" ? document.documentElement : undefined;
@@ -149,15 +150,23 @@ let tip = null, tipTimer = 0, lastHide = 0, tipFor = null, described = null, tip
 const tipEl = () => (tip ??= document.getElementById("sn-tip") || document.body.appendChild(Object.assign(document.createElement("div"), { className: "sn-tip", id: "sn-tip", popover: "manual" })));
 // 读屏：提示层 role="tooltip"，显示时元素 aria-describedby 指向它（提示和 aria-label 一样时不再重复读）
 const undescribe = () => { described?.removeAttribute("aria-describedby"); described = null; };
+const positionTip = (el) => {
+  if (!tip || !el?.isConnected) return;
+  const pos = computeFloating(tip, el, { placement: "top", align: "center", gap: 8, margin: 8 });
+  tip.style.left = pos.left + "px";
+  tip.style.top = pos.top + "px";
+  tip.style.transformOrigin = `${pos.ox}px ${pos.oy}px`;
+  tip.classList.toggle("sn-below", !pos.up);
+};
 export function showTip(el, text) {
   tipEl(); if (!tip.matches(":popover-open")) tip.showPopover();
   tip.setAttribute("role", "tooltip"); if (described !== el || el.getAttribute("aria-label") === text) undescribe();
   if (!described && !el.hasAttribute("aria-describedby") && el.getAttribute("aria-label") !== text) { el.setAttribute("aria-describedby", tip.id); described = el; }
   tip.textContent = shown = text; if (el.dataset.kbd && !matchMedia("(hover: none)").matches) { const k = document.createElement("kbd"); k.textContent = el.dataset.kbd; tip.append(k); } // 触屏上不写快捷键
-  tip.classList.toggle("sn-wrap", text.length > 20); tip.classList.add("sn-on"); tipFor = el;
-  const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
-  const top = r.top - h - 8 < 64 ? r.bottom + 8 : r.top - h - 8;
-  tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px"; tip.style.top = top + "px";
+  tip.classList.toggle("sn-wrap", text.length > 20);
+  tipFor = el;
+  positionTip(el);
+  tip.classList.add("sn-on");
 }
 export const hideTip = () => { clearTimeout(tipTimer); tipWait = null; undescribe(); if (tipFor) { tip.classList.remove("sn-on"); tipFor = null; lastHide = performance.now(); } };
 export const tipTarget = () => tipFor;
@@ -188,4 +197,5 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && (tipFor 
 document.addEventListener("focusin", (e) => { const el = e.target.closest?.("[data-tip]"); if (el?.matches(":focus-visible")) showTip(el, el.dataset.tip); });
 document.addEventListener("focusout", hideTip);
 addEventListener("scroll", hideTip, { passive: true });
+addEventListener("satin-reposition", () => { if (tipFor) positionTip(tipFor); });
 }

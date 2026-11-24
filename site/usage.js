@@ -20,7 +20,7 @@ export const USAGE = {
   choice: { css: ["form.css"], api: [["checkHTML({ label, checked, indeterminate, disabled })", C], ["switchHTML({ label, checked, disabled })", C], ["setup()：整页调一次，复选框勾上时轻轻弹一下", S]] },
   segmented: { css: ["form.css"], api: [["createSegmented(元素, { items, value, size, label, onChange })", C], ["initSeg(元素, 回调, 起始格)", S]] },
   slider: { css: ["form.css"], api: [["createSlider(元素, { value, max, label, onChange })", C]] },
-  otp: { css: ["form.css"], api: [["createOtp(容器, { length, onComplete })", C]] },
+  otp: { css: ["form.css"], api: [["createOtp(容器, { length, mask, reveal, onComplete })", C]] },
   tooltip: { css: ["buttons.css"], api: [["setup()：整页调一次，写了 data-tip 的元素自动有提示", S], ["showTip(元素, 文字) / hideTip()", S]] },
   popover: { css: ["overlay.css"], api: [["bindOverlays(root)：接上 [data-pop]", C], ["openPopover(面板, 按钮, { align, onClose })", C], ["popoverOf(面板)", C], ["setup()：整页调一次，Esc、点外面关上", S]] },
   popconfirm: { css: ["overlay.css"], api: [["openPopover(面板, 按钮, { align })", C], ["setup()：整页调一次，Esc、点外面关上", S]] },
@@ -79,29 +79,35 @@ for (const save of document.querySelectorAll(".sn-btn.sn-primary")) {
   compound: `import { copied } from "satin-ui/components";
 
 const btn = document.querySelector("[data-copy]");
-btn.addEventListener("click", async () => {
-  await navigator.clipboard.writeText(location.href);
+btn?.addEventListener("click", async () => {
+  try { await navigator.clipboard?.writeText(location.href); } catch {}
   copied(btn); // 图标换成对勾，1.5 秒后换回来
 });`,
   segmented: `import { createSegmented } from "satin-ui/components";
 
 // 在已有的标记上接交互；给空容器时按 items、value 渲染
-const seg = createSegmented(document.querySelector(".sn-seg"), {
-  onChange: (value) => console.log("选中了", value),
-});
-seg.select("9:16"); // 从外面切过去`,
+const segEl = document.querySelector(".sn-seg");
+if (segEl) {
+  const seg = createSegmented(segEl, {
+    onChange: (value) => console.log("选中了", value),
+  });
+  seg.select("9:16"); // 从外面切过去
+}`,
   slider: `import { createSlider } from "satin-ui/components";
 
-const slider = createSlider(document.querySelector("[data-slider]"), {
-  onChange: (value) => console.log("当前值", value),
-});
-slider.update({ value: 60 }); // 从外面改值`,
+const sliderEl = document.querySelector("[data-slider]");
+if (sliderEl) {
+  const slider = createSlider(sliderEl, {
+    onChange: (value) => console.log("当前值", value),
+  });
+  slider.update({ value: 60 }); // 从外面改值
+}`,
   tooltip: `import { setup, showTip, hideTip } from "satin-ui";
 
 setup(); // 整页调一次：写了 data-tip 的元素自动有提示
 // 要在别处触发时：比如点了"放大预览"，在按钮上说一下结果，1.5 秒后收起
 const zoom = document.querySelector('[data-tip="放大预览"]');
-zoom.addEventListener("click", () => {
+zoom?.addEventListener("click", () => {
   showTip(zoom, "已放大到 200%");
   setTimeout(hideTip, 1500);
 });`,
@@ -127,41 +133,54 @@ t.update({ progress: 0.42 });
 t.update({ text: "已导出" });`,
   numflow: `import { createNumberFlow } from "satin-ui/components";
 
-const views = createNumberFlow(document.querySelector("#views"), { value: 12840 });
-views.set(12841); // 只滚动变了的那几位`,
+const viewsEl = document.querySelector("#views");
+if (viewsEl) {
+  const views = createNumberFlow(viewsEl, { value: 12840 });
+  views.set(12841); // 只滚动变了的那几位
+}`,
   scrollarea: `import { createScrollArea } from "satin-ui/components";
 
 // 原生滚动照旧，只换掉滚动条：滚动时出现，停下后淡出
-createScrollArea(document.querySelector(".sn-list"), { size: 24 });`,
+const listEl = document.querySelector(".sn-list");
+if (listEl) createScrollArea(listEl, { size: 24 });`,
   md: `import { renderMarkdown } from "satin-ui/markdown";
 
-const doc = renderMarkdown(document.querySelector("#readme"), text, { codeMax: 240 });
-doc.update(newText); // 换内容；doc.set({ codeMax: 0 }) 改折叠高度`,
-  charts: `import { createAreaChart, createBarChart, createDonutChart, createChart3D, createSparkline, icon3DHTML, bindIcons3D } from "satin-ui/charts";
+const mdEl = document.querySelector("#readme");
+if (mdEl) {
+  const doc = renderMarkdown(mdEl, text, { codeMax: 240 });
+  doc.update(newText); // 换内容；doc.set({ codeMax: 0 }) 改折叠高度
+}`,
+  charts: `import { createAreaChart, createChart3D, icon3DHTML, bindIcons3D } from "satin-ui/charts";
 import "satin-ui/css/charts.css";
 
 // 1. 趋势面积图（周期切换平滑 Morph）
-const area = createAreaChart(document.querySelector("#chArea"), {
-  labels: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
-  series: [
-    { name: "生成镜头", color: "accent", values: [168, 214, 196, 268, 312, 284, 342] },
-    { name: "一次通过", color: "success", values: [134, 178, 162, 224, 266, 241, 298] },
-  ],
-  unit: " 镜",
-});
+const areaHost = document.querySelector("#chArea");
+if (areaHost) {
+  createAreaChart(areaHost, {
+    labels: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+    series: [
+      { name: "生成镜头", color: "accent", values: [168, 214, 196, 268, 312, 284, 342] },
+      { name: "一次通过", color: "success", values: [134, 178, 162, 224, 266, 241, 298] },
+    ],
+    unit: " 镜",
+  });
+}
 
 // 2. 真交互 3D 立体柱阵（可 360° 拖拽旋转、预设视角飞行、悬停立体抬升）
-const c3d = createChart3D(document.querySelector("#ch3d"), {
-  rows: ["上海集群", "杭州集群", "深圳集群"],
-  cols: ["周一", "周二", "周三", "周四", "周五", "周六"],
-  rowColors: ["blue", "violet", "success"],
-  metricLabel: "渲染吞吐",
-  unit: " 镜/h",
-  values: [[72, 94, 88, 126, 148, 112], [56, 78, 108, 118, 134, 96], [42, 64, 74, 92, 106, 84]],
-});
+const c3dHost = document.querySelector("#ch3d");
+if (c3dHost) {
+  createChart3D(c3dHost, {
+    rows: ["上海集群", "杭州集群", "深圳集群"],
+    cols: ["周一", "周二", "周三", "周四", "周五", "周六"],
+    rowColors: ["blue", "violet", "success"],
+    metricLabel: "渲染吞吐",
+    unit: " 镜/h",
+    values: [[72, 94, 88, 126, 148, 112], [56, 78, 108, 118, 134, 96], [42, 64, 74, 92, 106, 84]],
+  });
+}
 
 // 3. 3D 立体质感图标（陀螺仪倾角视差 + 动态高光）
-const iconHost = document.querySelector("#chIcon3d");
+const iconHost = document.querySelector("#chIcons3d");
 if (iconHost) {
   iconHost.innerHTML = icon3DHTML({ name: "clapperboard", tone: "obsidian", size: "lg", label: "分镜创作" });
   bindIcons3D(iconHost);

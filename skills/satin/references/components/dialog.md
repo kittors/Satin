@@ -2,7 +2,7 @@
 
 > 组件 id：`dialog`　分组：浮层
 
-只在必须停下来时用：短表单、影响大或不能撤销的确认、要先做另一个决定。从按钮那里长出来，关闭时原路缩回；焦点限制在弹窗里，Esc 取消，关闭后焦点回到按钮。点背景不会关掉，只轻轻顶一下，免得误点丢了填好的内容。
+只在必须停下来时用：短表单、影响大或不能撤销的确认、要先做另一个决定。从按钮那里长出来，关闭时原地缩回；默认支持按住标题栏自由拖动（双击标题栏复位回正中，自动限制在安全视口内）；焦点限制在弹窗里，Esc 取消，关闭后焦点回到按钮。点背景不会关掉，只轻轻顶一下，免得误点丢了填好的内容。
 
 **盖在页面上、必须先处理完才能回去的一小块界面：短表单、不能撤销的确认、要先做的另一个决定。**
 
@@ -1309,6 +1309,7 @@ export default function NewProject() {
 | `footerClass` | `string` | — | 否 | 加在底栏 `.sn-ft` 上的类名，比如两组按钮叠在一起原地切换的 `sn-two`、问的时候加的 `sn-asking`（见"填了内容再关"示例）。 | React：`footerClassName`；Vue：`footerClass（模板里写 footer-class）`；Svelte：`footerClass`；Preact：`footerClassName`；纯 HTML：`<div class="sn-ft sn-two">` |
 | `className` | `string` | — | 否 | 加在 `<dialog>` 上的类名，比如 sn-wide（宽 560，默认 440）。 | React：`className`；Svelte：`class`；Preact：`className`；标记：`<dialog class="sn-dlg sn-wide">`；纯 HTML：`<dialog class="sn-dlg sn-wide">` |
 | `guard` | `(close: () => void) => void` | — | 否 | 关之前拦一下（Esc、取消、×）：比如填了内容就先在底栏问一句。组件给的 close 调了才真关；手写标记里 guard 不带参数，确认要关时自己调 `closeDialog(弹窗)`。（例：`guard={(close) => (dirty ? setAsking(true) : close())}`） | React：`guard`；Vue：`guard`；Svelte：`guard`；Preact：`guard`；标记：`弹窗元素的 guard 属性：dialog.guard = () => {}`；纯 HTML：`弹窗元素的 guard 属性：dialog.guard = () => {}` |
+| `draggable` | `boolean` | true | 否 | 是否允许按住标题栏（.sn-hd）拖动弹窗；双击标题栏自动复位回正中。 | React：`draggable`；Vue：`draggable`；Svelte：`draggable`；Preact：`draggable`；标记：`data-draggable="false"（关闭）`；纯 HTML：`data-draggable="false"（关闭）` |
 
 ## 事件
 

@@ -17,8 +17,8 @@ export const Avatar: DefineComponent<AvatarOptions>; // 只显示，没有 v-mod
 export const Segmented: C<{ items: Item[]; value?: string; size?: "sm" | "md"; label?: string }>;
 export const Slider: C<{ value?: number; max?: number; label?: string }>;
 export const Select: C<{ items: Item[]; value?: string; placeholder?: string; label?: string }>;
-/** 验证码：不用 v-model（填满时发 complete，参数是整串数字） */
-export const Otp: DefineComponent<{ length?: number }>;
+/** 验证码：不用 v-model（填满时发 complete，参数是整串数字）；mask 开启密码隐藏，reveal 控制显隐切换按钮 */
+export const Otp: DefineComponent<{ length?: number; mask?: boolean; reveal?: boolean }>;
 export const Tabs: C<{ tabs: { label: string; badge?: string | number; content?: string; html?: string }[]; value?: number }>;
 export const Pager: C<{ total: number; page?: number; count?: number }>;
 export const Collapse: C<{ items: { title: string; content?: string; html?: string }[]; single?: boolean; open?: number[] }>;
@@ -46,8 +46,8 @@ export const Spinner: DefineComponent<{ size?: "lg"; label?: string }>;
 export const Steps: DefineComponent<{ steps: string[]; current?: number }>;
 export const Text: DefineComponent<{ as?: string; level?: string; tone?: string; num?: boolean; truncate?: boolean }>;
 export const Tooltip: DefineComponent<{ text: string; kbd?: string }>;
-/** 弹窗：v-model:open；@close 关完以后、@submit 表单提交；guard 拦下关闭；footerClass 加在底栏上；#footer 插槽放按钮 */
-export const Dialog: DefineComponent<{ open: boolean; title?: string; description?: string; icon?: string; guard?(close: () => void): void; footerClass?: string }>;
+/** 弹窗：v-model:open；@close 关完以后、@submit 表单提交；guard 拦下关闭；footerClass 加在底栏上；draggable 默认 true 支持按住标题栏拖动；#footer 插槽放按钮 */
+export const Dialog: DefineComponent<{ open: boolean; title?: string; description?: string; icon?: string; guard?(close: () => void): void; footerClass?: string; draggable?: boolean }>;
 export const Drawer: DefineComponent<{ open: boolean; title?: string }>;
 /** 局部主题作用域：<SnThemeScope mode="dark" accent="blue">…</SnThemeScope> */
 export const ThemeScope: DefineComponent<Partial<ThemeChoice> & { as?: string; mode?: "light" | "dark" }>;

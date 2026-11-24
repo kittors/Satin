@@ -1,14 +1,13 @@
 /* Satin：浮层。规则照 09 号 §5：不必打断就不打断，能撤销就不确认，只有必须停下来时才用弹窗。
    所有面板全程不透明（09 号 §2.3），透明度在前 40% 的时间内到 1，形状变化只靠缩放和位移。 */
-/* ———— 通用浮层面板 ———— */
-/* 和菜单同一种开合：第一帧就不透明，只轻轻放大 140ms，不回弹；收起 100ms 淡出（见 form.css 的 .menu） */
+/* ———— 通用浮层面板（与下拉菜单、日期面板统一双向微动效） ———— */
 @layer satin {
 .sn-pop { position: fixed; z-index: 40; border-radius: var(--sn-r-lg); background: var(--sn-overlay); box-shadow: var(--sn-e1); color: var(--sn-label);
-  opacity: 0; scale: .97; translate: 0 -4px; pointer-events: none; visibility: hidden;
-  transition: opacity .1s var(--sn-ease-in), scale 0s linear .1s, translate 0s linear .1s, visibility 0s linear .1s; }
+  opacity: 0; scale: .96; translate: 0 -6px; pointer-events: none; visibility: hidden;
+  transition: opacity .16s var(--sn-ease-in), scale .16s var(--sn-ease-in), translate .16s var(--sn-ease-in), visibility 0s linear .16s; }
 .sn-pop.sn-open { opacity: 1; scale: 1; translate: 0; pointer-events: auto; visibility: visible;
-  transition: opacity 0s, scale .14s var(--sn-ease-out-strong), translate .14s var(--sn-ease-out-strong), visibility 0s; }
-.sn-pop.sn-up:not(.sn-open) { translate: 0 4px; }
+  transition: opacity .16s var(--sn-ease-out), scale .22s var(--sn-ease-out-strong), translate .22s var(--sn-ease-out-strong), visibility 0s; }
+.sn-pop.sn-up:not(.sn-open) { translate: 0 6px; }
 
 /* Popover：点开的小面板，可以放操作 */
 .sn-popover { width: 280px; padding: 14px 16px 12px; }
@@ -26,9 +25,9 @@
 .sn-menu.sn-float { position: fixed; z-index: 46; top: 0; left: 0; min-width: 210px; max-width: 260px; }
 .sn-menu .sn-item .sn-more { margin-left: auto; width: 14px; height: 14px; color: var(--sn-label3); }
 .sn-menu .sn-item.sn-sub-open { background: var(--sn-b-ghost-hover); }
-/* 子菜单：从父菜单那一侧轻轻滑出 4px，等比放大，不横向拉伸 */
-.sn-menu.sn-sub { min-width: 180px; transform-origin: left top; scale: .97; translate: -4px 0; }
-.sn-menu.sn-sub.sn-left { transform-origin: right top; translate: 4px 0; }
+/* 子菜单：从父菜单那一侧轻轻滑出 6px，等比放大，退场同步收束 */
+.sn-menu.sn-sub { min-width: 180px; transform-origin: left top; scale: .96; translate: -6px 0; }
+.sn-menu.sn-sub.sn-left { transform-origin: right top; translate: 6px 0; }
 .sn-menu.sn-sub.sn-open { scale: 1; translate: 0; }
 
 /* 安全三角区（调试用，只在设计稿里显示） */
@@ -73,6 +72,9 @@ dialog.sn-dlg.sn-wide { width: min(560px, calc(100vw - 48px)); }
 dialog.sn-dlg::backdrop { background: var(--sn-scrim); opacity: 0; transition: opacity .18s var(--sn-ease-in); }
 dialog.sn-dlg.sn-shown::backdrop { opacity: 1; transition: opacity .2s var(--sn-ease-out); }
 .sn-dlg .sn-hd { display: flex; align-items: flex-start; gap: 12px; padding: 20px 20px 0; }
+dialog.sn-dlg:not([data-draggable="false"]) .sn-hd { cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; }
+dialog.sn-dlg:not([data-draggable="false"]) .sn-hd :is(button, a, input, textarea, select, [role="button"], [data-no-drag]) { cursor: pointer; }
+dialog.sn-dlg.sn-dragging .sn-hd { cursor: grabbing; }
 .sn-dlg .sn-hd h3 { flex: 1; font: 600 calc(17px * var(--sn-font-scale, 1))/calc(24px * var(--sn-font-scale, 1)) var(--sn-sans); }
 .sn-dlg .sn-hd .sn-sub { margin-top: 4px; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); }
 .sn-dlg .sn-bd { padding: 16px 20px 4px; display: grid; gap: 14px; }

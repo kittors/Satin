@@ -5,6 +5,7 @@ import { scoped, onLocaleChange } from "./i18n.js";
 import { initSeg as coreInitSeg, injectIcons as coreInjectIcons, hideTip } from "./core.js";
 import { defineComponent } from "./lifecycle.js";
 import { hitAny, pushDismiss, dropDismiss } from "./dismiss.js";
+import { computeFloating } from "./floating.js";
 import I18N_DEFAULTS from "./locales/zh-CN/theme-panel.js";
 
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
@@ -156,19 +157,12 @@ function createColorPopover({ anchor, key, title, value, defaultValue, hasCustom
     if (closed || !anchor.isConnected) { close(false); return; }
     const ar = anchor.getBoundingClientRect();
     if (ar.width === 0 && ar.height === 0) { close(false); return; }
-    const m = 12, gap = 8, w = pop.offsetWidth || 248, h = pop.offsetHeight || 280;
-    const roomBelow = innerHeight - ar.bottom - m;
-    const roomAbove = ar.top - m;
-    const up = roomBelow < h + gap && roomAbove > roomBelow;
-    const top = Math.max(m, Math.min(innerHeight - h - m, up ? ar.top - h - gap : ar.bottom + gap));
     const preferRight = ar.left + ar.width / 2 > innerWidth / 2;
-    const rawLeft = preferRight ? ar.right - w : ar.left;
-    const left = Math.max(m, Math.min(innerWidth - w - m, rawLeft));
-    pop.style.left = `${Math.round(left)}px`;
-    pop.style.top = `${Math.round(top)}px`;
-    pop.classList.toggle("sn-up", up);
-    const ox = Math.max(16, Math.min(w - 16, ar.left + ar.width / 2 - left));
-    pop.style.transformOrigin = `${Math.round(ox)}px ${up ? "100%" : "0%"}`;
+    const pos = computeFloating(pop, anchor, { align: preferRight ? "end" : "start", gap: 8, margin: 12 });
+    pop.style.left = `${pos.left}px`;
+    pop.style.top = `${pos.top}px`;
+    pop.classList.toggle("sn-up", pos.up);
+    pop.style.transformOrigin = `${pos.ox}px ${pos.oy}px`;
   };
 
   // 2D 饱和度/明度画布拖拽
@@ -294,6 +288,7 @@ function createColorPopover({ anchor, key, title, value, defaultValue, hasCustom
 
   addEventListener("resize", onViewport);
   addEventListener("scroll", onViewport, { passive: true, capture: true });
+  addEventListener("satin-reposition", onViewport);
 
   paintUI();
   place();
@@ -308,10 +303,11 @@ function createColorPopover({ anchor, key, title, value, defaultValue, hasCustom
     dropDismiss(dismissLayer);
     removeEventListener("resize", onViewport);
     removeEventListener("scroll", onViewport, { capture: true });
+    removeEventListener("satin-reposition", onViewport);
     anchor.setAttribute("aria-expanded", "false");
     anchor.classList.remove("sn-is-open");
     pop.classList.remove("sn-open");
-    setTimeout(() => pop.remove(), 120);
+    setTimeout(() => pop.remove(), 180);
     onClose?.();
     if (refocus && anchor.isConnected) anchor.focus({ preventScroll: true });
   }

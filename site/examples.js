@@ -237,7 +237,7 @@ bindSelects(document); // 分裂按钮的备选菜单
 // 复制按钮：写入剪贴板，成功后图标换成对勾 1.2 秒
 for (const b of document.querySelectorAll("[data-copy]")) {
   b.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(b.dataset.copy);
+    try { await navigator.clipboard?.writeText(b.dataset.copy || ""); } catch {}
     copied(b);
   });
 }`,
@@ -637,6 +637,51 @@ fix?.addEventListener("click", async () => {
   },
   loading: {
     0: {
+      html: `<div class="ld-cfg">
+  <span class="ld-cfg-g"><span class="sn-cap">尺寸</span><div class="sn-seg sn-sm" data-seg="ldsize"><span class="sn-thumb"></span><button data-v="sm">16</button><button data-v="md">20</button><button data-v="lg">28</button><button data-v="xl">36</button></div></span>
+  <span class="ld-cfg-g"><span class="sn-cap">节奏</span><div class="sn-seg sn-sm" data-seg="ldspeed"><span class="sn-thumb"></span><button data-v="0.7">舒缓</button><button data-v="1">标准</button><button data-v="1.5">疾速</button></div></span>
+  <span class="ld-cfg-g"><span class="sn-cap">色调</span><div class="sn-seg sn-sm" data-seg="ldtone"><span class="sn-thumb"></span><button data-v="label">中性墨</button><button data-v="accent">主色</button><button data-v="success">成功</button><button data-v="warning">琥珀</button></div></span>
+</div>
+<div class="ld-grid" id="ldGallery"></div>`,
+      js: `import { initSeg } from "satin-ui";
+import { LOADER_VARIANTS, loaderHTML } from "satin-ui/components";
+
+// 8 款几何物理动感加载器：尺寸、速度与色彩令牌均可实时定制
+const ldBox = document.querySelector("#ldGallery");
+const META = new Map([
+  ["matrix", ["波纹点阵", "AI 思考 · 工具调用"]],
+  ["dots", ["弹性三点", "对话首字节 · 轻等待"]],
+  ["arc", ["可变弧环", "按钮等待 · 局部刷新"]],
+  ["orbit", ["行星微环", "同步 · 检索运行"]],
+  ["bars", ["声纹四柱", "语音 · 流式渲染"]],
+  ["grid", ["接力方块", "结构构建 · 批处理"]],
+  ["radar", ["同心涟漪", "连接 · 实时发现"]],
+  ["morph", ["几何呼吸", "沉浸态 · 极简微核"]],
+]);
+const SIZES = new Map([["sm", 16], ["md", 20], ["lg", 28], ["xl", 36]]);
+const TONES = new Map([
+  ["label", "var(--sn-label)"],
+  ["accent", "var(--sn-accent)"],
+  ["success", "var(--sn-success)"],
+  ["warning", "var(--sn-warning)"],
+]);
+let sizeKey = "lg", speed = 1, toneKey = "label";
+const paint = () => {
+  if (!ldBox) return;
+  ldBox.innerHTML = LOADER_VARIANTS.map((variant) => {
+    const [name, use] = META.get(variant) || [variant, ""];
+    return \`<div class="ld-cell"><div class="ld-stage">\${loaderHTML({ variant, size: SIZES.get(sizeKey) ?? 28, speed, color: TONES.get(toneKey), label: name })}</div><b>\${name}</b><span>\${use}</span><code>\${variant}</code></div>\`;
+  }).join("");
+};
+paint();
+const sz = document.querySelector('[data-seg="ldsize"]');
+const sp = document.querySelector('[data-seg="ldspeed"]');
+const tn = document.querySelector('[data-seg="ldtone"]');
+if (sz) initSeg(sz, (v) => { sizeKey = v; paint(); }, 2);
+if (sp) initSeg(sp, (v) => { speed = Number(v) || 1; paint(); }, 1);
+if (tn) initSeg(tn, (v) => { toneKey = v; paint(); }, 0);`,
+    },
+    1: {
       js: `import { loadWithSkeleton } from "satin-ui/components";
 
 // 300ms 内回来就不显示骨架（不闪）；显示了就至少留 500ms；数据到了逐行替换，每行淡入
@@ -645,14 +690,176 @@ const SHOTS = [["07", "车站外，雨刚停", "远景 · 4 秒"], ["08", "林�
 const skRow = '<div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:46%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>';
 const row = ([n, title, meta]) => \`<div class="sn-sk-row"><span class="sn-thumb"></span><div class="sn-meta"><b>镜头 \${n} · \${title}</b><span>\${meta}</span></div></div>\`;
 for (const btn of document.querySelectorAll("[data-load]")) btn.addEventListener("click", async () => {
+  if (!list) return;
   const ms = Number(btn.dataset.load);
   const r = await loadWithSkeleton(list, {
     load: () => new Promise((done) => setTimeout(() => done(SHOTS), ms)), // 换成你的请求，比如 fetch("/api/shots").then((res) => res.json())
     skeleton: skRow.repeat(SHOTS.length),
     render: (shots) => shots.map(row).join(""),
   });
-  if (r) note.textContent = r.shown ? \`等了 \${r.waited}ms，骨架至少留了 500ms\` : \`\${ms}ms 就回来了，没有闪出骨架\`;
+  if (r && note) note.textContent = r.shown ? \`等了 \${r.waited}ms，骨架至少留了 500ms\` : \`\${ms}ms 就回来了，没有闪出骨架\`;
 });`,
+    },
+  },
+  charts: {
+    0: {
+      html: `<div class="ch-demo-bar">
+  <div class="sn-seg sn-sm" data-seg="charea"><span class="sn-thumb"></span><button data-v="week">本周</button><button data-v="month">本月</button><button data-v="quarter">季度</button></div>
+  <button type="button" class="sn-btn sn-ghost sn-sm" data-ch-area-replay data-i="refresh-cw:before">重播入场</button>
+</div>
+<div id="chArea"></div>`,
+      js: `import { initSeg } from "satin-ui";
+import { createAreaChart } from "satin-ui/charts";
+import "satin-ui/css/charts.css";
+
+// 平滑趋势面积图：周期切换自动平滑 Morph 形变，悬停带阻尼准星
+const DATA = new Map([
+  ["week", {
+    labels: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+    series: [
+      { name: "生成镜头", color: "accent", values: [168, 214, 196, 268, 312, 284, 342] },
+      { name: "一次通过", color: "success", values: [134, 178, 162, 224, 266, 241, 298] },
+    ],
+  }],
+  ["month", {
+    labels: ["第 1 周", "第 2 周", "第 3 周", "第 4 周"],
+    series: [
+      { name: "生成镜头", color: "accent", values: [1120, 1480, 1690, 1940] },
+      { name: "一次通过", color: "success", values: [890, 1210, 1420, 1685] },
+    ],
+  }],
+  ["quarter", {
+    labels: ["9 月", "10 月", "11 月", "12 月"],
+    series: [
+      { name: "生成镜头", color: "accent", values: [4280, 5610, 6230, 7480] },
+      { name: "一次通过", color: "success", values: [3310, 4620, 5290, 6510] },
+    ],
+  }],
+]);
+const areaEl = document.querySelector("#chArea");
+const init = DATA.get("week");
+if (areaEl && init) {
+  const chart = createAreaChart(areaEl, { ...init, height: 244, unit: " 镜" });
+  const seg = document.querySelector('[data-seg="charea"]');
+  if (seg) initSeg(seg, (v) => chart.update(DATA.get(v) || init), 0);
+  document.querySelector("[data-ch-area-replay]")?.addEventListener("click", () => chart.replay());
+}`,
+    },
+    1: {
+      html: `<div class="ch-demo-bar">
+  <span class="sn-note" id="chLinkNote">点击柱组或环段可聚焦联动查看</span>
+  <button type="button" class="sn-btn sn-ghost sn-sm" data-ch-bar-replay data-i="refresh-cw:before">重播生长</button>
+</div>
+<div class="ch-demo-2col">
+  <div id="chBar"></div>
+  <div id="chDonut"></div>
+</div>`,
+      js: `import { createBarChart, createDonutChart } from "satin-ui/charts";
+import "satin-ui/css/charts.css";
+
+// 分组对比柱状图 + 环形占比图：悬停压暗非焦点，点击柱组或环段可联动筛选
+const barEl = document.querySelector("#chBar");
+const donutEl = document.querySelector("#chDonut");
+const noteEl = document.querySelector("#chLinkNote");
+if (barEl && donutEl) {
+  const barChart = createBarChart(barEl, {
+    labels: ["纪录", "电影感", "动画", "MV", "短剧"],
+    unit: " 镜",
+    height: 236,
+    series: [
+      { name: "本周交付", color: "blue", values: [420, 580, 360, 290, 470] },
+      { name: "上周交付", color: "muted", values: [350, 490, 310, 260, 390] },
+    ],
+    onSelect: (label) => {
+      if (noteEl) noteEl.textContent = label ? \`已聚焦「\${label}」题材（再次点击取消筛选）\` : "点击柱组或环段可聚焦联动查看";
+    },
+  });
+  createDonutChart(donutEl, {
+    size: 164,
+    totalLabel: "项目总数",
+    unit: " 个",
+    items: [
+      { label: "已完成", value: 64, color: "success" },
+      { label: "生成中", value: 32, color: "blue" },
+      { label: "待审核", value: 24, color: "warning" },
+      { label: "重试队列", value: 8, color: "danger" },
+    ],
+    onSelect: (item) => {
+      if (noteEl) noteEl.textContent = item ? \`已筛选「\${item.label}」状态：共 \${item.value} 个项目\` : "点击柱组或环段可聚焦联动查看";
+    },
+  });
+  document.querySelector("[data-ch-bar-replay]")?.addEventListener("click", () => barChart.replay());
+}`,
+    },
+    2: {
+      html: `<div class="ch-demo-bar">
+  <div class="sn-seg sn-sm" data-seg="ch3d"><span class="sn-thumb"></span><button data-v="gpu">集群渲染吞吐</button><button data-v="cost">任务算力分布</button></div>
+  <span class="sn-note">支持鼠标左键拖拽旋转 · 惯性阻尼</span>
+</div>
+<div id="ch3d"></div>`,
+      js: `import { initSeg } from "satin-ui";
+import { createChart3D } from "satin-ui/charts";
+import "satin-ui/css/charts.css";
+
+// 真交互 3D 立体柱阵：支持 360° 拖拽惯性旋转、等轴测/俯视/正面视角飞行与悬停抬升
+const SETS = new Map([
+  ["gpu", {
+    rows: ["上海集群", "杭州集群", "深圳集群"],
+    cols: ["周一", "周二", "周三", "周四", "周五", "周六"],
+    rowColors: ["blue", "violet", "success"],
+    metricLabel: "渲染吞吐",
+    unit: " 镜/h",
+    values: [[72, 94, 88, 126, 148, 112], [56, 78, 108, 118, 134, 96], [42, 64, 74, 92, 106, 84]],
+  }],
+  ["cost", {
+    rows: ["视频生成", "语音配乐", "超分精修"],
+    cols: ["周一", "周二", "周三", "周四", "周五", "周六"],
+    rowColors: ["accent", "warning", "blue"],
+    metricLabel: "算力消耗",
+    unit: " 卡时",
+    values: [[110, 142, 135, 168, 192, 154], [48, 52, 61, 74, 82, 66], [64, 86, 79, 104, 118, 92]],
+  }],
+]);
+const c3dEl = document.querySelector("#ch3d");
+const init = SETS.get("gpu");
+if (c3dEl && init) {
+  const chart3d = createChart3D(c3dEl, { ...init, height: 340 });
+  const seg3d = document.querySelector('[data-seg="ch3d"]');
+  if (seg3d) initSeg(seg3d, (v) => chart3d.update(SETS.get(v) || init), 0);
+}`,
+    },
+    3: {
+      html: `<div id="chIcons3d"></div>
+<div class="ch-demo-sparks" id="chSparks">
+  <div class="ch-spk-card"><div><span>日均生成镜头</span><b class="sn-num">254 镜</b><small class="sn-up">+14.2%</small></div><div id="spk1"></div></div>
+  <div class="ch-spk-card"><div><span>首镜通过率</span><b class="sn-num">93.4%</b><small class="sn-up">+4.8%</small></div><div id="spk2"></div></div>
+  <div class="ch-spk-card"><div><span>单镜渲染耗时</span><b class="sn-num">1 分 48 秒</b><small class="sn-up">-22 秒</small></div><div id="spk3"></div></div>
+</div>`,
+      js: `import { createSparkline, icon3DHTML, bindIcons3D } from "satin-ui/charts";
+import "satin-ui/css/charts.css";
+
+// 3D 立体质感图标（陀螺仪倾角视差 + 动态镜面高光）
+const i3dEl = document.querySelector("#chIcons3d");
+if (i3dEl) {
+  const tiles = [
+    ["分镜脚本", icon3DHTML({ name: "clapperboard", tone: "obsidian", size: "lg", label: "分镜脚本" })],
+    ["数据洞察", icon3DHTML({ name: "chart-column", tone: "cobalt", size: "lg", label: "数据洞察" })],
+    ["工作流引擎", icon3DHTML({ name: "layers", tone: "violet", size: "lg", label: "工作流引擎" })],
+    ["GPU 集群", icon3DHTML({ name: "cpu", tone: "emerald", size: "lg", label: "GPU 集群" })],
+    ["3D 资产", icon3DHTML({ name: "box", tone: "amber", size: "lg", label: "3D 资产" })],
+    ["空间预览", icon3DHTML({ name: "compass", tone: "glass", size: "lg", label: "空间预览" })],
+  ];
+  i3dEl.innerHTML = \`<div class="sn-ico3d-grid">\${tiles.map(([label, html]) => \`<div class="sn-ico3d-tile">\${html}<span>\${label}</span></div>\`).join("")}</div>\`;
+  bindIcons3D(i3dEl);
+}
+
+// KPI 迷你趋势火花线
+const spk1 = document.querySelector("#spk1");
+const spk2 = document.querySelector("#spk2");
+const spk3 = document.querySelector("#spk3");
+if (spk1) createSparkline(spk1, { values: [32, 41, 38, 52, 64, 58, 76, 84], color: "accent", height: 34 });
+if (spk2) createSparkline(spk2, { values: [74, 78, 81, 79, 85, 88, 91, 93], color: "success", height: 34 });
+if (spk3) createSparkline(spk3, { values: [48, 44, 51, 39, 36, 31, 29, 24], color: "blue", height: 34 });`,
     },
   },
   progress: {
@@ -1426,8 +1633,10 @@ export const API = {
   otp: [
     ["createOtp(容器, 选项)", ["选项 / 返回", "说明"], [
       ["length", "空容器按它渲染几格（默认 6）"],
+      ["mask", "开启密码隐藏（掩码圆点显示，默认 false）"],
+      ["reveal", "是否显示右侧眼睛显隐切换按钮（开启 mask 时默认为 true）"],
       ["onComplete", "(code) => {}：填满时调（同时在容器上发 complete、sn-complete 事件）"],
-      ["返回 value / clear()", "现在填了的 / 清空"],
+      ["返回 value / masked / setMask(on) / clear()", "当前值 / 是否掩码 / 切换掩码 / 清空"],
     ]],
   ],
   segmented: [
@@ -1547,6 +1756,7 @@ export const API = {
       ['[data-dlg="弹窗 id"]', "打开弹窗的按钮（bindOverlays 接上）"],
       ["[data-x] / [data-cancel]", "关闭（走 guard）"],
       ["点背景", "只“顶一下”提示，不关（避免误关丢内容）"],
+      ['标题栏拖动 / data-draggable="false"', '默认按住 .sn-hd 可拖动，双击标题栏复位；写 data-draggable="false" 关闭'],
     ]],
   ],
   drawer: [

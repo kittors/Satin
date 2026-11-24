@@ -217,13 +217,13 @@ export function Tooltip({ text, kbd, children }) {
 // ———— 对话框：open 控制开关；标题、说明、内容、底部按钮都是 React 节点 ————
 // 取消按钮写 data-cancel、关闭按钮写 data-x：和 Esc 一样先走 guard 再关。onSubmit 接住表单提交（主按钮写 type="submit"，输入框里按回车也算），弹窗不会因为提交自己关
 // icon：标题左边的图标（危险确认用 trash-2）；footerClassName 加在底栏上（比如两组按钮原地切换的 sn-two、sn-asking）
-export function Dialog({ open, onClose, title, description, icon, footer, footerClassName, children, className, guard, onSubmit }) {
+export function Dialog({ open, onClose, title, description, icon, footer, footerClassName, children, className, guard, onSubmit, draggable = true }) {
   const ref = useRef(null), was = useRef(false), tid = useId();
   useIso(() => { const d = ref.current; wireDialog(d); const off = () => onCloseRef.current?.(); d.addEventListener("close", off); return () => d.removeEventListener("close", off); }, []);
   const onCloseRef = useRef(onClose); onCloseRef.current = onClose;
   useIso(() => { const d = ref.current; d.guard = guard ? () => guard(() => closeDialog(d)) : undefined; });
   useIso(() => { const d = ref.current; if (open && !d.open) { was.current = document.activeElement; openDialog(d, was.current); } else if (!open && d.open) closeDialog(d); }, [open]);
-  return h("dialog", { ref, className: cx("sn-dlg", className), "aria-labelledby": title ? tid : undefined },
+  return h("dialog", { ref, className: cx("sn-dlg", className), "aria-labelledby": title ? tid : undefined, "data-draggable": draggable === false ? "false" : undefined },
     h("form", { method: "dialog", onSubmit },
       title || description || icon ? h("div", { className: "sn-hd" }, icon ? h("span", { className: "sn-dlg-icon" }, h(Icon, { name: icon })) : null, h("div", { style: { flex: 1 } }, title ? h("h3", { id: tid }, title) : null, description ? h("div", { className: "sn-sub" }, description) : null)) : null,
       children != null && children !== false ? h("div", { className: "sn-bd" }, children) : null,

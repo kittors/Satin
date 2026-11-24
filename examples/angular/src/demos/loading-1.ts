@@ -1,5 +1,6 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
 import { setup, enhance } from "satin-ui";
+import { loadWithSkeleton } from "satin-ui/components";
 
 @Component({
   selector: "demo-loading-1",
@@ -54,7 +55,23 @@ export class LoadingDemo1Component {
   private off = () => {};
   ngAfterViewInit() {
     const unsetup = setup();
-    const done = enhance(this.root.nativeElement);
+    const done = enhance(this.root.nativeElement, (root: any) => {
+      // 300ms 内回来就不显示骨架（不闪）；显示了就至少留 500ms；数据到了逐行替换，每行淡入
+      const list = root.querySelector(".sn-sk-list"), note = root.querySelector("#loadNote");
+      const SHOTS = [["07", "车站外，雨刚停", "远景 · 4 秒"], ["08", "林夏走进候车厅", "全景 · 6 秒"], ["09", "站台上的最后一班车", "中景 · 5 秒"], ["10", "车窗里的倒影", "特写 · 3 秒"]];
+      const skRow = '<div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:46%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>';
+      const row = ([n, title, meta]: any) => `<div class="sn-sk-row"><span class="sn-thumb"></span><div class="sn-meta"><b>镜头 ${n} · ${title}</b><span>${meta}</span></div></div>`;
+      for (const btn of root.querySelectorAll("[data-load]")) btn.addEventListener("click", async () => {
+        if (!list) return;
+        const ms = Number(btn.dataset.load);
+        const r = await loadWithSkeleton(list, {
+          load: () => new Promise((done?: any) => window.setTimeout(() => done(SHOTS), ms)), // 换成你的请求，比如 fetch("/api/shots").then((res?: any) => res.json())
+          skeleton: skRow.repeat(SHOTS.length),
+          render: (shots?: any) => shots.map(row).join(""),
+        });
+        if (r && note) note.textContent = r.shown ? `等了 ${r.waited}ms，骨架至少留了 500ms` : `${ms}ms 就回来了，没有闪出骨架`;
+      });
+    });
     this.off = () => { done(); unsetup(); };
   }
   ngOnDestroy() { this.off(); }

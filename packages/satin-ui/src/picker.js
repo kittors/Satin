@@ -9,6 +9,7 @@ import { onCleanup } from "./lifecycle.js";
 import { scrollArea } from "./scroll.js";
 import { $, reduced, injectIcons } from "./core.js";
 import { hitAny, pushDismiss, dropDismiss } from "./dismiss.js";
+import { computeFloating, isAnchorOutOfView } from "./floating.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/picker.js";
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
@@ -30,22 +31,18 @@ export function bindPickers(root = document, { today, now } = {}) {
   const fmtFull = (d) => tt("picker.2", { p0: fmtDay(d), p1: WK[d.getDay()] });
   const EASE = "cubic-bezier(.22,1,.36,1)";
 
-  // ———— 面板开合（统一走 dismiss.js：精准命中触发框与面板、自动上下翻转、捕获阶段外部关闭、Esc / 失焦收起） ————
+  // ———— 面板开合（统一走 floating.js + dismiss.js：精准命中触发框与面板、避让顶栏与视口边缘自动翻转、捕获阶段外部关闭、Esc / 失焦收起） ————
   const openState = new WeakMap();
   const place = (h, autoCloseOnOut = false) => {
     const p = $(".sn-pk-panel", h), trig = $(".sn-pk-trigger", h);
     if (!p || !trig) return;
-    const hr = trig.getBoundingClientRect();
-    if (autoCloseOnOut && ((hr.width === 0 && hr.height === 0) || hr.bottom < 0 || hr.top > innerHeight)) { close(h, false); return; }
-    p.style.left = ""; p.style.right = ""; p.style.transformOrigin = "";
-    const w = p.offsetWidth, ph = p.offsetHeight, room = innerWidth - 12;
-    const roomBot = innerHeight - hr.bottom - 12, roomTop = hr.top - 12;
-    const up = roomBot < ph + 6 && roomTop > roomBot;
-    p.classList.toggle("sn-up", up);
-    // 横向放进窗口：默认和触发框左边对齐；右边出界就往左挪，最多挪到离窗口左边 12px
-    let x = 0;
-    if (hr.left + w > room) { x = Math.max(12 - hr.left, room - w - hr.left); p.style.left = x + "px"; }
-    p.style.transformOrigin = `${Math.round(Math.max(0, Math.min(w, hr.width / 2 - x)))}px ${up ? "100%" : "0%"}`;
+    if (autoCloseOnOut && isAnchorOutOfView(trig)) { close(h, false); return; }
+    const pos = computeFloating(p, trig, { gap: 6, margin: 12 });
+    p.classList.toggle("sn-up", pos.up);
+    p.classList.toggle("sn-end", pos.end);
+    pos.dx ? p.style.setProperty("--sn-pk-dx", `${pos.dx}px`) : p.style.removeProperty("--sn-pk-dx");
+    pos.dy ? p.style.setProperty("--sn-pk-dy", `${pos.dy}px`) : p.style.removeProperty("--sn-pk-dy");
+    p.style.transformOrigin = `${pos.ox}px ${pos.oy}px`;
   };
   const close = (h, refocus) => {
     if (!h.classList.contains("sn-open")) return;
@@ -56,24 +53,48 @@ export function bindPickers(root = document, { today, now } = {}) {
   };
   const open = (h) => {
     const p = $(".sn-pk-panel", h), trig = $(".sn-pk-trigger", h);
+    place(h, false);
     h.classList.add("sn-open"); h._onOpen?.();
     place(h, false);
     const onRe = () => place(h, false);
     const onSc = (e) => { if (p && (e.target === p || p.contains?.(e.target))) return; place(h, true); };
     addEventListener("resize", onRe);
     addEventListener("scroll", onSc, { passive: true, capture: true });
+    addEventListener("satin-reposition", onRe);
     const layer = pushDismiss({
       panel: p || h,
       trigger: trig || h,
       close: (refocus) => close(h, refocus),
       contains: (t, path) => hitAny(t, path, [trig, p]),
     });
-    openState.set(h, { layer, offPos: () => { removeEventListener("resize", onRe); removeEventListener("scroll", onSc, true); } });
+    openState.set(h, { layer, offPos: () => { removeEventListener("resize", onRe); removeEventListener("scroll", onSc, true); removeEventListener("satin-reposition", onRe); } });
   };
   function host(h) {
-    const trig = $(".sn-pk-trigger", h);
+    const trig = $(".sn-pk-trigger", h), endSlot = $(".sn-end", trig);
+    // 有值时点击右侧清除区（含图标本身与胶囊右端整个舒适热区）：一律只清空并保持关闭，绝不误弹面板
+    const isClearHit = (e) => {
+      if (!h.classList.contains("sn-has")) return false;
+      if (e.target.closest?.(".sn-end")) return true;
+      if (endSlot && typeof e.clientX === "number" && e.clientX > 0) {
+        const er = endSlot.getBoundingClientRect();
+        if (er.width > 0 && e.clientX >= er.left - 4) return true;
+      }
+      return false;
+    };
+    let clearedOnDown = false;
+    trig.addEventListener("pointerdown", (e) => {
+      clearedOnDown = false;
+      if (e.button === 0 && isClearHit(e)) {
+        clearedOnDown = true;
+        e.preventDefault();
+        e.stopPropagation();
+        h._clear?.();
+        close(h, false);
+      }
+    });
     trig.addEventListener("click", (e) => {
-      if (e.target.closest(".sn-end > .sn-b") && h.classList.contains("sn-has")) { h._clear?.(); return; }
+      if (clearedOnDown) { clearedOnDown = false; e.preventDefault(); e.stopPropagation(); return; }
+      if (isClearHit(e)) { e.preventDefault(); e.stopPropagation(); h._clear?.(); close(h, false); return; }
       if (h.classList.contains("sn-open")) close(h); else open(h);
     });
     h.addEventListener("keydown", (e) => {
@@ -157,7 +178,7 @@ export function bindPickers(root = document, { today, now } = {}) {
       setView(nv, nv < view ? -1 : 1); return true;
     }
     const cellOf = (d) => { for (const g of grids) { const i = Math.round((d - g._start) / 864e5); if (i >= 0 && i < 42 && !(multi && g.children[i].classList.contains("sn-out"))) return g.children[i]; } return null; };
-    const pop = (d) => { if (reduced()) return; const el = cellOf(d); if (!el) return; el.classList.remove("sn-pop"); void el.offsetWidth; el.classList.add("sn-pop"); };
+    const pop = (d) => { if (reduced()) return; const el = cellOf(d); if (!el) return; el.classList.remove("sn-d-pop"); void el.offsetWidth; el.classList.add("sn-d-pop"); };
     // 确认结束日期、重置时：带子用 120ms 补成实色 / 淡掉；平时（悬停预览）直接变，不拖尾巴
     let settleT = 0;
     const settle = () => { if (reduced()) return; root.classList.add("sn-settle"); clearTimeout(settleT); settleT = setTimeout(() => root.classList.remove("sn-settle"), 160); };

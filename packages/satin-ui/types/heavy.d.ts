@@ -223,10 +223,10 @@ export interface ChartSeries { name: string; values: number[]; color?: string; u
 export interface AreaChartOptions { labels: string[]; series: ChartSeries[]; height?: number | string; unit?: string; legend?: boolean; area?: boolean; tipNote?(index: number, cfg: AreaChartOptions): string }
 export interface BarChartOptions { labels: string[]; series: ChartSeries[]; height?: number | string; unit?: string; legend?: boolean; activeIndex?: number; onSelect?(label: string | null, index: number): void }
 export interface DonutItem { label: string; value: number; color?: string }
-export interface DonutChartOptions { items: DonutItem[]; totalLabel?: string; unit?: string; activeIndex?: number; onSelect?(item: DonutItem | null, index: number): void }
+export interface DonutChartOptions { items: DonutItem[]; totalLabel?: string; centerLabel?: string; size?: number; unit?: string; activeIndex?: number; onSelect?(item: DonutItem | null, index: number): void }
 export interface Chart3DOptions { rows: string[]; cols: string[]; values: number[][]; height?: number | string; unit?: string; metricLabel?: string; rowColors?: string[]; interactive?: boolean }
 export interface SparklineOptions { values: number[]; color?: string; height?: number | string }
-export interface Icon3DOptions { name?: string; tone?: "obsidian" | "ceramic" | "cobalt" | "emerald" | "amber" | "crimson"; size?: "sm" | "md" | "lg"; label?: string }
+export interface Icon3DOptions { name?: string; tone?: "obsidian" | "ceramic" | "cobalt" | "emerald" | "amber" | "crimson" | "violet" | "glass"; size?: "sm" | "md" | "lg"; label?: string }
 export const createAreaChart: SatinFactory<AreaChartOptions, { replay(): void }>;
 export const createBarChart: SatinFactory<BarChartOptions, { replay(): void }>;
 export const createDonutChart: SatinFactory<DonutChartOptions, { replay(): void }>;

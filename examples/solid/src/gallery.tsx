@@ -94,9 +94,6 @@ import VlistDemo0 from "./demos/vlist-0.tsx";
 import ChatDemo0 from "./demos/chat-0.tsx";
 import ChatDemo1 from "./demos/chat-1.tsx";
 import MdDemo0 from "./demos/md-0.tsx";
-import EditorialHotspot from "./demos/editorial-hotspot.tsx";
-import EditorialCompare from "./demos/editorial-compare.tsx";
-import EditorialBasic from "./demos/editorial-basic.tsx";
 import EditorialDemo0 from "./demos/editorial-0.tsx";
 import FlowDemo0 from "./demos/flow-0.tsx";
 import ImageDemo0 from "./demos/image-0.tsx";
@@ -166,6 +163,9 @@ import DialogControlled from "./demos/dialog-controlled.tsx";
 import DrawerBasic from "./demos/drawer-basic.tsx";
 import DrawerControlled from "./demos/drawer-controlled.tsx";
 import DrawerFooter from "./demos/drawer-footer.tsx";
+import EditorialBasic from "./demos/editorial-basic.tsx";
+import EditorialCompare from "./demos/editorial-compare.tsx";
+import EditorialHotspot from "./demos/editorial-hotspot.tsx";
 import EmptyBasic from "./demos/empty-basic.tsx";
 import EmptySearch from "./demos/empty-search.tsx";
 import EmptyError from "./demos/empty-error.tsx";
@@ -224,6 +224,7 @@ import OptimisticPending from "./demos/optimistic-pending.tsx";
 import OtpBasic from "./demos/otp-basic.tsx";
 import OtpComplete from "./demos/otp-complete.tsx";
 import OtpLength from "./demos/otp-length.tsx";
+import OtpMask from "./demos/otp-mask.tsx";
 import PickerBasic from "./demos/picker-basic.tsx";
 import PickerRange from "./demos/picker-range.tsx";
 import PickerTime from "./demos/picker-time.tsx";
@@ -556,9 +557,6 @@ function Gallery() {
       </section>
       <section id="editorial">
         <h2>图文编排与内容张力</h2>
-        <div class="demo" data-demo="editorial-hotspot"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-hotspot 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialHotspot /></Errored></div>
-        <div class="demo" data-demo="editorial-compare"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-compare 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialCompare /></Errored></div>
-        <div class="demo" data-demo="editorial-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialBasic /></Errored></div>
         <div class="demo" data-demo="editorial-0"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-0 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialDemo0 /></Errored></div>
       </section>
       <section id="flow">
@@ -704,6 +702,12 @@ function Gallery() {
         <div class="demo" data-demo="drawer-controlled"><Errored fallback={(err: () => unknown) => { console.error("演示 drawer-controlled 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><DrawerControlled /></Errored></div>
         <div class="demo" data-demo="drawer-footer"><Errored fallback={(err: () => unknown) => { console.error("演示 drawer-footer 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><DrawerFooter /></Errored></div>
       </section>
+      <section id="editorial">
+        <h2>图文编排与内容张力</h2>
+        <div class="demo" data-demo="editorial-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialBasic /></Errored></div>
+        <div class="demo" data-demo="editorial-compare"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-compare 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialCompare /></Errored></div>
+        <div class="demo" data-demo="editorial-hotspot"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-hotspot 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialHotspot /></Errored></div>
+      </section>
       <section id="empty">
         <h2>空状态</h2>
         <div class="demo" data-demo="empty-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 empty-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EmptyBasic /></Errored></div>
@@ -815,6 +819,7 @@ function Gallery() {
         <div class="demo" data-demo="otp-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 otp-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><OtpBasic /></Errored></div>
         <div class="demo" data-demo="otp-complete"><Errored fallback={(err: () => unknown) => { console.error("演示 otp-complete 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><OtpComplete /></Errored></div>
         <div class="demo" data-demo="otp-length"><Errored fallback={(err: () => unknown) => { console.error("演示 otp-length 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><OtpLength /></Errored></div>
+        <div class="demo" data-demo="otp-mask"><Errored fallback={(err: () => unknown) => { console.error("演示 otp-mask 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><OtpMask /></Errored></div>
       </section>
       <section id="picker">
         <h2>日期、时间、地址</h2>

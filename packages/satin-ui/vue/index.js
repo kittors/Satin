@@ -28,7 +28,7 @@ export const Segmented = /* @__PURE__ */ wrap(S.createSegmented, { name: "SnSegm
 export const Avatar = /* @__PURE__ */ wrap(S.createAvatar, { name: "SnAvatar", props: ["src", "name", "seed", "size", "label", "decorative", "online"], events: [] });
 export const Slider = /* @__PURE__ */ wrap(S.createSlider, { name: "SnSlider", props: ["value", "max", "label"] });
 export const Select = /* @__PURE__ */ wrap(S.createSelect, { name: "SnSelect", props: ["items", "value", "placeholder", "label"] });
-export const Otp = /* @__PURE__ */ wrap(S.createOtp, { name: "SnOtp", props: ["length"], events: ["complete"] });
+export const Otp = /* @__PURE__ */ wrap(S.createOtp, { name: "SnOtp", props: ["length", "mask", "reveal"], events: ["complete"] });
 export const Tabs = /* @__PURE__ */ wrap(S.createTabs, { name: "SnTabs", props: ["tabs", "value"] });
 export const Pager = /* @__PURE__ */ wrap(S.createPager, { name: "SnPager", props: ["total", "page", "count"], valueKey: "page" });
 export const Collapse = /* @__PURE__ */ wrap(S.createCollapse, { name: "SnCollapse", props: ["items", "single", "open"], valueKey: "open", events: ["toggle", "change"] });
@@ -253,7 +253,7 @@ export const Tooltip = /* @__PURE__ */ defineComponent({ name: "SnTooltip", prop
 // @submit 接住表单提交（主按钮写 type="submit"，输入框里按回车也算），弹窗不会因为提交自己关。icon：标题左边的图标；footer-class 加在底栏上
 let dlgN = 0;
 export const Dialog = /* @__PURE__ */ defineComponent({
-  name: "SnDialog", props: { open: Boolean, title: String, description: String, icon: String, guard: Function, footerClass: null }, emits: ["close", "update:open", "submit"],
+  name: "SnDialog", props: { open: Boolean, title: String, description: String, icon: String, guard: Function, footerClass: null, draggable: { type: Boolean, default: true } }, emits: ["close", "update:open", "submit"],
   setup(p, { slots, emit }) {
     const el = ref(null), tid = Vue.useId?.() ?? "sn-dlg-" + ++dlgN;
     onMounted(() => {
@@ -263,7 +263,7 @@ export const Dialog = /* @__PURE__ */ defineComponent({
       if (p.open) openDialog(d, document.activeElement);
     });
     watch(() => p.open, (o) => { const d = el.value; if (!d) return; if (o && !d.open) openDialog(d, document.activeElement); else if (!o && d.open) closeDialog(d); });
-    return () => h("dialog", { ref: el, class: "sn-dlg", "aria-labelledby": p.title ? tid : undefined }, [h("form", { method: "dialog", onSubmit: (e) => emit("submit", e) }, [
+    return () => h("dialog", { ref: el, class: "sn-dlg", "aria-labelledby": p.title ? tid : undefined, "data-draggable": p.draggable === false ? "false" : undefined }, [h("form", { method: "dialog", onSubmit: (e) => emit("submit", e) }, [
       p.title || p.description || p.icon ? h("div", { class: "sn-hd" }, [p.icon ? h("span", { class: "sn-dlg-icon" }, [h(Icon, { name: p.icon })]) : null, h("div", { style: "flex:1" }, [p.title ? h("h3", { id: tid }, p.title) : null, p.description ? h("div", { class: "sn-sub" }, p.description) : null])]) : null,
       slots.default ? h("div", { class: "sn-bd" }, slots.default()) : null,
       slots.footer ? h("div", { class: ["sn-ft", p.footerClass] }, slots.footer()) : null,

@@ -11,7 +11,7 @@ const CASES = [
   ["setup()", `import { setup } from "satin-ui"; setup();`, 19.5], // 2026-11-23 +5.0（含 Solar 148 图标全表 +4.0KB，实测 18.4KB）
   ["createSegmented", `import { createSegmented } from "satin-ui/components"; createSegmented(document.body, { items: ["a", "b"] });`, 7],
   ["createSlider", `import { createSlider } from "satin-ui/components"; createSlider(document.body, {});`, 4],
-  ["createSelect", `import { createSelect } from "satin-ui/components"; createSelect(document.body, { items: ["a"] });`, 5],
+  ["createSelect", `import { createSelect } from "satin-ui/components"; createSelect(document.body, { items: ["a"] });`, 6], // 2026-11-24 +1.0（接入统一浮层定位引擎 floating.js，实测 5.4KB）
   ["toast", `import { toast } from "satin-ui/components"; toast({ text: "已保存" });`, 14.5], // 2026-11-23 +4.5（含 Solar 图标表，实测 13.0KB）
   ["openDialog", `import { openDialog } from "satin-ui/components"; openDialog(document.querySelector("dialog"));`, 3],
   ["createTabs", `import { createTabs } from "satin-ui/components"; createTabs(document.body, { tabs: [] });`, 7],
@@ -22,7 +22,7 @@ const CASES = [
   ["React Segmented", `import { Segmented } from "satin-ui/react"; export default Segmented;`, 27], // 2026-11-23 +6.0（含 setup() 与 Solar 图标表，实测 25.0KB）
   ["Vue Segmented", `import { Segmented } from "satin-ui/vue"; export default Segmented;`, 27], // 2026-11-23 +4.0（含 setup() 与 Solar 图标表，实测 25.0KB）
   ["markdown（重组件）", `import { renderMarkdown } from "satin-ui/markdown"; renderMarkdown(document.body, "# hi");`, 44], // 2026-11-23 +6.0（含 Solar 图标表，实测 40.9KB）
-  ["grid（重组件）", `import { mountDataGrid } from "satin-ui/grid"; mountDataGrid(document.body);`, 60], // 2026-11-23 +8.0（含 Solar 图标表，实测 56.1KB）
+  ["grid（重组件）", `import { mountDataGrid } from "satin-ui/grid"; mountDataGrid(document.body);`, 62], // 2026-11-24 +2.0（接入统一浮层定位引擎 floating.js，实测 60.6KB）
 ];
 const alias = { name: "alias", setup(b) {
   // 包里的 JS 都没有副作用（package.json 的 sideEffects 只列了 css 和 theme-boot）：插件解析出来的路径也按这个标

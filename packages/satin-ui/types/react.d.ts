@@ -21,7 +21,7 @@ export const Slider: React.ForwardRefExoticComponent<Base & Controlled<number> &
 /** 下拉选择的属性：value 受控、defaultValue 非受控 */
 export type SelectProps = Base & Controlled<string> & { items: Item[]; placeholder?: string; label?: string; onChange?(value: string): void };
 export const Select: React.ForwardRefExoticComponent<SelectProps & React.RefAttributes<SatinInstance>>;
-export const Otp: React.ForwardRefExoticComponent<Base & { length?: number; onComplete?(code: string): void } & React.RefAttributes<SatinInstance>>;
+export const Otp: React.ForwardRefExoticComponent<Base & { length?: number; /** 密码隐藏模式（掩码圆点显示） */ mask?: boolean; /** 是否显示明文/密文切换眼睛按钮（开启 mask 时默认为 true） */ reveal?: boolean; onComplete?(code: string): void } & React.RefAttributes<SatinInstance>>;
 export const Tabs: React.ForwardRefExoticComponent<Base & Controlled<number> & { tabs: { label: string; badge?: string | number; content?: string; html?: string }[]; onChange?(index: number): void } & React.RefAttributes<SatinInstance>>;
 export const Pager: React.ForwardRefExoticComponent<Base & Controlled<number, "page"> & { total: number; count?: number; onChange?(page: number): void } & React.RefAttributes<SatinInstance>>;
 export const Collapse: React.ForwardRefExoticComponent<Base & Controlled<number[], "open"> & { items: { title: string; content?: string; html?: string }[]; single?: boolean; onToggle?(e: { index: number; open: boolean }): void; onChange?(open: number[]): void } & React.RefAttributes<SatinInstance>>;
@@ -83,7 +83,7 @@ export type TooltipProps = { text: string; kbd?: string; children: React.ReactEl
 export function Tooltip(p: TooltipProps): React.ReactElement;
 /** 弹窗的属性：open 控制开关；关完（Esc、取消、程序关）调 onClose；guard 拦下关闭（比如有填写内容先问一句），确认要关时调它给的 close。
  *  取消按钮写 data-cancel、关闭按钮写 data-x，和 Esc 一样先走 guard；onSubmit 接住表单提交（弹窗不会因为提交自己关）；icon 是标题左边的图标；footerClassName 加在底栏上 */
-export interface DialogProps { open: boolean; onClose?(): void; title?: React.ReactNode; description?: React.ReactNode; icon?: string; footer?: React.ReactNode; footerClassName?: string; children?: React.ReactNode; className?: string; guard?(close: () => void): void; onSubmit?(e: React.FormEvent<HTMLFormElement>): void }
+export interface DialogProps { open: boolean; onClose?(): void; title?: React.ReactNode; description?: React.ReactNode; icon?: string; footer?: React.ReactNode; footerClassName?: string; /** 是否允许按住标题栏拖动弹窗（默认 true；双击标题栏复位） */ draggable?: boolean; children?: React.ReactNode; className?: string; guard?(close: () => void): void; onSubmit?(e: React.FormEvent<HTMLFormElement>): void }
 export function Dialog(p: DialogProps): React.ReactElement;
 export type DrawerProps = { open: boolean; onClose?(): void; title?: React.ReactNode; footer?: React.ReactNode; children?: React.ReactNode; className?: string };
 export function Drawer(p: DrawerProps): React.ReactElement;

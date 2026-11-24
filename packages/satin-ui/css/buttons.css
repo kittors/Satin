@@ -156,19 +156,20 @@
 .sn-chip .sn-x:hover { color: var(--sn-label); background: var(--sn-b-ghost-active); } }
 .sn-chip .sn-x .sn-ic { width: 10px; height: 10px; opacity: 1; }
 
-/* ———— Tooltip：浅色深底，深色主题用深灰（不反成白块）；可以带快捷键 ———— */
-.sn-tip { position: fixed; z-index: 90; pointer-events: none; display: flex; align-items: center; gap: 8px; padding: 4px 8px; min-height: 28px; border-radius: 6px;
+/* ———— Tooltip：浅色深底，深色主题用深灰（不反成白块）；可以带快捷键；限定排除 Markdown 的 .sn-md-callout.sn-tip ———— */
+.sn-tip:not(.sn-md-callout) { position: fixed; z-index: 90; pointer-events: none; display: flex; align-items: center; gap: 8px; padding: 4px 8px; min-height: 28px; border-radius: 6px;
   background: var(--sn-tip-bg); color: var(--sn-tip-fg); box-shadow: var(--sn-tip-shadow); font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); white-space: nowrap;
-  opacity: 0; transform: translateY(3px) scale(.98); transition: opacity .08s var(--sn-ease-in), transform .08s var(--sn-ease-in); }
-.sn-tip.sn-on { opacity: 1; transform: none; transition: opacity .12s var(--sn-ease-out), transform .18s var(--sn-ease-out-strong); }
-.sn-tip kbd { font: 500 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-sans); opacity: .55; }
+  opacity: 0; transform: translateY(4px) scale(.96); transition: opacity .13s var(--sn-ease-in), transform .13s var(--sn-ease-in); }
+.sn-tip:not(.sn-md-callout).sn-below { transform: translateY(-4px) scale(.96); }
+.sn-tip:not(.sn-md-callout).sn-on { opacity: 1; transform: none; transition: opacity .14s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong); }
+.sn-tip:not(.sn-md-callout) kbd { font: 500 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-sans); opacity: .55; }
 /* Tooltip 放在顶层（popover），弹窗打开时也能盖在上面；@starting-style 让它第一次出现也有过渡 */
 #sn-tip[popover] { inset: auto; margin: 0; border: 0; overflow: visible; }
-@starting-style { .sn-tip.sn-on { opacity: 0; transform: translateY(3px) scale(.98); } }
+@starting-style { .sn-tip:not(.sn-md-callout).sn-on { opacity: 0; transform: translateY(4px) scale(.96); } .sn-tip:not(.sn-md-callout).sn-below.sn-on { opacity: 0; transform: translateY(-4px) scale(.96); } }
 
 /* Tooltip 的静态展示（只用于设计稿）和两行说明 */
-.sn-tip.sn-static { position: relative; z-index: auto; opacity: 1; transform: none; }
-.sn-tip.sn-wrap { white-space: normal; max-width: 240px; align-items: flex-start; }
+.sn-tip:not(.sn-md-callout).sn-static { position: relative; z-index: auto; opacity: 1; transform: none; }
+.sn-tip:not(.sn-md-callout).sn-wrap { white-space: normal; max-width: 240px; align-items: flex-start; }
 
 /* ———— 工具条：一组纯图标按钮装在一个浮起的条里，组内用细竖线分段 ———— */
 .sn-toolbar { display: inline-flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: 2px; padding: 4px; border-radius: calc(var(--sn-btn-r) + 4px); background: var(--sn-raised); box-shadow: var(--sn-e1); }

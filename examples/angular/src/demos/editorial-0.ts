@@ -169,16 +169,6 @@ defineElements();
                       <i></i>
                       <i></i>
                       <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
                     </div>
                     <div class="sn-wv sn-pv">
                       <i></i>
@@ -216,28 +206,8 @@ defineElements();
                       <i></i>
                       <i></i>
                       <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
                     </div>
                     <div class="sn-wv sn-lit">
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                      <i></i>
                       <i></i>
                       <i></i>
                       <i></i>

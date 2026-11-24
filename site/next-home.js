@@ -47,7 +47,7 @@ function photos(scope = document) {
 }
 
 // ———— 首屏的命令：点了复制（组件库的"已复制"反馈） ————
-for (const b of $$("[data-copy-cmd]")) b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(b.dataset.copyCmd); copied(b); } catch { toast({ icon: "circle-x", tone: "danger", text: "没能复制，手动选中命令复制吧", alert: true }); } });
+for (const b of $$("[data-copy-cmd]")) b.addEventListener("click", async () => { try { if (!navigator.clipboard) throw 0; await navigator.clipboard.writeText(b.dataset.copyCmd); copied(b); } catch { toast({ icon: "circle-x", tone: "danger", text: "没能复制，手动选中命令复制吧", alert: true }); } });
 
 // ———— 窄屏：顶栏右边的菜单按钮打开导航抽屉（和文档页同一套，见 mnav.js）。组件目录要读展示页，读好了补进抽屉 ————
 {
@@ -380,7 +380,7 @@ initSeg($("[data-pv-seg]"), null, 0);
   cv.addEventListener("click", () => {
     const t = T.get(), block = (sel, o) => { const e = Object.entries(o); return e.length ? `${sel} {\n${e.map(([k, v]) => `  ${k}: ${v};`).join("\n")}\n}` : ""; };
     const css = [block(":root", T.vars(t, false)), block('[data-theme="dark"]', T.vars(t, true))].filter(Boolean).join("\n\n") || "/* 现在是默认主题：不用写任何变量 */";
-    navigator.clipboard.writeText(css).then(() => toast({ text: "已复制 CSS 变量，贴到你的样式表里就生效" }), () => toast({ icon: "circle-x", tone: "danger", text: "复制失败，请再试一次", alert: true }));
+    (navigator.clipboard?.writeText(css) ?? Promise.reject()).then(() => toast({ text: "已复制 CSS 变量，贴到你的样式表里就生效" }), () => toast({ icon: "circle-x", tone: "danger", text: "复制失败，请再试一次", alert: true }));
   });
 }
 

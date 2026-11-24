@@ -1,8 +1,3 @@
 .ld-cfg { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 16px; }
 .ld-cfg-g { display: inline-flex; align-items: center; gap: 8px; }
 .ld-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.ld-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 20px 12px 14px; border-radius: var(--sn-r-lg); background: var(--sn-canvas); box-shadow: inset 0 0 0 var(--sn-bw-hairline, 1px) var(--sn-line); text-align: center; }
-.ld-stage { display: grid; place-items: center; height: 52px; margin-bottom: 6px; }
-.ld-cell b { font: 600 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
-.ld-cell span { font: 400 calc(11.5px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
-.ld-cell code { margin-top: 2px; font: 400 calc(11px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label2); }

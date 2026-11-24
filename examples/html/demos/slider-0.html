@@ -27,10 +27,13 @@
 
   defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
   const root = document.getElementById("demo-slider-0");
-  const slider = createSlider(root.querySelector("[data-slider]"), {
-    onChange: (value) => console.log("当前值", value),
-  });
-  slider.update({ value: 60 }); // 从外面改值
+  const sliderEl = root.querySelector("[data-slider]");
+  if (sliderEl) {
+    const slider = createSlider(sliderEl, {
+      onChange: (value) => console.log("当前值", value),
+    });
+    slider.update({ value: 60 }); // 从外面改值
+  }
 </script>
 
 <style>

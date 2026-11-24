@@ -384,7 +384,15 @@ function codeOf(demo, doc) {
 // ———— 代码：跟着全站的框架偏好（fwpref.js），读 examples/<框架>/ 里这个演示的源码——全量示例生成、构建、逐块截图比对过的同一份文件 ————
 const DEMOS = new Map((await fetch(new URL("../examples/shared/demos.json", import.meta.url)).then((r) => r.json()).catch(() => [])).map((d) => [d.slug, d]));
 const texts = new Map();
-const getText = (u) => texts.get(u) || (texts.set(u, fetch(new URL(u, import.meta.url)).then((r) => (r.ok ? r.text() : null)).catch(() => null)), texts.get(u));
+const getText = (u) => {
+  const hit = texts.get(u);
+  if (hit) return hit;
+  const p = fetch(new URL(u, import.meta.url))
+    .then((r) => (r.ok ? r.text() : null))
+    .catch(() => { texts.delete(u); return null; });
+  texts.set(u, p);
+  return p;
+};
 const htmlFw = FRAMEWORKS.find((f) => f.id === "html");
 // 填了契约的组件（全量示例的清单里带 contract 的示例）：组件页用统一的七部分结构（ASYNC.contract）
 const CONTRACTED = new Set([...DEMOS.values()].filter((d) => d.contract).map((d) => d.id));
@@ -473,7 +481,8 @@ async function codeFiles(kind, key) {
 const fwLead = (note) => `<span class="cx-fw">${fwButtonHTML({ variant: "code" })}</span>${note ? `<span class="cx-note">${esc(note)}</span>` : ""}`;
 async function fillCode(slot) {
   const kind = slot.dataset.recipe ? "recipe" : "demo", key = slot.dataset.recipe || slot.dataset.slug, want = getFw().id + (getEnv()?.id || "");
-  const r = await codeFiles(kind, key); if (!slot.isConnected) return;
+  const r = await codeFiles(kind, key);
+  if (!slot.isConnected || want !== getFw().id + (getEnv()?.id || "")) return;
   const cx = $(".dx-cx", slot), open = cx.querySelector(".cx")?.classList.contains("sn-open");
   cx.innerHTML = r.files.length ? codePanel(r.files, { fold: +slot.dataset.fold || 8, lead: fwLead(r.note) }) : `<p class="d-err">这一块的代码还没生成（node scripts/examples/gallery.mjs）</p>`;
   slot.dataset.fw = want; mountCode(cx); mountFwButtons(cx);
@@ -591,11 +600,25 @@ function watchFloats(f, doc, { anchored = true } = {}) {
   if (!document.querySelector("iframe.global")) document.documentElement.classList.remove("dx-lock");
   const MODAL = "dialog, .sn-drawer, .sn-drawer-scrim, .sn-cmdk, .sn-cmdk-scrim, .sn-lb-stage", LOOSE = ".sn-toasts .sn-toast, .sn-notifs .sn-notif";
   const shown = (el) => { const cs = win.getComputedStyle(el); if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity <= .02) return false; const r = el.getBoundingClientRect(); return r.width > 4 && r.height > 4 && r.right > 0 && r.left < win.innerWidth; }; // 只看水平方向：收起的抽屉滑到右边外面去了；竖直方向小画布本来就装不下弹窗
-  // 伸出去（跟着元素弹出的浮层）
+  const nav = document.querySelector(".s-nav");
+  const navBottom = () => { const q = nav?.getBoundingClientRect(); return q && getComputedStyle(nav).position !== "static" ? Math.max(0, q.bottom) : 0; };
+  // 向同源嵌入预览的统一浮层引擎（floating.js）注入真实宿主可见视口边界：
+  // 水平限制在预览框内（不超左右边界被裁），竖直使用真实窗口安全区（自动扣除固定顶栏 navBottom，并补偿 html paddingTop = up）
+  win.__satinViewportBounds = () => {
+    const wr = wrap.getBoundingClientRect();
+    if (!anchored) return { left: 0, top: 0, right: wr.width, bottom: wr.height };
+    return { left: 0, top: navBottom() - wr.top + up, right: wr.width, bottom: innerHeight - wr.top + up };
+  };
+  // 伸出去（跟着元素弹出的浮层）：向上伸展绝不越过固定顶栏底边，且 paddingTop 变化时同步通知 iframe 里的 fixed 浮层重排
   const extend = (u, d) => {
-    if (u === up && d === down) return; up = u; down = d;
-    f.style.top = u ? -u + "px" : ""; f.style.height = u || d ? `calc(var(--sn-h) + ${u + d}px)` : "";
-    doc.documentElement.style.paddingTop = u ? u + "px" : ""; wrap.classList.toggle("ext", !!(u || d));
+    const maxU = Math.max(0, Math.floor(wrap.getBoundingClientRect().top - navBottom()));
+    const cu = Math.max(0, Math.min(u, maxU)), cd = Math.max(0, d);
+    if (cu === up && cd === down) return;
+    const upChanged = cu !== up;
+    up = cu; down = cd;
+    f.style.top = cu ? -cu + "px" : ""; f.style.height = cu || cd ? `calc(var(--sn-h) + ${cu + cd}px)` : "";
+    doc.documentElement.style.paddingTop = cu ? cu + "px" : ""; wrap.classList.toggle("ext", !!(cu || cd));
+    if (upChanged && !dead) try { win.dispatchEvent(new win.Event("satin-reposition")); } catch {}
   };
   // 铺满窗口（全局浮层）：演示留在原地 = html 的外边距对准预览框在窗口里的位置，body 宽度和预览框一样。
   // 用外边距不用内边距：演示上半截滚到窗口上面 / 顶栏底下时位置是负的，内边距不认负数，一打开看图整块往下掉一截、关上又弹回去
@@ -603,8 +626,6 @@ function watchFloats(f, doc, { anchored = true } = {}) {
   const place = () => { const r = wrap.getBoundingClientRect(), de = doc.documentElement; de.style.marginTop = r.top + "px"; de.style.marginLeft = r.left + "px"; doc.body.style.width = r.width + "px"; return r; };
   // 演示框在文档页上真正露出来的那一块（窗口坐标，带圆角）：预览框 ∩ 裁它的祖先（窗口样式演示的窗口）∩ 窗口 ∩ 顶栏以下。
   // 铺满时演示本身只在这一块里画：不然被顶栏盖着的那截会画到顶栏上面（同一段录屏："分镜助手"压在顶栏上），窗口的圆角也变成直角
-  const nav = document.querySelector(".s-nav");
-  const navBottom = () => { const q = nav?.getBoundingClientRect(); return q && getComputedStyle(nav).position !== "static" ? Math.max(0, q.bottom) : 0; };
   const visible = () => {
     const r = wrap.getBoundingClientRect(); let l = r.left, t = r.top, rt = r.right, b = r.bottom; const clips = [];
     for (let a = wrap; a && a !== document.body; a = a.parentElement) {
@@ -751,16 +772,19 @@ function watchFloats(f, doc, { anchored = true } = {}) {
     // 轻提示：正在进场（有动画在播、还没淡入）就算出现，不等它画出来；收起后留在 DOM 里、看不见的不算（只看“在不在 DOM 里”会一直铺满着出不来）
     if ([...doc.querySelectorAll(LOOSE)].some((el) => shown(el) || (el.matches(".sn-toasts .sn-toast") && el.getAnimations().some((a) => a.playState === "running")))) return toGlobal(false);
     toLocal(); if (!anchored) return;
-    // 每次都从头算：位置换算回"没伸出去时"的坐标（伸出去以后内容整体下移了 up），超出预览框上沿 / 下沿多少就伸多少，没有浮层露出来就缩回去
-    const H = wrap.offsetHeight; let nu = 0, nd = 0;
+    // 每次都从头算：位置换算回"没伸出去时"的坐标（伸出去以后内容整体下移了 up），超出预览框上沿 / 下沿多少就伸多少（给足 22px 投影阴影余量），没有浮层露出来就缩回去
+    const H = wrap.offsetHeight, PAD = 22; let nu = 0, nd = 0;
     for (const el of candidates()) {
       if (!el.isConnected) continue;
       const cs = win.getComputedStyle(el); if (cs.position !== "absolute" && cs.position !== "fixed") continue;
       if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity <= .02) continue;
-      const r = el.getBoundingClientRect(); if (r.width < 8 || r.height < 8 || (r.top - up >= 0 && r.bottom - up <= H)) continue;
+      const r = el.getBoundingClientRect();
+      const isFloat = el.matches?.(".sn-pk-panel, .sn-menu, .sn-pop, .sn-tip");
+      const guard = isFloat ? 16 : 0;
+      if (r.width < 8 || r.height < 8 || (r.top - up >= guard && r.bottom - up <= H - guard)) continue;
       const y = seenY(el, cs); if (!y) continue;
-      if (y[0] - up < 0) nu = Math.max(nu, up - y[0] + 8);
-      if (y[1] - up > H) nd = Math.max(nd, y[1] - up - H + 8);
+      if (y[0] - up < guard) nu = Math.max(nu, up - y[0] + PAD);
+      if (y[1] - up > H - guard) nd = Math.max(nd, y[1] - up - H + PAD);
     }
     extend(Math.ceil(nu), Math.ceil(nd));
   };
@@ -773,7 +797,7 @@ function watchFloats(f, doc, { anchored = true } = {}) {
   let raf = 0, until = 0;
   const frame = () => { raf = 0; if (dead) return; check(); if (performance.now() < until) raf = requestAnimationFrame(frame); };
   // 这份文档走了（重新载入）：停掉自己的计时、逐帧、页面上的滚动监听，恢复外框——不然旧的定时复查还会去动新文档用的 iframe
-  win.addEventListener("pagehide", () => { dead = true; until = 0; cancelAnimationFrame(raf); clearTimeout(pollT); toLocal(); extend(0, 0); });
+  win.addEventListener("pagehide", () => { dead = true; until = 0; cancelAnimationFrame(raf); clearTimeout(pollT); delete win.__satinViewportBounds; toLocal(); extend(0, 0); });
   const follow = (ms) => { until = Math.max(until, performance.now() + ms); if (!raf) raf = requestAnimationFrame(frame); };
   const later = () => follow(0), soon = () => { candAt = -1e9; follow(600); };
   for (const ev of ["pointerdown", "pointerup", "click", "keydown", "keyup", "focusin", "contextmenu"]) doc.addEventListener(ev, soon, true);
@@ -1607,7 +1631,15 @@ function contractHTML(c, k, ruleMap = null) {
 }
 // 全站异步数据缓存：组件契约、去 AI 味规则、令牌表与配方 Markdown 均缓存，并由左侧目录悬停预取（0ms 感知切换）
 const DATA_CACHE = new Map();
-const fetchJSON = (rel) => DATA_CACHE.get(rel) || (DATA_CACHE.set(rel, fetch(new URL(rel, location.href)).then((x) => x.json())), DATA_CACHE.get(rel));
+const fetchJSON = (rel) => {
+  const hit = DATA_CACHE.get(rel);
+  if (hit) return hit;
+  const p = fetch(new URL(rel, location.href))
+    .then((x) => { if (!x.ok) throw new Error(`${rel} HTTP ${x.status}`); return x.json(); })
+    .catch((e) => { DATA_CACHE.delete(rel); throw e; });
+  DATA_CACHE.set(rel, p);
+  return p;
+};
 const READY_CACHE = new Map(); // 已解出的同步值：在原子提交时直接拿，零异步空壳
 
 function prefetchAsync(k, arg) {
@@ -1637,8 +1669,8 @@ side.addEventListener("focusin", (e) => { const a = e.target.closest?.("a[href]"
 const ASYNC = {
   async contract(id) {
     const [k, rulesData] = await Promise.all([
-      READY_CACHE.get(`contract:${id}`) || prefetchAsync("contract", id),
-      (READY_CACHE.get("rules:") || prefetchAsync("rules", "")).catch(() => null),
+      READY_CACHE.get(`contract:${id}`) ?? prefetchAsync("contract", id),
+      Promise.resolve(READY_CACHE.get("rules:") ?? prefetchAsync("rules", "")).catch(() => null),
     ]);
     const ruleMap = rulesData?.rules ? new Map(rulesData.rules.map((r) => [r.id, r.title])) : null;
     const lead = $("[data-async-lead]", main); if (lead && k.lead) lead.outerHTML = md(k.lead);
@@ -1790,8 +1822,8 @@ async function route() {
   if (alias) { location.replace(alias + (part ? ":" + part : "")); return; }
   const pg = byHash.get(base === "#/" || base === "#" ? "#/intro" : base);
   queueMicrotask(syncURL); // 用户选过框架：换页以后把 ?fw= 写回网址（复制地址栏分享出去对方看到同一种写法）
+  const seq = ++routeSeq;
   if (pg !== curPage) {
-    const seq = ++routeSeq;
     // 切换目标页前等待异步数据最多 180ms（悬停预取命中时 0ms 即回）：彻底消灭先切出空壳再硬砸进 DOM 的闪白
     if (pg && asyncTaskOf(pg)) {
       await Promise.race([prefetchPage(pg), new Promise((r) => setTimeout(r, first ? 600 : 180))]);
@@ -1868,7 +1900,7 @@ async function swapPage(pg, part, inVT = false) {
     document.title = `${pg.title} · Satin`;
   }
   sideLinks.forEach((a, h) => a.toggleAttribute("aria-current", h === pg?.hash));
-  if (pg) { const a = sideLinks.get(pg.hash), vp = a.closest(".sn-sa-vp") || side, r = a.getBoundingClientRect(), vr = vp.getBoundingClientRect(); if (r.top < vr.top + 40 || r.bottom > vr.bottom - 40) vp.scrollTop += r.top - vr.top - vr.height / 3; }
+  if (pg) { const a = sideLinks.get(pg.hash); if (a) { const vp = a.closest(".sn-sa-vp") || side, r = a.getBoundingClientRect(), vr = vp.getBoundingClientRect(); if (r.top < vr.top + 40 || r.bottom > vr.bottom - 40) vp.scrollTop += r.top - vr.top - vr.height / 3; } }
   for (const n of $$("[data-nav]")) n.toggleAttribute("aria-current", !!pg && n.dataset.nav === NAV_OF(pg));
   scrollTo({ top: 0, behavior: "instant" });
   mnav?.sync();

@@ -16,7 +16,7 @@ export default function CompoundDemo0() {
       // 复制按钮：写入剪贴板，成功后图标换成对勾 1.2 秒
       for (const b of root.querySelectorAll("[data-copy]")) {
         b.addEventListener("click", async () => {
-          await navigator.clipboard.writeText(b.dataset.copy);
+          try { await navigator.clipboard?.writeText(b.dataset.copy || ""); } catch {}
           copied(b);
         });
       }

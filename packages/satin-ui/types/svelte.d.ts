@@ -9,6 +9,7 @@ type DatePickerProps = Attrs & Inst & { kind?: PickerKind; placeholder?: string;
 type DialogProps = Attrs & {
   /** bind:open 双向绑定 */ open?: boolean; title?: string; description?: string; icon?: string;
   /** 拦下关闭（Esc、取消、×）：确认要关时调 close() */ guard?(close: () => void): void;
+  /** 是否允许按住标题栏拖动弹窗（默认 true；双击标题栏复位） */ draggable?: boolean;
   /** 关完以后（open 同时改回 false） */ onclose?(): void; onsubmit?(e: SubmitEvent): void; footerClass?: string; children?: Snippet; footer?: Snippet;
 };
 type IconProps = { name: string; size?: number; class?: string };
@@ -21,7 +22,7 @@ type TabsProps = Attrs & Inst & { tabs: { label: string; badge?: string | number
 type PagerProps = Attrs & Inst & { total: number; count?: number; /** bind:page 双向绑定 */ page?: number; onchange?(page: number): void };
 type TagInputProps = Attrs & Inst & { max?: number; placeholder?: string; hint?: string; /** bind:tags 双向绑定 */ tags?: string[]; onchange?(tags: string[]): void };
 type StepperProps = Attrs & Inst & { min?: number; max?: number; unit?: string; label?: string; /** bind:value 双向绑定 */ value?: number; onchange?(value: number): void };
-type OtpProps = Attrs & Inst & { length?: number; oncomplete?(code: string): void };
+type OtpProps = Attrs & Inst & { length?: number; /** 密码隐藏模式（掩码圆点显示） */ mask?: boolean; /** 是否显示明文/密文切换眼睛按钮（开启 mask 时默认为 true） */ reveal?: boolean; oncomplete?(code: string): void };
 type CollapseProps = Attrs & Inst & { items: { title: string; content?: string; html?: string }[]; single?: boolean; /** 展开的序号；bind:open 双向绑定 */ open?: number[]; ontoggle?(e: { index: number; open: boolean }): void; onchange?(open: number[]): void };
 type NumberFlowProps = Attrs & Inst & { value: number; /** 变化的样子 */ effect?: "roll" | "blur" | "push" | "fade"; format?(v: number): string };
 /** 下拉选择：<Select items={…} bind:value label="…" /> */

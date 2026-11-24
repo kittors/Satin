@@ -11,10 +11,13 @@ onMounted(() => {
   const unsetup = setup();
   const done = enhance(root.value, (root: any) => {
     // 在已有的标记上接交互；给空容器时按 items、value 渲染
-    const seg = createSegmented(root.querySelector(".sn-seg"), {
-      onChange: (value?: any) => console.log("选中了", value),
-    });
-    seg.select("9:16"); // 从外面切过去
+    const segEl = root.querySelector(".sn-seg");
+    if (segEl) {
+      const seg = createSegmented(segEl, {
+        onChange: (value?: any) => console.log("选中了", value),
+      });
+      seg.select("9:16"); // 从外面切过去
+    }
   });
   off = () => { done(); unsetup(); };
 });

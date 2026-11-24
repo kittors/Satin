@@ -11,7 +11,7 @@ onMounted(() => {
   const done = enhance(root.value, (root: any) => {
     // 要在别处触发时：比如点了"放大预览"，在按钮上说一下结果，1.5 秒后收起
     const zoom = root.querySelector('[data-tip="放大预览"]');
-    zoom.addEventListener("click", () => {
+    zoom?.addEventListener("click", () => {
       showTip(zoom, "已放大到 200%");
       window.setTimeout(hideTip, 1500);
     });

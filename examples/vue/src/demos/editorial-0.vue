@@ -175,16 +175,6 @@ onBeforeUnmount(() => off());
                     <i></i>
                     <i></i>
                     <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
                   </div>
                   <div class="sn-wv sn-pv">
                     <i></i>
@@ -222,28 +212,8 @@ onBeforeUnmount(() => off());
                     <i></i>
                     <i></i>
                     <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
                   </div>
                   <div class="sn-wv sn-lit">
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
                     <i></i>
                     <i></i>
                     <i></i>

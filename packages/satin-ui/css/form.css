@@ -91,13 +91,13 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
    菜单先被压成一个小滚动盒，演示框为了露出它往下伸，菜单又跟着长高，追两三帧才稳住、这几帧被截（2026-11-20）。文档页把 --vh 设成真实窗口高 */
 .sn-menu { position: absolute; z-index: 30; left: 0; top: calc(100% + 6px); width: max-content; min-width: 100%; max-width: min(320px, calc(100vw - 16px)); max-height: min(420px, calc(var(--sn-vh, 100vh) - 24px)); overflow: auto; padding: 4px; border-radius: var(--sn-r-lg);
   background: var(--sn-menu-bg); box-shadow: var(--sn-menu-shadow);
-  transform-origin: top left; opacity: 0; scale: .97; translate: var(--sn-menu-dx, 0px) -4px; pointer-events: none; visibility: hidden;
-  transition: opacity .1s var(--sn-ease-in), scale 0s linear .1s, translate 0s linear .1s, visibility 0s linear .1s; }
-.sn-menu.sn-up { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: var(--sn-menu-dx, 0px) 4px; }
+  transform-origin: top left; opacity: 0; scale: .96; translate: var(--sn-menu-dx, 0px) calc(var(--sn-menu-dy, 0px) - 6px); pointer-events: none; visibility: hidden;
+  transition: opacity .16s var(--sn-ease-in), scale .16s var(--sn-ease-in), translate .16s var(--sn-ease-in), visibility 0s linear .16s; }
+.sn-menu.sn-up { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: var(--sn-menu-dx, 0px) calc(var(--sn-menu-dy, 0px) + 6px); }
 .sn-menu.sn-end { left: auto; right: 0; transform-origin: top right; }
 .sn-menu.sn-up.sn-end { transform-origin: bottom right; }
-.sn-open > .sn-menu, .sn-menu.sn-open { opacity: 1; scale: 1; translate: var(--sn-menu-dx, 0px) 0; pointer-events: auto; visibility: visible;
-  transition: opacity 0s, scale .14s var(--sn-ease-out-strong), translate .14s var(--sn-ease-out-strong), visibility 0s; }
+.sn-open > .sn-menu, .sn-menu.sn-open { opacity: 1; scale: 1; translate: var(--sn-menu-dx, 0px) var(--sn-menu-dy, 0px); pointer-events: auto; visibility: visible;
+  transition: opacity .16s var(--sn-ease-out), scale .22s var(--sn-ease-out-strong), translate .22s var(--sn-ease-out-strong), visibility 0s; }
 .sn-menu .sn-item { display: flex; align-items: center; text-decoration: none; gap: 8px; height: 32px; padding: 0 8px; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); white-space: nowrap; cursor: pointer;
   transition: background-color .08s var(--sn-ease-out); }
 .sn-menu .sn-item.sn-hl { background: var(--sn-b-ghost-hover); }
@@ -168,30 +168,33 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 @media (pointer: coarse) { .sn-seg button::after { content: ""; position: absolute; inset: 50% 0 auto; height: max(100%, 44px); translate: 0 -50%; } }
 
 /* ———— 滑块：悬停圆钮放大，拖动时再放大并显示数值 ———— */
-.sn-slider { position: relative; display: block; width: 240px; height: 20px; cursor: pointer; touch-action: none; }
-.sn-slider .sn-rail { position: absolute; left: 0; right: 0; top: 8px; height: 4px; border-radius: 2px; background: var(--sn-fill-active); }
-.sn-slider .sn-fillbar { position: absolute; left: 0; top: 8px; height: 4px; border-radius: 2px; background: var(--sn-accent); }
+.sn-slider { position: relative; display: block; width: 240px; height: 20px; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.sn-slider .sn-rail { position: absolute; left: 0; right: 0; top: 8px; height: 4px; display: block; transform: none; border-radius: 2px; background: var(--sn-fill-active); pointer-events: none; }
+.sn-slider .sn-fillbar { position: absolute; left: 0; top: 8px; height: 4px; border-radius: 2px; background: var(--sn-accent); pointer-events: none; }
 .sn-slider .sn-knob { position: absolute; top: 2px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 0 0 .5px rgba(0, 0, 0, .08); transition: scale .16s var(--sn-ease-out); }
 @media (hover: hover) {
 .sn-slider:hover .sn-knob { scale: 1.12; } }
 .sn-slider.sn-drag .sn-knob { scale: 1.25; }
-.sn-slider .sn-bubble { position: absolute; bottom: calc(100% + 6px); translate: -50% 0; padding: 4px 8px; border-radius: var(--sn-r-sm); background: var(--sn-label); color: var(--sn-raised);
-  max-width: min(520px, 80%); box-shadow: inset 0 0 0 1px var(--sn-card-line); white-space: pre-wrap; overflow-wrap: anywhere; /* 这四项原来是从聊天气泡 .sn-bubble 那条全局规则吃到的：聊天那条限定到对话里以后照原样写在这里，样子不变 */
+.sn-slider .sn-bubble { position: absolute; bottom: calc(100% + 6px); translate: -50% 0; width: max-content; padding: 4px 8px; border-radius: var(--sn-r-sm); background: var(--sn-label); color: var(--sn-raised);
+  box-shadow: inset 0 0 0 1px var(--sn-card-line); white-space: nowrap; user-select: none; -webkit-user-select: none;
   font: 500 calc(11px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-sans); font-variant-numeric: tabular-nums; opacity: 0; scale: .8; transition: opacity .12s var(--sn-ease-out), scale .16s var(--sn-ease-out-strong); pointer-events: none; }
 .sn-slider.sn-drag .sn-bubble { opacity: 1; scale: 1; }
 .sn-slider:focus-visible { outline: none; }
 .sn-slider:focus-visible .sn-knob { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
 
-/* ———— 验证码：6 格，自动跳格，粘贴自动分配；填进去的数字淡入上移 ———— */
-.sn-otp { display: inline-flex; gap: 8px; }
+/* ———— 验证码：6 格，自动跳格，粘贴自动分配；填进去的数字淡入上移；支持密码掩码隐藏与显隐切换 ———— */
+.sn-otp { display: inline-flex; align-items: center; gap: 8px; }
 .sn-otp input { all: unset; box-sizing: border-box; width: 40px; height: 44px; border-radius: min(var(--sn-btn-r), 12px); text-align: center; font: 500 calc(18px * var(--sn-font-scale, 1))/1 var(--sn-sans); font-variant-numeric: tabular-nums;
   color: var(--sn-label); background: var(--sn-field); border: 1px solid var(--sn-line-control); box-shadow: var(--sn-field-inset); caret-color: transparent;
   transition: border-color .15s var(--sn-ease-out), box-shadow .15s var(--sn-ease-out); }
+.sn-otp.sn-masked input { font-size: calc(20px * var(--sn-font-scale, 1)); }
 .sn-otp input:focus { border-color: var(--sn-focus); box-shadow: var(--sn-field-inset), 0 0 0 3px var(--sn-ring); }
 .sn-otp input.sn-typed { animation: sn-digit .22s var(--sn-ease-out-strong); }
 @keyframes sn-digit { from { color: transparent; text-shadow: 0 6px 0 var(--sn-label); } }
 .sn-otp .sn-gap { width: 4px; }
+.sn-otp .sn-otp-eye { flex: none; width: 32px; height: 32px; margin-left: 2px; border-radius: var(--sn-btn-r); }
+.sn-otp .sn-otp-eye:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
 /* 胶囊形：前缀图标和后缀按钮离两头的半圆远一点 */
 :is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-ib > .sn-pre { left: 13px; }
 :is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-ib.sn-has-pre > .sn-input { padding-left: 36px; } /* sp-ok: 给前置图标让位（胶囊） */

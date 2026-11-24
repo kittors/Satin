@@ -654,8 +654,13 @@
   <!-- ———— 验证码 ———— -->
   <section class="spec" id="otp">
     <h2>验证码<small>OTP</small></h2>
-    <p>6 格，输入后自动跳到下一格；退格回到上一格；粘贴一串数字会自动分到各格。填进去的数字从下面淡入上来。</p>
-    <div class="demo"><div class="sn-otp" data-otp><input inputmode="numeric" maxlength="1" aria-label="第 1 位"><input inputmode="numeric" maxlength="1" aria-label="第 2 位"><input inputmode="numeric" maxlength="1" aria-label="第 3 位"><span class="sn-gap"></span><input inputmode="numeric" maxlength="1" aria-label="第 4 位"><input inputmode="numeric" maxlength="1" aria-label="第 5 位"><input inputmode="numeric" maxlength="1" aria-label="第 6 位"></div></div>
+    <p>6 格，输入后自动跳到下一格；退格回到上一格；粘贴一串数字会自动分到各格。支持密码隐藏（掩码）模式与显隐切换，适合支付密码、安全口令等隐私场景。</p>
+    <div class="demo"><div class="grid-m lc">
+      <span class="sn-cap">标准验证码</span>
+      <div class="sn-otp" data-otp><input inputmode="numeric" maxlength="1" aria-label="第 1 位"><input inputmode="numeric" maxlength="1" aria-label="第 2 位"><input inputmode="numeric" maxlength="1" aria-label="第 3 位"><span class="sn-gap"></span><input inputmode="numeric" maxlength="1" aria-label="第 4 位"><input inputmode="numeric" maxlength="1" aria-label="第 5 位"><input inputmode="numeric" maxlength="1" aria-label="第 6 位"></div>
+      <span class="sn-cap">密码隐藏（掩码）</span>
+      <div class="sn-otp" data-otp data-mask><input inputmode="numeric" maxlength="1" aria-label="第 1 位"><input inputmode="numeric" maxlength="1" aria-label="第 2 位"><input inputmode="numeric" maxlength="1" aria-label="第 3 位"><span class="sn-gap"></span><input inputmode="numeric" maxlength="1" aria-label="第 4 位"><input inputmode="numeric" maxlength="1" aria-label="第 5 位"><input inputmode="numeric" maxlength="1" aria-label="第 6 位"></div>
+    </div></div>
   </section>
   <!-- ======== 第二批 · 浮层 ======== -->
   <section class="spec" id="tooltip">
@@ -719,7 +724,7 @@
 
   <section class="spec" id="dialog">
     <h2>弹窗<small>Dialog</small></h2>
-    <p>只在必须停下来时用：短表单、影响大或不能撤销的确认、要先做另一个决定。从按钮那里长出来，关闭时原路缩回；焦点限制在弹窗里，Esc 取消，关闭后焦点回到按钮。点背景不会关掉，只轻轻顶一下，免得误点丢了填好的内容。</p>
+    <p>只在必须停下来时用：短表单、影响大或不能撤销的确认、要先做另一个决定。从按钮那里长出来，关闭时原地缩回；默认支持按住标题栏自由拖动（双击标题栏复位回正中，自动限制在安全视口内）；焦点限制在弹窗里，Esc 取消，关闭后焦点回到按钮。点背景不会关掉，只轻轻顶一下，免得误点丢了填好的内容。</p>
     <div class="demo"><div class="row">
       <button class="sn-btn sn-primary" data-dlg="dlg-new" data-i="plus:before">新建项目</button>
       <button class="sn-btn sn-danger-soft" data-dlg="dlg-del" data-i="trash-2:before">删除项目…</button>

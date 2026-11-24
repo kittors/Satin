@@ -28,10 +28,13 @@
   defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
   const root = document.getElementById("demo-segmented-0");
   // 在已有的标记上接交互；给空容器时按 items、value 渲染
-  const seg = createSegmented(root.querySelector(".sn-seg"), {
-    onChange: (value) => console.log("选中了", value),
-  });
-  seg.select("9:16"); // 从外面切过去
+  const segEl = root.querySelector(".sn-seg");
+  if (segEl) {
+    const seg = createSegmented(segEl, {
+      onChange: (value) => console.log("选中了", value),
+    });
+    seg.select("9:16"); // 从外面切过去
+  }
 </script>
 
 <style>

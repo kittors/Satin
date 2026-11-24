@@ -9,7 +9,7 @@ import { initSeg, injectIcons, reduced as reducedMotion } from "./core.js";
 import { icon } from "./icons.js";
 import { svg } from "./svg.js";
 import { check, chevronDown, chevronLeft, chevronRight, minus, plus, x } from "./icons/index.js";
-import { initSlider, mountSelect, mountOtp, BOX, busy, succeed, copied, removeChip } from "./form.js";
+import { initSlider, mountSelect, mountOtp, otpEyeHTML, BOX, busy, succeed, copied, removeChip } from "./form.js";
 import { mountTabs, mountPager, setStep, mountUpload, mountReorder, mountSidebar } from "./nav.js";
 import { mountCollapse } from "./data.js";
 import { mountTagInput, mountStepper, mountPassword, mountEmail, mountSearch, mountCount, mountLongText, mountComposer, cmContextHTML, cmModeHTML, cmModelsHTML, syncComposerParts } from "./input.js";
@@ -220,11 +220,26 @@ const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
 // ———— 验证码 ————
 export const createOtp = /* @__PURE__ */ defineComponent({
   name: "otp",
-  defaults: { length: 6 },
-  html: (o) => `<div class="sn-otp" data-otp>${Array.from({ length: o.length }, (_, i) => `${i === o.length / 2 && o.length % 2 === 0 ? '<span class="sn-gap"></span>' : ""}<input inputmode="numeric" maxlength="1" aria-label="${tt("components.15", { p0: i + 1 })}">`).join("")}</div>`,
+  defaults: { length: 6, mask: false, reveal: undefined },
+  html: (o) => {
+    const masked = flag(o.mask), showEye = o.reveal !== undefined ? flag(o.reveal) : masked;
+    const type = masked ? ' type="password"' : "";
+    return `<div class="sn-otp${masked ? " sn-masked" : ""}" data-otp${masked ? " data-mask" : ""}${showEye ? " data-reveal" : ""}>${Array.from({ length: o.length }, (_, i) => `${i === o.length / 2 && o.length % 2 === 0 ? '<span class="sn-gap"></span>' : ""}<input${type} inputmode="numeric" maxlength="1" aria-label="${tt("components.15", { p0: i + 1 })}">`).join("")}${showEye ? otpEyeHTML(masked) : ""}</div>`;
+  },
   mount(el, o, api) {
-    const otp = mountOtp(el, { onComplete: (v) => api.emit("complete", v) });
-    return { get value() { return otp.value; }, clear: otp.clear, destroy() { delete el._otp; } };
+    const mask = flag(o.mask), reveal = o.reveal !== undefined ? flag(o.reveal) : mask;
+    const otp = mountOtp(el, { mask, reveal, onComplete: (v) => api.emit("complete", v) });
+    return {
+      update(n, prev) {
+        const nextMask = flag(n.mask);
+        if (nextMask !== flag(prev.mask)) otp.setMask(nextMask);
+      },
+      get value() { return otp.value; },
+      get masked() { return otp.masked; },
+      setMask: otp.setMask,
+      clear: otp.clear,
+      destroy() { delete el._otp; },
+    };
   },
 });
 
