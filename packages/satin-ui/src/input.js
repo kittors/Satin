@@ -318,7 +318,7 @@ export function mountStepper(st, { onChange } = {}) {
 //   onStop()：生成中点停止；upload(file, onProgress) 返回 Promise：真上传（不给就是演示用的假进度）。
 //   不给 onSend、写了 data-external：发送 / 停止改成在容器上发 compose / compose-stop 事件（对话组件就这样接）。
 //   返回 { setBusy(on), clear({ smooth }), files() }
-export function mountComposer(box, { onSend, onStop, upload: realUpload, attachments, voice, onModelChange, onModeChange, onContextChange, onContextClick } = {}) {
+export function mountComposer(box, { onSend, onStop, upload: realUpload, attachments, voice, submitKey, onModelChange, onModeChange, onContextChange, onContextClick } = {}) {
   if (box._cm) return box._cm;
   // 输入框里的菜单（附件、模型）自己接上：用 createComposer / createChat 渲染出来的输入框，页面不一定调过 bindForms；已经接过的不重复接
   for (const h of box.querySelectorAll(".sn-select")) mountSelect(h);
@@ -343,7 +343,16 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   const notify = (text) => { $(".sn-tx", note).textContent = text; note.classList.add("sn-on"); clearTimeout(noteT); noteT = setTimeout(() => { note.classList.remove("sn-on"); rejected = []; }, 5000); };
   const reject = (name, why) => { rejected.push(name); notify(rejected.length > 1 ? tt("input.12", { p0: rejected.length, p1: why }) : tt("input.13", { p0: midEllipsis(name, 22), p1: why })); };
   // data-external：发送和停止交给外面处理（比如聊天框），输入框只管三种状态；生成中仍然可以接着写下一条
-  const external = box.hasAttribute("data-external"), idleLabel = send.getAttribute("aria-label") || tt("input.14"), idleKbd = send.dataset.kbd;
+  const external = box.hasAttribute("data-external"), idleLabel = send.getAttribute("aria-label") || tt("input.14");
+  const normSubmitKey = (v) => (v === "mod-enter" ? "mod-enter" : "enter");
+  let curSubmitKey = normSubmitKey(submitKey ?? box.dataset.submitKey ?? "enter");
+  let idleKbd = curSubmitKey === "mod-enter" ? "⌘↵" : "↵";
+  send.dataset.kbd = idleKbd;
+  const setSubmitKey = (mode) => {
+    curSubmitKey = normSubmitKey(mode);
+    idleKbd = curSubmitKey === "mod-enter" ? "⌘↵" : "↵";
+    if (!busy) { send.dataset.kbd = idleKbd; retip(send); }
+  };
   let busy = false, timer = 0, fileN = 0;
   // 有文字或有附件就能发；超出字数不能发。正在收起的附件（.sn-leaving）不算
   const kept = () => [...files.children].filter((f) => !f.classList.contains("sn-leaving"));
@@ -561,7 +570,7 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
     if (voiceState.on && e.key === "Escape") { e.preventDefault(); e.stopPropagation(); stopVoice(false); }
   });
   onCleanup(() => stopVoice(true));
-  box._cm = { setBusy, clear, files: kept, startVoice, stopVoice };
+  box._cm = { setBusy, clear, files: kept, startVoice, stopVoice, setSubmitKey };
   // 填一段字进输入框（新对话的建议、程序里预填）：长高、计数、发送按钮跟着变，光标放到最后；字淡入
   box._cm.fill = (text) => {
     ta.value = String(text ?? ""); ta.dispatchEvent(new Event("input", { bubbles: true })); ta.focus({ preventScroll: true }); const n = ta.value.length; ta.setSelectionRange(n, n);
@@ -616,7 +625,14 @@ export function mountComposer(box, { onSend, onStop, upload: realUpload, attachm
   box._cm.setMode = (mode) => swapPart($(".sn-cm-bar > .sn-cm-mode, .sn-cm-bar > .sn-cm-pick[data-pick=\"mode\"]", box), cmModeHTML(mode), (el) => $(".sn-cm-bar > .sn-grow", box).before(el));
   box._cm.setModels = (models, model) => { swapPart($(".sn-cm-models", box), cmModelsHTML(models, model), (el) => $(".sn-cm-bar > .sn-grow", box).after(el)); fitModel(); };
   ta.addEventListener("input", sync);
-  ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && !e.isComposing) { e.preventDefault(); start(true); } });
+  ta.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
+    if (curSubmitKey === "mod-enter") {
+      if (e.metaKey || e.ctrlKey) { e.preventDefault(); start(true); }
+    } else if (!e.shiftKey && !e.altKey) {
+      e.preventDefault(); start(true);
+    }
+  });
   send.addEventListener("click", () => start());
   // ———— 附件：图片、视频（缩略图块），音频、文档（条）。加进来先上传，传完才能发；可以拖进来，也可以粘贴截图 ————
   const X = tt("input.18");

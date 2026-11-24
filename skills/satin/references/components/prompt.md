@@ -665,6 +665,7 @@ export default function PromptParts() {
 | `attach` | `boolean` | true | 否 | 左下角的 +（加图片、视频、音频、文档；未配演示回调时自动唤起系统文件选择器）。 | createXxx 选项：`attach`；React：`attach`；Preact：`attach`；Vue：`attach` |
 | `voice` | `boolean` | true | 否 | 发送键左侧的一键语音输入按钮：点击原地切换为动态微声纹并实时听写进输入框，再点一下或直接点发送即可停止，零多余确认步骤。 | createXxx 选项：`voice`；React：`voice`；Preact：`voice`；Vue：`voice` |
 | `send` | `string` | "发送" | 否 | 发送按钮的名字（读屏、提示里）："生成"。 | createXxx 选项：`send`；React：`send`；Preact：`send`；Vue：`send` |
+| `submitKey` | `"enter" \| "mod-enter"` | "enter" | 否 | 回车提交模式：enter（默认：Enter 直接发送、Shift+Enter 换行，自动防护中文输入法合成态）或 mod-enter（⌘/Ctrl+Enter 发送、Enter 换行）。 | createXxx 选项：`submitKey`；React：`submitKey`；Preact：`submitKey`；Vue：`submitKey（模板里写 submit-key）` |
 | `upload` | `(file: File, progress: (p: number) => void) => Promise<unknown>` | 演示用的假进度 | 否 | 真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。 | createXxx 选项：`upload`；React：`upload`；Preact：`upload`；Vue：`upload` |
 | `external` | `boolean` | false | 否 | 发送由外面接管（对话组件里用），发送后不在这里清空。 | createXxx 选项：`external` |
 | `context` | `ComposerContextItem[]` | — | 否 | 输入框顶上的上下文栏（项目文件夹、本地 / 云端、分支……）：每项 `{ icon?, text }`；给了 `options`（`[{ value, label }]`）和 `value` 的那项点开是菜单，选了发 `contextChange`，没有的点了发 `contextClick`。只是选中项换了不重画。 | createXxx 选项：`context`；React：`context`；Preact：`context`；Vue：`context` |
@@ -691,6 +692,7 @@ export default function PromptParts() {
 | `clear` | `clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void` | 清空（`smooth` 时文字淡出、框缩回去）。 |
 | `files` | `files(): HTMLElement[]` | 现在的附件（缩略图元素）。 |
 | `fill` | `fill(text: string): void` | 把一段字填进输入框（字淡入、拿到焦点、光标在最后），不发。 |
+| `setSubmitKey` | `setSubmitKey(mode: "enter" \| "mod-enter"): void` | 运行时动态切换回车提交模式（Enter 直接发送 / ⌘↵ 发送）。 |
 | `startVoice` | `startVoice(): void` | 开始语音输入（展开实时动态声波与实时听写）。 |
 | `stopVoice` | `stopVoice(cancel?: boolean): void` | 结束语音输入；cancel 为 true 时放弃本次听写并恢复原文本。 |
 
@@ -700,7 +702,7 @@ export default function PromptParts() {
 
 | 签名 | 从哪引 | 说明 |
 |---|---|---|
-| `composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string` | `satin-ui` | 拼出提示词输入框的标记（服务端渲染、模板里用）。 |
+| `composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; submitKey?: "enter" \| "mod-enter"; external?: boolean; fresh?: boolean } & ComposerParts): string` | `satin-ui` | 拼出提示词输入框的标记（服务端渲染、模板里用）。 |
 
 ## 样式定制
 
@@ -722,7 +724,7 @@ export default function PromptParts() {
 
 | 按键 | 什么时候 | 做什么 |
 |---|---|---|
-| ⌘↵ / Ctrl+↵ |  | 发送。 |
+| Enter |  | 默认直接发送（防护输入法选字）；submitKey 为 mod-enter 时为 ⌘↵ / Ctrl+↵ 发送。 |
 | ⇧↵ |  | 换行。 |
 
 ## 无障碍

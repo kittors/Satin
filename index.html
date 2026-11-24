@@ -1095,6 +1095,11 @@
     <h2>聊天与 AI 对话<small>Chat</small></h2>
     <p>超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条；已经载入的消息滚得再快、拖滚动条拖得再猛，都直接显示真内容，不换骨架，也不露白。发送时，输入框里的字原地变成气泡，果断地飞进它在列表里的位置（一起步就是高速，再柔和停住），图片、视频的缩略图边飞边放大，音频、文档整条飞过去，原来的消息同时往上让位。AI 回复先思考（灰字流出，想完自动收起，可以点开看），再列出步骤，再逐词流出正文、镜头卡片和生成的画面；生成中发送按钮变成"停止"。</p>
     <div class="sn-chat-cfg"><span class="sn-cap">演示</span><button class="sn-btn sn-secondary sn-sm" data-chat-sim="stream" data-i="play:before">体验流式与工具调用</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="top" data-i="arrow-up:before">快速滚到最早</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="incoming">模拟收到消息</button><button class="sn-btn sn-ghost sn-sm" data-chat-sim="fail">模拟发送失败</button></div>
+    <div class="sn-chat-cfg"><span class="sn-cap">过程展示</span><div class="sn-seg sn-sm" data-seg="chattrace"><span class="sn-thumb"></span><button data-v="visible">工具可见</button><button data-v="active">仅当前执行</button><button data-v="collapsed">全收起</button><button data-v="expanded">展开详情</button><button data-v="hidden">仅正文</button></div></div>
+    <div class="sn-chat-cfg"><span class="sn-cap">工具样式</span><div class="sn-seg sn-sm" data-seg="chattool"><span class="sn-thumb"></span><button data-v="timeline">时间流</button><button data-v="card">卡片</button><button data-v="minimal">极简</button></div></div>
+    <div class="sn-chat-cfg"><span class="sn-cap">历史加载</span><div class="sn-seg sn-sm" data-seg="chathist"><span class="sn-thumb"></span><button data-v="auto">无缝加载</button><button data-v="top">置顶加载</button><button data-v="demand">按需加载</button></div></div>
+    <div class="sn-chat-cfg"><span class="sn-cap">用户 MD</span><div class="sn-seg sn-sm" data-seg="chatmd"><span class="sn-thumb"></span><button data-v="on">渲染</button><button data-v="off">纯文本</button></div></div>
+    <div class="sn-chat-cfg"><span class="sn-cap">密度</span><div class="sn-seg sn-sm" data-seg="chatdensity"><span class="sn-thumb"></span><button data-v="comfortable">舒适</button><button data-v="compact">紧凑</button></div></div>
     <div class="sn-chat-cfg"><span class="sn-cap">刻度轨</span><div class="sn-seg sn-sm" data-seg="chatrail"><span class="sn-thumb"></span><button data-v="left">左侧</button><button data-v="right">右侧</button><button data-v="off">隐藏</button></div></div>
     <div class="sn-chat-cfg"><span class="sn-cap">输入框磨砂</span><div class="sn-seg sn-sm" data-seg="chatblur"><span class="sn-thumb"></span><button data-v="none">实底</button><button data-v="sm">轻柔</button><button data-v="md">标准</button><button data-v="lg">深邃</button></div></div>
     <div class="demo">
@@ -1104,10 +1109,10 @@
         <div class="sn-chat-foot">
           <div class="sn-box-in sn-composer" data-composer data-external data-max="500" data-max-lines="5">
             <div class="sn-cm-files"></div>
-            <textarea rows="1" placeholder="和分镜助手一起改这一集"></textarea>
+            <textarea rows="1" placeholder="和分镜助手一起改这一集（Enter 发送，Shift+Enter 换行，支持 Markdown）"></textarea>
             <div class="sn-cm-bar"><div class="sn-select sn-inline-menu sn-up"><button class="sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add" data-menubtn data-cm-attach data-tip="添加图片、视频、音频或文档" aria-label="添加附件" data-i="plus"></button><div class="sn-menu" role="menu" style="min-width:208px"><div class="sn-item" data-add="img" data-i="image:before">图片<span class="sn-key">JPG · PNG</span></div><div class="sn-item" data-add="vid" data-i="film:before">视频<span class="sn-key">MP4 · MOV</span></div><div class="sn-item" data-add="aud" data-i="audio-lines:before">音频<span class="sn-key">MP3 · WAV</span></div><div class="sn-item" data-add="doc" data-i="file-text:before">文档<span class="sn-key">PDF · DOCX</span></div><div class="sn-sep"></div><div class="sn-item" data-add="fail" data-i="refresh-cw:before">演示：上传失败</div><div class="sn-item" data-add="big" data-i="circle-alert:before">演示：文件太大</div></div></div><button class="sn-btn sn-ghost sn-sm sn-cm-chip" data-cm-style>风格：电影感</button><span class="sn-grow"></span>
               <button class="sn-btn sn-ghost sn-sm sn-cm-model" data-cm-model data-tip="换模型" data-i="chevron-down:after">分镜模型 · 精细</button><span class="sn-ta-count"><svg class="sn-uring" viewBox="0 0 16 16"><circle class="sn-bg" cx="8" cy="8" r="6"/><circle class="sn-fg" cx="8" cy="8" r="6"/></svg></span>
-              <button class="sn-cm-send" aria-label="发送" data-tip="发送" data-kbd="⌘↵"><span class="sn-swap"><span class="sn-a" data-i="arrow-up"></span><span class="sn-b"><span class="sn-stop"></span></span></span></button></div>
+              <button class="sn-cm-send" aria-label="发送" data-tip="发送" data-kbd="↵"><span class="sn-swap"><span class="sn-a" data-i="arrow-up"></span><span class="sn-b"><span class="sn-stop"></span></span></span></button></div>
           </div>
         </div>
       </div>

@@ -1077,6 +1077,14 @@ export default function Storyboard() {
 | `meta` | `boolean \| { time?: boolean; duration?: boolean; latency?: boolean; tps?: boolean }` | true | 否 | AI 回复底栏元信息开关：控制时间戳、首字/总耗时与生成速率（tok/s）展示。 | createXxx 选项：`meta`；React：`meta`；Preact：`meta`；Vue：`meta` |
 | `actions` | `"hover" \| "latest" \| "always" \| false \| "none"` | "hover" | 否 | 消息操作栏显隐策略：默认仅鼠标移入对应消息内容区域时平滑显现；支持 latest（最新一条常显）、always（全部常显）或 false / none（隐藏）。 | createXxx 选项：`actions`；React：`actions`；Preact：`actions`；Vue：`actions` |
 | `caret` | `"dot" \| "bar" \| false` | "dot" | 否 | 流式输出末尾跟随光标样式：柔和呼吸圆点、竖线光标或关闭。 | createXxx 选项：`caret`；React：`caret`；Preact：`caret`；Vue：`caret` |
+| `traceMode` | `"visible" \| "active" \| "collapsed" \| "expanded" \| "hidden"` | "visible" | 否 | 模型思考与工具调用展示模式：visible（工具可见）、active（仅展示当前执行单行，完成后自动收起）、collapsed（思考与工具全收起为紧凑活动流）、expanded（默认展开代码/Diff 高亮详情）、hidden（仅正文）。 | createXxx 选项：`traceMode`；React：`traceMode`；Preact：`traceMode`；Vue：`traceMode（模板里写 trace-mode）` |
+| `toolStyle` | `"timeline" \| "card" \| "minimal"` | "timeline" | 否 | 工具调用外观风格：timeline（紧凑活动时间流）、card（精致卡片）、minimal（极简细导引线）；均支持 JSON / Diff / Shell / 代码语法高亮与 --sn-tool-* 变量定制。 | createXxx 选项：`toolStyle`；React：`toolStyle`；Preact：`toolStyle`；Vue：`toolStyle（模板里写 tool-style）` |
+| `renderTool` | `ChatToolRenderer` | — | 否 | 自定义单个工具调用渲染器，接收 (tool, ctx)（ctx 提供 esc / icon / highlight / codeBox / formatJSON），返回 DOM 节点、HTML 字符串或 { header, body, className }。 | createXxx 选项：`renderTool`；React：`renderTool`；Preact：`renderTool`；Vue：`renderTool（模板里写 render-tool）` |
+| `historyMode` | `"auto" \| "top" \| "demand"` | "auto" | 否 | 超长对话（10,000+ 条）历史加载模式：auto（无缝自动预加载，视口不跳）、top（置顶加载，到顶轻推或点击加载）、demand（按需分块加载，含进度与批量拉取）。 | createXxx 选项：`historyMode`；React：`historyMode`；Preact：`historyMode`；Vue：`historyMode（模板里写 history-mode）` |
+| `density` | `"comfortable" \| "compact"` | "comfortable" | 否 | 对话排版密度：comfortable（舒适阅读）或 compact（紧凑高密度，适合万条长历史与工具密集会话）。 | createXxx 选项：`density`；React：`density`；Preact：`density`；Vue：`density` |
+| `userMarkdown` | `boolean` | true | 否 | 用户输入包含 Markdown 时是否渲染安全富文本与代码高亮（默认开启，可关闭；复制与编辑回溯始终保留原始 Markdown 源码）。 | createXxx 选项：`userMarkdown`；React：`userMarkdown`；Preact：`userMarkdown`；Vue：`userMarkdown（模板里写 user-markdown）` |
+| `markdown` | `boolean` | true | 否 | AI 回复正文是否渲染安全 Markdown 与语法高亮代码块（默认开启）。 | createXxx 选项：`markdown`；React：`markdown`；Preact：`markdown`；Vue：`markdown` |
+| `submitKey` | `"enter" \| "mod-enter"` | "enter" | 否 | 输入框发送快捷键：enter（默认：Enter 直接发送、Shift+Enter 换行，自动防护中文输入法合成态）或 mod-enter（⌘/Ctrl+Enter 发送、Enter 换行）。 | createXxx 选项：`submitKey`；React：`submitKey`；Preact：`submitKey`；Vue：`submitKey（模板里写 submit-key）` |
 | `composerBlur` | `"none" \| "sm" \| "md" \| "lg" \| number \| false` | "md" | 否 | 底部输入框背景高斯模糊级别（受安全限度约束，底色不透明度强制 ≥78%/76%，绝不允许透明；数字自动钳制在 0–28px）。 | createXxx 选项：`composerBlur`；React：`composerBlur`；Preact：`composerBlur`；Vue：`composerBlur（模板里写 composer-blur）` |
 | `composerResizable` | `boolean` | true | 否 | 是否开启底部输入框顶部微把手拖拽调高（带安全最大高度上限，双击微把手恢复自动高度）。 | createXxx 选项：`composerResizable`；React：`composerResizable`；Preact：`composerResizable`；Vue：`composerResizable（模板里写 composer-resizable）` |
 | `composerHeight` | `number` | 自动 | 否 | 手动指定底部输入框文本区高度（px），自动钳制在单行至容器 46% 的安全区间内。 | createXxx 选项：`composerHeight`；React：`composerHeight`；Preact：`composerHeight`；Vue：`composerHeight（模板里写 composer-height）` |
@@ -1108,8 +1116,17 @@ export default function Storyboard() {
 | `sendText` | `sendText(text: string, o?: { fail?: boolean }): unknown` | 发一条（不走 respond）。注意："发送中 → 已送达"现在是库里定时器做的，没有接真实发送结果；fail: true 显示发送失败、点感叹号重发。 |
 | `scrollToOldest` | `scrollToOldest(): void` | 平滑滚到最早一条。 |
 | `scrollToId` | `scrollToId(id: string \| number): void` | 平滑滚动定位到指定消息 ID。 |
+| `loadOlder` | `loadOlder(batches?: number): Promise<number>` | 主动按需加载更早的历史消息（支持指定批次数），插入后自动补偿滚动位置确保视口不跳。 |
+| `getStats` | `getStats(): ChatStats` | 获取已载入消息条数、总条数、是否还有更早记录以及当前虚拟列表真实 DOM 节点数。 |
 | `setRail` | `setRail(side: "left" \| "right" \| "off" \| false): void` | 运行时动态切换侧边定位刻度轨的位置或隐藏。 |
 | `setActions` | `setActions(mode: "hover" \| "latest" \| "always" \| false \| "none"): void` | 运行时动态切换消息操作栏显隐策略。 |
+| `setTraceMode` | `setTraceMode(mode: "visible" \| "active" \| "collapsed" \| "expanded" \| "hidden"): void` | 运行时动态切换模型思考与工具调用展示模式（工具可见 / 仅当前执行 / 全收起活动流 / 展开详情 / 仅正文）。 |
+| `setToolStyle` | `setToolStyle(style: "timeline" \| "card" \| "minimal"): void` | 运行时动态切换工具调用外观风格（时间流 / 卡片 / 极简导引线）。 |
+| `setRenderTool` | `setRenderTool(fn?: ChatToolRenderer \| null): void` | 运行时动态替换或重置自定义工具调用渲染器。 |
+| `setHistoryMode` | `setHistoryMode(mode: "auto" \| "top" \| "demand"): void` | 运行时动态切换历史加载模式（无缝加载 / 置顶加载 / 按需加载）。 |
+| `setDensity` | `setDensity(density: "comfortable" \| "compact"): void` | 运行时动态切换排版密度（舒适 / 紧凑）。 |
+| `setUserMarkdown` | `setUserMarkdown(enabled: boolean): void` | 运行时动态开关用户输入内容的 Markdown 渲染。 |
+| `setSubmitKey` | `setSubmitKey(mode: "enter" \| "mod-enter"): void` | 运行时动态切换回车提交模式（Enter 直接发送 / ⌘↵ 发送）。 |
 | `setComposerBlur` | `setComposerBlur(level: "none" \| "sm" \| "md" \| "lg" \| number \| false): void` | 运行时调整输入框高斯模糊级别（受不透明度安全下限约束，不允许透明）。 |
 | `setComposerHeight` | `setComposerHeight(height: number \| "auto" \| null): void` | 运行时设置输入框高度（px）或传 "auto" 恢复随内容自动伸缩。 |
 | `fill` | `fill(text: string): void` | 把一段字填进底部输入框（字淡入、拿到焦点、光标在最后），不发。新对话的建议点了就是这样。 |
@@ -1123,21 +1140,26 @@ export default function Storyboard() {
 |---|---|---|
 | `--sn-raised`（全局令牌） | 对话框底色 | 白（深色主题 #1c1c1e） |
 | `--sn-r-xl`（全局令牌） | 对话框圆角 | 16px |
+| `--sn-tool-bg / --sn-tool-border / --sn-tool-r` | 工具调用卡片底色 / 边框 / 圆角 | 主题自适应 / 10px |
+| `--sn-tool-code-bg / --sn-tool-code-max` | 工具代码与 Diff 高亮块底色 / 最大高度 | 主题自适应 / 220px |
+| `--sn-trace-max` | 全收起活动流面板内部最大滚动高度 | 280px |
+| `--sn-t-kw / --sn-t-str / --sn-t-num / --sn-t-fn / --sn-t-prop` | 工具代码/JSON/Shell 语法高亮色板 | 亮/暗双主题语义色 |
 
 | 类名 / 属性 | 作用 |
 |---|---|
 | `.sn-chat / .sn-chat-hd / .sn-chat-body / .sn-chat-foot` | 对话框 / 顶栏 / 消息区 / 底部输入框 |
-| `.sn-msg.sn-me / .sn-msg.sn-ai` | 自己发的（靠右浅灰气泡）/ 对方、AI（靠左直接是正文） |
+| `.sn-msg.sn-me / .sn-msg.sn-ai` | 自己发的（靠右浅灰气泡，支持安全 Markdown）/ 对方、AI（靠左直接是正文） |
+| `.sn-trace / .sn-tool / .sn-tcode` | 过程汇总活动流（含专注单行）/ 工具调用条目 / 语法高亮代码与 Diff 块 |
 
 ## 导出的类型
 
-`ChatOptions`、`ChatProps`、`ChatHistory`、`ChatItem`、`ChatApi`、`ChatEmpty`、`ComposerAttachment`、`ComposerParts`、`ComposerPartEvents`、`ComposerContextItem`、`ComposerOption`、`ComposerMode`、`ComposerTone`
+`ChatOptions`、`ChatProps`、`ChatHistory`、`ChatItem`、`ChatToolItem`、`ChatToolBlock`、`ChatToolRenderContext`、`ChatToolRenderer`、`ChatStats`、`ChatApi`、`ChatEmpty`、`ComposerAttachment`、`ComposerParts`、`ComposerPartEvents`、`ComposerContextItem`、`ComposerOption`、`ComposerMode`、`ComposerTone`
 
 ## 键盘
 
 | 按键 | 什么时候 | 做什么 |
 |---|---|---|
-| ⌘ / Ctrl + 回车 |  | 发送；生成中点"停止"。 |
+| Enter / Shift + Enter |  | 默认 Enter 直接发送（自动防护中文输入法选字），Shift + Enter 换行；可经 submitKey 切换为 ⌘/Ctrl + Enter 发送。 |
 | Enter / 空格（图片、视频气泡上） |  | 点开看图。 |
 
 ## 无障碍

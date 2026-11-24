@@ -163,7 +163,7 @@ addEventListener("storage", (e) => {
   pref = e.newValue || "auto"; themeSeg?.go(Math.max(0, ["auto", "light", "dark"].indexOf(pref)), false, true); applyTheme(!EMBED);
 });
 { const s = $('[data-seg="iconsize"]'); if (s) initSeg(s, (v) => paintIcons(Number(v))); }
-for (const s of $$(".doc-main .sn-seg[data-seg]")) if (!["theme", "iconsize", "toastpos", "safade", "navfx", "nfstyle", "sabar", "saover", "ctxbound", "ctxsize", "spdensity", "lomode", "gmode", "cgmode", "gsb", "cgsb", "glines", "cglines", "tlines", "mdcode", "mdimg", "mdtable", "mdview", "lmnav", "lmdelay", "charea", "ch3d", "ldsize", "ldspeed", "ldtone", "chatrail", "chatblur"].includes(s.dataset.seg)) initSeg(s);
+for (const s of $$(".doc-main .sn-seg[data-seg]")) if (!["theme", "iconsize", "toastpos", "safade", "navfx", "nfstyle", "sabar", "saover", "ctxbound", "ctxsize", "spdensity", "lomode", "gmode", "cgmode", "gsb", "cgsb", "glines", "cglines", "tlines", "mdcode", "mdimg", "mdtable", "mdview", "lmnav", "lmdelay", "charea", "ch3d", "ldsize", "ldspeed", "ldtone", "chattrace", "chattool", "chathist", "chatmd", "chatdensity", "chatrail", "chatblur"].includes(s.dataset.seg)) initSeg(s);
 $("#reduce")?.addEventListener("change", (e) => root.classList.toggle("sn-reduce-motion", e.target.checked));
 // 动效曲线：点一下，圆点按这条曲线走到另一头；再点回来
 for (const c of $$(".curve")) c.addEventListener("click", () => {

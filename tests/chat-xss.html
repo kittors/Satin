@@ -19,6 +19,7 @@
   const history = { initial: () => [
     { kind: "day", text: P },
     { kind: "msg", me: false, text: P },
+    { kind: "msg", me: true, type: "text", text: `**${P}** \`${P}\` [x](javascript:window.__pwned=1)\n\`\`\`js\n${P}\n\`\`\`` },
     { kind: "msg", me: true, type: "image", g: P, cap: P },
     { kind: "msg", me: false, type: "video", g: P, dur: P, cap: P },
     { kind: "msg", me: true, type: "audio", dur: P, name: P },
@@ -26,6 +27,7 @@
   ] };
   async function* respond(_q, ctx) {
     yield { think: P };
+    yield { tool: { id: "x", name: P, label: P, path: P, command: P, diff: `+${P}\n-${P}`, code: P, args: { k: P }, output: P, result: { v: P }, badge: P, status: "done", open: true } };
     yield { step: { t: P, s: P, n: P } };
     yield P;
     yield { card: [P, P, P, P] };

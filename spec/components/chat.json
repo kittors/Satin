@@ -113,7 +113,7 @@
   "demos": [
     {
       "caption": "",
-      "html": "<div class=\"sn-chat\" id=\"chatBox\">\n  <div class=\"sn-chat-hd\"><div class=\"sn-tx\"><b>分镜助手</b><span class=\"sn-sub\"><span data-chat-status></span></span></div></div>\n  <div class=\"sn-chat-body\"><div class=\"sn-chat-vp\" id=\"chatVp\"><div class=\"sn-chat-canvas\"><div class=\"sn-chat-ph sn-top\"></div><div class=\"sn-chat-ph sn-bot\"></div></div></div><button class=\"sn-chat-jump\" data-chat-jump aria-label=\"跳到最新\"><span data-i=\"arrow-down\"></span><span class=\"sn-badge\" hidden>0</span></button></div>\n  <div class=\"sn-chat-foot\">\n    <div class=\"sn-box-in sn-composer\" data-composer data-external data-max=\"500\" data-max-lines=\"5\">\n      <div class=\"sn-cm-files\"></div>\n      <textarea rows=\"1\" placeholder=\"和分镜助手一起改这一集\"></textarea>\n      <div class=\"sn-cm-bar\"><div class=\"sn-select sn-inline-menu sn-up\"><button class=\"sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add\" data-menubtn data-cm-attach data-tip=\"添加图片、视频、音频或文档\" aria-label=\"添加附件\" data-i=\"plus\"></button><div class=\"sn-menu\" role=\"menu\" style=\"min-width:208px\"><div class=\"sn-item\" data-add=\"img\" data-i=\"image:before\">图片<span class=\"sn-key\">JPG · PNG</span></div><div class=\"sn-item\" data-add=\"vid\" data-i=\"film:before\">视频<span class=\"sn-key\">MP4 · MOV</span></div><div class=\"sn-item\" data-add=\"aud\" data-i=\"audio-lines:before\">音频<span class=\"sn-key\">MP3 · WAV</span></div><div class=\"sn-item\" data-add=\"doc\" data-i=\"file-text:before\">文档<span class=\"sn-key\">PDF · DOCX</span></div><div class=\"sn-sep\"></div><div class=\"sn-item\" data-add=\"fail\" data-i=\"refresh-cw:before\">演示：上传失败</div><div class=\"sn-item\" data-add=\"big\" data-i=\"circle-alert:before\">演示：文件太大</div></div></div><button class=\"sn-btn sn-ghost sn-sm sn-cm-chip\" data-cm-style>风格：电影感</button><span class=\"sn-grow\"></span>\n        <button class=\"sn-btn sn-ghost sn-sm sn-cm-model\" data-cm-model data-tip=\"换模型\" data-i=\"chevron-down:after\">分镜模型 · 精细</button><span class=\"sn-ta-count\"><svg class=\"sn-uring\" viewBox=\"0 0 16 16\"><circle class=\"sn-bg\" cx=\"8\" cy=\"8\" r=\"6\" /><circle class=\"sn-fg\" cx=\"8\" cy=\"8\" r=\"6\" /></svg></span>\n        <button class=\"sn-cm-send\" aria-label=\"发送\" data-tip=\"发送\" data-kbd=\"⌘↵\"><span class=\"sn-swap\"><span class=\"sn-a\" data-i=\"arrow-up\"></span><span class=\"sn-b\"><span class=\"sn-stop\"></span></span></span></button></div>\n    </div>\n  </div>\n</div>"
+      "html": "<div class=\"sn-chat\" id=\"chatBox\">\n  <div class=\"sn-chat-hd\"><div class=\"sn-tx\"><b>分镜助手</b><span class=\"sn-sub\"><span data-chat-status></span></span></div></div>\n  <div class=\"sn-chat-body\"><div class=\"sn-chat-vp\" id=\"chatVp\"><div class=\"sn-chat-canvas\"><div class=\"sn-chat-ph sn-top\"></div><div class=\"sn-chat-ph sn-bot\"></div></div></div><button class=\"sn-chat-jump\" data-chat-jump aria-label=\"跳到最新\"><span data-i=\"arrow-down\"></span><span class=\"sn-badge\" hidden>0</span></button></div>\n  <div class=\"sn-chat-foot\">\n    <div class=\"sn-box-in sn-composer\" data-composer data-external data-max=\"500\" data-max-lines=\"5\">\n      <div class=\"sn-cm-files\"></div>\n      <textarea rows=\"1\" placeholder=\"和分镜助手一起改这一集（Enter 发送，Shift+Enter 换行，支持 Markdown）\"></textarea>\n      <div class=\"sn-cm-bar\"><div class=\"sn-select sn-inline-menu sn-up\"><button class=\"sn-btn sn-ghost sn-sm sn-ibtn sn-cm-add\" data-menubtn data-cm-attach data-tip=\"添加图片、视频、音频或文档\" aria-label=\"添加附件\" data-i=\"plus\"></button><div class=\"sn-menu\" role=\"menu\" style=\"min-width:208px\"><div class=\"sn-item\" data-add=\"img\" data-i=\"image:before\">图片<span class=\"sn-key\">JPG · PNG</span></div><div class=\"sn-item\" data-add=\"vid\" data-i=\"film:before\">视频<span class=\"sn-key\">MP4 · MOV</span></div><div class=\"sn-item\" data-add=\"aud\" data-i=\"audio-lines:before\">音频<span class=\"sn-key\">MP3 · WAV</span></div><div class=\"sn-item\" data-add=\"doc\" data-i=\"file-text:before\">文档<span class=\"sn-key\">PDF · DOCX</span></div><div class=\"sn-sep\"></div><div class=\"sn-item\" data-add=\"fail\" data-i=\"refresh-cw:before\">演示：上传失败</div><div class=\"sn-item\" data-add=\"big\" data-i=\"circle-alert:before\">演示：文件太大</div></div></div><button class=\"sn-btn sn-ghost sn-sm sn-cm-chip\" data-cm-style>风格：电影感</button><span class=\"sn-grow\"></span>\n        <button class=\"sn-btn sn-ghost sn-sm sn-cm-model\" data-cm-model data-tip=\"换模型\" data-i=\"chevron-down:after\">分镜模型 · 精细</button><span class=\"sn-ta-count\"><svg class=\"sn-uring\" viewBox=\"0 0 16 16\"><circle class=\"sn-bg\" cx=\"8\" cy=\"8\" r=\"6\" /><circle class=\"sn-fg\" cx=\"8\" cy=\"8\" r=\"6\" /></svg></span>\n        <button class=\"sn-cm-send\" aria-label=\"发送\" data-tip=\"发送\" data-kbd=\"↵\"><span class=\"sn-swap\"><span class=\"sn-a\" data-i=\"arrow-up\"></span><span class=\"sn-b\"><span class=\"sn-stop\"></span></span></span></button></div>\n    </div>\n  </div>\n</div>"
     },
     {
       "caption": "新对话",
@@ -485,6 +485,110 @@
       }
     },
     {
+      "name": "traceMode",
+      "type": "\"visible\" | \"active\" | \"collapsed\" | \"expanded\" | \"hidden\"",
+      "default": "\"visible\"",
+      "required": false,
+      "desc": "模型思考与工具调用展示模式：visible（工具可见）、active（仅展示当前执行单行，完成后自动收起）、collapsed（思考与工具全收起为紧凑活动流）、expanded（默认展开代码/Diff 高亮详情）、hidden（仅正文）。",
+      "names": {
+        "js": "traceMode",
+        "react": "traceMode",
+        "preact": "traceMode",
+        "vue": "traceMode（模板里写 trace-mode）"
+      }
+    },
+    {
+      "name": "toolStyle",
+      "type": "\"timeline\" | \"card\" | \"minimal\"",
+      "default": "\"timeline\"",
+      "required": false,
+      "desc": "工具调用外观风格：timeline（紧凑活动时间流）、card（精致卡片）、minimal（极简细导引线）；均支持 JSON / Diff / Shell / 代码语法高亮与 --sn-tool-* 变量定制。",
+      "names": {
+        "js": "toolStyle",
+        "react": "toolStyle",
+        "preact": "toolStyle",
+        "vue": "toolStyle（模板里写 tool-style）"
+      }
+    },
+    {
+      "name": "renderTool",
+      "type": "ChatToolRenderer",
+      "default": "—",
+      "required": false,
+      "desc": "自定义单个工具调用渲染器，接收 (tool, ctx)（ctx 提供 esc / icon / highlight / codeBox / formatJSON），返回 DOM 节点、HTML 字符串或 { header, body, className }。",
+      "names": {
+        "js": "renderTool",
+        "react": "renderTool",
+        "preact": "renderTool",
+        "vue": "renderTool（模板里写 render-tool）"
+      }
+    },
+    {
+      "name": "historyMode",
+      "type": "\"auto\" | \"top\" | \"demand\"",
+      "default": "\"auto\"",
+      "required": false,
+      "desc": "超长对话（10,000+ 条）历史加载模式：auto（无缝自动预加载，视口不跳）、top（置顶加载，到顶轻推或点击加载）、demand（按需分块加载，含进度与批量拉取）。",
+      "names": {
+        "js": "historyMode",
+        "react": "historyMode",
+        "preact": "historyMode",
+        "vue": "historyMode（模板里写 history-mode）"
+      }
+    },
+    {
+      "name": "density",
+      "type": "\"comfortable\" | \"compact\"",
+      "default": "\"comfortable\"",
+      "required": false,
+      "desc": "对话排版密度：comfortable（舒适阅读）或 compact（紧凑高密度，适合万条长历史与工具密集会话）。",
+      "names": {
+        "js": "density",
+        "react": "density",
+        "preact": "density",
+        "vue": "density"
+      }
+    },
+    {
+      "name": "userMarkdown",
+      "type": "boolean",
+      "default": "true",
+      "required": false,
+      "desc": "用户输入包含 Markdown 时是否渲染安全富文本与代码高亮（默认开启，可关闭；复制与编辑回溯始终保留原始 Markdown 源码）。",
+      "names": {
+        "js": "userMarkdown",
+        "react": "userMarkdown",
+        "preact": "userMarkdown",
+        "vue": "userMarkdown（模板里写 user-markdown）"
+      }
+    },
+    {
+      "name": "markdown",
+      "type": "boolean",
+      "default": "true",
+      "required": false,
+      "desc": "AI 回复正文是否渲染安全 Markdown 与语法高亮代码块（默认开启）。",
+      "names": {
+        "js": "markdown",
+        "react": "markdown",
+        "preact": "markdown",
+        "vue": "markdown"
+      }
+    },
+    {
+      "name": "submitKey",
+      "type": "\"enter\" | \"mod-enter\"",
+      "default": "\"enter\"",
+      "required": false,
+      "desc": "输入框发送快捷键：enter（默认：Enter 直接发送、Shift+Enter 换行，自动防护中文输入法合成态）或 mod-enter（⌘/Ctrl+Enter 发送、Enter 换行）。",
+      "names": {
+        "js": "submitKey",
+        "react": "submitKey",
+        "preact": "submitKey",
+        "vue": "submitKey（模板里写 submit-key）"
+      }
+    },
+    {
       "name": "composerBlur",
       "type": "\"none\" | \"sm\" | \"md\" | \"lg\" | number | false",
       "default": "\"md\"",
@@ -675,6 +779,20 @@
       "desc": "平滑滚动定位到指定消息 ID。"
     },
     {
+      "name": "loadOlder",
+      "kind": "method",
+      "signature": "loadOlder(batches?: number): Promise<number>",
+      "returns": "Promise<number>",
+      "desc": "主动按需加载更早的历史消息（支持指定批次数），插入后自动补偿滚动位置确保视口不跳。"
+    },
+    {
+      "name": "getStats",
+      "kind": "method",
+      "signature": "getStats(): ChatStats",
+      "returns": "ChatStats",
+      "desc": "获取已载入消息条数、总条数、是否还有更早记录以及当前虚拟列表真实 DOM 节点数。"
+    },
+    {
       "name": "setRail",
       "kind": "method",
       "signature": "setRail(side: \"left\" | \"right\" | \"off\" | false): void",
@@ -687,6 +805,55 @@
       "signature": "setActions(mode: \"hover\" | \"latest\" | \"always\" | false | \"none\"): void",
       "returns": "void",
       "desc": "运行时动态切换消息操作栏显隐策略。"
+    },
+    {
+      "name": "setTraceMode",
+      "kind": "method",
+      "signature": "setTraceMode(mode: \"visible\" | \"active\" | \"collapsed\" | \"expanded\" | \"hidden\"): void",
+      "returns": "void",
+      "desc": "运行时动态切换模型思考与工具调用展示模式（工具可见 / 仅当前执行 / 全收起活动流 / 展开详情 / 仅正文）。"
+    },
+    {
+      "name": "setToolStyle",
+      "kind": "method",
+      "signature": "setToolStyle(style: \"timeline\" | \"card\" | \"minimal\"): void",
+      "returns": "void",
+      "desc": "运行时动态切换工具调用外观风格（时间流 / 卡片 / 极简导引线）。"
+    },
+    {
+      "name": "setRenderTool",
+      "kind": "method",
+      "signature": "setRenderTool(fn?: ChatToolRenderer | null): void",
+      "returns": "void",
+      "desc": "运行时动态替换或重置自定义工具调用渲染器。"
+    },
+    {
+      "name": "setHistoryMode",
+      "kind": "method",
+      "signature": "setHistoryMode(mode: \"auto\" | \"top\" | \"demand\"): void",
+      "returns": "void",
+      "desc": "运行时动态切换历史加载模式（无缝加载 / 置顶加载 / 按需加载）。"
+    },
+    {
+      "name": "setDensity",
+      "kind": "method",
+      "signature": "setDensity(density: \"comfortable\" | \"compact\"): void",
+      "returns": "void",
+      "desc": "运行时动态切换排版密度（舒适 / 紧凑）。"
+    },
+    {
+      "name": "setUserMarkdown",
+      "kind": "method",
+      "signature": "setUserMarkdown(enabled: boolean): void",
+      "returns": "void",
+      "desc": "运行时动态开关用户输入内容的 Markdown 渲染。"
+    },
+    {
+      "name": "setSubmitKey",
+      "kind": "method",
+      "signature": "setSubmitKey(mode: \"enter\" | \"mod-enter\"): void",
+      "returns": "void",
+      "desc": "运行时动态切换回车提交模式（Enter 直接发送 / ⌘↵ 发送）。"
     },
     {
       "name": "setComposerBlur",
@@ -730,6 +897,30 @@
       "desc": "对话框圆角",
       "default": "16px",
       "token": true
+    },
+    {
+      "name": "--sn-tool-bg / --sn-tool-border / --sn-tool-r",
+      "desc": "工具调用卡片底色 / 边框 / 圆角",
+      "default": "主题自适应 / 10px",
+      "token": false
+    },
+    {
+      "name": "--sn-tool-code-bg / --sn-tool-code-max",
+      "desc": "工具代码与 Diff 高亮块底色 / 最大高度",
+      "default": "主题自适应 / 220px",
+      "token": false
+    },
+    {
+      "name": "--sn-trace-max",
+      "desc": "全收起活动流面板内部最大滚动高度",
+      "default": "280px",
+      "token": false
+    },
+    {
+      "name": "--sn-t-kw / --sn-t-str / --sn-t-num / --sn-t-fn / --sn-t-prop",
+      "desc": "工具代码/JSON/Shell 语法高亮色板",
+      "default": "亮/暗双主题语义色",
+      "token": false
     }
   ],
   "classes": [
@@ -739,7 +930,11 @@
     },
     {
       "name": ".sn-msg.sn-me / .sn-msg.sn-ai",
-      "desc": "自己发的（靠右浅灰气泡）/ 对方、AI（靠左直接是正文）"
+      "desc": "自己发的（靠右浅灰气泡，支持安全 Markdown）/ 对方、AI（靠左直接是正文）"
+    },
+    {
+      "name": ".sn-trace / .sn-tool / .sn-tcode",
+      "desc": "过程汇总活动流（含专注单行）/ 工具调用条目 / 语法高亮代码与 Diff 块"
     }
   ],
   "types": [
@@ -747,6 +942,11 @@
     "ChatProps",
     "ChatHistory",
     "ChatItem",
+    "ChatToolItem",
+    "ChatToolBlock",
+    "ChatToolRenderContext",
+    "ChatToolRenderer",
+    "ChatStats",
     "ChatApi",
     "ChatEmpty",
     "ComposerAttachment",
@@ -759,8 +959,8 @@
   ],
   "keyboard": [
     {
-      "keys": "⌘ / Ctrl + 回车",
-      "does": "发送；生成中点\"停止\"。"
+      "keys": "Enter / Shift + Enter",
+      "does": "默认 Enter 直接发送（自动防护中文输入法选字），Shift + Enter 换行；可经 submitKey 切换为 ⌘/Ctrl + Enter 发送。"
     },
     {
       "keys": "Enter / 空格（图片、视频气泡上）",

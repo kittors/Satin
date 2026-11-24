@@ -8,13 +8,19 @@ export function renderMarkdown(el: HTMLElement, md: string, opt?: Omit<MarkdownO
 export const createMarkdown: SatinFactory<MarkdownOptions, { readonly source: string }>;
 export function highlightLines(code: string, lang: string): string[];
 /** 对话：box 是空容器时按 title / status / placeholder / max 自己填好标记（或用 chatHTML 先填）；respond 返回流式的文字（异步迭代）或一整段 */
-/** 一条：kind "day" 日期分隔（text 是日期）；"msg" 消息——me 是不是自己发的，type 决定画成什么：文字 text；图片、视频 g（CSS 背景，比如 "url(…) center / cover"）、cap 说明、dur 时长文字，视频再给 src、poster 才能点开播放；音频 dur；文件 name、ext、size（字节）。status 是自己发的消息的状态 */
-export interface ChatItem { kind: "day" | "msg"; text?: string; me?: boolean; type?: "text" | "image" | "video" | "audio" | "file"; g?: string; cap?: string; dur?: string; src?: string; poster?: string; name?: string; ext?: string; size?: number; status?: "sending" | "sent" | "fail"; [k: string]: unknown }
-/** 历史消息：initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有更早的 */
-export interface ChatHistory { initial(): ChatItem[]; older?(): ChatItem[] | Promise<ChatItem[]>; hasMore?(): boolean }
+/** 工具调用条目：支持 JSON 参数/结果、Shell 命令、Unified Diff、代码片段与多区块语法高亮 */
+export interface ChatToolBlock { label?: string; path?: string; content: string | Record<string, unknown>; lang?: string; lines?: boolean; badge?: string }
+export interface ChatToolItem { id?: string | number; name?: string; kind?: "read" | "edit" | "bash" | "search" | "code" | "think" | "tool" | string; icon?: string; label?: string; path?: string; command?: string; code?: string; diff?: string; lang?: string; args?: unknown; argsLang?: string; output?: unknown; outputLang?: string; result?: unknown; resultLang?: string; badge?: string; exitCode?: number; status?: "run" | "done" | "error" | "fail" | "stop"; ms?: number; open?: boolean; blocks?: ChatToolBlock[]; [k: string]: unknown }
+export interface ChatToolRenderContext { esc(s: unknown): string; icon(name: string, size?: number): string; highlight(code: string, lang?: string): string; codeBox(o: { label?: string; content?: string; lang?: string; showLines?: boolean; badge?: string }): string; formatJSON(v: unknown): string; index: number; style: "timeline" | "card" | "minimal"; traceMode: "visible" | "active" | "collapsed" | "expanded" | "hidden"; expanded: boolean }
+export type ChatToolRenderer = (tool: ChatToolItem, ctx: ChatToolRenderContext) => Node | string | { header?: Node | string; body?: Node | string; className?: string } | void | null;
+export interface ChatStats { loaded: number; total: number; hasMore: boolean; liveNodes: number }
+/** 一条：kind "day" 日期分隔（text 是日期）；"msg" 消息；"ai" 富 AI 回复 */
+export interface ChatItem { kind: "day" | "msg" | "ai"; text?: string; me?: boolean; type?: "text" | "image" | "video" | "audio" | "file"; g?: string; cap?: string; dur?: string; src?: string; poster?: string; name?: string; ext?: string; size?: number; status?: "sending" | "sent" | "fail"; think?: string | null; tools?: ChatToolItem[]; [k: string]: unknown }
+/** 历史消息：initial() 一开始的条目（从旧到新）；往上翻或按需加载时 older(step?) 要更早的一页（可以是 Promise），hasMore() 说还有没有更早的，total 可选总条数（如 12000） */
+export interface ChatHistory { initial(): ChatItem[]; older?(step?: number): ChatItem[] | Promise<ChatItem[]>; hasMore?(): boolean; total?: number | (() => number) }
 /** 对话的选项（不含事件回调；Vue 组件的属性就是这些） */
 export interface ChatProps extends ComposerParts {
-  /** 接模型的口子：异步生成器一段段 yield 字符串（或 { text } / { think } / { step } …），或直接返回一整段 */
+  /** 接模型的口子：异步生成器一段段 yield 字符串（或 { text } / { think } / { tool } / { toolUpdate } / { step } …），或直接返回一整段 */
   respond?(text: string, ctx: { /** 用户点了"停止"以后变成 true（每次读都是现在的值） */ readonly stopped: boolean }): AsyncIterable<unknown> | Promise<string> | string;
   history?: ChatHistory; title?: string; status?: string; placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean;
   /** 新对话：还没有消息时消息区正中的样子。不写有一个默认的（对话图标 + "有什么可以帮你？"）；true 只留空容器（自己画进 emptyEl）；false 不要 */
@@ -34,6 +40,22 @@ export interface ChatProps extends ComposerParts {
   actions?: "hover" | "latest" | "always" | false | "none";
   /** 流式输出光标样式："dot" | "bar" | false */
   caret?: "dot" | "bar" | false;
+  /** 模型思考与工具过程展示模式："visible" 工具可见 | "active" 仅显示当前执行单行 | "collapsed" 思考与工具全收起活动流 | "expanded" 默认展开高亮详情 | "hidden" 仅正文 */
+  traceMode?: "visible" | "active" | "collapsed" | "expanded" | "hidden";
+  /** 工具调用外观风格："timeline" 紧凑活动时间流（默认）| "card" 精致卡片 | "minimal" 极简细导引线 */
+  toolStyle?: "timeline" | "card" | "minimal";
+  /** 自定义单个工具调用渲染器（可自定义外框、代码/Diff 高亮与交互结构） */
+  renderTool?: ChatToolRenderer;
+  /** 历史消息加载模式："auto" 无缝自动预加载（默认）| "top" 置顶加载 | "demand" 按需加载（适配 10,000+ 条超长会话） */
+  historyMode?: "auto" | "top" | "demand";
+  /** 排版密度："comfortable" 舒适（默认）| "compact" 紧凑高密度 */
+  density?: "comfortable" | "compact";
+  /** 用户输入包含 Markdown 时是否渲染（默认 true，可关闭为纯文本；复制与编辑回溯始终保留原始 Markdown） */
+  userMarkdown?: boolean;
+  /** AI 回复正文是否渲染安全 Markdown 与代码高亮（默认 true） */
+  markdown?: boolean;
+  /** 输入框发送快捷键："enter"（默认：Enter 直接发送、Shift+Enter 换行）| "mod-enter"（⌘/Ctrl+Enter 发送、Enter 换行） */
+  submitKey?: "enter" | "mod-enter";
   /** 底部输入框高斯模糊级别（带不透明度安全下限 ≥78%/76%，绝不允许透明）："none" | "sm" | "md" | "lg" | 0–28px 数值 */
   composerBlur?: "none" | "sm" | "md" | "lg" | number | false;
   /** 是否启用输入框顶部微把手拖拽调高（默认 true，双击微把手恢复自动高度） */
@@ -53,10 +75,28 @@ export interface ChatEmpty { icon?: string; title?: string; subtitle?: string; s
 export interface ChatApi { send(text: string): void; receive(item: Partial<ChatItem>): unknown; sendText(text: string, o?: { fail?: boolean }): unknown; scrollToOldest(): void;
   /** 滚动定位到某条消息 */
   scrollToId(id: string | number): void;
+  /** 主动加载更早历史（默认 1 批，可传批次数快速按需拉取） */
+  loadOlder(batches?: number): Promise<number>;
+  /** 获取当前对话载入统计（已载条数、总条数、是否还有更早、当前虚拟列表 DOM 节点数） */
+  getStats(): ChatStats;
   /** 动态切换侧边刻度轨位置或隐藏 */
   setRail(side: "left" | "right" | "off" | false): void;
   /** 动态切换消息操作栏显隐策略 */
   setActions(mode: "hover" | "latest" | "always" | false | "none"): void;
+  /** 动态切换模型思考与工具调用展示模式 */
+  setTraceMode(mode: "visible" | "active" | "collapsed" | "expanded" | "hidden"): void;
+  /** 动态切换工具调用视觉样式 */
+  setToolStyle(style: "timeline" | "card" | "minimal"): void;
+  /** 动态设置或清除自定义工具渲染器 */
+  setRenderTool(fn?: ChatToolRenderer | null): void;
+  /** 动态切换历史加载模式（无缝加载 / 置顶加载 / 按需加载） */
+  setHistoryMode(mode: "auto" | "top" | "demand"): void;
+  /** 动态切换排版密度（舒适 / 紧凑） */
+  setDensity(density: "comfortable" | "compact"): void;
+  /** 动态开关用户消息 Markdown 渲染 */
+  setUserMarkdown(enabled: boolean): void;
+  /** 动态切换发送快捷键模式（Enter 直接发送 / ⌘↵ 发送） */
+  setSubmitKey(mode: "enter" | "mod-enter"): void;
   /** 动态调整输入框高斯模糊级别（受安全不透明度下限约束，不允许透明） */
   setComposerBlur(level: "none" | "sm" | "md" | "lg" | number | false): void;
   /** 动态设置输入框文本区高度（px）或传 "auto" 恢复自动伸缩 */

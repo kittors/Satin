@@ -9,7 +9,7 @@ import { defineComponent, h, ref, computed, shallowRef, onMounted, Teleport } fr
 import { createChat, createThreadRail } from "../src/chat.js";
 import { wrap } from "./wrap.js";
 
-const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "voice", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model", "menu", "newChat", "rail", "meta", "actions", "caret", "composerBlur", "composerResizable", "composerHeight"];
+const KEYS = ["title", "status", "placeholder", "max", "maxLines", "attach", "voice", "history", "composer", "respond", "hiRes", "empty", "context", "mode", "models", "model", "menu", "newChat", "rail", "meta", "actions", "caret", "traceMode", "toolStyle", "renderTool", "historyMode", "density", "userMarkdown", "markdown", "submitKey", "composerBlur", "composerResizable", "composerHeight"];
 const Base = /* @__PURE__ */ wrap(createChat, { name: "SnChatInstance", props: KEYS, events: ["modelChange", "modeChange", "contextChange", "contextClick", "menu", "newChat"], modelEvent: null });
 export const ThreadRail = /* @__PURE__ */ wrap(createThreadRail, { name: "SnThreadRail", props: ["side", "max"], events: ["select"], modelEvent: null });
 export const Chat = /* @__PURE__ */ defineComponent({

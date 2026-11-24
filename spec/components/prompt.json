@@ -246,6 +246,19 @@
       }
     },
     {
+      "name": "submitKey",
+      "type": "\"enter\" | \"mod-enter\"",
+      "default": "\"enter\"",
+      "required": false,
+      "desc": "回车提交模式：enter（默认：Enter 直接发送、Shift+Enter 换行，自动防护中文输入法合成态）或 mod-enter（⌘/Ctrl+Enter 发送、Enter 换行）。",
+      "names": {
+        "js": "submitKey",
+        "react": "submitKey",
+        "preact": "submitKey",
+        "vue": "submitKey（模板里写 submit-key）"
+      }
+    },
+    {
       "name": "upload",
       "type": "(file: File, progress: (p: number) => void) => Promise<unknown>",
       "default": "演示用的假进度",
@@ -443,6 +456,13 @@
       "desc": "把一段字填进输入框（字淡入、拿到焦点、光标在最后），不发。"
     },
     {
+      "name": "setSubmitKey",
+      "kind": "method",
+      "signature": "setSubmitKey(mode: \"enter\" | \"mod-enter\"): void",
+      "returns": "void",
+      "desc": "运行时动态切换回车提交模式（Enter 直接发送 / ⌘↵ 发送）。"
+    },
+    {
       "name": "startVoice",
       "kind": "method",
       "signature": "startVoice(): void",
@@ -460,7 +480,7 @@
   "functions": [
     {
       "name": "composerHTML",
-      "signature": "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string",
+      "signature": "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; submitKey?: \"enter\" | \"mod-enter\"; external?: boolean; fresh?: boolean } & ComposerParts): string",
       "returns": "string",
       "from": "satin-ui",
       "desc": "拼出提示词输入框的标记（服务端渲染、模板里用）。"
@@ -501,8 +521,8 @@
   ],
   "keyboard": [
     {
-      "keys": "⌘↵ / Ctrl+↵",
-      "does": "发送。"
+      "keys": "Enter",
+      "does": "默认直接发送（防护输入法选字）；submitKey 为 mod-enter 时为 ⌘↵ / Ctrl+↵ 发送。"
     },
     {
       "keys": "⇧↵",

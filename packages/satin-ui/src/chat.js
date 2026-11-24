@@ -36,20 +36,227 @@ const chatEmptyHTML = (e, hide) => {
     (o.suggestions?.length ? `<div class="sn-chat-sugs">${o.suggestions.map((t) => `<button type="button" class="sn-chat-sug">${esc(t)}</button>`).join("")}</div>` : "") +
     `</div>`;
 };
-export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true, voice = true, empty: em, history, context, mode, models, model, menu, newChat } = {}) => {
+export const chatHTML = ({ title = "", status, placeholder = "", max = 500, maxLines = 5, attach = true, voice = true, submitKey = "enter", empty: em, history, context, mode, models, model, menu, newChat } = {}) => {
   const empty = emptyOf(em);
   // 顶栏两侧（可选）：左边会话列表、右边新对话，像 ChatGPT / Codex 的手机端；单色细线图标，点了发 menu / newChat
   const hb = (on, k, ic, label) => (on ? `<button type="button" class="sn-btn sn-ghost sn-ibtn sn-chat-hb" data-chat-${k} data-tip="${esc(label)}" aria-label="${esc(label)}" data-i="${ic}"></button>` : "");
   return `<div class="sn-chat-hd${menu || newChat ? " sn-has-btns" : ""}">${hb(menu, "menu", "menu", tt("chat.menu"))}<div class="sn-tx"><b>${esc(title)}</b><span class="sn-sub"><span data-chat-status>${esc(status ?? "")}</span></span></div>${hb(newChat, "new", "square-pen", tt("chat.newChat"))}</div>` +
   `<div class="sn-chat-body"><div class="sn-chat-vp"><div class="sn-chat-canvas"><div class="sn-chat-ph sn-top"></div><div class="sn-chat-ph sn-bot"></div></div></div><button class="sn-chat-jump" data-chat-jump aria-label="${esc(tt("chat.jump"))}"><span data-i="arrow-down"></span><span class="sn-badge" hidden>0</span></button>${chatEmptyHTML(empty, !!history)}</div>` +
-  `<div class="sn-chat-foot">${composerHTML({ placeholder, max, maxLines, attach, voice, external: true, context, mode, models, model, fresh: !!empty })}</div>`;
+  `<div class="sn-chat-foot">${composerHTML({ placeholder, max, maxLines, attach, voice, submitKey, external: true, context, mode, models, model, fresh: !!empty })}</div>`;
 };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const fmtClock = () => new Date().toTimeString().slice(0, 5);
 const fmtSec = (s) => (s < 10 ? s.toFixed(1).replace(/\.0$/, "") : String(Math.round(s)));
+const fmtNum = (n) => Number(n || 0).toLocaleString("en-US");
 const LD_MATRIX = '<span class="sn-ld sn-ld-matrix sn-xs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>';
 const LD_ARC = '<span class="sn-ld sn-ld-arc sn-xs" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="sn-ld-tr" cx="12" cy="12" r="9"/><circle class="sn-ld-hd" cx="12" cy="12" r="9"/></svg></span>';
+const LD_ORB = '<span class="sn-act-orb" aria-hidden="true"><i></i><i></i><i></i></span>';
+const IC_TERM = '<svg class="sn-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 17 6-5-6-5"/><path d="M12 19h7"/></svg>';
+const IC_THINK = '<svg class="sn-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 4.5a3.3 3.3 0 0 0-3.1 4.4A3.1 3.1 0 0 0 5.3 15a3.2 3.2 0 0 0 4.2 3v1a2 2 0 0 0 2.5 1.8V4.5a2.4 2.4 0 0 0-2.5 0Z"/><path d="M14.5 4.5a3.3 3.3 0 0 1 3.1 4.4A3.1 3.1 0 0 1 18.7 15a3.2 3.2 0 0 1-4.2 3v1a2 2 0 0 1-2.5 1.8V4.5a2.4 2.4 0 0 1 2.5 0Z"/></svg>';
+const IC_SUM = '<svg class="sn-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.7 6.3 3 3-9.8 9.8a2.1 2.1 0 0 1-3-3l9.8-9.8Z"/><path d="m13 4 7 7-1.8 1.8-7-7L13 4Z"/></svg>';
+
+// ———— 安全轻量语法高亮器（JSON / Diff / Shell / JS / TS / CSS / HTML / Python / SQL）————
+// 全程先分词再 esc() 转义，绝不输出任何未转义原始 HTML，彻底杜绝 XSS
+const HL_FAMILY = { javascript: "js", jsx: "js", ts: "js", typescript: "js", tsx: "js", mjs: "js", cjs: "js", python: "py", golang: "go", jsonc: "json", scss: "css", less: "css", xml: "html", svg: "html", vue: "html", bash: "sh", zsh: "sh", shell: "sh", cmd: "sh", console: "sh", patch: "diff" };
+const HL_LABEL = { js: "JS", ts: "TS", jsx: "JSX", tsx: "TSX", json: "JSON", diff: "DIFF", sh: "BASH", bash: "BASH", zsh: "ZSH", shell: "SHELL", css: "CSS", scss: "SCSS", html: "HTML", py: "PY", python: "PY", go: "GO", sql: "SQL", text: "TEXT", txt: "TEXT" };
+const HL_KW = {
+  js: new Set("break case catch class const continue default delete do else export extends finally for from function if import in instanceof let new of return static super switch this throw try typeof var void while yield async await interface type enum implements readonly as keyof infer satisfies".split(" ")),
+  py: new Set("and as assert async await break class continue def del elif else except finally for from global if import in is lambda not or pass raise return try while with yield match case self".split(" ")),
+  go: new Set("break case chan const continue default defer else for func go goto if import interface map package range return select struct switch type var".split(" ")),
+  sh: new Set("if then else elif fi for while until do done case esac function in return export local set unset echo cd source exit sudo".split(" ")),
+  sql: new Set("select from where insert into values update set delete create table index view drop alter add join left right inner outer on group by order having limit offset as and or not is in like between distinct union all case when then else end primary key foreign unique asc desc".split(" ")),
+};
+const HL_LIT = { js: new Set(["true", "false", "null", "undefined", "NaN", "Infinity"]), py: new Set(["True", "False", "None"]), go: new Set(["true", "false", "nil", "iota"]), sql: new Set(["null", "true", "false"]) };
+const HL_RULES = {
+  json: [["prop", /"(?:\\.|[^"\\\n])*"(?=\s*:)/y], ["str", /"(?:\\.|[^"\\\n])*"?/y], ["num", /-?\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b/iy], ["kw", /\b(?:true|false|null)\b/y], ["com", /\/\/[^\n]*/y]],
+  js: [["com", /\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$)/y], ["str", /`(?:\\[\s\S]|[^`\\])*`?|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?/y], ["num", /\b(?:0[xob][\da-f_]+|\d[\d_]*(?:\.\d+)?(?:e[+-]?\d+)?n?)\b/iy]],
+  py: [["com", /#[^\n]*/y], ["str", /[rbfu]{0,2}(?:"""[\s\S]*?(?:"""|$)|'''[\s\S]*?(?:'''|$)|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?)/iy], ["num", /\b\d[\d_]*(?:\.\d+)?\b/iy], ["attr", /@[\w.]+/y]],
+  go: [["com", /\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$)/y], ["str", /`[^`]*`?|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?/y], ["num", /\b(?:0[xob][\da-f_]+|\d[\d_]*(?:\.\d+)?)\b/iy]],
+  sh: [["com", /(?<![\w$])#[^\n]*/y], ["str", /"(?:\\.|[^"\\])*"?|'[^']*'?/y], ["prop", /\$\{[^}]*\}?|\$[\w@#?*!-]+/y], ["attr", /(?<=\s)--?[\w-]+/y], ["num", /\b\d+\b/y]],
+  sql: [["com", /--[^\n]*|\/\*[\s\S]*?(?:\*\/|$)/y], ["str", /'(?:''|[^'])*'?/y], ["num", /\b\d+(?:\.\d+)?\b/y]],
+  css: [["com", /\/\*[\s\S]*?(?:\*\/|$)/y], ["str", /"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?/y], ["kw", /@[\w-]+/y], ["prop", /[\w-]+(?=\s*:(?!:))/y], ["num", /#[\da-f]{3,8}\b|-?\b\d+(?:\.\d+)?(?:px|rem|em|%|vh|vw|s|ms|deg|fr)?\b/iy], ["fn", /[\w-]+(?=\()/y], ["attr", /[.#][\w-]+|::?[\w-]+/y]],
+  html: [["com", /<!--[\s\S]*?(?:-->|$)/y], ["tag", /<\/?[a-zA-Z][\w:-]*|\/?>/y], ["attr", /(?<=\s)[\w:@.-]+(?==)/y], ["str", /"[^"]*"?|'[^']*'?/y]],
+};
+const inferLang = (path, content) => {
+  if (path) {
+    const ext = String(path).split(".").pop()?.toLowerCase();
+    if (ext && (HL_FAMILY[ext] || HL_RULES[ext])) return ext;
+  }
+  const s = String(content || "").trim();
+  if (!s) return "text";
+  if (/^(?:diff --git |---\s+\S|\+\+\+\s+\S|@@\s+-\d+)/m.test(s)) return "diff";
+  if ((s[0] === "{" && s.at(-1) === "}") || (s[0] === "[" && s.at(-1) === "]")) { try { JSON.parse(s); return "json"; } catch { /* ignore */ } }
+  return "text";
+};
+const diffCounts = (code) => {
+  let add = 0, del = 0;
+  for (const ln of String(code || "").split("\n")) {
+    if (ln.startsWith("+") && !ln.startsWith("+++")) add++;
+    else if (ln.startsWith("-") && !ln.startsWith("---")) del++;
+  }
+  return { add, del };
+};
+function highlightCode(raw, lang0 = "") {
+  const code = String(raw ?? ""), l0 = String(lang0 || "").toLowerCase(), f = HL_FAMILY[l0] || l0;
+  if (f === "diff") {
+    return code.split("\n").map((ln) => {
+      const cls = ln.startsWith("@@") ? "sn-dl sn-dl-hunk"
+        : ln.startsWith("+++") || ln.startsWith("---") || ln.startsWith("diff ") || ln.startsWith("index ") ? "sn-dl sn-dl-meta"
+        : ln.startsWith("+") ? "sn-dl sn-dl-add"
+        : ln.startsWith("-") ? "sn-dl sn-dl-del" : "sn-dl";
+      return `<span class="${cls}">${esc(ln) || " "}</span>`;
+    }).join("");
+  }
+  const rules = HL_RULES[f];
+  if (!rules) return code.split("\n").map((ln) => `<span class="sn-cl">${esc(ln) || " "}</span>`).join("");
+  const toks = []; let i = 0; const n = code.length;
+  const atLineStart = (pos) => { let k = pos - 1; while (k >= 0 && code[k] !== "\n" && /\s/.test(code[k])) k--; return k < 0 || code[k] === "\n"; };
+  while (i < n) {
+    if (f === "sh" && code[i] === "$" && code[i + 1] === " " && atLineStart(i)) { toks.push(["pun", "$ "]); i += 2; continue; }
+    let matched = false;
+    for (const [t, re] of rules) { re.lastIndex = i; const m = re.exec(code); if (m && m[0]) { toks.push([t, m[0]]); i += m[0].length; matched = true; break; } }
+    if (matched) continue;
+    const c = code[i];
+    if (/[A-Za-z_$\u00c0-\uffff]/.test(c) && f !== "html" && f !== "json") {
+      const reW = /[\w$\u00c0-\uffff]+/y; reW.lastIndex = i; const w = reW.exec(code)[0];
+      let a = i + w.length; while (a < n && /\s/.test(code[a])) a++;
+      let b = i - 1; while (b >= 0 && /\s/.test(code[b])) b--;
+      const after = a < n ? code[a] : "", before = b >= 0 ? code[b] : "";
+      const lw = f === "sql" ? w.toLowerCase() : w;
+      const t = HL_KW[f]?.has(lw) ? "kw" : HL_LIT[f]?.has(lw) ? "kw" : before === "." ? "prop" : after === "(" ? "fn" : (f === "js" || f === "go") && /^[A-Z]/.test(w) ? "typ" : f === "sh" && (atLineStart(i) || before === "|" || before === "&" || before === ";") ? "fn" : "";
+      toks.push([t, w]); i += w.length; continue;
+    }
+    if (/[+\-*/%=<>!&|^~?:]/.test(c)) { const reO = /[+\-*/%=<>!&|^~?:]+/y; reO.lastIndex = i; const o = reO.exec(code)[0]; toks.push(["op", o]); i += o.length; continue; }
+    if (/[{}()[\];,.]/.test(c)) { toks.push(["pun", c]); i++; continue; }
+    toks.push(["", c]); i++;
+  }
+  const lines = [""];
+  for (const [t, s] of toks) {
+    const parts = s.split("\n");
+    for (let k = 0; k < parts.length; k++) {
+      if (k) lines.push("");
+      if (parts[k]) lines[lines.length - 1] += t ? `<span class="sn-t-${t}">${esc(parts[k])}</span>` : esc(parts[k]);
+    }
+  }
+  return lines.map((ln) => `<span class="sn-cl">${ln || " "}</span>`).join("");
+}
+
+// ———— 安全轻量 Markdown 渲染（零原始 HTML 注入，支持标题/加粗/斜体/删除线/行内代码/安全链接/列表/引用/表格/高亮代码块）————
+const MD_PROBE = /```|`[^`\n]+`|\*\*[^*\n]+\*\*|__[^_\n]+__|~~[^~\n]+~~|\[[^\]\n]+\]\([^)\n]+\)|(^|\n)\s{0,3}(?:#{1,6}\s|[-*+]\s|\d+\.\s|>\s|-{3,}\s*$|\|[^|\n]+\|)/;
+const hasMarkdown = (s) => typeof s === "string" && s.length > 1 && MD_PROBE.test(s);
+const safeHref = (u) => {
+  const s = String(u || "").replace(/^[\u0000-\u0020]+|[\u0000-\u0020]+$/g, "").replace(/[\t\n\r]/g, "");
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(s) || /^(https?:|mailto:)/i.test(s)) return s;
+  return "#";
+};
+const mdInline = (raw) => {
+  let out = "", i = 0; const s = String(raw ?? ""), n = s.length;
+  while (i < n) {
+    const c = s[i];
+    if (c === "`") {
+      const m = /^(`+)([^`\n]+?)\1/.exec(s.slice(i));
+      if (m) { out += `<code class="sn-md-code-in">${esc(m[2].trim())}</code>`; i += m[0].length; continue; }
+    }
+    if (c === "[") {
+      const m = /^\[([^\]\n]+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/.exec(s.slice(i));
+      if (m) {
+        const u = safeHref(m[2]), ext = /^https?:/i.test(u);
+        out += `<a href="${esc(u)}"${m[3] ? ` title="${esc(m[3])}"` : ""}${ext ? ' target="_blank" rel="noopener noreferrer"' : ""}>${mdInline(m[1])}</a>`;
+        i += m[0].length; continue;
+      }
+    }
+    if (c === "*" || c === "_") {
+      const m2 = /^(\*\*|__)(?=\S)([^\n]+?\S)\1/.exec(s.slice(i));
+      if (m2) { out += `<strong>${mdInline(m2[2])}</strong>`; i += m2[0].length; continue; }
+      const prev = s[i - 1] || "";
+      if (c === "*" || !/[\w\u4e00-\u9fff]/.test(prev)) {
+        const m1 = /^(\*|_)(?=\S)([^\n*]+?\S)\1/.exec(s.slice(i));
+        if (m1 && (c === "*" || !/[\w\u4e00-\u9fff]/.test(s[i + m1[0].length] || ""))) { out += `<em>${mdInline(m1[2])}</em>`; i += m1[0].length; continue; }
+      }
+    }
+    if (c === "~" && s[i + 1] === "~") {
+      const m = /^~~(?=\S)([^\n]+?\S)~~/.exec(s.slice(i));
+      if (m) { out += `<del>${mdInline(m[1])}</del>`; i += m[0].length; continue; }
+    }
+    if (c === "\n") { out += "<br>"; i++; continue; }
+    out += esc(c); i++;
+  }
+  return out;
+};
+function renderChatCodeBox({ label = "", content = "", lang = "", showLines = false, badge = "" }) {
+  const raw = String(content ?? "");
+  const l = (lang || inferLang(label, raw)).toLowerCase();
+  const f = HL_FAMILY[l] || l;
+  const tag = HL_LABEL[l] || HL_LABEL[f] || (l ? l.toUpperCase() : "");
+  let stat = "";
+  if (f === "diff") {
+    const { add, del } = diffCounts(raw);
+    if (add || del) stat = `<span class="sn-tcode-stat sn-num">${add ? `<i class="sn-add">+${add}</i>` : ""}${del ? `<i class="sn-del">-${del}</i>` : ""}</span>`;
+  }
+  const hasHead = !!(label || tag || stat || badge);
+  return `<div class="sn-tcode${showLines && f !== "diff" ? " sn-tcode-ln" : ""}${f === "diff" ? " sn-tcode-diff" : ""}">` +
+    (hasHead
+      ? `<div class="sn-tcode-hd">` +
+        (label ? `<span class="sn-tcode-lbl">${esc(label)}</span>` : "") +
+        (tag ? `<span class="sn-tcode-lang">${esc(tag)}</span>` : "") +
+        (badge ? `<span class="sn-tcode-badge sn-num">${esc(badge)}</span>` : "") +
+        stat +
+        `<button type="button" class="sn-tcode-copy" data-copy-code aria-label="${esc(tt("chat.14"))}" data-tip="${esc(tt("chat.14"))}"><span class="sn-swap"><span class="sn-a">${icon("copy", 12)}</span><span class="sn-b">${icon("check", 12)}</span></span></button>` +
+        `</div>`
+      : "") +
+    `<pre class="sn-tcode-pre"><code>${highlightCode(raw, l)}</code></pre></div>`;
+}
+function renderChatMD(raw) {
+  const lines = String(raw ?? "").replace(/\r\n?/g, "\n").split("\n"), out = [];
+  let i = 0;
+  const isSep = (l) => /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/.test(l) && l.includes("|");
+  const cells = (l) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+  while (i < lines.length) {
+    const l = lines[i];
+    if (!l.trim()) { i++; continue; }
+    const fm = /^\s{0,3}(`{3,}|~{3,})\s*([^\s`]*)(?:\s+(.*))?$/.exec(l);
+    if (fm) {
+      const ch = fm[1][0], minLen = fm[1].length, lang = fm[2] || "", body = [];
+      const closeRe = new RegExp(`^\\s{0,3}${ch === "`" ? "`" : "~"}{${minLen},}\\s*$`);
+      i++;
+      while (i < lines.length && !closeRe.test(lines[i])) { body.push(lines[i]); i++; }
+      if (i < lines.length) i++;
+      out.push(renderChatCodeBox({ label: (fm[3] || "").trim(), content: body.join("\n"), lang: lang || "text", showLines: true }));
+      continue;
+    }
+    const hm = /^\s{0,3}(#{1,6})\s+(.+?)\s*#*\s*$/.exec(l);
+    if (hm) { const lv = Math.min(4, hm[1].length); out.push(`<div class="sn-md-h sn-md-h${lv}">${mdInline(hm[2])}</div>`); i++; continue; }
+    if (/^\s{0,3}([-*_])(\s*\1){2,}\s*$/.test(l)) { out.push('<hr class="sn-md-hr">'); i++; continue; }
+    if (l.includes("|") && i + 1 < lines.length && isSep(lines[i + 1])) {
+      const hd = cells(l); i += 2; const rows = [];
+      while (i < lines.length && lines[i].trim() && lines[i].includes("|")) { rows.push(cells(lines[i])); i++; }
+      out.push(`<div class="sn-md-tbl"><table><thead><tr>${hd.map((c) => `<th>${mdInline(c)}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${hd.map((_, k) => `<td>${mdInline(r[k] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+      continue;
+    }
+    if (/^\s{0,3}>\s?/.test(l)) {
+      const q = [];
+      while (i < lines.length && /^\s{0,3}>\s?/.test(lines[i])) { q.push(lines[i].replace(/^\s{0,3}>\s?/, "")); i++; }
+      out.push(`<blockquote class="sn-md-bq">${mdInline(q.join("\n"))}</blockquote>`);
+      continue;
+    }
+    if (/^\s{0,3}(?:[-*+]|\d+\.)\s+/.test(l)) {
+      const ord = /^\s{0,3}\d+\.\s+/.test(l), items = [];
+      while (i < lines.length && (ord ? /^\s{0,3}\d+\.\s+/ : /^\s{0,3}[-*+]\s+/).test(lines[i])) {
+        const txt = lines[i].replace(/^\s{0,3}(?:[-*+]|\d+\.)\s+/, "");
+        const tm = /^\[([ xX])\]\s+(.*)$/.exec(txt);
+        items.push(tm ? `<li class="sn-md-task"><i class="sn-md-chk${tm[1] !== " " ? " sn-on" : ""}"></i><span>${mdInline(tm[2])}</span></li>` : `<li>${mdInline(txt)}</li>`);
+        i++;
+      }
+      out.push(ord ? `<ol class="sn-md-ls">${items.join("")}</ol>` : `<ul class="sn-md-ls">${items.join("")}</ul>`);
+      continue;
+    }
+    const para = [l]; i++;
+    while (i < lines.length && lines[i].trim() && !/^\s{0,3}(?:`{3,}|~{3,}|#{1,6}\s|[-*+]\s|\d+\.\s|>\s|-{3,}\s*$)/.test(lines[i]) && !(lines[i].includes("|") && i + 1 < lines.length && isSep(lines[i + 1]))) { para.push(lines[i]); i++; }
+    out.push(`<p>${mdInline(para.join("\n"))}</p>`);
+  }
+  return out.join("");
+}
 
 // 独立可复用的「侧边迷你定位刻度轨 + 悬停摘要浮窗」（Thread Rail / Minimap）
 // 可挂进对话容器或任意长文档：每条对应一根细横线，激活与悬停时平滑伸长加亮，紧邻侧边淡入圆角摘要气泡，点击丝滑跳转。
@@ -207,23 +414,42 @@ export const createThreadRail = /* @__PURE__ */ defineComponent({
   },
 });
 
-// mountChat(.chat, { respond, history, hiRes, rail, meta, actions, caret })：
+// mountChat(.chat, { respond, history, hiRes, rail, meta, actions, caret, traceMode, toolStyle, renderTool, historyMode, density, userMarkdown, markdown, submitKey })：
 //   respond(问题, { stopped })：异步生成器，一段一段地 yield——
 //     字符串或 { text }：正文；{ think: "…" }：思考（实时读秒，结束后收起）；
-//     { tool: { id, name, label, args, status, result, ms } } / { toolUpdate: { id, status, result, ms } }：精密折叠工具调用卡片；
+//     { tool: { id, name, kind, label, path, command, code, diff, lang, args, output, result, badge, status, ms, blocks } } / { toolUpdate: { id, ... } }：可定制高亮工具调用；
 //     { step: { t, s, n } } / { stepUpdate: { index, s, n } }：步骤；
 //     { card: [编号, 副信息, 说明, 背景] }：镜头卡片；{ image: { g } }、{ imageProgress: 0–1 }、{ imageDone: true }：生成画面。
+//   traceMode："visible"（工具可见）| "collapsed"（思考与工具全收起活动流）| "active"（仅显示当前执行单行，完毕收起）| "expanded"（工具默认展开高亮详情）| "hidden"（纯净正文）
+//   toolStyle："timeline"（紧凑活动时间流，默认）| "card"（精致卡片）| "minimal"（极简细导引线）
+//   renderTool：(tool, ctx) => Node | string | { header?, body?, className? } | void（自定义单个工具调用外观与高亮）
+//   historyMode："auto"（无缝自动预加载，默认）| "top"（置顶加载）| "demand"（按需加载，适配 10,000+ 条超长会话）
+//   density："comfortable"（舒适，默认）| "compact"（紧凑高密度）
+//   userMarkdown：boolean（用户输入含 Markdown 时是否渲染，默认 true）
+//   markdown：boolean（AI 回复正文是否渲染 Markdown 与代码高亮，默认 true）
+//   submitKey："enter"（默认：Enter 直接发送、Shift+Enter 换行）| "mod-enter"（⌘/Ctrl+Enter 发送、Enter 换行）
 //   rail：false 关闭 | "left" | "right" | { side: "left" | "right", max: 18 }（默认 "left" 侧边迷你定位刻度轨）
 //   meta：{ time?: true, duration?: true, tps?: true }（消息底部悬停操作栏元信息显示开关）
 //   actions："hover"（默认：鼠标移入对应消息内容区域才显示）| "latest"（最新一条 AI 回复常显）| "always"（全部常显）| false / "none"（关闭）
 //   caret："dot" | "bar"（流式输出光标样式，默认 "dot"）
-//   composerBlur："none" | "sm" | "md" | "lg" | number | false（输入框高斯模糊级别，默认 "md"；底色不透明度强制 ≥82%/80%，绝不允许透明）
+//   composerBlur："none" | "sm" | "md" | "lg" | number | false（输入框高斯模糊级别，默认 "md"；底色不透明度强制 ≥78%/76%，绝不允许透明）
 //   composerResizable：boolean（是否支持顶部微把手拖拽调整输入框高度，默认 true）
 //   composerHeight：number（初始输入框文本区高度，自动钳制在安全范围内）
-export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railOpt = "left", meta: metaOpt, actions = "hover", caret = "dot", composerBlur = "md", composerResizable = true, composerHeight, composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, onMenu, onNewChat, ...view } = {}) {
+export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railOpt = "left", meta: metaOpt, actions = "hover", caret = "dot", traceMode = "visible", toolStyle = "timeline", renderTool, historyMode = "auto", density = "comfortable", userMarkdown = true, markdown = true, submitKey = "enter", composerBlur = "md", composerResizable = true, composerHeight, composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, onMenu, onNewChat, ...view } = {}) {
   if (!box || box._chat) return box?._chat;
   const metaCfg = { time: true, duration: true, tps: true, ...metaOpt };
   const normActions = (v) => (v === false || v === "none" ? "none" : v === "always" || v === "latest" ? v : "hover");
+  const normTraceMode = (v) => (v === "collapsed" || v === "active" || v === "expanded" || v === "hidden" ? v : "visible");
+  const normToolStyle = (v) => (v === "card" || v === "minimal" ? v : "timeline");
+  const normHistoryMode = (v) => (v === "top" || v === "demand" ? v : "auto");
+  const normDensity = (v) => (v === "compact" ? "compact" : "comfortable");
+  let curTraceMode = normTraceMode(traceMode);
+  let curToolStyle = normToolStyle(toolStyle);
+  let curHistoryMode = normHistoryMode(historyMode);
+  let curDensity = normDensity(density);
+  let curUserMd = userMarkdown !== false;
+  let curAiMd = markdown !== false;
+  let curRenderTool = typeof renderTool === "function" ? renderTool : null;
   const setActions = (v) => { box.dataset.actions = normActions(v); };
   const BLUR_PRESETS = { none: { px: 0, tint: 100 }, sm: { px: 8, tint: 46 }, md: { px: 14, tint: 23 }, lg: { px: 22, tint: 0 } };
   const setComposerBlur = (level) => {
@@ -249,9 +475,13 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     }
   };
   // 空容器：先按选项（title、status、placeholder、max……）填好标记
-  if (!box.querySelector(".sn-chat-vp")) { box.classList.add("sn-chat"); box.innerHTML = chatHTML(view); injectIcons(box); }
+  if (!box.querySelector(".sn-chat-vp")) { box.classList.add("sn-chat"); box.innerHTML = chatHTML({ ...view, submitKey }); injectIcons(box); }
   setActions(actions);
   setComposerBlur(composerBlur);
+  box.dataset.traceMode = curTraceMode;
+  box.dataset.toolStyle = curToolStyle;
+  box.dataset.historyMode = curHistoryMode;
+  box.dataset.density = curDensity;
   if (caret === "bar") box.dataset.caret = "bar";
   const bodyEl = $(".sn-chat-body", box), vp = $(".sn-chat-vp", box), canvas = $(".sn-chat-canvas", vp), phTop = $(".sn-chat-ph.sn-top", canvas), phBot = $(".sn-chat-ph.sn-bot", canvas);
   const jump = $("[data-chat-jump]", box), badge = $(".sn-badge", jump);
@@ -262,7 +492,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   let emptyGone = !emptyEl;
   // 底部的提示词输入框（data-external：发送 / 停止交给对话）：还没人接就在这里接上——页面不用再调 bindInputs。
   // cmOpts：传给输入框的选项（upload 上传函数、attachments 预置附件）
-  if (!composer._cm) mountComposer(composer, { ...cmOpts, voice: view.voice, onModelChange, onModeChange, onContextChange, onContextClick });
+  if (!composer._cm) mountComposer(composer, { ...cmOpts, voice: view.voice, submitKey, onModelChange, onModeChange, onContextChange, onContextClick });
+  else if (submitKey) composer._cm.setSubmitKey?.(submitKey);
   // ———— 输入框可调高度（顶部微把手拖拽 + 双击/Home 恢复自动 + 安全上下限） ————
   const minTaH = () => {
     const cs = getComputedStyle(ta), lh = parseFloat(cs.lineHeight) || 22;
@@ -341,17 +572,21 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   let seq = 0, msgCount = 0;
   const items = [], index = new Map(); let off = [0];
   const reindex = () => { index.clear(); items.forEach((it, i) => index.set(it.id, i)); };
+  const historyTotal = () => {
+    const v = typeof history?.total === "function" ? history.total() : history?.total;
+    return Number.isFinite(v) && v > 0 ? Math.max(Math.round(v), msgCount) : 0;
+  };
   // 外面给的条目编上号（按顺序），顺便数消息条数
   const ingest = (arr) => (arr || []).map((it) => {
     if (it.kind === "msg" || it.kind === "ai") msgCount++;
-    if (it.kind === "ai") return { ph: "done", think: null, secs: 0, open: false, steps: [], tools: [], text: "", cards: 0, cardList: [], img: null, acts: true, stopped: false, ...it, id: ++seq };
+    if (it.kind === "ai") return { ph: "done", think: null, secs: 0, open: false, traceOpen: false, thinkOpen: false, steps: [], tools: [], text: "", cards: 0, cardList: [], img: null, acts: true, stopped: false, ...it, id: ++seq };
     return { ...it, id: ++seq };
   });
   const more = { id: ++seq, kind: "more", state: "idle" };
   if (!history || !history.hasMore?.()) more.state = "end";
   items.push(more, ...(history ? ingest(history.initial()) : [])); reindex();
 
-  // ———— 侧边迷你定位刻度轨（Thread Rail）：按用户提问轮次生成刻度，悬停出摘要气泡，点击丝滑跳转 ————
+  // ———— 侧边迷你定位刻度轨（Thread Rail）：万级对话等距均匀采样 + O(log N) 二分激活 ————
   const railCfg = railOpt === false ? null : typeof railOpt === "object" ? { side: "left", max: 18, ...railOpt } : { side: railOpt === "right" ? "right" : "left", max: 18 };
   const rail = railCfg && bodyEl ? mountThreadRail(bodyEl, {
     side: railCfg.side,
@@ -359,38 +594,54 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     onSelect: (entry) => scrollToId(entry.id),
   }) : null;
   const summaryOf = (it) => {
-    if (it.text) return it.text.replace(/\s+/g, " ").trim();
+    if (it.text) return it.text.replace(/[`*_~#>]+/g, "").replace(/\s+/g, " ").trim();
     if (it.type === "image") return it.cap || `[${tt("chat.11")}]`;
     if (it.type === "video") return it.cap || `[${tt("chat.10")}]`;
     if (it.type === "audio") return it.name || `[${tt("chat.4")}]`;
     if (it.type === "file") return it.name || tt("chat.file");
     return "";
   };
+  let railSamples = [];
   function syncRailItems() {
     if (!rail) return;
-    const turns = [];
-    for (const it of items) {
-      if (it.kind === "msg" && it.me) {
-        const s = summaryOf(it);
-        if (s) turns.push({ id: it.id, summary: s, meta: it.time || "" });
+    const allIdx = [];
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      if (it.kind === "msg" && it.me) allIdx.push(i);
+    }
+    const maxN = railCfg.max || 18, totalTurns = allIdx.length;
+    const picked = [];
+    if (totalTurns <= maxN) {
+      for (let k = 0; k < totalTurns; k++) picked.push({ i: allIdx[k], ord: k + 1 });
+    } else {
+      for (let k = 0; k < maxN; k++) {
+        const pos = Math.round((k * (totalTurns - 1)) / (maxN - 1));
+        picked.push({ i: allIdx[pos], ord: pos + 1 });
       }
+    }
+    railSamples = [];
+    const turns = [];
+    for (const { i, ord } of picked) {
+      const it = items[i], s = summaryOf(it);
+      if (!s) continue;
+      const meta = totalTurns > maxN ? `#${ord}${it.time ? ` · ${it.time}` : ""}` : (it.time || "");
+      turns.push({ id: it.id, summary: s, meta });
+      railSamples.push({ id: it.id, i });
     }
     rail.setItems(turns);
     syncRailActive();
   }
   let railLockUntil = 0;
   function syncRailActive() {
-    if (!rail || performance.now() < railLockUntil) return;
+    if (!rail || !railSamples.length || performance.now() < railLockUntil) return;
     const probe = vp.scrollTop + vp.clientHeight * .32 - PAD_T;
-    let cur = null;
-    for (let i = 0; i < items.length; i++) {
-      const it = items[i];
-      if (it.kind === "msg" && it.me) {
-        if (off[i] <= probe || cur == null) cur = it.id;
-        else break;
-      }
+    let lo = 0, hi = railSamples.length - 1;
+    while (lo < hi) {
+      const m = (lo + hi + 1) >> 1;
+      if (off[railSamples[m].i] <= probe) lo = m;
+      else hi = m - 1;
     }
-    if (cur != null) rail.setActive(cur);
+    rail.setActive(railSamples[lo].id);
   }
   function scrollToId(id) {
     const i = index.get(id); if (i == null) return;
@@ -413,14 +664,17 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   let colW = 600;
   const meMax = () => Math.min(560, colW * .78);
   function est(it) {
-    if (it.kind === "day" || it.kind === "more") return 44;
-    if (it.kind === "ai") return 260 + (it.tools?.length || 0) * 44;
-    if (it.type === "image" || it.type === "video") return 200 + (it.cap ? 28 : 0) + GAP + 28;
-    if (it.type === "audio") return 48 + GAP + 28;
-    if (it.type === "file") return 52 + GAP + 28;
-    const cjk = (it.text.match(/[⺀-鿿　-〿＀-￯]/g) || []).length, w = cjk * 15.2 + (it.text.length - cjk) * 8.1;
+    if (it.kind === "day") return curDensity === "compact" ? 36 : 44;
+    if (it.kind === "more") return curHistoryMode === "demand" ? 66 : curHistoryMode === "top" ? 52 : 44;
+    const gap = curDensity === "compact" ? 10 : GAP;
+    if (it.kind === "ai") return (curTraceMode === "collapsed" || curTraceMode === "active" || curTraceMode === "hidden" ? 160 : 220 + (it.tools?.length || 0) * 38);
+    if (it.type === "image" || it.type === "video") return 200 + (it.cap ? 28 : 0) + gap + 28;
+    if (it.type === "audio") return 48 + gap + 28;
+    if (it.type === "file") return 52 + gap + 28;
+    const txt = String(it.text || "");
+    const cjk = (txt.match(/[⺀-鿿　-〿＀-￯]/g) || []).length, w = cjk * 15.2 + (txt.length - cjk) * 8.1;
     const max = it.me ? meMax() - 32 : colW;
-    return (it.me ? 20 : 0) + Math.max(1, Math.ceil(w / max)) * (it.me ? 24 : 26) + GAP + 30;
+    return (it.me ? 20 : 0) + Math.max(1, Math.ceil(w / max)) * (it.me ? 24 : 26) + gap + 30;
   }
   const hOf = (it) => it.h ?? (it.e ??= est(it));
   function relayout(from = 1) {
@@ -432,7 +686,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
 
   // ———— 条目的样子 ————
   // 不放头像：谁说的靠位置和样式区分（用户靠右、浅灰气泡；助手靠左、直接是正文）
-  const CHECK = icon("check", 14), ALERT = icon("circle-alert", 14), PLAY = icon("play", 16), PAUSE = icon("pause", 16), CHEV = icon("chevron-down", 13);
+  const CHECK = icon("check", 14), ALERT = icon("circle-alert", 14), PLAY = icon("play", 16), PAUSE = icon("pause", 16), CHEV = icon("chevron-down", 13), CHEV_R = icon("chevron-right", 13);
   const STATE = { sending: LD_ARC, sent: CHECK, fail: ALERT };
   const contOf = (i) => { const it = items[i], p = items[i - 1]; return !!p && (p.kind === "msg" || p.kind === "ai") && p.me === it.me; };
   const metaHTML = (it) => {
@@ -454,9 +708,10 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     `<div class="sn-me-acts">` +
     (metaCfg.time && it.time ? `<span class="sn-ai-meta sn-num"><span>${esc(it.time)}</span></span>` : "") +
     `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="copy" data-tip="${esc(tt("chat.14"))}" aria-label="${esc(tt("chat.14"))}"><span class="sn-swap"><span class="sn-a">${icon("copy", 14)}</span><span class="sn-b">${CHECK}</span></span></button>` +
-    (it.type === "text" ? `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="edit" data-tip="${esc(tt("chat.28"))}" aria-label="${esc(tt("chat.28"))}">${icon("pencil", 14)}</button>` : "") +
+    (it.type === "text" || !it.type ? `<button class="sn-btn sn-ghost sn-sm sn-ibtn" data-act="edit" data-tip="${esc(tt("chat.28"))}" aria-label="${esc(tt("chat.28"))}">${icon("pencil", 14)}</button>` : "") +
     `</div>`;
   const isLastMsg = (i) => i === items.length - 1;
+  const renderRichText = (text, allowMd) => (allowMd && hasMarkdown(text) ? renderChatMD(text) : esc(text));
   function msgHTML(it, cont, i) {
     let bub;
     const cap = it.cap ? `<span class="sn-cap2">${esc(it.cap)}</span>` : "";
@@ -464,18 +719,52 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     else if (it.type === "video") bub = `<div class="sn-bubble sn-img sn-vid"><span class="sn-ph" tabindex="0" role="button" aria-label="${tt("chat.3")}"><span class="sn-pic" style="--sn-g:${esc(it.g)}"></span><span class="sn-play">${PLAY}</span><span class="sn-dur">${esc(it.dur ?? "")}</span></span>${cap}</div>`;
     else if (it.type === "audio") bub = `<div class="sn-bubble sn-aud"><button class="sn-ap" type="button" aria-label="${tt("chat.4")}"><span class="sn-swap"><span class="sn-a">${PLAY}</span><span class="sn-b">${PAUSE}</span></span></button><span class="sn-wf">${waveBars(28, it.seed || 1)}<span class="sn-wf-on">${waveBars(28, it.seed || 1)}</span></span><span class="sn-dur">${esc(it.dur ?? "")}</span></div>`;
     else if (it.type === "file") bub = `<div class="sn-bubble sn-fcard"><span class="sn-ext-card">${esc(it.ext ?? "")}</span><span class="sn-meta"><b class="sn-fname">${esc(midEllipsis(it.name, 20))}</b><span>${esc(it.ext ?? "")} · ${fmtSize(it.size)}</span></span></div>`;
-    else bub = `<div class="sn-bubble">${esc(it.text)}</div>`;
+    else {
+      const useMd = it.me ? curUserMd : curAiMd;
+      const isMd = useMd && hasMarkdown(it.text);
+      bub = `<div class="sn-bubble${isMd ? " sn-md-msg" : ""}">${isMd ? renderChatMD(it.text) : esc(it.text)}</div>`;
+    }
     const st = it.me && it.status === "fail" ? `<span class="sn-msg-state sn-bad" role="button" tabindex="0" title="${tt("chat.27")}">${STATE[it.status]}</span>` : "";
-    const acts = it.status === "fail" ? tt("chat.5") : it.me ? meActsHTML(it) : it.type === "text" ? aiActsHTML(it, isLastMsg(i)) : "";
+    const acts = it.status === "fail" ? tt("chat.5") : it.me ? meActsHTML(it) : it.type === "text" || !it.type ? aiActsHTML(it, isLastMsg(i)) : "";
     return `<div class="sn-msg ${it.me ? "sn-me" : "sn-ai"}${cont ? " sn-cont" : ""}${it.flying ? " sn-flying" : ""}"><div class="sn-msg-col">${bub}${acts}</div>${st}</div>`;
   }
-  // 历史最上面那一行：正在加载只展示动感几何微环（字留给读屏）；平时、到头了都不写字
-  const moreHTML = () => more.state === "loading" ? tt("chat.6") : "";
+  // 历史最上面那一行：按 historyMode 区分「无缝加载 / 置顶加载 / 按需加载」，清晰展现万级对话加载进度
+  function moreHTML() {
+    if (!history) return "";
+    const total = historyTotal(), hasMore = !!history.hasMore?.();
+    const loading = more.state === "loading";
+    const pct = total > 0 ? Math.min(100, Math.round((msgCount / total) * 100)) : 0;
+    const rem = total > 0 ? Math.max(0, total - msgCount) : 0;
+    const statTxt = total > 0 ? tt("chat.histLoaded", { p0: fmtNum(msgCount), p1: fmtNum(total) }) : tt("chat.histLoadedOnly", { p0: fmtNum(msgCount) });
+    if (!hasMore && !loading) {
+      return msgCount >= 80 ? `<div class="sn-hist-end sn-num">${esc(tt("chat.histAll", { p0: fmtNum(msgCount) }))}</div>` : "";
+    }
+    if (curHistoryMode === "auto") {
+      if (!loading) return "";
+      return `<div class="sn-hist-auto">${LD_ARC}<span>${esc(tt("chat.histLoading"))}</span>${total > 0 ? `<span class="sn-hist-meta sn-num">${esc(statTxt)}</span>` : ""}</div>`;
+    }
+    if (curHistoryMode === "top") {
+      return `<div class="sn-hist-bar sn-hist-top${loading ? " sn-loading" : ""}">` +
+        `<button type="button" class="sn-hist-pill" data-hist-load="1"${loading ? " disabled" : ""}>` +
+        `${loading ? LD_ARC : icon("arrow-up", 13)}` +
+        `<span>${esc(loading ? tt("chat.histLoading") : tt("chat.histLoadTop"))}</span>` +
+        (total > 0 ? `<span class="sn-hist-meta sn-num">${esc(rem > 0 ? tt("chat.histMoreLeft", { p0: fmtNum(rem) }) : statTxt)}</span>` : "") +
+        `</button></div>`;
+    }
+    return `<div class="sn-hist-bar sn-hist-demand${loading ? " sn-loading" : ""}">` +
+      (total > 0 ? `<div class="sn-hist-prog" aria-hidden="true"><i style="width:${pct}%"></i></div>` : "") +
+      `<div class="sn-hist-row">` +
+      `<span class="sn-hist-meta sn-num">${esc(statTxt)}</span>` +
+      `<div class="sn-hist-acts">` +
+      `<button type="button" class="sn-btn sn-secondary sn-sm sn-hist-btn" data-hist-load="1"${loading ? " disabled" : ""}>${loading ? LD_ARC : icon("history", 13)}<span>${esc(loading ? tt("chat.histLoading") : tt("chat.histLoadMore"))}</span></button>` +
+      (rem >= 600 ? `<button type="button" class="sn-btn sn-ghost sn-sm sn-hist-btn" data-hist-load="4"${loading ? " disabled" : ""}>${esc(tt("chat.histLoadBatch"))}</button>` : "") +
+      `</div></div></div>`;
+  }
   function realEl(it, i) {
     const el = document.createElement("div"); el.className = "sn-ci";
     if (it.kind === "day") { el.classList.add("sn-ci-day"); el.innerHTML = `<span class="sn-day">${esc(it.text)}</span>`; }
     else if (it.kind === "more") { el.classList.add("sn-ci-more"); el.innerHTML = moreHTML(); }
-    else if (it.kind === "ai") { el.classList.add("sn-ci-ai"); el.innerHTML = aiHTML(it, isLastMsg(i)); }
+    else if (it.kind === "ai") { el.classList.add("sn-ci-ai"); el.innerHTML = aiHTML(it, isLastMsg(i)); applyCustomTools(el, it); }
     else el.innerHTML = msgHTML(it, contOf(i), i);
     return el;
   }
@@ -516,15 +805,22 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     render();
   });
 
-  // ———— 滚动：用户自己往上滚就不再贴底；快到顶时提前加载 ————
-  let pinned = true, userAt = 0;
+  // ———— 滚动：用户自己往上滚就不再贴底；按 historyMode 控制自动预加载 / 置顶加载 / 按需加载 ————
+  let pinned = true, userAt = 0, topReadyAt = 0;
   // 用捕获阶段：滚动条滑块按下时会 stopPropagation，冒泡阶段收不到——收不到就会以为还贴着底，跟随弹簧会和拖动对着干
   for (const ev of ["wheel", "touchstart", "keydown", "pointerdown"]) sa.box.addEventListener(ev, () => (userAt = performance.now()), { passive: true, capture: true });
   vp.addEventListener("scroll", () => {
     const st = vp.scrollTop;
     if (performance.now() - userAt < 400) pinned = maxTop() - st < 24;
+    if (st <= 4) { if (!topReadyAt) topReadyAt = performance.now(); }
+    else topReadyAt = 0;
     render(); syncJump(); syncRailActive();
-    if (st - PAD_T < vp.clientHeight * 2) loadOlder();
+    if (curHistoryMode === "auto" && st - PAD_T < vp.clientHeight * 2) loadOlder(1);
+  }, { passive: true });
+  // 置顶加载模式：已抵顶停顿后继续向上推滚轮，温和触发置顶加载（也可直接点击顶部按钮）
+  vp.addEventListener("wheel", (e) => {
+    if (curHistoryMode !== "top" || e.deltaY >= -18 || vp.scrollTop > 4 || loadingOld || !history?.hasMore?.()) return;
+    if (topReadyAt && performance.now() - topReadyAt > 240) { topReadyAt = 0; loadOlder(1); }
   }, { passive: true });
   // 拖滚动条：同一个任务里画好新位置的内容，并重算是否贴底
   vp.addEventListener("sa-jump", () => { userAt = performance.now(); pinned = maxTop() - vp.scrollTop < 24; render(); syncJump(); syncRailActive(); });
@@ -598,22 +894,126 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   function syncJump() { const away = maxTop() - vp.scrollTop > 120; jump.classList.toggle("sn-on", away); if (!away) unread = 0; badge.textContent = unread; badge.hidden = !unread; }
   jump.addEventListener("click", toLatest);
 
-  // ———— 往上加载更早的 ————
+  // ———— 往上加载更早的（支持万级消息增量偏移 + 按需多批连续加载，插入后视口纹丝不动） ————
   let loadingOld = false;
-  const patchMore = () => { const el = live.get(more.id); if (el) el.innerHTML = moreHTML(); };
-  async function loadOlder() {
-    if (loadingOld || !history?.hasMore?.()) return; loadingOld = true; more.state = "loading"; patchMore();
-    const b = ingest(await history.older());
-    const st = vp.scrollTop; items.splice(1, 0, ...b); reindex(); relayout(1);
-    let added = 0; for (const it of b) added += hOf(it);
-    vp.scrollTop = st + added;
-    const firstOld = items[1 + b.length], el = firstOld && live.get(firstOld.id); if (el) drop(firstOld.id, el); // 它前面的人变了，头像分组要重算
-    more.state = history.hasMore() ? "idle" : "end"; patchMore(); loadingOld = false; render(); syncRailItems();
+  const patchMore = () => {
+    const el = live.get(more.id);
+    if (el) el.innerHTML = moreHTML();
+    more.h = undefined; more.e = undefined;
+  };
+  async function loadOlder(batches = 1) {
+    if (loadingOld || !history?.hasMore?.()) return 0;
+    loadingOld = true; more.state = "loading"; patchMore();
+    const collected = [];
+    const nBatch = Math.max(1, Math.min(20, Math.round(Number(batches) || 1)));
+    try {
+      for (let step = 0; step < nBatch && history?.hasMore?.(); step++) {
+        const chunk = await history.older(step);
+        if (chunk?.length) collected.push(...chunk);
+        else break;
+      }
+    } finally {
+      if (collected.length) {
+        const b = ingest(collected);
+        const st = vp.scrollTop, oldLen = items.length;
+        let added = 0; for (const it of b) added += hOf(it);
+        items.splice(1, 0, ...b);
+        reindex();
+        // 万级优化：仅计算新插入批次的偏移量，旧有全部条目直接整体平移 +added
+        const nextOff = new Array(items.length + 1);
+        nextOff[0] = 0; nextOff[1] = hOf(items[0]);
+        for (let k = 0; k < b.length; k++) nextOff[k + 2] = nextOff[k + 1] + hOf(b[k]);
+        for (let k = 1; k < oldLen; k++) nextOff[b.length + k + 1] = off[k + 1] + added;
+        off = nextOff;
+        canvas.style.height = PAD_T + off[items.length] + PAD_B + "px";
+        vp.scrollTop = st + added;
+        const firstOld = items[1 + b.length], el = firstOld && live.get(firstOld.id);
+        if (el) drop(firstOld.id, el); // 它前面的人变了，分组状态重算
+      }
+      more.state = history?.hasMore?.() ? "idle" : "end";
+      loadingOld = false;
+      patchMore();
+      relayout(1);
+      render();
+      syncRailItems();
+    }
+    return collected.length;
   }
 
-  // ———— 追加、更新 ————
+  // ———— 追加、更新与运行时模式切换 ————
   function append(arr) { const j = items.length; items.push(...arr); reindex(); relayout(j); syncRailItems(); }
-  function patch(it) { const el = live.get(it.id); if (!el) return; const i = index.get(it.id); if (it.kind === "ai") el.innerHTML = aiHTML(it, isLastMsg(i)); else el.innerHTML = msgHTML(it, contOf(i), i); }
+  function measureItem(it) {
+    const el = live.get(it.id), i = index.get(it.id);
+    if (!el || i == null) return;
+    const h = Math.round(el.offsetHeight);
+    if (h > 0 && h !== it.h) {
+      it.h = h;
+      relayout(i + 1);
+      if (pinned) follow();
+      render();
+    }
+  }
+  function patch(it) {
+    const el = live.get(it.id); if (!el) return;
+    const i = index.get(it.id);
+    if (it.kind === "ai") { el.innerHTML = aiHTML(it, isLastMsg(i)); applyCustomTools(el, it); }
+    else el.innerHTML = msgHTML(it, contOf(i), i);
+    measureItem(it);
+  }
+  function refreshLive(filter) {
+    const st = vp.scrollTop;
+    for (const it of items) { if (!filter || filter(it)) { it.h = undefined; it.e = undefined; } }
+    for (const [id, el] of live) {
+      const it = el._it;
+      if (!it || (filter && !filter(it))) continue;
+      const i = index.get(id); if (i == null) continue;
+      if (it.kind === "more") el.innerHTML = moreHTML();
+      else if (it.kind === "ai") { el.innerHTML = aiHTML(it, isLastMsg(i)); applyCustomTools(el, it); }
+      else if (it.kind === "msg") el.innerHTML = msgHTML(it, contOf(i), i);
+      const h = Math.round(el.offsetHeight);
+      if (h > 0) it.h = h;
+    }
+    relayout(1);
+    if (pinned) vp.scrollTop = maxTop();
+    else vp.scrollTop = Math.min(maxTop(), st);
+    render();
+  }
+  const setTraceMode = (v) => {
+    const next = normTraceMode(v);
+    if (next === curTraceMode) return;
+    curTraceMode = next; box.dataset.traceMode = next;
+    refreshLive((it) => it.kind === "ai");
+  };
+  const setToolStyle = (v) => {
+    const next = normToolStyle(v);
+    if (next === curToolStyle) return;
+    curToolStyle = next; box.dataset.toolStyle = next;
+    refreshLive((it) => it.kind === "ai" && it.tools?.length > 0);
+  };
+  const setRenderTool = (fn) => {
+    curRenderTool = typeof fn === "function" ? fn : null;
+    refreshLive((it) => it.kind === "ai" && it.tools?.length > 0);
+  };
+  const setHistoryMode = (v) => {
+    const next = normHistoryMode(v);
+    if (next === curHistoryMode) return;
+    curHistoryMode = next; box.dataset.historyMode = next;
+    more.h = undefined; more.e = undefined;
+    patchMore(); relayout(1); render();
+  };
+  const setDensity = (v) => {
+    const next = normDensity(v);
+    if (next === curDensity) return;
+    curDensity = next; box.dataset.density = next;
+    refreshLive();
+  };
+  const setUserMarkdown = (on) => {
+    const next = on !== false;
+    if (next === curUserMd) return;
+    curUserMd = next;
+    refreshLive((it) => it.kind === "msg" && it.me && (it.type === "text" || !it.type));
+  };
+  const setSubmitKey = (mode) => { composer._cm?.setSubmitKey?.(mode); };
   const setState = (it, s) => { it.status = s; patch(it); };
   function settle(it, fail) {
     setTimeout(() => {
@@ -708,12 +1108,13 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
         const s = document.createElement("div"); s.className = "sn-fx-src"; s.textContent = text; s.style.width = "max-content";
         c.style.width = r.width + "px"; clip.append(bg, c, s); g.append(sh, clip); fx.append(g);
         const natural = s.getBoundingClientRect().width;
-        if (natural <= bw + .5 && natural <= src.w + .5) {
+        const isMdBub = b.classList.contains("sn-md-msg");
+        if (!isMdBub && natural <= bw + .5 && natural <= src.w + .5) {
           // 两边都不用自动换行，排版一模一样：字原地直接变成气泡（底色从 55% 补满，字一直清楚，不经过"灰字灰底"）
           s.remove(); clip.style.clipPath = `inset(0 round ${rad})`;
           bg.animate([{ opacity: .55, transform: "scale(.97)" }, { opacity: 1, transform: "none" }], { duration: 110, easing: "ease-out" });
         } else {
-          // 换行不一样（字比较长）：实心底先贴着输入框里那块字（只算看得见的那段），再收成气泡的形状；两种换行的字在实心底上交叉淡化
+          // 换行不一样或 Markdown 渲染气泡：实心底先贴着输入框里那块字，再收成真实气泡形状并平滑交叉淡化
           s.style.width = src.w + "px";
           const th = s.offsetHeight, vTop = Math.max(0, src.top - src.y), vBot = Math.min(th, src.bottom - src.y);
           const gw = Math.max(r.width, src.w + bl + br), gh = Math.max(r.height, th + bt + bb);
@@ -739,38 +1140,190 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     return { news, landed };
   }
 
-  // ———— AI 回复 ————
+  // ———— AI 回复：5 种过程模式（active / collapsed / visible / expanded / hidden）+ 3 种工具样式 + 语法高亮 + 自定义渲染 ————
   const fmtJSON = (v) => (v == null ? "" : typeof v === "string" ? v : JSON.stringify(v, null, 2));
-  const toolIcon = (s) => (s === "done" ? CHECK : s === "error" || s === "fail" ? ALERT : s === "stop" ? "" : LD_ARC);
-  const toolHTML = (t, k) => {
-    const st = t.status || "run", hasDetail = t.args != null || t.result != null;
-    const msStr = t.ms != null ? (t.ms >= 1000 ? `${(t.ms / 1000).toFixed(2)}s` : `${Math.round(t.ms)}ms`) : "";
-    const detail = hasDetail
-      ? `<div class="sn-tool-bd"><div>` +
-        (t.args != null ? `<div class="sn-tool-sec"><span>${esc(tt("chat.29"))}</span><pre>${esc(fmtJSON(t.args))}</pre></div>` : "") +
-        (t.result != null ? `<div class="sn-tool-sec"><span>${esc(tt("chat.30"))}</span><pre>${esc(fmtJSON(t.result))}</pre></div>` : "") +
-        `</div></div>` : "";
-    return `<div class="sn-tool sn-${esc(st)}${t.open ? " sn-open" : ""}" data-tool-i="${k}" data-tool-id="${esc(t.id ?? k)}">` +
-      `<button class="sn-tool-hd" type="button" aria-expanded="${!!t.open}"${hasDetail ? "" : " disabled"}>` +
-      `<span class="sn-tool-ic">${toolIcon(st)}</span>` +
-      `<code class="sn-tool-name">${esc(t.name || "")}</code>` +
-      (t.label ? `<span class="sn-tool-sub">${esc(t.label)}</span>` : "") +
-      `<span class="sn-tool-ms sn-num">${esc(msStr)}</span>` +
-      (hasDetail ? `<span class="sn-tool-chev">${CHEV}</span>` : "") +
-      `</button>${detail}</div>`;
+  const fmtMs = (ms) => (ms == null ? "" : ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${Math.round(ms)}ms`);
+  const inferToolKind = (t) => {
+    if (t.kind) return t.kind;
+    if (t.command != null) return "bash";
+    if (t.diff != null) return "edit";
+    if (t.code != null) return "code";
+    const n = String(t.name || "");
+    if (/^(read|get|fetch|inspect|view|list|load|open)/i.test(n)) return "read";
+    if (/^(edit|write|apply|patch|update|create|save|set|modify)/i.test(n)) return "edit";
+    if (/^(run|exec|bash|shell|cmd|terminal|ffmpeg|pnpm|npm|git)/i.test(n)) return "bash";
+    if (/^(search|grep|find|query|lookup)/i.test(n)) return "search";
+    return "tool";
   };
+  const toolKindIcon = (t, st) => {
+    if (st === "run") return LD_ARC;
+    if (st === "error" || st === "fail") return ALERT;
+    if (st === "stop") return "";
+    if (t.icon) return icon(t.icon, 14);
+    const k = inferToolKind(t);
+    if (k === "read") return icon("eye", 14);
+    if (k === "edit") return icon("square-pen", 14);
+    if (k === "bash") return IC_TERM;
+    if (k === "search") return icon("search", 14);
+    if (k === "code") return icon("code-xml", 14);
+    return icon("blocks", 14);
+  };
+  const toolHasDetail = (t) => !!(t.blocks?.length || t.command != null || t.diff != null || t.code != null || t.args != null || t.output != null || t.result != null);
+  const toolDiffBadge = (t) => {
+    if (t.badge) return `<span class="sn-tool-badge sn-num">${esc(t.badge)}</span>`;
+    if (t.diff != null) {
+      const { add, del } = diffCounts(t.diff);
+      if (add || del) return `<span class="sn-tool-diff-stat sn-num">${add ? `<i class="sn-add">+${add}</i>` : ""}${del ? `<i class="sn-del">-${del}</i>` : ""}</span>`;
+    }
+    return "";
+  };
+  function toolDetailHTML(t) {
+    const secs = [];
+    if (Array.isArray(t.blocks) && t.blocks.length) {
+      for (const b of t.blocks) {
+        if (!b || b.content == null) continue;
+        secs.push(renderChatCodeBox({ label: b.label || b.path || "", content: typeof b.content === "object" ? fmtJSON(b.content) : String(b.content), lang: b.lang || (typeof b.content === "object" ? "json" : inferLang(b.path, b.content)), showLines: !!b.lines, badge: b.badge || "" }));
+      }
+    } else {
+      if (t.command != null) secs.push(renderChatCodeBox({ label: tt("chat.toolCmd"), content: t.command, lang: t.lang || "sh", badge: t.exitCode != null ? `exit ${t.exitCode}` : "" }));
+      if (t.diff != null) secs.push(renderChatCodeBox({ label: t.path || tt("chat.toolDiff"), content: t.diff, lang: "diff" }));
+      if (t.code != null) secs.push(renderChatCodeBox({ label: t.path || tt("chat.toolCode"), content: t.code, lang: t.lang || inferLang(t.path, t.code), showLines: true }));
+      if (t.args != null) secs.push(renderChatCodeBox({ label: tt("chat.29"), content: fmtJSON(t.args), lang: typeof t.args === "object" ? "json" : (t.argsLang || inferLang("", t.args)) }));
+      if (t.output != null) secs.push(renderChatCodeBox({ label: tt("chat.toolOutput"), content: fmtJSON(t.output), lang: typeof t.output === "object" ? "json" : (t.outputLang || "text") }));
+      if (t.result != null) secs.push(renderChatCodeBox({ label: tt("chat.30"), content: fmtJSON(t.result), lang: typeof t.result === "object" ? "json" : (t.resultLang || inferLang("", t.result)) }));
+    }
+    return secs.length ? `<div class="sn-tool-bd"><div class="sn-tool-bd-in">${secs.join("")}</div></div>` : "";
+  }
+  const isToolOpen = (t) => (t.open != null ? !!t.open : curTraceMode === "expanded");
+  function toolHTML(t, k, compact = false) {
+    const st = t.status || "run", hasDetail = toolHasDetail(t), open = isToolOpen(t);
+    const msStr = fmtMs(t.ms), kind = inferToolKind(t);
+    const sub = t.label || t.path || (t.command ? t.command.split("\n")[0] : "");
+    const titlePrimary = compact
+      ? (t.command ? `<code class="sn-tool-cmd">${esc(t.command.split("\n")[0])}</code>` : t.path ? `<span class="sn-tool-path">${esc(t.label ? `${t.label} · ${t.path}` : t.path)}</span>` : `<code class="sn-tool-name">${esc(t.name || "")}</code>${sub ? `<span class="sn-tool-sub">${esc(sub)}</span>` : ""}`)
+      : `<code class="sn-tool-name">${esc(t.name || "")}</code>${sub ? `<span class="sn-tool-sub">${esc(sub)}</span>` : ""}`;
+    return `<div class="${compact ? "sn-tr-item " : ""}sn-tool sn-${esc(st)} sn-tkind-${esc(kind)}${open ? " sn-open" : ""}" data-tool-i="${k}" data-tool-id="${esc(t.id ?? k)}">` +
+      `<button class="sn-tool-hd" type="button" aria-expanded="${open}"${hasDetail ? "" : " disabled"}>` +
+      `<span class="sn-tool-ic">${toolKindIcon(t, st)}</span>` +
+      `<span class="sn-tool-main">${titlePrimary}</span>` +
+      toolDiffBadge(t) +
+      (msStr ? `<span class="sn-tool-ms sn-num">${esc(msStr)}</span>` : "") +
+      (hasDetail ? `<span class="sn-tool-chev">${compact || curToolStyle !== "card" ? CHEV_R : CHEV}</span>` : "") +
+      `</button>${hasDetail ? toolDetailHTML(t) : ""}</div>`;
+  }
+  function applyCustomTools(root, it) {
+    if (!curRenderTool || !root || !it?.tools?.length) return;
+    for (const node of root.querySelectorAll(".sn-tool[data-tool-i]")) {
+      const k = Number(node.dataset.toolI), t = it.tools[k];
+      if (!t) continue;
+      const res = curRenderTool(t, { esc, icon, highlight: highlightCode, codeBox: renderChatCodeBox, formatJSON: fmtJSON, index: k, style: curToolStyle, traceMode: curTraceMode, expanded: isToolOpen(t) });
+      if (res == null) continue;
+      if (typeof Node !== "undefined" && res instanceof Node) {
+        node.classList.add("sn-tool-custom"); node.replaceChildren(res);
+      } else if (typeof res === "string") {
+        node.classList.add("sn-tool-custom"); node.innerHTML = res;
+      } else if (typeof res === "object") {
+        if (res.className) node.classList.add(...String(res.className).split(/\s+/).filter(Boolean));
+        if (res.header != null) {
+          const hd = node.querySelector(".sn-tool-main");
+          if (hd) { if (typeof Node !== "undefined" && res.header instanceof Node) hd.replaceChildren(res.header); else hd.innerHTML = String(res.header); }
+        }
+        if (res.body != null) {
+          const bd = node.querySelector(".sn-tool-bd-in");
+          if (bd) { if (typeof Node !== "undefined" && res.body instanceof Node) bd.replaceChildren(res.body); else bd.innerHTML = String(res.body); }
+        }
+      }
+    }
+  }
+  const traceCount = (it) => (it.tools?.length || 0) + (it.steps?.length || 0);
+  const traceTotalSec = (it) => {
+    const toolSec = (it.tools || []).reduce((a, t) => a + (Number(t.ms) || 0), 0) / 1000;
+    const sum = (it.secs || 0) + toolSec;
+    return sum > 0 ? sum : (it.durSec || 0);
+  };
+  function traceActiveLabel(it) {
+    if (it.ph === "wait") return tt("chat.26");
+    if (it.ph === "think") return `${tt("chat.26")} · ${fmtSec(it.secs || 0)}s`;
+    const runningTool = [...(it.tools || [])].reverse().find((t) => t.status === "run") || it.tools?.at(-1);
+    if (runningTool) return runningTool.label || runningTool.name || tt("chat.traceRun");
+    const runningStep = [...(it.steps || [])].reverse().find((s) => s.s === "run") || it.steps?.at(-1);
+    if (runningStep) return runningStep.t || tt("chat.traceRun");
+    return tt("chat.traceRun");
+  }
+  function traceHeadLabel(it, liveNow) {
+    const n = traceCount(it), hasThink = it.think != null && it.think.length > 0;
+    if (liveNow) return traceActiveLabel(it);
+    if (hasThink && n > 0) return tt("chat.traceDoneThink", { p0: n });
+    if (n > 0) return tt("chat.traceDone", { p0: n });
+    if (hasThink) return tt("chat.traceThinkOnly", { p0: fmtSec(it.secs || 1) });
+    return "";
+  }
+  function traceGroupHTML(it) {
+    const n = traceCount(it), hasThink = it.think != null;
+    if (!hasThink && n === 0) return "";
+    const liveNow = it.ph === "think" || it.ph === "tools" || it.ph === "steps";
+    // 「仅当前执行」模式（active）：运行中且未手动展开时，只呈现极简单行（灵动三点轨道 + 当前执行动作）
+    if (curTraceMode === "active" && liveNow && !it.traceOpen) {
+      return `<div class="sn-trace sn-trace-active sn-live"><button class="sn-act-row" type="button" data-trace-toggle aria-expanded="false">${LD_ORB}<span class="sn-act-txt">${esc(traceActiveLabel(it))}</span><span class="sn-act-chev">${CHEV}</span></button></div>`;
+    }
+    const secTotal = traceTotalSec(it);
+    const secTag = !liveNow && n > 0 && secTotal > 0 ? `<span class="sn-trace-sec sn-num">${esc(fmtSec(secTotal))}s</span>` : "";
+    const rows = [];
+    if (hasThink) {
+      const snippet = String(it.think || "").replace(/\s+/g, " ").trim() || tt("chat.traceThinking");
+      rows.push(
+        `<div class="sn-tr-item sn-tr-think${it.thinkOpen ? " sn-open" : ""}">` +
+        `<button class="sn-tr-hd" type="button" data-tr-think aria-expanded="${!!it.thinkOpen}">` +
+        `<span class="sn-tool-ic">${it.ph === "think" ? LD_MATRIX : IC_THINK}</span>` +
+        `<span class="sn-tool-main"><span class="sn-tr-snip">${esc(snippet)}</span></span>` +
+        (it.secs ? `<span class="sn-tool-ms sn-num">${esc(fmtSec(it.secs))}s</span>` : "") +
+        `<span class="sn-tool-chev">${CHEV_R}</span>` +
+        `</button>` +
+        `<div class="sn-tr-bd"><div><p class="sn-tr-think-txt">${esc(it.think)}</p></div></div></div>`
+      );
+    }
+    (it.tools || []).forEach((t, k) => rows.push(toolHTML(t, k, true)));
+    (it.steps || []).forEach((s) => rows.push(
+      `<div class="sn-tr-item sn-tr-step ${Object.hasOwn(SI, s.s) ? "sn-" + esc(s.s) : "sn-done"}">` +
+      `<div class="sn-tr-hd sn-static"><span class="sn-tool-ic">${SI[s.s] ?? ""}</span><span class="sn-tool-main"><span class="sn-tr-snip">${esc(s.t)}</span></span>${s.n ? `<span class="sn-tool-ms sn-num">${esc(s.n)}</span>` : ""}</div></div>`
+    ));
+    const totalOps = (hasThink ? 1 : 0) + n;
+    return `<div class="sn-trace${it.traceOpen ? " sn-open" : ""}${liveNow ? " sn-live" : ""}">` +
+      `<button class="sn-trace-hd" type="button" data-trace-toggle aria-expanded="${!!it.traceOpen}">` +
+      (liveNow ? LD_ORB : "") +
+      `<span class="sn-trace-t">${esc(traceHeadLabel(it, liveNow))}</span>` +
+      secTag +
+      `<span class="sn-trace-chev">${CHEV}</span>` +
+      `</button>` +
+      `<div class="sn-trace-bd"><div><div class="sn-trace-panel">` +
+      `<div class="sn-trace-sum"><span class="sn-tool-ic">${IC_SUM}</span><span class="sn-trace-sum-t">${esc(tt("chat.traceSummary", { p0: totalOps }))}</span>${it.time ? `<span class="sn-tool-ms sn-num">${esc(it.time)}</span>` : ""}</div>` +
+      `<div class="sn-trace-list">${rows.join("")}</div>` +
+      `</div></div></div></div>`;
+  }
   function aiHTML(it, keep) {
-    const thinkIc = it.ph === "think" ? LD_MATRIX : '<span class="sn-think-dot" aria-hidden="true"></span>';
-    const thinkLbl = it.ph === "think" ? `${esc(tt("chat.26"))} <span class="sn-think-sec sn-num">${esc(fmtSec(it.secs || 0))}s</span>` : esc(tt("chat.23", { p0: fmtSec(it.secs || 1) }));
-    const think = it.think == null ? "" : `<div class="sn-think${it.open ? " sn-open" : ""}${it.ph === "think" ? " sn-live" : ""}"><button class="sn-think-hd" type="button">${thinkIc}<span class="sn-think-t">${thinkLbl}</span>${icon("chevron-down", 14)}</button><div class="sn-think-bd"><div><p class="sn-think-txt">${esc(it.think)}</p></div></div></div>`;
-    // 首字节来之前：动感 3×3 波纹点阵 + 柔和微骨条，零纯文字加载（读屏仍可读）
-    const waitEl = it.ph === "wait" ? `<div class="sn-ai-wait" role="status">${LD_MATRIX}<span class="sn-ai-wait-bars" aria-hidden="true"><i></i><i></i></span><span class="sn-ci-sr">${esc(tt("chat.26"))}</span></div>` : "";
-    const tools = it.tools?.length ? `<div class="sn-tools">${it.tools.map(toolHTML).join("")}</div>` : "";
-    const steps = it.steps?.length ? `<ol class="sn-ai-plan">${it.steps.map(stepHTML).join("")}</ol>` : "";
-    const text = it.text || it.ph === "text" ? `<div class="sn-ai-text">${esc(it.text)}${it.ph === "text" ? '<span class="sn-caret"></span>' : ""}</div>` : "";
+    const waitEl = it.ph === "wait"
+      ? (curTraceMode === "active"
+        ? `<div class="sn-trace sn-trace-active sn-live sn-ai-wait"><div class="sn-act-row">${LD_ORB}<span class="sn-act-txt">${esc(tt("chat.26"))}</span></div></div>`
+        : `<div class="sn-ai-wait" role="status">${LD_MATRIX}<span class="sn-ai-wait-bars" aria-hidden="true"><i></i><i></i></span><span class="sn-ci-sr">${esc(tt("chat.26"))}</span></div>`)
+      : "";
+    let proc = "";
+    if (curTraceMode === "collapsed" || curTraceMode === "active") {
+      proc = traceGroupHTML(it);
+    } else if (curTraceMode !== "hidden") {
+      const thinkIc = it.ph === "think" ? LD_MATRIX : '<span class="sn-think-dot" aria-hidden="true"></span>';
+      const thinkLbl = it.ph === "think" ? `${esc(tt("chat.26"))} <span class="sn-think-sec sn-num">${esc(fmtSec(it.secs || 0))}s</span>` : esc(tt("chat.23", { p0: fmtSec(it.secs || 1) }));
+      const think = it.think == null ? "" : `<div class="sn-think${it.open ? " sn-open" : ""}${it.ph === "think" ? " sn-live" : ""}"><button class="sn-think-hd" type="button">${thinkIc}<span class="sn-think-t">${thinkLbl}</span>${icon("chevron-down", 14)}</button><div class="sn-think-bd"><div><p class="sn-think-txt">${esc(it.think)}</p></div></div></div>`;
+      const tools = it.tools?.length ? `<div class="sn-tools">${it.tools.map((t, k) => toolHTML(t, k, false)).join("")}</div>` : "";
+      const steps = it.steps?.length ? `<ol class="sn-ai-plan">${it.steps.map(stepHTML).join("")}</ol>` : "";
+      proc = `${think}${tools}${steps}`;
+    }
+    const useAiMd = curAiMd && it.ph !== "text" && hasMarkdown(it.text);
+    const text = it.text || it.ph === "text"
+      ? `<div class="sn-ai-text${useAiMd ? " sn-md-msg" : ""}">${useAiMd ? renderChatMD(it.text) : esc(it.text)}${it.ph === "text" ? '<span class="sn-caret"></span>' : ""}</div>`
+      : "";
     const cards = it.cards ? `<div class="sn-ai-cards">${it.cardList.slice(0, it.cards).map(cardHTML).join("")}</div>` : "";
     const img = it.img ? imgHTML(it.img) : "";
-    return `<div class="sn-msg sn-ai sn-rich"><div class="sn-ai-body">${waitEl}${think}${tools}${steps}${text}${cards}${img}${it.stopped ? STOPPED : ""}${it.acts ? aiActsHTML(it, keep) : ""}</div></div>`;
+    return `<div class="sn-msg sn-ai sn-rich"><div class="sn-ai-body">${waitEl}${proc}${text}${cards}${img}${it.stopped ? STOPPED : ""}${it.acts ? aiActsHTML(it, keep) : ""}</div></div>`;
   }
   const imgHTML = (m) => `<div class="sn-ai-image${m.done ? " sn-done" : ""}"><span class="sn-blur" style="--sn-g:${esc(m.g)}"></span><span class="sn-pic" style="--sn-g:${esc(m.g)}"></span><span class="sn-gen-l">${LD_ARC}${tt("chat.12")} <b class="sn-num">${Math.round(m.p * 100)}%</b></span></div>`;
   const STOPPED = tt("chat.13");
@@ -868,7 +1421,8 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       Object.assign(s.style, { left: bl + "px", top: bt + "px", font: tcs.font, lineHeight: tcs.lineHeight, width: "max-content" });
       clip.append(bg, c, s); ghost.append(sh, clip); fx.append(ghost);
       const natural = s.getBoundingClientRect().width;
-      if (natural <= bw + .5 && natural <= dst.w + .5) {
+      const isMdBub = editBubble.classList.contains("sn-md-msg");
+      if (!isMdBub && natural <= bw + .5 && natural <= dst.w + .5) {
         s.remove(); clip.style.clipPath = `inset(0 round ${rad})`;
         c.style.lineHeight = tcs.lineHeight;
         bg.animate([{ opacity: 1 }, { opacity: .45, offset: .45 }, { opacity: 0 }], { duration: Math.round(FLY_Y * .72), easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" });
@@ -900,12 +1454,64 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       rewindTimer = setTimeout(() => { rewindTimer = 0; finishEdit(); }, Math.max(120, maxEnd));
     }
   }
-  // 复制、赞/踩、编辑、重新生成、工具调用展开：全委托在 canvas 上
+  // 复制、赞/踩、编辑、重新生成、过程汇总/工具展开、代码复制、置顶/按需历史加载：全委托在 canvas 上
   canvas.addEventListener("click", (e) => {
+    const histBtn = e.target.closest("[data-hist-load]");
+    if (histBtn && !histBtn.disabled) {
+      userAt = performance.now();
+      loadOlder(Number(histBtn.dataset.histLoad) || 1);
+      return;
+    }
+    const copyCode = e.target.closest("[data-copy-code]");
+    if (copyCode) {
+      const pre = copyCode.closest(".sn-tcode")?.querySelector(".sn-tcode-pre code");
+      if (pre) {
+        navigator.clipboard?.writeText(pre.textContent || "").catch(() => {});
+        const sw = copyCode.querySelector(".sn-swap");
+        if (sw) { sw.classList.add("sn-on"); clearTimeout(copyCode._t); copyCode._t = setTimeout(() => sw.classList.remove("sn-on"), 1500); }
+      }
+      return;
+    }
+    const trToggle = e.target.closest("[data-trace-toggle]");
+    if (trToggle) {
+      const ci = trToggle.closest(".sn-ci"), it = ci?._it;
+      if (it) {
+        it.traceOpen = !it.traceOpen;
+        const wrap = trToggle.closest(".sn-trace");
+        if (wrap?.classList.contains("sn-trace-active")) {
+          // 专注单行模式点开 → 立即展开完整活动流面板
+          const tmp = document.createElement("div"); tmp.innerHTML = traceGroupHTML(it);
+          const next = tmp.firstElementChild;
+          if (next) { wrap.replaceWith(next); applyCustomTools(next, it); }
+        } else if (wrap) {
+          wrap.classList.toggle("sn-open", it.traceOpen);
+          trToggle.setAttribute("aria-expanded", String(it.traceOpen));
+        }
+        userAt = performance.now();
+      }
+      return;
+    }
+    const trThink = e.target.closest("[data-tr-think]");
+    if (trThink) {
+      const ci = trThink.closest(".sn-ci"), it = ci?._it, item = trThink.closest(".sn-tr-think");
+      if (it && item) {
+        it.thinkOpen = !it.thinkOpen;
+        item.classList.toggle("sn-open", it.thinkOpen);
+        trThink.setAttribute("aria-expanded", String(it.thinkOpen));
+        userAt = performance.now();
+      }
+      return;
+    }
     const thd = e.target.closest(".sn-tool-hd");
     if (thd && !thd.disabled) {
       const card = thd.closest(".sn-tool"), ci = thd.closest(".sn-ci"), it = ci?._it, k = Number(card?.dataset.toolI);
-      if (it?.tools?.[k]) { it.tools[k].open = !it.tools[k].open; card.classList.toggle("sn-open", it.tools[k].open); thd.setAttribute("aria-expanded", String(it.tools[k].open)); userAt = performance.now(); }
+      if (it?.tools?.[k]) {
+        const nextOpen = !isToolOpen(it.tools[k]);
+        it.tools[k].open = nextOpen;
+        card.classList.toggle("sn-open", nextOpen);
+        thd.setAttribute("aria-expanded", String(nextOpen));
+        userAt = performance.now();
+      }
       return;
     }
     const b = e.target.closest(".sn-ai-acts [data-act], .sn-me-acts [data-act]"); if (!b) return;
@@ -934,7 +1540,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   canvas.addEventListener("click", (e) => {
     const hd = e.target.closest(".sn-think-hd"); if (hd) { const el = hd.closest(".sn-ci"), it = el?._it; if (!it) return; it.open = !it.open; hd.parentElement.classList.toggle("sn-open", it.open); userAt = performance.now(); return; }
     // 触屏无悬停设备：点按对应消息内容区展开该条操作栏，点空白处收起
-    if (typeof matchMedia === "function" && matchMedia("(hover: none)").matches && !e.target.closest("button, a, .sn-ph, .sn-ai-image, .sn-tool-hd")) {
+    if (typeof matchMedia === "function" && matchMedia("(hover: none)").matches && !e.target.closest("button, a, .sn-ph, .sn-ai-image, .sn-tool-hd, [data-trace-toggle], [data-tr-think]")) {
       const col = e.target.closest(".sn-msg-col, .sn-ai-body");
       for (const x of canvas.querySelectorAll(".sn-act-open")) if (x !== col) x.classList.remove("sn-act-open");
       if (col) col.classList.toggle("sn-act-open");
@@ -966,14 +1572,42 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   // 淡入结束的字合并回纯文本，DOM 节点不会越积越多
   canvas.addEventListener("animationend", (e) => { const s = e.target; if (s.classList?.contains("sn-tk")) { const p = s.parentNode; s.replaceWith(s.textContent); if (p && p.childNodes.length > 40) p.normalize(); } });
   let job = null;
-  // 回答：按 respond 给的一段段内容画——思考（实时读秒）、工具调用、步骤、正文（实时测算 TPS）、镜头卡片、生成画面；停止、出错都在原地收尾
+  // 回答：按 respond 给的一段段内容画——思考（实时读秒）、工具调用（多样式+高亮）、步骤、正文（实时测算 TPS）、镜头卡片、生成画面；停止、出错都在原地收尾
   async function reply(prompt, after) {
     if (!respond) return;
     const me = { stop: false }; job = me;
-    const it = { id: ++seq, kind: "ai", me: false, keep: true, ph: "text", think: null, secs: 0, open: true, tools: [], steps: [], text: "", cards: 0, cardList: [], img: null, acts: false, stopped: false, time: fmtClock(), durSec: null, tps: null };
+    const it = { id: ++seq, kind: "ai", me: false, keep: true, ph: "text", think: null, secs: 0, open: true, traceOpen: false, thinkOpen: false, tools: [], steps: [], text: "", cards: 0, cardList: [], img: null, acts: false, stopped: false, time: fmtClock(), durSec: null, tps: null };
     composer._cm?.setBusy(true);
     await after; await wait(90); if (me.rewound) return; if (me.stop) return finish(it, me);
-    let inserted = false, th = null, tx = null, t0 = 0, runStart = performance.now(), textStart = 0, thinkIv = 0;
+    let inserted = false, th = null, tx = null, t0 = 0, runStart = performance.now(), textStart = 0, thinkIv = 0, lastActText = "";
+    const isGroupedMode = () => curTraceMode === "collapsed" || curTraceMode === "active";
+    const syncTraceDOM = () => {
+      if (!isGroupedMode()) return;
+      const el = liveEl(it), body = el?.querySelector(".sn-ai-body");
+      if (!body) return;
+      const cur = body.querySelector(".sn-trace");
+      // 仅当前执行单行模式且未展开时：只丝滑替换单行文案（带柔和上滑切换动效），不重建 DOM
+      if (curTraceMode === "active" && !it.traceOpen && cur?.classList.contains("sn-trace-active") && (it.ph === "think" || it.ph === "tools" || it.ph === "steps")) {
+        const nextTxt = traceActiveLabel(it), txtEl = cur.querySelector(".sn-act-txt");
+        if (txtEl && nextTxt !== lastActText) {
+          lastActText = nextTxt;
+          txtEl.textContent = nextTxt;
+          if (!reduced()) {
+            txtEl.animate([{ opacity: 0, transform: "translateY(5px)" }, { opacity: 1, transform: "none" }], { duration: 200, easing: "cubic-bezier(.22,1,.36,1)" });
+          }
+        }
+        return;
+      }
+      const html = traceGroupHTML(it);
+      if (!html) { cur?.remove(); return; }
+      const tmp = document.createElement("div"); tmp.innerHTML = html;
+      const next = tmp.firstElementChild;
+      if (cur) cur.replaceWith(next);
+      else body.prepend(next);
+      applyCustomTools(next, it);
+      lastActText = traceActiveLabel(it);
+      measureItem(it);
+    };
     const stopThinkTimer = () => { if (thinkIv) { clearInterval(thinkIv); thinkIv = 0; } };
     const startThinkTimer = () => {
       stopThinkTimer(); t0 = performance.now();
@@ -982,12 +1616,15 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
         it.secs = (performance.now() - t0) / 1000;
         const secEl = liveEl(it)?.querySelector(".sn-think-sec");
         if (secEl) secEl.textContent = fmtSec(it.secs) + "s";
-      }, 120);
+        if (isGroupedMode()) {
+          const actTxt = liveEl(it)?.querySelector(".sn-act-txt, .sn-trace-t");
+          if (actTxt) actTxt.textContent = traceActiveLabel(it);
+        }
+      }, 140);
     };
     const unwait = (ph) => { if (it.ph !== "wait") return false; it.ph = ph; liveEl(it)?.querySelector(".sn-ai-wait")?.remove(); return true; };
     const show = (ph) => {
       if (inserted) return; inserted = true; it.ph = ph; if (ph === "think") it.think = "";
-      // 先把上一条常显的操作栏降回悬停显示，保持底部干净
       for (const prev of canvas.querySelectorAll(".sn-ai-acts.sn-keep")) prev.classList.remove("sn-keep");
       insert([it], { dur: DY }); msgCount++;
       const el = liveEl(it); if (el) { el.classList.add("sn-streaming"); if (!reduced()) el.classList.add("sn-reveal"); }
@@ -998,6 +1635,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       if (it.ph !== "think") return;
       stopThinkTimer();
       await th?.drain(); it.ph = ph; it.open = false; it.secs = Math.max(.4, (performance.now() - t0) / 1000);
+      if (isGroupedMode()) { syncTraceDOM(); return; }
       const el = liveEl(it), t = el?.querySelector(".sn-think");
       if (t) {
         t.classList.remove("sn-live", "sn-open");
@@ -1010,41 +1648,53 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     const toText = async () => {
       if (tx) return tx;
       if (!inserted) show("text");
-      else { unwait("text"); await closeThink("text"); it.ph = "text"; liveEl(it)?.querySelector(".sn-ai-body")?.insertAdjacentHTML("beforeend", '<div class="sn-ai-text"><span class="sn-caret"></span></div>'); }
+      else { unwait("text"); await closeThink("text"); it.ph = "text"; if (isGroupedMode()) syncTraceDOM(); liveEl(it)?.querySelector(".sn-ai-body")?.insertAdjacentHTML("beforeend", '<div class="sn-ai-text"><span class="sn-caret"></span></div>'); }
       textStart = performance.now();
       tx = revealer(it, "text", ".sn-ai-text"); return tx;
     };
     const endText = async () => { if (tx && it.ph === "text") { await tx.drain(); if (me.stop) return; it.ph = "cards"; liveEl(it)?.querySelector(".sn-ai-text .sn-caret")?.remove(); } };
     const addTool = async (tool) => {
-      if (!inserted) show("tools"); else { unwait("tools"); await closeThink("tools"); }
+      if (!inserted) show("tools"); else { unwait("tools"); await closeThink("tools"); it.ph = "tools"; }
       if (me.stop) return;
-      const entry = { status: "run", open: false, _t0: performance.now(), ...tool };
+      const entry = { status: "run", open: curTraceMode === "expanded" ? true : undefined, _t0: performance.now(), ...tool };
       const k = it.tools.push(entry) - 1;
+      if (curTraceMode === "hidden") return;
+      if (isGroupedMode()) { syncTraceDOM(); return; }
       const el = liveEl(it); if (!el) return;
       let wrap = el.querySelector(".sn-tools");
       if (!wrap) { wrap = document.createElement("div"); wrap.className = "sn-tools"; const thEl = el.querySelector(".sn-think"); if (thEl) thEl.after(wrap); else el.querySelector(".sn-ai-body").prepend(wrap); }
-      wrap.insertAdjacentHTML("beforeend", toolHTML(entry, k));
+      wrap.insertAdjacentHTML("beforeend", toolHTML(entry, k, false));
+      applyCustomTools(wrap, it);
     };
     const setTool = (patchObj) => {
       const k = patchObj.id != null ? it.tools.findIndex((x) => x.id === patchObj.id) : (patchObj.index ?? it.tools.length - 1);
       const entry = it.tools[k]; if (!entry) return;
-      if (patchObj.status != null) entry.status = patchObj.status;
-      if (patchObj.label != null) entry.label = patchObj.label;
-      if (patchObj.args != null) entry.args = patchObj.args;
-      if (patchObj.result != null) entry.result = patchObj.result;
+      for (const f of ["status", "label", "path", "command", "code", "diff", "lang", "args", "output", "result", "badge", "exitCode", "blocks", "kind", "icon"]) {
+        if (patchObj[f] != null) entry[f] = patchObj[f];
+      }
       if (patchObj.ms != null) entry.ms = patchObj.ms;
       else if (entry.status === "done" && entry.ms == null && entry._t0) entry.ms = Math.round(performance.now() - entry._t0);
+      if (curTraceMode === "hidden") return;
+      if (isGroupedMode()) { syncTraceDOM(); return; }
       const card = liveEl(it)?.querySelectorAll(".sn-tools > .sn-tool")[k];
       if (!card) return;
-      const wasOpen = entry.open;
-      card.outerHTML = toolHTML({ ...entry, open: wasOpen }, k);
+      card.outerHTML = toolHTML(entry, k, false);
+      applyCustomTools(liveEl(it)?.querySelector(".sn-tools"), it);
     };
     const addStep = async (st) => {
-      if (!inserted) show("steps"); else { unwait("steps"); await closeThink("steps"); }
+      if (!inserted) show("steps"); else { unwait("steps"); await closeThink("steps"); it.ph = "steps"; }
       if (me.stop) return;
-      it.steps.push(st); const el = liveEl(it); if (!el) return; let ol = el.querySelector(".sn-ai-plan"); if (!ol) { ol = document.createElement("ol"); ol.className = "sn-ai-plan"; const prev = el.querySelector(".sn-tools") || el.querySelector(".sn-think"); if (prev) prev.after(ol); else el.querySelector(".sn-ai-body").prepend(ol); } ol.insertAdjacentHTML("beforeend", stepHTML(st));
+      it.steps.push(st);
+      if (curTraceMode === "hidden") return;
+      if (isGroupedMode()) { syncTraceDOM(); return; }
+      const el = liveEl(it); if (!el) return; let ol = el.querySelector(".sn-ai-plan"); if (!ol) { ol = document.createElement("ol"); ol.className = "sn-ai-plan"; const prev = el.querySelector(".sn-tools") || el.querySelector(".sn-think"); if (prev) prev.after(ol); else el.querySelector(".sn-ai-body").prepend(ol); } ol.insertAdjacentHTML("beforeend", stepHTML(st));
     };
-    const setStep = ({ index: k, s: st, n }) => { const x = it.steps[k]; if (!x) return; if (st != null) x.s = st; if (n != null) x.n = n; const li = liveEl(it)?.querySelectorAll(".sn-ai-plan li")[k]; if (!li) return; li.className = x.s ? "sn-" + x.s : ""; li.querySelector(".sn-si").innerHTML = SI[x.s]; li.querySelector(".sn-sn").textContent = x.n || ""; };
+    const setStep = ({ index: k, s: st, n }) => {
+      const x = it.steps[k]; if (!x) return; if (st != null) x.s = st; if (n != null) x.n = n;
+      if (curTraceMode === "hidden") return;
+      if (isGroupedMode()) { syncTraceDOM(); return; }
+      const li = liveEl(it)?.querySelectorAll(".sn-ai-plan li")[k]; if (!li) return; li.className = x.s ? "sn-" + x.s : ""; li.querySelector(".sn-si").innerHTML = SI[x.s]; li.querySelector(".sn-sn").textContent = x.n || "";
+    };
     const addCard = async (c) => {
       await endText(); if (me.stop) return; if (!inserted) show("cards"); else unwait("cards");
       it.cardList.push(c); it.cards = it.cardList.length;
@@ -1063,7 +1713,27 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
           if (me.stop) break;
           if (part == null) continue;
           if (typeof part !== "object") (await toText()).push(String(part));
-          else if (part.think != null) { if (tx) continue; if (!inserted) show("think"); else if (unwait("think")) { it.think = ""; startThinkTimer(); const el = liveEl(it); if (el) { const tmp = document.createElement("div"); tmp.innerHTML = aiHTML(it); el.querySelector(".sn-ai-body")?.prepend(tmp.querySelector(".sn-think")); } } th ??= revealer(it, "think", ".sn-think-txt"); th.push(String(part.think)); }
+          else if (part.think != null) {
+            if (tx) continue;
+            if (!inserted) show("think");
+            else if (unwait("think")) {
+              it.think = ""; startThinkTimer();
+              if (isGroupedMode()) syncTraceDOM();
+              else if (curTraceMode !== "hidden") {
+                const el = liveEl(it);
+                if (el) { const tmp = document.createElement("div"); tmp.innerHTML = aiHTML(it); const tn = tmp.querySelector(".sn-think"); if (tn) el.querySelector(".sn-ai-body")?.prepend(tn); }
+              }
+            }
+            if (isGroupedMode() || curTraceMode === "hidden") {
+              it.think = (it.think || "") + String(part.think);
+              if (isGroupedMode() && it.traceOpen) {
+                const p = liveEl(it)?.querySelector(".sn-tr-think-txt"); if (p) p.textContent = it.think;
+                const sn = liveEl(it)?.querySelector(".sn-tr-think .sn-tr-snip"); if (sn) sn.textContent = it.think.replace(/\s+/g, " ").trim();
+              }
+            } else {
+              th ??= revealer(it, "think", ".sn-think-txt"); th.push(String(part.think));
+            }
+          }
           else if (part.tool) await addTool(part.tool);
           else if (part.toolUpdate) setTool(part.toolUpdate);
           else if (part.text != null) (await toText()).push(String(part.text));
@@ -1092,7 +1762,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     liveEl(it)?.querySelector(".sn-ai-text .sn-caret")?.remove();
     finish(it, me);
   }
-  // 收尾：只在原地补上"已停止"和操作按钮（含真实时间、耗时、TPS），不整块重画
+  // 收尾：原地收拢过程条、补上 Markdown 排版、已停止与操作按钮（含真实时间、耗时、TPS）
   function finish(it, me) {
     if (job === me) job = null;
     if (it.ph === "wait") { it.ph = "text"; liveEl(it)?.querySelector(".sn-ai-wait")?.remove(); }
@@ -1108,15 +1778,31 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       const el = liveEl(it);
       if (el) {
         el.querySelector(".sn-ai-text .sn-caret")?.remove();
-        const t = el.querySelector(".sn-think");
-        if (t?.classList.contains("sn-live")) {
-          t.classList.remove("sn-live", "sn-open");
-          const txEl = t.querySelector(".sn-think-txt"); if (txEl) { txEl.classList.remove("sn-think-fade"); txEl.scrollTop = 0; }
-          const ld = t.querySelector(".sn-think-hd .sn-ld"); if (ld) ld.outerHTML = '<span class="sn-think-dot" aria-hidden="true"></span>';
-          const ttEl = t.querySelector(".sn-think-t"); if (ttEl) ttEl.textContent = tt("chat.23", { p0: fmtSec(it.secs || 1) });
+        if (curTraceMode === "collapsed" || curTraceMode === "active") {
+          const curTr = el.querySelector(".sn-trace");
+          const html = traceGroupHTML(it);
+          if (html) {
+            const tmp = document.createElement("div"); tmp.innerHTML = html;
+            const next = tmp.firstElementChild;
+            if (curTr) curTr.replaceWith(next); else el.querySelector(".sn-ai-body")?.prepend(next);
+            applyCustomTools(next, it);
+          } else curTr?.remove();
+        } else {
+          const t = el.querySelector(".sn-think");
+          if (t?.classList.contains("sn-live")) {
+            t.classList.remove("sn-live", "sn-open");
+            const txEl = t.querySelector(".sn-think-txt"); if (txEl) { txEl.classList.remove("sn-think-fade"); txEl.scrollTop = 0; }
+            const ld = t.querySelector(".sn-think-hd .sn-ld"); if (ld) ld.outerHTML = '<span class="sn-think-dot" aria-hidden="true"></span>';
+            const ttEl = t.querySelector(".sn-think-t"); if (ttEl) ttEl.textContent = tt("chat.23", { p0: fmtSec(it.secs || 1) });
+          }
+          el.querySelectorAll(".sn-tools .sn-tool.sn-run").forEach((c) => { c.className = "sn-tool sn-stop"; const ic = c.querySelector(".sn-tool-ic"); if (ic) ic.innerHTML = ""; });
+          el.querySelectorAll(".sn-ai-plan li.sn-run").forEach((li) => { li.className = "sn-stop"; li.querySelector(".sn-si").innerHTML = ""; });
         }
-        el.querySelectorAll(".sn-tools .sn-tool.sn-run").forEach((c) => { c.className = "sn-tool sn-stop"; const ic = c.querySelector(".sn-tool-ic"); if (ic) ic.innerHTML = ""; });
-        el.querySelectorAll(".sn-ai-plan li.sn-run").forEach((li) => { li.className = "sn-stop"; li.querySelector(".sn-si").innerHTML = ""; });
+        // 流式结束后若正文含 Markdown，就地无闪烁升级为安全 Markdown 高亮排版
+        if (curAiMd && it.text && hasMarkdown(it.text)) {
+          const txNode = el.querySelector(".sn-ai-text");
+          if (txNode) { txNode.classList.add("sn-md-msg"); txNode.innerHTML = renderChatMD(it.text); }
+        }
         if (!it.img) el.querySelector(".sn-ai-image:not(.sn-done)")?.remove();
         el.querySelector(".sn-ai-body").insertAdjacentHTML("beforeend", (it.stopped ? STOPPED : "") + aiActsHTML(it, true));
         el.classList.remove("sn-streaming");
@@ -1137,6 +1823,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   }
   const sendText = (text, opt) => { ta.value = text; return send(text, opt); };
   const scrollToOldest = () => { pinned = false; glide(0, 900); };
+  const getStats = () => ({ loaded: msgCount, total: historyTotal() || msgCount, hasMore: !!history?.hasMore?.(), liveNodes: live.size });
 
   // ———— 尺寸变化：容器窄于 560px 自动收紧边距并隐藏刻度轨，保证消息与输入框宽度比例舒展 ————
   const syncNarrow = () => {
@@ -1199,18 +1886,18 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   syncRailItems();
   toBottom();
   new IntersectionObserver((es, io) => { if (es.some((x) => x.isIntersecting)) { toBottom(); requestAnimationFrame(toBottom); io.disconnect(); } }).observe(box);
-  void $$; void injectIcons; void toast;
+  void $$; void injectIcons; void toast; void renderRichText;
   // 销毁：停掉正在生成的回答、放开实例（同一个容器可以再挂一次）。挂载时加的监听、观察器由 createChat 一起撤
-  const destroy = () => { if (job) { job.stop = true; job.rewound = true; } job = null; clearTimeout(rewindTimer); rewindTimer = 0; ghosts.clear(); fx.replaceChildren(); ta.style.opacity = ""; resizeEl?.remove(); delete composer.dataset.cmH; composer.classList.remove("sn-cm-resizing"); delete box.dataset.composerBlur; box.style.removeProperty("--sn-chat-foot-blur"); box.style.removeProperty("--sn-chat-foot-tint"); rail?.destroy(); composer?._cm?.stopVoice?.(true); if (box._chat === api) delete box._chat; };
+  const destroy = () => { if (job) { job.stop = true; job.rewound = true; } job = null; clearTimeout(rewindTimer); rewindTimer = 0; ghosts.clear(); fx.replaceChildren(); ta.style.opacity = ""; resizeEl?.remove(); delete composer.dataset.cmH; composer.classList.remove("sn-cm-resizing"); delete box.dataset.composerBlur; delete box.dataset.traceMode; delete box.dataset.toolStyle; delete box.dataset.historyMode; delete box.dataset.density; box.style.removeProperty("--sn-chat-foot-blur"); box.style.removeProperty("--sn-chat-foot-tint"); rail?.destroy(); composer?._cm?.stopVoice?.(true); if (box._chat === api) delete box._chat; };
   // 程序里发一条（和用户在输入框里发一样：飞进列表、然后回复）
-  const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, scrollToId, setRail: (s) => rail?.setSide(s), setActions, setComposerBlur, setComposerHeight, destroy,
+  const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, scrollToId, loadOlder, getStats, setRail: (s) => rail?.setSide(s), setActions, setTraceMode, setToolStyle, setRenderTool, setHistoryMode, setDensity, setUserMarkdown, setSubmitKey, setComposerBlur, setComposerHeight, destroy,
     fill: (text) => composer._cm?.fill(text), get emptyEl() { return emptyEl; } };
   return (box._chat = api);
 }
 
 // createChat(空容器或 .sn-chat, 选项) → { send, receive, sendText, scrollToOldest, update, destroy, on, off }：统一的组件写法。
 // 空容器按选项渲染（标题、状态、占位、字数上限……），destroy 时撤掉挂载时加的全部监听、观察器，清空容器；
-// update({ status }) 改顶栏的状态文字（其余选项只在创建时用）。React / Vue 里在 effect 里创建、卸载时 destroy
+// update({ status, traceMode, toolStyle, historyMode, density, userMarkdown, submitKey, ... }) 动态更新配置。React / Vue 里在 effect 里创建、卸载时 destroy
 export const createChat = /* @__PURE__ */ defineComponent({
   name: "chat",
   html: (o) => `<div class="sn-chat">${chatHTML(o)}</div>`,
@@ -1222,11 +1909,19 @@ export const createChat = /* @__PURE__ */ defineComponent({
       onMenu: () => api.emit("menu"), onNewChat: () => api.emit("newChat") });
     const cm = () => el.querySelector(".sn-composer")?._cm;
     return {
-      send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, scrollToId: c.scrollToId, setRail: c.setRail, setActions: c.setActions, setComposerBlur: c.setComposerBlur, setComposerHeight: c.setComposerHeight, fill: c.fill,
+      send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, scrollToId: c.scrollToId, loadOlder: c.loadOlder, getStats: c.getStats,
+      setRail: c.setRail, setActions: c.setActions, setTraceMode: c.setTraceMode, setToolStyle: c.setToolStyle, setRenderTool: c.setRenderTool, setHistoryMode: c.setHistoryMode, setDensity: c.setDensity, setUserMarkdown: c.setUserMarkdown, setSubmitKey: c.setSubmitKey, setComposerBlur: c.setComposerBlur, setComposerHeight: c.setComposerHeight, fill: c.fill,
       get emptyEl() { return c.emptyEl; },
       update(next, prev) {
         if (next.status !== prev.status) { const s = el.querySelector("[data-chat-status]"); if (s) s.textContent = next.status ?? ""; }
         if (next.actions !== prev.actions) c.setActions(next.actions);
+        if (next.traceMode !== prev.traceMode) c.setTraceMode(next.traceMode);
+        if (next.toolStyle !== prev.toolStyle) c.setToolStyle(next.toolStyle);
+        if (next.renderTool !== prev.renderTool) c.setRenderTool(next.renderTool);
+        if (next.historyMode !== prev.historyMode) c.setHistoryMode(next.historyMode);
+        if (next.density !== prev.density) c.setDensity(next.density);
+        if (next.userMarkdown !== prev.userMarkdown) c.setUserMarkdown(next.userMarkdown);
+        if (next.submitKey !== prev.submitKey) c.setSubmitKey(next.submitKey);
         if (next.composerBlur !== prev.composerBlur) c.setComposerBlur(next.composerBlur);
         if (next.composerHeight !== prev.composerHeight) c.setComposerHeight(next.composerHeight);
         // 底部输入框的上下文、模式、模型：只是选中项换了就只改选中（不发事件）；结构变了才换那一块

@@ -40,6 +40,7 @@ export default {
     { name: "attach", type: "boolean", default: "true", required: false, desc: "左下角的 +（加图片、视频、音频、文档；未配演示回调时自动唤起系统文件选择器）。", names: { js: "attach", react: "attach", preact: "attach", vue: "attach" } },
     { name: "voice", type: "boolean", default: "true", required: false, desc: "发送键左侧的一键语音输入按钮：点击原地切换为动态微声纹并实时听写进输入框，再点一下或直接点发送即可停止，零多余确认步骤。", names: { js: "voice", react: "voice", preact: "voice", vue: "voice" } },
     { name: "send", type: "string", default: "\"发送\"", required: false, desc: "发送按钮的名字（读屏、提示里）：\"生成\"。", names: { js: "send", react: "send", preact: "send", vue: "send" } },
+    { name: "submitKey", type: '"enter" | "mod-enter"', default: '"enter"', required: false, desc: "回车提交模式：enter（默认：Enter 直接发送、Shift+Enter 换行，自动防护中文输入法合成态）或 mod-enter（⌘/Ctrl+Enter 发送、Enter 换行）。", names: { js: "submitKey", react: "submitKey", preact: "submitKey", vue: "submitKey（模板里写 submit-key）" } },
     { name: "upload", type: "(file: File, progress: (p: number) => void) => Promise<unknown>", default: "演示用的假进度", required: false,
       desc: "真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。", names: { js: "upload", react: "upload", preact: "upload", vue: "upload" } },
     { name: "external", type: "boolean", default: "false", required: false, desc: "发送由外面接管（对话组件里用），发送后不在这里清空。", names: { js: "external" } },
@@ -62,11 +63,12 @@ export default {
     { name: "clear", kind: "method", signature: "clear(o?: { smooth?: boolean; dur?: number; ease?: string; phHold?: number }): void", returns: "void", desc: "清空（`smooth` 时文字淡出、框缩回去）。" },
     { name: "files", kind: "method", signature: "files(): HTMLElement[]", returns: "HTMLElement[]", desc: "现在的附件（缩略图元素）。" },
     { name: "fill", kind: "method", signature: "fill(text: string): void", returns: "void", desc: "把一段字填进输入框（字淡入、拿到焦点、光标在最后），不发。" },
+    { name: "setSubmitKey", kind: "method", signature: 'setSubmitKey(mode: "enter" | "mod-enter"): void', returns: "void", desc: "运行时动态切换回车提交模式（Enter 直接发送 / ⌘↵ 发送）。" },
     { name: "startVoice", kind: "method", signature: "startVoice(): void", returns: "void", desc: "开始语音输入（展开实时动态声波与实时听写）。" },
     { name: "stopVoice", kind: "method", signature: "stopVoice(cancel?: boolean): void", returns: "void", desc: "结束语音输入；cancel 为 true 时放弃本次听写并恢复原文本。" },
   ],
   functions: [
-    { name: "composerHTML", signature: "composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; external?: boolean; fresh?: boolean } & ComposerParts): string", returns: "string", from: "satin-ui", desc: "拼出提示词输入框的标记（服务端渲染、模板里用）。" },
+    { name: "composerHTML", signature: 'composerHTML(o?: { placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; submitKey?: "enter" | "mod-enter"; external?: boolean; fresh?: boolean } & ComposerParts): string', returns: "string", from: "satin-ui", desc: "拼出提示词输入框的标记（服务端渲染、模板里用）。" },
   ],
   cssVars: [
     { name: "--sn-field", desc: "输入框底色", default: "白（深色主题深灰）", token: true },
@@ -77,7 +79,7 @@ export default {
     { name: ".sn-cm-files / .sn-cm-bar / .sn-cm-send", desc: "附件 / 底栏 / 发送按钮（生成中 .sn-busy）" },
   ],
   types: ["ComposerProps", "ComposerParts", "ComposerPartEvents", "ComposerContextItem", "ComposerOption", "ComposerMode", "ComposerTone"],
-  keyboard: [{ keys: "⌘↵ / Ctrl+↵", does: "发送。" }, { keys: "⇧↵", does: "换行。" }],
+  keyboard: [{ keys: "Enter", does: "默认直接发送（防护输入法选字）；submitKey 为 mod-enter 时为 ⌘↵ / Ctrl+↵ 发送。" }, { keys: "⇧↵", does: "换行。" }],
   a11y: {
     roles: ["发送按钮写 `aria-label`（\"生成\"），生成中换成\"停止\"；附件按钮写\"添加附件\"。"],
     focus: ["发送以后焦点留在输入框；停止以后回到可以接着写。"],

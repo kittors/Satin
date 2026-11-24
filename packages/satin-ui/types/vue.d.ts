@@ -8,7 +8,7 @@ export const Search: DefineComponent<{ search?(q: string): number | unknown[] | 
 export const CountInput: C<{ value?: string; max?: number; placeholder?: string; size?: "sm" | "lg" | "xl"; id?: string; name?: string }>;
 export const LongText: C<{ value?: string; max?: number; maxLines?: number; rows?: number; placeholder?: string; hint?: string; label?: string; id?: string; name?: string }>;
 /** 提示词输入框：@send 返回 Promise 时发送后进入"生成中"，结束回到可发送；send 是发送按钮的名字 */
-export const Composer: DefineComponent<{ placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; upload?(file: File, progress: (p: number) => void): Promise<unknown> } & ComposerParts>;
+export const Composer: DefineComponent<{ placeholder?: string; max?: number; maxLines?: number; attach?: boolean; voice?: boolean; send?: string; submitKey?: "enter" | "mod-enter"; upload?(file: File, progress: (p: number) => void): Promise<unknown> } & ComposerParts>;
 export const Email: C<{ value?: string; label?: string; help?: string; name?: string; id?: string; placeholder?: string; size?: "sm" | "lg" | "xl"; autocomplete?: string }>;
 /** 表格：v-model 绑勾上的行（selected），v-model:expanded 绑展开着的行（expandedKeys），v-model:sort 绑排序；事件写 @sort、@select、@row-click、@expand-change、@row-reorder……；插槽 #cell-<key>="{ value, row, index }" */
 export const Table: C<Omit<TableOptions, "onSort" | "onSelect" | "onRowClick" | "onExpandChange" | "onRowReorder" | "onColumnReorder" | "onColumnResize" | "onRowResize" | "onCellEdit" | "onPageChange" | "onRetry" | "onLayout"> & { /** v-model:expanded：展开着的行 */ expanded?: (string | number)[] }>;
