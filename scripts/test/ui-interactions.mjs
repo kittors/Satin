@@ -399,6 +399,26 @@ try {
     await inkPage.close();
   }
 
+  console.log("\n[10/10] 右键菜单区域尺寸饱满 + 真实右键唤起零裁切");
+  await gotoDoc(page, "#/c/ctxmenu");
+  {
+    const { handle, frame } = await waitIframeReady(page, "ctxmenu-context");
+    await handle.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(250);
+    const zone = frame.locator(".sn-ctx-zone").first();
+    const zbox = await zone.boundingBox();
+    assert(zbox.width >= 320 && zbox.height >= 140, "右键演示区保持饱满可点击面积不被 flex 压扁", `${Math.round(zbox.width)}×${Math.round(zbox.height)}px`);
+    await page.mouse.click(zbox.x + zbox.width / 2, zbox.y + zbox.height / 2, { button: "right" });
+    await page.waitForTimeout(300);
+    const menuOpen = await frame.locator(".sn-menu.sn-float.sn-open").count();
+    assert(menuOpen > 0, "在演示区右键成功唤起浮动菜单");
+    if (menuOpen > 0) {
+      const mRect = await hostRectOf(page, handle, frame, ".sn-menu.sn-float.sn-open");
+      assert(mRect.top >= navBottom - 1 && mRect.bottom <= vh + 1, "右键菜单完整落在视口内无裁切", `top=${Math.round(mRect.top)}, bottom=${Math.round(mRect.bottom)}`);
+    }
+    await page.keyboard.press("Escape");
+  }
+
   assert(pageErrors.length === 0, "全流程 0 pageerror", pageErrors.join(" | "));
 } finally {
   await browser.close();

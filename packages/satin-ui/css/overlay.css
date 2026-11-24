@@ -35,11 +35,14 @@
 .sn-tri-debug.sn-on { display: block; }
 .sn-tri-debug polygon { fill: rgba(255, 59, 48, .12); stroke: rgba(255, 59, 48, .55); stroke-width: 1; }
 
-/* 右键菜单的演示区 */
-.sn-ctx-zone { flex: 1; min-width: 260px; display: grid; place-content: center; justify-items: center; gap: 4px; height: 148px; border-radius: var(--sn-r-lg); background: var(--sn-fill-subtle);
-  color: var(--sn-label2); font: 500 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); box-shadow: inset 0 0 0 1px var(--sn-line); user-select: none; outline: none; transition: box-shadow .15s var(--sn-ease-out); }
+/* 右键菜单的演示区：横排 flex 自适应撑宽，竖排 / fit-content 容器下也稳定保持饱满可右键面积（360×148） */
+.sn-ctx-zone { flex: 1 1 auto; min-width: min(360px, calc(100vw - 48px)); max-width: 100%; min-height: 148px; padding: 20px 24px; box-sizing: border-box; display: grid; place-content: center; justify-items: center; gap: 4px; border-radius: var(--sn-r-lg); background: var(--sn-fill-subtle);
+  color: var(--sn-label2); font: 500 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); box-shadow: inset 0 0 0 1px var(--sn-line); user-select: none; outline: none;
+  transition: box-shadow .15s var(--sn-ease-out), background-color .15s var(--sn-ease-out); }
+@media (hover: hover) {
+.sn-ctx-zone:hover { background: var(--sn-fill-hover); box-shadow: inset 0 0 0 1px var(--sn-line-control); } }
 .sn-ctx-zone:focus-visible { box-shadow: inset 0 0 0 1px var(--sn-line), 0 0 0 2px var(--sn-focus); }
-.sn-ctx-zone.sn-active { box-shadow: inset 0 0 0 1px var(--sn-line-control-hover); }
+.sn-ctx-zone.sn-active { box-shadow: inset 0 0 0 1px var(--sn-line-control-hover); background: var(--sn-fill-hover); }
 /* 下钻：原位换层——下一层第一帧就完全不透明、盖住上一层，从 98% 放大；上一层在它底下隐去、点不到（退回去时反过来，退出的那层直接消失）。
    不横着滑：贴边时滑动会探出容器。过渡里不带平移：子菜单的关闭状态带着 -4px 平移和"0.1s 后才跳过去"的过渡，
    换成下钻时会一路带着 -4px 放大、最后一帧才跳回 4px（2026-11-20 用户录屏里的抖动） */
