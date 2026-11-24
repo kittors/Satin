@@ -1,6 +1,6 @@
 # 组件清单
 
-每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`popconfirm`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`table`、`grid`、`cgrid`、`list`、`card`、`tags`、`avatar`、`collapse`、`scrollarea`、`vlist`、`chat`、`md`、`flow`、`flowstress`、`image`、`media`、`upload`、`sidebar`、`tabs`、`reorder`、`addremove`、`optimistic`。
+每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`popconfirm`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`table`、`grid`、`cgrid`、`list`、`card`、`tags`、`avatar`、`collapse`、`scrollarea`、`vlist`、`chat`、`md`、`editorial`、`flow`、`flowstress`、`image`、`media`、`upload`、`sidebar`、`tabs`、`reorder`、`addremove`、`optimistic`。
 
 ## 契约格式（手写的 API 契约）
 
@@ -143,7 +143,7 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | `vlist` | 无限列表（VirtualList · InfiniteList） | ✓ | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置。滚到离底部 400px 时自动加载下一页，底部先出骨架行（300ms 内回来就不出）；加载失… |
 | `chat` | 聊天与 AI 对话（Chat） | ✓ | 超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条；已经载入的消息滚得再快、拖滚动条拖得再猛，都直接显示真内容，不换骨架，也不露白。发送时，输入框里… |
 | `md` | Markdown 文档（Markdown） | ✓ | AI 的回复、说明文档都用它渲染：标题、列表和任务、引用和提示块、表格、代码（高亮、行号、复制、自动换行、超高折叠）、图片（定高、定宽、定比例、加载占位、失败提… |
-| `editorial` | 图文编排与内容张力（Editorial） |  | 打破单调文字墙与 AI 模板卡：用大字阶非对称杂志头图、2px 拉引金句、去盒化极简数字带、不对称 Bento 视觉拼贴、交互悬浮标注点与调色/声波多元素组合，… |
+| `editorial` | 图文编排与内容张力（Editorial） | ✓ | 用尺度对比、留白节奏与真实交互组件构建出版级专题阅读体验：互动电影调色拉帘、就近锚定的光学靶心标注、无竖条衬线拉引金句，以及直接复用的 Satin 分段控件、弹… |
 | `flow` | 流程图（FlowCanvas） | ✓ | 做视频的流水线：原文 → 拆分 → 分镜；分镜一张卡连出五条线，画面、配音、配乐、音效、字幕并行做，再五条线汇到合成，最后分出横屏、竖屏两个导出。点"运行"按依… |
 | `flowstress` | 流程图 · 万级 ComfyUI 节点集群（Canvas · 异构多端口节点 · 视口裁剪 · 细节分级） | ✓ | 节点超过几百个后改由一块 Canvas 画布承接，按 1024px 空间网格做视口裁剪与三档 LOD 细节分级。全图由 500 座（1 万节点）或 2,500 … |
 

@@ -91,6 +91,9 @@ import VlistDemo0 from "../demos/vlist-0.vue";
 import ChatDemo0 from "../demos/chat-0.vue";
 import ChatDemo1 from "../demos/chat-1.vue";
 import MdDemo0 from "../demos/md-0.vue";
+import EditorialHotspot from "../demos/editorial-hotspot.vue";
+import EditorialCompare from "../demos/editorial-compare.vue";
+import EditorialBasic from "../demos/editorial-basic.vue";
 import EditorialDemo0 from "../demos/editorial-0.vue";
 import FlowDemo0 from "../demos/flow-0.vue";
 import ImageDemo0 from "../demos/image-0.vue";
@@ -550,6 +553,9 @@ import VlistRetry from "../demos/vlist-retry.vue";
   </section>
   <section id="editorial">
     <h2>图文编排与内容张力</h2>
+    <div class="demo" data-demo="editorial-hotspot"><DemoGuard slug="editorial-hotspot"><EditorialHotspot /></DemoGuard></div>
+    <div class="demo" data-demo="editorial-compare"><DemoGuard slug="editorial-compare"><EditorialCompare /></DemoGuard></div>
+    <div class="demo" data-demo="editorial-basic"><DemoGuard slug="editorial-basic"><EditorialBasic /></DemoGuard></div>
     <div class="demo" data-demo="editorial-0"><DemoGuard slug="editorial-0"><EditorialDemo0 /></DemoGuard></div>
   </section>
   <section id="flow">

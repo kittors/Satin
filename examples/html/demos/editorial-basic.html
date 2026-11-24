@@ -1,0 +1,35 @@
+<sn-enhance>
+  <div class="sn-ed" id="editorial-basic">
+    <header class="sn-ed-head">
+      <div class="sn-ed-title" role="heading" aria-level="3">把冷雨夜的光影层次，压进三分钟的留白里</div>
+      <p class="sn-ed-deck">在几乎没有对白的夜戏里，色彩温差、机位高度与环境声就是叙事本身。</p>
+    </header>
+    <figure class="sn-ed-quote">
+      <blockquote>“不要把画面填满，留出三分之一给雨雾和暗部，观众自己的想象会把情绪补完。”</blockquote>
+      <cite>导演分镜批注 · 第三集定稿评审</cite>
+    </figure>
+    <div class="sn-ed-palette-strip">
+      <span class="sn-ed-palette-lbl">本场实景主光采样</span>
+      <div class="sn-ed-swatches">
+        <button type="button" class="sn-ed-swatch" data-hex="#1C2733" style="--sn-c:#1C2733" data-tip="积水暗部阴影基调 · 点击复制"><i></i><b>雨夜深蓝</b><code>#1C2733</code><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>
+        <button type="button" class="sn-ed-swatch" data-hex="#4A6274" style="--sn-c:#4A6274" data-tip="雨幕漫反射中间调 · 点击复制"><i></i><b>钠灯冷灰</b><code>#4A6274</code><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>
+        <button type="button" class="sn-ed-swatch" data-hex="#C8935B" style="--sn-c:#C8935B" data-tip="候车厅室内暖光高光 · 点击复制"><i></i><b>钨丝暖琥珀</b><code>#C8935B</code><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>
+        <button type="button" class="sn-ed-swatch" data-hex="#7D2932" style="--sn-c:#7D2932" data-tip="列车制动灯点缀色 · 点击复制"><i></i><b>尾灯暗红</b><code>#7D2932</code><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>
+      </div>
+    </div>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { copied, toast } from "satin-ui";
+
+  const root = document.getElementById("editorial-basic");
+  for (const btn of root?.querySelectorAll(".sn-ed-swatch") || []) {
+    btn.addEventListener("click", () => {
+      const hex = btn.dataset.hex || "";
+      navigator.clipboard?.writeText(hex).catch(() => {});
+      copied(btn);
+      toast({ text: `已复制 ${hex}` });
+    });
+  }
+</script>

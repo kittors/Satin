@@ -94,6 +94,9 @@ import VlistDemo0 from "./demos/vlist-0.tsx";
 import ChatDemo0 from "./demos/chat-0.tsx";
 import ChatDemo1 from "./demos/chat-1.tsx";
 import MdDemo0 from "./demos/md-0.tsx";
+import EditorialHotspot from "./demos/editorial-hotspot.tsx";
+import EditorialCompare from "./demos/editorial-compare.tsx";
+import EditorialBasic from "./demos/editorial-basic.tsx";
 import EditorialDemo0 from "./demos/editorial-0.tsx";
 import FlowDemo0 from "./demos/flow-0.tsx";
 import ImageDemo0 from "./demos/image-0.tsx";
@@ -553,6 +556,9 @@ function Gallery() {
       </section>
       <section id="editorial">
         <h2>图文编排与内容张力</h2>
+        <div class="demo" data-demo="editorial-hotspot"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-hotspot 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialHotspot /></Errored></div>
+        <div class="demo" data-demo="editorial-compare"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-compare 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialCompare /></Errored></div>
+        <div class="demo" data-demo="editorial-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialBasic /></Errored></div>
         <div class="demo" data-demo="editorial-0"><Errored fallback={(err: () => unknown) => { console.error("演示 editorial-0 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><EditorialDemo0 /></Errored></div>
       </section>
       <section id="flow">

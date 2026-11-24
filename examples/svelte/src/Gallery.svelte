@@ -89,6 +89,9 @@
   import ChatDemo0 from "./demos/chat-0.svelte";
   import ChatDemo1 from "./demos/chat-1.svelte";
   import MdDemo0 from "./demos/md-0.svelte";
+  import EditorialHotspot from "./demos/editorial-hotspot.svelte";
+  import EditorialCompare from "./demos/editorial-compare.svelte";
+  import EditorialBasic from "./demos/editorial-basic.svelte";
   import EditorialDemo0 from "./demos/editorial-0.svelte";
   import FlowDemo0 from "./demos/flow-0.svelte";
   import ImageDemo0 from "./demos/image-0.svelte";
@@ -547,6 +550,9 @@
   </section>
   <section id="editorial">
     <h2>图文编排与内容张力</h2>
+    <div class="demo" data-demo="editorial-hotspot"><svelte:boundary onerror={(e) => console.error("演示 editorial-hotspot 出错：", e)}><EditorialHotspot />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="editorial-compare"><svelte:boundary onerror={(e) => console.error("演示 editorial-compare 出错：", e)}><EditorialCompare />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="editorial-basic"><svelte:boundary onerror={(e) => console.error("演示 editorial-basic 出错：", e)}><EditorialBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="editorial-0"><svelte:boundary onerror={(e) => console.error("演示 editorial-0 出错：", e)}><EditorialDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="flow">

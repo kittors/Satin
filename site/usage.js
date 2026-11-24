@@ -48,6 +48,7 @@ export const USAGE = {
   vlist: { css: ["scroll.css", "content.css"], api: [["createInfiniteList(容器, { loadPage, renderRow, rowHeight, total, pageSize, onCount })", C]] },
   chat: { css: ["content.css", "input.css", "data.css"], api: [["createChat(空容器或 .sn-chat, { title, respond, history })", "satin-ui/chat"]] },
   md: { css: ["md.css", "data.css"], api: [["createMarkdown(空容器, { source, codeMax, imgH, tableMax })", "satin-ui/markdown"], ["renderMarkdown(容器, 文本, 选项)", "satin-ui/markdown"]] },
+  editorial: { css: ["content.css", "data.css", "form.css", "overlay.css", "feedback.css", "scroll.css", "number.css"], api: [["createSegmented / createAudio / createPlayer / createNumberFlow / createScrollArea", C], ["openDialog / openLightbox / copied / optimistic / toast", C]], js: "出版编排版式（<code>.sn-ed-*</code>）与 Satin 真实组件组合使用，零假控件、零假波形" },
   flow: { css: ["content.css"], api: [["createFlow(空容器或 .sn-flow, { nodes, edges })", "satin-ui/flow"]] },
   // demoOnly：展示页自己的演示，没有组件库的代码——文档里不放代码面板，也不生成单独的示例（生成出来是空的）
   flowstress: { js: "万级节点压测是展示页自己的演示（画布绘制、布局都写在展示页里），不在组件库里", demoOnly: true },

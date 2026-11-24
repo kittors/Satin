@@ -10,137 +10,384 @@ defineElements();
   encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式
   template: `
     <div #root>
-      <article class="sn-ed">
-        <header class="sn-ed-hero">
-          <div class="sn-ed-hero-copy">
-            <div>
-              <span class="sn-ed-kicker"><i></i>雨夜车站 · 第三集摄影手记</span>
-              <div class="sn-ed-title" role="heading" aria-level="3">把冷雨夜的光影层次，压进三分钟的留白里</div>
-              <div class="sn-ed-deck">在没有密集对白的夜戏里，色彩温差、机位高度与环境声就是叙事本身。我们把站前广场的冷蓝积水与候车厅的暖黄钨丝灯拆成两条互相牵引的情绪线。</div>
-            </div>
-            <div class="sn-ed-byline">
-              <div class="sn-ed-author">
-                <sn-avatar seed="u3" name="林夏" size="32" decorative=""></sn-avatar>
-                <div>
-                  <b>林夏 · 摄影指导</b>
-                  <span>2026 年 11 月 19 日 · 4 分钟阅读</span>
-                </div>
-              </div>
-              <div class="sn-ed-acts">
-                <button type="button" class="sn-btn sn-primary sn-sm" data-i="play:before">看第三集样片</button>
-                <button type="button" class="sn-btn sn-secondary sn-sm" data-i="star:before">收藏手记</button>
+      <article class="sn-ed" id="editorialDemo">
+        <header class="sn-ed-head">
+          <div class="sn-ed-title" role="heading" aria-level="3">把冷雨夜的光影层次，压进三分钟的留白里</div>
+          <p class="sn-ed-deck">在几乎没有对白的夜戏里，色彩温差、机位高度与环境声就是叙事本身。我们把站前广场的冷蓝积水与候车厅的暖黄钨丝灯拆成两条互相牵引的情绪线。</p>
+          <div class="sn-ed-byline">
+            <div class="sn-ed-author">
+              <sn-avatar seed="u3" name="林夏" size="32" decorative=""></sn-avatar>
+              <div>
+                <b>林夏 · 摄影指导</b>
+                <span>2026 年 11 月 19 日 · 雨夜车站第三集 · 4 分钟阅读</span>
               </div>
             </div>
-          </div>
-          <div class="sn-ed-frame" data-ed-zoom="">
-            <img src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&amp;fit=crop&amp;w=960&amp;h=640&amp;q=80" alt="雨夜车站广场灯光倒影" decoding="async">
-            <span class="sn-ed-scrim" aria-hidden="true"></span>
-            <div class="sn-ed-exif">
-              <span class="sn-ed-glass">35mm · f/1.8 · 5200K · 1/60s</span>
-              <span class="sn-ed-cap-light">图 01 · 站前广场雨后倒影（点图放大）</span>
+            <div class="sn-ed-acts">
+              <button type="button" class="sn-btn sn-primary sn-sm" id="edWatchBtn" data-i="play:before">看第三集样片</button>
+              <button type="button" class="sn-btn sn-secondary sn-sm sn-ed-fav" id="edFavBtn" aria-pressed="false">
+                <span class="sn-ed-star" data-i="star"></span>
+                <span class="sn-ed-fav-t">收藏</span>
+                <span class="sn-ed-fav-n" id="edFavNum">24</span>
+              </button>
             </div>
           </div>
         </header>
+        <section class="sn-ed-stage" aria-label="电影调色前后对比">
+          <div class="sn-ed-stage-bar">
+            <span class="sn-ed-stage-meta">
+              <b>图 01 · 站前广场雨后倒影</b>
+              <span>35mm · f/1.8 · 5200K · 1/60s</span>
+            </span>
+            <div class="sn-ed-stage-ctrl">
+              <div id="edGradeSeg">
+                <div class="sn-seg sn-sm" aria-label="调色对比视角">
+                  <span class="sn-thumb"></span>
+                  <button type="button" data-v="对比拉帘">对比拉帘</button>
+                  <button type="button" data-v="Log 原片">Log 原片</button>
+                  <button type="button" data-v="5200K 定调">5200K 定调</button>
+                </div>
+              </div>
+              <button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-ed-open="0" data-i="maximize-2" data-tip="全屏查看原图" aria-label="全屏查看图 01 原图"></button>
+            </div>
+          </div>
+          <div class="sn-ed-compare" id="edCompare">
+            <div class="sn-ed-compare-layer sn-ed-compare-after">
+              <img src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=84" alt="雨夜车站广场 5200K 电影冷调定调帧" decoding="async">
+            </div>
+            <div class="sn-ed-compare-layer sn-ed-compare-before">
+              <img src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=84" alt="雨夜车站广场 Log 灰片原帧" decoding="async">
+            </div>
+            <span class="sn-ed-divider" aria-hidden="true"></span>
+            <button type="button" class="sn-ed-handle" id="edHandle" role="slider" aria-label="拖动对比 Log 原片与 5200K 定调画面" aria-valuemin="0" aria-valuemax="100" aria-valuenow="52">
+              <span data-i="chevron-left"></span>
+              <span data-i="chevron-right"></span>
+            </button>
+            <span class="sn-ed-tag sn-ed-tag-l" id="edTagL">Log 原片</span>
+            <span class="sn-ed-tag sn-ed-tag-r" id="edTagR">5200K 定调</span>
+          </div>
+          <div class="sn-ed-palette-strip">
+            <span class="sn-ed-palette-lbl">本场实景主光采样</span>
+            <div class="sn-ed-swatches">
+              <button type="button" class="sn-ed-swatch" data-hex="#1C2733" data-name="雨夜深蓝" style="--sn-c:#1C2733" data-tip="积水暗部阴影基调 · 点击复制">
+                <i></i>
+                <b>雨夜深蓝</b>
+                <code>#1C2733</code>
+                <span class="sn-swap">
+                  <span class="sn-a" data-i="copy"></span>
+                  <span class="sn-b" data-i="check"></span>
+                </span>
+              </button>
+              <button type="button" class="sn-ed-swatch" data-hex="#4A6274" data-name="钠灯冷灰" style="--sn-c:#4A6274" data-tip="雨幕漫反射中间调 · 点击复制">
+                <i></i>
+                <b>钠灯冷灰</b>
+                <code>#4A6274</code>
+                <span class="sn-swap">
+                  <span class="sn-a" data-i="copy"></span>
+                  <span class="sn-b" data-i="check"></span>
+                </span>
+              </button>
+              <button type="button" class="sn-ed-swatch" data-hex="#C8935B" data-name="钨丝暖琥珀" style="--sn-c:#C8935B" data-tip="候车厅室内暖光高光 · 点击复制">
+                <i></i>
+                <b>钨丝暖琥珀</b>
+                <code>#C8935B</code>
+                <span class="sn-swap">
+                  <span class="sn-a" data-i="copy"></span>
+                  <span class="sn-b" data-i="check"></span>
+                </span>
+              </button>
+              <button type="button" class="sn-ed-swatch" data-hex="#7D2932" data-name="尾灯暗红" style="--sn-c:#7D2932" data-tip="列车制动灯点缀色 · 点击复制">
+                <i></i>
+                <b>尾灯暗红</b>
+                <code>#7D2932</code>
+                <span class="sn-swap">
+                  <span class="sn-a" data-i="copy"></span>
+                  <span class="sn-b" data-i="check"></span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </section>
         <div class="sn-ed-article">
           <div class="sn-ed-prose">
             <div class="sn-ed-lead">开场前四十秒几乎没有人物近景。摄影机贴在离地六十厘米的湿润石板上方，让路灯在积水里拉出长而克制的纵向倒影，观众在看见林夏之前，先听见远处最后一班列车进站的制动低鸣。</div>
             <figure class="sn-ed-quote">
               <blockquote>“不要把画面填满，留出三分之一给雨雾和暗部，观众自己的想象会把情绪补完。”</blockquote>
-              <cite>— 导演分镜批注 · 第三集定稿评审</cite>
+              <cite>导演分镜批注 · 第三集定稿评审</cite>
             </figure>
-            <div class="sn-ed-p">进入候车厅以后，色温从室外的 5200K 缓慢滑向 3400K。长椅选用带有磨损木纹的旧松木，扶手反光刚好接住顶灯余晖；整段六分钟实拍素材最终剪入五个镜头，用一次十二帧叠化把雨声无缝送进站台。</div>
-            <div class="sn-ed-metrics">
-              <div class="sn-ed-metric">
-                <b>48</b>
-                <span>全集精修镜头</span>
-              </div>
-              <div class="sn-ed-metric">
-                <b>5200K</b>
-                <span>雨夜冷调基线</span>
-              </div>
-              <div class="sn-ed-metric">
-                <b>02:48</b>
-                <span>第三集成片时长</span>
-              </div>
-              <div class="sn-ed-metric">
-                <b>12</b>
-                <span>实景机位方案</span>
+            <div class="sn-ed-p">整集 <strong>48&nbsp;个精修镜头</strong>由 <strong>12&nbsp;组实景机位</strong>完成，最终成片 <strong>2&nbsp;分&nbsp;48&nbsp;秒</strong>。进入候车厅以后，色温从室外的 <strong>5200K</strong> 缓慢滑向 <strong>3400K</strong>：磨损松木长椅的扶手反光刚好接住顶灯余晖，六分钟实拍素材剪入五个镜头，用一次十二帧叠化把雨声无缝送进站台。</div>
+            <div class="sn-ed-audio-wrap">
+              <div id="edAudioHost">
+                <div class="sn-audio-row" data-src="https://assets.mixkit.co/music/127/127.mp3">
+                  <button class="sn-play" aria-label="播放">
+                    <span class="sn-swap">
+                      <span class="sn-a">
+                        <span data-i="play"></span>
+                      </span>
+                      <span class="sn-b">
+                        <span data-i="pause"></span>
+                      </span>
+                    </span>
+                  </button>
+                  <div class="sn-who">
+                    <b>站台雨夜环境音</b>
+                    <span>同期双声道 · 降噪后压低 6dB</span>
+                  </div>
+                  <div class="sn-wave sn-flat" role="slider" aria-label="播放进度" aria-valuemin="0" aria-valuemax="133">
+                    <div class="sn-wv">
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                    </div>
+                    <div class="sn-wv sn-pv">
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                    </div>
+                    <div class="sn-wv sn-lit">
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                    </div>
+                  </div>
+                  <span class="sn-time">2:14</span>
+                </div>
               </div>
             </div>
           </div>
           <aside class="sn-ed-aside">
             <figure class="sn-ed-fig">
-              <div class="sn-ed-fig-img" data-ed-zoom="">
-                <img src="https://images.unsplash.com/photo-1554103577-c0d26e9b90e0?auto=format&amp;fit=crop&amp;w=560&amp;h=420&amp;q=80" alt="候车厅暖光实景参考" decoding="async">
-              </div>
-              <figcaption><b>图 02 · 候车厅中景</b>：暖黄顶灯与冷色雨夜玻璃门形成天然画幅分割。</figcaption>
+              <button type="button" class="sn-ed-fig-img" data-ed-open="1" aria-label="全屏查看图 02：候车厅暖光实景参考">
+                <img src="https://images.unsplash.com/photo-1554103577-c0d26e9b90e0?auto=format&amp;fit=crop&amp;w=640&amp;h=400&amp;q=82" alt="候车厅暖光实景参考" decoding="async">
+                <span class="sn-ed-fig-zoom" data-i="maximize-2" aria-hidden="true"></span>
+              </button>
+              <figcaption><b>图 02 · 候车厅中景</b>：3400K 暖黄顶灯与冷色雨夜玻璃门形成天然画幅分割。</figcaption>
             </figure>
             <figure class="sn-ed-fig">
-              <div class="sn-ed-fig-img" data-ed-zoom="">
-                <img src="https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&amp;fit=crop&amp;w=560&amp;h=420&amp;q=80" alt="夜间铁道站台灯光" decoding="async">
-              </div>
+              <button type="button" class="sn-ed-fig-img" data-ed-open="2" aria-label="全屏查看图 03：站台九盏灯实景">
+                <img src="https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&amp;fit=crop&amp;w=640&amp;h=400&amp;q=82" alt="夜间铁道站台灯光" decoding="async">
+                <span class="sn-ed-fig-zoom" data-i="maximize-2" aria-hidden="true"></span>
+              </button>
               <figcaption><b>图 03 · 站台九盏灯</b>：长镜头慢摇过七盏灯，车灯恰好切入画框。</figcaption>
             </figure>
           </aside>
         </div>
-        <div class="sn-ed-bento">
-          <div class="sn-ed-tile sn-ed-wide" data-ed-zoom="">
-            <img src="https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&amp;fit=crop&amp;w=960&amp;h=560&amp;q=80" alt="夜色街道与雨幕高光分析" decoding="async">
-            <span class="sn-ed-scrim" aria-hidden="true"></span>
-            <button type="button" class="sn-ed-pin sn-on" style="--sn-x:30%;--sn-y:42%" aria-label="查看主光标注" aria-pressed="true"></button>
-            <button type="button" class="sn-ed-pin" style="--sn-x:72%;--sn-y:34%" aria-label="查看构图标注" aria-pressed="false"></button>
-            <div class="sn-ed-note" id="edPinNote">
-              <b>5200K 冷雨夜主光</b>
-              <span>站前广场积水反射冷白钠灯，压低高光饱和度，与后景候车厅 3400K 暖灯形成冷暖纵深。</span>
-            </div>
+        <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
+          <div class="sn-ed-inspect-hd">
+            <b>镜头 08 · 雨夜街道构图与光位剖析</b>
+            <span>点击画面光学靶心或下方索引切换标注，点击空白处收起浮卡</span>
           </div>
-          <div class="sn-ed-tile sn-ed-tall" data-ed-zoom="">
-            <img src="https://images.unsplash.com/photo-1541702467897-41915a07d3a7?auto=format&amp;fit=crop&amp;w=640&amp;h=900&amp;q=80" alt="竖幅夜雨光影特写" decoding="async">
-            <span class="sn-ed-scrim" aria-hidden="true"></span>
-            <div class="sn-ed-exif">
-              <span class="sn-ed-cap-light">镜 09 · 车灯切过侧脸的 1.4 秒停顿</span>
-            </div>
-          </div>
-          <div class="sn-ed-tile sn-ed-palette">
-            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
-              <b class="sn-t-body-strong">本场实景采样色板</b>
-              <span class="sn-t-caption sn-c-tertiary">点色块复制</span>
-            </div>
-            <div class="sn-ed-swatches">
-              <button type="button" class="sn-ed-swatch" data-hex="#1C2733" style="--sn-c:#1C2733">
-                <i></i>
-                <span>#1C2733</span>
-              </button>
-              <button type="button" class="sn-ed-swatch" data-hex="#4A6274" style="--sn-c:#4A6274">
-                <i></i>
-                <span>#4A6274</span>
-              </button>
-              <button type="button" class="sn-ed-swatch" data-hex="#C8935B" style="--sn-c:#C8935B">
-                <i></i>
-                <span>#C8935B</span>
-              </button>
-              <button type="button" class="sn-ed-swatch" data-hex="#7D2932" style="--sn-c:#7D2932">
-                <i></i>
-                <span>#7D2932</span>
-              </button>
-            </div>
-          </div>
-          <div class="sn-ed-tile sn-ed-sound" id="edSound">
-            <div class="sn-ed-sound-top">
-              <div>
-                <b>站台雨夜环境音 · 01:14</b>
-                <span>同期双声道 · 降噪后压低 6dB</span>
+          <div class="sn-ed-canvas" id="edInspect">
+            <img src="https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=84" alt="夜色街道与雨幕高光剖析帧" decoding="async">
+            <button type="button" class="sn-ed-canvas-zoom" data-ed-open="3" data-i="maximize-2" data-tip="全屏查看剖析帧" aria-label="全屏查看镜头 08 剖析帧"></button>
+            <button type="button" class="sn-ed-pin sn-on" data-pin="0" style="--sn-x:24%;--sn-y:74%" aria-label="标注 01：5200K 冷雨积水反射" aria-pressed="true"></button>
+            <button type="button" class="sn-ed-pin" data-pin="1" style="--sn-x:54%;--sn-y:36%" aria-label="标注 02：纵深电车视线引导" aria-pressed="false"></button>
+            <button type="button" class="sn-ed-pin" data-pin="2" style="--sn-x:78%;--sn-y:48%" aria-label="标注 03：右侧暗部三分留白" aria-pressed="false"></button>
+            <div class="sn-ed-pop" id="edPop" style="--sn-px:24%;--sn-py:74%" data-align="left" role="region" aria-live="polite">
+              <div class="sn-ed-pop-hd">
+                <span class="sn-ed-pop-idx" id="edPopIdx">01 / 03</span>
+                <button type="button" class="sn-ed-pop-next" id="edPopNext">下一处<span data-i="arrow-right"></span></button>
               </div>
-              <button type="button" class="sn-btn sn-primary sn-round sn-ibtn" data-ed-play="" aria-label="播放环境音" aria-pressed="false">
-                <span class="sn-swap">
-                  <span class="sn-a" data-i="play"></span>
-                  <span class="sn-b" data-i="pause"></span>
-                </span>
-              </button>
+              <div class="sn-ed-pop-body" id="edPopBody">
+                <b>5200K 冷雨积水反射</b>
+                <p>浅积水承接钠灯冷白反光并压低高光饱和度，与远景 3400K 暖灯拉开冷暖纵深。</p>
+              </div>
             </div>
-            <div class="sn-ed-wave" aria-hidden="true"></div>
           </div>
-        </div>
+          <div class="sn-ed-pin-bar">
+            <div class="sn-ed-pin-tabs" role="tablist" aria-label="构图标注点">
+              <button type="button" class="sn-ed-pin-tab sn-on" data-pin-tab="0" role="tab" aria-selected="true"><i>01</i>冷雨反射</button>
+              <button type="button" class="sn-ed-pin-tab" data-pin-tab="1" role="tab" aria-selected="false"><i>02</i>视线引导</button>
+              <button type="button" class="sn-ed-pin-tab" data-pin-tab="2" role="tab" aria-selected="false"><i>03</i>三分留白</button>
+            </div>
+            <span class="sn-ed-pin-hint">方向键 ← / → 切换标注</span>
+          </div>
+        </section>
+        <section class="sn-ed-reel-wrap" aria-label="第三集关键帧接触印相">
+          <div class="sn-ed-reel-hd">
+            <b>第三集关键帧接触印相</b>
+            <span>横向滑动或点击任意一帧进入连续大图预览</span>
+          </div>
+          <div class="sn-ed-reel" id="edReel">
+            <button type="button" class="sn-ed-shot" data-ed-open="0">
+              <div class="sn-ed-shot-img">
+                <img src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&amp;fit=crop&amp;w=480&amp;h=300&amp;q=80" alt="镜 01 站前广场" decoding="async">
+                <span class="sn-ed-fig-zoom" data-i="maximize-2" aria-hidden="true"></span>
+              </div>
+              <div class="sn-ed-shot-meta">
+                <b>站前广场倒影</b>
+                <span>00:14</span>
+              </div>
+            </button>
+            <button type="button" class="sn-ed-shot" data-ed-open="1">
+              <div class="sn-ed-shot-img">
+                <img src="https://images.unsplash.com/photo-1554103577-c0d26e9b90e0?auto=format&amp;fit=crop&amp;w=480&amp;h=300&amp;q=80" alt="镜 04 候车厅中景" decoding="async">
+                <span class="sn-ed-fig-zoom" data-i="maximize-2" aria-hidden="true"></span>
+              </div>
+              <div class="sn-ed-shot-meta">
+                <b>候车厅暖光</b>
+                <span>00:52</span>
+              </div>
+            </button>
+            <button type="button" class="sn-ed-shot" data-ed-open="2">
+              <div class="sn-ed-shot-img">
+                <img src="https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&amp;fit=crop&amp;w=480&amp;h=300&amp;q=80" alt="镜 07 站台九盏灯" decoding="async">
+                <span class="sn-ed-fig-zoom" data-i="maximize-2" aria-hidden="true"></span>
+              </div>
+              <div class="sn-ed-shot-meta">
+                <b>站台九盏灯</b>
+                <span>01:36</span>
+              </div>
+            </button>
+            <button type="button" class="sn-ed-shot" data-ed-open="4">
+              <div class="sn-ed-shot-img">
+                <img src="https://images.unsplash.com/photo-1541702467897-41915a07d3a7?auto=format&amp;fit=crop&amp;w=480&amp;h=300&amp;q=80" alt="镜 09 车灯切过侧脸" decoding="async">
+                <span class="sn-ed-fig-zoom" data-i="maximize-2" aria-hidden="true"></span>
+              </div>
+              <div class="sn-ed-shot-meta">
+                <b>车灯切过侧脸</b>
+                <span>02:18</span>
+              </div>
+            </button>
+          </div>
+        </section>
+        <dialog class="sn-dlg sn-ed-dlg" id="edVideoDlg" aria-labelledby="edVideoDlgTitle">
+          <div class="sn-hd">
+            <div style="flex:1">
+              <h3 id="edVideoDlgTitle">雨夜车站 · 第三集定调样片</h3>
+              <div class="sn-sub">5200K / 3400K 实景调色参考 · 720p</div>
+            </div>
+            <button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-cancel="" data-i="x" aria-label="关闭样片预览"></button>
+          </div>
+          <div class="sn-bd">
+            <div id="edPlayerHost"></div>
+          </div>
+        </dialog>
       </article>
     </div>`,
 })

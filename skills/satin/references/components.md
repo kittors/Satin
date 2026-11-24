@@ -86,7 +86,7 @@
 | [`vlist`](components/vlist.md) | 无限列表 · VirtualList · InfiniteList | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置 |
 | [`chat`](components/chat.md) | 聊天与 AI 对话 · Chat | 超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条 |
 | [`md`](components/md.md) | Markdown 文档 · Markdown | AI 的回复、说明文档都用它渲染：标题、列表和任务、引用和提示块、表格、代码（高亮、行号、复制、自动换行、超高折叠）、图片（定高、定宽、定比例、加载占位、失败提示、点开放大）、公式（TeX 写法转成浏览器原生的 MathML） |
-| [`editorial`](components/editorial.md) | 图文编排与内容张力 · Editorial | 打破单调文字墙与 AI 模板卡：用大字阶非对称杂志头图、2px 拉引金句、去盒化极简数字带、不对称 Bento 视觉拼贴、交互悬浮标注点与调色/声波多元素组合，让文字、段落与影像自带张力与节奏 |
+| [`editorial`](components/editorial.md) | 图文编排与内容张力 · Editorial | 用尺度对比、留白节奏与真实交互组件构建出版级专题阅读体验：互动电影调色拉帘、就近锚定的光学靶心标注、无竖条衬线拉引金句，以及直接复用的 Satin 分段控件、弹窗视频播放器、真实波形音频条、乐观更新数字滚变与横向接触印相胶片条 |
 | [`flow`](components/flow.md) | 流程图 · FlowCanvas | 做视频的流水线：原文 → 拆分 → 分镜 |
 | [`flowstress`](components/flowstress.md) | 流程图 · 万级 ComfyUI 节点集群 · Canvas · 异构多端口节点 · 视口裁剪 · 细节分级 | 节点超过几百个后改由一块 Canvas 画布承接，按 1024px 空间网格做视口裁剪与三档 LOD 细节分级 |
 

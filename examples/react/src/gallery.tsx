@@ -94,6 +94,9 @@ import VlistDemo0 from "./demos/vlist-0.tsx";
 import ChatDemo0 from "./demos/chat-0.tsx";
 import ChatDemo1 from "./demos/chat-1.tsx";
 import MdDemo0 from "./demos/md-0.tsx";
+import EditorialHotspot from "./demos/editorial-hotspot.tsx";
+import EditorialCompare from "./demos/editorial-compare.tsx";
+import EditorialBasic from "./demos/editorial-basic.tsx";
 import EditorialDemo0 from "./demos/editorial-0.tsx";
 import FlowDemo0 from "./demos/flow-0.tsx";
 import ImageDemo0 from "./demos/image-0.tsx";
@@ -563,6 +566,9 @@ function Gallery() {
       </section>
       <section id="editorial">
         <h2>图文编排与内容张力</h2>
+        <div className="demo" data-demo="editorial-hotspot"><Guard slug="editorial-hotspot"><EditorialHotspot /></Guard></div>
+        <div className="demo" data-demo="editorial-compare"><Guard slug="editorial-compare"><EditorialCompare /></Guard></div>
+        <div className="demo" data-demo="editorial-basic"><Guard slug="editorial-basic"><EditorialBasic /></Guard></div>
         <div className="demo" data-demo="editorial-0"><Guard slug="editorial-0"><EditorialDemo0 /></Guard></div>
       </section>
       <section id="flow">

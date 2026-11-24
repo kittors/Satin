@@ -1,0 +1,72 @@
+<sn-enhance>
+  <section class="sn-ed-inspect" id="editorial-hotspot" aria-label="雨夜构图与布光剖析">
+    <div class="sn-ed-canvas">
+      <img src="https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1200&h=675&q=84" alt="夜色街道与雨幕高光剖析帧" decoding="async">
+      <button type="button" class="sn-ed-canvas-zoom" data-i="maximize-2" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧"></button>
+      <button type="button" class="sn-ed-pin sn-on" style="--sn-x:24%;--sn-y:74%" aria-label="标注 01：5200K 冷雨积水反射" aria-pressed="true"></button>
+      <button type="button" class="sn-ed-pin" style="--sn-x:54%;--sn-y:36%" aria-label="标注 02：纵深电车视线引导" aria-pressed="false"></button>
+      <button type="button" class="sn-ed-pin" style="--sn-x:78%;--sn-y:48%" aria-label="标注 03：右侧暗部三分留白" aria-pressed="false"></button>
+      <div class="sn-ed-pop" style="--sn-px:24%;--sn-py:74%" data-align="left" role="region" aria-live="polite">
+        <div class="sn-ed-pop-hd">
+          <span class="sn-ed-pop-idx">01 / 03</span>
+          <button type="button" class="sn-ed-pop-next">下一处<span data-i="arrow-right"></span></button>
+        </div>
+        <div class="sn-ed-pop-body">
+          <b>5200K 冷雨积水反射</b>
+          <p>浅积水承接钠灯冷白反光并压低高光饱和度，与远景 3400K 暖灯拉开冷暖纵深。</p>
+        </div>
+      </div>
+    </div>
+    <div class="sn-ed-pin-bar">
+      <div class="sn-ed-pin-tabs" role="tablist" aria-label="构图标注点">
+        <button type="button" class="sn-ed-pin-tab sn-on" role="tab" aria-selected="true"><i>01</i>冷雨反射</button>
+        <button type="button" class="sn-ed-pin-tab" role="tab" aria-selected="false"><i>02</i>视线引导</button>
+        <button type="button" class="sn-ed-pin-tab" role="tab" aria-selected="false"><i>03</i>三分留白</button>
+      </div>
+      <span class="sn-ed-pin-hint">点击靶心切换，点空白收起</span>
+    </div>
+  </section>
+</sn-enhance>
+
+<script type="module">
+  import { openLightbox } from "satin-ui/lightbox";
+
+  const SPOTS = [
+    { x: 24, y: 74, align: "left", side: "above", title: "5200K 冷雨积水反射", desc: "浅积水承接钠灯冷白反光并压低高光饱和度，与远景 3400K 暖灯拉开冷暖纵深。" },
+    { x: 54, y: 36, align: "center", side: "below", title: "纵深电车视线引导", desc: "两侧路沿与湿润车道向画面中心汇聚，车灯成为唯一暖色高光锚点。" },
+    { x: 78, y: 48, align: "right", side: "below", title: "右侧暗部三分留白", desc: "刻意压暗右侧建筑体块保留三分之一负空间，为片名与字幕留出纯净通道。" },
+  ];
+  const root = document.getElementById("editorial-hotspot");
+  const canvas = root?.querySelector(".sn-ed-canvas");
+  const pop = root?.querySelector(".sn-ed-pop");
+  const idxEl = root?.querySelector(".sn-ed-pop-idx");
+  const body = root?.querySelector(".sn-ed-pop-body");
+  const pins = [...(root?.querySelectorAll(".sn-ed-pin") || [])];
+  const tabs = [...(root?.querySelectorAll(".sn-ed-pin-tab") || [])];
+  let cur = 0;
+  const pick = (i) => {
+    cur = ((i % SPOTS.length) + SPOTS.length) % SPOTS.length;
+    const s = SPOTS[cur];
+    pins.forEach((p, k) => { p.classList.toggle("sn-on", k === cur); p.setAttribute("aria-pressed", String(k === cur)); });
+    tabs.forEach((t, k) => { t.classList.toggle("sn-on", k === cur); t.setAttribute("aria-selected", String(k === cur)); });
+    pop?.classList.remove("sn-ed-hidden");
+    pop?.style.setProperty("--sn-px", `${s.x}%`);
+    pop?.style.setProperty("--sn-py", `${s.y}%`);
+    if (pop) { pop.dataset.align = s.align; if (s.side === "below") pop.dataset.side = "below"; else delete pop.dataset.side; }
+    if (idxEl) idxEl.textContent = `${String(cur + 1).padStart(2, "0")} / 03`;
+    if (body) { body.querySelector("b").textContent = s.title; body.querySelector("p").textContent = s.desc; }
+  };
+  pins.forEach((p, i) => p.addEventListener("click", (e) => { e.stopPropagation(); pick(i); }));
+  tabs.forEach((t, i) => t.addEventListener("click", () => pick(i)));
+  root?.querySelector(".sn-ed-pop-next")?.addEventListener("click", (e) => { e.stopPropagation(); pick(cur + 1); });
+  root?.querySelector(".sn-ed-canvas-zoom")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openLightbox([{ bg: 'url("https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1000&q=84") center / cover', ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+  });
+  canvas?.addEventListener("click", (e) => {
+    if (e.target.closest(".sn-ed-pin, .sn-ed-pop, .sn-ed-canvas-zoom")) return;
+    pop?.classList.add("sn-ed-hidden");
+    pins.forEach((p) => { p.classList.remove("sn-on"); p.setAttribute("aria-pressed", "false"); });
+    tabs.forEach((t) => { t.classList.remove("sn-on"); t.setAttribute("aria-selected", "false"); });
+  });
+</script>
