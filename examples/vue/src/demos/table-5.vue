@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { Avatar as SnAvatar } from "satin-ui/vue";
@@ -6,11 +6,12 @@ import { createScrollArea } from "satin-ui/components";
 import "satin-ui/css/data.css";
 import "satin-ui/css/scroll.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // .sn-tbl-sc 限高（--sn-tbl-max）以后在框里滚；表头 position: sticky 吸在顶上
     // 不加边缘渐隐（fade: "none"），免得表头被淡掉；表格不回弹：滚到头就停住，再滚一次交给页面
     createScrollArea(root.querySelector(".sn-tbl-sc"), { fade: "none" });

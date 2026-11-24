@@ -20,7 +20,7 @@ import { openLightbox } from "satin-ui/lightbox";
           <span class="sn-tag-ratio">16:9</span>
           <div class="sn-err"><span data-i="image-off"></span>图片加载失败<button class="sn-textbtn" data-img-retry="">重试</button></div>
         </div>
-        <div class="sn-im sn-loaded" data-n="1">
+        <div class="sn-im" data-n="1">
           <span class="sn-ph sn-sk"></span>
           <span class="sn-pic"></span>
           <span class="sn-tag-ratio">1:1</span>
@@ -61,7 +61,7 @@ export class ImageDemo0Component {
       const grid = root.querySelector("#imgGrid");
       const ims = () => [...grid.querySelectorAll(".sn-im")];
       function load() {
-        ims().forEach((im?: any, i?: any) => { im.classList.remove("sn-loaded", "sn-failed"); setTimeout(() => im.classList.add(i === 3 ? "sn-failed" : "sn-loaded"), 400 + i * 260 + Math.random() * 300); });
+        ims().forEach((im?: any, i?: any) => { im.classList.remove("sn-loaded", "sn-failed"); window.setTimeout(() => im.classList.add(i === 3 ? "sn-failed" : "sn-loaded"), 400 + i * 260 + Math.random() * 300); });
       }
       load();
       root.querySelector("[data-img-reload]").addEventListener("click", load);
@@ -73,7 +73,7 @@ export class ImageDemo0Component {
       const thumbOf = (i?: any) => grid.querySelector(`.sn-im[data-n="${i}"]`), enabled = (i?: any) => thumbOf(i)?.classList.contains("sn-loaded");
       grid.addEventListener("click", (e?: any) => {
         const retry = e.target.closest("[data-img-retry]"), im = e.target.closest(".sn-im");
-        if (retry) { im.classList.remove("sn-failed"); setTimeout(() => im.classList.add("sn-loaded"), 700); return; } // 换成真的重新请求
+        if (retry) { im.classList.remove("sn-failed"); window.setTimeout(() => im.classList.add("sn-loaded"), 700); return; } // 换成真的重新请求
         if (im?.classList.contains("sn-loaded")) openLightbox(items(), Number(im.dataset.n), { thumbOf, enabled });
       });
       grid.addEventListener("keydown", (e?: any) => { const im = e.target.closest(".sn-im"); if (im && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); im.click(); } });

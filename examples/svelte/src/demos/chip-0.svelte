@@ -1,14 +1,15 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance, injectIcons } from "satin-ui";
   import { removeChip } from "satin-ui/components";
   import "satin-ui/css/buttons.css";
   import "./chip-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 筛选芯片：点了切换 .sn-on，aria-pressed 跟着变
       for (const c of root.querySelectorAll(".sn-chip[data-toggle]")) {
         c.setAttribute("aria-pressed", String(c.classList.contains("sn-on")));
@@ -17,11 +18,11 @@
 
       // 可移除标签：点 × 先脱离布局淡出，剩下的用弹簧补位；移除后容器上冒泡 chipremove
       const row = root.querySelector('[data-chips="removable"]');
-      row.addEventListener("click", (e) => {
+      row.addEventListener("click", (e?: any) => {
         const x = e.target.closest(".sn-chip .sn-x");
         if (x) removeChip(x.closest(".sn-chip"));
       });
-      row.addEventListener("chipremove", (e) => console.log("移除了", e.detail.chip.textContent));
+      row.addEventListener("chipremove", (e?: any) => console.log("移除了", e.detail.chip.textContent));
     });
     return () => { off(); unsetup(); };
   });

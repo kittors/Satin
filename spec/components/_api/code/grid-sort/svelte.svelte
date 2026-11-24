@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
   // sortable 的列点表头排序：升序 → 降序 → 不排
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180, sortable: true },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
     { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
@@ -16,8 +17,8 @@
     { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
-  const TITLES = { name: "名称", shots: "镜头", dur: "时长" };
-  const describe = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
+  const TITLES: Record<string, string> = { name: "名称", shots: "镜头", dur: "时长" };
+  const describe = (s: { key: string; dir: number } | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
   // bind:sort：{ key, dir }（dir 1 升序、-1 降序）或 null
   let sort = $state({ key: "shots", dir: -1 });
 </script>

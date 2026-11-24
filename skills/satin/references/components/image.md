@@ -52,7 +52,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row" id="image-basic">
   <div class="sn-im" role="button" tabindex="0" aria-label="看大图：夜里停在站台边的电车" style="height:120px;aspect-ratio:4 / 3;--sn-g:url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&h=240&q=72) center"><span class="sn-ph sn-sk"></span><span class="sn-pic"></span></div>
   <div class="sn-im" role="button" tabindex="0" aria-label="看大图：雨天街上走路的人" style="height:120px;aspect-ratio:4 / 3;--sn-g:url(https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72) center"><span class="sn-ph sn-sk"></span><span class="sn-pic"></span></div>
@@ -91,11 +91,11 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef, useState } from "react";
-import { Lightbox } from "satin-ui/react";
+import { Lightbox, type LightboxItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: (LightboxItem & { thumb: string })[] = [
   { src: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "夜里停在站台边的电车" },
   { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "雨天街上走路的人" },
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
@@ -103,21 +103,21 @@ const ITEMS = [
 
 export default function Gallery() {
   // 点缩略图：图片从缩略图的位置长到铺满窗口；滚轮、捏合、双击缩放，左右键翻页，Esc 关上沿原路缩回；index 是数字就打开到那一张，onClose 里设回 null
-  const [state, setState] = useState({}), [index, setIndex] = useState(null), thumbs = useRef([]);
+  const [state, setState] = useState<Record<number, string | undefined>>({}), [index, setIndex] = useState<number | null>(null), thumbs = useRef<(HTMLDivElement | null)[]>([]);
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   useEffect(() => ITEMS.forEach((_, i) => load(i)), []);
-  const ok = (i) => state[i] === "sn-loaded";
-  const open = (i) => { if (ok(i)) setIndex(i); };
+  const ok = (i: number) => state[i] === "sn-loaded";
+  const open = (i: number) => { if (ok(i)) setIndex(i); };
   return (
     <div className="sn-row">
       {ITEMS.map((it, i) => (
-        <div key={it.src} ref={(el) => (thumbs.current[i] = el)} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
+        <div key={it.src} ref={(el) => { thumbs.current[i] = el; }} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
           style={{ height: 120, aspectRatio: "4 / 3", "--sn-g": `url(${it.thumb}) center` }}
           onClick={() => open(i)} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } }}>
           <span className="sn-ph sn-sk" />
@@ -133,7 +133,7 @@ export default function Gallery() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { Lightbox } from "satin-ui/vue";
 
@@ -142,17 +142,17 @@ const ITEMS = [
   { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "雨天街上走路的人" },
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
 ];
-const state = reactive({}), index = ref(null), thumbs = [];
+const state = reactive<Record<number, string | undefined>>({}), index = ref<number | null>(null), thumbs: (HTMLDivElement | null)[] = [];
 // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-const load = (i) => {
+const load = (i: number) => {
   const img = new Image(), fail = () => (state[i] = "sn-failed");
   img.onload = () => (state[i] = "sn-loaded");
   img.onerror = fail;
   img.src = ITEMS[i].thumb;
 };
 onMounted(() => ITEMS.forEach((_, i) => load(i)));
-const ok = (i) => state[i] === "sn-loaded";
-const open = (i) => { if (ok(i)) index.value = i; };
+const ok = (i: number) => state[i] === "sn-loaded";
+const open = (i: number) => { if (ok(i)) index.value = i; };
 </script>
 
 <template>
@@ -170,8 +170,8 @@ const open = (i) => { if (ok(i)) index.value = i; };
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { openLightbox } from "satin-ui/lightbox";
 
   const ITEMS = [
@@ -180,20 +180,20 @@ Svelte 的写法：
     { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
   ];
   // 点缩略图：图片从缩略图的位置长到铺满窗口；滚轮、捏合、双击缩放，左右键翻页，Esc 关上沿原路缩回
-  let state = $state({});
-  const thumbs = [];
+  let state = $state<Record<number, string | undefined>>({});
+  const thumbs: (HTMLDivElement | null)[] = [];
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
+  const load = (i: number) => {
     const img = new Image(), fail = () => (state[i] = "sn-failed");
     img.onload = () => (state[i] = "sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   $effect(() => ITEMS.forEach((_, i) => load(i)));
-  const ok = (i) => state[i] === "sn-loaded";
+  const ok = (i: number) => state[i] === "sn-loaded";
   // 图片从缩略图的位置长到铺满窗口，关上时沿原路缩回；左右翻页跳过没加载好的
-  const open = (i) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k) => thumbs[k], enabled: ok }); };
-  const onkey = (e, i) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
+  const open = (i: number) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k: number) => thumbs[k], enabled: ok }); };
+  const onkey = (e: KeyboardEvent, i: number) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
 </script>
 
 <div class="sn-row">
@@ -261,7 +261,7 @@ export class ImageBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, createSignal, onSettled } from "solid-js";
 import { openLightbox } from "satin-ui/lightbox";
 
@@ -273,18 +273,18 @@ const ITEMS = [
 
 export default function Gallery() {
   // 点缩略图：图片从缩略图的位置长到铺满窗口；滚轮、捏合、双击缩放，左右键翻页，Esc 关上沿原路缩回
-  const [state, setState] = createSignal({}), thumbs = [];
+  const [state, setState] = createSignal<Record<number, string | undefined>>({}), thumbs: (HTMLDivElement | null)[] = [];
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   onSettled(() => ITEMS.forEach((_, i) => load(i)));
-  const ok = (i) => state()[i] === "sn-loaded";
+  const ok = (i: number) => state()[i] === "sn-loaded";
   // 图片从缩略图的位置长到铺满窗口，关上时沿原路缩回；左右翻页跳过没加载好的
-  const open = (i) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k) => thumbs[k], enabled: ok }); };
+  const open = (i: number) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k: number) => thumbs[k], enabled: ok }); };
   return (
     <div class="sn-row">
       <For each={ITEMS}>{(it, i) => (
@@ -302,11 +302,11 @@ export default function Gallery() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef, useState } from "react";
-import { Lightbox } from "satin-ui/react";
+import { Lightbox, type LightboxItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: (LightboxItem & { thumb: string })[] = [
   { src: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "夜里停在站台边的电车" },
   { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "雨天街上走路的人" },
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
@@ -314,21 +314,21 @@ const ITEMS = [
 
 export default function Gallery() {
   // 点缩略图：图片从缩略图的位置长到铺满窗口；滚轮、捏合、双击缩放，左右键翻页，Esc 关上沿原路缩回；index 是数字就打开到那一张，onClose 里设回 null
-  const [state, setState] = useState({}), [index, setIndex] = useState(null), thumbs = useRef([]);
+  const [state, setState] = useState<Record<number, string | undefined>>({}), [index, setIndex] = useState<number | null>(null), thumbs = useRef<(HTMLDivElement | null)[]>([]);
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   useEffect(() => ITEMS.forEach((_, i) => load(i)), []);
-  const ok = (i) => state[i] === "sn-loaded";
-  const open = (i) => { if (ok(i)) setIndex(i); };
+  const ok = (i: number) => state[i] === "sn-loaded";
+  const open = (i: number) => { if (ok(i)) setIndex(i); };
   return (
     <div class="sn-row">
       {ITEMS.map((it, i) => (
-        <div key={it.src} ref={(el) => (thumbs.current[i] = el)} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
+        <div key={it.src} ref={(el) => { thumbs.current[i] = el; }} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
           style={{ height: 120, aspectRatio: "4 / 3", "--sn-g": `url(${it.thumb}) center` }}
           onClick={() => open(i)} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } }}>
           <span class="sn-ph sn-sk" />
@@ -351,7 +351,7 @@ type 写 "video" 在看图层里直接播；index 由页面决定，自己的按
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack" id="image-controlled">
   <div class="sn-row">
     <div class="sn-im" role="button" tabindex="0" aria-label="看大图：夜里停在站台边的电车" style="height:120px;aspect-ratio:4 / 3;--sn-g:url(https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&h=240&q=72) center"><span class="sn-ph sn-sk"></span><span class="sn-pic"></span></div>
@@ -397,11 +397,11 @@ type 写 "video" 在看图层里直接播；index 由页面决定，自己的按
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef, useState } from "react";
-import { Lightbox } from "satin-ui/react";
+import { Lightbox, type LightboxItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: (LightboxItem & { thumb: string })[] = [
   { src: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "夜里停在站台边的电车" },
   { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "雨天街上走路的人" },
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
@@ -410,22 +410,22 @@ const ITEMS = [
 
 export default function GalleryWithClip() {
   // 视频也放进看图层：type 写 "video"、src 是视频地址、poster 是封面，在里面直接播；受控：自己的按钮把 index 设成视频那一张；index 是数字就打开到那一张，onClose 里设回 null
-  const [state, setState] = useState({}), [index, setIndex] = useState(null), thumbs = useRef([]);
+  const [state, setState] = useState<Record<number, string | undefined>>({}), [index, setIndex] = useState<number | null>(null), thumbs = useRef<(HTMLDivElement | null)[]>([]);
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   useEffect(() => ITEMS.forEach((_, i) => load(i)), []);
-  const ok = (i) => state[i] === "sn-loaded";
-  const open = (i) => { if (ok(i)) setIndex(i); };
+  const ok = (i: number) => state[i] === "sn-loaded";
+  const open = (i: number) => { if (ok(i)) setIndex(i); };
   return (
     <div className="sn-stack">
       <div className="sn-row">
         {ITEMS.map((it, i) => (
-          <div key={it.src} ref={(el) => (thumbs.current[i] = el)} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
+          <div key={it.src} ref={(el) => { thumbs.current[i] = el; }} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
             style={{ height: 120, aspectRatio: "4 / 3", "--sn-g": `url(${it.thumb}) center` }}
             onClick={() => open(i)} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } }}>
             <span className="sn-ph sn-sk" />
@@ -443,7 +443,7 @@ export default function GalleryWithClip() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { Lightbox } from "satin-ui/vue";
 
@@ -453,17 +453,17 @@ const ITEMS = [
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
   { type: "video", src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", thumb: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", ratio: 16 / 9, alt: "雨夜样片" },
 ];
-const state = reactive({}), index = ref(null), thumbs = [];
+const state = reactive<Record<number, string | undefined>>({}), index = ref<number | null>(null), thumbs: (HTMLDivElement | null)[] = [];
 // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-const load = (i) => {
+const load = (i: number) => {
   const img = new Image(), fail = () => (state[i] = "sn-failed");
   img.onload = () => (state[i] = "sn-loaded");
   img.onerror = fail;
   img.src = ITEMS[i].thumb;
 };
 onMounted(() => ITEMS.forEach((_, i) => load(i)));
-const ok = (i) => state[i] === "sn-loaded";
-const open = (i) => { if (ok(i)) index.value = i; };
+const ok = (i: number) => state[i] === "sn-loaded";
+const open = (i: number) => { if (ok(i)) index.value = i; };
 </script>
 
 <template>
@@ -484,8 +484,8 @@ const open = (i) => { if (ok(i)) index.value = i; };
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { openLightbox } from "satin-ui/lightbox";
 
   const ITEMS = [
@@ -495,20 +495,20 @@ Svelte 的写法：
     { type: "video", src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", thumb: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", ratio: 16 / 9, alt: "雨夜样片" },
   ];
   // 视频也放进看图层：type 写 "video"、src 是视频地址、poster 是封面，在里面直接播；受控：自己的按钮直接打开到视频那一张
-  let state = $state({});
-  const thumbs = [];
+  let state = $state<Record<number, string | undefined>>({});
+  const thumbs: (HTMLDivElement | null)[] = [];
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
+  const load = (i: number) => {
     const img = new Image(), fail = () => (state[i] = "sn-failed");
     img.onload = () => (state[i] = "sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   $effect(() => ITEMS.forEach((_, i) => load(i)));
-  const ok = (i) => state[i] === "sn-loaded";
+  const ok = (i: number) => state[i] === "sn-loaded";
   // 图片从缩略图的位置长到铺满窗口，关上时沿原路缩回；左右翻页跳过没加载好的
-  const open = (i) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k) => thumbs[k], enabled: ok }); };
-  const onkey = (e, i) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
+  const open = (i: number) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k: number) => thumbs[k], enabled: ok }); };
+  const onkey = (e: KeyboardEvent, i: number) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
 </script>
 
 <div class="sn-stack">
@@ -583,7 +583,7 @@ export class ImageControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, createSignal, onSettled } from "solid-js";
 import { openLightbox } from "satin-ui/lightbox";
 
@@ -596,18 +596,18 @@ const ITEMS = [
 
 export default function GalleryWithClip() {
   // 视频也放进看图层：type 写 "video"、src 是视频地址、poster 是封面，在里面直接播；受控：自己的按钮直接打开到视频那一张
-  const [state, setState] = createSignal({}), thumbs = [];
+  const [state, setState] = createSignal<Record<number, string | undefined>>({}), thumbs: (HTMLDivElement | null)[] = [];
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   onSettled(() => ITEMS.forEach((_, i) => load(i)));
-  const ok = (i) => state()[i] === "sn-loaded";
+  const ok = (i: number) => state()[i] === "sn-loaded";
   // 图片从缩略图的位置长到铺满窗口，关上时沿原路缩回；左右翻页跳过没加载好的
-  const open = (i) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k) => thumbs[k], enabled: ok }); };
+  const open = (i: number) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k: number) => thumbs[k], enabled: ok }); };
   return (
     <div class="sn-stack">
       <div class="sn-row">
@@ -628,11 +628,11 @@ export default function GalleryWithClip() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef, useState } from "react";
-import { Lightbox } from "satin-ui/react";
+import { Lightbox, type LightboxItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: (LightboxItem & { thumb: string })[] = [
   { src: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "夜里停在站台边的电车" },
   { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "雨天街上走路的人" },
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
@@ -641,22 +641,22 @@ const ITEMS = [
 
 export default function GalleryWithClip() {
   // 视频也放进看图层：type 写 "video"、src 是视频地址、poster 是封面，在里面直接播；受控：自己的按钮把 index 设成视频那一张；index 是数字就打开到那一张，onClose 里设回 null
-  const [state, setState] = useState({}), [index, setIndex] = useState(null), thumbs = useRef([]);
+  const [state, setState] = useState<Record<number, string | undefined>>({}), [index, setIndex] = useState<number | null>(null), thumbs = useRef<(HTMLDivElement | null)[]>([]);
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   useEffect(() => ITEMS.forEach((_, i) => load(i)), []);
-  const ok = (i) => state[i] === "sn-loaded";
-  const open = (i) => { if (ok(i)) setIndex(i); };
+  const ok = (i: number) => state[i] === "sn-loaded";
+  const open = (i: number) => { if (ok(i)) setIndex(i); };
   return (
     <div class="sn-stack">
       <div class="sn-row">
         {ITEMS.map((it, i) => (
-          <div key={it.src} ref={(el) => (thumbs.current[i] = el)} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
+          <div key={it.src} ref={(el) => { thumbs.current[i] = el; }} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
             style={{ height: 120, aspectRatio: "4 / 3", "--sn-g": `url(${it.thumb}) center` }}
             onClick={() => open(i)} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } }}>
             <span class="sn-ph sn-sk" />
@@ -681,7 +681,7 @@ export default function GalleryWithClip() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-row" id="image-failed">
@@ -727,11 +727,11 @@ export default function GalleryWithClip() {
 
 React 的写法：
 
-```jsx
-import { useEffect, useRef, useState } from "react";
-import { Icon, Lightbox } from "satin-ui/react";
+```tsx
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { Icon, Lightbox, type LightboxItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: (LightboxItem & { thumb: string })[] = [
   { src: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "夜里停在站台边的电车" },
   { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "雨天街上走路的人" },
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
@@ -740,23 +740,23 @@ const failOnce = new Set([1]); // 演示用：第二张第一次当作加载失�
 
 export default function GalleryRetry() {
   // 加载失败显示图标和"重试"，点了再加载一次；左右翻页跳过失败的那张；index 是数字就打开到那一张，onClose 里设回 null
-  const [state, setState] = useState({}), [index, setIndex] = useState(null), thumbs = useRef([]);
+  const [state, setState] = useState<Record<number, string | undefined>>({}), [index, setIndex] = useState<number | null>(null), thumbs = useRef<(HTMLDivElement | null)[]>([]);
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     if (failOnce.delete(i)) setTimeout(fail, 600);
     else img.src = ITEMS[i].thumb;
   };
   useEffect(() => ITEMS.forEach((_, i) => load(i)), []);
-  const ok = (i) => state[i] === "sn-loaded";
-  const open = (i) => { if (ok(i)) setIndex(i); };
-  const retry = (e, i) => { e.stopPropagation(); setState((s) => ({ ...s, [i]: undefined })); load(i); };
+  const ok = (i: number) => state[i] === "sn-loaded";
+  const open = (i: number) => { if (ok(i)) setIndex(i); };
+  const retry = (e: MouseEvent, i: number) => { e.stopPropagation(); setState((s) => ({ ...s, [i]: undefined })); load(i); };
   return (
     <div className="sn-row">
       {ITEMS.map((it, i) => (
-        <div key={it.src} ref={(el) => (thumbs.current[i] = el)} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
+        <div key={it.src} ref={(el) => { thumbs.current[i] = el; }} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
           style={{ height: 120, aspectRatio: "4 / 3", "--sn-g": `url(${it.thumb}) center` }}
           onClick={() => open(i)} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } }}>
           <span className="sn-ph sn-sk" />
@@ -773,7 +773,7 @@ export default function GalleryRetry() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { Icon, Lightbox } from "satin-ui/vue";
 
@@ -783,9 +783,9 @@ const ITEMS = [
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
 ];
 const failOnce = new Set([1]); // 演示用：第二张第一次当作加载失败
-const state = reactive({}), index = ref(null), thumbs = [];
+const state = reactive<Record<number, string | undefined>>({}), index = ref<number | null>(null), thumbs: (HTMLDivElement | null)[] = [];
 // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-const load = (i) => {
+const load = (i: number) => {
   const img = new Image(), fail = () => (state[i] = "sn-failed");
   img.onload = () => (state[i] = "sn-loaded");
   img.onerror = fail;
@@ -793,9 +793,9 @@ const load = (i) => {
   else img.src = ITEMS[i].thumb;
 };
 onMounted(() => ITEMS.forEach((_, i) => load(i)));
-const ok = (i) => state[i] === "sn-loaded";
-const open = (i) => { if (ok(i)) index.value = i; };
-const retry = (i) => { delete state[i]; load(i); };
+const ok = (i: number) => state[i] === "sn-loaded";
+const open = (i: number) => { if (ok(i)) index.value = i; };
+const retry = (i: number) => { delete state[i]; load(i); };
 </script>
 
 <template>
@@ -814,8 +814,8 @@ const retry = (i) => { delete state[i]; load(i); };
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { openLightbox } from "satin-ui/lightbox";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
@@ -826,10 +826,10 @@ Svelte 的写法：
   ];
   const failOnce = new Set([1]); // 演示用：第二张第一次当作加载失败
   // 加载失败显示图标和"重试"，点了再加载一次；左右翻页跳过失败的那张
-  let state = $state({});
-  const thumbs = [];
+  let state = $state<Record<number, string | undefined>>({});
+  const thumbs: (HTMLDivElement | null)[] = [];
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
+  const load = (i: number) => {
     const img = new Image(), fail = () => (state[i] = "sn-failed");
     img.onload = () => (state[i] = "sn-loaded");
     img.onerror = fail;
@@ -837,11 +837,11 @@ Svelte 的写法：
     else img.src = ITEMS[i].thumb;
   };
   $effect(() => ITEMS.forEach((_, i) => load(i)));
-  const ok = (i) => state[i] === "sn-loaded";
+  const ok = (i: number) => state[i] === "sn-loaded";
   // 图片从缩略图的位置长到铺满窗口，关上时沿原路缩回；左右翻页跳过没加载好的
-  const open = (i) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k) => thumbs[k], enabled: ok }); };
-  const onkey = (e, i) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
-  const retry = (e, i) => { e.stopPropagation(); delete state[i]; load(i); };
+  const open = (i: number) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k: number) => thumbs[k], enabled: ok }); };
+  const onkey = (e: KeyboardEvent, i: number) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
+  const retry = (e: MouseEvent, i: number) => { e.stopPropagation(); delete state[i]; load(i); };
 </script>
 
 <div class="sn-row">
@@ -921,7 +921,7 @@ export class ImageFailedComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, createSignal, onSettled } from "solid-js";
 import { openLightbox } from "satin-ui/lightbox";
 
@@ -934,20 +934,20 @@ const failOnce = new Set([1]); // 演示用：第二张第一次当作加载失�
 
 export default function GalleryRetry() {
   // 加载失败显示图标和"重试"，点了再加载一次；左右翻页跳过失败的那张
-  const [state, setState] = createSignal({}), thumbs = [];
+  const [state, setState] = createSignal<Record<number, string | undefined>>({}), thumbs: (HTMLDivElement | null)[] = [];
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     if (failOnce.delete(i)) setTimeout(fail, 600);
     else img.src = ITEMS[i].thumb;
   };
   onSettled(() => ITEMS.forEach((_, i) => load(i)));
-  const ok = (i) => state()[i] === "sn-loaded";
+  const ok = (i: number) => state()[i] === "sn-loaded";
   // 图片从缩略图的位置长到铺满窗口，关上时沿原路缩回；左右翻页跳过没加载好的
-  const open = (i) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k) => thumbs[k], enabled: ok }); };
-  const retry = (e, i) => { e.stopPropagation(); setState((s) => ({ ...s, [i]: undefined })); load(i); };
+  const open = (i: number) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k: number) => thumbs[k], enabled: ok }); };
+  const retry = (e: MouseEvent, i: number) => { e.stopPropagation(); setState((s) => ({ ...s, [i]: undefined })); load(i); };
   return (
     <sn-enhance>
       <div class="sn-row">
@@ -968,11 +968,11 @@ export default function GalleryRetry() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef, useState } from "react";
-import { Icon, Lightbox } from "satin-ui/react";
+import { Icon, Lightbox, type LightboxItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: (LightboxItem & { thumb: string })[] = [
   { src: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "夜里停在站台边的电车" },
   { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "雨天街上走路的人" },
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
@@ -981,23 +981,23 @@ const failOnce = new Set([1]); // 演示用：第二张第一次当作加载失�
 
 export default function GalleryRetry() {
   // 加载失败显示图标和"重试"，点了再加载一次；左右翻页跳过失败的那张；index 是数字就打开到那一张，onClose 里设回 null
-  const [state, setState] = useState({}), [index, setIndex] = useState(null), thumbs = useRef([]);
+  const [state, setState] = useState<Record<number, string | undefined>>({}), [index, setIndex] = useState<number | null>(null), thumbs = useRef<(HTMLDivElement | null)[]>([]);
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
-    const img = new Image(), put = (c) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
+  const load = (i: number) => {
+    const img = new Image(), put = (c: string) => setState((s) => ({ ...s, [i]: c })), fail = () => put("sn-failed");
     img.onload = () => put("sn-loaded");
     img.onerror = fail;
     if (failOnce.delete(i)) setTimeout(fail, 600);
     else img.src = ITEMS[i].thumb;
   };
   useEffect(() => ITEMS.forEach((_, i) => load(i)), []);
-  const ok = (i) => state[i] === "sn-loaded";
-  const open = (i) => { if (ok(i)) setIndex(i); };
-  const retry = (e, i) => { e.stopPropagation(); setState((s) => ({ ...s, [i]: undefined })); load(i); };
+  const ok = (i: number) => state[i] === "sn-loaded";
+  const open = (i: number) => { if (ok(i)) setIndex(i); };
+  const retry = (e: Event, i: number) => { e.stopPropagation(); setState((s) => ({ ...s, [i]: undefined })); load(i); };
   return (
     <div class="sn-row">
       {ITEMS.map((it, i) => (
-        <div key={it.src} ref={(el) => (thumbs.current[i] = el)} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
+        <div key={it.src} ref={(el) => { thumbs.current[i] = el; }} className={["sn-im", state[i]].filter(Boolean).join(" ")} role="button" tabIndex={0} aria-label={"看大图：" + it.alt}
           style={{ height: 120, aspectRatio: "4 / 3", "--sn-g": `url(${it.thumb}) center` }}
           onClick={() => open(i)} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } }}>
           <span class="sn-ph sn-sk" />

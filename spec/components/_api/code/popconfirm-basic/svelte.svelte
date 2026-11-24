@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
   import { openPopover, popoverOf, toast } from "satin-ui";
 
-  let btn, panel;
+  let btn!: HTMLButtonElement, panel!: HTMLDivElement;
   // 打开：锚在按钮上，焦点先落在"取消"（data-no）上；Esc、点外面关上
   const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: "end" }); };
   const yes = () => { popoverOf(panel)?.close(false); toast({ text: "已永久删除镜头" }); };

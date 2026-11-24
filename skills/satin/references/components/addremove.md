@@ -52,7 +52,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-add-row" id="addremove-basic-add"><input class="sn-input" placeholder="添加一个标签，回车确认" aria-label="添加标签"><button type="button" class="sn-btn sn-secondary">添加</button></div>
@@ -94,7 +94,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { flipSnapshot } from "satin-ui";
@@ -103,18 +103,19 @@ import { Button, Chip, Input } from "satin-ui/react";
 const TAGS = ["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"];
 
 export default function TagEditor() {
-  const [tags, setTags] = useState(TAGS), [text, setText] = useState(""), box = useRef(null), els = useRef(new Map());
+  const [tags, setTags] = useState(TAGS), [text, setText] = useState(""), box = useRef<HTMLDivElement>(null), els = useRef(new Map<string, HTMLElement>());
   const now = useRef(tags); now.current = tags; // 撤销是过一会儿才调的：读最新的列表
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
-  const add = (t, at = now.current.length) => {
+  const add = (t: string, at = now.current.length) => {
     const xs = now.current;
     if (!t || xs.includes(t)) return;
+    if (!box.current) return;
     const play = flipSnapshot(box.current);
     flushSync(() => setTags([...xs.slice(0, at), t, ...xs.slice(at)]));
     play(els.current.get(t));
   };
   const submit = () => { add(text.trim()); setText(""); };
-  const remove = (t) => setTags((xs) => xs.filter((x) => x !== t));
+  const remove = (t: string) => setTags((xs) => xs.filter((x) => x !== t));
   return (
     <div>
       <div className="sn-add-row">
@@ -124,7 +125,7 @@ export default function TagEditor() {
       <div className="sn-chips-box" ref={box}>
         {tags.map((t) => (
           // 删除：先脱离布局淡出，剩下的用弹簧补位：Chip 自己播动画，播完调 onRemove，这时再从数据里删
-          <Chip key={t} ref={(el) => (el ? els.current.set(t, el) : els.current.delete(t))} removable selected onRemove={() => remove(t)}>{t}</Chip>
+          <Chip key={t} ref={(el) => { if (el) els.current.set(t, el); else els.current.delete(t); }} removable selected onRemove={() => remove(t)}>{t}</Chip>
         ))}
       </div>
     </div>
@@ -135,14 +136,14 @@ export default function TagEditor() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { nextTick, ref } from "vue";
 import { flipSnapshot } from "satin-ui";
 import { Button, Chip, Input } from "satin-ui/vue";
 
-const tags = ref(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]), text = ref(""), box = ref(null), els = new Map();
+const tags = ref<string[]>(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]), text = ref(""), box = ref<HTMLDivElement | null>(null), els = new Map<string, HTMLElement>();
 // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播
-const add = async (t, at = tags.value.length) => {
+const add = async (t: string, at = tags.value.length) => {
   if (!t || tags.value.includes(t)) return;
   const play = flipSnapshot(box.value);
   tags.value.splice(at, 0, t);
@@ -150,7 +151,7 @@ const add = async (t, at = tags.value.length) => {
   play(els.get(t));
 };
 const submit = () => { add(text.value.trim()); text.value = ""; };
-const remove = (t) => (tags.value = tags.value.filter((x) => x !== t));
+const remove = (t: string) => (tags.value = tags.value.filter((x) => x !== t));
 </script>
 
 <template>
@@ -169,20 +170,20 @@ const remove = (t) => (tags.value = tags.value.filter((x) => x !== t));
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { flushSync } from "svelte";
   import { flipSnapshot, removeWithFlip } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   let tags = $state(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]);
   let text = $state("");
-  let box;
-  const els = new Map();
+  let box!: HTMLDivElement;
+  const els = new Map<string, HTMLElement>();
   // 记下每个标签的元素（出现、收起动画要用）
-  const keep = (el, t) => { els.set(t, el); return { destroy: () => els.delete(t) }; };
+  const keep = (el: HTMLElement, t: string) => { els.set(t, el); return { destroy: () => els.delete(t) }; };
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
-  const add = (t, at = tags.length) => {
+  const add = (t: string, at = tags.length) => {
     if (!t || tags.includes(t)) return;
     const play = flipSnapshot(box);
     flushSync(() => tags.splice(at, 0, t));
@@ -190,7 +191,7 @@ Svelte 的写法：
   };
   const submit = () => { add(text.trim()); text = ""; };
   // 删除：先脱离布局淡出，剩下的用弹簧补位（keep：节点留给 Svelte 删），播完再从数据里删
-  const remove = async (t) => {
+  const remove = async (t: string) => {
     await removeWithFlip(els.get(t), { keep: true });
     tags = tags.filter((x) => x !== t);
   };
@@ -265,17 +266,17 @@ export class AddremoveBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, createSignal, flush } from "solid-js";
 import { flipSnapshot, icon, removeWithFlip } from "satin-ui";
 
 const TAGS = ["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"];
 
 export default function TagEditor() {
-  const [tags, setTags] = createSignal(TAGS), els = new Map();
-  let box, input;
+  const [tags, setTags] = createSignal<string[]>(TAGS), els = new Map<string, HTMLElement>();
+  let box!: HTMLDivElement, input!: HTMLInputElement;
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flush 让 DOM 当场更新）
-  const add = (t, at = tags().length) => {
+  const add = (t: string, at = tags().length) => {
     if (!t || tags().includes(t)) return;
     const play = flipSnapshot(box);
     setTags((xs) => [...xs.slice(0, at), t, ...xs.slice(at)]);
@@ -284,7 +285,7 @@ export default function TagEditor() {
   };
   const submit = () => { add(input.value.trim()); input.value = ""; };
   // 删除：先脱离布局淡出，剩下的用弹簧补位（keep：节点留给 Solid 删），播完再从数据里删
-  const remove = async (t) => {
+  const remove = async (t: string) => {
     await removeWithFlip(els.get(t), { keep: true });
     setTags((xs) => xs.filter((x) => x !== t));
   };
@@ -306,7 +307,7 @@ export default function TagEditor() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { flipSnapshot } from "satin-ui";
@@ -315,18 +316,19 @@ import { Button, Chip, Input } from "satin-ui/react";
 const TAGS = ["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"];
 
 export default function TagEditor() {
-  const [tags, setTags] = useState(TAGS), [text, setText] = useState(""), box = useRef(null), els = useRef(new Map());
+  const [tags, setTags] = useState(TAGS), [text, setText] = useState(""), box = useRef<HTMLDivElement>(null), els = useRef(new Map<string, HTMLElement>());
   const now = useRef(tags); now.current = tags; // 撤销是过一会儿才调的：读最新的列表
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
-  const add = (t, at = now.current.length) => {
+  const add = (t: string, at = now.current.length) => {
     const xs = now.current;
     if (!t || xs.includes(t)) return;
+    if (!box.current) return;
     const play = flipSnapshot(box.current);
     flushSync(() => setTags([...xs.slice(0, at), t, ...xs.slice(at)]));
     play(els.current.get(t));
   };
   const submit = () => { add(text.trim()); setText(""); };
-  const remove = (t) => setTags((xs) => xs.filter((x) => x !== t));
+  const remove = (t: string) => setTags((xs) => xs.filter((x) => x !== t));
   return (
     <div>
       <div class="sn-add-row">
@@ -336,7 +338,7 @@ export default function TagEditor() {
       <div class="sn-chips-box" ref={box}>
         {tags.map((t) => (
           // 删除：先脱离布局淡出，剩下的用弹簧补位：Chip 自己播动画，播完调 onRemove，这时再从数据里删
-          <Chip key={t} ref={(el) => (el ? els.current.set(t, el) : els.current.delete(t))} removable selected onRemove={() => remove(t)}>{t}</Chip>
+          <Chip key={t} ref={(el) => { if (el) els.current.set(t, el); else els.current.delete(t); }} removable selected onRemove={() => remove(t)}>{t}</Chip>
         ))}
       </div>
     </div>
@@ -354,7 +356,7 @@ export default function TagEditor() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-add-row" id="addremove-undo-add"><input class="sn-input" placeholder="添加一个标签，回车确认" aria-label="添加标签"><button type="button" class="sn-btn sn-secondary">添加</button></div>
@@ -398,7 +400,7 @@ export default function TagEditor() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { flipSnapshot, toast } from "satin-ui";
@@ -407,18 +409,19 @@ import { Button, Chip, Input } from "satin-ui/react";
 const TAGS = ["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"];
 
 export default function TagEditorUndo() {
-  const [tags, setTags] = useState(TAGS), [text, setText] = useState(""), box = useRef(null), els = useRef(new Map());
+  const [tags, setTags] = useState(TAGS), [text, setText] = useState(""), box = useRef<HTMLDivElement>(null), els = useRef(new Map<string, HTMLElement>());
   const now = useRef(tags); now.current = tags; // 撤销是过一会儿才调的：读最新的列表
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
-  const add = (t, at = now.current.length) => {
+  const add = (t: string, at = now.current.length) => {
     const xs = now.current;
     if (!t || xs.includes(t)) return;
+    if (!box.current) return;
     const play = flipSnapshot(box.current);
     flushSync(() => setTags([...xs.slice(0, at), t, ...xs.slice(at)]));
     play(els.current.get(t));
   };
   const submit = () => { add(text.trim()); setText(""); };
-  const remove = (t) => {
+  const remove = (t: string) => {
     const at = now.current.indexOf(t);
     setTags((xs) => xs.filter((x) => x !== t));
     // 删掉的能撤销：撤销后按"新增"的方式回到原来的位置
@@ -433,7 +436,7 @@ export default function TagEditorUndo() {
       <div className="sn-chips-box" ref={box}>
         {tags.map((t) => (
           // 删除：先脱离布局淡出，剩下的用弹簧补位：Chip 自己播动画，播完调 onRemove，这时再从数据里删
-          <Chip key={t} ref={(el) => (el ? els.current.set(t, el) : els.current.delete(t))} removable selected onRemove={() => remove(t)}>{t}</Chip>
+          <Chip key={t} ref={(el) => { if (el) els.current.set(t, el); else els.current.delete(t); }} removable selected onRemove={() => remove(t)}>{t}</Chip>
         ))}
       </div>
     </div>
@@ -444,14 +447,14 @@ export default function TagEditorUndo() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { nextTick, ref } from "vue";
 import { flipSnapshot, toast } from "satin-ui";
 import { Button, Chip, Input } from "satin-ui/vue";
 
-const tags = ref(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]), text = ref(""), box = ref(null), els = new Map();
+const tags = ref<string[]>(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]), text = ref(""), box = ref<HTMLDivElement | null>(null), els = new Map<string, HTMLElement>();
 // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播
-const add = async (t, at = tags.value.length) => {
+const add = async (t: string, at = tags.value.length) => {
   if (!t || tags.value.includes(t)) return;
   const play = flipSnapshot(box.value);
   tags.value.splice(at, 0, t);
@@ -459,7 +462,7 @@ const add = async (t, at = tags.value.length) => {
   play(els.get(t));
 };
 const submit = () => { add(text.value.trim()); text.value = ""; };
-const remove = (t) => {
+const remove = (t: string) => {
   const at = tags.value.indexOf(t);
   tags.value = tags.value.filter((x) => x !== t);
   // 删掉的能撤销：撤销后按"新增"的方式回到原来的位置
@@ -483,20 +486,20 @@ const remove = (t) => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { flushSync } from "svelte";
   import { flipSnapshot, removeWithFlip, toast } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   let tags = $state(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]);
   let text = $state("");
-  let box;
-  const els = new Map();
+  let box!: HTMLDivElement;
+  const els = new Map<string, HTMLElement>();
   // 记下每个标签的元素（出现、收起动画要用）
-  const keep = (el, t) => { els.set(t, el); return { destroy: () => els.delete(t) }; };
+  const keep = (el: HTMLElement, t: string) => { els.set(t, el); return { destroy: () => els.delete(t) }; };
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
-  const add = (t, at = tags.length) => {
+  const add = (t: string, at = tags.length) => {
     if (!t || tags.includes(t)) return;
     const play = flipSnapshot(box);
     flushSync(() => tags.splice(at, 0, t));
@@ -504,7 +507,7 @@ Svelte 的写法：
   };
   const submit = () => { add(text.trim()); text = ""; };
   // 删除：先脱离布局淡出，剩下的用弹簧补位（keep：节点留给 Svelte 删），播完再从数据里删
-  const remove = async (t) => {
+  const remove = async (t: string) => {
     const at = tags.indexOf(t);
     await removeWithFlip(els.get(t), { keep: true });
     tags = tags.filter((x) => x !== t);
@@ -584,17 +587,17 @@ export class AddremoveUndoComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, createSignal, flush } from "solid-js";
 import { flipSnapshot, icon, removeWithFlip, toast } from "satin-ui";
 
 const TAGS = ["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"];
 
 export default function TagEditorUndo() {
-  const [tags, setTags] = createSignal(TAGS), els = new Map();
-  let box, input;
+  const [tags, setTags] = createSignal<string[]>(TAGS), els = new Map<string, HTMLElement>();
+  let box!: HTMLDivElement, input!: HTMLInputElement;
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flush 让 DOM 当场更新）
-  const add = (t, at = tags().length) => {
+  const add = (t: string, at = tags().length) => {
     if (!t || tags().includes(t)) return;
     const play = flipSnapshot(box);
     setTags((xs) => [...xs.slice(0, at), t, ...xs.slice(at)]);
@@ -603,7 +606,7 @@ export default function TagEditorUndo() {
   };
   const submit = () => { add(input.value.trim()); input.value = ""; };
   // 删除：先脱离布局淡出，剩下的用弹簧补位（keep：节点留给 Solid 删），播完再从数据里删
-  const remove = async (t) => {
+  const remove = async (t: string) => {
     const at = tags().indexOf(t);
     await removeWithFlip(els.get(t), { keep: true });
     setTags((xs) => xs.filter((x) => x !== t));
@@ -628,7 +631,7 @@ export default function TagEditorUndo() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { flipSnapshot, toast } from "satin-ui";
@@ -637,18 +640,19 @@ import { Button, Chip, Input } from "satin-ui/react";
 const TAGS = ["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"];
 
 export default function TagEditorUndo() {
-  const [tags, setTags] = useState(TAGS), [text, setText] = useState(""), box = useRef(null), els = useRef(new Map());
+  const [tags, setTags] = useState(TAGS), [text, setText] = useState(""), box = useRef<HTMLDivElement>(null), els = useRef(new Map<string, HTMLElement>());
   const now = useRef(tags); now.current = tags; // 撤销是过一会儿才调的：读最新的列表
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
-  const add = (t, at = now.current.length) => {
+  const add = (t: string, at = now.current.length) => {
     const xs = now.current;
     if (!t || xs.includes(t)) return;
+    if (!box.current) return;
     const play = flipSnapshot(box.current);
     flushSync(() => setTags([...xs.slice(0, at), t, ...xs.slice(at)]));
     play(els.current.get(t));
   };
   const submit = () => { add(text.trim()); setText(""); };
-  const remove = (t) => {
+  const remove = (t: string) => {
     const at = now.current.indexOf(t);
     setTags((xs) => xs.filter((x) => x !== t));
     // 删掉的能撤销：撤销后按"新增"的方式回到原来的位置
@@ -663,7 +667,7 @@ export default function TagEditorUndo() {
       <div class="sn-chips-box" ref={box}>
         {tags.map((t) => (
           // 删除：先脱离布局淡出，剩下的用弹簧补位：Chip 自己播动画，播完调 onRemove，这时再从数据里删
-          <Chip key={t} ref={(el) => (el ? els.current.set(t, el) : els.current.delete(t))} removable selected onRemove={() => remove(t)}>{t}</Chip>
+          <Chip key={t} ref={(el) => { if (el) els.current.set(t, el); else els.current.delete(t); }} removable selected onRemove={() => remove(t)}>{t}</Chip>
         ))}
       </div>
     </div>
@@ -681,7 +685,7 @@ export default function TagEditorUndo() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div id="addremove-rows" class="sn-stack sn-gap-12">
@@ -716,26 +720,30 @@ export default function TagEditorUndo() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { flipSnapshot, removeWithFlip } from "satin-ui";
 import { Button } from "satin-ui/react";
 
-const ROWS = [{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }];
+interface ShotRow { id: number | string; name: string }
+
+const ROWS: ShotRow[] = [{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }];
 
 export default function ShotRows() {
-  const [rows, setRows] = useState(ROWS), list = useRef(null), els = useRef(new Map()), seq = useRef(0);
+  const [rows, setRows] = useState<ShotRow[]>(ROWS), list = useRef<HTMLDivElement>(null), els = useRef(new Map<number | string, HTMLDivElement>()), seq = useRef(0);
   // 新建的一行插在最前面，下面的往下让：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
   const add = () => {
     const row = { id: `new-${++seq.current}`, name: `新镜头 ${seq.current}` };
+    if (!list.current) return;
     const play = flipSnapshot(list.current);
     flushSync(() => setRows((xs) => [row, ...xs]));
     play(els.current.get(row.id));
   };
   // 删一行：先脱离布局淡出，下面的用弹簧补位（keep：节点留给 React 删），播完再从数据里删
-  const remove = async (id) => {
-    await removeWithFlip(els.current.get(id), { keep: true });
+  const remove = async (id: number | string) => {
+    const el = els.current.get(id);
+    if (el) await removeWithFlip(el, { keep: true });
     setRows((xs) => xs.filter((x) => x.id !== id));
   };
   return (
@@ -743,7 +751,7 @@ export default function ShotRows() {
       <div className="sn-row"><Button onClick={add}>新建镜头</Button></div>
       <div className="sn-stack sn-gap-8" ref={list}>
         {rows.map((r) => (
-          <div key={r.id} className="sn-opt-row" ref={(el) => (el ? els.current.set(r.id, el) : els.current.delete(r.id))}>
+          <div key={r.id} className="sn-opt-row" ref={(el) => { if (el) els.current.set(r.id, el); else els.current.delete(r.id); }}>
             <span className="sn-nm">{r.name}</span>
             <Button variant="ghost" size="sm" icon="trash-2" aria-label={"删除 " + r.name} onClick={() => remove(r.id)} />
           </div>
@@ -757,12 +765,12 @@ export default function ShotRows() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { nextTick, ref } from "vue";
 import { flipSnapshot, removeWithFlip } from "satin-ui";
 import { Button } from "satin-ui/vue";
 
-const rows = ref([{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }]), list = ref(null), els = new Map();
+const rows = ref([{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }]), list = ref<HTMLDivElement | null>(null), els = new Map<number, HTMLElement>();
 let seq = 0;
 // 新建的一行插在最前面，下面的往下让：改数据之前记下位置，DOM 更新以后播
 const add = async () => {
@@ -773,7 +781,7 @@ const add = async () => {
   play(els.get(row.id));
 };
 // 删一行：先脱离布局淡出，下面的用弹簧补位（keep：节点留给 Vue 删），播完再从数据里删
-const remove = async (id) => {
+const remove = async (id: number) => {
   await removeWithFlip(els.get(id), { keep: true });
   rows.value = rows.value.filter((x) => x.id !== id);
 };
@@ -794,17 +802,17 @@ const remove = async (id) => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { flushSync } from "svelte";
   import { flipSnapshot, removeWithFlip } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   let rows = $state([{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }]);
-  let list;
+  let list!: HTMLDivElement;
   let seq = 0;
-  const els = new Map();
-  const keep = (el, id) => { els.set(id, el); return { destroy: () => els.delete(id) }; };
+  const els = new Map<number, HTMLElement>();
+  const keep = (el: HTMLElement, id: number) => { els.set(id, el); return { destroy: () => els.delete(id) }; };
   // 新建的一行插在最前面，下面的往下让：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
   const add = () => {
     const row = { id: `new-${++seq}`, name: `新镜头 ${seq}` };
@@ -813,7 +821,7 @@ Svelte 的写法：
     play(els.get(row.id));
   };
   // 删一行：先脱离布局淡出，下面的用弹簧补位（keep：节点留给 Svelte 删），播完再从数据里删
-  const remove = async (id) => {
+  const remove = async (id: number) => {
     await removeWithFlip(els.get(id), { keep: true });
     rows = rows.filter((x) => x.id !== id);
   };
@@ -884,15 +892,15 @@ export class AddremoveRowsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, createSignal, flush } from "solid-js";
 import { flipSnapshot, icon, removeWithFlip } from "satin-ui";
 
 const ROWS = [{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }];
 
 export default function ShotRows() {
-  const [rows, setRows] = createSignal(ROWS), els = new Map();
-  let list, seq = 0;
+  const [rows, setRows] = createSignal(ROWS), els = new Map<number, HTMLElement>();
+  let list!: HTMLDivElement, seq = 0;
   // 新建的一行插在最前面，下面的往下让：改数据之前记下位置，DOM 更新以后播（flush 让 DOM 当场更新）
   const add = () => {
     const row = { id: `new-${++seq}`, name: `新镜头 ${seq}` };
@@ -902,7 +910,7 @@ export default function ShotRows() {
     play(els.get(row.id));
   };
   // 删一行：先脱离布局淡出，下面的用弹簧补位（keep：节点留给 Solid 删），播完再从数据里删
-  const remove = async (id) => {
+  const remove = async (id: number) => {
     await removeWithFlip(els.get(id), { keep: true });
     setRows((xs) => xs.filter((x) => x.id !== id));
   };
@@ -924,26 +932,30 @@ export default function ShotRows() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { flipSnapshot, removeWithFlip } from "satin-ui";
 import { Button } from "satin-ui/react";
 
-const ROWS = [{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }];
+interface ShotRow { id: number | string; name: string }
+
+const ROWS: ShotRow[] = [{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }];
 
 export default function ShotRows() {
-  const [rows, setRows] = useState(ROWS), list = useRef(null), els = useRef(new Map()), seq = useRef(0);
+  const [rows, setRows] = useState<ShotRow[]>(ROWS), list = useRef<HTMLDivElement>(null), els = useRef(new Map<number | string, HTMLDivElement>()), seq = useRef(0);
   // 新建的一行插在最前面，下面的往下让：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
   const add = () => {
     const row = { id: `new-${++seq.current}`, name: `新镜头 ${seq.current}` };
+    if (!list.current) return;
     const play = flipSnapshot(list.current);
     flushSync(() => setRows((xs) => [row, ...xs]));
     play(els.current.get(row.id));
   };
   // 删一行：先脱离布局淡出，下面的用弹簧补位（keep：节点留给 React 删），播完再从数据里删
-  const remove = async (id) => {
-    await removeWithFlip(els.current.get(id), { keep: true });
+  const remove = async (id: number | string) => {
+    const el = els.current.get(id);
+    if (el) await removeWithFlip(el, { keep: true });
     setRows((xs) => xs.filter((x) => x.id !== id));
   };
   return (
@@ -951,7 +963,7 @@ export default function ShotRows() {
       <div class="sn-row"><Button onClick={add}>新建镜头</Button></div>
       <div class="sn-stack sn-gap-8" ref={list}>
         {rows.map((r) => (
-          <div key={r.id} class="sn-opt-row" ref={(el) => (el ? els.current.set(r.id, el) : els.current.delete(r.id))}>
+          <div key={r.id} class="sn-opt-row" ref={(el) => { if (el) els.current.set(r.id, el); else els.current.delete(r.id); }}>
             <span class="sn-nm">{r.name}</span>
             <Button variant="ghost" size="sm" icon="trash-2" aria-label={"删除 " + r.name} onClick={() => remove(r.id)} />
           </div>

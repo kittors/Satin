@@ -1,2 +1,18 @@
-{ "name": "satin-example-next", "private": true, "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
-  "dependencies": { "satin-ui": "workspace:*", "next": "latest", "react": "latest", "react-dom": "latest" } }
+{
+  "name": "satin-example-next",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "satin-ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6"
+  }
+}

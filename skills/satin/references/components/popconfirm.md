@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-danger-soft" data-pc="popconfirm-basic" aria-haspopup="dialog" aria-expanded="false">永久删除</button>
   <div class="sn-pop sn-popconfirm" id="popconfirm-basic" role="alertdialog" aria-labelledby="popconfirm-basic-q" aria-describedby="popconfirm-basic-d">
@@ -74,7 +74,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, Popconfirm, toast } from "satin-ui/react";
 
 export default function PurgeShot() {
@@ -90,7 +90,7 @@ export default function PurgeShot() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Popconfirm, toast } from "satin-ui/vue";
 </script>
 
@@ -104,11 +104,11 @@ import { Button, Popconfirm, toast } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { openPopover, popoverOf, toast } from "satin-ui";
 
-  let btn, panel;
+  let btn!: HTMLButtonElement, panel!: HTMLDivElement;
   // 打开：锚在按钮上，焦点先落在"取消"（data-no）上；Esc、点外面关上
   const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: "end" }); };
   const yes = () => { popoverOf(panel)?.close(false); toast({ text: "已永久删除镜头" }); };
@@ -156,12 +156,12 @@ export class PopconfirmBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { openPopover, popoverOf, toast } from "satin-ui";
 
 // 只给单条、属于自己、不能撤销的操作；确认按钮写清楚做什么；<sn-enhance> 把 data-i 换成图标
 export default function PurgeShot() {
-  let btn, panel;
+  let btn!: HTMLButtonElement, panel!: HTMLDivElement;
   // 打开：锚在按钮上，焦点先落在"取消"（data-no）上；Esc、点外面关上
   const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: "end" }); };
   const yes = () => { popoverOf(panel)?.close(false); toast({ text: "已永久删除镜头" }); };
@@ -179,7 +179,7 @@ export default function PurgeShot() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, Popconfirm, toast } from "satin-ui/react";
 
 export default function PurgeShot() {
@@ -202,7 +202,7 @@ export default function PurgeShot() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="trash-btn">移到回收站</button>
 
 <script type="module">
@@ -218,7 +218,7 @@ export default function PurgeShot() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, toast } from "satin-ui/react";
 
 // 能撤销的操作不确认：直接做，再用轻提示给"撤销"
@@ -236,7 +236,7 @@ export default function TrashShot() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, toast } from "satin-ui/vue";
 
 // 能撤销的操作不确认：直接做，再用轻提示给"撤销"
@@ -254,8 +254,8 @@ const trash = () => toast({
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { toast } from "satin-ui";
 
   // 能撤销的操作不确认：直接做，再用轻提示给"撤销"
@@ -293,7 +293,7 @@ export class PopconfirmUndoComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { toast } from "satin-ui";
 
 // 能撤销的操作不确认：直接做，再用轻提示给"撤销"
@@ -310,7 +310,7 @@ export default function TrashShot() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, toast } from "satin-ui/react";
 
 // 能撤销的操作不确认：直接做，再用轻提示给"撤销"
@@ -335,7 +335,7 @@ danger 关掉，确认按钮用主按钮。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-primary" data-pc="popconfirm-submit" aria-haspopup="dialog" aria-expanded="false">提交审核</button>
   <div class="sn-pop sn-popconfirm" id="popconfirm-submit" role="alertdialog" aria-labelledby="popconfirm-submit-q" aria-describedby="popconfirm-submit-d">
@@ -356,7 +356,7 @@ danger 关掉，确认按钮用主按钮。
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, Popconfirm, toast } from "satin-ui/react";
 
 export default function SubmitReview() {
@@ -372,7 +372,7 @@ export default function SubmitReview() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Popconfirm, toast } from "satin-ui/vue";
 </script>
 
@@ -386,11 +386,11 @@ import { Button, Popconfirm, toast } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { openPopover, popoverOf, toast } from "satin-ui";
 
-  let btn, panel;
+  let btn!: HTMLButtonElement, panel!: HTMLDivElement;
   // 打开：锚在按钮上，焦点先落在"取消"（data-no）上；Esc、点外面关上
   const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: "end" }); };
   const yes = () => { popoverOf(panel)?.close(false); toast({ text: "已提交审核" }); };
@@ -438,12 +438,12 @@ export class PopconfirmSubmitComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { openPopover, popoverOf, toast } from "satin-ui";
 
 // 不是删除、但同样不能撤销：danger 关掉，确认按钮用主按钮；<sn-enhance> 把 data-i 换成图标
 export default function SubmitReview() {
-  let btn, panel;
+  let btn!: HTMLButtonElement, panel!: HTMLDivElement;
   // 打开：锚在按钮上，焦点先落在"取消"（data-no）上；Esc、点外面关上
   const ask = () => { const l = popoverOf(panel); l ? l.close(false) : openPopover(panel, btn, { align: "end" }); };
   const yes = () => { popoverOf(panel)?.close(false); toast({ text: "已提交审核" }); };
@@ -461,7 +461,7 @@ export default function SubmitReview() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, Popconfirm, toast } from "satin-ui/react";
 
 export default function SubmitReview() {

@@ -55,7 +55,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-12" style="max-width:420px">
   <div class="sn-pbar" style="--sn-p:.62" role="progressbar" aria-label="导出进度" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"><i></i></div>
   <div class="sn-pbar sn-indet" role="progressbar" aria-label="正在准备"><i></i></div>
@@ -64,7 +64,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Progress } from "satin-ui/react";
 
 export default function ExportBars() {
@@ -81,7 +81,7 @@ export default function ExportBars() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Progress } from "satin-ui/vue";
 </script>
 
@@ -96,7 +96,7 @@ import { Progress } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- --sn-p 是 0～1；sn-indet 是不知道还要多久（来回走） -->
 <div class="sn-stack sn-gap-12" style="max-width: 420px">
   <div class="sn-pbar" style="--sn-p: .62" role="progressbar" aria-label="导出进度" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"><i></i></div>
@@ -124,7 +124,7 @@ export class ProgressBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // --sn-p 是 0～1；sn-indet 是不知道还要多久（来回走）
 export default function ExportBars() {
   return (
@@ -138,7 +138,7 @@ export default function ExportBars() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Progress } from "satin-ui/react";
 
 export default function ExportBars() {
@@ -162,7 +162,7 @@ export default function ExportBars() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <span class="sn-pring" style="--sn-p:.25" role="progressbar" aria-label="上传 1" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></span>
   <span class="sn-pring" style="--sn-p:.62" role="progressbar" aria-label="上传 2" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></span>
@@ -174,7 +174,7 @@ export default function ExportBars() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Progress, Spinner } from "satin-ui/react";
 
 export default function Rings() {
@@ -194,7 +194,7 @@ export default function Rings() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Progress, Spinner } from "satin-ui/vue";
 </script>
 
@@ -212,7 +212,7 @@ import { Progress, Spinner } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- 进度环放在缩略图、按钮里；转圈是不知道进度的时候 -->
 <div class="sn-row">
   <span class="sn-pring" style="--sn-p: .25" role="progressbar" aria-label="上传 1" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></span>
@@ -246,7 +246,7 @@ export class ProgressRingComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 进度环放在缩略图、按钮里；转圈是不知道进度的时候
 export default function Rings() {
   return (
@@ -263,7 +263,7 @@ export default function Rings() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Progress, Spinner } from "satin-ui/react";
 
 export default function Rings() {
@@ -290,7 +290,7 @@ export default function Rings() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" style="max-width:420px" id="exp-box">
   <div class="sn-pbar" style="--sn-p:0" role="progressbar" aria-label="导出进度" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><i></i></div>
   <div class="sn-row"><span class="sn-help sn-num">还没开始</span><button type="button" class="sn-btn sn-secondary sn-sm">开始导出</button></div>
@@ -312,7 +312,7 @@ export default function Rings() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useState } from "react";
 import { Button, Progress } from "satin-ui/react";
 
@@ -340,7 +340,7 @@ export default function ExportProgress() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, onBeforeUnmount } from "vue";
 import { Button, Progress } from "satin-ui/vue";
 
@@ -369,8 +369,8 @@ onBeforeUnmount(stop);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   let p = $state(0), running = $state(false), t = 0;
   const stop = () => { clearInterval(t); running = false; };
   const toggle = () => {
@@ -426,7 +426,7 @@ export class ProgressControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onCleanup } from "solid-js";
 
 export default function ExportProgress() {
@@ -454,7 +454,7 @@ export default function ExportProgress() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useState } from "react";
 import { Button, Progress } from "satin-ui/react";
 

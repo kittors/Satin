@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Avatar from "satin-ui/svelte/Avatar.svelte";
 
   const sizes = [16, 20, 24, 32, 40, 64];

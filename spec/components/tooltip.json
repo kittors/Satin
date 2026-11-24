@@ -295,7 +295,7 @@
       "code": {
         "html": "<button type=\"button\" class=\"sn-btn sn-secondary\" data-tip=\"保存到草稿箱，可以随时接着改\">存草稿</button>\n",
         "react": "import { Button, Tooltip } from \"satin-ui/react\";\n\nexport default function DraftButton() {\n  return (\n    <Tooltip text=\"保存到草稿箱，可以随时接着改\">\n      <Button>存草稿</Button>\n    </Tooltip>\n  );\n}\n",
-        "vue": "<script setup>\nimport { Button, Tooltip } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Tooltip text=\"保存到草稿箱，可以随时接着改\">\n    <Button>存草稿</Button>\n  </Tooltip>\n</template>\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Button, Tooltip } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Tooltip text=\"保存到草稿箱，可以随时接着改\">\n    <Button>存草稿</Button>\n  </Tooltip>\n</template>\n",
         "svelte": "<button type=\"button\" class=\"sn-btn sn-secondary\" data-tip=\"保存到草稿箱，可以随时接着改\">存草稿</button>\n",
         "angular": "import { Component } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-tooltip-basic\",\n  template: `<button type=\"button\" class=\"sn-btn sn-secondary\" data-tip=\"保存到草稿箱，可以随时接着改\">存草稿</button>`,\n})\nexport class TooltipBasicComponent {}\n",
         "solid": "export default function DraftButton() {\n  return <button type=\"button\" class=\"sn-btn sn-secondary\" data-tip=\"保存到草稿箱，可以随时接着改\">存草稿</button>;\n}\n",
@@ -310,7 +310,7 @@
       "code": {
         "html": "<button type=\"button\" class=\"sn-btn sn-primary\" data-tip=\"导出成片\" data-kbd=\"⌘E\">导出</button>\n",
         "react": "import { Button, Tooltip } from \"satin-ui/react\";\n\nexport default function ExportButton() {\n  return (\n    <Tooltip text=\"导出成片\" kbd=\"⌘E\">\n      <Button variant=\"primary\">导出</Button>\n    </Tooltip>\n  );\n}\n",
-        "vue": "<script setup>\nimport { Button, Tooltip } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Tooltip text=\"导出成片\" kbd=\"⌘E\">\n    <Button variant=\"primary\">导出</Button>\n  </Tooltip>\n</template>\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Button, Tooltip } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Tooltip text=\"导出成片\" kbd=\"⌘E\">\n    <Button variant=\"primary\">导出</Button>\n  </Tooltip>\n</template>\n",
         "svelte": "<button type=\"button\" class=\"sn-btn sn-primary\" data-tip=\"导出成片\" data-kbd=\"⌘E\">导出</button>\n",
         "angular": "import { Component } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-tooltip-kbd\",\n  template: `<button type=\"button\" class=\"sn-btn sn-primary\" data-tip=\"导出成片\" data-kbd=\"⌘E\">导出</button>`,\n})\nexport class TooltipKbdComponent {}\n",
         "solid": "export default function ExportButton() {\n  return <button type=\"button\" class=\"sn-btn sn-primary\" data-tip=\"导出成片\" data-kbd=\"⌘E\">导出</button>;\n}\n",

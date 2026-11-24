@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Button, notify } from "satin-ui/vue";
 
 // 通知：右上角滑进来，不自己消失，点 × 关

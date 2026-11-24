@@ -54,7 +54,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-set-list">
     <div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="user"></span><div class="sn-tx"><b>个人资料</b><span>头像、昵称、邮箱</span></div><span class="sn-end" data-i="chevron-right"></span></div>
@@ -67,16 +67,16 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function ListBasic() {
   return (
     <div className="sn-set-list">
-      <div className="sn-set-row" tabIndex="0"><span className="sn-ico"><Icon name="user" /></span><div className="sn-tx"><b>个人资料</b><span>头像、昵称、邮箱</span></div><span className="sn-end"><Icon name="chevron-right" /></span></div>
-      <div className="sn-set-row" tabIndex="0"><span className="sn-ico"><Icon name="layout-grid" /></span><div className="sn-tx"><b>默认画面比例</b></div><span className="sn-val">16:9</span><span className="sn-end"><Icon name="chevron-right" /></span></div>
-      <div className="sn-set-row" tabIndex="0"><span className="sn-ico"><Icon name="key-round" /></span><div className="sn-tx"><b>修改密码</b></div><span className="sn-end"><Icon name="chevron-right" /></span></div>
-      <div className="sn-set-row sn-danger" tabIndex="0"><span className="sn-ico"><Icon name="log-out" /></span><div className="sn-tx"><b>退出登录</b></div></div>
+      <div className="sn-set-row" tabIndex={0}><span className="sn-ico"><Icon name="user" /></span><div className="sn-tx"><b>个人资料</b><span>头像、昵称、邮箱</span></div><span className="sn-end"><Icon name="chevron-right" /></span></div>
+      <div className="sn-set-row" tabIndex={0}><span className="sn-ico"><Icon name="layout-grid" /></span><div className="sn-tx"><b>默认画面比例</b></div><span className="sn-val">16:9</span><span className="sn-end"><Icon name="chevron-right" /></span></div>
+      <div className="sn-set-row" tabIndex={0}><span className="sn-ico"><Icon name="key-round" /></span><div className="sn-tx"><b>修改密码</b></div><span className="sn-end"><Icon name="chevron-right" /></span></div>
+      <div className="sn-set-row sn-danger" tabIndex={0}><span className="sn-ico"><Icon name="log-out" /></span><div className="sn-tx"><b>退出登录</b></div></div>
     </div>
   );
 }
@@ -85,7 +85,7 @@ export default function ListBasic() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Icon } from "satin-ui/vue";
 </script>
 
@@ -101,8 +101,8 @@ import { Icon } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -138,7 +138,7 @@ export class ListBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ListBasic() {
   return (
     <sn-enhance>
@@ -155,16 +155,16 @@ export default function ListBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function ListBasic() {
   return (
     <div class="sn-set-list">
-      <div class="sn-set-row" tabindex="0"><span class="sn-ico"><Icon name="user" /></span><div class="sn-tx"><b>个人资料</b><span>头像、昵称、邮箱</span></div><span class="sn-end"><Icon name="chevron-right" /></span></div>
-      <div class="sn-set-row" tabindex="0"><span class="sn-ico"><Icon name="layout-grid" /></span><div class="sn-tx"><b>默认画面比例</b></div><span class="sn-val">16:9</span><span class="sn-end"><Icon name="chevron-right" /></span></div>
-      <div class="sn-set-row" tabindex="0"><span class="sn-ico"><Icon name="key-round" /></span><div class="sn-tx"><b>修改密码</b></div><span class="sn-end"><Icon name="chevron-right" /></span></div>
-      <div class="sn-set-row sn-danger" tabindex="0"><span class="sn-ico"><Icon name="log-out" /></span><div class="sn-tx"><b>退出登录</b></div></div>
+      <div class="sn-set-row" tabIndex={0}><span class="sn-ico"><Icon name="user" /></span><div class="sn-tx"><b>个人资料</b><span>头像、昵称、邮箱</span></div><span class="sn-end"><Icon name="chevron-right" /></span></div>
+      <div class="sn-set-row" tabIndex={0}><span class="sn-ico"><Icon name="layout-grid" /></span><div class="sn-tx"><b>默认画面比例</b></div><span class="sn-val">16:9</span><span class="sn-end"><Icon name="chevron-right" /></span></div>
+      <div class="sn-set-row" tabIndex={0}><span class="sn-ico"><Icon name="key-round" /></span><div class="sn-tx"><b>修改密码</b></div><span class="sn-end"><Icon name="chevron-right" /></span></div>
+      <div class="sn-set-row sn-danger" tabIndex={0}><span class="sn-ico"><Icon name="log-out" /></span><div class="sn-tx"><b>退出登录</b></div></div>
     </div>
   );
 }
@@ -180,7 +180,7 @@ export default function ListBasic() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <dl class="sn-kv">
   <dt>项目</dt><dd>雨夜车站</dd>
   <dt>负责人</dt><dd><sn-avatar seed="u3" name="林夏" size="20" decorative></sn-avatar>林夏</dd>
@@ -192,7 +192,7 @@ export default function ListBasic() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 export default function ListKv() {
@@ -211,7 +211,7 @@ export default function ListKv() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Avatar } from "satin-ui/vue";
 </script>
 
@@ -228,8 +228,8 @@ import { Avatar } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Avatar from "satin-ui/svelte/Avatar.svelte";
 </script>
 
@@ -265,7 +265,7 @@ export class ListKvComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ListKv() {
   return (
     <dl class="sn-kv">
@@ -281,7 +281,7 @@ export default function ListKv() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 export default function ListKv() {
@@ -307,7 +307,7 @@ export default function ListKv() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-set-list">
     <div class="sn-set-row"><span class="sn-ico" data-i="bell"></span><div class="sn-tx"><b>生成完成时提醒</b><span>在桌面右上角显示通知</span></div><label class="sn-switch"><input type="checkbox" role="switch" aria-label="生成完成时提醒" checked><span class="sn-track"><span class="sn-knob"></span></span></label></div>
@@ -318,7 +318,7 @@ export default function ListKv() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function ListSwitch() {
@@ -334,7 +334,7 @@ export default function ListSwitch() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Icon } from "satin-ui/vue";
 </script>
 
@@ -348,8 +348,8 @@ import { Icon } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -381,7 +381,7 @@ export class ListSwitchComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ListSwitch() {
   return (
     <sn-enhance>
@@ -396,7 +396,7 @@ export default function ListSwitch() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function ListSwitch() {

@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { busy, succeed } from "satin-ui/components";
   import "./button-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 点"保存修改"：300ms 内回来不转圈；转圈出现后至少留 500ms；完了打个勾
       for (const save of root.querySelectorAll(".sn-btn.sn-primary")) {
         save.addEventListener("click", async () => {

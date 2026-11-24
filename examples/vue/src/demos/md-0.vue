@@ -1,15 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { renderMarkdown } from "satin-ui/markdown";
 import "satin-ui/css/md.css";
 import "satin-ui/css/data.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     const source = `# 分镜生成说明
 
 把**一集剧本**拆成镜头，每个镜头写清楚景别、时长和画面。
@@ -31,7 +32,7 @@ onMounted(() => {
 - [x] 每个镜头都有景别和时长
 - [ ] 背景音乐的节拍对齐到镜头切换
 
-\`\`\`js
+\`\`\`ts
 const shots = await generateShots(list, { retry: 3 });
 console.log(timeline(shots, 24));
 \`\`\`

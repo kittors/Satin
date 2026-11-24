@@ -32,14 +32,14 @@ const init = (fw, dir, extra = []) => run(["init", "--framework", fw, "--dir", d
 
 // 每种写法的起步模板里应该有的文件（除了 package.json、README、AGENTS.md / CLAUDE.md、技能）
 const FILES = {
-  react: ["index.html", "vite.config.js", "src/main.jsx", "src/App.jsx"],
-  vue: ["index.html", "vite.config.js", "src/main.js", "src/App.vue"],
-  svelte: ["index.html", "vite.config.js", "src/main.js", "src/App.svelte"],
-  solid: ["index.html", "vite.config.js", "src/main.js", "src/App.jsx"],
-  preact: ["index.html", "vite.config.js", "src/main.js", "src/App.jsx"],
+  react: ["index.html", "tsconfig.json", "vite.config.ts", "src/main.tsx", "src/App.tsx"],
+  vue: ["index.html", "tsconfig.json", "vite.config.ts", "src/main.ts", "src/App.vue"],
+  svelte: ["index.html", "tsconfig.json", "vite.config.ts", "src/main.ts", "src/App.svelte"],
+  solid: ["index.html", "tsconfig.json", "vite.config.ts", "src/main.tsx", "src/App.tsx"],
+  preact: ["index.html", "tsconfig.json", "vite.config.ts", "src/main.tsx", "src/App.tsx"],
   angular: ["angular.json", "tsconfig.json", "src/index.html", "src/main.ts", "src/app.ts", "src/styles.css"],
   html: ["index.html", "main.js", "serve.mjs"],
-  next: ["next.config.mjs", "app/layout.jsx", "app/page.jsx", "app/new-project.jsx"],
+  next: ["next.config.mjs", "tsconfig.json", "app/layout.tsx", "app/page.tsx", "app/new-project.tsx"],
   nuxt: ["nuxt.config.ts", "app/app.vue", "app/plugins/satin.ts"],
 };
 
@@ -98,9 +98,9 @@ test("起步模板：theme-boot、样式、框架接入放对了（按写法）"
   assert.match(read(d("angular"), "angular.json"), /theme-boot\.js/);
   assert.match(read(d("angular"), "src/index.html"), /<script src="theme-boot.js"><\/script>/);
   assert.match(read(d("html"), "index.html"), /<head>\n<meta charset="utf-8">\n<!--[^\n]*-->\n<script src="\/node_modules\/satin-ui\/src\/theme-boot.js"><\/script>/);
-  assert.match(read(d("next"), "app/layout.jsx"), /suppressHydrationWarning/);
+  assert.match(read(d("next"), "app/layout.tsx"), /suppressHydrationWarning/);
   assert.match(read(d("nuxt"), "nuxt.config.ts"), /tagPosition: "head"/);
-  for (const fw of ["react", "vue", "svelte", "solid", "preact"]) assert.match(read(d(fw), "vite.config.js"), /import satin from "satin-ui\/vite";[\s\S]*satin\(\)/);
+  for (const fw of ["react", "vue", "svelte", "solid", "preact"]) assert.match(read(d(fw), "vite.config.ts"), /import satin from "satin-ui\/vite";[\s\S]*satin\(\)/);
   // 起步模板里不能留示例专用的东西（截图对比用的 sink、泄漏测试的 leak、示例目录外的相对路径）
   for (const fw of IDS) for (const f of FILES[fw]) assert.doesNotMatch(read(d(fw), f), /sink|leak|\.\.\/\.\.\/|shared\//, `${fw}/${f}`);
 });
@@ -179,7 +179,7 @@ test("satin doctor：生成的项目只差装依赖；改坏 theme-boot、删掉
   const bad = (d) => diagnose(d).results.filter((r) => !r.ok).map((r) => r.title);
   assert.deepEqual(bad(dir).map((t) => t.replace(/（.*/, "")), ["satin-ui 装进了 node_modules"]);
   assert.match(diagnose(dir).results.find((r) => !r.ok).fix, /pnpm install/, "按项目记下的包管理器给修法");
-  fs.writeFileSync(path.join(dir, "vite.config.js"), read(dir, "vite.config.js").replace("satin()", ""));
+  fs.writeFileSync(path.join(dir, "vite.config.ts"), read(dir, "vite.config.ts").replace("satin()", ""));
   fs.writeFileSync(path.join(dir, "AGENTS.md"), "# 空的\n");
   const stamp = path.join(dir, ".claude/skills/satin/.satin-skill.json");
   fs.writeFileSync(stamp, JSON.stringify({ hash: "old" }));

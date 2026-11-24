@@ -55,7 +55,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <span class="sn-tag"><i></i>草稿</span>
   <span class="sn-tag sn-run"><i></i>生成中</span>
@@ -67,7 +67,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 export default function TagsBasic() {
   return (
     <div className="sn-row">
@@ -97,7 +97,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <span class="sn-tag"><i></i>草稿</span>
   <span class="sn-tag sn-run"><i></i>生成中</span>
@@ -129,7 +129,7 @@ export class TagsBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function TagsBasic() {
   return (
     <div class="sn-row">
@@ -145,7 +145,7 @@ export default function TagsBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function TagsBasic() {
   return (
     <div class="sn-row">
@@ -169,7 +169,7 @@ export default function TagsBasic() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <span class="sn-badge">3</span>
   <span class="sn-badge">99+</span>
@@ -179,7 +179,7 @@ export default function TagsBasic() {
 
 React 的写法：
 
-```jsx
+```tsx
 export default function TagsBadge() {
   return (
     <div className="sn-row">
@@ -205,7 +205,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <span class="sn-badge">3</span>
   <span class="sn-badge">99+</span>
@@ -233,7 +233,7 @@ export class TagsBadgeComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function TagsBadge() {
   return (
     <div class="sn-row">
@@ -247,7 +247,7 @@ export default function TagsBadge() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function TagsBadge() {
   return (
     <div class="sn-row">
@@ -269,7 +269,7 @@ export default function TagsBadge() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <sn-avatar seed="u4" name="周屿" size="24"></sn-avatar>
   <sn-avatar seed="u8" name="陈默"></sn-avatar>
@@ -284,7 +284,7 @@ export default function TagsBadge() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 export default function TagsAvatar() {
@@ -293,7 +293,7 @@ export default function TagsAvatar() {
       <Avatar seed="u4" name="周屿" size={24} />
       <Avatar seed="u8" name="陈默" />
       <Avatar seed="u5" name="李然" size={40} online />
-      <div className="sn-av-group" tabIndex="0" data-tip="林夏、周屿、陈默 3 人">
+      <div className="sn-av-group" tabIndex={0} data-tip="林夏、周屿、陈默 3 人">
         <Avatar seed="u3" name="林夏" size={24} decorative />
         <Avatar seed="u4" name="周屿" size={24} decorative />
         <Avatar seed="u8" name="陈默" size={24} decorative />
@@ -306,7 +306,7 @@ export default function TagsAvatar() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Avatar } from "satin-ui/vue";
 </script>
 
@@ -326,8 +326,8 @@ import { Avatar } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Avatar from "satin-ui/svelte/Avatar.svelte";
 </script>
 
@@ -369,7 +369,7 @@ export class TagsAvatarComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function TagsAvatar() {
   return (
     <div class="sn-row">
@@ -388,7 +388,7 @@ export default function TagsAvatar() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 export default function TagsAvatar() {
@@ -397,7 +397,7 @@ export default function TagsAvatar() {
       <Avatar seed="u4" name="周屿" size={24} />
       <Avatar seed="u8" name="陈默" />
       <Avatar seed="u5" name="李然" size={40} online />
-      <div class="sn-av-group" tabindex="0" data-tip="林夏、周屿、陈默 3 人">
+      <div class="sn-av-group" tabIndex={0} data-tip="林夏、周屿、陈默 3 人">
         <Avatar seed="u3" name="林夏" size={24} decorative />
         <Avatar seed="u4" name="周屿" size={24} decorative />
         <Avatar seed="u8" name="陈默" size={24} decorative />

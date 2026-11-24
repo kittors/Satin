@@ -1,24 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { optimistic, createNumberFlow, toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 先显示结果再保存；失败时恢复、整行抖两下、出一条带"重试"的提示（勾上"模拟保存失败"看失败的样子）
     const row = root.querySelector(".sn-opt-row"), star = root.querySelector("[data-star]");
     const nameEl = root.querySelector("[data-rename]"), failBox = root.querySelector("#optFail");
     let count = 24;
     const num = createNumberFlow(star.querySelector(".sn-n"), { value: count, style: "blur" });
     // 保存：换成你的接口。这里 700ms 后成功，勾上"模拟保存失败"时失败
-    const save = () => new Promise((ok, fail) => setTimeout(() => (failBox.checked ? fail(new Error("保存失败")) : ok()), 700));
+    const save = () => new Promise((ok?: any, fail?: any) => window.setTimeout(() => (failBox.checked ? fail(new Error("保存失败")) : ok()), 700));
 
     star.addEventListener("click", () => {
       const on = !star.classList.contains("sn-on");
-      const show = (v) => { star.classList.toggle("sn-on", v); star.setAttribute("aria-pressed", String(v)); count += v ? 1 : -1; num.update({ value: count }); };
+      const show = (v?: any) => { star.classList.toggle("sn-on", v); star.setAttribute("aria-pressed", String(v)); count += v ? 1 : -1; num.update({ value: count }); };
       optimistic({ shake: row, apply: () => show(on), revert: () => show(!on), save });
     });
 
@@ -27,17 +28,17 @@ onMounted(() => {
       const old = nameEl.textContent.trim(), inp = document.createElement("input");
       inp.className = "sn-input sn-sm"; inp.value = old; nameEl.replaceChildren(inp); inp.focus(); inp.select();
       let done = false;
-      const commit = (keep) => {
+      const commit = (keep?: any) => {
         if (done) return; done = true; const v = inp.value.trim() || old;
         if (!keep || v === old) { nameEl.textContent = old; return; }
         optimistic({ shake: row, apply: () => (nameEl.textContent = v), revert: () => (nameEl.textContent = old), save })
           .then(() => toast({ text: `已改名为"${v}"` }), () => {});
       };
-      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") commit(true); if (e.key === "Escape") { e.stopPropagation(); commit(false); } });
+      inp.addEventListener("keydown", (e?: any) => { if (e.key === "Enter") commit(true); if (e.key === "Escape") { e.stopPropagation(); commit(false); } });
       inp.addEventListener("blur", () => commit(true));
     }
     nameEl.addEventListener("dblclick", rename);
-    nameEl.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target === nameEl) rename(); });
+    nameEl.addEventListener("keydown", (e?: any) => { if (e.key === "Enter" && e.target === nameEl) rename(); });
   });
   off = () => { done(); unsetup(); };
 });

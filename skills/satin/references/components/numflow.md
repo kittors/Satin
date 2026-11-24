@@ -53,13 +53,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-number-flow value="1280"></sn-number-flow>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { NumberFlow } from "satin-ui/react";
 
 export default function ShotTotal() {
@@ -70,7 +70,7 @@ export default function ShotTotal() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { NumberFlow } from "satin-ui/vue";
 </script>
 
@@ -81,8 +81,8 @@ import { NumberFlow } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import NumberFlow from "satin-ui/svelte/NumberFlow.svelte";
 </script>
 
@@ -104,7 +104,7 @@ export class NumflowBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ShotTotal() {
   return <sn-number-flow value="1280"></sn-number-flow>;
 }
@@ -112,7 +112,7 @@ export default function ShotTotal() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { NumberFlow } from "satin-ui/react";
 
 export default function ShotTotal() {
@@ -130,7 +130,7 @@ export default function ShotTotal() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row" id="numflow-counter-box">
   <sn-number-flow value="128"></sn-number-flow>
   <button type="button" class="sn-btn sn-secondary sn-sm" data-add="1">+1</button>
@@ -149,7 +149,7 @@ export default function ShotTotal() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, NumberFlow } from "satin-ui/react";
 
@@ -169,7 +169,7 @@ export default function ShotCounter() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, NumberFlow } from "satin-ui/vue";
 
@@ -188,8 +188,8 @@ const n = ref(128);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import NumberFlow from "satin-ui/svelte/NumberFlow.svelte";
 
   let n = $state(128);
@@ -227,7 +227,7 @@ export class NumflowCounterComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 export default function ShotCounter() {
@@ -245,7 +245,7 @@ export default function ShotCounter() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, NumberFlow } from "satin-ui/react";
 
@@ -272,7 +272,7 @@ effect 换变化的样子；跳得多的大号数字用 blur 更有速度感。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row" id="numflow-styles-box">
   <sn-number-flow value="2026" effect="blur"></sn-number-flow>
   <button type="button" class="sn-btn sn-secondary sn-sm" data-add="137">+137</button>
@@ -290,7 +290,7 @@ effect 换变化的样子；跳得多的大号数字用 blur 更有速度感。
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, NumberFlow } from "satin-ui/react";
 
@@ -309,7 +309,7 @@ export default function NumberEffect() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, NumberFlow } from "satin-ui/vue";
 
@@ -327,8 +327,8 @@ const n = ref(2026);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import NumberFlow from "satin-ui/svelte/NumberFlow.svelte";
 
   let n = $state(2026);
@@ -364,7 +364,7 @@ export class NumflowStylesComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 export default function NumberEffect() {
@@ -381,7 +381,7 @@ export default function NumberEffect() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, NumberFlow } from "satin-ui/react";
 

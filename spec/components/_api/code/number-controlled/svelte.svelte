@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Stepper from "satin-ui/svelte/Stepper.svelte";
 
   let value = $state(3);

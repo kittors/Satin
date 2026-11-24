@@ -67,7 +67,7 @@ export class BannerDemo0Component {
         banner.classList.replace("sn-bad", "sn-ok"); banner.setAttribute("role", "status");
         banner.querySelector(".sn-msg").innerHTML = "<b>已重新连接</b>，改动都同步好了。";
         net.remove();
-        setTimeout(() => banner.parentElement.classList.add("sn-closing"), 1600);
+        window.setTimeout(() => banner.parentElement.classList.add("sn-closing"), 1600);
       });
 
       // 条目上的失败：点"修改后重新生成"，成功后整行恢复正常

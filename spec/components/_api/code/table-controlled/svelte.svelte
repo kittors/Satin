@@ -1,6 +1,6 @@
-<script>
-  import { createTable } from "satin-ui";
-  const COLUMNS = [
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "镜头", sortable: true },
     { key: "type", title: "景别" },
     { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -14,7 +14,7 @@
   ];
 
   // selectable：最左边一列勾选框；勾选后底部浮出批量操作条；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: ROWS, selectable: true, selected: [1], label: "镜头清单", onSelect: (keys) => console.log("勾上了：", keys) });
     return () => it.destroy();

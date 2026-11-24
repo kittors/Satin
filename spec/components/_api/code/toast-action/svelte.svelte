@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { toast } from "satin-ui";
 
   const run = () => {

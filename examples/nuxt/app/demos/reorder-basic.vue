@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { createReorder } from "satin-ui";
 import { Icon } from "satin-ui/vue";
@@ -10,10 +10,10 @@ const SHOTS = [
   { no: "10", name: "镜头 10 · 车窗里的倒影", meta: "特写 · 3 秒", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72" },
   { no: "11", name: "镜头 11 · 雨夜里的公交站", meta: "近景 · 4 秒", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72" },
 ];
-const list = ref(null);
+const list = ref<HTMLDivElement | null>(null);
 // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
 // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
-let r;
+let r: ReturnType<typeof createReorder> | undefined;
 onMounted(() => (r = createReorder(list.value, { onReorder: ({ from, to }) => console.log(`第 ${from + 1} 个挪到了第 ${to + 1} 位`) })));
 onBeforeUnmount(() => r?.destroy());
 </script>

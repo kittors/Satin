@@ -41,7 +41,7 @@ export class CgridDemo0Component {
           dataSource: {
             total: 1000000,
             async load({ start, end }) {
-              await new Promise((r?: any) => setTimeout(r, 200)); // 模拟网络
+              await new Promise((r?: any) => window.setTimeout(r, 200)); // 模拟网络
               return Array.from({ length: end - start }, (_?: any, k?: any) => rowAt(start + k));
             },
           },

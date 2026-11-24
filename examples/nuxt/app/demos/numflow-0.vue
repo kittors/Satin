@@ -1,20 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createNumberFlow } from "satin-ui/components";
 import "./numflow-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 只滚动变了的那几位；style："roll"（滚动，默认）| "blur"（滚动带模糊）| "push"（推入）| "fade"（淡入）；format 决定怎么显示
-    const nf = (name, opts) => createNumberFlow(root.querySelector(`[data-nf="${name}"]`), opts);
-    const shots = nf("shots", { value: 1284, format: (v) => v.toLocaleString("zh-CN") });
-    const price = nf("price", { value: 199, format: (v) => "¥ " + v.toLocaleString("zh-CN", { minimumFractionDigits: 2 }) });
-    const live = nf("live", { value: 2875, format: (v) => `${Math.floor(v / 60)} 小时 ${String(v % 60).padStart(2, "0")} 分` });
-    const badge = nf("badge", { value: 3, style: "fade", format: (v) => (v > 99 ? "99+" : String(v)) });
+    const nf = (name?: any, opts?: any) => createNumberFlow(root.querySelector(`[data-nf="${name}"]`), opts);
+    const shots = nf("shots", { value: 1284, format: (v?: any) => v.toLocaleString("zh-CN") });
+    const price = nf("price", { value: 199, format: (v?: any) => "¥ " + v.toLocaleString("zh-CN", { minimumFractionDigits: 2 }) });
+    const live = nf("live", { value: 2875, format: (v?: any) => `${Math.floor(v / 60)} 小时 ${String(v % 60).padStart(2, "0")} 分` });
+    const badge = nf("badge", { value: 3, style: "fade", format: (v?: any) => (v > 99 ? "99+" : String(v)) });
 
     // set(新值) 滚到新值；value 是当前值
     for (const btn of root.querySelectorAll("[data-nf-add]")) btn.addEventListener("click", () => {
@@ -24,7 +25,7 @@ onMounted(() => {
     const PLANS = [199, 2399, 49.9, 12800, 999];
     root.querySelector("[data-nf-plan]").addEventListener("click", () => price.set(PLANS[(PLANS.indexOf(price.value) + 1) % PLANS.length]));
     root.querySelector("[data-nf-badge]").addEventListener("click", () => badge.set(badge.value >= 120 ? 3 : badge.value + 9));
-    setInterval(() => live.set(live.value + 1), 1200); // 每 1.2 秒自动更新
+    window.setInterval(() => live.set(live.value + 1), 1200); // 每 1.2 秒自动更新
   });
   off = () => { done(); unsetup(); };
 });

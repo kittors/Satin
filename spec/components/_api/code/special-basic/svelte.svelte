@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createSearch } from "satin-ui";
   const SHOTS = ["站台远景", "雨里的车灯", "推门进候车厅", "站台告别", "末班列车"];

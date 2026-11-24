@@ -7,3 +7,5 @@
 .grid-m.lc { grid-template-columns: var(--lc, 112px) minmax(0, 1fr); }
 .grid-m.lc { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
 .grid-m.lc > .sn-cap:not(:first-child) { margin-top: 12px; }
+.pg-live-bar { display: flex; align-items: center; gap: 14px; max-width: 520px; }
+.pg-live-bar .sn-slider { flex: 1; }

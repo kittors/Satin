@@ -1,11 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import { Checkbox } from "satin-ui/vue";
 
 const SHOTS = ["开场", "车站", "雨夜"];
 const picked = ref(["开场"]);
 const all = computed(() => picked.value.length === SHOTS.length);
-const toggle = (s, on) => { picked.value = on ? [...picked.value, s] : picked.value.filter((x) => x !== s); };
+const toggle = (s: string, on: boolean) => { picked.value = on ? [...picked.value, s] : picked.value.filter((x) => x !== s); };
 </script>
 
 <template>

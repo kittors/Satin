@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   const STEPS = ["导入原文", "拆分章节", "生成分镜", "配音"];
   let cur = $state(1);
 </script>

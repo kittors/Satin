@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { Lightbox } from "satin-ui/vue";
 
@@ -7,17 +7,17 @@ const ITEMS = [
   { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "雨天街上走路的人" },
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
 ];
-const state = reactive({}), index = ref(null), thumbs = [];
+const state = reactive<Record<number, string | undefined>>({}), index = ref<number | null>(null), thumbs: (HTMLDivElement | null)[] = [];
 // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-const load = (i) => {
+const load = (i: number) => {
   const img = new Image(), fail = () => (state[i] = "sn-failed");
   img.onload = () => (state[i] = "sn-loaded");
   img.onerror = fail;
   img.src = ITEMS[i].thumb;
 };
 onMounted(() => ITEMS.forEach((_, i) => load(i)));
-const ok = (i) => state[i] === "sn-loaded";
-const open = (i) => { if (ok(i)) index.value = i; };
+const ok = (i: number) => state[i] === "sn-loaded";
+const open = (i: number) => { if (ok(i)) index.value = i; };
 </script>
 
 <template>

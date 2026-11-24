@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { toast } from "satin-ui";
 
   // 状态提示：底部中间出现，3 秒后自己消失

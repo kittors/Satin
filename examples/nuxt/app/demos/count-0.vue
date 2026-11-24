@@ -1,14 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createCount, createLongText, toast } from "satin-ui/components";
 import "./count-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 单行：<input maxlength="20" data-count>，右边的计数跟着滚动，快满变色，写满还在敲时抖一下
     for (const input of root.querySelectorAll("input[data-count]")) createCount(input);
 

@@ -6,15 +6,16 @@
 // 的地方保留一个空格（JSX 写 {" "}，Vue 写在同一行）。浏览器里传 inline(el) 按计算样式判断；没传就按标签猜。
 
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"]);
-const BOOL = new Set(["disabled", "checked", "selected", "readonly", "required", "multiple", "hidden", "open", "autofocus", "novalidate", "inert", "muted", "controls", "loop", "autoplay", "playsinline", "default", "reversed", "allowfullscreen", "formnovalidate", "async", "defer", "nomodule", "itemscope"]);
+const BOOL = new Set(["disabled", "checked", "selected", "readonly", "required", "multiple", "hidden", "open", "autofocus", "novalidate", "inert", "muted", "controls", "loop", "autoplay", "playsinline", "default", "reversed", "allowfullscreen", "formnovalidate", "async", "defer", "nomodule", "itemscope", "disableremoteplayback"]);
 const REACT_ATTR = {
   class: "className", for: "htmlFor", tabindex: "tabIndex", readonly: "readOnly", maxlength: "maxLength", minlength: "minLength", colspan: "colSpan", rowspan: "rowSpan",
   contenteditable: "contentEditable", autocomplete: "autoComplete", autofocus: "autoFocus", spellcheck: "spellCheck", enterkeyhint: "enterKeyHint", inputmode: "inputMode",
-  crossorigin: "crossOrigin", srcset: "srcSet", playsinline: "playsInline", novalidate: "noValidate", datetime: "dateTime", allowfullscreen: "allowFullScreen",
+  crossorigin: "crossOrigin", srcset: "srcSet", playsinline: "playsInline", novalidate: "noValidate", datetime: "dateTime", allowfullscreen: "allowFullScreen", disableremoteplayback: "disableRemotePlayback",
   popovertarget: "popoverTarget", popovertargetaction: "popoverTargetAction", accesskey: "accessKey", "accept-charset": "acceptCharset", "http-equiv": "httpEquiv",
   formaction: "formAction", formnovalidate: "formNoValidate", referrerpolicy: "referrerPolicy", usemap: "useMap", frameborder: "frameBorder", hreflang: "hrefLang",
   charset: "charSet", fetchpriority: "fetchPriority", "xlink:href": "xlinkHref", "xml:space": "xmlSpace", "xmlns:xlink": "xmlnsXlink", "xml:lang": "xmlLang",
 };
+const REACT_NUM_ATTR = new Set(["tabIndex", "rows", "cols", "maxLength", "minLength", "colSpan", "rowSpan", "size", "span", "start", "aria-level", "aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-colcount", "aria-colindex", "aria-colspan", "aria-posinset", "aria-rowcount", "aria-rowindex", "aria-rowspan", "aria-setsize"]);
 const INLINE_TAGS = new Set(["a", "abbr", "b", "bdi", "bdo", "br", "button", "cite", "code", "data", "dfn", "em", "i", "img", "input", "kbd", "label", "mark", "q", "s", "samp", "select", "small", "span", "strong", "sub", "sup", "svg", "textarea", "time", "u", "var", "wbr"]);
 const camel = (s) => s.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 // 标记里的组件元素 <sn-xxx> 在 React、Vue 里换成现成的组件（satin-ui/react、satin-ui/vue）；vk：受控的那一项（React 里写 defaultXxx 当初始值，不锁死）
@@ -86,12 +87,14 @@ function jsxAttrs(el, inSvg, mode = "react") {
     if (!custom && el.localName === "input" && k === "checked") k = "defaultChecked";
     if (el.localName === "option" && k === "selected") continue; // 选中项写到 <select defaultValue>
     if (BOOL.has(name) && (v === "" || v === name) && !custom && !name.startsWith("data-")) { out.push(k === "defaultChecked" ? "defaultChecked" : k); continue; }
+    if (!custom && REACT_NUM_ATTR.has(k) && /^-?\d+(\.\d+)?$/.test(v)) { out.push(`${k}={${v}}`); continue; }
     out.push(!/["\n\\]/.test(v) ? `${k}="${v}"` : !/['\n\\]/.test(v) ? `${k}='${v}'` : `${k}={${JSON.stringify(v)}}`);
   }
   if (el.localName === "select") { const sel = [...el.querySelectorAll("option")].find((o) => o.hasAttribute("selected")); if (sel) out.push(`defaultValue=${JSON.stringify(sel.getAttribute("value") ?? sel.textContent)}`); }
   return out.length ? " " + out.join(" ") : "";
 }
-const jsxText = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\{/g, '{"{"}').replace(/\}/g, '{"}"}').replace(/ /g, "&nbsp;");
+const tplLit = (t) => t.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
+const jsxText = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/[{}]/g, (c) => `{"${c}"}`).replace(/\u00a0/g, "&nbsp;");
 export function toJSX(node, { inline = guessInline, flex = guessFlex, indent = "", used = null, attrs = "react" } = {}) {
   const el = (n, ind, inSvg) => {
     const E = attrs === "react" && ELEMS[n.localName];
@@ -99,7 +102,7 @@ export function toJSX(node, { inline = guessInline, flex = guessFlex, indent = "
       used.add(E.react);
       const ps = [...n.attributes].filter((x) => x.name !== "style" && x.name !== "class").map(({ name, value }) => {
         if (n.localName === "sn-avatar" && name === "status" && value === "online") return "online";
-        const k = camel(name) === E.vk && E.vk ? "default" + E.vk[0].toUpperCase() + E.vk.slice(1) : camel(name);
+        const k = name.startsWith("data-") || name.startsWith("aria-") ? name : camel(name) === E.vk && E.vk ? "default" + E.vk[0].toUpperCase() + E.vk.slice(1) : camel(name);
         if (value === "" && E.bools?.includes(name)) return k;
         const j = parseAttr(value);
         return j !== null ? `${k}={${JSON.stringify(j)}}` : /["\n\\]/.test(value) ? `${k}={${JSON.stringify(value)}}` : `${k}="${value}"`;
@@ -107,6 +110,7 @@ export function toJSX(node, { inline = guessInline, flex = guessFlex, indent = "
       return `${ind}<${E.react}${ps.length ? " " + ps.join(" ") : ""} />`;
     }
     const svg = inSvg || n.localName === "svg", tag = n.localName, a = jsxAttrs(n, svg, attrs);
+    if (tag === "style") return `${ind}<style${a}>{\`${tplLit(n.textContent)}\`}</style>`;
     if (tag === "textarea") { const v = n.textContent; return attrs === "html" ? `${ind}<textarea${a}>${jsxText(v)}</textarea>` : `${ind}<textarea${a}${v ? ` defaultValue=${JSON.stringify(v)}` : ""} />`; }
     if (VOID.has(tag)) return `${ind}<${tag}${a} />`;
     const ks = kids(n, inline, flex);
@@ -170,7 +174,8 @@ export function splitJS(js = "") {
   if (/(^|[^\w.])await\s/.test(stripCode(b).replace(/async[^{]*\{[\s\S]*?\}/g, ""))) b = "(async () => {\n" + ind(b, "  ") + "\n})();";
   b = b.replace(/^\s*setup\(\);?[^\n]*\n?/gm, "").replace(/^\s*injectIcons\(document\);?[^\n]*\n?/gm, "")
     .replace(/document\.querySelector(All)?\(/g, (_, all) => `root.querySelector${all || ""}(`).replace(/document\.getElementById\((["'])([^"']+)\1\)/g, (_, q, id) => `root.querySelector("#${id}")`);
-  return { imports, body: b.trim() };
+  const hasRootDecl = /\b(?:const|let|var)\s+root\b/.test(stripCode(b));
+  return { imports, body: hasRootDecl ? b.replace(/\broot\.querySelector/g, "_root.querySelector").trim() : b.trim(), rootParam: hasRootDecl ? "_root" : "root" };
 }
 // 合并 import：同一个来源的具名导入并成一行
 export function mergeImports(lines) {
@@ -189,7 +194,6 @@ export const compOf = (slug) => slug.replace(/(^|-)([a-z0-9])/g, (_, __, c) => c
 // Svelte、Angular 模板里的花括号、@ 要转义（不然当成表达式、控制流）
 const escSvelte = (t) => t.replace(/\{/g, "&#123;").replace(/\}/g, "&#125;");
 const escNg = (t) => t.replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/@/g, "&#64;");
-const tplLit = (t) => t.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
 // TypeScript（Angular 组件里）：接线脚本是普通 JS，参数补上 any，严格模式下也能编译
 export function tsAny(js) {
   // 普通参数写成可选（name?: any）：JS 里少传几个参数是常事，TS 严格模式会报"参数不够"；解构参数不能可选，写成 any
@@ -211,6 +215,7 @@ export function tsTypes(body, imports) {
     imports = imports.map((l, i) => (i === gi && !/\bGridColumn\b/.test(l) ? l.replace(/\s*\}\s+from/, ", type GridColumn } from") : l));
   }
   body = body.replace(/(\b[\w$.]+\[[^\][\n]+\])\[key\] = /g, "($1 as Record<string, unknown>)[key] = ");
+  body = body.replace(/(?<![\w.])(setTimeout|setInterval)\(/g, "window.$1(");
   return { body, imports };
 }
 
@@ -220,55 +225,56 @@ export function variants({ node, js = "", css = "", name, slug, htmlCode, inline
   slug = slug || String(name || "demo").toLowerCase();
   const opt = { inline, flex };
   const markup = htmlCode ?? toHTML(node, opt);
-  const { imports, body } = splitJS(js);
-  const comp = compOf(slug), cssName = slug + ".css", hasBody = !!body;
+  const { imports, body, rootParam } = splitJS(js);
+  const comp = compOf(slug), cssName = slug + ".css", hasBodyFlag = !!body;
+  const ts = tsTypes(body, imports), tsBody = hasBodyFlag ? tsAny(ts.body) : "";
   const cssFile = css ? [{ name: cssName, lang: "css", code: css }] : [];
   const cssImport = css ? [`import "./${cssName}";`] : [];
   const usesElems = !!node.querySelector?.("sn-avatar, sn-segmented, sn-slider, sn-select, sn-otp, sn-tabs, sn-pager, sn-collapse, sn-tag-input, sn-stepper, sn-number-flow");
   const elemsImport = usesElems ? ['import { defineElements } from "satin-ui/elements";'] : [];
-  const wire = (pre, rootExpr, param = "root") => `enhance(${rootExpr}${hasBody ? `, (${param}) => {\n${ind(body, pre + "  ")}\n${pre}}` : ""})`;
+  const wireTs = (pre, rootExpr, param = rootParam) => `enhance(${rootExpr}${hasBodyFlag ? `, (${param}: any) => {\n${ind(tsBody, pre + "  ")}\n${pre}}` : ""})`;
 
-  // React：挂载时 setup()（引用计数）+ enhance(根元素, 自己的接线)，卸载时撤掉；<sn-xxx> 换成 satin-ui/react 的组件
+  // React（TSX）：挂载时 setup()（引用计数）+ enhance(根元素, 自己的接线)，卸载时撤掉；<sn-xxx> 换成 satin-ui/react 的组件
   const rUsed = new Set(), jsx = toJSX(node, { ...opt, indent: "      ", used: rUsed });
-  const rImp = mergeImports(['import { useEffect, useRef } from "react";', 'import { setup, enhance } from "satin-ui";', ...(rUsed.size ? [`import { ${[...rUsed].join(", ")} } from "satin-ui/react";`] : []), ...imports, ...cssImport]);
-  const react = `${rImp.join("\n")}\n\nexport default function ${comp}() {\n  const ref = useRef(null);\n  useEffect(() => {\n    const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数\n    const off = ${wire("    ", "ref.current")}; // 接上标记里的交互，返回撤销函数\n    return () => { off(); unsetup(); };\n  }, []);\n  return (\n    <div ref={ref}>\n${jsx}\n    </div>\n  );\n}\n`;
+  const rImp = mergeImports(['import { useEffect, useRef } from "react";', 'import { setup, enhance } from "satin-ui";', ...(rUsed.size ? [`import { ${[...rUsed].join(", ")} } from "satin-ui/react";`] : []), ...ts.imports, ...cssImport]);
+  const react = `${rImp.join("\n")}\n\nexport default function ${comp}() {\n  const ref = useRef<HTMLDivElement>(null);\n  useEffect(() => {\n    if (!ref.current) return;\n    const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数\n    const off = ${wireTs("    ", "ref.current")}; // 接上标记里的交互，返回撤销函数\n    return () => { off(); unsetup(); };\n  }, []);\n  return (\n    <div ref={ref}>\n${jsx}\n    </div>\n  );\n}\n`;
 
-  // Vue：同样的生命周期；<sn-xxx> 换成 satin-ui/vue 的组件
+  // Vue（TS）：同样的生命周期；<sn-xxx> 换成 satin-ui/vue 的组件
   const vUsed = new Set(), tpl = toHTML(node, { ...opt, indent: "    ", vue: true, used: vUsed });
-  const vImp = mergeImports(['import { ref, onMounted, onBeforeUnmount } from "vue";', 'import { setup, enhance } from "satin-ui";', ...(vUsed.size ? [`import { ${[...vUsed].map((n) => `${ELEM_OF_VUE(n)} as ${n}`).join(", ")} } from "satin-ui/vue";`] : []), ...imports, ...cssImport]);
-  const vue = `<script setup>\n${vImp.join("\n")}\n\nconst root = ref(null);\nlet off = () => {};\nonMounted(() => {\n  const unsetup = setup();\n  const done = ${wire("  ", "root.value")};\n  off = () => { done(); unsetup(); };\n});\nonBeforeUnmount(() => off());\n</script>\n\n<template>\n  <div ref="root">\n${tpl}\n  </div>\n</template>\n`;
+  const vImp = mergeImports(['import { ref, onMounted, onBeforeUnmount } from "vue";', 'import { setup, enhance } from "satin-ui";', ...(vUsed.size ? [`import { ${[...vUsed].map((n) => `${ELEM_OF_VUE(n)} as ${n}`).join(", ")} } from "satin-ui/vue";`] : []), ...ts.imports, ...cssImport]);
+  const vue = `<script setup lang="ts">\n${vImp.join("\n")}\n\nconst root = ref<HTMLDivElement | null>(null);\nlet off = () => {};\nonMounted(() => {\n  if (!root.value) return;\n  const unsetup = setup();\n  const done = ${wireTs("  ", "root.value")};\n  off = () => { done(); unsetup(); };\n});\nonBeforeUnmount(() => off());\n</script>\n\n<template>\n  <div ref="root">\n${tpl}\n  </div>\n</template>\n`;
 
-  // Svelte 5：onMount 里接上、返回的函数里撤掉；<sn-xxx> 用自定义元素（defineElements 重复调没有影响）
-  const sImp = mergeImports(['import { onMount } from "svelte";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...imports, ...cssImport]);
-  const svelte = `<script>\n${ind(sImp.join("\n"), "  ")}\n${usesElems ? "  defineElements();\n" : ""}\n  let root;\n  onMount(() => {\n    const unsetup = setup();\n    const off = ${wire("    ", "root")};\n    return () => { off(); unsetup(); };\n  });\n</script>\n\n<div bind:this={root}>\n${toHTML(node, { ...opt, indent: "  ", text: escSvelte, attr: escSvelte })}\n</div>\n`;
+  // Svelte 5（TS）：onMount 里接上、返回的函数里撤掉；<sn-xxx> 用自定义元素（defineElements 重复调没有影响）
+  const sImp = mergeImports(['import { onMount } from "svelte";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...ts.imports, ...cssImport]);
+  const svelte = `<script lang="ts">\n${ind(sImp.join("\n"), "  ")}\n${usesElems ? "  defineElements();\n" : ""}\n  let root!: HTMLDivElement;\n  onMount(() => {\n    if (!root) return;\n    const unsetup = setup();\n    const off = ${wireTs("    ", "root")};\n    return () => { off(); unsetup(); };\n  });\n</script>\n\n<div bind:this={root}>\n${toHTML(node, { ...opt, indent: "  ", text: escSvelte, attr: escSvelte })}\n</div>\n`;
 
-  // Angular：独立组件；模板写在组件里，ngAfterViewInit 接上、ngOnDestroy 撤掉；接线脚本的参数补成 any（严格模式能编译）
-  const cls = comp + "Component", sel = "demo-" + slug, ngTs = tsTypes(body, imports);
-  const aImp = mergeImports(['import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...ngTs.imports.filter((l) => !/^import\s+["'][^"']+\.css["']/.test(l))]); // Angular 的样式走 angular.json（page.css 里已经包含全部组件样式），组件文件里不 import CSS
+  // Angular（TS）：独立组件；模板写在组件里，ngAfterViewInit 接上、ngOnDestroy 撤掉；接线脚本的参数补成 any（严格模式能编译）
+  const cls = comp + "Component", sel = "demo-" + slug;
+  const aImp = mergeImports(['import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...ts.imports.filter((l) => !/^import\s+["'][^"']+\.css["']/.test(l))]); // Angular 的样式走 angular.json（page.css 里已经包含全部组件样式），组件文件里不 import CSS
   const ngTpl = tplLit(toHTML(node, { ...opt, indent: "      ", text: escNg, attr: (t) => t.replace(/\{\{/g, "&#123;&#123;") }));
-  const angular = `${aImp.join("\n")}\n${usesElems ? "\ndefineElements();\n" : ""}\n@Component({\n  selector: "${sel}",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素\n  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式\n${css ? `  styles: [\`\n${ind(tplLit(css), "    ")}\n  \`],\n` : ""}  template: \`\n    <div #root>\n${ngTpl}\n    </div>\`,\n})\nexport class ${cls} {\n  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;\n  private off = () => {};\n  ngAfterViewInit() {\n    const unsetup = setup();\n    const done = enhance(this.root.nativeElement${hasBody ? `, (root: any) => {\n${ind(tsAny(ngTs.body), "      ")}\n    }` : ""});\n    this.off = () => { done(); unsetup(); };\n  }\n  ngOnDestroy() { this.off(); }\n}\n`;
+  const angular = `${aImp.join("\n")}\n${usesElems ? "\ndefineElements();\n" : ""}\n@Component({\n  selector: "${sel}",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-xxx> 这类自定义元素\n  encapsulation: ViewEncapsulation.None, // 接上交互时动态加的元素（图标、滚动条）也要吃到样式\n${css ? `  styles: [\`\n${ind(tplLit(css), "    ")}\n  \`],\n` : ""}  template: \`\n    <div #root>\n${ngTpl}\n    </div>\`,\n})\nexport class ${cls} {\n  @ViewChild("root", { static: true }) root!: ElementRef<HTMLElement>;\n  private off = () => {};\n  ngAfterViewInit() {\n    const unsetup = setup();\n    const done = enhance(this.root.nativeElement${hasBodyFlag ? `, (${rootParam}: any) => {\n${ind(tsBody, "      ")}\n    }` : ""});\n    this.off = () => { done(); unsetup(); };\n  }\n  ngOnDestroy() { this.off(); }\n}\n`;
 
-  // Solid 2：onSettled 里接上（相当于以前的 onMount），onCleanup 撤掉；属性名照 HTML 写
-  const soImp = mergeImports(['import { onSettled, onCleanup } from "solid-js";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...imports, ...cssImport]);
-  const solid = `${soImp.join("\n")}\n${usesElems ? "\ndefineElements();\n" : ""}\nexport default function ${comp}() {\n  let root, off = () => {};\n  onSettled(() => {\n    const unsetup = setup();\n    const done = ${wire("    ", "root")};\n    off = () => { done(); unsetup(); };\n  });\n  onCleanup(() => off());\n  return (\n    <div ref={(el) => (root = el)}>\n${toJSX(node, { ...opt, indent: "      ", attrs: "html" })}\n    </div>\n  );\n}\n`;
+  // Solid 2（TSX）：onSettled 里接上（相当于以前的 onMount），onCleanup 撤掉；属性名照 HTML 写
+  const soImp = mergeImports(['import { onSettled, onCleanup } from "solid-js";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...ts.imports, ...cssImport]);
+  const solid = `${soImp.join("\n")}\n${usesElems ? "\ndefineElements();\n" : ""}\nexport default function ${comp}() {\n  let root!: HTMLDivElement;\n  let off = () => {};\n  onSettled(() => {\n    if (!root) return;\n    const unsetup = setup();\n    const done = ${wireTs("    ", "root")};\n    off = () => { done(); unsetup(); };\n  });\n  onCleanup(() => off());\n  return (\n    <div ref={(el: HTMLDivElement) => (root = el)}>\n${toJSX(node, { ...opt, indent: "      ", attrs: "html" })}\n    </div>\n  );\n}\n`;
 
-  // Preact：和 React 一样用 hooks，属性名照 HTML 写（class、for）
-  const pImp = mergeImports(['import { useEffect, useRef } from "preact/hooks";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...imports, ...cssImport]);
-  const preact = `${pImp.join("\n")}\n${usesElems ? "\ndefineElements();\n" : ""}\nexport default function ${comp}() {\n  const ref = useRef(null);\n  useEffect(() => {\n    const unsetup = setup();\n    const off = ${wire("    ", "ref.current")};\n    return () => { off(); unsetup(); };\n  }, []);\n  return (\n    <div ref={ref}>\n${toJSX(node, { ...opt, indent: "      ", attrs: "html" })}\n    </div>\n  );\n}\n`;
+  // Preact（TSX）：和 React 一样用 hooks，属性名照 HTML 写（class、for）
+  const pImp = mergeImports(['import { useEffect, useRef } from "preact/hooks";', 'import { setup, enhance } from "satin-ui";', ...elemsImport, ...ts.imports, ...cssImport]);
+  const preact = `${pImp.join("\n")}\n${usesElems ? "\ndefineElements();\n" : ""}\nexport default function ${comp}() {\n  const ref = useRef<HTMLDivElement>(null);\n  useEffect(() => {\n    if (!ref.current) return;\n    const unsetup = setup();\n    const off = ${wireTs("    ", "ref.current")};\n    return () => { off(); unsetup(); };\n  }, []);\n  return (\n    <div ref={ref}>\n${toJSX(node, { ...opt, indent: "      ", attrs: "html" })}\n    </div>\n  );\n}\n`;
 
   // 纯 HTML：<sn-enhance> 包住标记（放进页面自动接上交互、移出页面自动撤掉），自己的接线写在模块脚本里
   const id = "demo-" + slug;
   const hImp = mergeImports(['import { defineElements } from "satin-ui/elements";', ...imports.filter((l) => !/^import\s+["'][^"']+\.css["']/.test(l))]); // 浏览器的模块脚本不能 import CSS：样式用 <link> 引 page.css（已经包含全部组件样式）
-  const html = `<sn-enhance id="${id}">\n${ind(markup, "  ")}\n</sn-enhance>\n\n<script type="module">\n${ind([...hImp, "", "defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素", ...(hasBody ? [`const root = document.getElementById("${id}");`, body] : [])].join("\n"), "  ")}\n</script>\n${css ? `\n<style>\n${ind(css, "  ")}\n</style>\n` : ""}`;
+  const html = `<sn-enhance id="${id}">\n${ind(markup, "  ")}\n</sn-enhance>\n\n<script type="module">\n${ind([...hImp, "", "defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素", ...(hasBodyFlag ? [`const root = document.getElementById("${id}");`, body] : [])].join("\n"), "  ")}\n</script>\n${css ? `\n<style>\n${ind(css, "  ")}\n</style>\n` : ""}`;
 
   return {
     html: [{ name: slug + ".html", lang: "html", code: html }],
-    react: [{ name: slug + ".jsx", lang: "jsx", code: react }, ...cssFile],
+    react: [{ name: slug + ".tsx", lang: "tsx", code: react }, ...cssFile],
     vue: [{ name: slug + ".vue", lang: "vue", code: vue }, ...cssFile],
-    svelte: [{ name: slug + ".svelte", lang: "html", code: svelte }, ...cssFile],
+    svelte: [{ name: slug + ".svelte", lang: "svelte", code: svelte }, ...cssFile],
     angular: [{ name: slug + ".ts", lang: "ts", code: angular }],
-    solid: [{ name: slug + ".jsx", lang: "jsx", code: solid }, ...cssFile],
-    preact: [{ name: slug + ".jsx", lang: "jsx", code: preact }, ...cssFile],
+    solid: [{ name: slug + ".tsx", lang: "tsx", code: solid }, ...cssFile],
+    preact: [{ name: slug + ".tsx", lang: "tsx", code: preact }, ...cssFile],
   };
 }
 

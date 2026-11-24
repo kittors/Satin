@@ -1,14 +1,15 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createScrollArea } from "satin-ui/components";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 写在标记上的滚动区域：data-sa="y | x | both | none | top bottom…" 是渐隐方向，其余选项写成 data-sa-*（size、bar、bar-size、inset、over、wheel）
-      const num = (v) => (v == null || v === "" ? undefined : Number(v));
+      const num = (v?: any) => (v == null || v === "" ? undefined : Number(v));
       for (const el of root.querySelectorAll("[data-sa]")) {
         const d = el.dataset;
         createScrollArea(el, { fade: d.sa || "y", wheel: d.saWheel || "auto", bar: d.saBar || "auto", overscroll: d.saOver || "auto", size: num(d.saSize), barSize: num(d.saBarSize), barInset: num(d.saInset) });

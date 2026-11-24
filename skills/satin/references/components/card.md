@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-pc" tabindex="0" aria-label="雨夜车站">
   <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72" alt><span class="sn-len">12:36</span></div>
   <div class="sn-meta"><b>雨夜车站</b><span class="sn-sub">48 个镜头 · 3 分钟前</span></div>
@@ -62,10 +62,10 @@
 
 React 的写法：
 
-```jsx
+```tsx
 export default function CardBasic() {
   return (
-    <div className="sn-pc" tabIndex="0" aria-label="雨夜车站">
+    <div className="sn-pc" tabIndex={0} aria-label="雨夜车站">
       <div className="sn-cover"><img className="sn-art" src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72" alt="" /><span className="sn-len">12:36</span></div>
       <div className="sn-meta"><b>雨夜车站</b><span className="sn-sub">48 个镜头 · 3 分钟前</span></div>
     </div>
@@ -86,7 +86,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-pc" tabindex="0" aria-label="雨夜车站">
   <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72" alt><span class="sn-len">12:36</span></div>
   <div class="sn-meta"><b>雨夜车站</b><span class="sn-sub">48 个镜头 · 3 分钟前</span></div>
@@ -112,7 +112,7 @@ export class CardBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function CardBasic() {
   return (
     <div class="sn-pc" tabindex="0" aria-label="雨夜车站">
@@ -125,10 +125,10 @@ export default function CardBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function CardBasic() {
   return (
-    <div class="sn-pc" tabindex="0" aria-label="雨夜车站">
+    <div class="sn-pc" tabIndex={0} aria-label="雨夜车站">
       <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72" alt="" /><span class="sn-len">12:36</span></div>
       <div class="sn-meta"><b>雨夜车站</b><span class="sn-sub">48 个镜头 · 3 分钟前</span></div>
     </div>
@@ -146,7 +146,7 @@ export default function CardBasic() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-pcards">
 <div class="sn-pc" tabindex="0" aria-label="雨夜车站">
   <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72" alt><span class="sn-len">12:36</span></div>
@@ -165,21 +165,21 @@ export default function CardBasic() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 export default function CardGrid() {
   return (
     <div className="sn-pcards">
-    <div className="sn-pc" tabIndex="0" aria-label="雨夜车站">
+    <div className="sn-pc" tabIndex={0} aria-label="雨夜车站">
       <div className="sn-cover"><img className="sn-art" src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72" alt="" /><span className="sn-len">12:36</span></div>
       <div className="sn-meta"><b>雨夜车站</b><span className="sn-sub">48 个镜头 · 3 分钟前<span className="sn-av-group"><Avatar seed="u3" name="林夏" size={20} decorative /><Avatar seed="u4" name="周屿" size={20} decorative /></span></span></div>
     </div>
-    <div className="sn-pc" tabIndex="0" aria-label="候车厅">
+    <div className="sn-pc" tabIndex={0} aria-label="候车厅">
       <div className="sn-cover"><img className="sn-art" src="https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=480&q=72" alt="" /><span className="sn-len">04:12</span></div>
       <div className="sn-meta"><b>候车厅</b><span className="sn-sub">16 个镜头 · 昨天<span className="sn-av-group"><Avatar seed="u4" name="周屿" size={20} decorative /></span></span></div>
     </div>
-    <div className="sn-pc" tabIndex="0" aria-label="积水里的城市">
+    <div className="sn-pc" tabIndex={0} aria-label="积水里的城市">
       <div className="sn-cover"><img className="sn-art" src="https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=480&q=72" alt="" /><span className="sn-len">08:50</span></div>
       <div className="sn-meta"><b>积水里的城市</b><span className="sn-sub">30 个镜头 · 上周<span className="sn-av-group"><Avatar seed="u11" name="许诺" size={20} decorative /><Avatar seed="u3" name="林夏" size={20} decorative /><Avatar seed="u8" name="陈默" size={20} decorative /></span></span></div>
     </div>
@@ -191,7 +191,7 @@ export default function CardGrid() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Avatar } from "satin-ui/vue";
 </script>
 
@@ -215,8 +215,8 @@ import { Avatar } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Avatar from "satin-ui/svelte/Avatar.svelte";
 </script>
 
@@ -266,7 +266,7 @@ export class CardGridComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function CardGrid() {
   return (
     <div class="sn-pcards">
@@ -289,21 +289,21 @@ export default function CardGrid() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 export default function CardGrid() {
   return (
     <div class="sn-pcards">
-    <div class="sn-pc" tabindex="0" aria-label="雨夜车站">
+    <div class="sn-pc" tabIndex={0} aria-label="雨夜车站">
       <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72" alt="" /><span class="sn-len">12:36</span></div>
       <div class="sn-meta"><b>雨夜车站</b><span class="sn-sub">48 个镜头 · 3 分钟前<span class="sn-av-group"><Avatar seed="u3" name="林夏" size={20} decorative /><Avatar seed="u4" name="周屿" size={20} decorative /></span></span></div>
     </div>
-    <div class="sn-pc" tabindex="0" aria-label="候车厅">
+    <div class="sn-pc" tabIndex={0} aria-label="候车厅">
       <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=480&q=72" alt="" /><span class="sn-len">04:12</span></div>
       <div class="sn-meta"><b>候车厅</b><span class="sn-sub">16 个镜头 · 昨天<span class="sn-av-group"><Avatar seed="u4" name="周屿" size={20} decorative /></span></span></div>
     </div>
-    <div class="sn-pc" tabindex="0" aria-label="积水里的城市">
+    <div class="sn-pc" tabIndex={0} aria-label="积水里的城市">
       <div class="sn-cover"><img class="sn-art" src="https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=480&q=72" alt="" /><span class="sn-len">08:50</span></div>
       <div class="sn-meta"><b>积水里的城市</b><span class="sn-sub">30 个镜头 · 上周<span class="sn-av-group"><Avatar seed="u11" name="许诺" size={20} decorative /><Avatar seed="u3" name="林夏" size={20} decorative /><Avatar seed="u8" name="陈默" size={20} decorative /></span></span></div>
     </div>
@@ -322,7 +322,7 @@ export default function CardGrid() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-pcards" style="--sn-card-min:196px">
     <div class="sn-card">
@@ -355,7 +355,7 @@ export default function CardGrid() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function CardVariants() {
@@ -393,7 +393,7 @@ export default function CardVariants() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Icon } from "satin-ui/vue";
 </script>
 
@@ -429,8 +429,8 @@ import { Icon } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -488,7 +488,7 @@ export class CardVariantsComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function CardVariants() {
   return (
     <sn-enhance>
@@ -507,7 +507,7 @@ export default function CardVariants() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function CardVariants() {
@@ -552,7 +552,7 @@ export default function CardVariants() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-16">
   <div class="sn-pcards" style="--sn-card-min:240px">
     <div class="sn-pc sn-bleed" tabindex="0" aria-label="雨夜车站">
@@ -577,7 +577,7 @@ export default function CardVariants() {
 
 React 的写法：
 
-```jsx
+```tsx
 export default function CardLayouts() {
   return (
     <div className="sn-stack sn-gap-16">
@@ -633,7 +633,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-stack sn-gap-16">
   <div class="sn-pcards" style="--sn-card-min:240px">
     <div class="sn-pc sn-bleed" tabindex="0" aria-label="雨夜车站">
@@ -691,7 +691,7 @@ export class CardLayoutsComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function CardLayouts() {
   return (
     <div class="sn-stack sn-gap-16">
@@ -720,7 +720,7 @@ export default function CardLayouts() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function CardLayouts() {
   return (
     <div class="sn-stack sn-gap-16">
@@ -757,7 +757,7 @@ export default function CardLayouts() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-pcards" style="--sn-card-min:260px">
   <div class="sn-card sn-divided">
     <div class="sn-card-hd">
@@ -789,7 +789,7 @@ export default function CardLayouts() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Avatar, Button } from "satin-ui/react";
 
 export default function CardContent() {
@@ -828,7 +828,7 @@ export default function CardContent() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Avatar, Button } from "satin-ui/vue";
 </script>
 
@@ -865,8 +865,8 @@ import { Avatar, Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Avatar from "satin-ui/svelte/Avatar.svelte";
 </script>
 
@@ -942,7 +942,7 @@ export class CardContentComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function CardContent() {
   return (
     <div class="sn-pcards" style="--sn-card-min:260px">
@@ -978,7 +978,7 @@ export default function CardContent() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Avatar, Button } from "satin-ui/react";
 
 export default function CardContent() {
@@ -1024,7 +1024,7 @@ export default function CardContent() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-12" id="pick-cards">
   <div class="sn-pcards">
     <div class="sn-pc sn-sel" tabindex="0" aria-label="雨夜车站">
@@ -1055,7 +1055,7 @@ export default function CardContent() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 
 const SHOTS = [
@@ -1066,7 +1066,7 @@ const SHOTS = [
 
 export default function PickCards() {
   const [picked, setPicked] = useState(["雨夜车站"]);
-  const toggle = (n, on) => setPicked(on ? [...picked, n] : picked.filter((x) => x !== n));
+  const toggle = (n: string, on: boolean) => setPicked(on ? [...picked, n] : picked.filter((x) => x !== n));
   return (
     <div className="sn-stack sn-gap-12">
       <div className="sn-pcards">
@@ -1094,7 +1094,7 @@ export default function PickCards() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 
 const SHOTS = [
@@ -1128,8 +1128,8 @@ const picked = ref(["雨夜车站"]);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   const SHOTS = [
     { name: "雨夜车站", cover: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&q=72", length: "12:36" },
     { name: "候车厅", cover: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=480&q=72", length: "04:12" },
@@ -1195,7 +1195,7 @@ export class CardSelectComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, For } from "solid-js";
 
 const SHOTS = [
@@ -1206,7 +1206,7 @@ const SHOTS = [
 
 export default function PickCards() {
   const [picked, setPicked] = createSignal(["雨夜车站"]);
-  const toggle = (n, on) => setPicked(on ? [...picked(), n] : picked().filter((x) => x !== n));
+  const toggle = (n: string, on: boolean) => setPicked(on ? [...picked(), n] : picked().filter((x) => x !== n));
   return (
     <div class="sn-stack sn-gap-12">
       <div class="sn-pcards">
@@ -1232,7 +1232,7 @@ export default function PickCards() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 
 const SHOTS = [
@@ -1243,7 +1243,7 @@ const SHOTS = [
 
 export default function PickCards() {
   const [picked, setPicked] = useState(["雨夜车站"]);
-  const toggle = (n, on) => setPicked(on ? [...picked, n] : picked.filter((x) => x !== n));
+  const toggle = (n: string, on: boolean) => setPicked(on ? [...picked, n] : picked.filter((x) => x !== n));
   return (
     <div class="sn-stack sn-gap-12">
       <div class="sn-pcards">

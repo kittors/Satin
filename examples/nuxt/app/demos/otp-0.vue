@@ -1,18 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createOtp, toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入
     const otp = createOtp(root.querySelector("[data-otp]"), {
-      onComplete: (code) => { // 6 位都填满时调：换成你的校验请求
+      onComplete: (code?: any) => { // 6 位都填满时调：换成你的校验请求
         toast({ text: `已提交验证码 ${code}` });
-        setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
+        window.setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
       },
     });
   });

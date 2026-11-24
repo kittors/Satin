@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { openDrawer, toast } from "satin-ui/components";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 抽屉里的 [data-x]、Esc、点外面关闭，焦点圈在抽屉里，触屏上手指往右拖也能关
       // 自己控制：先把要编辑的内容填进去再打开，关上时收尾
       const editBtn = root.querySelector("#edit-shot"), drawer = root.querySelector("#dr-edit"), title = root.querySelector("#dr-title");

@@ -30,7 +30,7 @@ export class PopoverDemo0Component {
       copyBtn.addEventListener("click", async () => {
         await navigator.clipboard?.writeText(location.href).catch(() => {});
         copied(copyBtn);
-        setTimeout(() => popoverOf(pop)?.close(true), 700);
+        window.setTimeout(() => popoverOf(pop)?.close(true), 700);
       });
       // 不用标记也行：openPopover(面板, 按钮, { align: "end", onClose })，返回的那一层有 close()
     });

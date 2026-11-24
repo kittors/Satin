@@ -56,7 +56,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="share" data-tip="分享" aria-label="分享"></button>
@@ -69,7 +69,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function Toolbar() {
@@ -87,7 +87,7 @@ export default function Toolbar() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -103,8 +103,8 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -140,7 +140,7 @@ export class IconbuttonBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function IconbuttonBasic() {
   return (
     <sn-enhance>
@@ -157,7 +157,7 @@ export default function IconbuttonBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function Toolbar() {
@@ -182,7 +182,7 @@ export default function Toolbar() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="settings" data-tip="设置" aria-label="设置"></button>
@@ -196,7 +196,7 @@ export default function Toolbar() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function IconButtonVariants() {
@@ -215,7 +215,7 @@ export default function IconButtonVariants() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -232,8 +232,8 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -271,7 +271,7 @@ export class IconbuttonVariantsComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function IconbuttonVariants() {
   return (
     <sn-enhance>
@@ -289,7 +289,7 @@ export default function IconbuttonVariants() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function IconButtonVariants() {
@@ -315,7 +315,7 @@ export default function IconButtonVariants() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <button type="button" class="sn-btn sn-ghost sn-ibtn" data-i="bell" data-tip="通知，3 条未读" aria-label="通知，3 条未读"><span class="sn-count">3</span></button>
@@ -327,7 +327,7 @@ export default function IconButtonVariants() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function IconButtonStates() {
@@ -345,7 +345,7 @@ export default function IconButtonStates() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -361,8 +361,8 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -396,7 +396,7 @@ export class IconbuttonStatesComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function IconbuttonStates() {
   return (
     <sn-enhance>
@@ -412,7 +412,7 @@ export default function IconbuttonStates() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function IconButtonStates() {
@@ -437,7 +437,7 @@ export default function IconButtonStates() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <button type="button" class="sn-btn sn-ghost sn-ibtn sn-selected" aria-pressed="true" data-i="layout-grid" data-tip="网格（已打开）" aria-label="网格（已打开）" id="grid-toggle"></button>
@@ -458,7 +458,7 @@ export default function IconButtonStates() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button } from "satin-ui/react";
 
@@ -475,7 +475,7 @@ export default function GridToggle() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button } from "satin-ui/vue";
 
@@ -491,8 +491,8 @@ const on = ref(true);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   let on = $state(true);
@@ -528,7 +528,7 @@ export class IconbuttonControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 export default function GridToggle() {
@@ -546,7 +546,7 @@ export default function GridToggle() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button } from "satin-ui/react";
 

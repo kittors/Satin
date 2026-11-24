@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
-  import { createCanvasGrid } from "satin-ui/canvas-grid";
+  import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
   // 列和数据的写法和数据表格一样；画布上只能画文字：格子的文字用 format 改（没有 render）
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180 },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
     { key: "owner", title: "负责人", type: "owner", width: 120 },

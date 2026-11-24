@@ -1,0 +1,127 @@
+import { onSettled, onCleanup } from "solid-js";
+import { setup, enhance } from "satin-ui";
+
+export default function NotFound() {
+  let root!: HTMLDivElement;
+  let off = () => {};
+  onSettled(() => {
+    if (!root) return;
+    const unsetup = setup();
+    const done = enhance(root, (root: any) => {
+      const page = root.querySelector("[data-nf-root]");
+      if (page) {
+      let rot = 0, timer = 0;
+      const shoot = () => {
+        rot += 30;
+        page.style.setProperty("--sn-e404-rot", rot + "deg");
+        page.classList.remove("sn-shutter");
+        void page.offsetWidth;
+        page.classList.add("sn-shutter");
+        clearTimeout(timer);
+        timer = window.setTimeout(() => page.classList.remove("sn-shutter"), 180);
+      };
+
+      page.querySelector("[data-nf-lens]")?.addEventListener("click", shoot);
+      page.querySelector("[data-nf-back]")?.addEventListener("click", () => { if (history.length > 1) history.back(); });
+
+      page.addEventListener("pointermove", (e?: any) => {
+        const r = page.getBoundingClientRect();
+        const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+        const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+        page.style.setProperty("--sn-e404-x", (nx * 5).toFixed(1) + "px");
+        page.style.setProperty("--sn-e404-y", (ny * 5).toFixed(1) + "px");
+      });
+      page.addEventListener("pointerleave", () => {
+        page.style.setProperty("--sn-e404-x", "0px");
+        page.style.setProperty("--sn-e404-y", "0px");
+      });
+      document.addEventListener("keydown", (e?: any) => {
+        if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "")) {
+          e.preventDefault();
+          shoot();
+        }
+      });
+      }
+    });
+    off = () => { done(); unsetup(); };
+  });
+  onCleanup(() => off());
+  return (
+    <div ref={(el: HTMLDivElement) => (root = el)}>
+      <main class="sn-e404" data-nf-root="">
+        <div class="sn-e404-wrap">
+          <div class="sn-e404-trio" aria-label="404">
+            <svg class="sn-e404-digit" viewBox="0 0 88 124" aria-hidden="true">
+              <path class="sn-e404-digit-solid" fill-rule="evenodd" d="M55 17 L13 78 V91 H55 V113 H71 V91 H83 V77 H71 V17 Z M55 39 V77 H29 Z"></path>
+            </svg>
+            <button type="button" class="sn-e404-lens" data-nf-lens="" aria-label="点击触发光圈快门">
+              <svg class="sn-e404-lens-svg" viewBox="0 0 140 140" aria-hidden="true">
+                <defs>
+                  <clipPath id="sn-e404-iris-clip">
+                    <circle cx="70" cy="70" r="42"></circle>
+                  </clipPath>
+                </defs>
+                <g class="sn-e404-dial">
+                  <line class="sn-e404-tick-major" x1="70" y1="8" x2="70" y2="15"></line>
+                  {" "}
+                  <line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(30 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(60 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick-major" x1="70" y1="8" x2="70" y2="15" transform="rotate(90 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(120 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(150 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick-major" x1="70" y1="8" x2="70" y2="15" transform="rotate(180 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(210 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(240 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick-major" x1="70" y1="8" x2="70" y2="15" transform="rotate(270 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(300 70 70)"></line>
+                  {" "}
+                  <line class="sn-e404-tick" x1="70" y1="10" x2="70" y2="14" transform="rotate(330 70 70)"></line>
+                </g>
+                {" "}
+                <g class="sn-e404-iris-wrap">
+                  <circle class="sn-e404-barrel" cx="70" cy="70" r="42"></circle>
+                  <g clip-path="url(#sn-e404-iris-clip)">
+                    <g class="sn-e404-blades">
+                      <path class="sn-e404-blade" d="M58 51 H118 V18 H58 Z"></path>
+                      {" "}
+                      <path class="sn-e404-blade-alt" d="M58 51 H118 V18 H58 Z" transform="rotate(60 70 70)"></path>
+                      {" "}
+                      <path class="sn-e404-blade" d="M58 51 H118 V18 H58 Z" transform="rotate(120 70 70)"></path>
+                      {" "}
+                      <path class="sn-e404-blade-alt" d="M58 51 H118 V18 H58 Z" transform="rotate(180 70 70)"></path>
+                      {" "}
+                      <path class="sn-e404-blade" d="M58 51 H118 V18 H58 Z" transform="rotate(240 70 70)"></path>
+                      {" "}
+                      <path class="sn-e404-blade-alt" d="M58 51 H118 V18 H58 Z" transform="rotate(300 70 70)"></path>
+                    </g>
+                  </g>
+                  <circle class="sn-e404-dot" cx="70" cy="70" r="2.2"></circle>
+                </g>
+              </svg>
+            </button>
+            <svg class="sn-e404-digit" viewBox="0 0 88 124" aria-hidden="true">
+              <path class="sn-e404-digit-solid" fill-rule="evenodd" d="M55 17 L13 78 V91 H55 V113 H71 V91 H83 V77 H71 V17 Z M55 39 V77 H29 Z"></path>
+            </svg>
+          </div>
+          <div class="sn-e404-head">
+            <h1>这一页不在镜头里</h1>
+            <p>你访问的地址可能已移动或失效。</p>
+          </div>
+          <div class="sn-e404-acts">
+            <a class="sn-btn sn-primary" href="/">回到首页</a>
+            <button type="button" class="sn-btn sn-secondary" data-nf-back="">返回上一页</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

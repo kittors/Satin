@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import TagInput from "satin-ui/svelte/TagInput.svelte";
 </script>
 

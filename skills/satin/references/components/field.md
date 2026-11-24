@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-field">
   <label class="sn-lbl" for="project-name">项目名称</label>
   <input class="sn-input" id="project-name" placeholder="比如：雨夜车站">
@@ -63,7 +63,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Field, Input } from "satin-ui/react";
 
 export default function NameField() {
@@ -78,7 +78,7 @@ export default function NameField() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Field, Input } from "satin-ui/vue";
 </script>
 
@@ -91,7 +91,7 @@ import { Field, Input } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-field">
   <label class="sn-lbl" for="project-name">项目名称</label>
   <input class="sn-input" id="project-name" placeholder="比如：雨夜车站" />
@@ -119,7 +119,7 @@ export class FieldBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function NameField() {
   return (
     <div class="sn-field">
@@ -133,7 +133,7 @@ export default function NameField() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Field, Input } from "satin-ui/react";
 
 export default function NameField() {
@@ -155,7 +155,7 @@ export default function NameField() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <form class="sn-stack sn-gap-12" id="new-project" novalidate>
   <div class="sn-field" data-f="name">
     <label class="sn-lbl" for="new-name">项目名称</label>
@@ -178,14 +178,14 @@ export default function NameField() {
 
 React 的写法：
 
-```jsx
-import { useState } from "react";
+```tsx
+import { useState, type FormEvent } from "react";
 import { Button, Field, Input } from "satin-ui/react";
 
 export default function NewProject() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const submit = (e) => {
+  const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name.trim()) return setError("请填写项目名称");
     setName("");
@@ -205,7 +205,7 @@ export default function NewProject() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Field, Input } from "satin-ui/vue";
 
@@ -230,11 +230,11 @@ const submit = () => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   let name = $state("");
   let error = $state("");
-  const submit = (e) => {
+  const submit = (e: SubmitEvent) => {
     e.preventDefault();
     if (!name.trim()) return (error = "请填写项目名称");
     name = "";
@@ -284,13 +284,13 @@ export class FieldErrorComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 export default function NewProject() {
   const [name, setName] = createSignal("");
   const [error, setError] = createSignal("");
-  const submit = (e) => {
+  const submit = (e: SubmitEvent) => {
     e.preventDefault();
     if (!name().trim()) return setError("请填写项目名称");
     setName("");
@@ -311,14 +311,14 @@ export default function NewProject() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Field, Input } from "satin-ui/react";
 
 export default function NewProject() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const submit = (e) => {
+  const submit = (e: Event) => {
     e.preventDefault();
     if (!name.trim()) return setError("请填写项目名称");
     setName("");
@@ -345,7 +345,7 @@ export default function NewProject() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-field">
   <label class="sn-lbl" for="notify-mail">通知邮箱 <span class="sn-opt">可选</span></label>
   <input class="sn-input" id="notify-mail" type="email" placeholder="name@example.com">
@@ -355,7 +355,7 @@ export default function NewProject() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Field, Input } from "satin-ui/react";
 
 export default function MailField() {
@@ -371,7 +371,7 @@ export default function MailField() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Field, Input } from "satin-ui/vue";
 </script>
 
@@ -387,7 +387,7 @@ import { Field, Input } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- 只标"可选"，不标必填 -->
 <div class="sn-field">
   <label class="sn-lbl" for="notify-mail">通知邮箱 <span class="sn-opt">可选</span></label>
@@ -417,7 +417,7 @@ export class FieldOptionalComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function MailField() {
   return (
     // 只标"可选"，不标必填
@@ -432,7 +432,7 @@ export default function MailField() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Field, Input } from "satin-ui/react";
 
 export default function MailField() {

@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { createPlayer } from "satin-ui";
 
   // 实例上有 play()、pause()、toggle()，video 是里面的 <video>：自己的按钮直接控制播放；挂上以后建，卸载时 destroy()
-  let host, player;
+  let host!: HTMLDivElement, player: ReturnType<typeof createPlayer> | undefined;
   $effect(() => {
     player = createPlayer(host, { src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", label: "雨夜样片" });
     return () => player.destroy();

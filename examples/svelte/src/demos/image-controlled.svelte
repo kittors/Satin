@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { openLightbox } from "satin-ui/lightbox";
 
   const ITEMS = [
@@ -8,20 +8,20 @@
     { type: "video", src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", thumb: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", ratio: 16 / 9, alt: "雨夜样片" },
   ];
   // 视频也放进看图层：type 写 "video"、src 是视频地址、poster 是封面，在里面直接播；受控：自己的按钮直接打开到视频那一张
-  let state = $state({});
-  const thumbs = [];
+  let state = $state<Record<number, string | undefined>>({});
+  const thumbs: (HTMLDivElement | null)[] = [];
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
+  const load = (i: number) => {
     const img = new Image(), fail = () => (state[i] = "sn-failed");
     img.onload = () => (state[i] = "sn-loaded");
     img.onerror = fail;
     img.src = ITEMS[i].thumb;
   };
   $effect(() => ITEMS.forEach((_, i) => load(i)));
-  const ok = (i) => state[i] === "sn-loaded";
+  const ok = (i: number) => state[i] === "sn-loaded";
   // 图片从缩略图的位置长到铺满窗口，关上时沿原路缩回；左右翻页跳过没加载好的
-  const open = (i) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k) => thumbs[k], enabled: ok }); };
-  const onkey = (e, i) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
+  const open = (i: number) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k: number) => thumbs[k], enabled: ok }); };
+  const onkey = (e: KeyboardEvent, i: number) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
 </script>
 
 <div class="sn-stack">

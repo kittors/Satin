@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="count-basic"></div>
 
 <script type="module">
@@ -65,7 +65,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { CountInput, Field } from "satin-ui/react";
 
 export default function ShotTitle() {
@@ -81,7 +81,7 @@ export default function ShotTitle() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { CountInput, Field } from "satin-ui/vue";
 
@@ -98,8 +98,8 @@ const title = ref("");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createCount } from "satin-ui";
 
@@ -136,12 +136,12 @@ export class CountBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createCount } from "satin-ui";
 
 export default function ShotTitle() {
-  let host;
+  let host!: HTMLDivElement;
   // 写到 90% 变成提醒色，写满再敲时计数抖一下；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createCount(host, { max: 20, placeholder: "一句话说清这个镜头", id: "shot-title", size: "lg" });
@@ -153,7 +153,7 @@ export default function ShotTitle() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { CountInput, Field } from "satin-ui/react";
 
 export default function ShotTitle() {
@@ -176,7 +176,7 @@ export default function ShotTitle() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="count-controlled"></div>
 
 <script type="module">
@@ -188,7 +188,7 @@ export default function ShotTitle() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, CountInput } from "satin-ui/react";
 
@@ -207,7 +207,7 @@ export default function RoleName() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, CountInput } from "satin-ui/vue";
 
@@ -225,8 +225,8 @@ const name = ref("林夏");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createCount } from "satin-ui";
 
@@ -263,12 +263,12 @@ export class CountControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createCount } from "satin-ui";
 
 export default function RoleName() {
-  let host;
+  let host!: HTMLDivElement;
   // onChange 拿到新值；程序里改值用 update({ value })；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createCount(host, { max: 8, value: "林夏", id: "role-name", onChange: (v) => console.log("角色名：", v) });
@@ -280,7 +280,7 @@ export default function RoleName() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, CountInput } from "satin-ui/react";
 
@@ -306,7 +306,7 @@ export default function RoleName() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="count-longtext"></div>
 
 <script type="module">
@@ -324,7 +324,7 @@ export default function RoleName() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { LongText, toast } from "satin-ui/react";
 
 export default function ShotDescription() {
@@ -344,7 +344,7 @@ export default function ShotDescription() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { LongText, toast } from "satin-ui/vue";
 
@@ -366,8 +366,8 @@ const desc = ref("");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createLongText } from "satin-ui";
 
@@ -416,12 +416,12 @@ export class CountLongtextComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createLongText } from "satin-ui";
 
 export default function ShotDescription() {
-  let host;
+  let host!: HTMLDivElement;
   // 随内容长高、用量环；⌘↵ 调 onSubmit；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createLongText(host, {
@@ -439,7 +439,7 @@ export default function ShotDescription() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { LongText, toast } from "satin-ui/react";
 
 export default function ShotDescription() {

@@ -54,13 +54,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" data-tip="保存到草稿箱，可以随时接着改">存草稿</button>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, Tooltip } from "satin-ui/react";
 
 export default function DraftButton() {
@@ -75,7 +75,7 @@ export default function DraftButton() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Tooltip } from "satin-ui/vue";
 </script>
 
@@ -88,7 +88,7 @@ import { Button, Tooltip } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <button type="button" class="sn-btn sn-secondary" data-tip="保存到草稿箱，可以随时接着改">存草稿</button>
 ```
 
@@ -106,7 +106,7 @@ export class TooltipBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function DraftButton() {
   return <button type="button" class="sn-btn sn-secondary" data-tip="保存到草稿箱，可以随时接着改">存草稿</button>;
 }
@@ -114,7 +114,7 @@ export default function DraftButton() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, Tooltip } from "satin-ui/react";
 
 export default function DraftButton() {
@@ -136,13 +136,13 @@ export default function DraftButton() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-primary" data-tip="导出成片" data-kbd="⌘E">导出</button>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, Tooltip } from "satin-ui/react";
 
 export default function ExportButton() {
@@ -157,7 +157,7 @@ export default function ExportButton() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Tooltip } from "satin-ui/vue";
 </script>
 
@@ -170,7 +170,7 @@ import { Button, Tooltip } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <button type="button" class="sn-btn sn-primary" data-tip="导出成片" data-kbd="⌘E">导出</button>
 ```
 
@@ -188,7 +188,7 @@ export class TooltipKbdComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ExportButton() {
   return <button type="button" class="sn-btn sn-primary" data-tip="导出成片" data-kbd="⌘E">导出</button>;
 }
@@ -196,7 +196,7 @@ export default function ExportButton() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, Tooltip } from "satin-ui/react";
 
 export default function ExportButton() {
@@ -218,13 +218,13 @@ export default function ExportButton() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <span class="sn-truncate" style="max-width:180px" data-tip-full>第三集 · 雨夜车站 · 第二场 · 长镜头版本</span>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 export default function LongTitle() {
   // data-tip-full：只有文字被截断时，悬停才显示全文
   return <span className="sn-truncate" style={{ maxWidth: 180 }} data-tip-full>第三集 · 雨夜车站 · 第二场 · 长镜头版本</span>;
@@ -242,7 +242,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- data-tip-full：只有文字被截断时，悬停才显示全文 -->
 <span class="sn-truncate" style="max-width:180px" data-tip-full>第三集 · 雨夜车站 · 第二场 · 长镜头版本</span>
 ```
@@ -262,7 +262,7 @@ export class TooltipTruncateComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function LongTitle() {
   // data-tip-full：只有文字被截断时，悬停才显示全文
   return <span class="sn-truncate" style="max-width: 180px" data-tip-full>第三集 · 雨夜车站 · 第二场 · 长镜头版本</span>;
@@ -271,7 +271,7 @@ export default function LongTitle() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function LongTitle() {
   // data-tip-full：只有文字被截断时，悬停才显示全文
   return <span class="sn-truncate" style={{ maxWidth: 180 }} data-tip-full>第三集 · 雨夜车站 · 第二场 · 长镜头版本</span>;

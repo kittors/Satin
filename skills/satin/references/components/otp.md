@@ -53,13 +53,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-otp length="6"></sn-otp>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Otp } from "satin-ui/react";
 
 export default function VerifyCode() {
@@ -70,7 +70,7 @@ export default function VerifyCode() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Otp } from "satin-ui/vue";
 </script>
 
@@ -81,8 +81,8 @@ import { Otp } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Otp from "satin-ui/svelte/Otp.svelte";
 </script>
 
@@ -104,7 +104,7 @@ export class OtpBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function VerifyCode() {
   return <sn-otp length="6"></sn-otp>;
 }
@@ -112,7 +112,7 @@ export default function VerifyCode() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Otp } from "satin-ui/react";
 
 export default function VerifyCode() {
@@ -130,7 +130,7 @@ export default function VerifyCode() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="otp-box">
   <sn-otp length="6"></sn-otp>
   <span class="sn-help">输入 6 位验证码</span>
@@ -146,7 +146,7 @@ export default function VerifyCode() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Otp } from "satin-ui/react";
 
@@ -165,7 +165,7 @@ export default function VerifyOnComplete() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Otp } from "satin-ui/vue";
 
@@ -183,8 +183,8 @@ const note = ref("输入 6 位验证码");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Otp from "satin-ui/svelte/Otp.svelte";
 
   let note = $state("输入 6 位验证码");
@@ -220,11 +220,11 @@ export class OtpCompleteComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function VerifyOnComplete() {
   const [note, setNote] = createSignal("输入 6 位验证码");
@@ -240,7 +240,7 @@ export default function VerifyOnComplete() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Otp } from "satin-ui/react";
 
@@ -266,13 +266,13 @@ export default function VerifyOnComplete() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-otp length="4"></sn-otp>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Otp } from "satin-ui/react";
 
 export default function ShortCode() {
@@ -283,7 +283,7 @@ export default function ShortCode() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Otp } from "satin-ui/vue";
 </script>
 
@@ -294,8 +294,8 @@ import { Otp } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Otp from "satin-ui/svelte/Otp.svelte";
 </script>
 
@@ -317,7 +317,7 @@ export class OtpLengthComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ShortCode() {
   return <sn-otp length="4"></sn-otp>;
 }
@@ -325,7 +325,7 @@ export default function ShortCode() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Otp } from "satin-ui/react";
 
 export default function ShortCode() {

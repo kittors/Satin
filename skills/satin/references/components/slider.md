@@ -53,13 +53,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-slider value="40" max="100" label="音量"></sn-slider>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Slider } from "satin-ui/react";
 
 export default function VolumeSlider() {
@@ -70,7 +70,7 @@ export default function VolumeSlider() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Slider } from "satin-ui/vue";
 </script>
 
@@ -81,8 +81,8 @@ import { Slider } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Slider from "satin-ui/svelte/Slider.svelte";
 </script>
 
@@ -104,7 +104,7 @@ export class SliderBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function VolumeSlider() {
   return <sn-slider value="40" max="100" label="音量"></sn-slider>;
 }
@@ -112,7 +112,7 @@ export default function VolumeSlider() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Slider } from "satin-ui/react";
 
 export default function VolumeSlider() {
@@ -130,7 +130,7 @@ export default function VolumeSlider() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="slider-controlled-box">
   <sn-slider max="100" label="不透明度" value="72"></sn-slider>
   <span class="sn-help">不透明度 72%</span>
@@ -147,7 +147,7 @@ export default function VolumeSlider() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Slider } from "satin-ui/react";
 
@@ -165,7 +165,7 @@ export default function OpacitySlider() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Slider } from "satin-ui/vue";
 
@@ -182,8 +182,8 @@ const value = ref(72);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Slider from "satin-ui/svelte/Slider.svelte";
 
   let value = $state(72);
@@ -217,11 +217,11 @@ export class SliderControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function OpacitySlider() {
   const [value, setValue] = createSignal(72);
@@ -236,7 +236,7 @@ export default function OpacitySlider() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Slider } from "satin-ui/react";
 
@@ -261,13 +261,13 @@ export default function OpacitySlider() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-slider value="6" max="10" label="风格强度"></sn-slider>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Slider } from "satin-ui/react";
 
 export default function StrengthSlider() {
@@ -278,7 +278,7 @@ export default function StrengthSlider() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Slider } from "satin-ui/vue";
 </script>
 
@@ -289,8 +289,8 @@ import { Slider } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Slider from "satin-ui/svelte/Slider.svelte";
 </script>
 
@@ -312,7 +312,7 @@ export class SliderMaxComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function StrengthSlider() {
   return <sn-slider value="6" max="10" label="风格强度"></sn-slider>;
 }
@@ -320,7 +320,7 @@ export default function StrengthSlider() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Slider } from "satin-ui/react";
 
 export default function StrengthSlider() {

@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { defineElements } from "satin-ui/elements";
   import "./avatar-1.css";
   defineElements();
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
     const off = enhance(root);
     return () => { off(); unsetup(); };

@@ -1,7 +1,7 @@
-<script>
-  import { createTable } from "satin-ui";
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
   // resizable：拖表头右边缘改宽（双击按内容定宽）；width 是数字的列固定宽度，没写的分剩下的
-  const COLUMNS = [
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "镜头", resizable: true, minWidth: 140 },
     { key: "type", title: "景别", width: 96, resizable: true },
     { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v) => `${v} 秒` },
@@ -14,10 +14,10 @@
     { id: 4, name: "车窗上的雨", type: "特写", dur: 4, owner: "周屿" },
     { id: 5, name: "末班列车", type: "全景", dur: 8, owner: "陈默" },
   ];
-  const nameOf = (k) => DATA.find((r) => String(r.id) === k).name;
+  const nameOf = (k: string) => DATA.find((r) => String(r.id) === k)?.name ?? "";
 
   // draggableRows：按住左边的把手拖行，松手时 onRowReorder 给出新顺序（e.keys）；draggableColumns：按住表头拖列；挂上以后建，卸载时 destroy()
-  let host, order = $state(DATA.map((r) => r.name).join(" → "));
+  let host!: HTMLDivElement, order = $state(DATA.map((r) => r.name).join(" → "));
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: DATA, draggableRows: true, draggableColumns: true, label: "分镜顺序", onRowReorder: (e) => (order = e.keys.map(nameOf).join(" → ")) });
     return () => it.destroy();

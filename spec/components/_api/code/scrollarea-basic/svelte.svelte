@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { createScrollArea } from "satin-ui";
 
   // 写法和 div 一样，限高写在 style 上；滚动条细、不滚 0.7 秒后淡出；上下还有内容时边缘渐隐；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createScrollArea(host, {});
     return () => it.destroy();

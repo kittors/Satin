@@ -58,7 +58,7 @@ npx satin-cli init my-app
 
 ### 1. Import Styles
 
-```js
+```ts
 // Full-page Satin app (includes minimal reset + all component styles inside @layer satin)
 import "satin-ui/css/page.css";
 

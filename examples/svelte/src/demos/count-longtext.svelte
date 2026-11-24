@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createLongText } from "satin-ui";
 

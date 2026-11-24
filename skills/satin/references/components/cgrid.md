@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="cshots-basic"></div>
 
 <script type="module">
@@ -82,11 +82,11 @@
 
 React 的写法：
 
-```jsx
-import { CanvasGrid } from "satin-ui/react/canvas-grid";
+```tsx
+import { CanvasGrid, type GridColumn } from "satin-ui/react/canvas-grid";
 
 // 列和数据的写法和数据表格一样；画布上只能画文字：格子的文字用 format 改（没有 render）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -110,11 +110,11 @@ export default function ShotCanvas() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { CanvasGrid } from "satin-ui/vue/canvas-grid";
+<script setup lang="ts">
+import { CanvasGrid, type GridColumn } from "satin-ui/vue/canvas-grid";
 
 // 列和数据的写法和数据表格一样；画布上只能画文字：格子的文字用 format 改（没有 render）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -138,13 +138,13 @@ const rows = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
-  import { createCanvasGrid } from "satin-ui/canvas-grid";
+  import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
   // 列和数据的写法和数据表格一样；画布上只能画文字：格子的文字用 format 改（没有 render）
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180 },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
     { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -207,12 +207,12 @@ export class CgridBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createCanvasGrid } from "satin-ui/canvas-grid";
+import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
 // 列和数据的写法和数据表格一样；画布上只能画文字：格子的文字用 format 改（没有 render）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -229,7 +229,7 @@ const rows = [
 ];
 
 export default function ShotCanvas() {
-  let host;
+  let host!: HTMLDivElement;
   // 挂上以后建表格；卸载时 destroy() 撤掉监听和放进 <head> 的样式
   onSettled(() => {
     const grid = createCanvasGrid(host, { columns, data: rows, height: 260, label: "镜头清单" });
@@ -241,11 +241,11 @@ export default function ShotCanvas() {
 
 Preact 的写法：
 
-```jsx
-import { CanvasGrid } from "satin-ui/react/canvas-grid";
+```tsx
+import { CanvasGrid, type GridColumn } from "satin-ui/react/canvas-grid";
 
 // 列和数据的写法和数据表格一样；画布上只能画文字：格子的文字用 format 改（没有 render）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -276,7 +276,7 @@ export default function ShotCanvas() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="cshots-million"></div>
 
 <script type="module">
@@ -305,21 +305,21 @@ export default function ShotCanvas() {
 
 React 的写法：
 
-```jsx
-import { CanvasGrid } from "satin-ui/react/canvas-grid";
+```tsx
+import { CanvasGrid, type GridColumn, type GridDataSource } from "satin-ui/react/canvas-grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 第 i 行（假的服务端按行号算出来；真的项目里换成 fetch，按 start、end 返回这一段）
-const rowAt = (i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
+const rowAt = (i: number) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
 // 一百万行在服务端：表格按块要（一块 200 行），滚到哪要到哪；还没到的行画占位条
-const dataSource = {
+const dataSource: GridDataSource = {
   total: 1000000,
   async load({ start, end }) {
     await new Promise((r) => setTimeout(r, 200));
     return Array.from({ length: end - start }, (_, k) => rowAt(start + k));
   },
 };
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 200 },
   { key: "shots", title: "镜头", type: "int", width: 96 },
   { key: "dur", title: "时长", type: "dur", width: 96 },
@@ -334,12 +334,12 @@ export default function MillionShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { CanvasGrid } from "satin-ui/vue/canvas-grid";
+<script setup lang="ts">
+import { CanvasGrid, type GridColumn } from "satin-ui/vue/canvas-grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 第 i 行（假的服务端按行号算出来；真的项目里换成 fetch，按 start、end 返回这一段）
-const rowAt = (i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
+const rowAt = (i: number) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
 // 一百万行在服务端：表格按块要（一块 200 行），滚到哪要到哪；还没到的行画占位条
 const dataSource = {
   total: 1000000,
@@ -348,7 +348,7 @@ const dataSource = {
     return Array.from({ length: end - start }, (_, k) => rowAt(start + k));
   },
 };
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 200 },
   { key: "shots", title: "镜头", type: "int", width: 96 },
   { key: "dur", title: "时长", type: "dur", width: 96 },
@@ -363,14 +363,14 @@ const columns = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
-  import { createCanvasGrid } from "satin-ui/canvas-grid";
+  import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
   const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
   // 第 i 行（假的服务端按行号算出来；真的项目里换成 fetch，按 start、end 返回这一段）
-  const rowAt = (i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
+  const rowAt = (i: number) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
   // 一百万行在服务端：表格按块要（一块 200 行），滚到哪要到哪；还没到的行画占位条
   const dataSource = {
     total: 1000000,
@@ -379,7 +379,7 @@ Svelte 的写法：
       return Array.from({ length: end - start }, (_, k) => rowAt(start + k));
     },
   };
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 200 },
     { key: "shots", title: "镜头", type: "int", width: 96 },
     { key: "dur", title: "时长", type: "dur", width: 96 },
@@ -434,13 +434,13 @@ export class CgridMillionComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createCanvasGrid } from "satin-ui/canvas-grid";
+import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 第 i 行（假的服务端按行号算出来；真的项目里换成 fetch，按 start、end 返回这一段）
-const rowAt = (i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
+const rowAt = (i: number) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
 // 一百万行在服务端：表格按块要（一块 200 行），滚到哪要到哪；还没到的行画占位条
 const dataSource = {
   total: 1000000,
@@ -449,14 +449,14 @@ const dataSource = {
     return Array.from({ length: end - start }, (_, k) => rowAt(start + k));
   },
 };
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 200 },
   { key: "shots", title: "镜头", type: "int", width: 96 },
   { key: "dur", title: "时长", type: "dur", width: 96 },
 ];
 
 export default function MillionShots() {
-  let host;
+  let host!: HTMLDivElement;
   onSettled(() => {
     // 这个假的服务端不会搜索、排序：不要工具条（toolbar: false），列也不写 sortable
     const grid = createCanvasGrid(host, { columns, dataSource, toolbar: false, label: "一百万个镜头" });
@@ -468,21 +468,21 @@ export default function MillionShots() {
 
 Preact 的写法：
 
-```jsx
-import { CanvasGrid } from "satin-ui/react/canvas-grid";
+```tsx
+import { CanvasGrid, type GridColumn, type GridDataSource } from "satin-ui/react/canvas-grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 第 i 行（假的服务端按行号算出来；真的项目里换成 fetch，按 start、end 返回这一段）
-const rowAt = (i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
+const rowAt = (i: number) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 });
 // 一百万行在服务端：表格按块要（一块 200 行），滚到哪要到哪；还没到的行画占位条
-const dataSource = {
+const dataSource: GridDataSource = {
   total: 1000000,
   async load({ start, end }) {
     await new Promise((r) => setTimeout(r, 200));
     return Array.from({ length: end - start }, (_, k) => rowAt(start + k));
   },
 };
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 200 },
   { key: "shots", title: "镜头", type: "int", width: 96 },
   { key: "dur", title: "时长", type: "dur", width: 96 },
@@ -510,7 +510,7 @@ export default function MillionShots() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <div id="cshots-controlled"></div>
   <div class="sn-row sn-gap-8">
@@ -552,11 +552,11 @@ export default function MillionShots() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { CanvasGrid } from "satin-ui/react/canvas-grid";
+import { CanvasGrid, type GridColumn } from "satin-ui/react/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -570,15 +570,15 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: unknown) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: unknown[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 
 export default function PickShots() {
   // 受控：selectedKeys 是勾上的行的 rowKey（这里是 id）；点全选时数组数据也给出全部的 key
-  const [keys, setKeys] = useState([1, 4]);
+  const [keys, setKeys] = useState<unknown[]>([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <CanvasGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
+      <CanvasGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys ?? [])} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>
@@ -591,11 +591,11 @@ export default function PickShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
-import { CanvasGrid } from "satin-ui/vue/canvas-grid";
+import { CanvasGrid, type GridColumn } from "satin-ui/vue/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -609,8 +609,8 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: number | string) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: (number | string)[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 // v-model:selected：勾上的行的 rowKey（这里是 id）
 const keys = ref([1, 4]);
 const note = computed(() => noteOf(keys.value));
@@ -629,12 +629,12 @@ const note = computed(() => noteOf(keys.value));
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
-  import { createCanvasGrid } from "satin-ui/canvas-grid";
+  import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180 },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
     { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -648,8 +648,8 @@ Svelte 的写法：
     { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
-  const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-  const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+  const nameOf = (id: number | string) => rows.find((r) => r.id === id)?.name;
+  const noteOf = (keys: (number | string)[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
   // selectedKeys：勾上的行的 rowKey（这里是 id）；用户勾选时 onSelectionChange 给出新的
   let keys = $state([1, 4]);
 </script>
@@ -725,11 +725,11 @@ export class CgridControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onSettled } from "solid-js";
-import { createCanvasGrid } from "satin-ui/canvas-grid";
+import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -743,12 +743,12 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: number | string) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: (number | string)[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 const first = [1, 4];
 
 export default function PickShots() {
-  let host, grid;
+  let host!: HTMLDivElement, grid: ReturnType<typeof createCanvasGrid> | undefined;
   const [keys, setKeys] = createSignal(first);
   onSettled(() => {
     // selectedKeys：勾上的行的 rowKey（这里是 id）；用户勾选时 onSelectionChange 给出新的
@@ -771,11 +771,11 @@ export default function PickShots() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { CanvasGrid } from "satin-ui/react/canvas-grid";
+import { CanvasGrid, type GridColumn } from "satin-ui/react/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -789,15 +789,15 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: unknown) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: unknown[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 
 export default function PickShots() {
   // 受控：selectedKeys 是勾上的行的 rowKey（这里是 id）；点全选时数组数据也给出全部的 key
-  const [keys, setKeys] = useState([1, 4]);
+  const [keys, setKeys] = useState<unknown[]>([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <CanvasGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
+      <CanvasGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys ?? [])} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>
@@ -820,7 +820,7 @@ export default function PickShots() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <div id="cshots-events"></div>
   <span class="sn-help" id="cshots-events-note">点表头排序、勾选、双击格子改，这里显示最近一次的事件</span>
@@ -859,11 +859,11 @@ export default function PickShots() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { CanvasGrid } from "satin-ui/react/canvas-grid";
+import { CanvasGrid, type GridColumn, type GridSort } from "satin-ui/react/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true, editable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], filter: "enum", editable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true, editable: true, min: 1, max: 999 },
@@ -877,11 +877,11 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
 // 事件的参数：sortChange 给 { key, dir } 或 null；selectionChange 给 { keys, all, except }；cellEdit 给 { row, rowKey, key, value, oldValue }
-const sortText = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
-const selText = (e) => `勾了 ${e.keys.length} 行`;
-const editText = (e) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
+const sortText = (s: GridSort | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
+const selText = (e: { keys: unknown[] | null }) => `勾了 ${e.keys?.length ?? 0} 行`;
+const editText = (e: { row: { name: string }; key: string; value: unknown }) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
 
 export default function CanvasEvents() {
   const [note, setNote] = useState("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
@@ -898,11 +898,11 @@ export default function CanvasEvents() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { CanvasGrid } from "satin-ui/vue/canvas-grid";
+import { CanvasGrid, type GridColumn } from "satin-ui/vue/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true, editable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], filter: "enum", editable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true, editable: true, min: 1, max: 999 },
@@ -916,11 +916,11 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
 // 事件的参数：sortChange 给 { key, dir } 或 null；selectionChange 给 { keys, all, except }；cellEdit 给 { row, rowKey, key, value, oldValue }
-const sortText = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
-const selText = (e) => `勾了 ${e.keys.length} 行`;
-const editText = (e) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
+const sortText = (s: { key: string; dir: number } | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
+const selText = (e: { keys: (string | number)[] }) => `勾了 ${e.keys.length} 行`;
+const editText = (e: { row: { name: string }; key: string; value: unknown }) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
 const note = ref("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
 </script>
 
@@ -935,12 +935,12 @@ const note = ref("点表头排序、勾选、双击格子改，这里显示最�
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
-  import { createCanvasGrid } from "satin-ui/canvas-grid";
+  import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180, sortable: true, editable: true },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], filter: "enum", editable: true },
     { key: "shots", title: "镜头", type: "int", width: 96, sortable: true, editable: true, min: 1, max: 999 },
@@ -954,11 +954,11 @@ Svelte 的写法：
     { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
-  const TITLES = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
+  const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
   // 事件的参数：sortChange 给 { key, dir } 或 null；selectionChange 给 { keys, all, except }；cellEdit 给 { row, rowKey, key, value, oldValue }
-  const sortText = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
-  const selText = (e) => `勾了 ${e.keys.length} 行`;
-  const editText = (e) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
+  const sortText = (s: { key: string; dir: number } | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
+  const selText = (e: { keys: (string | number)[] }) => `勾了 ${e.keys.length} 行`;
+  const editText = (e: { row: { name: string }; key: string; value: unknown }) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
   let note = $state("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
 </script>
 
@@ -1024,11 +1024,11 @@ export class CgridEventsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onSettled } from "solid-js";
-import { createCanvasGrid } from "satin-ui/canvas-grid";
+import { createCanvasGrid, type GridColumn } from "satin-ui/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true, editable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], filter: "enum", editable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true, editable: true, min: 1, max: 999 },
@@ -1042,14 +1042,14 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
 // 事件的参数：sortChange 给 { key, dir } 或 null；selectionChange 给 { keys, all, except }；cellEdit 给 { row, rowKey, key, value, oldValue }
-const sortText = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
-const selText = (e) => `勾了 ${e.keys.length} 行`;
-const editText = (e) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
+const sortText = (s: { key: string; dir: number } | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
+const selText = (e: { keys: (string | number)[] }) => `勾了 ${e.keys.length} 行`;
+const editText = (e: { row: { name: string }; key: string; value: unknown }) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
 
 export default function CanvasEvents() {
-  let host;
+  let host!: HTMLDivElement;
   const [note, setNote] = createSignal("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
   onSettled(() => {
     const grid = createCanvasGrid(host, {
@@ -1069,11 +1069,11 @@ export default function CanvasEvents() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { CanvasGrid } from "satin-ui/react/canvas-grid";
+import { CanvasGrid, type GridColumn, type GridSort } from "satin-ui/react/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true, editable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], filter: "enum", editable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true, editable: true, min: 1, max: 999 },
@@ -1087,11 +1087,11 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
 // 事件的参数：sortChange 给 { key, dir } 或 null；selectionChange 给 { keys, all, except }；cellEdit 给 { row, rowKey, key, value, oldValue }
-const sortText = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
-const selText = (e) => `勾了 ${e.keys.length} 行`;
-const editText = (e) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
+const sortText = (s: GridSort | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
+const selText = (e: { keys: unknown[] | null }) => `勾了 ${e.keys?.length ?? 0} 行`;
+const editText = (e: { row: { name: string }; key: string; value: unknown }) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
 
 export default function CanvasEvents() {
   const [note, setNote] = useState("点表头排序、勾选、双击格子改，这里显示最近一次的事件");

@@ -55,7 +55,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <div class="sn-group" role="group" aria-label="切换镜头"><button type="button" class="sn-btn sn-secondary sn-ibtn" data-tip="上一个" aria-label="上一个" data-i="chevron-left"></button><button type="button" class="sn-btn sn-secondary sn-ibtn" data-tip="下一个" aria-label="下一个" data-i="chevron-right"></button></div>
@@ -66,7 +66,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ShotNav() {
@@ -90,7 +90,7 @@ export default function ShotNav() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -112,7 +112,7 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- .sn-group：相关的几个按钮连成一组；<sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-row">
@@ -144,7 +144,7 @@ export class CompoundBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // .sn-group：相关的几个按钮连成一组；<sn-enhance> 把 data-i 换成图标
 export default function ShotNav() {
   return (
@@ -160,7 +160,7 @@ export default function ShotNav() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ShotNav() {
@@ -191,7 +191,7 @@ export default function ShotNav() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- 分裂按钮：主按钮做最常用的那一种，右边的箭头打开别的选项；<sn-enhance> 接上菜单 -->
 <sn-enhance>
   <div class="sn-group sn-split">
@@ -209,10 +209,10 @@ export default function ShotNav() {
 
 React 的写法：
 
-```jsx
-import { Button, Menu, toast } from "satin-ui/react";
+```tsx
+import { Button, Menu, toast, type MenuItem } from "satin-ui/react";
 
-const FORMATS = [
+const FORMATS: MenuItem[] = [
   { type: "group", label: "导出为" },
   { key: "1080p", label: "MP4（1080p）", icon: "film" },
   { key: "4k", label: "MP4（4K）", icon: "film" },
@@ -224,7 +224,7 @@ export default function ExportSplit() {
   return (
     <div className="sn-group sn-split">
       <Button variant="primary" onClick={() => toast({ text: "开始导出 1080p" })}>导出成片</Button>
-      <Menu items={FORMATS} align="end" label="导出为" onSelect={(key, it) => toast({ text: "开始导出 " + it.label })}>
+      <Menu items={FORMATS} align="end" label="导出为" onSelect={(_key, it) => toast({ text: "开始导出 " + (it && "label" in it ? it.label : "") })}>
         <Button variant="primary" className="sn-more" icon="chevron-down" tip="更多导出方式" />
       </Menu>
     </div>
@@ -235,7 +235,7 @@ export default function ExportSplit() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Menu, toast } from "satin-ui/vue";
 
 const FORMATS = [
@@ -259,7 +259,7 @@ const FORMATS = [
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- 分裂按钮：主按钮做最常用的那一种，右边的箭头打开别的选项；<sn-enhance> 接上菜单 -->
 <sn-enhance>
   <div class="sn-group sn-split">
@@ -303,7 +303,7 @@ export class CompoundSplitComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 分裂按钮：主按钮做最常用的那一种，右边的箭头打开别的选项；<sn-enhance> 接上菜单
 export default function ExportSplit() {
   return (
@@ -325,10 +325,10 @@ export default function ExportSplit() {
 
 Preact 的写法：
 
-```jsx
-import { Button, Menu, toast } from "satin-ui/react";
+```tsx
+import { Button, Menu, toast, type MenuItem } from "satin-ui/react";
 
-const FORMATS = [
+const FORMATS: MenuItem[] = [
   { type: "group", label: "导出为" },
   { key: "1080p", label: "MP4（1080p）", icon: "film" },
   { key: "4k", label: "MP4（4K）", icon: "film" },
@@ -340,7 +340,7 @@ export default function ExportSplit() {
   return (
     <div class="sn-group sn-split">
       <Button variant="primary" onClick={() => toast({ text: "开始导出 1080p" })}>导出成片</Button>
-      <Menu items={FORMATS} align="end" label="导出为" onSelect={(key, it) => toast({ text: "开始导出 " + it.label })}>
+      <Menu items={FORMATS} align="end" label="导出为" onSelect={(_key, it) => toast({ text: "开始导出 " + (it && "label" in it ? it.label : "") })}>
         <Button variant="primary" class="sn-more" icon="chevron-down" tip="更多导出方式" />
       </Menu>
     </div>
@@ -358,7 +358,7 @@ export default function ExportSplit() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- data-copy：点了把值写进剪贴板，图标原地变成对勾 1.2 秒，不另弹轻提示 -->
 <sn-enhance>
   <button type="button" class="sn-btn sn-ghost sn-ibtn" data-copy="https://example.com/s/7f3k2q" data-tip="复制链接" aria-label="复制链接" data-kbd="⌘C"><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>
@@ -367,7 +367,8 @@ export default function ExportSplit() {
 
 React 的写法：
 
-```jsx
+```tsx
+import type { MouseEvent } from "react";
 import { Icon } from "satin-ui/react";
 import { copied } from "satin-ui";
 
@@ -375,7 +376,7 @@ const LINK = "https://example.com/s/7f3k2q";
 
 export default function CopyLink() {
   // 复制成功：copied(按钮) 让图标原地变成对勾 1.2 秒、提示换成"已复制"，不另弹轻提示
-  const copy = async (e) => { const b = e.currentTarget; await navigator.clipboard.writeText(LINK); copied(b); };
+  const copy = async (e: MouseEvent<HTMLButtonElement>) => { const b = e.currentTarget; await navigator.clipboard.writeText(LINK); copied(b); };
   return (
     <button type="button" className="sn-btn sn-ghost sn-ibtn" data-tip="复制链接" aria-label="复制链接" data-kbd="⌘C" onClick={copy}>
       <span className="sn-swap"><span className="sn-a"><Icon name="copy" /></span><span className="sn-b"><Icon name="check" /></span></span>
@@ -387,13 +388,13 @@ export default function CopyLink() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Icon } from "satin-ui/vue";
 import { copied } from "satin-ui";
 
 const LINK = "https://example.com/s/7f3k2q";
 // 复制成功：copied(按钮) 让图标原地变成对勾 1.2 秒、提示换成"已复制"，不另弹轻提示
-const copy = async (e) => { const b = e.currentTarget; await navigator.clipboard.writeText(LINK); copied(b); };
+const copy = async (e: MouseEvent) => { const b = e.currentTarget as HTMLButtonElement; await navigator.clipboard.writeText(LINK); copied(b); };
 </script>
 
 <template>
@@ -405,7 +406,7 @@ const copy = async (e) => { const b = e.currentTarget; await navigator.clipboard
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- data-copy：点了把值写进剪贴板，图标原地变成对勾 1.2 秒；<sn-enhance> 接上 -->
 <sn-enhance>
   <button type="button" class="sn-btn sn-ghost sn-ibtn" data-copy="https://example.com/s/7f3k2q" data-tip="复制链接" aria-label="复制链接" data-kbd="⌘C"><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button>
@@ -427,7 +428,7 @@ export class CompoundCopyComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // data-copy：点了把值写进剪贴板，图标原地变成对勾 1.2 秒；<sn-enhance> 接上
 export default function CopyLink() {
   return (
@@ -440,7 +441,7 @@ export default function CopyLink() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 import { copied } from "satin-ui";
 
@@ -448,7 +449,7 @@ const LINK = "https://example.com/s/7f3k2q";
 
 export default function CopyLink() {
   // 复制成功：copied(按钮) 让图标原地变成对勾 1.2 秒、提示换成"已复制"，不另弹轻提示
-  const copy = async (e) => { const b = e.currentTarget; await navigator.clipboard.writeText(LINK); copied(b); };
+  const copy = async (e: MouseEvent & { currentTarget: HTMLButtonElement }) => { const b = e.currentTarget; await navigator.clipboard.writeText(LINK); copied(b); };
   return (
     <button type="button" class="sn-btn sn-ghost sn-ibtn" data-tip="复制链接" aria-label="复制链接" data-kbd="⌘C" onClick={copy}>
       <span class="sn-swap"><span class="sn-a"><Icon name="copy" /></span><span class="sn-b"><Icon name="check" /></span></span>

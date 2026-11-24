@@ -1,16 +1,17 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createSegmented } from "satin-ui/components";
   import "./segmented-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 在已有的标记上接交互；给空容器时按 items、value 渲染
       const seg = createSegmented(root.querySelector(".sn-seg"), {
-        onChange: (value) => console.log("选中了", value),
+        onChange: (value?: any) => console.log("选中了", value),
       });
       seg.select("9:16"); // 从外面切过去
     });

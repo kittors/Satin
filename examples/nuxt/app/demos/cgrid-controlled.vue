@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
-import { CanvasGrid } from "satin-ui/vue/canvas-grid";
+import { CanvasGrid, type GridColumn } from "satin-ui/vue/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -16,8 +16,8 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: number | string) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: (number | string)[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 // v-model:selected：勾上的行的 rowKey（这里是 id）
 const keys = ref([1, 4]);
 const note = computed(() => noteOf(keys.value));

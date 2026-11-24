@@ -22,7 +22,7 @@ npm install satin-ui
 
 ### 1. Import Styles
 
-```js
+```ts
 // Full-page Satin app (minimal reset + all component styles)
 import "satin-ui/css/page.css";
 

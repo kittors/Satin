@@ -1,8 +1,17 @@
 // satin-ui/react
 import type * as React from "react";
 import type { SatinInstance, Item, AvatarOptions, EmptyArtOptions, ProgressOptions, LoaderOptions, ToastOptions, ToastHandle, NotifyOptions, PickerOptions, PickDetail, TableOptions, TableColumn, TableCellContext, TableApi, ComposerParts, ComposerPartEvents } from "./components";
+import type { SatinIntrinsicElements } from "./elements";
 import type { ThemeChoice } from "./theme";
-type Base = { className?: string; style?: React.CSSProperties; id?: string };
+declare module "react" {
+  interface CSSProperties {
+    [customProp: `--${string}`]: string | number | undefined;
+  }
+  namespace JSX {
+    interface IntrinsicElements extends SatinIntrinsicElements {}
+  }
+}
+type Base = { className?: string; style?: React.CSSProperties; id?: string; [data: `data-${string}`]: unknown };
 type Controlled<T, K extends string = "value"> = { [P in K]?: T } & { [P in `default${Capitalize<K>}`]?: T };
 type Ref = React.Ref<SatinInstance | null>;
 /** 头像：<Avatar name="林知远" size={24} decorative />；有照片给 src，加载失败退回预设 */
@@ -96,3 +105,4 @@ export function useToast(): (o: ToastOptions) => ToastHandle;
 /** 把任意 createXxx（包括重组件 createChat、createMarkdown、createFlow……）包成 React 组件：props 就是组件的选项，ref 拿到实例 */
 export function wrapSatin<O>(create: import("./components").SatinFactory<O, any>, opts?: { valueKey?: string; events?: string[]; displayName?: string }): import("react").ForwardRefExoticComponent<O & { className?: string; style?: import("react").CSSProperties; id?: string; [k: string]: unknown } & import("react").RefAttributes<unknown>>;
 export * from "./react-extra";
+export type { EmptyArtName, ComposerMode, ComposerContextItem, ComposerOption, TableRowReorderEvent, TableSpan, TableSort, TableExpandEvent, TableCellEditEvent } from "./components";

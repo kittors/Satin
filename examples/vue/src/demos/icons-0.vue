@@ -1,11 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import "./icons-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
   const done = enhance(root.value);
   off = () => { done(); unsetup(); };
@@ -26,690 +27,701 @@ onBeforeUnmount(() => off());
     <div class="icon-grid" id="iconGrid">
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="accessibility" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="16" cy="4" r="1"></circle>
-          <path d="m18 19 1-7-6 1"></path>
-          <path d="m5 8 3-3 5.5 3-2.36 3.5"></path>
-          <path d="M4.24 14.5a5 5 0 0 0 6.88 6"></path>
-          <path d="M13.76 17.5a5 5 0 0 0-6.88-6"></path>
+          <circle cx="12" cy="12" r="10" class="sn-ic-d"></circle>
+          <path d="M14 7a2 2 0 11-4 0 2 2 0 014 0"></path>
+          <path d="M18 10s-3.5 1.5-6 1.5S6 10 6 10"></path>
+          <path d="M12 12v1.5q0 .7.5 1.6L15 19"></path>
+          <path d="M12 12v1.5a3 3 0 01-.5 1.6L9 19"></path>
         </svg>
         <span>accessibility</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="activity" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path>
+          <path d="M2 15h3l1.2.1 1 .8 1.1 1.2q.6.6.8.6.4 0 .7-.7l3.7-5q.4-.7.7-.7.4 0 .8.6l1.8 2 1 1 1.3.1H22"></path>
+          <path d="M2 12c0-4.7 0-7 1.5-8.5C4.9 2 7.3 2 12 2s7 0 8.5 1.5C22 4.9 22 7.3 22 12s0 7-1.5 8.5C19.1 22 16.7 22 12 22s-7 0-8.5-1.5C2 19.1 2 16.7 2 12" class="sn-ic-d"></path>
         </svg>
         <span>activity</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="archive" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="20" height="5" x="2" y="3" rx="1"></rect>
-          <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path>
-          <path d="M10 12h4"></path>
+          <path d="M10.5 13.5h3.9l.5-.6.1-.9v-.9l-.6-.5-.9-.1H9.6l-.5.6-.1.9v.9l.6.5z"></path>
+          <path d="M20.5 7v6c0 3.8 0 5.7-1.2 6.8-1.1 1.2-3 1.2-6.8 1.2h-1c-3.8 0-5.7 0-6.8-1.2-1.2-1.1-1.2-3-1.2-6.8V7" class="sn-ic-d"></path>
+          <path d="M4 7h16q1.4 0 1.7-.3.4-.4.3-1.7 0-1.4-.3-1.7-.4-.4-1.7-.3H4q-1.4 0-1.7.3-.4.4-.3 1.7 0 1.4.3 1.7.4.4 1.7.3"></path>
         </svg>
         <span>archive</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="arrow-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 5v14"></path>
-          <path d="m19 12-7 7-7-7"></path>
+          <path d="M12 4v16" class="sn-ic-d"></path>
+          <path d="m18 14-6 6-6-6"></path>
         </svg>
         <span>arrow-down</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="arrow-left" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m12 19-7-7 7-7"></path>
-          <path d="M19 12H5"></path>
+          <path d="M20 12H4" class="sn-ic-d"></path>
+          <path d="m10 6-6 6 6 6"></path>
         </svg>
         <span>arrow-left</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="arrow-right" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12h14"></path>
-          <path d="m12 5 7 7-7 7"></path>
+          <path d="M4 12h16" class="sn-ic-d"></path>
+          <path d="m14 6 6 6-6 6"></path>
         </svg>
         <span>arrow-right</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="arrow-up" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m5 12 7-7 7 7"></path>
-          <path d="M12 19V5"></path>
+          <path d="M12 20V4" class="sn-ic-d"></path>
+          <path d="m18 10-6-6-6 6"></path>
         </svg>
         <span>arrow-up</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="arrow-up-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m21 16-4 4-4-4"></path>
-          <path d="M17 20V4"></path>
-          <path d="m3 8 4-4 4 4"></path>
-          <path d="M7 4v16"></path>
+          <path d="M16 18V6m-4 4.1L16 6l4 4.1" class="sn-ic-d"></path>
+          <path d="M8 6v12m-4-4.1L8 18l4-4.1"></path>
         </svg>
         <span>arrow-up-down</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="arrow-up-right" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M7 7h10v10"></path>
-          <path d="M7 17 17 7"></path>
+          <path d="M6 18 18 6" class="sn-ic-d"></path>
+          <path d="M9 6h9v9"></path>
         </svg>
         <span>arrow-up-right</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="audio-lines" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M2 10v3"></path>
-          <path d="M6 6v11"></path>
-          <path d="M10 3v18"></path>
-          <path d="M14 8v7"></path>
-          <path d="M18 5v13"></path>
-          <path d="M22 10v3"></path>
+          <path d="M12 4v16"></path>
+          <path d="M16 7v10" class="sn-ic-d"></path>
+          <path d="M8 7v10" class="sn-ic-d"></path>
+          <path d="M20 11v2"></path>
+          <path d="M4 11v2"></path>
         </svg>
         <span>audio-lines</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="bell" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10.268 21a2 2 0 0 0 3.464 0"></path>
-          <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path>
+          <path d="M18.7 9.7V9c0-3.9-3-7-6.7-7a7 7 0 00-6.7 7v.7q0 1.3-.7 2.4l-1.1 1.7c-1 1.6-.3 3.7 1.5 4.2q7 2 14 0a2.8 2.8 0 001.5-4.2l-1-1.7q-.8-1-.8-2.4"></path>
+          <path d="M7.5 19a4.9 4.9 0 009 0" class="sn-ic-d"></path>
         </svg>
         <span>bell</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="bell-ring" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10.268 21a2 2 0 0 0 3.464 0"></path>
-          <path d="M22 8c0-2.3-.8-4.3-2-6"></path>
-          <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path>
-          <path d="M4 2C2.8 3.7 2 5.7 2 8"></path>
+          <path d="M18.7 9.7V9c0-3.9-3-7-6.7-7a7 7 0 00-6.7 7v.7q0 1.3-.7 2.4l-1.1 1.7c-1 1.6-.3 3.7 1.5 4.2q7 2 14 0a2.8 2.8 0 001.5-4.2l-1-1.7q-.8-1-.8-2.4"></path>
+          <path d="M7.5 19a4.9 4.9 0 009 0" class="sn-ic-d"></path>
+          <path d="M12 6v4" class="sn-ic-d"></path>
         </svg>
         <span>bell-ring</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="blocks" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"></path>
-          <rect x="14" y="2" width="8" height="8" rx="1"></rect>
+          <path d="M6.2 11.4q-2.5.2-3.2-.6-.6-.7-.5-3-.1-2.6.5-3.2T6.2 4q2.5-.1 3.1.6.8.6.6 3.1.2 2.4-.6 3.1-.7.8-3.1.6" class="sn-ic-d"></path>
+          <path d="M16.3 21.5q-2.4.1-3.1-.5c-.6-.6-.6-1.4-.6-3.2q-.2-2.4.6-3.1.7-.7 3-.6 2.6-.2 3.2.6.8.7.6 3.1.1 2.5-.6 3.2-.6.6-3.1.5" class="sn-ic-d"></path>
+          <path d="M6.2 21.5q-2.5.1-3.2-.5c-.5-.6-.5-1.4-.5-3.2q-.1-2.4.5-3.1t3.2-.6q2.5-.2 3.1.6.8.7.6 3.1.2 2.5-.6 3.2-.7.6-3.1.5" class="sn-ic-d"></path>
+          <path d="M15 3.8Q16.6 2 17.6 2t2.6 1.8C21.4 5.1 22 5.7 22 6.4s-.6 1.4-1.8 2.6-1.9 1.9-2.6 1.9-1.4-.6-2.6-1.9-2-1.8-2-2.6q0-.8 1.9-2.6Z"></path>
         </svg>
         <span>blocks</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="book-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 5v16"></path>
-          <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"></path>
+          <path d="M20 19H8" class="sn-ic-d"></path>
+          <path d="M10 22h4c2.8 0 4.2 0 5.1-.9s.9-2.3.9-5.1V8c0-2.8 0-4.2-.9-5.1S16.8 2 14 2h-4c-2.8 0-4.2 0-5.1.9S4 5.2 4 8v8c0 2.8 0 4.2.9 5.1s2.3.9 5.1.9"></path>
+          <path d="M8 7h8" class="sn-ic-d"></path>
+          <path d="M8 10.5h5" class="sn-ic-d"></path>
+          <path d="M20 16H7.9l-1.8.1q-1.6.5-2 2"></path>
         </svg>
         <span>book-open</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="box" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
-          <path d="m3.3 7 8.7 5 8.7-5"></path>
-          <path d="M12 22V12"></path>
+          <path d="m17.6 4.4-2-1C13.8 2.4 12.9 2 12 2c-1 0-1.8.5-3.6 1.4l-2 1C4.3 5.6 3.2 6.1 2.6 7.1S2 9.4 2 12v.2c0 2.5 0 3.7.6 4.8s1.7 1.5 3.8 2.7l2 1c1.8 1 2.7 1.4 3.6 1.4 1 0 1.8-.5 3.6-1.4l2-1c2.1-1.2 3.2-1.7 3.8-2.7s.6-2.3.6-4.8V12c0-2.5 0-3.7-.6-4.8s-1.7-1.5-3.8-2.7"></path>
+          <path d="M12 12 3 7.5m9 4.5v9.5m0-9.5 4.5-2.2.5-.3m4-2-4 2m0 0V13m0-3.5-9.5-5" class="sn-ic-d"></path>
         </svg>
         <span>box</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="calendar" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M8 2v3"></path>
-          <path d="M16 2v3"></path>
-          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-          <path d="M3 9h18"></path>
+          <path d="M10 21.8h4c3.8 0 5.7 0 6.8-1.2 1.2-1.2 1.2-3 1.2-6.9v-2C22 8 22 6.2 20.8 5s-3-1.2-6.8-1.2h-4c-3.8 0-5.7 0-6.8 1.2C2 6.1 2 8 2 11.8v2c0 3.7 0 5.6 1.2 6.8 1.1 1.1 3 1.1 6.8 1.1"></path>
+          <path d="M17 12.8h.01"></path>
+          <path d="M12 12.8h.01"></path>
+          <path d="M7 12.8h.01"></path>
+          <path d="M17 16.8h.01"></path>
+          <path d="M12 16.8h.01"></path>
+          <path d="M7 16.8h.01"></path>
+          <path d="M2 8.8h20" class="sn-ic-d"></path>
+          <path d="M7 3.8V2.3m10 1.5V2.3" class="sn-ic-d"></path>
         </svg>
         <span>calendar</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="chart-column" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
-          <path d="M18 17V9"></path>
-          <path d="M13 17V5"></path>
-          <path d="M8 17v-3"></path>
+          <path d="M3 22h18" class="sn-ic-d"></path>
+          <path d="M5 19q-1.4 0-1.7-.3-.4-.4-.3-1.7v-6q0-1.4.3-1.7.4-.4 1.7-.3 1.4 0 1.7.3.4.4.3 1.7v6q0 1.4-.3 1.7-.4.4-1.7.3"></path>
+          <path d="M12 19q-1.4 0-1.7-.3-.4-.4-.3-1.7V7q0-1.4.3-1.7.4-.4 1.7-.3 1.4 0 1.7.3.4.4.3 1.7v10q0 1.4-.3 1.7-.4.4-1.7.3"></path>
+          <path d="M19 19q-1.4 0-1.7-.3-.4-.4-.3-1.7V4q0-1.4.3-1.7.4-.4 1.7-.3 1.4 0 1.7.3.4.4.3 1.7v13q0 1.4-.3 1.7-.4.4-1.7.3"></path>
         </svg>
         <span>chart-column</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 6 9 17l-5-5"></path>
+          <path d="m5 13 4 4L19 7"></path>
         </svg>
         <span>check</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="check-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M18 6 7 17l-5-5"></path>
-          <path d="m22 10-7.5 7.5L13 16"></path>
+          <path d="m4 12.9 3.1 3.6 7.9-9"></path>
+          <path d="m20 7.6-8.6 9-.4-.6" class="sn-ic-d"></path>
         </svg>
         <span>check-check</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="chevron-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m6 9 6 6 6-6"></path>
+          <path d="m19 9-7 6-7-6"></path>
         </svg>
         <span>chevron-down</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="chevron-left" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m15 18-6-6 6-6"></path>
+          <path d="m15 5-6 7 6 7"></path>
         </svg>
         <span>chevron-left</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="chevron-right" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m9 18 6-6-6-6"></path>
+          <path d="m9 5 6 7-6 7"></path>
         </svg>
         <span>chevron-right</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="chevron-up" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m18 15-6-6-6 6"></path>
+          <path d="m19 15-7-6-7 6"></path>
         </svg>
         <span>chevron-up</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="chevrons-up-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m7 15 5 5 5-5"></path>
-          <path d="m7 9 5-5 5 5"></path>
+          <path d="m18 9-6-6-6 6"></path>
+          <path d="m18 15-6 6-6-6"></path>
         </svg>
         <span>chevrons-up-down</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="circle-alert" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" x2="12" y1="8" y2="12"></line>
-          <line x1="12" x2="12.01" y1="16" y2="16"></line>
+          <circle cx="12" cy="12" r="10" class="sn-ic-d"></circle>
+          <path d="M12 7v6"></path>
+          <path d="M12 16h.01"></path>
         </svg>
         <span>circle-alert</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="circle-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="m16 9-5.5 5.5L8 12"></path>
+          <circle cx="12" cy="12" r="10" class="sn-ic-d"></circle>
+          <path d="m8.5 12.5 2 2 5-5"></path>
         </svg>
         <span>circle-check</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="circle-dashed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10.1 2.182a10 10 0 0 1 3.8 0"></path>
-          <path d="M13.9 21.818a10 10 0 0 1-3.8 0"></path>
-          <path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"></path>
-          <path d="M2.182 13.9a10 10 0 0 1 0-3.8"></path>
-          <path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"></path>
-          <path d="M21.818 10.1a10 10 0 0 1 0 3.8"></path>
-          <path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"></path>
-          <path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"></path>
+          <path d="M20.3 6.4a10 10 0 00-2.7-2.7m4.2 10.2a10 10 0 000-3.8m-4.2 10.2a10 10 0 002.7-2.7m-10.2 4.2a10 10 0 003.8 0M3.7 17.6a10 10 0 002.7 2.7"></path>
+          <path d="M2.2 10a10 10 0 000 4M6.4 3.6a10 10 0 00-2.7 2.7m10.2-4.2a10 10 0 00-3.8 0" class="sn-ic-d"></path>
         </svg>
         <span>circle-dashed</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="circle-x" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="m15 9-6 6"></path>
-          <path d="m9 9 6 6"></path>
+          <circle cx="12" cy="12" r="10" class="sn-ic-d"></circle>
+          <path d="M14.5 9.5 12 12m0 0-2.5 2.5M12 12 9.5 9.5M12 12l2.5 2.5"></path>
         </svg>
         <span>circle-x</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="clapperboard" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m12.296 3.464 3.02 3.956"></path>
-          <path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"></path>
-          <path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-          <path d="m6.18 5.276 3.1 3.899"></path>
+          <path d="M12 22c-4.7 0-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2s7 0 8.5 1.5C22 4.9 22 7.3 22 12s0 7-1.5 8.5C19.1 22 16.7 22 12 22"></path>
+          <path d="M21.5 8h-8m0 0H7m6.5 0L17 2.5M7 8H2.5M7 8l3.5-5.5" class="sn-ic-d"></path>
+          <path d="M13 12.6q2 1.1 2 1.9t-2 2q-1.8 1.3-2.5.9t-.5-2.9q-.1-2.5.5-2.9t2.5 1" class="sn-ic-d"></path>
         </svg>
         <span>clapperboard</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="clipboard" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
-          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+          <path d="M16 4q3.2-.2 4.1.9c.9.9.9 2.3.9 5.1v6c0 2.8 0 4.2-.9 5.1s-2.3.9-5.1.9H9c-2.8 0-4.2 0-5.1-.9S3 18.8 3 16v-6c0-2.8 0-4.2.9-5.1q1-1 4.1-.9" class="sn-ic-d"></path>
+          <path d="M8 14h8"></path>
+          <path d="M7 10.5h10"></path>
+          <path d="M9 17.5h6"></path>
+          <path d="M9.5 6h5q1.4-.2 1.5-1.5v-1q-.1-1.3-1.5-1.5h-5Q8.1 2.2 8 3.5v1Q8.1 5.8 9.5 6"></path>
         </svg>
         <span>clipboard</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="clock" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M12 6v6l4 2"></path>
+          <circle cx="12" cy="12" r="10" class="sn-ic-d"></circle>
+          <path d="M12 8v4l2.5 2.5"></path>
         </svg>
         <span>clock</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="cloud-upload" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 13v8"></path>
-          <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
-          <path d="m8 17 4-4 4 4"></path>
+          <path d="M6.3 19A4.3 4.3 0 012 14.8a4.3 4.3 0 015.1-4.2M17.5 19a6 6 0 004.5-5.5 5.7 5.7 0 00-5.7-5.7q-1 0-2 .3m-7.2 2.6q-.3-1-.3-2a5.7 5.7 0 0111.4-.6m-11 2.6 1.5.6" class="sn-ic-d"></path>
+          <path d="M12 16v6m-2-4 2-2 2 2"></path>
         </svg>
         <span>cloud-upload</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="code-xml" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m18 16 4-4-4-4"></path>
-          <path d="m6 8-4 4 4 4"></path>
-          <path d="m14.5 4-5 16"></path>
+          <path d="m17 7.8 1.7 1.6c1.5 1.3 2.3 2 2.3 3 0 .8-.8 1.5-2.3 2.9L17 16.8"></path>
+          <path d="m14 5-4 14.8" class="sn-ic-d"></path>
+          <path d="M7 7.8 5.3 9.4c-1.5 1.3-2.3 2-2.3 3 0 .8.8 1.5 2.3 2.9L7 16.8"></path>
         </svg>
         <span>code-xml</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="command" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path>
+          <path d="M8 8h8v8H8z" class="sn-ic-d"></path>
+          <path d="M16 16h3a3 3 0 11-3 3z"></path>
+          <path d="M8 16H5a3 3 0 103 3z"></path>
+          <path d="M16 8h3a3 3 0 10-3-3z"></path>
+          <path d="M8 8H5a3 3 0 113-3z"></path>
         </svg>
         <span>command</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="compass" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path>
+          <circle cx="12" cy="12" r="10" class="sn-ic-d"></circle>
+          <path d="m13 14.6 1-.5.1-.1.5-1c.9-2.3 1.3-3.4.9-4.1l-.4-.4q-.8-.6-4.1 1-.7.1-1 .4l-.1.1-.5 1q-1.4 3.3-.9 4l.4.4q.8.5 4.1-1"></path>
         </svg>
         <span>compass</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="component" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15.536 11.293a1 1 0 0 0 0 1.414l2.376 2.377a1 1 0 0 0 1.414 0l2.377-2.377a1 1 0 0 0 0-1.414l-2.377-2.377a1 1 0 0 0-1.414 0z"></path>
-          <path d="M2.297 11.293a1 1 0 0 0 0 1.414l2.377 2.377a1 1 0 0 0 1.414 0l2.377-2.377a1 1 0 0 0 0-1.414L6.088 8.916a1 1 0 0 0-1.414 0z"></path>
-          <path d="M8.916 17.912a1 1 0 0 0 0 1.415l2.377 2.376a1 1 0 0 0 1.414 0l2.377-2.376a1 1 0 0 0 0-1.415l-2.377-2.376a1 1 0 0 0-1.414 0z"></path>
-          <path d="M8.916 4.674a1 1 0 0 0 0 1.414l2.377 2.376a1 1 0 0 0 1.414 0l2.377-2.376a1 1 0 0 0 0-1.414l-2.377-2.377a1 1 0 0 0-1.414 0z"></path>
+          <path d="M6.5 10.5a4 4 0 110-8 4 4 0 010 8"></path>
+          <path d="M17.5 21.5a4 4 0 110-8 4 4 0 010 8" class="sn-ic-d"></path>
+          <path d="M6.5 21.5q-2.7.1-3.4-.6t-.6-3.4q-.1-2.7.6-3.4t3.4-.6q2.7-.2 3.4.6.8.7.6 3.4.2 2.7-.6 3.4-.7.8-3.4.6"></path>
+          <path d="M17.5 10.5q-2.7.2-3.4-.6-.7-.7-.6-3.4-.2-2.7.6-3.4.7-.7 3.4-.6 2.7-.1 3.4.6.8.7.6 3.4.1 2.7-.6 3.4-.7.8-3.4.6" class="sn-ic-d"></path>
         </svg>
         <span>component</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
-          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+          <path d="M12 22h3c2.8 0 4.2 0 5.1-.9s.9-2.3.9-5.1v-5c0-2.8 0-4.2-.9-5.1S17.8 5 15 5h-3c-2.8 0-4.2 0-5.1.9S6 8.2 6 11v5c0 2.8 0 4.2.9 5.1s2.3.9 5.1.9"></path>
+          <path d="M6 19a3 3 0 01-3-3v-6c0-3.8 0-5.7 1.2-6.8C5.3 2 7.2 2 11 2h4a3 3 0 013 3" class="sn-ic-d"></path>
         </svg>
         <span>copy</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="corner-down-left" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
-          <path d="m9 10-5 5 5 5"></path>
+          <path d="M7 4 4 7l3 3"></path>
+          <path d="M4 7h11q2.6-.1 3.5.4.7.4 1.1 1.1T20 12q.1 2.7-.4 3.5a3 3 0 01-1.1 1.1q-.9.5-3.5.4H8" class="sn-ic-d"></path>
         </svg>
         <span>corner-down-left</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="cpu" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 20v2"></path>
-          <path d="M12 2v2"></path>
-          <path d="M17 20v2"></path>
-          <path d="M17 2v2"></path>
-          <path d="M2 12h2"></path>
-          <path d="M2 17h2"></path>
-          <path d="M2 7h2"></path>
-          <path d="M20 12h2"></path>
-          <path d="M20 17h2"></path>
-          <path d="M20 7h2"></path>
-          <path d="M7 20v2"></path>
-          <path d="M7 2v2"></path>
-          <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-          <rect x="8" y="8" width="8" height="8" rx="1"></rect>
+          <path d="M10 17h4q2 .1 2.6-.4.5-.6.4-2.6v-4q.1-2-.4-2.6Q16 7 14 7h-4q-2-.1-2.6.4Q7 8 7 10v4q-.1 2 .4 2.6.6.5 2.6.4" class="sn-ic-d"></path>
+          <path d="M12 20c-3.8 0-5.7 0-6.8-1.2C4 17.7 4 15.8 4 12s0-5.7 1.2-6.8C6.3 4 8.2 4 12 4s5.7 0 6.8 1.2C20 6.3 20 8.2 20 12s0 5.7-1.2 6.8C17.7 20 15.8 20 12 20"></path>
+          <path d="M4 12H2" class="sn-ic-d"></path>
+          <path d="M22 12h-2" class="sn-ic-d"></path>
+          <path d="M4 9H2" class="sn-ic-d"></path>
+          <path d="M22 9h-2" class="sn-ic-d"></path>
+          <path d="M4 15H2" class="sn-ic-d"></path>
+          <path d="M22 15h-2" class="sn-ic-d"></path>
+          <path d="M12 20v2" class="sn-ic-d"></path>
+          <path d="M12 2v2" class="sn-ic-d"></path>
+          <path d="M9 20v2" class="sn-ic-d"></path>
+          <path d="M9 2v2" class="sn-ic-d"></path>
+          <path d="M15 20v2" class="sn-ic-d"></path>
+          <path d="M15 2v2" class="sn-ic-d"></path>
         </svg>
         <span>cpu</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="credit-card" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="20" height="14" x="2" y="5" rx="2"></rect>
-          <line x1="2" x2="22" y1="10" y2="10"></line>
-          <path d="M6 14h2"></path>
+          <path d="M10 20h4c3.8 0 5.7 0 6.8-1.2 1.2-1.1 1.2-3 1.2-6.8s0-5.7-1.2-6.8C19.7 4 17.8 4 14 4h-4C6.2 4 4.3 4 3.2 5.2 2 6.3 2 8.2 2 12s0 5.7 1.2 6.8C4.3 20 6.2 20 10 20"></path>
+          <path d="M10 16H6" class="sn-ic-d"></path>
+          <path d="M14 16h-1.5" class="sn-ic-d"></path>
+          <path d="M2 10h20" class="sn-ic-d"></path>
         </svg>
         <span>credit-card</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="download" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 15V3"></path>
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <path d="m7 10 5 5 5-5"></path>
+          <path d="M3 15c0 2.8 0 4.2.9 5.1s2.3.9 5.1.9h6c2.8 0 4.2 0 5.1-.9s.9-2.3.9-5.1" class="sn-ic-d"></path>
+          <path d="M12 3v13m-4-4.4 4 4.4 4-4.4"></path>
         </svg>
         <span>download</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="droplet" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path>
+          <path d="M20.6 13c0 5-3.9 9-8.6 9s-8.6-4-8.6-9c0-3 3.4-7.2 5.9-9.8 1.5-1.6 4-1.6 5.4 0 2.5 2.6 5.9 6.8 5.9 9.9"></path>
+          <path d="M7.6 10.8Q9.2 8.5 11 6.7" class="sn-ic-d"></path>
         </svg>
         <span>droplet</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="ellipsis" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="1"></circle>
-          <circle cx="19" cy="12" r="1"></circle>
-          <circle cx="5" cy="12" r="1"></circle>
+          <circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"></circle>
+          <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" class="sn-ic-d"></circle>
+          <circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"></circle>
         </svg>
         <span>ellipsis</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="external-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15 3h6v6"></path>
-          <path d="M10 14 21 3"></path>
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <path d="m13 11 9-9m0 5.3V2h-5.3"></path>
+          <path d="M22 12c0 4.7 0 7-1.5 8.5C19.1 22 16.7 22 12 22s-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2" class="sn-ic-d"></path>
         </svg>
         <span>external-link</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
-          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 4a11 11 0 00-8.7 4.7C2.4 9.8 2 10.4 2 12s.4 2.2 1.3 3.3A11 11 0 0012 20c4.2 0 7-2.5 8.7-4.7.9-1.1 1.3-1.7 1.3-3.3s-.4-2.2-1.3-3.3A11 11 0 0012 4" class="sn-ic-d"></path>
+          <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0"></path>
         </svg>
         <span>eye</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="eye-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"></path>
-          <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"></path>
-          <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"></path>
-          <path d="m2 2 20 20"></path>
+          <path d="M2 7s3 7 10 7a10 10 0 007-2.9C21 9.2 22 7 22 7"></path>
+          <path d="M12 14v2.5m3.6-3.2 1.4 2.2m-8.6-2.2L7 15.5m12-4.4 1.5 1.5M5 11.1l-1.5 1.5" class="sn-ic-d"></path>
         </svg>
         <span>eye-off</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="file" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path>
-          <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+          <path d="M13 2.3V5c0 2.4 0 3.5.7 4.3q1 .9 4.3.7h3.6" class="sn-ic-d"></path>
+          <path d="M3.2 3.2C4.3 2 6.2 2 10 2c1.6 0 2.3 0 3 .3q.9.2 2.4 1.8l4 3.5q1.9 1.6 2.3 2.6t.3 3.4v.4c0 3.8 0 5.7-1.2 6.8-1.1 1.2-3 1.2-6.8 1.2h-4c-3.8 0-5.7 0-6.8-1.2C2 19.7 2 17.8 2 14v-4c0-3.8 0-5.7 1.2-6.8"></path>
         </svg>
         <span>file</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="file-music" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M11.65 22H18a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v10.35"></path>
-          <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
-          <path d="M8 20v-7l3 1.474"></path>
-          <circle cx="6" cy="20" r="2"></circle>
+          <path d="M9.4 17.2a1.6 1.6 0 11-3.2 0 1.6 1.6 0 013.2 0m0 0v-4m3.6-11V5c0 2.4 0 3.5.7 4.3q1 .9 4.3.7h3.6M11 11.7l-1 .5q-.3 0-.3.2-.3 0-.3.4V14q.3.5.8.5l.7-.3 1-.5q.2 0 .3-.2l.3-.5v-1a1 1 0 00-.9-.5z" class="sn-ic-d"></path>
+          <path d="M3.2 3.2C4.3 2 6.2 2 10 2c1.6 0 2.3 0 3 .3q.9.2 2.4 1.8l4 3.5q1.9 1.6 2.3 2.6t.3 3.4v.4c0 3.8 0 5.7-1.2 6.8-1.1 1.2-3 1.2-6.8 1.2h-4c-3.8 0-5.7 0-6.8-1.2C2 19.7 2 17.8 2 14v-4c0-3.8 0-5.7 1.2-6.8"></path>
         </svg>
         <span>file-music</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="file-play" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path>
-          <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
-          <path d="M15.033 13.44a.647.647 0 0 1 0 1.12l-4.065 2.352a.645.645 0 0 1-.968-.56v-4.704a.645.645 0 0 1 .967-.56z"></path>
+          <path d="M13 2.3V5c0 2.4 0 3.5.7 4.3q1 .9 4.3.7h3.6M9.9 12.6q2.3 1.3 2.3 2.3c0 1-.7 1.3-2.3 2.3q-2.2 1.7-3 1.2-.9-.5-.7-3.5Q6 12 7 11.4q.7-.5 3 1.2" class="sn-ic-d"></path>
+          <path d="M3.2 3.2C4.3 2 6.2 2 10 2c1.6 0 2.3 0 3 .3q.9.2 2.4 1.8l4 3.5q1.9 1.6 2.3 2.6t.3 3.4v.4c0 3.8 0 5.7-1.2 6.8-1.1 1.2-3 1.2-6.8 1.2h-4c-3.8 0-5.7 0-6.8-1.2C2 19.7 2 17.8 2 14v-4c0-3.8 0-5.7 1.2-6.8"></path>
         </svg>
         <span>file-play</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="file-text" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path>
-          <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
-          <path d="M10 9H8"></path>
-          <path d="M16 13H8"></path>
-          <path d="M16 17H8"></path>
+          <path d="M3 10c0-3.8 0-5.7 1.2-6.8C5.3 2 7.2 2 11 2h2c3.8 0 5.7 0 6.8 1.2C21 4.3 21 6.2 21 10v4c0 3.8 0 5.7-1.2 6.8-1.1 1.2-3 1.2-6.8 1.2h-2c-3.8 0-5.7 0-6.8-1.2C3 19.7 3 17.8 3 14z" class="sn-ic-d"></path>
+          <path d="M8 12h8"></path>
+          <path d="M8 8h8"></path>
+          <path d="M8 16h5"></path>
         </svg>
         <span>file-text</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="film" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-          <path d="M7 3v18"></path>
-          <path d="M3 7.5h4"></path>
-          <path d="M3 12h18"></path>
-          <path d="M3 16.5h4"></path>
-          <path d="M17 3v18"></path>
-          <path d="M17 7.5h4"></path>
-          <path d="M17 16.5h4"></path>
+          <path d="M12 22c-4.7 0-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2s7 0 8.5 1.5C22 4.9 22 7.3 22 12s0 7-1.5 8.5C19.1 22 16.7 22 12 22"></path>
+          <path d="M17 2.5V7m0 0v5m0-5h4.5M17 12v5m0-5H7m10 0h5m-5 5v4.5m0-4.5h4.5M7 2.5V7m0 0v5m0-5H2.5M7 12v5m0-5H2m5 5v4.5M7 17H2.5" class="sn-ic-d"></path>
         </svg>
         <span>film</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="folder" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+          <path d="M18 10h-5" class="sn-ic-d"></path>
+          <path d="m11 4-.6-.6L10 3a4 4 0 00-2.3-1H5.3A4 4 0 002 5.4V14c0 3.8 0 5.7 1.2 6.8C4.3 22 6.2 22 10 22h4c3.8 0 5.7 0 6.8-1.2 1.2-1.1 1.2-3 1.2-6.8v-2.2q.2-3.7-.8-4.8l-.2-.2q-1-1-4.8-.8h-.4q-1.5 0-2.2-.2l-.9-.3z"></path>
         </svg>
         <span>folder</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="folder-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path>
+          <path d="M20 11.5V9.3q.1-2.9-.6-3.6l-.2-.1c-.7-.6-1.7-.6-3.8-.6H15l-1.9-.1-.6-.3-1.4-1.1-.4-.4-.5-.4Q9.6 2 8.6 2h-2a3 3 0 00-2.5 2.4L4 5.7v5.8" class="sn-ic-d"></path>
+          <path d="M14 17h-4" class="sn-ic-d"></path>
+          <path d="M8.7 22h6.6c2 0 2.9 0 3.6-.5l.5-.4q.8-.9 1.1-3.6c.5-2.7.7-4 .2-5l-.6-.7c-.8-.8-2.1-.8-4.8-.8H8.7c-2.7 0-4 0-4.8.8l-.6.6q-.6 1.3.2 5 .4 2.8 1 3.7l.6.4q.9.6 3.6.5"></path>
         </svg>
         <span>folder-open</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="gauge" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m12 14 4-4"></path>
-          <path d="M3.34 19a10 10 0 1 1 17.32 0"></path>
+          <path d="M22 12a10 10 0 11-20 0 10 10 0 0120 0"></path>
+          <path d="m19 19-1.5-1.5" class="sn-ic-d"></path>
+          <path d="m19 5-1.5 1.5" class="sn-ic-d"></path>
+          <path d="m5 19 1.5-1.5" class="sn-ic-d"></path>
+          <path d="m5 5 1.5 1.5" class="sn-ic-d"></path>
+          <path d="M2 12h2" class="sn-ic-d"></path>
+          <path d="M20 12h2" class="sn-ic-d"></path>
+          <path d="M12 4V2" class="sn-ic-d"></path>
+          <path d="M15 12a3 3 0 11-6 0q0-1 1-2.3c.8-1.3 1.2-2 2-2s1.2.7 2 2q1 1.3 1 2.3"></path>
         </svg>
         <span>gauge</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="git-branch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15 6a9 9 0 0 0-9 9V3"></path>
-          <circle cx="18" cy="6" r="3"></circle>
-          <circle cx="6" cy="18" r="3"></circle>
+          <path d="M17.7 10a2.5 2.5 0 100-5 2.5 2.5 0 000 5m0 0c0 2.3-2.2 3.6-5.6 3.6s-5.6 1-5.6 3.4" class="sn-ic-d"></path>
+          <path d="M9 4.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0"></path>
+          <path d="M9 19.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0"></path>
+          <path d="M6.5 17V7"></path>
         </svg>
         <span>git-branch</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="git-fork" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="18" r="3"></circle>
-          <circle cx="6" cy="6" r="3"></circle>
-          <circle cx="18" cy="6" r="3"></circle>
-          <path d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9"></path>
-          <path d="M12 12v3"></path>
+          <path d="M12 16v-4m0 0c3.3 0 5 0 6-.6S19 10 19 8m-7 4c-3.3 0-5 0-6-.6S5 10 5 8" class="sn-ic-d"></path>
+          <path d="M8 5a3 3 0 11-6 0 3 3 0 016 0"></path>
+          <path d="M22 5a3 3 0 11-6 0 3 3 0 016 0"></path>
+          <path d="M15 19a3 3 0 11-6 0 3 3 0 016 0"></path>
         </svg>
         <span>git-fork</span>
       </div>
       <div class="icon-cell">
+        <svg class="sn-ic" data-icon="github" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+          <path d="M9 18c-4.51 2-5-2-7-2" class="sn-ic-d"></path>
+        </svg>
+        <span>github</span>
+      </div>
+      <div class="icon-cell">
         <svg class="sn-ic" data-icon="grip-vertical" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="9" cy="12" r="1"></circle>
-          <circle cx="9" cy="5" r="1"></circle>
-          <circle cx="9" cy="19" r="1"></circle>
-          <circle cx="15" cy="12" r="1"></circle>
-          <circle cx="15" cy="5" r="1"></circle>
-          <circle cx="15" cy="19" r="1"></circle>
+          <circle cx="15.5" cy="19" r=".8"></circle>
+          <circle cx="15.5" cy="12" r=".8" class="sn-ic-d"></circle>
+          <circle cx="15.5" cy="5" r=".8"></circle>
+          <circle cx="8.5" cy="19" r=".8"></circle>
+          <circle cx="8.5" cy="12" r=".8" class="sn-ic-d"></circle>
+          <circle cx="8.5" cy="5" r=".8"></circle>
         </svg>
         <span>grip-vertical</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="hash" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="4" x2="20" y1="9" y2="9"></line>
-          <line x1="4" x2="20" y1="15" y2="15"></line>
-          <line x1="10" x2="8" y1="3" y2="21"></line>
-          <line x1="16" x2="14" y1="3" y2="21"></line>
+          <path d="M10 3 5 21"></path>
+          <path d="m19 3-5 18"></path>
+          <path d="M22 9H4" class="sn-ic-d"></path>
+          <path d="M20 16H2" class="sn-ic-d"></path>
         </svg>
         <span>hash</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="headphones" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path>
+          <path d="M21 17v-5a9 9 0 10-18 0v5" class="sn-ic-d"></path>
+          <path d="M22 15.5v2" class="sn-ic-d"></path>
+          <path d="M2 15.5v2" class="sn-ic-d"></path>
+          <path d="M5.9 20.8q1.2.4 1.6.1l.3-.3q.3-.3.2-1.6v-5.2q0-1-.2-1.4l-.3-.3H6q-1.7 0-2.3.5l-.5.6q-.4.6-.3 2.4v1.6q0 1.9.3 2.4 0 .3.4.5.5.5 2.2.7"></path>
+          <path d="M18.1 20.8q-1.2.4-1.6.1l-.3-.3q-.2-.3-.2-1.6v-5.2q0-1 .2-1.4l.3-.3H18q1.7 0 2.3.5l.5.6q.4.6.3 2.4v1.6q0 1.9-.3 2.4l-.4.5q-.5.5-2.2.7"></path>
         </svg>
         <span>headphones</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="history" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-          <path d="M3 3v5h5"></path>
-          <path d="M12 7v5l4 2"></path>
+          <path d="M12 8v4l2.5 2.5" class="sn-ic-d"></path>
+          <path d="m4.3 6.9 1.3-1.3a9 9 0 0112.7 0 9 9 0 01.1 12.8 9 9 0 01-15.3-7.7m1.2-6.4V7H7"></path>
         </svg>
         <span>history</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="house" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
-          <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <path d="M7.9 3.9 5.9 5Q3.1 6.8 2.5 7.8c-.6 1-.5 2.2-.5 4.4v1.5c0 4 0 5.9 1.2 7C4.3 22 6.2 22 10 22h4c3.8 0 5.7 0 6.8-1.2 1.2-1.2 1.2-3.2 1.2-7v-1.6c0-2.3 0-3.4-.5-4.4S20 6.3 18 5.1l-2-1.2C14 2.6 13 2 11.9 2s-2.1.6-4.1 1.9" class="sn-ic-d"></path>
+          <path d="M12 15v3"></path>
         </svg>
         <span>house</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="image" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
-          <circle cx="9" cy="9" r="2"></circle>
-          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+          <path d="M12 22c-4.7 0-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2s7 0 8.5 1.5C22 4.9 22 7.3 22 12s0 7-1.5 8.5C19.1 22 16.7 22 12 22"></path>
+          <circle cx="16" cy="8" r="2" class="sn-ic-d"></circle>
+          <path d="M2 12.5 3.8 11c.9-.8 2.2-.8 3 0l4.4 4.4a2 2 0 002.5.2l.3-.2a3 3 0 013.8.2l3.2 2.9" class="sn-ic-d"></path>
         </svg>
         <span>image</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="image-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="2" x2="22" y1="2" y2="22"></line>
-          <path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"></path>
-          <line x1="13.5" x2="6" y1="13.5" y2="21"></line>
-          <line x1="18" x2="21" y1="12" y2="15"></line>
-          <path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59"></path>
-          <path d="M21 15V5a2 2 0 0 0-2-2H9"></path>
+          <path d="M20.5 20.5C19.1 22 16.7 22 12 22s-7 0-8.5-1.5C2 19.1 2 17 2 12.5V12c0-4.7 0-7 1.5-8.5M2 12.5 3.8 11c.9-.8 2.2-.8 3 0l4.4 4.4a2 2 0 002.5.2l.3-.2 1-.5M5.7 2.3Q7.8 2 12 2c4.7 0 7 0 8.5 1.5C22 4.9 22 7.3 22 12q0 4.2-.3 6.2" class="sn-ic-d"></path>
+          <circle cx="16" cy="8" r="2"></circle>
+          <path d="m2 2 20 20"></path>
         </svg>
         <span>image-off</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="image-plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M16 5h6"></path>
-          <path d="M19 2v6"></path>
-          <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5"></path>
-          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
-          <circle cx="9" cy="9" r="2"></circle>
+          <path d="M22 12c0 4.7 0 7-1.5 8.5C19.1 22 16.7 22 12 22s-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2"></path>
+          <path d="M2 12.5 3.8 11c.9-.8 2.2-.8 3 0l4.4 4.4a2 2 0 002.5.2l.3-.2a3 3 0 013.8.2l3.2 2.9" class="sn-ic-d"></path>
+          <path d="M15 5.5h3.5m0 0H22m-3.5 0V9m0-3.5V2"></path>
         </svg>
         <span>image-plus</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="inbox" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
-          <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+          <path d="M12 22c-4.7 0-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2s7 0 8.5 1.5C22 4.9 22 7.3 22 12s0 7-1.5 8.5C19.1 22 16.7 22 12 22"></path>
+          <path d="M2 13h3.2q1.2 0 1.7.2t1.3 1.2l.6.7q.8 1 1.3 1.2.5.3 1.7.2h.4q1.2 0 1.7-.2t1.3-1.2l.6-.7q.8-1 1.3-1.2t1.7-.2H22" class="sn-ic-d"></path>
         </svg>
         <span>inbox</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="info" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M12 16v-4"></path>
+          <circle cx="12" cy="12" r="10" class="sn-ic-d"></circle>
+          <path d="M12 17v-6"></path>
           <path d="M12 8h.01"></path>
         </svg>
         <span>info</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="key-round" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"></path>
-          <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
+          <path d="M22 8.3a6.3 6.3 0 01-9.1 5.6l-.9.8c-.7.8-.1.8.2 1.4 0 0 .7 1 0 2-.5.6-1.7 1.4-3.1 0l-.3.3s.9 1 .1 2c-.4.6-1.6 1.2-2.6.2l-1 1c-.8.7-1.6.3-2 0l-.8-.9c-.9-.8-.4-1.7 0-2L10 11s-.7-1.2-.7-2.8a6.3 6.3 0 0112.6 0"></path>
+          <path d="M17.9 8.3a2.2 2.2 0 11-4.4 0 2.2 2.2 0 014.4 0" class="sn-ic-d"></path>
         </svg>
         <span>key-round</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="keyboard" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10 8h.01"></path>
-          <path d="M12 12h.01"></path>
-          <path d="M14 8h.01"></path>
-          <path d="M16 12h.01"></path>
-          <path d="M18 8h.01"></path>
-          <path d="M6 8h.01"></path>
-          <path d="M7 16h10"></path>
-          <path d="M8 12h.01"></path>
-          <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+          <path d="M8 19h8c2.8 0 4.2 0 5.1-.9s.9-2.3.9-5.1v-2c0-2.8 0-4.2-.9-5.1S18.8 5 16 5H8c-2.8 0-4.2 0-5.1.9S2 8.2 2 11v2c0 2.8 0 4.2.9 5.1s2.3.9 5.1.9"></path>
+          <path d="M7 16h10" class="sn-ic-d"></path>
+          <path d="M6 9h.01" class="sn-ic-d"></path>
+          <path d="M9 9h.01" class="sn-ic-d"></path>
+          <path d="M12 9h.01" class="sn-ic-d"></path>
+          <path d="M15 9h.01" class="sn-ic-d"></path>
+          <path d="M18 9h.01" class="sn-ic-d"></path>
+          <path d="M18 12h.01" class="sn-ic-d"></path>
+          <path d="M15 12h.01" class="sn-ic-d"></path>
+          <path d="M12 12h.01" class="sn-ic-d"></path>
+          <path d="M9 12h.01" class="sn-ic-d"></path>
+          <path d="M6 12h.01" class="sn-ic-d"></path>
         </svg>
         <span>keyboard</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="layers" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path>
-          <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path>
-          <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path>
+          <path d="M16.2 10.8 19 9.7q3-1 3-1.7t-3-1.7l-2.8-1.1c-2-.8-3-1.2-4.2-1.2s-2.2.4-4.2 1.2L5 6.3Q2 7.3 2 8t3 1.7l2.8 1.1c2 .8 3 1.2 4.2 1.2s2.2-.4 4.2-1.2"></path>
+          <path d="m18.2 14 .8-.3q3-1 3-1.7t-3-1.7l-.8-.3m0 4-2 .8c-2 .8-3 1.2-4.2 1.2s-2.2-.4-4.2-1.2l-2-.8m12.4 0 .8.3q3 1 3 1.7t-3 1.7l-2.8 1.1c-2 .8-3 1.2-4.2 1.2s-2.2-.4-4.2-1.2L5 17.7q-3-1-3-1.7t3-1.7l.8-.3m0 0-.8-.3q-3-1-3-1.7t3-1.7l.8-.3" class="sn-ic-d"></path>
         </svg>
         <span>layers</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="layout-dashboard" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="7" height="9" x="3" y="3" rx="1"></rect>
-          <rect width="7" height="5" x="14" y="3" rx="1"></rect>
-          <rect width="7" height="9" x="14" y="12" rx="1"></rect>
-          <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+          <path d="M17.5 21.5q-2.7.1-3.4-.6t-.6-3.4v-2q-.2-2.7.6-3.4.7-.7 3.4-.6 2.7-.2 3.4.6.8.7.6 3.4v2q.1 2.7-.6 3.4-.7.8-3.4.6" class="sn-ic-d"></path>
+          <path d="M6 2.5q-2.7-.1-3.4.6T2 6.5v2q-.1 2.7.6 3.4t3.4.6q2.7.2 3.4-.6.8-.7.6-3.4v-2q.2-2.7-.6-3.4-.7-.7-3.4-.6"></path>
+          <path d="M16.5 8.5h2q1.3 0 1.8-.2a2 2 0 001-1q.3-.5.2-1.8t-.2-1.8a2 2 0 00-1-1q-.5-.2-1.8-.2h-2q-1.4 0-1.8.2a2 2 0 00-1 1q-.2.5-.2 1.8t.2 1.8q.3.7 1 1 .5.3 1.8.2"></path>
+          <path d="M5 15.5h2q1.4 0 1.8.2.7.3 1 1 .3.5.2 1.8t-.2 1.8a2 2 0 01-1 1q-.5.3-1.8.2H5q-1.3 0-1.8-.2a2 2 0 01-1-1q-.2-.5-.2-1.8t.2-1.8a2 2 0 011-1q.5-.2 1.8-.2" class="sn-ic-d"></path>
         </svg>
         <span>layout-dashboard</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="layout-grid" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="7" height="7" x="3" y="3" rx="1"></rect>
-          <rect width="7" height="7" x="14" y="3" rx="1"></rect>
-          <rect width="7" height="7" x="14" y="14" rx="1"></rect>
-          <rect width="7" height="7" x="3" y="14" rx="1"></rect>
+          <path d="M6.5 10.5q-2.7.2-3.4-.6-.7-.7-.6-3.4-.1-2.7.6-3.4t3.4-.6q2.7-.1 3.4.6.8.7.6 3.4.2 2.7-.6 3.4-.7.8-3.4.6" class="sn-ic-d"></path>
+          <path d="M17.5 21.5q-2.7.1-3.4-.6t-.6-3.4q-.2-2.7.6-3.4.7-.7 3.4-.6 2.7-.2 3.4.6.8.7.6 3.4.1 2.7-.6 3.4-.7.8-3.4.6" class="sn-ic-d"></path>
+          <path d="M6.5 21.5q-2.7.1-3.4-.6t-.6-3.4q-.1-2.7.6-3.4t3.4-.6q2.7-.2 3.4.6.8.7.6 3.4.2 2.7-.6 3.4-.7.8-3.4.6"></path>
+          <path d="M17.5 10.5q-2.7.2-3.4-.6-.7-.7-.6-3.4-.2-2.7.6-3.4.7-.7 3.4-.6 2.7-.1 3.4.6.8.7.6 3.4.1 2.7-.6 3.4-.7.8-3.4.6"></path>
         </svg>
         <span>layout-grid</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          <path d="m14.2 18.5-.8.7a6.1 6.1 0 11-8.6-8.6l.7-.8" class="sn-ic-d"></path>
+          <path d="m9.8 14.2 4.4-4.4"></path>
+          <path d="m9.8 5.5.8-.7a6.1 6.1 0 018.6 8.6l-.7.8" class="sn-ic-d"></path>
         </svg>
         <span>link</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="list" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 5h.01"></path>
-          <path d="M3 12h.01"></path>
-          <path d="M3 19h.01"></path>
-          <path d="M8 5h13"></path>
-          <path d="M8 12h13"></path>
-          <path d="M8 19h13"></path>
+          <path d="M20 7H4"></path>
+          <path d="M15 12H4" class="sn-ic-d"></path>
+          <path d="M9 17H4" class="sn-ic-d"></path>
         </svg>
         <span>list</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="list-filter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M2 5h20"></path>
-          <path d="M6 12h12"></path>
-          <path d="M9 19h6"></path>
+          <path d="M22 5.8v.7q0 1.5-.3 2t-1.6 1.2l-3 1.7q-1 .4-1.1.7-.7.6-1 1.5v3.9q.2 3-.7 3.3-.8.5-3.5-.7-1.2-.4-1.5-.8T9 17.5v-3.9q-.3-.8-1-1.5l-1-.7-3-1.7Q2.5 9 2.3 8.5q-.4-.5-.3-2v-.7"></path>
+          <path d="M22 5.8q.1-1.9-.4-2.4T19 3H5q-2-.1-2.6.4-.5.4-.4 2.4" class="sn-ic-d"></path>
         </svg>
         <span>list-filter</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="loader-circle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+          <circle cx="12" cy="12" r="10" class="sn-ic-d"></circle>
+          <path d="M22 12a10 10 0 00-10-10"></path>
         </svg>
         <span>loader-circle</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="locate-fixed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="2" x2="5" y1="12" y2="12"></line>
-          <line x1="19" x2="22" y1="12" y2="12"></line>
-          <line x1="12" x2="12" y1="2" y2="5"></line>
-          <line x1="12" x2="12" y1="19" y2="22"></line>
-          <circle cx="12" cy="12" r="7"></circle>
-          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M20 12a8 8 0 11-16 0 8 8 0 0116 0"></path>
+          <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0" class="sn-ic-d"></path>
+          <path d="M2 12h2" class="sn-ic-d"></path>
+          <path d="M20 12h2" class="sn-ic-d"></path>
+          <path d="M12 4V2" class="sn-ic-d"></path>
+          <path d="M12 22v-2" class="sn-ic-d"></path>
         </svg>
         <span>locate-fixed</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="lock" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          <path d="M8 22h8c2.8 0 4.2 0 5.1-.9s.9-2.3.9-5.1 0-4.2-.9-5.1-2.3-.9-5.1-.9H8c-2.8 0-4.2 0-5.1.9S2 13.2 2 16s0 4.2.9 5.1 2.3.9 5.1.9"></path>
+          <circle cx="12" cy="16" r="2" class="sn-ic-d"></circle>
+          <path d="M6 10V8a6 6 0 1112 0v2" class="sn-ic-d"></path>
         </svg>
         <span>lock</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="log-out" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m16 17 5-5-5-5"></path>
-          <path d="M21 12H9"></path>
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <path d="M9 7q-.2-3.2.9-4.1C10.8 2 12.2 2 15 2h1c2.8 0 4.2 0 5.1.9S22 5.2 22 8v8c0 2.8 0 4.2-.9 5.1s-2.3.9-5.1.9h-1c-2.8 0-4.2 0-5.1-.9q-1-1-.9-4.1" class="sn-ic-d"></path>
+          <path d="M15 12H2m3.5 3L2 12l3.5-3"></path>
         </svg>
         <span>log-out</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="mail" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path>
-          <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+          <path d="M10 20h4c3.8 0 5.7 0 6.8-1.2 1.2-1.1 1.2-3 1.2-6.8s0-5.7-1.2-6.8C19.7 4 17.8 4 14 4h-4C6.2 4 4.3 4 3.2 5.2 2 6.3 2 8.2 2 12s0 5.7 1.2 6.8C4.3 20 6.2 20 10 20" class="sn-ic-d"></path>
+          <path d="m6 8 2.2 1.8c1.8 1.5 2.7 2.3 3.8 2.3s2-.8 3.8-2.3L18 8"></path>
         </svg>
         <span>mail</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="map-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
+          <path d="M13.5 21.7q-1.5.6-3 0C6.5 19.8 4 14.7 4 10a8 8 0 018-8 8 8 0 018 8.1c0 4.5-2.6 9.7-6.5 11.6" class="sn-ic-d"></path>
           <circle cx="12" cy="10" r="3"></circle>
         </svg>
         <span>map-pin</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="maximize-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15 3h6v6"></path>
-          <path d="m21 3-7 7"></path>
-          <path d="m3 21 7-7"></path>
-          <path d="M9 21H3v-6"></path>
+          <path d="m9 15-7 7m0-5.9V22h5.9" class="sn-ic-d"></path>
+          <path d="m15 9 7-7m0 5.9V2h-5.9"></path>
         </svg>
         <span>maximize-2</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="menu" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 12h16"></path>
-          <path d="M4 18h16"></path>
-          <path d="M4 6h16"></path>
+          <path d="M20 7H4"></path>
+          <path d="M20 12H4" class="sn-ic-d"></path>
+          <path d="M20 17H4"></path>
         </svg>
         <span>menu</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="message-circle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path>
+          <path d="M22 12a10 10 0 01-14.5 9q-.5-.3-1.1-.2l-2.2.6c-1 .3-1.9-.6-1.6-1.6l.6-2.2q0-.6-.2-1.1A10 10 0 1122 12Z"></path>
         </svg>
         <span>message-circle</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="message-square" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>
+          <path d="M13.6 20.5q.6-1 1-1.3.4-.2 1.6-.2 1.8 0 2.7-.4a5 5 0 002.7-2.7c.4-1 .4-2 .4-4.4v-1c0-3.3 0-5-.7-6.1a5 5 0 00-1.7-1.7C18.4 2 16.8 2 13.5 2h-3c-3.3 0-5 0-6.1.7a5 5 0 00-1.7 1.7C2 5.6 2 7.2 2 10.5v1c0 2.3 0 3.5.4 4.4A5 5 0 005 18.6q.8.4 2.7.4 1.2 0 1.6.2t1 1.3l.5.9c.5.8 1.7.8 2.2 0Z"></path>
         </svg>
         <span>message-square</span>
       </div>
       <div class="icon-cell">
+        <svg class="sn-ic" data-icon="mic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="9" y="2.5" width="6" height="11" rx="3"></rect>
+          <path d="M5.5 10.5a6.5 6.5 0 0013 0" class="sn-ic-d"></path>
+          <path d="M12 17v4.5M9 21.5h6" class="sn-ic-d"></path>
+        </svg>
+        <span>mic</span>
+      </div>
+      <div class="icon-cell">
         <svg class="sn-ic" data-icon="minimize-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m14 10 7-7"></path>
-          <path d="M20 10h-6V4"></path>
-          <path d="m3 21 7-7"></path>
-          <path d="M4 14h6v6"></path>
+          <path d="m2 22 7-7m0 5.9V15H3.1" class="sn-ic-d"></path>
+          <path d="m22 2-7 7m0-5.9V9h5.9"></path>
         </svg>
         <span>minimize-2</span>
       </div>
@@ -721,120 +733,123 @@ onBeforeUnmount(() => off());
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="monitor" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="20" height="14" x="2" y="3" rx="2"></rect>
-          <line x1="8" x2="16" y1="21" y2="21"></line>
-          <line x1="12" x2="12" y1="17" y2="21"></line>
+          <path d="M8 17h8c2.8 0 4.2 0 5.1-.9s.9-2.3.9-5.1v-1c0-3.8 0-5.7-1.2-6.8C19.7 2 17.8 2 14 2h-4C6.2 2 4.3 2 3.2 3.2 2 4.3 2 6.2 2 10v1c0 2.8 0 4.2.9 5.1s2.3.9 5.1.9"></path>
+          <path d="M16 22h-4m0 0H8m4 0v-5" class="sn-ic-d"></path>
+          <path d="M22 13H2" class="sn-ic-d"></path>
         </svg>
         <span>monitor</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path>
+          <path d="M12 22a10 10 0 0010-10c0-.5-.7-.5-1-.1a6.5 6.5 0 11-8.9-9c.4-.2.4-.9-.1-.9a10 10 0 100 20Z"></path>
         </svg>
         <span>moon</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="mouse-pointer-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"></path>
+          <path d="m15.3 12.6 1.2-1.2q1.8-1.6 1.7-2.5-.3-.8-2.6-1.5l-5.5-2C7 4.2 5.2 3.6 4.4 4.4q-1 1 1 5.7l2 5.5q.7 2.3 1.5 2.6.9.1 2.5-1.7l1.2-1.2"></path>
+          <path d="m12.6 15.3 4 3.9.8.7h1q.3 0 .8-.7l.7-.8v-1q0-.2-.7-.8l-4-4" class="sn-ic-d"></path>
         </svg>
         <span>mouse-pointer-2</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="move" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 2v20"></path>
-          <path d="m15 19-3 3-3-3"></path>
-          <path d="m19 9 3 3-3 3"></path>
-          <path d="M2 12h20"></path>
+          <path d="M2 12h7" class="sn-ic-d"></path>
           <path d="m5 9-3 3 3 3"></path>
-          <path d="m9 5 3-3 3 3"></path>
+          <path d="M22 12h-7" class="sn-ic-d"></path>
+          <path d="m19 15 3-3-3-3"></path>
+          <path d="M12 2v7" class="sn-ic-d"></path>
+          <path d="m15 5-3-3-3 3"></path>
+          <path d="M12 22v-7" class="sn-ic-d"></path>
+          <path d="m9 19 3 3 3-3"></path>
         </svg>
         <span>move</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="music" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 16V3a1 1 0 0 0-1.28-.96l-10 2.917a1 1 0 0 0-.72.96V19"></path>
-          <circle cx="18" cy="16" r="3"></circle>
-          <circle cx="6" cy="19" r="3"></circle>
+          <path d="M13 18V2" class="sn-ic-d"></path>
+          <circle cx="9" cy="18" r="4"></circle>
+          <path d="M19 8a6 6 0 01-6-6"></path>
         </svg>
         <span>music</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="palette" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"></path>
-          <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
-          <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
-          <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
-          <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
+          <path d="M6 22q-2 0-2.6-.3-.8-.4-1.1-1-.4-.8-.3-2.7V6q0-2 .3-2.6.4-.8 1-1.1.8-.4 2.7-.3 2 0 2.6.3.8.4 1.1 1 .4.8.3 2.7v12q0 2-.3 2.6-.3.8-1 1.1T6 22"></path>
+          <path d="M7 19H5" class="sn-ic-d"></path>
+          <path d="m11.2 7 2.1-2q1.4-1.5 2-1.7.9-.3 1.6 0c.6.1 1 .6 2 1.6q1.5 1.4 1.7 2 .3.9 0 1.6-.1.8-1.6 2l-9 9V10q0-1.1.2-1.6.1-.5 1-1.2"></path>
+          <path d="M6 22h12q2 0 2.6-.3.8-.4 1.1-1 .4-.8.3-2.7 0-2-.3-2.6-.4-.8-1-1.1-.8-.4-2.7-.3h-2.5" class="sn-ic-d"></path>
         </svg>
         <span>palette</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="panel-left" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-          <path d="M9 3v18"></path>
+          <path d="M14 21h-4c-3.8 0-5.7 0-6.8-1.2C2 18.7 2 16.8 2 13v-2c0-3.8 0-5.7 1.2-6.8C4.3 3 6.2 3 10 3h4c3.8 0 5.7 0 6.8 1.2C22 5.3 22 7.2 22 11v2c0 3.8 0 5.7-1.2 6.8-1.1 1.2-3 1.2-6.8 1.2"></path>
+          <path d="M9 21V3" class="sn-ic-d"></path>
         </svg>
         <span>panel-left</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="panel-right" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-          <path d="M15 3v18"></path>
+          <path d="M10 21h4c3.8 0 5.7 0 6.8-1.2 1.2-1.1 1.2-3 1.2-6.8v-2c0-3.8 0-5.7-1.2-6.8C19.7 3 17.8 3 14 3h-4C6.2 3 4.3 3 3.2 4.2 2 5.3 2 7.2 2 11v2c0 3.8 0 5.7 1.2 6.8C4.3 21 6.2 21 10 21"></path>
+          <path d="M15 21V3" class="sn-ic-d"></path>
         </svg>
         <span>panel-right</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="paperclip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"></path>
+          <path d="M15.8 7c-1-1-2.5-1-3.4 0l-7.9 7.5a4.3 4.3 0 000 6.2 5 5 0 006.6 0l8-7.6a6.3 6.3 0 000-9.2 7 7 0 00-9.7 0L3 10"></path>
         </svg>
         <span>paperclip</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="pause" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="14" y="3" width="5" height="18" rx="1"></rect>
-          <rect x="5" y="3" width="5" height="18" rx="1"></rect>
+          <path d="M6 22q-2.7.1-3.4-.6T2 18V6q-.1-2.7.6-3.4T6 2q2.7-.1 3.4.6.8.7.6 3.4v12q.2 2.7-.6 3.4-.7.8-3.4.6"></path>
+          <path d="M18 22q-2.7.1-3.4-.6T14 18V6q-.2-2.7.6-3.4.7-.7 3.4-.6 2.7-.1 3.4.6.8.7.6 3.4v12q.1 2.7-.6 3.4-.7.8-3.4.6" class="sn-ic-d"></path>
         </svg>
         <span>pause</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="pen-line" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M13 21h8"></path>
-          <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+          <path d="m14.4 4 .9-.8a4 4 0 015.5 5.5l-.9 1-8.5 8.5-1.2 1q-.6.6-1.2.8l-1.5.6-3.3 1-.8.3a1 1 0 01-1.3-1.3l.2-.8 1.1-3.3L4 15l.7-1.2 1.1-1.2z"></path>
+          <path d="M14.4 4s0 2 1.8 3.8S20 9.6 20 9.6m-15.7 12-1.9-1.8" class="sn-ic-d"></path>
         </svg>
         <span>pen-line</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
-          <path d="m15 5 4 4"></path>
+          <path d="M4 22h16" class="sn-ic-d"></path>
+          <path d="m13.9 3.7.7-.8a3.1 3.1 0 114.5 4.5l-.8.7-6.8 6.8-1 1-.9.5-1.2.5-2.6.8-.7.3a.8.8 0 01-1-1.1l.2-.7.8-2.6.5-1.2.6-1 .9-1z"></path>
+          <path d="M13.9 3.7s0 1.5 1.5 3a5 5 0 003 1.4M5.7 17.7l-1.5-1.5" class="sn-ic-d"></path>
         </svg>
         <span>pencil</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="picture-in-picture-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h4"></path>
-          <rect width="10" height="7" x="12" y="13" rx="2"></rect>
+          <path d="M11 21h2c3.7 0 5.6 0 7-1l1-1c1-1.4 1-3.3 1-7s0-5.6-1-7l-1-1c-1.4-1-3.3-1-7-1h-2C7.3 3 5.4 3 4 4L3 5c-1 1.4-1 3.3-1 7s0 5.6 1 7l1 1c1.4 1 3.3 1 7 1" class="sn-ic-d"></path>
+          <path d="M14 17h1q1.3 0 1.8-.2a2 2 0 001-1q.3-.5.2-1.8t-.2-1.8a2 2 0 00-1-1q-.5-.2-1.8-.2h-1l-1.8.2a2 2 0 00-1 1q-.2.5-.2 1.8t.2 1.8q.3.7 1 1 .5.3 1.8.2"></path>
         </svg>
         <span>picture-in-picture-2</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 17v5"></path>
-          <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"></path>
+          <path d="m19 8-3-3c-2.1-2.2-3.2-3.2-4.3-3S10.1 3.7 9 6.5l-.7 1.9-.6 1.4-.4.3q-.4.4-1.5.6-2.4.5-2.9 1.3l-.2.8q0 .7 2 2.5l4 4.1q1.8 2 2.6 2 .5 0 .8-.3.7-.4 1.3-2.9l.5-1.5.4-.3q.3-.4 1.3-.7l2-.7c2.7-1 4.1-1.6 4.4-2.7.2-1.1-.8-2.2-3-4.3"></path>
+          <path d="m2 22 4.7-4.7" class="sn-ic-d"></path>
         </svg>
         <span>pin</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="play" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"></path>
+          <path d="M3 5v14c0 2.3 2.5 3.7 4.6 2.6l12.8-7a3 3 0 000-5.2l-12.8-7C5.6 1.3 3 2.7 3 5Z"></path>
         </svg>
         <span>play</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="plug" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 22v-5"></path>
-          <path d="M15 8V2"></path>
-          <path d="M17 8a1 1 0 0 1 1 1v4a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z"></path>
-          <path d="M9 8V2"></path>
+          <path d="M12 15.1v5q-.2 2-2 1.9c-4.6-1-8-5-8-10A10 10 0 0112 2a10 10 0 014.4 19.2" class="sn-ic-d"></path>
+          <path d="M9 11.8q.1-.7.8-.8h4.4q.7.1.8.8v.2a3 3 0 11-6 0z"></path>
+          <path d="M13.5 11V9"></path>
+          <path d="M10.5 11V9"></path>
         </svg>
         <span>plug</span>
       </div>
@@ -847,381 +862,381 @@ onBeforeUnmount(() => off());
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="receipt" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 17V7"></path>
-          <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"></path>
-          <path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"></path>
+          <path d="M7.2 2h9.6q1.6 0 2.2.2A3 3 0 0120.8 4q.2.5.2 2.3v14c0 .8-1 1.3-1.6.7a1 1 0 00-1.3 0l-.5.5q-1.1.8-2.2 0t-2.3 0c-.6.5-1.6.5-2.2 0q-1.1-.9-2.3 0c-.6.5-1.6.5-2.2 0l-.5-.5a1 1 0 00-1.3 0c-.6.6-1.6.1-1.6-.7v-14q0-1.7.2-2.3A3 3 0 015 2z" class="sn-ic-d"></path>
+          <path d="M10.5 11H17"></path>
+          <path d="M7 11h.5"></path>
+          <path d="M7 7.5h.5"></path>
+          <path d="M7 14.5h.5"></path>
+          <path d="M10.5 7.5H17"></path>
+          <path d="M10.5 14.5H17"></path>
         </svg>
         <span>receipt</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="redo-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m15 14 5-5-5-5"></path>
-          <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"></path>
+          <path d="m17 4 3 3-3 3"></path>
+          <path d="M20 7H9a5 5 0 100 10h7" class="sn-ic-d"></path>
         </svg>
         <span>redo-2</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="refresh-cw" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-          <path d="M21 3v5h-5"></path>
-          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-          <path d="M8 16H3v5"></path>
+          <path d="M3.7 13v-1.7C3.7 6.7 7.4 3 12 3c3 0 5.7 1.6 7.2 4M2 11.3 3.7 13l1.7-1.7"></path>
+          <path d="M20.3 11v1.7A8.4 8.4 0 014.7 17M22 12.7 20.3 11l-1.7 1.7" class="sn-ic-d"></path>
         </svg>
         <span>refresh-cw</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="rotate-ccw" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-          <path d="M3 3v5h5"></path>
+          <path d="M16 22h-1c-2.8 0-4.2 0-5.1-.9S9 18.8 9 16V8c0-2.8 0-4.2.9-5.1S12.2 2 15 2h1c2.8 0 4.2 0 5.1.9S22 5.2 22 8v8c0 2.8 0 4.2-.9 5.1s-2.3.9-5.1.9"></path>
+          <path d="M6.5 10q-2.8 0-3.6.9C2 11.8 2 13.2 2 16s0 4.2.9 5.1q.9 1 3.6.9" class="sn-ic-d"></path>
+          <path d="M3.5 7 2 8a6 6 0 015-6" class="sn-ic-d"></path>
         </svg>
         <span>rotate-ccw</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="rotate-cw" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-          <path d="M21 3v5h-5"></path>
+          <path d="M8 22h1c2.8 0 4.2 0 5.1-.9s.9-2.3.9-5.1V8c0-2.8 0-4.2-.9-5.1S11.8 2 9 2H8c-2.8 0-4.2 0-5.1.9S2 5.2 2 8v8c0 2.8 0 4.2.9 5.1s2.3.9 5.1.9"></path>
+          <path d="M17.5 10q2.8 0 3.6.9c.9.9.9 2.3.9 5.1s0 4.2-.9 5.1q-.9 1-3.6.9" class="sn-ic-d"></path>
+          <path d="M20.5 7 22 8a6 6 0 00-5-6" class="sn-ic-d"></path>
         </svg>
         <span>rotate-cw</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="rows-3" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-          <path d="M21 9H3"></path>
-          <path d="M21 15H3"></path>
+          <path d="M3 15.3h18" class="sn-ic-d"></path>
+          <path d="M3 8.7h18" class="sn-ic-d"></path>
+          <path d="M3 10v4c0 3.8 0 5.7 1.2 6.8C5.3 22 7.2 22 11 22h2c3.8 0 5.7 0 6.8-1.2 1.2-1.1 1.2-3 1.2-6.8v-4c0-3.8 0-5.7-1.2-6.8C18.7 2 16.8 2 13 2h-2C7.2 2 5.3 2 4.2 3.2 3 4.3 3 6.2 3 10"></path>
         </svg>
         <span>rows-3</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="ruler" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path>
-          <path d="m14.5 12.5 2-2"></path>
-          <path d="m11.5 9.5 2-2"></path>
-          <path d="m8.5 6.5 2-2"></path>
-          <path d="m17.5 15.5 2-2"></path>
+          <path d="M4 18.5c-1.3-1.4-2-2-2-2.9s.7-1.5 2-2.9L12.7 4c1.4-1.3 2-2 3-2 .8 0 1.4.7 2.8 2L20 5.5c1.3 1.4 2 2 2 2.9s-.7 1.5-2 2.9L11.3 20c-1.4 1.3-2 2-3 2-.8 0-1.4-.7-2.8-2z"></path>
+          <path d="m8.5 8.5 1.4 1.4" class="sn-ic-d"></path>
+          <path d="m12.7 4.2 1.4 1.4" class="sn-ic-d"></path>
+          <path d="m4.2 12.7 1.4 1.4" class="sn-ic-d"></path>
+          <path d="m6.3 10.6 2.2 2.1" class="sn-ic-d"></path>
+          <path d="m10.6 6.3 2.1 2.2" class="sn-ic-d"></path>
         </svg>
         <span>ruler</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="scan" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-          <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-          <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-          <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+          <path d="M10 22c-3.8 0-5.7 0-6.8-1.2C2 19.7 2 18.8 2 15" class="sn-ic-d"></path>
+          <path d="M22 15c0 3.8 0 4.7-1.2 5.8-1.1 1.2-3 1.2-6.8 1.2" class="sn-ic-d"></path>
+          <path d="M14 2c3.8 0 5.7 0 6.8 1.2C22 4.3 22 5.2 22 9" class="sn-ic-d"></path>
+          <path d="M10 2C6.2 2 4.3 2 3.2 3.2 2 4.3 2 5.2 2 9" class="sn-ic-d"></path>
+          <path d="M2 12h20"></path>
         </svg>
         <span>scan</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="scan-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-          <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-          <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-          <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
-          <circle cx="12" cy="12" r="1"></circle>
-          <path d="M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0"></path>
+          <path d="M10 22c-3.8 0-5.7 0-6.8-1.2C2 19.7 2 18.8 2 15" class="sn-ic-d"></path>
+          <path d="M22 15c0 3.8 0 4.7-1.2 5.8-1.1 1.2-3 1.2-6.8 1.2" class="sn-ic-d"></path>
+          <path d="M14 2c3.8 0 5.7 0 6.8 1.2C22 4.3 22 5.2 22 9" class="sn-ic-d"></path>
+          <path d="M10 2C6.2 2 4.3 2 3.2 3.2 2 4.3 2 5.2 2 9" class="sn-ic-d"></path>
+          <path d="M12 7a8 8 0 00-6.1 3q-.9.7-.9 2t.9 2a8 8 0 006.1 3c3 0 5-1.6 6.1-3q.9-.7.9-2t-.9-2A8 8 0 0012 7"></path>
+          <circle cx="12" cy="12" r="2"></circle>
         </svg>
         <span>scan-eye</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="scissors" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="6" cy="6" r="3"></circle>
-          <path d="M8.12 8.12 12 12"></path>
-          <path d="M20 4 8.12 15.88"></path>
-          <circle cx="6" cy="18" r="3"></circle>
-          <path d="M14.8 14.8 20 20"></path>
+          <path d="M16.4 20.5 6 2m16 17a3 3 0 11-6 0 3 3 0 016 0" class="sn-ic-d"></path>
+          <path d="M7.6 20.5 18 2M2 19a3 3 0 106 0 3 3 0 00-6 0"></path>
         </svg>
         <span>scissors</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="search" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m21 21-4.34-4.34"></path>
-          <circle cx="11" cy="11" r="8"></circle>
+          <circle cx="11.5" cy="11.5" r="9.5" class="sn-ic-d"></circle>
+          <path d="M18.5 18.5 22 22"></path>
         </svg>
         <span>search</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="server" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect>
-          <rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect>
-          <line x1="6" x2="6.01" y1="6" y2="6"></line>
-          <line x1="6" x2="6.01" y1="18" y2="18"></line>
+          <path d="M6 21h12q2.7.1 3.4-.6.8-.7.6-3.4.1-2.7-.6-3.4T18 13H6q-2.7-.2-3.4.6-.7.7-.6 3.4-.1 2.7.6 3.4.7.8 3.4.6" class="sn-ic-d"></path>
+          <path d="M6 10h12q2.7.2 3.4-.6.8-.7.6-3.4.1-2.7-.6-3.4T18 2H6q-2.7-.1-3.4.6T2 6q-.1 2.7.6 3.4.7.8 3.4.6" class="sn-ic-d"></path>
+          <path d="M13.5 6H18"></path>
+          <path d="M6 7V5"></path>
+          <path d="M9 7V5"></path>
+          <path d="M13.5 17H18"></path>
+          <path d="M6 18v-2"></path>
+          <path d="M9 18v-2"></path>
         </svg>
         <span>server</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="settings" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path>
           <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 2q1.3 0 1.8.2.7.3 1 1l.2.9q0 .8.8 1.4.7.3 1.5 0l.9-.3q.8-.2 1.4.3t1 1.5q.8 1.1.8 1.6.1.7-.4 1.5-.1.3-.7.5-.6.5-.7 1.4t.7 1.4q.6.3.7.5.5.7.4 1.5 0 .5-.7 1.6l-1 1.5a2 2 0 01-1.5.3q-.4 0-.9-.3-.7-.3-1.5 0-.8.5-.8 1.4 0 .5-.2.9a2 2 0 01-1 1q-.5.3-1.8.2t-1.8-.2a2 2 0 01-1-1l-.2-.9q0-.9-.8-1.4-.7-.3-1.5 0l-.9.3q-.8.1-1.4-.3t-1-1.5l-.8-1.6q-.1-.7.4-1.5.1-.2.7-.5.7-.5.7-1.4t-.7-1.4q-.6-.2-.7-.5a2 2 0 01-.4-1.5q0-.5.7-1.6l1-1.5a2 2 0 011.5-.3q.4 0 .9.3.7.3 1.5 0Q9 5 9 4q0-.5.2-.9a2 2 0 011-1z" class="sn-ic-d"></path>
         </svg>
         <span>settings</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="share" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 2v13"></path>
-          <path d="m16 6-4-4-4 4"></path>
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+          <path d="M19.5 5.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0"></path>
+          <path d="M14.5 18.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0"></path>
+          <path d="M4.5 12a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0"></path>
+          <path d="m9.1 13.4 5.8 3.7" class="sn-ic-d"></path>
+          <path d="M9.1 10.6 14.9 7" class="sn-ic-d"></path>
         </svg>
         <span>share</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="shield" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
+          <path d="M21 12v-1.6q.1-4.7-.4-5.3c-.4-.6-1.9-1-4.9-2.1l-.5-.2C13.6 2.3 12.8 2 12 2s-1.6.3-3.2.8l-.5.2q-4.4 1.4-5 2-.4.8-.3 5.4V12c0 5.6 4.2 8.4 6.9 9.5.7.3 1 .5 2.1.5 1 0 1.4-.2 2.1-.5 2.7-1.1 6.9-3.9 6.9-9.5" class="sn-ic-d"></path>
+          <path d="m3 11 9-3 9 3"></path>
+          <path d="M12 2v19.5"></path>
         </svg>
         <span>shield</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="sliders-horizontal" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10 5H3"></path>
-          <path d="M12 19H3"></path>
-          <path d="M14 3v4"></path>
-          <path d="M16 17v4"></path>
-          <path d="M21 12h-9"></path>
-          <path d="M21 19h-5"></path>
-          <path d="M21 5h-7"></path>
-          <path d="M8 10v4"></path>
-          <path d="M8 12H3"></path>
+          <path d="M9.5 14a3 3 0 110 6 3 3 0 010-6"></path>
+          <path d="M14.5 4a3 3 0 100 6 3 3 0 000-6"></path>
+          <path d="M13 17h9" class="sn-ic-d"></path>
+          <path d="M11 7H2" class="sn-ic-d"></path>
+          <path d="M2 17h4" class="sn-ic-d"></path>
+          <path d="M22 7h-4" class="sn-ic-d"></path>
         </svg>
         <span>sliders-horizontal</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="sparkles" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path>
-          <path d="M20 2v4"></path>
-          <path d="M22 4h-4"></path>
-          <circle cx="4" cy="20" r="2"></circle>
+          <path d="m11.6 10.9.6.9.9.6.4.2c1.7 1 3 1.4 3 2.2 0 .7-1.3 1.2-3 2.1l-.4.3q-.7.3-.9.6l-.6.9-.2.4c-1 1.7-1.4 2.9-2.2 2.9q-.9-.2-2.1-2.9l-.3-.4-.6-1-.9-.5-.4-.3Q2.2 15.7 2 14.8c-.2-.9 1.2-1.2 2.9-2.2l.4-.2 1-.6.5-.9.3-.4c1-1.7 1.4-3 2.1-3s1.2 1.3 2.2 3z"></path>
+          <path d="m16 3.4.2.4.4.2.2.1q1.1.5 1.2.9t-1.2.9h-.2l-.4.3-.2.4-.1.2Q15.4 7.9 15 8t-.9-1.2v-.2l-.3-.4-.4-.2-.2-.1Q12.1 5.4 12 5t1.2-.9h.2l.4-.3.2-.4.1-.2q.5-1.1.9-1.2t.9 1.2zm4.7 5.5.1.3.3.1.1.1q.8.4.8.6t-.8.6h-.1l-.3.2-.1.3-.1.1q-.4.8-.6.8t-.6-.8v-.1l-.2-.3-.3-.1-.1-.1q-.8-.4-.8-.6t.8-.6h.1l.3-.2.1-.3.1-.1q.4-.8.6-.8t.6.8z" class="sn-ic-d"></path>
         </svg>
         <span>sparkles</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="square" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+          <path d="M12 22c-4.7 0-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2s7 0 8.5 1.5C22 4.9 22 7.3 22 12s0 7-1.5 8.5C19.1 22 16.7 22 12 22Z"></path>
         </svg>
         <span>square</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="square-check-big" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344"></path>
-          <path d="m9 11 3 3L22 4"></path>
+          <path d="M12 22c-4.7 0-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2s7 0 8.5 1.5C22 4.9 22 7.3 22 12s0 7-1.5 8.5C19.1 22 16.7 22 12 22" class="sn-ic-d"></path>
+          <path d="m8.5 12.5 2 2 5-5"></path>
         </svg>
         <span>square-check-big</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="square-pen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-          <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"></path>
+          <path d="M22 10.5V12c0 4.7 0 7-1.5 8.5C19.1 22 16.7 22 12 22s-7 0-8.5-1.5C2 19.1 2 16.7 2 12s0-7 1.5-8.5C4.9 2 7.3 2 12 2h1.5" class="sn-ic-d"></path>
+          <path d="m16.7 3.5.6-.7a2.8 2.8 0 013.9 3.9l-.7.6-6 6-.7.8-.9.5-1 .4-1.8.6L9 16a.7.7 0 01-1-1l.4-1.1.6-1.7.4-1.1.5-.9.8-.8z"></path>
+          <path d="M16.7 3.5s0 1.3 1.2 2.6a4 4 0 002.6 1.2m-10.4 8.3-1.7-1.7" class="sn-ic-d"></path>
         </svg>
         <span>square-pen</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="star" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+          <path d="m6.7 7.6-.7.2c-2.4.5-3.6.8-4 1.7-.2 1 .6 2 2.3 4l.4.4.8 1.2v2.2q-.6 3.8.4 4.5.9.6 4.2-1l.6-.3q.9-.5 1.3-.5t1.3.5l.6.3q3.3 1.6 4.2 1 1-.8.4-4.5V15q0-.4.8-1.2l.4-.5c1.7-2 2.5-3 2.2-3.9s-1.5-1.2-4-1.7l-.6-.2q-1-.1-1.3-.4T15.2 6l-.4-.6Q13.2 2 12 2c-1 0-1.6 1.1-2.8 3.4l-.4.6q-.4.9-.8 1.2-.3.3-1.3.4Z"></path>
         </svg>
         <span>star</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="4"></circle>
+          <circle cx="12" cy="12" r="5"></circle>
           <path d="M12 2v2"></path>
           <path d="M12 20v2"></path>
-          <path d="m4.93 4.93 1.41 1.41"></path>
-          <path d="m17.66 17.66 1.41 1.41"></path>
-          <path d="M2 12h2"></path>
-          <path d="M20 12h2"></path>
-          <path d="m6.34 17.66-1.41 1.41"></path>
-          <path d="m19.07 4.93-1.41 1.41"></path>
+          <path d="M4 12H2"></path>
+          <path d="M22 12h-2"></path>
+          <path d="m19.8 4.2-2.2 2" class="sn-ic-d"></path>
+          <path d="m4.2 4.2 2.2 2" class="sn-ic-d"></path>
+          <path d="m6.4 17.6-2.2 2.2" class="sn-ic-d"></path>
+          <path d="m19.8 19.8-2.2-2.2" class="sn-ic-d"></path>
         </svg>
         <span>sun</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="swatch-book" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M11 17a4 4 0 0 1-8 0V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2Z"></path>
-          <path d="M16.7 13H19a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H7"></path>
-          <path d="M 7 17h.01"></path>
-          <path d="m11 8 2.3-2.3a2.4 2.4 0 0 1 3.404.004L18.6 7.6a2.4 2.4 0 0 1 .026 3.434L9.9 19.8"></path>
+          <path d="M10.8 22A10 10 0 1122 12c0 8.2-8.2 2.4-9.7 5q-.4 1 .5 1.9c.7.6.7 1.7 0 2.3q-.8 1-2 .8"></path>
+          <circle cx="17.5" cy="11.5" r="1.5" class="sn-ic-d"></circle>
+          <circle cx="6.5" cy="11.5" r="1.5" class="sn-ic-d"></circle>
+          <path d="M11 7a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0" class="sn-ic-d"></path>
+          <path d="M16 7a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0" class="sn-ic-d"></path>
         </svg>
         <span>swatch-book</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="table-cells-merge" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 21v-6"></path>
-          <path d="M12 9V3"></path>
-          <path d="M3 15h18"></path>
-          <path d="M3 9h18"></path>
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+          <path d="M3 15.3h9m0 0h9m-9 0V22M3 8.7h9m0 0h9m-9 0V2" class="sn-ic-d"></path>
+          <path d="M3 10v4c0 3.8 0 5.7 1.2 6.8C5.3 22 7.2 22 11 22h2c3.8 0 5.7 0 6.8-1.2 1.2-1.1 1.2-3 1.2-6.8v-4c0-3.8 0-5.7-1.2-6.8C18.7 2 16.8 2 13 2h-2C7.2 2 5.3 2 4.2 3.2 3 4.3 3 6.2 3 10"></path>
         </svg>
         <span>table-cells-merge</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="table-cells-split" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 15V9"></path>
-          <path d="M3 15h18"></path>
-          <path d="M3 9h18"></path>
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+          <path d="M3 15.3h18" class="sn-ic-d"></path>
+          <path d="M3 8.7h18" class="sn-ic-d"></path>
+          <path d="M12 8.7v6.6"></path>
+          <path d="M3 10v4c0 3.8 0 5.7 1.2 6.8C5.3 22 7.2 22 11 22h2c3.8 0 5.7 0 6.8-1.2 1.2-1.1 1.2-3 1.2-6.8v-4c0-3.8 0-5.7-1.2-6.8C18.7 2 16.8 2 13 2h-2C7.2 2 5.3 2 4.2 3.2 3 4.3 3 6.2 3 10"></path>
         </svg>
         <span>table-cells-split</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="tag" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
-          <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
+          <path d="m2.9 7.4-.3 1.2c-.5 2.1-.8 3.2-.5 4.2s1 1.8 2.6 3.3L6.6 18c2.6 2.7 4 4 5.7 4 1.6 0 3-1.3 5.7-4s4-4 4-5.7-1.3-3-4-5.7l-2-1.9c-1.5-1.5-2.3-2.3-3.3-2.6s-2 0-4.2.5l-1.2.3Q4.9 3.4 4 4q-.7.8-1.2 3.3"></path>
+          <circle cx="8.6" cy="8.9" r="2" class="sn-ic-d"></circle>
+          <path d="m11.5 18.5 7-7" class="sn-ic-d"></path>
         </svg>
         <span>tag</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="thumbs-down" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"></path>
-          <path d="M17 14V2"></path>
+          <path d="M7 13.5V4a1 1 0 00-1-1H4a1 1 0 00-1 1v8.5a1 1 0 001 1h3Z" class="sn-ic-d"></path>
+          <path d="M7 13.5l3.6 6.6A1.8 1.8 0 0013.8 19v-3.5h4.7a2.2 2.2 0 002.2-2.6l-1.2-7.2A2.8 2.8 0 0016.7 3H7"></path>
         </svg>
         <span>thumbs-down</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="thumbs-up" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path>
-          <path d="M7 10v12"></path>
+          <path d="M7 10.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1v-8.5a1 1 0 011-1h3Z" class="sn-ic-d"></path>
+          <path d="M7 10.5l3.6-6.6A1.8 1.8 0 0113.8 5v3.5h4.7a2.2 2.2 0 012.2 2.6l-1.2 7.2A2.8 2.8 0 0116.7 21H7"></path>
         </svg>
         <span>thumbs-up</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="timer" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="10" x2="14" y1="2" y2="2"></line>
-          <line x1="12" x2="15" y1="14" y2="11"></line>
-          <circle cx="12" cy="14" r="8"></circle>
+          <path d="M21 13a9 9 0 11-18 0 9 9 0 0118 0" class="sn-ic-d"></path>
+          <path d="M12 13V9"></path>
+          <path d="M10 2h4"></path>
         </svg>
         <span>timer</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="trash-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10 11v6"></path>
-          <path d="M14 11v6"></path>
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-          <path d="M3 6h18"></path>
-          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <path d="M20.5 6h-17"></path>
+          <path d="m18.8 8.5-.4 6.9c-.2 2.7-.3 4-1.2 4.8s-2.2.8-4.8.8h-.8q-3.7.2-4.8-.8c-1-.8-1-2.1-1.2-4.8l-.4-6.9"></path>
+          <path d="m9.5 11 .5 5" class="sn-ic-d"></path>
+          <path d="m14.5 11-.5 5" class="sn-ic-d"></path>
+          <path d="M6.5 6a2 2 0 001.8-1.3v-.1l.2-.3q0-.4.2-.5.3-.6 1-.8h4.4q.7.1 1 .8l.2.5.1.3a2 2 0 002 1.4" class="sn-ic-d"></path>
         </svg>
         <span>trash-2</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="triangle-alert" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path>
-          <path d="M12 9v4"></path>
-          <path d="M12 17h.01"></path>
+          <path d="M11.6 21h.8c5.4 0 8.1 0 9.2-1.6 1-1.5-.1-3.7-2.5-8l-.4-.6C15.7 5.6 14.3 3 12 3s-3.8 2.6-6.7 7.8l-.4.6c-2.4 4.3-3.6 6.5-2.5 8C3.5 21 6.2 21 11.6 21" class="sn-ic-d"></path>
+          <path d="M12 8v5"></path>
+          <path d="M12 16h.01"></path>
         </svg>
         <span>triangle-alert</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="type" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 4v16"></path>
-          <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"></path>
-          <path d="M9 20h6"></path>
+          <path d="M20 8V7q.1-2.7-.6-3.4T16 3H8q-2.7-.1-3.4.6T4 7v1"></path>
+          <path d="M12 21V3" class="sn-ic-d"></path>
+          <path d="M7 21h10"></path>
         </svg>
         <span>type</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="undo-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M9 14 4 9l5-5"></path>
-          <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"></path>
+          <path d="M7 4 4 7l3 3"></path>
+          <path d="M4 7h11a5 5 0 010 10H8" class="sn-ic-d"></path>
         </svg>
         <span>undo-2</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="upload" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 3v12"></path>
-          <path d="m17 8-5-5-5 5"></path>
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <path d="M3 15c0 2.8 0 4.2.9 5.1s2.3.9 5.1.9h6c2.8 0 4.2 0 5.1-.9s.9-2.3.9-5.1" class="sn-ic-d"></path>
+          <path d="M12 16V3M8 7.4 12 3l4 4.4"></path>
         </svg>
         <span>upload</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="user" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
+          <circle cx="12" cy="6" r="4"></circle>
+          <ellipse cx="12" cy="17" class="sn-ic-d" rx="7" ry="4"></ellipse>
         </svg>
         <span>user</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="user-plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <line x1="19" x2="19" y1="8" y2="14"></line>
-          <line x1="22" x2="16" y1="11" y2="11"></line>
+          <path d="M16.7 14q-2-1-4.7-1c-3.9 0-7 1.8-7 4s3.1 4 7 4q1.2 0 2.2-.2" class="sn-ic-d"></path>
+          <path d="M21 18a4 4 0 11-8 0 4 4 0 018 0"></path>
+          <circle cx="12" cy="6" r="4"></circle>
+          <path d="M17 16.7v2.6"></path>
+          <path d="M15.7 18h2.6"></path>
         </svg>
         <span>user-plus</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="users" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-          <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-          <circle cx="9" cy="7" r="4"></circle>
+          <circle cx="9" cy="6" r="4"></circle>
+          <path d="M12.6 4.2a3 3 0 110 3.6" class="sn-ic-d"></path>
+          <ellipse cx="9" cy="17" rx="7" ry="4"></ellipse>
+          <path d="M18 14q2.9.7 3 2.5c0 1-1 2-2.5 2.4" class="sn-ic-d"></path>
         </svg>
         <span>users</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="volume-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"></path>
-          <path d="M16 9a5 5 0 0 1 0 6"></path>
-          <path d="M19.364 18.364a9 9 0 0 0 0-12.728"></path>
+          <path d="M1.5 12v1q0 1.7.5 2.4.4.9 1.3 1.3.7.4 2.7.3h1q.4 0 .7.3.4 0 .9.5l.2.1c2.6 1.7 3.8 2.5 4.9 2.2l.6-.3q1.2-.9 1.1-5.2V9.4q0-4.3-1.1-5.2l-.6-.3c-1-.3-2.3.5-4.9 2.2l-.2.1-.9.5L7 7H6c-1.4 0-2 0-2.7.3q-.8.3-1.3 1.3-.5.8-.5 2.4z"></path>
+          <path d="M20 6s1.5 1.8 1.5 6-1.5 6-1.5 6" class="sn-ic-d"></path>
+          <path d="M18 9s.5.9.5 3-.5 3-.5 3" class="sn-ic-d"></path>
         </svg>
         <span>volume-2</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="wand-sparkles" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"></path>
-          <path d="m14 7 3 3"></path>
-          <path d="M5 6v4"></path>
-          <path d="M19 14v4"></path>
-          <path d="M10 2v2"></path>
-          <path d="M7 8H3"></path>
-          <path d="M21 16h-4"></path>
-          <path d="M11 3H9"></path>
+          <path d="M20.2 20.2a3 3 0 01-4.1 0L3.8 7.9A2.9 2.9 0 118 4l12.2 12c1 1.1 1 3 0 4"></path>
+          <path d="m6 10 4-4" class="sn-ic-d"></path>
+          <path d="m15.4 3.7-1 .4q-.7.4 0 1l1 .3.3.3.4 1.1q.5.6.9 0l.4-1q0-.3.3-.4l1-.4q.8-.5 0-.9l-1-.4-.3-.3-.4-1a.5.5 0 00-.9 0l-.4 1z"></path>
+          <path d="m19.5 9.8-.4.2c-.4.1-.4.7 0 .9l.4.1q.3 0 .3.3l.2.4c.1.4.7.4.9 0l.1-.4.3-.3.4-.1c.4-.2.4-.8 0-1l-.4-.1-.3-.3-.1-.4a.5.5 0 00-1 0v.4q-.1.3-.4.3" class="sn-ic-d"></path>
+          <path d="m4.7 16-.4.1q-.6.5 0 1l.4.1.3.3.1.4c.2.4.8.4 1 0v-.4q.1-.3.4-.3l.4-.2c.4-.1.4-.7 0-.9l-.4-.1-.3-.3-.2-.4a.5.5 0 00-.9 0l-.1.4z" class="sn-ic-d"></path>
         </svg>
         <span>wand-sparkles</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="wifi-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 20h.01"></path>
-          <path d="M8.5 16.429a5 5 0 0 1 7 0"></path>
-          <path d="M5 12.859a10 10 0 0 1 5.17-2.69"></path>
-          <path d="M19 12.859a10 10 0 0 0-2.007-1.523"></path>
-          <path d="M2 8.82a15 15 0 0 1 4.177-2.643"></path>
-          <path d="M22 8.82a15 15 0 0 0-11.288-3.764"></path>
-          <path d="m2 2 20 20"></path>
+          <path d="M22 2 2 22"></path>
+          <path d="M13 14.5q1.3.3 2.3 1.4" class="sn-ic-d"></path>
+          <path d="M5.3 12.3a9 9 0 019-2.7" class="sn-ic-d"></path>
+          <path d="m16.8 10.7 1.9 1.6" class="sn-ic-d"></path>
+          <path d="M2 8.7C6.4 4 13 3 18.2 5.7" class="sn-ic-d"></path>
+          <path d="M20.3 7.1 22 8.7" class="sn-ic-d"></path>
+          <path d="M12 19.5h.01" class="sn-ic-d"></path>
         </svg>
         <span>wifi-off</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="workflow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect width="8" height="8" x="3" y="3" rx="2"></rect>
-          <path d="M7 11v4a2 2 0 0 0 2 2h4"></path>
-          <rect width="8" height="8" x="13" y="13" rx="2"></rect>
+          <path d="M6 10v4q-.2 2.7.6 3.4.7.8 3.4.6h4" class="sn-ic-d"></path>
+          <path d="M2 6V5q-.1-2 .4-2.6Q3 2 5 2h2q2-.1 2.6.4.5.6.4 2.6v2q.1 2-.4 2.6Q9 10 7 10H5q-2 .1-2.6-.4Q2 9 2 7z"></path>
+          <path d="M14 18v-1q-.1-2 .4-2.6.6-.5 2.6-.4h2q2-.1 2.6.4.5.6.4 2.6v2q.1 2-.4 2.6-.6.5-2.6.4h-2q-2 .1-2.6-.4Q14 21 14 19z"></path>
         </svg>
         <span>workflow</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="x" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M18 6 6 18"></path>
-          <path d="m6 6 12 12"></path>
+          <path d="M6 6l12 12"></path>
         </svg>
         <span>x</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="zap" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"></path>
+          <path d="M13.5 7.2c0-3.2 0-4.9-.9-5.2s-1.9 1-3.9 3.8l-3 4.1c-1.3 1.8-2 2.6-1.6 3.3q.5.9 3.7.7 1.8-.1 2.3.4.5.5.4 2.1v.4c0 3.2 0 4.9.8 5.2s2-1.1 4-3.8l3-4.1c1.3-1.8 2-2.6 1.6-3.3q-.5-.9-3.7-.7-1.8.1-2.2-.4-.6-.5-.5-2.1Z"></path>
         </svg>
         <span>zap</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="zoom-in" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
-          <line x1="11" x2="11" y1="8" y2="14"></line>
-          <line x1="8" x2="14" y1="11" y2="11"></line>
+          <circle cx="11.5" cy="11.5" r="9.5" class="sn-ic-d"></circle>
+          <path d="M18.5 18.5 22 22M9 11.5h2.5m0 0H14m-2.5 0V14m0-2.5V9"></path>
         </svg>
         <span>zoom-in</span>
       </div>
       <div class="icon-cell">
         <svg class="sn-ic" data-icon="zoom-out" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
-          <line x1="8" x2="14" y1="11" y2="11"></line>
+          <circle cx="11.5" cy="11.5" r="9.5" class="sn-ic-d"></circle>
+          <path d="M18.5 18.5 22 22M9 11.5h5"></path>
         </svg>
         <span>zoom-out</span>
       </div>

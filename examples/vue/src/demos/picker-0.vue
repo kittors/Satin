@@ -1,20 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { bindPickers } from "satin-ui/components";
 import "satin-ui/css/picker.css";
 import "./picker-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 写了 data-pk 的都接上：date（日期）| range（范围，两个月并排、快捷预设）| time（时、分两列）
     //                       | datetime（定时发布：日历 + 时间）| region（省 / 市 / 区，可跨级搜索）
     bindPickers(document);
 
-    document.addEventListener("pick", (e) => {
+    document.addEventListener("pick", (e?: any) => {
       console.log(e.target.dataset.pk, e.detail.text); // 比如 "date"、"11 月 21 日 星期六"
     });
   });

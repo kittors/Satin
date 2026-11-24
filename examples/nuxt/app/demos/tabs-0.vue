@@ -1,19 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createTabs, createPager, setStep } from "satin-ui/components";
 import "./tabs-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 标签页：下划线前缘先走、后缘跟上；新内容从所选标签那一侧滑进来；← → 切换
-    createTabs(root.querySelector(".sn-tabs"), { onChange: (i) => console.log("切到第", i + 1, "个标签") });
+    createTabs(root.querySelector(".sn-tabs"), { onChange: (i?: any) => console.log("切到第", i + 1, "个标签") });
 
     // 分页：当前页的底色滑到新页码；页码多时中间用省略（onChange 里换成你的取数）
-    createPager(root.querySelector(".sn-pager"), { total: 13, onChange: (p) => console.log("第", p, "页") });
+    createPager(root.querySelector(".sn-pager"), { total: 13, onChange: (p?: any) => console.log("第", p, "页") });
 
     // 步骤：第 i 步是当前，前面的都完成
     const steps = root.querySelector(".sn-steps"), max = steps.querySelectorAll(".sn-st").length - 1;

@@ -52,7 +52,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-sa-vp" style="max-height:160px">
   <p>第 1 场 · 车站外</p>
   <p>第 2 场 · 候车厅</p>
@@ -83,7 +83,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { ScrollArea } from "satin-ui/react";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];
@@ -101,7 +101,7 @@ export default function SceneList() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ScrollArea } from "satin-ui/vue";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];
@@ -117,12 +117,12 @@ const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回�
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createScrollArea } from "satin-ui";
 
   // 写法和 div 一样，限高写在 style 上；滚动条细、不滚 0.7 秒后淡出；上下还有内容时边缘渐隐；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createScrollArea(host, {});
     return () => it.destroy();
@@ -195,12 +195,12 @@ export class ScrollareaBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createScrollArea } from "satin-ui";
 
 export default function SceneList() {
-  let host;
+  let host!: HTMLDivElement;
   // 写法和 div 一样，限高写在 style 上；滚动条细、不滚 0.7 秒后淡出；上下还有内容时边缘渐隐；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createScrollArea(host, {});
@@ -233,7 +233,7 @@ export default function SceneList() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { ScrollArea } from "satin-ui/react";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];
@@ -258,7 +258,7 @@ bar="always" 让人一眼看出能滚；fade="both" 四边都渐隐。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-sa-vp" style="max-height:160px">
   <p>第 1 场 · 车站外</p>
   <p>第 2 场 · 候车厅</p>
@@ -289,7 +289,7 @@ bar="always" 让人一眼看出能滚；fade="both" 四边都渐隐。
 
 React 的写法：
 
-```jsx
+```tsx
 import { ScrollArea } from "satin-ui/react";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];
@@ -307,7 +307,7 @@ export default function SceneList() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ScrollArea } from "satin-ui/vue";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];
@@ -323,12 +323,12 @@ const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回�
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createScrollArea } from "satin-ui";
 
   // bar="always"：滚动条一直在；fade 四边都渐隐；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createScrollArea(host, { bar: "always", fade: "both" });
     return () => it.destroy();
@@ -401,12 +401,12 @@ export class ScrollareaBarComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createScrollArea } from "satin-ui";
 
 export default function SceneListBar() {
-  let host;
+  let host!: HTMLDivElement;
   // bar="always"：滚动条一直在；fade 四边都渐隐；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createScrollArea(host, { bar: "always", fade: "both" });
@@ -439,7 +439,7 @@ export default function SceneListBar() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { ScrollArea } from "satin-ui/react";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];
@@ -464,7 +464,7 @@ fade="none"；overscroll="contain" 滚到头不带着外面的页面一起滚。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-sa-vp" style="max-height:160px">
   <p>第 1 场 · 车站外</p>
   <p>第 2 场 · 候车厅</p>
@@ -495,7 +495,7 @@ fade="none"；overscroll="contain" 滚到头不带着外面的页面一起滚。
 
 React 的写法：
 
-```jsx
+```tsx
 import { ScrollArea } from "satin-ui/react";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];
@@ -513,7 +513,7 @@ export default function SceneList() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ScrollArea } from "satin-ui/vue";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];
@@ -529,12 +529,12 @@ const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回�
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createScrollArea } from "satin-ui";
 
   // fade="none" 不要渐隐；overscroll="contain" 滚到头不带着外面的页面一起滚；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createScrollArea(host, { fade: "none", overscroll: "contain" });
     return () => it.destroy();
@@ -607,12 +607,12 @@ export class ScrollareaNoneComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createScrollArea } from "satin-ui";
 
 export default function SceneListPlain() {
-  let host;
+  let host!: HTMLDivElement;
   // fade="none" 不要渐隐；overscroll="contain" 滚到头不带着外面的页面一起滚；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createScrollArea(host, { fade: "none", overscroll: "contain" });
@@ -645,7 +645,7 @@ export default function SceneListPlain() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { ScrollArea } from "satin-ui/react";
 
 const SCENES = ["车站外", "候车厅", "站台", "车厢里", "雨夜", "回忆", "告别", "清晨", "天台", "便利店", "隧道", "海边", "旧书店", "医院走廊", "末班地铁", "屋檐下", "桥上", "片尾"];

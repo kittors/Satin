@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-opt-row" id="optimistic-basic">
@@ -86,17 +86,17 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { optimistic } from "satin-ui";
 import { Icon } from "satin-ui/react";
 
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 
 export default function Favorite() {
-  const [star, setStar] = useState({ on: false, count: 24 }), row = useRef(null);
+  const [star, setStar] = useState({ on: false, count: 24 }), row = useRef<HTMLDivElement>(null);
   const toggle = () => {
     const next = !star.on, d = next ? 1 : -1;
     // 先显示结果再保存；保存失败：改回去、这一行抖两下、弹出带"重试"的提示
@@ -110,7 +110,7 @@ export default function Favorite() {
   return (
     <div className="sn-opt-row" ref={row}>
       <span className="sn-nm">雨夜车站</span>
-      <button type="button" className={star.on ? "sn-star sn-on" : "sn-star"} aria-pressed={String(star.on)} aria-label="收藏" onClick={toggle}>
+      <button type="button" className={star.on ? "sn-star sn-on" : "sn-star"} aria-pressed={star.on} aria-label="收藏" onClick={toggle}>
         <Icon name="star" />
         <span className="sn-n">{star.count}</span>
       </button>
@@ -122,15 +122,15 @@ export default function Favorite() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { reactive, ref } from "vue";
 import { optimistic } from "satin-ui";
 import { Icon } from "satin-ui/vue";
 
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
-const star = reactive({ on: false, count: 24 }), row = ref(null);
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const star = reactive({ on: false, count: 24 }), row = ref<HTMLDivElement | null>(null);
 const toggle = () => {
   const next = !star.on, d = next ? 1 : -1;
   // 先显示结果再保存；保存失败：改回去、这一行抖两下、弹出带"重试"的提示
@@ -156,17 +156,17 @@ const toggle = () => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { optimistic } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
   let n = 0;
-  const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+  const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
   let on = $state(false);
   let count = $state(24);
-  let row;
+  let row!: HTMLDivElement;
   const toggle = () => {
     const next = !on, d = next ? 1 : -1;
     // 先显示结果再保存；保存失败：改回去、这一行抖两下、弹出带"重试"的提示
@@ -229,17 +229,17 @@ export class OptimisticBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 import { optimistic } from "satin-ui";
 
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 
 export default function Favorite() {
   const [on, setOn] = createSignal(false), [count, setCount] = createSignal(24);
-  let row;
+  let row!: HTMLDivElement;
   const toggle = () => {
     const next = !on(), d = next ? 1 : -1;
     // 先显示结果再保存；保存失败：改回去、这一行抖两下、弹出带"重试"的提示
@@ -263,17 +263,17 @@ export default function Favorite() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { optimistic } from "satin-ui";
 import { Icon } from "satin-ui/react";
 
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 
 export default function Favorite() {
-  const [star, setStar] = useState({ on: false, count: 24 }), row = useRef(null);
+  const [star, setStar] = useState({ on: false, count: 24 }), row = useRef<HTMLDivElement>(null);
   const toggle = () => {
     const next = !star.on, d = next ? 1 : -1;
     // 先显示结果再保存；保存失败：改回去、这一行抖两下、弹出带"重试"的提示
@@ -306,7 +306,7 @@ export default function Favorite() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-opt-row" id="optimistic-switch">
   <label class="sn-switch"><input type="checkbox" role="switch"><span class="sn-track"><span class="sn-knob"></span></span>自动保存草稿</label>
 </div>
@@ -328,18 +328,18 @@ export default function Favorite() {
 
 React 的写法：
 
-```jsx
-import { useRef, useState } from "react";
+```tsx
+import { useRef, useState, type ChangeEvent } from "react";
 import { optimistic } from "satin-ui";
 import { Switch } from "satin-ui/react";
 
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 
 export default function AutosaveSetting() {
-  const [on, setOn] = useState(false), row = useRef(null);
-  const change = (e) => {
+  const [on, setOn] = useState(false), row = useRef<HTMLDivElement>(null);
+  const change = (e: ChangeEvent<HTMLInputElement>) => {
     const next = e.target.checked;
     // 开关已经拨过去了，apply 只是把数据对上；保存失败：拨回去、这一行抖两下、给"重试"
     optimistic({ shake: row.current, apply: () => setOn(next), revert: () => setOn(!next), save });
@@ -355,16 +355,16 @@ export default function AutosaveSetting() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { optimistic } from "satin-ui";
 import { Switch } from "satin-ui/vue";
 
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
-const on = ref(false), row = ref(null);
-const change = (next) => {
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const on = ref(false), row = ref<HTMLDivElement | null>(null);
+const change = (next: boolean) => {
   // 开关已经拨过去了，apply 只是把数据对上；保存失败：拨回去、这一行抖两下、给"重试"
   optimistic({ shake: row.value, apply: () => (on.value = next), revert: () => (on.value = !next), save });
 };
@@ -379,17 +379,17 @@ const change = (next) => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { optimistic } from "satin-ui";
 
   // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
   let n = 0;
-  const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+  const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
   let on = $state(false);
-  let row;
-  const change = (e) => {
-    const next = e.currentTarget.checked;
+  let row!: HTMLDivElement;
+  const change = (e: Event) => {
+    const next = (e.currentTarget as HTMLInputElement).checked;
     // 开关已经拨过去了，apply 只是把数据对上；保存失败：拨回去、这一行抖两下、给"重试"
     optimistic({ shake: row, apply: () => (on = next), revert: () => (on = !next), save });
   };
@@ -431,19 +431,19 @@ export class OptimisticSwitchComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 import { optimistic } from "satin-ui";
 
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 
 export default function AutosaveSetting() {
   const [on, setOn] = createSignal(false);
-  let row;
-  const change = (e) => {
-    const next = e.currentTarget.checked;
+  let row!: HTMLDivElement;
+  const change = (e: Event) => {
+    const next = (e.currentTarget as HTMLInputElement).checked;
     // 开关已经拨过去了，apply 只是把数据对上；保存失败：拨回去、这一行抖两下、给"重试"
     optimistic({ shake: row, apply: () => setOn(next), revert: () => setOn(!next), save });
   };
@@ -457,18 +457,18 @@ export default function AutosaveSetting() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useRef, useState } from "react";
 import { optimistic } from "satin-ui";
 import { Switch } from "satin-ui/react";
 
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 
 export default function AutosaveSetting() {
-  const [on, setOn] = useState(false), row = useRef(null);
-  const change = (e) => {
+  const [on, setOn] = useState(false), row = useRef<HTMLDivElement>(null);
+  const change = (e: Event & { target: HTMLInputElement }) => {
     const next = e.target.checked;
     // 开关已经拨过去了，apply 只是把数据对上；保存失败：拨回去、这一行抖两下、给"重试"
     optimistic({ shake: row.current, apply: () => setOn(next), revert: () => setOn(!next), save });
@@ -491,7 +491,7 @@ export default function AutosaveSetting() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-primary" id="optimistic-pending"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">支付 ¥68</span></span></button>
 
 <script type="module">
@@ -511,7 +511,7 @@ export default function AutosaveSetting() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { toast } from "satin-ui";
 import { Button } from "satin-ui/react";
@@ -541,7 +541,7 @@ export default function PayButton() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { toast } from "satin-ui";
 import { Button } from "satin-ui/vue";
@@ -571,13 +571,13 @@ async function onPay() {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { busy, succeed, toast } from "satin-ui";
 
   // 演示用的付款：1.2 秒后成功；换成真实的请求
   const pay = () => new Promise((done) => setTimeout(done, 1200));
-  let button;
+  let button!: HTMLButtonElement;
   async function onPay() {
     // 付款、永久删除、发给别人的操作不用乐观更新：等服务器确认，按钮转圈、不能连点
     await busy(button, pay()); // 300ms 内回来不转圈；转圈出现后至少留 500ms
@@ -620,14 +620,14 @@ export class OptimisticPendingComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { busy, succeed, toast } from "satin-ui";
 
 // 演示用的付款：1.2 秒后成功；换成真实的请求
 const pay = () => new Promise((done) => setTimeout(done, 1200));
 
 export default function PayButton() {
-  let button;
+  let button!: HTMLButtonElement;
   async function onPay() {
     // 付款、永久删除、发给别人的操作不用乐观更新：等服务器确认，按钮转圈、不能连点
     await busy(button, pay()); // 300ms 内回来不转圈；转圈出现后至少留 500ms
@@ -645,7 +645,7 @@ export default function PayButton() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { toast } from "satin-ui";
 import { Button } from "satin-ui/react";
@@ -679,7 +679,7 @@ export default function PayButton() {
 | `apply` | `() => void` | — | 是 | 马上把界面改成结果（保存之前）；点"重试"时会再调一次，写成幂等的。 | createXxx 选项：`apply` |
 | `revert` | `() => void` | — | 是 | 保存失败时改回去。 | createXxx 选项：`revert` |
 | `save` | `() => Promise<unknown> \| unknown` | — | 是 | 真正的保存：返回 Promise，reject 就算失败。 | createXxx 选项：`save` |
-| `shake` | `HTMLElement` | — | 否 | 失败时左右抖两下的元素（一般是这一行）。 | createXxx 选项：`shake` |
+| `shake` | `HTMLElement \| null` | — | 否 | 失败时左右抖两下的元素（一般是这一行）。 | createXxx 选项：`shake` |
 | `failText` | `string` | "没保存上，已恢复原样" | 否 | 失败提示的字（提示里自带"重试"）。 | createXxx 选项：`failText` |
 
 ## 函数

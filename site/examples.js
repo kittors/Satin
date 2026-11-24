@@ -24,7 +24,7 @@ const MD_SRC = `# 分镜生成说明
 - [x] 每个镜头都有景别和时长
 - [ ] 背景音乐的节拍对齐到镜头切换
 
-\`\`\`js
+\`\`\`ts
 const shots = await generateShots(list, { retry: 3 });
 console.log(timeline(shots, 24));
 \`\`\`
@@ -45,7 +45,7 @@ export const EXAMPLES = {
     0: {
       files: [
         { name: "Markdown", lang: "md", code: MD_SRC },
-        { name: "JS", lang: "js", code: `import { setup } from "satin-ui";
+        { name: "TS", lang: "ts", code: `import { setup } from "satin-ui";
 import { renderMarkdown } from "satin-ui/markdown";
 import "satin-ui/css/md.css";
 import "satin-ui/css/data.css";

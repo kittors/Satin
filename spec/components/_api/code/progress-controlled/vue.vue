@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onBeforeUnmount } from "vue";
 import { Button, Progress } from "satin-ui/vue";
 

@@ -1,15 +1,16 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { toast } from "satin-ui/components";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 写在标记上：[data-ctx="菜单 id"] 右键（或 Shift+F10、菜单键）在指针处弹，触屏长按 500ms 弹；[data-fmenu="菜单 id"] 贴着按钮弹——enhance() 已经接上
       // 选中：根菜单上冒泡 menuselect，detail 里有条目文字和子菜单路径
-      root.querySelector("#m-shot").addEventListener("menuselect", (e) => {
+      root.querySelector("#m-shot").addEventListener("menuselect", (e?: any) => {
         const { label, path } = e.detail; // 比如 "第二集"、["移动到"]
         toast({ text: [...path, label].join(" › ") });
       });

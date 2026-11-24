@@ -1,18 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createReorder, toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 按住 .sn-grip 拖（先动 4px 才算拿起）；其他行让位、落点画线；拿出列表 40px 外松手就取消；
     // 键盘：空格拿起、↑↓ 移动、空格放下、Esc 取消（读屏会播报位置）
     const list = root.querySelector(".sn-drag-list");
     createReorder(list, {
-      onReorder: ({ from, to }) => toast({ text: `已从第 ${from + 1} 位移到第 ${to + 1} 位` }), // 换成你的保存
+      onReorder: ({ from, to }: any) => toast({ text: `已从第 ${from + 1} 位移到第 ${to + 1} 位` }), // 换成你的保存
     });
   });
   off = () => { done(); unsetup(); };

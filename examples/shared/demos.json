@@ -108,6 +108,15 @@
   "css": true
  },
  {
+  "slug": "space-2",
+  "id": "space",
+  "n": 2,
+  "name": "圆角与线",
+  "group": "基础",
+  "cap": "统一线条、虚化与功能性渐变规范",
+  "css": true
+ },
+ {
   "slug": "elevation-0",
   "id": "elevation",
   "n": 0,
@@ -126,10 +135,37 @@
   "css": true
  },
  {
+  "slug": "loadingmotion-0",
+  "id": "loadingmotion",
+  "n": 0,
+  "name": "内容加载与过渡",
+  "group": "基础",
+  "cap": "",
+  "css": true
+ },
+ {
   "slug": "icons-0",
   "id": "icons",
   "n": 0,
   "name": "图标",
+  "group": "基础",
+  "cap": "",
+  "css": true
+ },
+ {
+  "slug": "icons-1",
+  "id": "icons",
+  "n": 1,
+  "name": "图标",
+  "group": "基础",
+  "cap": "3D 立体质感图标（移动鼠标体验陀螺仪倾角视差与动态镜面高光）",
+  "css": true
+ },
+ {
+  "slug": "feel-0",
+  "id": "feel",
+  "n": 0,
+  "name": "交互质感",
   "group": "基础",
   "cap": "",
   "css": true
@@ -446,7 +482,16 @@
   "n": 0,
   "name": "骨架与加载",
   "group": "反馈",
-  "cap": "",
+  "cap": "动感加载器画廊（实时可定制）",
+  "css": true
+ },
+ {
+  "slug": "loading-1",
+  "id": "loading",
+  "n": 1,
+  "name": "骨架与加载",
+  "group": "反馈",
+  "cap": "同构骨架与 300 / 500ms 防闪",
   "css": true
  },
  {
@@ -556,6 +601,42 @@
   "group": "数据展示",
   "cap": "",
   "css": false
+ },
+ {
+  "slug": "charts-0",
+  "id": "charts",
+  "n": 0,
+  "name": "数据图表与 3D",
+  "group": "数据展示",
+  "cap": "平滑趋势面积图（切换周期体验曲线 Morph 形变，悬停体验阻尼准星与多系列对比）",
+  "css": true
+ },
+ {
+  "slug": "charts-1",
+  "id": "charts",
+  "n": 1,
+  "name": "数据图表与 3D",
+  "group": "数据展示",
+  "cap": "分组对比柱状图 & 环形占比图（悬停压暗非焦点、点击柱组或环段可联动筛选）",
+  "css": true
+ },
+ {
+  "slug": "charts-2",
+  "id": "charts",
+  "n": 2,
+  "name": "数据图表与 3D",
+  "group": "数据展示",
+  "cap": "3D 立体柱阵图表（拖拽 360° 自由旋转、切预设视角飞行、悬停单柱立体抬升）",
+  "css": true
+ },
+ {
+  "slug": "charts-3",
+  "id": "charts",
+  "n": 3,
+  "name": "数据图表与 3D",
+  "group": "数据展示",
+  "cap": "3D 立体质感图标 & KPI 迷你趋势火花线",
+  "css": true
  },
  {
   "slug": "list-0",
@@ -715,6 +796,15 @@
   "id": "md",
   "n": 0,
   "name": "Markdown 文档",
+  "group": "数据展示",
+  "cap": "",
+  "css": false
+ },
+ {
+  "slug": "editorial-0",
+  "id": "editorial",
+  "n": 0,
+  "name": "图文编排与内容张力",
   "group": "数据展示",
   "cap": "",
   "css": false
@@ -977,6 +1067,36 @@
   "name": "卡片",
   "group": "数据展示",
   "cap": "卡片网格",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "card-variants",
+  "id": "card",
+  "n": -1,
+  "name": "卡片",
+  "group": "数据展示",
+  "cap": "5 种表面与边框变体",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "card-layouts",
+  "id": "card",
+  "n": -1,
+  "name": "卡片",
+  "group": "数据展示",
+  "cap": "全出血封面与横向布局",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "card-content",
+  "id": "card",
+  "n": -1,
+  "name": "卡片",
+  "group": "数据展示",
+  "cap": "通用内容卡片（头 / 体 / 底）",
   "css": false,
   "contract": true
  },
@@ -1391,6 +1511,16 @@
   "contract": true
  },
  {
+  "slug": "empty-presets",
+  "id": "empty",
+  "n": -1,
+  "name": "空状态",
+  "group": "反馈",
+  "cap": "6 款内置场景插画",
+  "css": false,
+  "contract": true
+ },
+ {
   "slug": "field-basic",
   "id": "field",
   "n": -1,
@@ -1456,7 +1586,7 @@
   "n": -1,
   "name": "万级节点压测",
   "group": "数据展示",
-  "cap": "几百个节点：用流程图组件",
+  "cap": "ComfyUI 影视生图生视频工作流（6 群组 · 24 异构节点 · 60fps）",
   "css": false,
   "contract": true
  },
@@ -2649,41 +2779,5 @@
   "cap": "加载失败和重试",
   "css": false,
   "contract": true
- },
- {
-  "slug": "charts-0",
-  "id": "charts",
-  "n": 0,
-  "name": "数据图表与 3D",
-  "group": "数据展示",
-  "cap": "平滑趋势面积图",
-  "css": true
- },
- {
-  "slug": "charts-1",
-  "id": "charts",
-  "n": 1,
-  "name": "数据图表与 3D",
-  "group": "数据展示",
-  "cap": "分组对比柱状图 & 环形占比图",
-  "css": true
- },
- {
-  "slug": "charts-2",
-  "id": "charts",
-  "n": 2,
-  "name": "数据图表与 3D",
-  "group": "数据展示",
-  "cap": "3D 立体柱阵图表",
-  "css": true
- },
- {
-  "slug": "charts-3",
-  "id": "charts",
-  "n": 3,
-  "name": "数据图表与 3D",
-  "group": "数据展示",
-  "cap": "3D 立体质感图标 & KPI 迷你趋势火花线",
-  "css": true
  }
 ]

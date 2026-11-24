@@ -56,7 +56,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <label class="sn-check"><input type="checkbox" checked><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>自动保存草稿</label>
   <label class="sn-switch"><input type="checkbox" role="switch"><span class="sn-track"><span class="sn-knob"></span></span>生成完成后提醒我</label>
@@ -65,7 +65,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Checkbox, Switch } from "satin-ui/react";
 
 export default function SaveOptions() {
@@ -81,7 +81,7 @@ export default function SaveOptions() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Checkbox, Switch } from "satin-ui/vue";
 
@@ -99,8 +99,8 @@ const remind = ref(false);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   let autosave = $state(true);
   let remind = $state(false);
 </script>
@@ -133,7 +133,7 @@ export class ChoiceBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 复选框的方框：对勾和半选的横线
 const Box = () => (
   <span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5" /></svg><span class="sn-bar"></span></span>
@@ -151,7 +151,7 @@ export default function SaveOptions() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Checkbox, Switch } from "satin-ui/react";
 
 export default function SaveOptions() {
@@ -174,7 +174,7 @@ export default function SaveOptions() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" role="radiogroup" aria-label="画质">
   <label class="sn-radio"><input type="radio" name="quality" value="standard" checked><span class="sn-box"></span>标准画质</label>
   <label class="sn-radio"><input type="radio" name="quality" value="high"><span class="sn-box"></span>高画质</label>
@@ -184,7 +184,7 @@ export default function SaveOptions() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Radio } from "satin-ui/react";
 
 export default function QualityPicker() {
@@ -201,7 +201,7 @@ export default function QualityPicker() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Radio } from "satin-ui/vue";
 
@@ -219,8 +219,8 @@ const quality = ref("standard");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   let quality = $state("standard");
 </script>
 
@@ -251,7 +251,7 @@ export class ChoiceRadioComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function QualityPicker() {
   return (
     <div class="sn-stack sn-gap-8" role="radiogroup" aria-label="画质">
@@ -265,7 +265,7 @@ export default function QualityPicker() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Radio } from "satin-ui/react";
 
 export default function QualityPicker() {
@@ -289,7 +289,7 @@ export default function QualityPicker() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="shot-picks">
   <label class="sn-check"><input type="checkbox" data-all><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>全选</label>
   <label class="sn-check"><input type="checkbox" checked><span class="sn-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.4 4.6-5"/></svg><span class="sn-bar"></span></span>开场</label>
@@ -314,7 +314,7 @@ export default function QualityPicker() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Checkbox } from "satin-ui/react";
 
@@ -323,7 +323,7 @@ const SHOTS = ["开场", "车站", "雨夜"];
 export default function PickShots() {
   const [picked, setPicked] = useState(["开场"]);
   const all = picked.length === SHOTS.length;
-  const toggle = (s, on) => setPicked(on ? [...picked, s] : picked.filter((x) => x !== s));
+  const toggle = (s: string, on: boolean) => setPicked(on ? [...picked, s] : picked.filter((x) => x !== s));
   return (
     <div className="sn-stack sn-gap-8">
       <Checkbox label="全选" checked={all} indeterminate={picked.length > 0 && !all} onChange={(e) => setPicked(e.target.checked ? SHOTS : [])} />
@@ -338,14 +338,14 @@ export default function PickShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import { Checkbox } from "satin-ui/vue";
 
 const SHOTS = ["开场", "车站", "雨夜"];
 const picked = ref(["开场"]);
 const all = computed(() => picked.value.length === SHOTS.length);
-const toggle = (s, on) => { picked.value = on ? [...picked.value, s] : picked.value.filter((x) => x !== s); };
+const toggle = (s: string, on: boolean) => { picked.value = on ? [...picked.value, s] : picked.value.filter((x) => x !== s); };
 </script>
 
 <template>
@@ -358,11 +358,11 @@ const toggle = (s, on) => { picked.value = on ? [...picked.value, s] : picked.va
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   const SHOTS = ["开场", "车站", "雨夜"];
   let picked = $state(["开场"]);
-  let allBox;
+  let allBox!: HTMLInputElement;
   const all = $derived(picked.length === SHOTS.length);
   // 半选只能用属性设（没有对应的 HTML 属性）
   $effect(() => { allBox.indeterminate = picked.length > 0 && !all; });
@@ -405,7 +405,7 @@ export class ChoiceControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, For } from "solid-js";
 
 const SHOTS = ["开场", "车站", "雨夜"];
@@ -417,7 +417,7 @@ const Box = () => (
 export default function PickShots() {
   const [picked, setPicked] = createSignal(["开场"]);
   const all = () => picked().length === SHOTS.length;
-  const toggle = (s, on) => setPicked(on ? [...picked(), s] : picked().filter((x) => x !== s));
+  const toggle = (s: string, on: boolean) => setPicked(on ? [...picked(), s] : picked().filter((x) => x !== s));
   return (
     <div class="sn-stack sn-gap-8">
       <label class="sn-check"><input type="checkbox" checked={all()} prop:indeterminate={picked().length > 0 && !all()} onChange={(e) => setPicked(e.currentTarget.checked ? [...SHOTS] : [])} /><Box />全选</label>
@@ -429,7 +429,7 @@ export default function PickShots() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Checkbox } from "satin-ui/react";
 
@@ -438,7 +438,7 @@ const SHOTS = ["开场", "车站", "雨夜"];
 export default function PickShots() {
   const [picked, setPicked] = useState(["开场"]);
   const all = picked.length === SHOTS.length;
-  const toggle = (s, on) => setPicked(on ? [...picked, s] : picked.filter((x) => x !== s));
+  const toggle = (s: string, on: boolean) => setPicked(on ? [...picked, s] : picked.filter((x) => x !== s));
   return (
     <div class="sn-stack sn-gap-8">
       <Checkbox label="全选" checked={all} indeterminate={picked.length > 0 && !all} onChange={(e) => setPicked(e.target.checked ? SHOTS : [])} />

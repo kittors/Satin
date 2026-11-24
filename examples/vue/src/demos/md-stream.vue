@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { Markdown } from "satin-ui/vue/markdown";
 
@@ -12,9 +12,9 @@ const REPLY = [
   "三段加起来约 2 分 40 秒，站台那段最长。",
 ].join("\n");
 // 演示用：每 40ms 多给 3 个字（换成模型的流式输出）
-const stream = (onText) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
+const stream = (onText: (text: string) => void) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
 const text = ref("");
-let stop;
+let stop: (() => void) | undefined;
 onMounted(() => (stop = stream((t) => (text.value = t))));
 onBeforeUnmount(() => stop?.());
 </script>

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Button, Icon, vEnhance } from "satin-ui/vue";
 
 const sorts = ["最近更新", "名称", "创建时间"];

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Slider from "satin-ui/svelte/Slider.svelte";
 </script>
 

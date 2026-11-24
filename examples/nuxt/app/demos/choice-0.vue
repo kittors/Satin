@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import "./choice-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 复选、单选、开关都是纯标记：勾上时方框轻轻弹一下是 setup() 装好的页面级行为，不用另外接
     // 标记可以照着手写，也可以用标记函数生成，两种一模一样：
     //   import { checkHTML, switchHTML } from "satin-ui/components";

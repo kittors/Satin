@@ -1,11 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { nextTick, ref } from "vue";
 import { flipSnapshot } from "satin-ui";
 import { Button, Chip, Input } from "satin-ui/vue";
 
-const tags = ref(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]), text = ref(""), box = ref(null), els = new Map();
+const tags = ref<string[]>(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]), text = ref(""), box = ref<HTMLDivElement | null>(null), els = new Map<string, HTMLElement>();
 // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播
-const add = async (t, at = tags.value.length) => {
+const add = async (t: string, at = tags.value.length) => {
   if (!t || tags.value.includes(t)) return;
   const play = flipSnapshot(box.value);
   tags.value.splice(at, 0, t);
@@ -13,7 +13,7 @@ const add = async (t, at = tags.value.length) => {
   play(els.get(t));
 };
 const submit = () => { add(text.value.trim()); text.value = ""; };
-const remove = (t) => (tags.value = tags.value.filter((x) => x !== t));
+const remove = (t: string) => (tags.value = tags.value.filter((x) => x !== t));
 </script>
 
 <template>

@@ -28,29 +28,29 @@ Satin 是一套带规范的 UI 库：令牌（颜色、间距、圆角、字号�
 npm i satin-ui
 ```
 
-### React（Vite）
-```js
-// vite.config.js —— satin() 把 theme-boot 内联进 <head>：第一帧之前写好深浅主题，刷新不闪
+### React（Vite + TypeScript）
+```ts
+// vite.config.ts —— satin() 把 theme-boot 内联进 <head>：第一帧之前写好深浅主题，刷新不闪
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import satin from "satin-ui/vite";
 export default defineConfig({ plugins: [react(), satin()] });
 ```
-```jsx
-// main.jsx
+```tsx
+// main.tsx
 import "satin-ui/css/page.css";            // 整页用：令牌 + 页面级重置 + 全部组件样式（一行）
 import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
-createRoot(document.getElementById("root")).render(<App />);
+import App from "./App";
+createRoot(document.getElementById("root")!).render(<App />);
 
 // 组件：import { Button, Field, Input, Select, Segmented, Tabs, Pager, Dialog, toast } from "satin-ui/react";
 // 页面级行为（Tooltip、浮层栈、Esc 关闭）在第一个组件挂载时自动装好，不用手动 setup()
 ```
 
-### Vue 3（Vite）
-```js
-// vite.config.js：plugins: [vue(), satin()]（同上，import satin from "satin-ui/vite"）
-// main.js
+### Vue 3（Vite + TypeScript）
+```ts
+// vite.config.ts：plugins: [vue(), satin()]（同上，import satin from "satin-ui/vite"）
+// main.ts
 import { createApp } from "vue";
 import Satin from "satin-ui/vue";
 import "satin-ui/css/page.css";
@@ -58,12 +58,13 @@ import App from "./App.vue";
 createApp(App).use(Satin).mount("#app");   // 模板里直接写 <SnButton>、<SnSelect v-model="x" :items="...">
 ```
 
-### Next.js（App Router）
-```jsx
-// app/layout.jsx
+### Next.js（App Router + TypeScript）
+```tsx
+// app/layout.tsx
+import type { ReactNode } from "react";
 import themeBoot from "satin-ui/theme-boot-script";
 import "satin-ui/css/page.css";
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeBoot }} /></head>
@@ -193,16 +194,16 @@ React 写 `<Xxx>`（`satin-ui/react`），Vue 写 `<SnXxx>`（`app.use(Satin)` �
 | 文字层级 | `<Text level="title2" tone="secondary">` | `class="sn-t-title2 sn-c-secondary"` | 层级：display、title1～3、body、body-strong、callout、caption、micro、code |
 
 ### 表格（最常用）
-```js
+```ts
 // 有交互（排序、勾选）：createTable / React <Table> / Vue <SnTable>
-createTable(document.getElementById("projects"), {
+createTable(document.getElementById("projects")!, {
   columns: [
     { key: "name", title: "项目", sortable: true },
     { key: "owner", title: "负责人" },
-    { key: "status", title: "状态", html: (v) => `<span class="sn-tag ${v.tone}"><i></i>${v.text}</span>` },
+    { key: "status", title: "状态", html: (v: { tone: string; text: string }) => `<span class="sn-tag ${v.tone}"><i></i>${v.text}</span>` },
     { key: "shots", title: "镜头", align: "right", sortable: true },
   ],
-  rows, rowKey: "id", selectable: true, onSelect: (keys) => {}, empty: "还没有项目",
+  rows, rowKey: "id", selectable: true, onSelect: (keys: string[]) => {}, empty: "还没有项目",
 });
 ```
 只展示、不排序时直接写标记：
@@ -323,7 +324,7 @@ createTable(document.getElementById("projects"), {
 - 标题上面放英文全大写小字（PROJECTS · 2026、CHECKOUT · 01、YOUR WORKSPACE）：删掉，补充信息写进标题下面那句说明。
 - 标题、数字加粗写 `font-weight: 700` / `bold`：Satin 只有 400 / 500 / 600 三档，加粗用 600（或排版类 `sn-t-title2`、`sn-t-body-strong`）。
 - 忘了引样式（`satin-ui/css/page.css`）→ 页面没样式。
-- Vite 项目忘了加 `satin()` 插件（`vite.config.js` 里 `plugins: [react(), satin()]`）→ 深色模式下每次刷新先闪一下浅色。这一步和引样式一样是必做的。
+- Vite 项目忘了加 `satin()` 插件（`vite.config.ts` 里 `plugins: [react(), satin()]`）→ 深色模式下每次刷新先闪一下浅色。这一步和引样式一样是必做的。
 - 在 Next.js / Nuxt 的服务端代码里 `import "satin-ui/theme-boot"`：那是浏览器里 `<script src>` 用的首帧脚本，服务端什么都不做。服务端渲染内联首帧脚本用 `satin-ui/theme-boot-script`（上面第 1 节的写法），Vite 项目用 `satin()` 插件。
 - 只写了 `class="btn primary"` → Satin 的类名都带 `sn-` 前缀：`sn-btn sn-primary`。
 - 纯 HTML 页面没调 `setup()` / `defineElements()` / `injectIcons()` → Tooltip 不出、`<sn-select>` 不渲染、`data-i` 不显示图标。

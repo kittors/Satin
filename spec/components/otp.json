@@ -258,8 +258,8 @@
       "code": {
         "html": "<sn-otp length=\"6\"></sn-otp>\n",
         "react": "import { Otp } from \"satin-ui/react\";\n\nexport default function VerifyCode() {\n  return <Otp length={6} />;\n}\n",
-        "vue": "<script setup>\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length=\"6\" />\n</template>\n",
-        "svelte": "<script>\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n</script>\n\n<Otp length={6} />\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length=\"6\" />\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n</script>\n\n<Otp length={6} />\n",
         "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-basic\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `<sn-otp length=\"6\"></sn-otp>`,\n})\nexport class OtpBasicComponent {}\n",
         "solid": "export default function VerifyCode() {\n  return <sn-otp length=\"6\"></sn-otp>;\n}\n",
         "preact": "import { Otp } from \"satin-ui/react\";\n\nexport default function VerifyCode() {\n  return <Otp length={6} />;\n}\n"
@@ -273,10 +273,10 @@
       "code": {
         "html": "<div class=\"sn-stack sn-gap-8\" id=\"otp-box\">\n  <sn-otp length=\"6\"></sn-otp>\n  <span class=\"sn-help\">输入 6 位验证码</span>\n</div>\n\n<script type=\"module\">\n  const box = document.getElementById(\"otp-box\");\n  box.addEventListener(\"sn-complete\", (e) => {\n    box.querySelector(\".sn-help\").textContent = `正在校验 ${e.detail}…`; // 换成真实的校验请求\n  });\n</script>\n",
         "react": "import { useState } from \"react\";\nimport { Otp } from \"satin-ui/react\";\n\nexport default function VerifyOnComplete() {\n  const [note, setNote] = useState(\"输入 6 位验证码\");\n  return (\n    <div className=\"sn-stack sn-gap-8\">\n      {/* 填满就拿整串数字去校验（换成真实的请求） */}\n      <Otp length={6} onComplete={(code) => setNote(`正在校验 ${code}…`)} />\n      <span className=\"sn-help\">{note}</span>\n    </div>\n  );\n}\n",
-        "vue": "<script setup>\nimport { ref } from \"vue\";\nimport { Otp } from \"satin-ui/vue\";\n\nconst note = ref(\"输入 6 位验证码\");\n</script>\n\n<template>\n  <div class=\"sn-stack sn-gap-8\">\n    <!-- 填满就拿整串数字去校验（换成真实的请求） -->\n    <Otp :length=\"6\" @complete=\"(code) => (note = `正在校验 ${code}…`)\" />\n    <span class=\"sn-help\">{{ note }}</span>\n  </div>\n</template>\n",
-        "svelte": "<script>\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n\n  let note = $state(\"输入 6 位验证码\");\n</script>\n\n<div class=\"sn-stack sn-gap-8\">\n  <!-- 填满就拿整串数字去校验（换成真实的请求） -->\n  <Otp length={6} oncomplete={(code) => (note = `正在校验 ${code}…`)} />\n  <span class=\"sn-help\">{note}</span>\n</div>\n",
+        "vue": "<script setup lang=\"ts\">\nimport { ref } from \"vue\";\nimport { Otp } from \"satin-ui/vue\";\n\nconst note = ref(\"输入 6 位验证码\");\n</script>\n\n<template>\n  <div class=\"sn-stack sn-gap-8\">\n    <!-- 填满就拿整串数字去校验（换成真实的请求） -->\n    <Otp :length=\"6\" @complete=\"(code) => (note = `正在校验 ${code}…`)\" />\n    <span class=\"sn-help\">{{ note }}</span>\n  </div>\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n\n  let note = $state(\"输入 6 位验证码\");\n</script>\n\n<div class=\"sn-stack sn-gap-8\">\n  <!-- 填满就拿整串数字去校验（换成真实的请求） -->\n  <Otp length={6} oncomplete={(code) => (note = `正在校验 ${code}…`)} />\n  <span class=\"sn-help\">{note}</span>\n</div>\n",
         "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-complete\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `\n    <div class=\"sn-stack sn-gap-8\">\n      <!-- 填满就拿整串数字去校验（换成真实的请求） -->\n      <sn-otp length=\"6\" (sn-complete)=\"note.set('正在校验 ' + $any($event).detail + '…')\"></sn-otp>\n      <span class=\"sn-help\">{{ note() }}</span>\n    </div>\n  `,\n})\nexport class OtpCompleteComponent {\n  protected note = signal(\"输入 6 位验证码\");\n}\n",
-        "solid": "import { createSignal } from \"solid-js\";\n\n// 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）\nconst on = (type, fn) => (el) => el.addEventListener(type, fn);\n\nexport default function VerifyOnComplete() {\n  const [note, setNote] = createSignal(\"输入 6 位验证码\");\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      {/* 填满就拿整串数字去校验（换成真实的请求） */}\n      <sn-otp length=\"6\" ref={on(\"sn-complete\", (e) => setNote(`正在校验 ${e.detail}…`))}></sn-otp>\n      <span class=\"sn-help\">{note()}</span>\n    </div>\n  );\n}\n",
+        "solid": "import { createSignal } from \"solid-js\";\n\n// 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）\nconst on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);\n\nexport default function VerifyOnComplete() {\n  const [note, setNote] = createSignal(\"输入 6 位验证码\");\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      {/* 填满就拿整串数字去校验（换成真实的请求） */}\n      <sn-otp length=\"6\" ref={on(\"sn-complete\", (e) => setNote(`正在校验 ${e.detail}…`))}></sn-otp>\n      <span class=\"sn-help\">{note()}</span>\n    </div>\n  );\n}\n",
         "preact": "import { useState } from \"react\";\nimport { Otp } from \"satin-ui/react\";\n\nexport default function VerifyOnComplete() {\n  const [note, setNote] = useState(\"输入 6 位验证码\");\n  return (\n    <div class=\"sn-stack sn-gap-8\">\n      {/* 填满就拿整串数字去校验（换成真实的请求） */}\n      <Otp length={6} onComplete={(code) => setNote(`正在校验 ${code}…`)} />\n      <span class=\"sn-help\">{note}</span>\n    </div>\n  );\n}\n"
       }
     },
@@ -288,8 +288,8 @@
       "code": {
         "html": "<sn-otp length=\"4\"></sn-otp>\n",
         "react": "import { Otp } from \"satin-ui/react\";\n\nexport default function ShortCode() {\n  return <Otp length={4} />;\n}\n",
-        "vue": "<script setup>\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length=\"4\" />\n</template>\n",
-        "svelte": "<script>\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n</script>\n\n<Otp length={4} />\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Otp } from \"satin-ui/vue\";\n</script>\n\n<template>\n  <Otp :length=\"4\" />\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import Otp from \"satin-ui/svelte/Otp.svelte\";\n</script>\n\n<Otp length={4} />\n",
         "angular": "import { Component, CUSTOM_ELEMENTS_SCHEMA } from \"@angular/core\";\n\n@Component({\n  selector: \"demo-otp-length\",\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-otp>\n  template: `<sn-otp length=\"4\"></sn-otp>`,\n})\nexport class OtpLengthComponent {}\n",
         "solid": "export default function ShortCode() {\n  return <sn-otp length=\"4\"></sn-otp>;\n}\n",
         "preact": "import { Otp } from \"satin-ui/react\";\n\nexport default function ShortCode() {\n  return <Otp length={4} />;\n}\n"

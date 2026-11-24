@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Drawer, Field, Input } from "satin-ui/vue";
 

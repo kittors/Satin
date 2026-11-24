@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance, createBrowserTabs, createTable, avatarHTML } from "satin-ui";
   import { defineElements } from "satin-ui/elements";
   defineElements();
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       createBrowserTabs(root.querySelector("#work-tabs"), {
         tabs: [
           { id: "projects", title: "全部项目", icon: "layout-grid", pinned: true },
@@ -18,9 +19,9 @@
       });
       createTable(root.querySelector("#projects-table"), {
         columns: [
-          { key: "name", title: "项目", fixed: "left", width: 220, sortable: true, html: (v) => `<b>${v}</b>` },
-          { key: "owner", title: "负责人", width: 132, html: (v, r) => `<span class="sn-name">${avatarHTML({ seed: r.uid, name: v, size: 20, decorative: true })}${v}</span>` },
-          { key: "status", title: "状态", width: 112, html: (v) => `<span class="sn-tag ${v.tone}"><i></i>${v.text}</span>` },
+          { key: "name", title: "项目", fixed: "left", width: 220, sortable: true, html: (v?: any) => `<b>${v}</b>` },
+          { key: "owner", title: "负责人", width: 132, html: (v?: any, r?: any) => `<span class="sn-name">${avatarHTML({ seed: r.uid, name: v, size: 20, decorative: true })}${v}</span>` },
+          { key: "status", title: "状态", width: 112, html: (v?: any) => `<span class="sn-tag ${v.tone}"><i></i>${v.text}</span>` },
           { key: "shots", title: "镜头", width: 96, align: "right", sortable: true },
           { key: "res", title: "分辨率", width: 120, className: "sn-num sn-c-secondary" },
           { key: "updated", title: "更新时间", width: 120, align: "right", className: "sn-num sn-c-tertiary" },

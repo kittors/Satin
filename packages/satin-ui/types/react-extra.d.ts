@@ -38,5 +38,6 @@ export const InfiniteList: React.ForwardRefExoticComponent<InfiniteListProps & R
 /** 滚动区域：写法和 div 一样（限高写在 style 上），as 换标签 */
 export type ScrollAreaProps = React.HTMLAttributes<HTMLElement> & Omit<ScrollAreaOptions, "inner"> & { as?: keyof React.JSX.IntrinsicElements };
 export const ScrollArea: React.ForwardRefExoticComponent<ScrollAreaProps & React.RefAttributes<SatinInstance & { refresh(): void; set(o: Partial<ScrollAreaOptions>): void }>>;
-export const Player: React.ForwardRefExoticComponent<Base & PlayerOptions & React.RefAttributes<SatinInstance & { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; readonly video: HTMLVideoElement }>>;
+export type PlayerHandle = SatinInstance & { play(): Promise<void>; pause(): void; toggle(): Promise<void> | void; readonly video: HTMLVideoElement };
+export const Player: React.ForwardRefExoticComponent<Base & PlayerOptions & React.RefAttributes<PlayerHandle>>;
 export const AudioPlayer: React.ForwardRefExoticComponent<Base & AudioOptions & React.RefAttributes<SatinInstance & { toggle(): void; readonly audio: HTMLAudioElement }>>;

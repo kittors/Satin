@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Avatar from "satin-ui/svelte/Avatar.svelte";
 </script>
 

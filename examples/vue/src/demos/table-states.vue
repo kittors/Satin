@@ -1,15 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { Table } from "satin-ui/vue";
+import { Table, type TableColumn } from "satin-ui/vue";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
   { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 // 加载中给 loading（骨架行，300ms 内回来不出）；加载完是空数组就显示 empty
-const rows = ref(null);
+const rows = ref<typeof DATA | null>(null);
 onMounted(() => setTimeout(() => (rows.value = []), 1200));
 </script>
 

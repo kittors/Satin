@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import TagInput from "satin-ui/svelte/TagInput.svelte";
 
   let tags = $state(["悬疑", "长镜头"]);

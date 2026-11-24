@@ -1,5 +1,5 @@
-// 纯样式组件的契约示例（只有标记、没有脚本：卡片、空状态、标签、芯片……）：从一份框架无关的标记写出 7 种写法的代码文件，
-// 写进 spec/components/_api/code/<slug>/（html.html、react.jsx、vue.vue、svelte.svelte、angular.ts、solid.jsx、preact.jsx），写完可以再手改。
+// 纯样式组件的契约示例（只有标记、没有脚本：卡片、空状态、标签、芯片……）：从一份框架无关的标记写出 7 种写法的 TypeScript 代码文件，
+// 写进 spec/components/_api/code/<slug>/（html.html、react.tsx、vue.vue、svelte.svelte、angular.ts、solid.tsx、preact.tsx），写完可以再手改。
 // 规则（照各框架的惯用法，不加 setup / enhance 样板，也不加初始化注释）：
 //   · 图标 data-i="名字[:before|:after|:caret|:chk]"：React、Preact、Vue、Svelte 换成 <Icon name>（Satin 的图标组件）；Angular、Solid、纯 HTML 保留 data-i，外面包一层 <sn-enhance>
 //   · React：class → className、for → htmlFor、tabindex → tabIndex 等，style 写成对象，空元素自闭合；Preact、Solid 用 class，style 写字符串
@@ -87,8 +87,8 @@ export function staticVariants(src, slug) {
     react: `${hasIcon ? 'import { Icon } from "satin-ui/react";\n\n' : ""}export default function ${comp}() {\n  return ${ret(multi(react))};\n}\n`,
     preact: `${hasIcon ? 'import { Icon } from "satin-ui/react";\n\n' : ""}export default function ${comp}() {\n  return ${ret(multi(preact))};\n}\n`,
     solid: `export default function ${comp}() {\n  return ${ret(multi(solid))};\n}\n`,
-    vue: `${hasIcon ? '<script setup>\nimport { Icon } from "satin-ui/vue";\n</script>\n\n' : ""}<template>\n${indent(vue, "  ")}\n</template>\n`,
-    svelte: `${hasIcon ? '<script>\n  import Icon from "satin-ui/svelte/Icon.svelte";\n</script>\n\n' : ""}${svelte}\n`,
+    vue: `${hasIcon ? '<script setup lang="ts">\nimport { Icon } from "satin-ui/vue";\n</script>\n\n' : ""}<template>\n${indent(vue, "  ")}\n</template>\n`,
+    svelte: `${hasIcon ? '<script lang="ts">\n  import Icon from "satin-ui/svelte/Icon.svelte";\n</script>\n\n' : ""}${svelte}\n`,
     angular: `import { Component${hasIcon ? ", CUSTOM_ELEMENTS_SCHEMA" : ""} } from "@angular/core";\n\n@Component({\n  selector: "demo-${slug}",${hasIcon ? "\n  schemas: [CUSTOM_ELEMENTS_SCHEMA], // 模板里有 <sn-enhance>" : ""}\n  template: \`\n${indent(wrapEnh(serialize(host, "angular", "attr")), "    ").replace(/`/g, "\\`").replace(/\$\{/g, "\\${")}\n  \`,\n})\nexport class ${comp}Component {}\n`,
   };
 }
@@ -99,7 +99,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const src = fs.readFileSync(file === "-" ? 0 : file, "utf8");
   const files = staticVariants(src, slug), dir = path.join(ROOT, "spec/components/_api/code", slug);
   fs.mkdirSync(dir, { recursive: true });
-  const EXT = { html: "html", react: "jsx", vue: "vue", svelte: "svelte", angular: "ts", solid: "jsx", preact: "jsx" };
+  const EXT = { html: "html", react: "tsx", vue: "vue", svelte: "svelte", angular: "ts", solid: "tsx", preact: "tsx" };
   for (const [fw, code] of Object.entries(files)) fs.writeFileSync(path.join(dir, `${fw}.${EXT[fw]}`), code);
   console.log(`写了 ${path.relative(ROOT, dir)}/ 下 7 个文件`);
 }

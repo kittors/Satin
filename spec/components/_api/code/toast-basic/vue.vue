@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Button, toast } from "satin-ui/vue";
 
 // 状态提示：底部中间出现，3 秒后自己消失

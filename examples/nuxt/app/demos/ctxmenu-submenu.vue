@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Button, Menu, toast } from "satin-ui/vue";
 
 const ITEMS = [
@@ -6,7 +6,7 @@ const ITEMS = [
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 </script>
 
 <template>

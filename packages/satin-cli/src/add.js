@@ -30,7 +30,7 @@ function usageHint(fw, id, m, rel) {
   const entry = `${rel}/${m.entry}`.replace(/^\.\//, ""), name = compName(id);
   switch (fw) {
     case "html": return `开发服务器起来以后打开 /${m.entry}`;
-    case "next": return `打开 /${id}（已经建好 app/${id}/page.jsx）`;
+    case "next": return `打开 /${id}（已经建好 app/${id}/page.tsx）`;
     case "nuxt": return `在页面里引入：import ${name} from "~/recipes/${id}/${m.entry}"`;
     case "angular": return `在 src/app.ts 里引入 ${m.entry.replace(/\.ts$/, "")} 导出的组件，加进 @Component 的 imports`;
     default: return `在 App 里引入：import ${name} from "./${entry.replace(/^src\//, "")}"`;
@@ -62,8 +62,9 @@ export async function add(args, log = console.log) {
   const rel = targetDir(p.fw, id), dest = path.join(dir, rel);
   const plan = m.files.map((file) => ({ from: path.join(vdir, file), to: path.join(dest, file) }));
   if (p.fw === "next") {
-    const page = path.join(dir, "app", id, "page.jsx");
-    plan.push({ to: page, content: `// satin add ${id} 建的路由：/${id}\nimport Recipe from "../recipes/${id}/${m.entry}";\n\nexport default function Page() {\n  return <Recipe />;\n}\n` });
+    const page = path.join(dir, "app", id, "page.tsx");
+    const entryMod = m.entry.replace(/\.(tsx|ts|jsx|js)$/, "");
+    plan.push({ to: page, content: `// satin add ${id} 建的路由：/${id}\nimport Recipe from "../recipes/${id}/${entryMod}";\n\nexport default function Page() {\n  return <Recipe />;\n}\n` });
   }
   const clash = plan.filter((x) => exists(x.to));
   if (clash.length && !f.force) throw new UsageError(`这些文件已经有了：${clash.map((x) => path.relative(dir, x.to)).join("、")}。要覆盖加 --force`);

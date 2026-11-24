@@ -1,0 +1,147 @@
+import { useEffect, useRef } from "react";
+import { setup, enhance } from "satin-ui";
+import { Stepper } from "satin-ui/react";
+import { busy, toast } from "satin-ui/components";
+
+export default function MobileOrder() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const unsetup = setup(); // 页面级行为（Tooltip、浮层栈、Esc 关闭），引用计数
+    const off = enhance(ref.current, (root: any) => {
+      const orderRoot = root.querySelector("[data-order-root]");
+      if (orderRoot) {
+      const UNIT = 189, OFF = 20;
+      const totEl = orderRoot.querySelector("[data-ord-total]");
+      const unitEl = orderRoot.querySelector("[data-ord-unit]");
+      const specEl = orderRoot.querySelector("[data-ord-spec]");
+      const qtyEl = orderRoot.querySelector("[data-ord-qty]");
+      const sync = () => {
+        const q = Math.max(1, Number(qtyEl?.getAttribute("value") || qtyEl?.value || 1));
+        const sub = UNIT * q;
+        if (unitEl) unitEl.textContent = "¥" + sub;
+        if (totEl) totEl.textContent = "¥" + Math.max(0, sub - OFF);
+      };
+      qtyEl?.addEventListener("change", sync);
+      qtyEl?.addEventListener("input", sync);
+
+      const colors = orderRoot.querySelector("[data-ord-colors]");
+      colors?.addEventListener("click", (e?: any) => {
+        const btn = e.target.closest("button[data-color]");
+        if (!btn) return;
+        for (const b of colors.querySelectorAll("button[data-color]")) {
+          const on = b === btn;
+          b.classList.toggle("sn-on", on);
+          b.setAttribute("aria-checked", String(on));
+        }
+        if (specEl) specEl.textContent = btn.dataset.color + " · 三档调光 · USB-C 充电";
+      });
+
+      const payRow = orderRoot.querySelector("[data-ord-pay]");
+      const payVal = orderRoot.querySelector("[data-ord-pay-val]");
+      payRow?.addEventListener("click", () => {
+        if (!payVal) return;
+        payVal.textContent = payVal.textContent === "微信支付" ? "支付宝" : "微信支付";
+        toast({ text: "已切换至" + payVal.textContent, tone: "info" });
+      });
+
+      const submitBtn = orderRoot.querySelector("[data-ord-submit]");
+      submitBtn?.addEventListener("click", () => {
+        busy(submitBtn, new Promise((r?: any) => window.setTimeout(r, 600)).then(() => {
+          toast({ text: "订单已创建，正在拉起支付", tone: "ok" });
+        }));
+      });
+      }
+    }); // 接上标记里的交互，返回撤销函数
+    return () => { off(); unsetup(); };
+  }, []);
+  return (
+    <div ref={ref}>
+      <style>{`
+.sn-ord-addr { display: flex; align-items: center; gap: var(--sn-sp-12); padding: var(--sn-sp-16); cursor: pointer; }
+.sn-ord-addr-tx { flex: 1; min-width: 0; display: grid; gap: var(--sn-sp-4); }
+.sn-ord-addr-hd { display: flex; align-items: baseline; gap: var(--sn-sp-8); }
+.sn-ord-addr-hd b { font: 600 calc(15px * var(--sn-font-scale, 1))/calc(22px * var(--sn-font-scale, 1)) var(--sn-sans); }
+.sn-ord-addr-hd span { font: 400 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); font-variant-numeric: tabular-nums; }
+.sn-ord-addr-tx p { margin: 0; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sn-ord-hero { display: block; width: 100%; height: 148px; border-radius: var(--sn-r-lg); object-fit: cover; background: var(--sn-fill-subtle); }
+.sn-ord-prod { display: grid; gap: var(--sn-sp-16); }
+.sn-ord-prod-hd { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sn-sp-12); }
+.sn-ord-prod-hd b { font: 600 calc(17px * var(--sn-font-scale, 1))/calc(24px * var(--sn-font-scale, 1)) var(--sn-sans); letter-spacing: -.01em; }
+.sn-ord-prod-sub { margin: var(--sn-sp-2) 0 0; font: 400 calc(13px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
+.sn-ord-ctrl { display: flex; align-items: center; justify-content: space-between; gap: var(--sn-sp-12); padding-top: var(--sn-sp-12); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--sn-line) 70%, transparent); }
+.sn-ord-kv { display: flex; align-items: center; justify-content: space-between; gap: var(--sn-sp-12); min-height: 50px; padding: var(--sn-sp-12) var(--sn-sp-16); cursor: pointer; }
+.sn-ord-kv + .sn-ord-kv { box-shadow: inset 0 1px 0 color-mix(in srgb, var(--sn-line) 70%, transparent); }
+.sn-ord-kv > span:first-child { font: 400 calc(14px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); }
+.sn-ord-kv-r { display: inline-flex; align-items: center; gap: var(--sn-sp-4); font: 500 calc(14px * var(--sn-font-scale, 1))/calc(20px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+.sn-ord-kv-r .sn-ic { width: 15px; height: 15px; color: var(--sn-label3); }
+.sn-ord-bar-meta { display: grid; gap: var(--sn-sp-2); }
+.sn-ord-bar-meta small { font: 400 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
+`}</style>
+      <main className="sn-page sn-narrow sn-screen" data-order-root="">
+        <header className="sn-page-hd">
+          <a className="sn-nav-back sn-nav-circle" href="/cart" aria-label="返回购物车" data-i="arrow-left"></a>
+          <div>
+            <h1>确认订单</h1>
+          </div>
+        </header>
+        <div className="sn-stack sn-gap-16">
+          <section className="sn-panel sn-flush">
+            <div className="sn-ord-addr" tabIndex={0} role="button" data-ord-addr="">
+              <div className="sn-ord-addr-tx">
+                <div className="sn-ord-addr-hd">
+                  <b>林夏</b>
+                  <span>138 0000 1234</span>
+                </div>
+                <p>上海市徐汇区漕溪北路 88&nbsp;号 12&nbsp;楼</p>
+              </div>
+              <span className="sn-end" data-i="chevron-right" style={{ color: "var(--sn-label3)" }}></span>
+            </div>
+          </section>
+          <section className="sn-panel sn-ord-prod">
+            <img className="sn-ord-hero" src="https://images.unsplash.com/photo-1534105615256-13940a56ff44?auto=format&fit=crop&w=720&h=360&q=85" alt="折叠台灯" width="720" height="360" />
+            <div>
+              <div className="sn-ord-prod-hd">
+                <b>折叠台灯</b>
+                <b className="sn-num" data-ord-unit="">¥189</b>
+              </div>
+              <p className="sn-ord-prod-sub" data-ord-spec="">暖白 · 三档调光 · USB-C 充电</p>
+            </div>
+            <div className="sn-ord-ctrl">
+              <div className="sn-row sn-gap-8" role="radiogroup" aria-label="选择颜色" data-ord-colors="">
+                <button type="button" className="sn-chip sn-on" aria-checked="true" role="radio" data-color="暖白">暖白</button>
+                <button type="button" className="sn-chip" aria-checked="false" role="radio" data-color="冷白">冷白</button>
+                <button type="button" className="sn-chip" aria-checked="false" role="radio" data-color="胡桃木">胡桃木</button>
+              </div>
+              <Stepper defaultValue={1} min={1} max={9} data-ord-qty="" />
+            </div>
+          </section>
+          <section className="sn-panel sn-flush">
+            <div className="sn-ord-kv" tabIndex={0} role="button" data-ord-ship="">
+              <span>配送</span>
+              <span className="sn-ord-kv-r">明天上午 · 免运费<span data-i="chevron-right"></span></span>
+            </div>
+            <div className="sn-ord-kv" tabIndex={0} role="button" data-ord-coupon="">
+              <span>优惠</span>
+              <span className="sn-ord-kv-r sn-num sn-c-success">−¥20<span data-i="chevron-right"></span></span>
+            </div>
+            <div className="sn-ord-kv" tabIndex={0} role="button" data-ord-pay="">
+              <span>支付方式</span>
+              <span className="sn-ord-kv-r">
+                <span data-ord-pay-val="">微信支付</span>
+                <span data-i="chevron-right"></span>
+              </span>
+            </div>
+          </section>
+        </div>
+        <div className="sn-bottom-bar">
+          <div className="sn-grow sn-ord-bar-meta">
+            <small>应付</small>
+            <b className="sn-t-title1 sn-num" data-ord-total="">¥169</b>
+          </div>
+          <button type="button" className="sn-btn sn-primary sn-lg" data-ord-submit="">立即支付</button>
+        </div>
+      </main>
+    </div>
+  );
+}

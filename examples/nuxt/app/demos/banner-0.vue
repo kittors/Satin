@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { busy } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 横幅里的 [data-dismiss]：enhance() 已经接上——点了给 .sn-banner-wrap 加 .sn-closing，高度过渡收起，下面的内容跟着上来
 
     // 网络断了：点"重新连接"，等待结束后原地变成成功，过一会儿自己收起
@@ -18,7 +19,7 @@ onMounted(() => {
       banner.classList.replace("sn-bad", "sn-ok"); banner.setAttribute("role", "status");
       banner.querySelector(".sn-msg").innerHTML = "<b>已重新连接</b>，改动都同步好了。";
       net.remove();
-      setTimeout(() => banner.parentElement.classList.add("sn-closing"), 1600);
+      window.setTimeout(() => banner.parentElement.classList.add("sn-closing"), 1600);
     });
 
     // 条目上的失败：点"修改后重新生成"，成功后整行恢复正常

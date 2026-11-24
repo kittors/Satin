@@ -54,13 +54,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-tag-input tags='["雨夜","车站"]'></sn-tag-input>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { TagInput } from "satin-ui/react";
 
 export default function SceneTags() {
@@ -71,7 +71,7 @@ export default function SceneTags() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { TagInput } from "satin-ui/vue";
 </script>
 
@@ -82,8 +82,8 @@ import { TagInput } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import TagInput from "satin-ui/svelte/TagInput.svelte";
 </script>
 
@@ -107,7 +107,7 @@ export class TaginputBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const TAGS = JSON.stringify(["雨夜", "车站"]);
 
@@ -118,7 +118,7 @@ export default function SceneTags() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { TagInput } from "satin-ui/react";
 
 export default function SceneTags() {
@@ -136,7 +136,7 @@ export default function SceneTags() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="taginput-controlled-box">
   <sn-tag-input max="5" placeholder="输入关键词，回车确认" tags='["悬疑","长镜头"]'></sn-tag-input>
   <span class="sn-help">已添加 2 / 5 个</span>
@@ -153,7 +153,7 @@ export default function SceneTags() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { TagInput } from "satin-ui/react";
 
@@ -171,7 +171,7 @@ export default function KeywordTags() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { TagInput } from "satin-ui/vue";
 
@@ -188,8 +188,8 @@ const tags = ref(["悬疑", "长镜头"]);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import TagInput from "satin-ui/svelte/TagInput.svelte";
 
   let tags = $state(["悬疑", "长镜头"]);
@@ -224,11 +224,11 @@ export class TaginputControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function KeywordTags() {
   const [tags, setTags] = createSignal(["悬疑", "长镜头"]);
@@ -243,7 +243,7 @@ export default function KeywordTags() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { TagInput } from "satin-ui/react";
 
@@ -268,13 +268,13 @@ export default function KeywordTags() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-tag-input max="3" placeholder="例如：雨夜" hint="按标签找素材，最多 3 个"></sn-tag-input>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { TagInput } from "satin-ui/react";
 
 export default function SearchTags() {
@@ -285,7 +285,7 @@ export default function SearchTags() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { TagInput } from "satin-ui/vue";
 </script>
 
@@ -296,8 +296,8 @@ import { TagInput } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import TagInput from "satin-ui/svelte/TagInput.svelte";
 </script>
 
@@ -319,7 +319,7 @@ export class TaginputHintComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function SearchTags() {
   return <sn-tag-input max="3" placeholder="例如：雨夜" hint="按标签找素材，最多 3 个"></sn-tag-input>;
 }
@@ -327,7 +327,7 @@ export default function SearchTags() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { TagInput } from "satin-ui/react";
 
 export default function SearchTags() {

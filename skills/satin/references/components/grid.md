@@ -56,7 +56,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="shots-basic"></div>
 
 <script type="module">
@@ -86,11 +86,11 @@
 
 React 的写法：
 
-```jsx
-import { DataGrid } from "satin-ui/react/grid";
+```tsx
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
 // 列：key 取行里的哪个字段；type 选内置的显示（status 带色点、owner 带头像、dur 把秒显示成 分:秒）
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -115,11 +115,11 @@ export default function ShotList() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { DataGrid } from "satin-ui/vue/grid";
+<script setup lang="ts">
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
 // 列：key 取行里的哪个字段；type 选内置的显示（status 带色点、owner 带头像、dur 把秒显示成 分:秒）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -144,12 +144,13 @@ const rows = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
   // 列：key 取行里的哪个字段；type 选内置的显示（status 带色点、owner 带头像、dur 把秒显示成 分:秒）
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180 },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
     { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -213,12 +214,12 @@ export class GridBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createDataGrid } from "satin-ui/grid";
+import { createDataGrid, type GridColumn } from "satin-ui/grid";
 
 // 列：key 取行里的哪个字段；type 选内置的显示（status 带色点、owner 带头像、dur 把秒显示成 分:秒）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -236,7 +237,7 @@ const rows = [
 ];
 
 export default function ShotList() {
-  let host;
+  let host!: HTMLDivElement;
   // 挂上以后建表格；卸载时 destroy() 撤掉监听和放进 <head> 的样式
   onSettled(() => {
     const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头清单" });
@@ -248,11 +249,11 @@ export default function ShotList() {
 
 Preact 的写法：
 
-```jsx
-import { DataGrid } from "satin-ui/react/grid";
+```tsx
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
 // 列：key 取行里的哪个字段；type 选内置的显示（status 带色点、owner 带头像、dur 把秒显示成 分:秒）
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -287,7 +288,7 @@ export default function ShotList() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <div id="shots-sort"></div>
   <span class="sn-help" id="shots-sort-note">按镜头从大到小排</span>
@@ -325,12 +326,12 @@ export default function ShotList() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { DataGrid } from "satin-ui/react/grid";
+import { DataGrid, type DataGridColumn, type GridSort } from "satin-ui/react/grid";
 
 // sortable 的列点表头排序：升序 → 降序 → 不排
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
@@ -344,12 +345,12 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", shots: "镜头", dur: "时长" };
-const describe = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
+const TITLES: Record<string, string> = { name: "名称", shots: "镜头", dur: "时长" };
+const describe = (s: GridSort | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
 
 export default function SortedShots() {
   // 受控：sort 是 { key, dir }（dir 1 升序、-1 降序）或 null；点表头时 onSortChange 给出新的
-  const [sort, setSort] = useState({ key: "shots", dir: -1 });
+  const [sort, setSort] = useState<GridSort | null>({ key: "shots", dir: -1 });
   return (
     <div className="sn-stack sn-gap-8">
       <DataGrid columns={columns} data={rows} sort={sort} onSortChange={setSort} height={320} label="镜头清单" />
@@ -362,12 +363,12 @@ export default function SortedShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
-import { DataGrid } from "satin-ui/vue/grid";
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
 // sortable 的列点表头排序：升序 → 降序 → 不排
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
@@ -381,8 +382,8 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", shots: "镜头", dur: "时长" };
-const describe = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
+const TITLES: Record<string, string> = { name: "名称", shots: "镜头", dur: "时长" };
+const describe = (s: { key: string; dir: number } | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
 // v-model:sort：{ key, dir }（dir 1 升序、-1 降序）或 null
 const sort = ref({ key: "shots", dir: -1 });
 const note = computed(() => describe(sort.value));
@@ -398,12 +399,13 @@ const note = computed(() => describe(sort.value));
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
   // sortable 的列点表头排序：升序 → 降序 → 不排
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180, sortable: true },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
     { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
@@ -417,8 +419,8 @@ Svelte 的写法：
     { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
-  const TITLES = { name: "名称", shots: "镜头", dur: "时长" };
-  const describe = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
+  const TITLES: Record<string, string> = { name: "名称", shots: "镜头", dur: "时长" };
+  const describe = (s: { key: string; dir: number } | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
   // bind:sort：{ key, dir }（dir 1 升序、-1 降序）或 null
   let sort = $state({ key: "shots", dir: -1 });
 </script>
@@ -478,12 +480,12 @@ export class GridSortComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onSettled } from "solid-js";
-import { createDataGrid } from "satin-ui/grid";
+import { createDataGrid, type GridColumn } from "satin-ui/grid";
 
 // sortable 的列点表头排序：升序 → 降序 → 不排
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
@@ -497,12 +499,12 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", shots: "镜头", dur: "时长" };
-const describe = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
+const TITLES: Record<string, string> = { name: "名称", shots: "镜头", dur: "时长" };
+const describe = (s: { key: string; dir: number } | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
 const first = { key: "shots", dir: -1 };
 
 export default function SortedShots() {
-  let host;
+  let host!: HTMLDivElement;
   const [note, setNote] = createSignal(describe(first));
   onSettled(() => {
     // defaultSort：一开始的排序；点表头时 onSortChange 给出 { key, dir } 或 null
@@ -520,12 +522,12 @@ export default function SortedShots() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { DataGrid } from "satin-ui/react/grid";
+import { DataGrid, type DataGridColumn, type GridSort } from "satin-ui/react/grid";
 
 // sortable 的列点表头排序：升序 → 降序 → 不排
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
@@ -539,12 +541,12 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", shots: "镜头", dur: "时长" };
-const describe = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
+const TITLES: Record<string, string> = { name: "名称", shots: "镜头", dur: "时长" };
+const describe = (s: GridSort | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "没有排序：按原来的顺序");
 
 export default function SortedShots() {
   // 受控：sort 是 { key, dir }（dir 1 升序、-1 降序）或 null；点表头时 onSortChange 给出新的
-  const [sort, setSort] = useState({ key: "shots", dir: -1 });
+  const [sort, setSort] = useState<GridSort | null>({ key: "shots", dir: -1 });
   return (
     <div className="sn-stack sn-gap-8">
       <DataGrid columns={columns} data={rows} sort={sort} onSortChange={setSort} height={320} label="镜头清单" />
@@ -570,7 +572,7 @@ export default function SortedShots() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <div id="shots-select"></div>
   <div class="sn-row sn-gap-8">
@@ -612,11 +614,11 @@ export default function SortedShots() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { DataGrid } from "satin-ui/react/grid";
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -630,15 +632,15 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: unknown) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: unknown[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 
 export default function PickShots() {
   // 受控：selectedKeys 是勾上的行的 rowKey（这里是 id）；点全选时数组数据也给出全部的 key
-  const [keys, setKeys] = useState([1, 4]);
+  const [keys, setKeys] = useState<unknown[]>([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys ?? [])} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>
@@ -651,11 +653,11 @@ export default function PickShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
-import { DataGrid } from "satin-ui/vue/grid";
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -669,8 +671,8 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: number | string) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: (number | string)[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 // v-model:selected：勾上的行的 rowKey（这里是 id）
 const keys = ref([1, 4]);
 const note = computed(() => noteOf(keys.value));
@@ -689,11 +691,12 @@ const note = computed(() => noteOf(keys.value));
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180 },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
     { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -707,8 +710,8 @@ Svelte 的写法：
     { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
-  const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-  const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+  const nameOf = (id: number | string) => rows.find((r) => r.id === id)?.name;
+  const noteOf = (keys: (number | string)[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
   // bind:selectedKeys：勾上的行的 rowKey（这里是 id）
   let keys = $state([1, 4]);
 </script>
@@ -783,11 +786,11 @@ export class GridSelectComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onSettled } from "solid-js";
-import { createDataGrid } from "satin-ui/grid";
+import { createDataGrid, type GridColumn } from "satin-ui/grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -801,12 +804,12 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: number | string) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: (number | string)[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 const first = [1, 4];
 
 export default function PickShots() {
-  let host, grid;
+  let host!: HTMLDivElement, grid: ReturnType<typeof createDataGrid> | undefined;
   const [keys, setKeys] = createSignal(first);
   onSettled(() => {
     // selectedKeys：勾上的行的 rowKey（这里是 id）；用户勾选时 onSelectionChange 给出新的
@@ -829,11 +832,11 @@ export default function PickShots() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { DataGrid } from "satin-ui/react/grid";
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -847,15 +850,15 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const nameOf = (id) => rows.find((r) => r.id === id)?.name;
-const noteOf = (keys) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
+const nameOf = (id: unknown) => rows.find((r) => r.id === id)?.name;
+const noteOf = (keys: unknown[]) => (keys.length ? `已选 ${keys.length} 个：${keys.map(nameOf).join("、")}` : "还没选");
 
 export default function PickShots() {
   // 受控：selectedKeys 是勾上的行的 rowKey（这里是 id）；点全选时数组数据也给出全部的 key
-  const [keys, setKeys] = useState([1, 4]);
+  const [keys, setKeys] = useState<unknown[]>([1, 4]);
   return (
     <div className="sn-stack sn-gap-8">
-      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys)} height={320} label="镜头清单" />
+      <DataGrid columns={columns} data={rows} selection="multiple" selectedKeys={keys} onSelectionChange={(e) => setKeys(e.keys ?? [])} height={320} label="镜头清单" />
       <div className="sn-row sn-gap-8">
         <span className="sn-help">{noteOf(keys)}</span>
         <button type="button" className="sn-textbtn sn-sm" disabled={!keys.length} onClick={() => setKeys([])}>清空</button>
@@ -875,7 +878,7 @@ export default function PickShots() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="shots-render"></div>
 
 <script type="module">
@@ -909,14 +912,14 @@ export default function PickShots() {
 
 React 的写法：
 
-```jsx
-import { DataGrid } from "satin-ui/react/grid";
+```tsx
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
 // 只改显示的文字用 format（预算加上 ¥ 和千分位）；要放自己的标记用 render（一行好几个标签）
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 160 },
-  { key: "tags", title: "标签", width: 200, render: (tags) => <span className="sn-row sn-gap-4">{tags.map((t) => <span key={t} className="sn-tag sn-sm">{t}</span>)}</span> },
-  { key: "budget", title: "预算", type: "money", width: 120, format: (v) => "¥" + v.toLocaleString("zh-CN") },
+  { key: "tags", title: "标签", width: 200, render: (tags: string[]) => <span className="sn-row sn-gap-4">{tags.map((t) => <span key={t} className="sn-tag sn-sm">{t}</span>)}</span> },
+  { key: "budget", title: "预算", type: "money", width: 120, format: (v: number) => "¥" + v.toLocaleString("zh-CN") },
   { key: "dur", title: "时长", type: "dur", width: 96 },
 ];
 const rows = [
@@ -937,11 +940,11 @@ export default function ShotTags() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { DataGrid } from "satin-ui/vue/grid";
+<script setup lang="ts">
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
 // 只改显示的文字用 format（预算加上 ¥ 和千分位）；要放自己的标记用插槽 #cell-列的key（一行好几个标签）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 160 },
   { key: "tags", title: "标签", width: 200 },
   { key: "budget", title: "预算", type: "money", width: 120, format: (v) => "¥" + v.toLocaleString("zh-CN") },
@@ -971,19 +974,20 @@ const rows = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
   // render 返回节点（或 HTML 字符串）：值是数据里来的，用 textContent 放，不拼进 HTML
-  const tagList = (tags) => {
+  const tagList = (tags: string[]) => {
     const box = document.createElement("span");
     box.className = "sn-row sn-gap-4";
     for (const t of tags) box.append(Object.assign(document.createElement("span"), { className: "sn-tag sn-sm", textContent: t }));
     return box;
   };
   // 只改显示的文字用 format（预算加上 ¥ 和千分位）；要放自己的标记用 render（一行好几个标签）
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 160 },
     { key: "tags", title: "标签", width: 200, render: tagList },
     { key: "budget", title: "预算", type: "money", width: 120, format: (v) => "¥" + v.toLocaleString("zh-CN") },
@@ -1050,19 +1054,19 @@ export class GridRenderComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createDataGrid } from "satin-ui/grid";
+import { createDataGrid, type GridColumn } from "satin-ui/grid";
 
 // render 返回节点（或 HTML 字符串）：值是数据里来的，用 textContent 放，不拼进 HTML
-const tagList = (tags) => {
+const tagList = (tags: string[]) => {
   const box = document.createElement("span");
   box.className = "sn-row sn-gap-4";
   for (const t of tags) box.append(Object.assign(document.createElement("span"), { className: "sn-tag sn-sm", textContent: t }));
   return box;
 };
 // 只改显示的文字用 format（预算加上 ¥ 和千分位）；要放自己的标记用 render（一行好几个标签）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 160 },
   { key: "tags", title: "标签", width: 200, render: tagList },
   { key: "budget", title: "预算", type: "money", width: 120, format: (v) => "¥" + v.toLocaleString("zh-CN") },
@@ -1078,7 +1082,7 @@ const rows = [
 ];
 
 export default function ShotTags() {
-  let host;
+  let host!: HTMLDivElement;
   onSettled(() => {
     const grid = createDataGrid(host, { columns, data: rows, height: 320, label: "镜头预算" });
     return () => grid.destroy();
@@ -1089,14 +1093,14 @@ export default function ShotTags() {
 
 Preact 的写法：
 
-```jsx
-import { DataGrid } from "satin-ui/react/grid";
+```tsx
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
 // 只改显示的文字用 format（预算加上 ¥ 和千分位）；要放自己的标记用 render（一行好几个标签）
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 160 },
-  { key: "tags", title: "标签", width: 200, render: (tags) => <span className="sn-row sn-gap-4">{tags.map((t) => <span key={t} className="sn-tag sn-sm">{t}</span>)}</span> },
-  { key: "budget", title: "预算", type: "money", width: 120, format: (v) => "¥" + v.toLocaleString("zh-CN") },
+  { key: "tags", title: "标签", width: 200, render: (tags: string[]) => <span className="sn-row sn-gap-4">{tags.map((t) => <span key={t} className="sn-tag sn-sm">{t}</span>)}</span> },
+  { key: "budget", title: "预算", type: "money", width: 120, format: (v: number) => "¥" + v.toLocaleString("zh-CN") },
   { key: "dur", title: "时长", type: "dur", width: 96 },
 ];
 const rows = [
@@ -1124,7 +1128,7 @@ export default function ShotTags() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="shots-remote"></div>
 
 <script type="module">
@@ -1164,24 +1168,25 @@ export default function ShotTags() {
 
 React 的写法：
 
-```jsx
-import { DataGrid } from "satin-ui/react/grid";
+```tsx
+import { DataGrid, type DataGridColumn, type GridDataSource, type GridSort } from "satin-ui/react/grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 假的服务端（真的项目里换成 fetch）：按 sort、搜索词排好、筛好，切出 [start, end) 这一段
-let all = null, last = "", list = [];
-function query(sort, q) {
+interface Shot { id: number; name: string; shots: number; dur: number }
+let all: Shot[] | null = null, last = "", list: Shot[] = [];
+function query(sort: GridSort | null, q?: string): Shot[] {
   all ??= Array.from({ length: 100000 }, (_, i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 }));
   const key = JSON.stringify([sort, q]);
   if (key !== last) {
     last = key;
     list = q ? all.filter((r) => r.name.includes(q)) : all.slice();
-    if (sort) list.sort((a, b) => (a[sort.key] < b[sort.key] ? -1 : a[sort.key] > b[sort.key] ? 1 : 0) * sort.dir);
+    if (sort) { const k = sort.key as keyof Shot; list.sort((a, b) => (a[k] < b[k] ? -1 : a[k] > b[k] ? 1 : 0) * sort.dir); }
   }
   return list;
 }
 // 表格按块要：滚到哪要到哪（一块 100 行），排序、搜索变了从头要；还没到的行显示占位条
-const dataSource = {
+const dataSource: GridDataSource<Shot> = {
   total: 100000,
   async load({ start, end, sort, filter }) {
     // 换成：return (await fetch(`/api/shots?start=${start}&end=${end}&sort=…&q=…`)).json() —— 返回 { rows, total }
@@ -1190,7 +1195,7 @@ const dataSource = {
     return { rows: found.slice(start, end), total: found.length };
   },
 };
-const columns = [
+const columns: DataGridColumn<Shot>[] = [
   { key: "name", title: "名称", width: 200, sortable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
   { key: "dur", title: "时长", type: "dur", width: 96, sortable: true },
@@ -1205,13 +1210,14 @@ export default function RemoteShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { DataGrid } from "satin-ui/vue/grid";
+<script setup lang="ts">
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 假的服务端（真的项目里换成 fetch）：按 sort、搜索词排好、筛好，切出 [start, end) 这一段
-let all = null, last = "", list = [];
-function query(sort, q) {
+type ShotRow = { id: number; name: string; shots: number; dur: number; [k: string]: string | number };
+let all: ShotRow[] | null = null, last = "", list: ShotRow[] = [];
+function query(sort: { key: string; dir: number } | null | undefined, q?: string) {
   all ??= Array.from({ length: 100000 }, (_, i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 }));
   const key = JSON.stringify([sort, q]);
   if (key !== last) {
@@ -1231,7 +1237,7 @@ const dataSource = {
     return { rows: found.slice(start, end), total: found.length };
   },
 };
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 200, sortable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
   { key: "dur", title: "时长", type: "dur", width: 96, sortable: true },
@@ -1245,14 +1251,16 @@ const columns = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
   const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
   // 假的服务端（真的项目里换成 fetch）：按 sort、搜索词排好、筛好，切出 [start, end) 这一段
-  let all = null, last = "", list = [];
-  function query(sort, q) {
+  type ShotRow = { id: number; name: string; shots: number; dur: number; [k: string]: string | number };
+  let all: ShotRow[] | null = null, last = "", list: ShotRow[] = [];
+  function query(sort: { key: string; dir: number } | null | undefined, q?: string) {
     all ??= Array.from({ length: 100000 }, (_, i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 }));
     const key = JSON.stringify([sort, q]);
     if (key !== last) {
@@ -1272,7 +1280,7 @@ Svelte 的写法：
       return { rows: found.slice(start, end), total: found.length };
     },
   };
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 200, sortable: true },
     { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
     { key: "dur", title: "时长", type: "dur", width: 96, sortable: true },
@@ -1337,14 +1345,15 @@ export class GridRemoteComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createDataGrid } from "satin-ui/grid";
+import { createDataGrid, type GridColumn } from "satin-ui/grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 假的服务端（真的项目里换成 fetch）：按 sort、搜索词排好、筛好，切出 [start, end) 这一段
-let all = null, last = "", list = [];
-function query(sort, q) {
+type ShotRow = { id: number; name: string; shots: number; dur: number; [k: string]: string | number };
+let all: ShotRow[] | null = null, last = "", list: ShotRow[] = [];
+function query(sort: { key: string; dir: number } | null | undefined, q?: string) {
   all ??= Array.from({ length: 100000 }, (_, i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 }));
   const key = JSON.stringify([sort, q]);
   if (key !== last) {
@@ -1364,14 +1373,14 @@ const dataSource = {
     return { rows: found.slice(start, end), total: found.length };
   },
 };
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 200, sortable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
   { key: "dur", title: "时长", type: "dur", width: 96, sortable: true },
 ];
 
 export default function RemoteShots() {
-  let host;
+  let host!: HTMLDivElement;
   onSettled(() => {
     const grid = createDataGrid(host, { columns, dataSource, label: "十万个镜头" });
     return () => grid.destroy();
@@ -1382,24 +1391,25 @@ export default function RemoteShots() {
 
 Preact 的写法：
 
-```jsx
-import { DataGrid } from "satin-ui/react/grid";
+```tsx
+import { DataGrid, type DataGridColumn, type GridDataSource, type GridSort } from "satin-ui/react/grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 假的服务端（真的项目里换成 fetch）：按 sort、搜索词排好、筛好，切出 [start, end) 这一段
-let all = null, last = "", list = [];
-function query(sort, q) {
+interface Shot { id: number; name: string; shots: number; dur: number }
+let all: Shot[] | null = null, last = "", list: Shot[] = [];
+function query(sort: GridSort | null, q?: string): Shot[] {
   all ??= Array.from({ length: 100000 }, (_, i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 }));
   const key = JSON.stringify([sort, q]);
   if (key !== last) {
     last = key;
     list = q ? all.filter((r) => r.name.includes(q)) : all.slice();
-    if (sort) list.sort((a, b) => (a[sort.key] < b[sort.key] ? -1 : a[sort.key] > b[sort.key] ? 1 : 0) * sort.dir);
+    if (sort) { const k = sort.key as keyof Shot; list.sort((a, b) => (a[k] < b[k] ? -1 : a[k] > b[k] ? 1 : 0) * sort.dir); }
   }
   return list;
 }
 // 表格按块要：滚到哪要到哪（一块 100 行），排序、搜索变了从头要；还没到的行显示占位条
-const dataSource = {
+const dataSource: GridDataSource<Shot> = {
   total: 100000,
   async load({ start, end, sort, filter }) {
     // 换成：return (await fetch(`/api/shots?start=${start}&end=${end}&sort=…&q=…`)).json() —— 返回 { rows, total }
@@ -1408,7 +1418,7 @@ const dataSource = {
     return { rows: found.slice(start, end), total: found.length };
   },
 };
-const columns = [
+const columns: DataGridColumn<Shot>[] = [
   { key: "name", title: "名称", width: 200, sortable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
   { key: "dur", title: "时长", type: "dur", width: 96, sortable: true },
@@ -1433,7 +1443,7 @@ export default function RemoteShots() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <div id="shots-edit"></div>
   <span class="sn-help" id="shots-edit-note">双击格子改；名称不能空，镜头要是 1～999 的整数</span>
@@ -1470,13 +1480,13 @@ export default function RemoteShots() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { DataGrid } from "satin-ui/react/grid";
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
 // editable 的列：双击（或回车、F2、直接打字）开始改，回车保存、Esc 取消；状态列从选项里选，数字列按 min / max 检查
-const columns = [
-  { key: "name", title: "名称", width: 180, editable: true, parse: (text) => (text.trim() ? { value: text.trim() } : { error: "名称不能为空" }) },
+const columns: DataGridColumn[] = [
+  { key: "name", title: "名称", width: 180, editable: true, parse: (text: string) => (text.trim() ? { value: text.trim() } : { error: "名称不能为空" }) },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], editable: true },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
   { key: "shots", title: "镜头", type: "int", width: 96, editable: true, min: 1, max: 999 },
@@ -1489,13 +1499,13 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头" };
-const savedText = ({ key, value, oldValue }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头" };
+const savedText = ({ key, value, oldValue }: { key: string; value: unknown; oldValue: unknown }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
 
 export default function EditShots() {
   const [note, setNote] = useState("双击格子改；名称不能空，镜头要是 1～999 的整数");
   // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
-  const save = (e) => setNote(savedText(e));
+  const save = (e: { key: string; value: unknown; oldValue: unknown }) => setNote(savedText(e));
   return (
     <div className="sn-stack sn-gap-8">
       <DataGrid columns={columns} data={rows} onCellEdit={save} height={320} label="镜头清单" />
@@ -1508,12 +1518,12 @@ export default function EditShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { DataGrid } from "satin-ui/vue/grid";
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
 // editable 的列：双击（或回车、F2、直接打字）开始改，回车保存、Esc 取消；状态列从选项里选，数字列按 min / max 检查
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, editable: true, parse: (text) => (text.trim() ? { value: text.trim() } : { error: "名称不能为空" }) },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], editable: true },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -1527,11 +1537,11 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头" };
-const savedText = ({ key, value, oldValue }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头" };
+const savedText = ({ key, value, oldValue }: { key: string; value: unknown; oldValue: unknown }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
 const note = ref("双击格子改；名称不能空，镜头要是 1～999 的整数");
 // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
-const save = (e) => (note.value = savedText(e));
+const save = (e: { key: string; value: unknown; oldValue: unknown }) => (note.value = savedText(e));
 </script>
 
 <template>
@@ -1544,12 +1554,13 @@ const save = (e) => (note.value = savedText(e));
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
   // editable 的列：双击（或回车、F2、直接打字）开始改，回车保存、Esc 取消；状态列从选项里选，数字列按 min / max 检查
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180, editable: true, parse: (text) => (text.trim() ? { value: text.trim() } : { error: "名称不能为空" }) },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], editable: true },
     { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -1563,11 +1574,11 @@ Svelte 的写法：
     { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
-  const TITLES = { name: "名称", status: "状态", shots: "镜头" };
-  const savedText = ({ key, value, oldValue }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
+  const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头" };
+  const savedText = ({ key, value, oldValue }: { key: string; value: unknown; oldValue: unknown }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
   let note = $state("双击格子改；名称不能空，镜头要是 1～999 的整数");
   // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
-  const save = (e) => (note = savedText(e));
+  const save = (e: { key: string; value: unknown; oldValue: unknown }) => (note = savedText(e));
 </script>
 
 <div class="sn-stack sn-gap-8">
@@ -1626,12 +1637,12 @@ export class GridEditComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onSettled } from "solid-js";
-import { createDataGrid } from "satin-ui/grid";
+import { createDataGrid, type GridColumn } from "satin-ui/grid";
 
 // editable 的列：双击（或回车、F2、直接打字）开始改，回车保存、Esc 取消；状态列从选项里选，数字列按 min / max 检查
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, editable: true, parse: (text) => (text.trim() ? { value: text.trim() } : { error: "名称不能为空" }) },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], editable: true },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -1645,11 +1656,11 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头" };
-const savedText = ({ key, value, oldValue }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头" };
+const savedText = ({ key, value, oldValue }: { key: string; value: unknown; oldValue: unknown }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
 
 export default function EditShots() {
-  let host;
+  let host!: HTMLDivElement;
   const [note, setNote] = createSignal("双击格子改；名称不能空，镜头要是 1～999 的整数");
   onSettled(() => {
     // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
@@ -1667,13 +1678,13 @@ export default function EditShots() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { DataGrid } from "satin-ui/react/grid";
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
 // editable 的列：双击（或回车、F2、直接打字）开始改，回车保存、Esc 取消；状态列从选项里选，数字列按 min / max 检查
-const columns = [
-  { key: "name", title: "名称", width: 180, editable: true, parse: (text) => (text.trim() ? { value: text.trim() } : { error: "名称不能为空" }) },
+const columns: DataGridColumn[] = [
+  { key: "name", title: "名称", width: 180, editable: true, parse: (text: string) => (text.trim() ? { value: text.trim() } : { error: "名称不能为空" }) },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], editable: true },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
   { key: "shots", title: "镜头", type: "int", width: 96, editable: true, min: 1, max: 999 },
@@ -1686,13 +1697,13 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头" };
-const savedText = ({ key, value, oldValue }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头" };
+const savedText = ({ key, value, oldValue }: { key: string; value: unknown; oldValue: unknown }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
 
 export default function EditShots() {
   const [note, setNote] = useState("双击格子改；名称不能空，镜头要是 1～999 的整数");
   // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
-  const save = (e) => setNote(savedText(e));
+  const save = (e: { key: string; value: unknown; oldValue: unknown }) => setNote(savedText(e));
   return (
     <div className="sn-stack sn-gap-8">
       <DataGrid columns={columns} data={rows} onCellEdit={save} height={320} label="镜头清单" />
@@ -1715,7 +1726,7 @@ export default function EditShots() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="shots-states">
   <sn-segmented items='["有数据","加载中","出错","空"]' value="空" size="sm" label="表格状态"></sn-segmented>
   <div id="shots-states-grid"></div>
@@ -1755,12 +1766,12 @@ export default function EditShots() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Segmented } from "satin-ui/react";
-import { DataGrid } from "satin-ui/react/grid";
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -1775,7 +1786,7 @@ const rows = [
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
 const STATES = ["有数据", "加载中", "出错", "空"];
-const EMPTY = [];
+const EMPTY: typeof rows = [];
 
 export default function GridStates() {
   const [state, setState] = useState("空");
@@ -1793,12 +1804,12 @@ export default function GridStates() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Segmented } from "satin-ui/vue";
-import { DataGrid } from "satin-ui/vue/grid";
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -1813,7 +1824,7 @@ const rows = [
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
 const STATES = ["有数据", "加载中", "出错", "空"];
-const EMPTY = [];
+const EMPTY: typeof rows = [];
 const state = ref("空");
 </script>
 
@@ -1829,12 +1840,13 @@ const state = ref("空");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Segmented from "satin-ui/svelte/Segmented.svelte";
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180 },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
     { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -1849,7 +1861,7 @@ Svelte 的写法：
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
   const STATES = ["有数据", "加载中", "出错", "空"];
-  const EMPTY = [];
+  const EMPTY: typeof rows = [];
   let state = $state("空");
 </script>
 
@@ -1920,11 +1932,11 @@ export class GridStatesComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createDataGrid } from "satin-ui/grid";
+import { createDataGrid, type GridColumn } from "satin-ui/grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -1943,8 +1955,8 @@ const STATES = ["有数据", "加载中", "出错", "空"];
 const ITEMS = JSON.stringify(STATES);
 
 export default function GridStates() {
-  let host, seg, grid;
-  const show = (state) => {
+  let host!: HTMLDivElement, seg!: HTMLElement, grid: ReturnType<typeof createDataGrid> | undefined;
+  const show = (state: string) => {
     seg.setAttribute("value", state);
     grid.update({ data: state === "空" ? [] : rows, loading: state === "加载中", error: state === "出错" ? "网络断了，没拿到镜头" : null });
   };
@@ -1966,12 +1978,12 @@ export default function GridStates() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Segmented } from "satin-ui/react";
-import { DataGrid } from "satin-ui/react/grid";
+import { DataGrid, type DataGridColumn } from "satin-ui/react/grid";
 
-const columns = [
+const columns: DataGridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -1986,7 +1998,7 @@ const rows = [
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
 const STATES = ["有数据", "加载中", "出错", "空"];
-const EMPTY = [];
+const EMPTY: typeof rows = [];
 
 export default function GridStates() {
   const [state, setState] = useState("空");

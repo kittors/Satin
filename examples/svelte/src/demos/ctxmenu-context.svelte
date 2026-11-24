@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
   import { toast } from "satin-ui";
-  const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+  const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
-  let menu;
+  let menu!: HTMLElement;
   // 选了一项：菜单上冒泡 menuselect，e.detail.item 是那一行
   $effect(() => {
-    const pick = (e) => toast({ text: DONE[e.detail.item.dataset.key] });
+    const pick = (e: Event) => { const key = (e as CustomEvent<{ item: HTMLElement }>).detail.item.dataset.key; if (key) toast({ text: DONE[key] }); };
     menu.addEventListener("menuselect", pick);
     return () => menu.removeEventListener("menuselect", pick);
   });

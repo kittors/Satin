@@ -60,7 +60,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-field">
     <span class="sn-lbl">交付日期</span>
@@ -74,7 +74,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function DueDate() {
@@ -90,7 +90,7 @@ export default function DueDate() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { DatePicker } from "satin-ui/vue";
 </script>
 
@@ -104,8 +104,8 @@ import { DatePicker } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DatePicker from "satin-ui/svelte/DatePicker.svelte";
 </script>
 
@@ -140,7 +140,7 @@ export class PickerBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function DueDate() {
   return (
     <sn-enhance>
@@ -158,7 +158,7 @@ export default function DueDate() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function DueDate() {
@@ -187,7 +187,7 @@ export default function DueDate() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-field">
     <span class="sn-lbl">统计范围</span>
@@ -202,7 +202,7 @@ export default function DueDate() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function StatsRange() {
@@ -218,7 +218,7 @@ export default function StatsRange() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { DatePicker } from "satin-ui/vue";
 </script>
 
@@ -232,8 +232,8 @@ import { DatePicker } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DatePicker from "satin-ui/svelte/DatePicker.svelte";
 </script>
 
@@ -269,7 +269,7 @@ export class PickerRangeComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function StatsRange() {
   return (
     <sn-enhance>
@@ -288,7 +288,7 @@ export default function StatsRange() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function StatsRange() {
@@ -316,7 +316,7 @@ export default function StatsRange() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-field">
     <span class="sn-lbl">每天提醒</span>
@@ -330,7 +330,7 @@ export default function StatsRange() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function ReminderTime() {
@@ -346,7 +346,7 @@ export default function ReminderTime() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { DatePicker } from "satin-ui/vue";
 </script>
 
@@ -360,8 +360,8 @@ import { DatePicker } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DatePicker from "satin-ui/svelte/DatePicker.svelte";
 </script>
 
@@ -396,7 +396,7 @@ export class PickerTimeComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ReminderTime() {
   return (
     <sn-enhance>
@@ -414,7 +414,7 @@ export default function ReminderTime() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function ReminderTime() {
@@ -443,7 +443,7 @@ export default function ReminderTime() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-field">
     <span class="sn-lbl">定时发布</span>
@@ -458,7 +458,7 @@ export default function ReminderTime() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function PublishAt() {
@@ -474,7 +474,7 @@ export default function PublishAt() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { DatePicker } from "satin-ui/vue";
 </script>
 
@@ -488,8 +488,8 @@ import { DatePicker } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DatePicker from "satin-ui/svelte/DatePicker.svelte";
 </script>
 
@@ -525,7 +525,7 @@ export class PickerDatetimeComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function PublishAt() {
   return (
     <sn-enhance>
@@ -544,7 +544,7 @@ export default function PublishAt() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function PublishAt() {
@@ -574,7 +574,7 @@ export default function PublishAt() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-field">
     <span class="sn-lbl">寄送地址</span>
@@ -590,7 +590,7 @@ export default function PublishAt() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function ShippingRegion() {
@@ -606,7 +606,7 @@ export default function ShippingRegion() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { DatePicker } from "satin-ui/vue";
 </script>
 
@@ -620,8 +620,8 @@ import { DatePicker } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DatePicker from "satin-ui/svelte/DatePicker.svelte";
 </script>
 
@@ -658,7 +658,7 @@ export class PickerRegionComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ShippingRegion() {
   return (
     <sn-enhance>
@@ -678,7 +678,7 @@ export default function ShippingRegion() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { DatePicker } from "satin-ui/react";
 
 export default function ShippingRegion() {
@@ -709,7 +709,7 @@ export default function ShippingRegion() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-stack sn-gap-8" id="due-events">
     <div class="sn-field">
@@ -734,7 +734,7 @@ export default function ShippingRegion() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { DatePicker } from "satin-ui/react";
 
@@ -756,7 +756,7 @@ export default function DueDate() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { DatePicker } from "satin-ui/vue";
 
@@ -777,8 +777,8 @@ const due = ref("");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import DatePicker from "satin-ui/svelte/DatePicker.svelte";
 
   let due = $state("");
@@ -829,11 +829,11 @@ export class PickerEventsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 名字不是驼峰的原生事件用 ref 挂（Solid 2 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function DueDate() {
   const [due, setDue] = createSignal("");
@@ -857,7 +857,7 @@ export default function DueDate() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "preact/hooks";
 import { DatePicker } from "satin-ui/react";
 

@@ -1,18 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance, showTip, hideTip } from "satin-ui";
 import "./tooltip-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 要在别处触发时：比如点了"放大预览"，在按钮上说一下结果，1.5 秒后收起
     const zoom = root.querySelector('[data-tip="放大预览"]');
     zoom.addEventListener("click", () => {
       showTip(zoom, "已放大到 200%");
-      setTimeout(hideTip, 1500);
+      window.setTimeout(hideTip, 1500);
     });
   });
   off = () => { done(); unsetup(); };

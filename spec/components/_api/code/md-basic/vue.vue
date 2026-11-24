@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Markdown } from "satin-ui/vue/markdown";
 
 const MD = [

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Tabs } from "satin-ui/vue";
 
 const TABS = [

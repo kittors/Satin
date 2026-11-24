@@ -54,7 +54,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-banner-wrap"><div class="sn-banner sn-warn" role="status"><span data-i="triangle-alert"></span><div class="sn-msg"><b>额度只剩 10%</b>，用完后新的生成会排队，不会丢失。</div><button type="button" class="sn-btn sn-secondary sn-sm">查看额度</button></div></div>
 </sn-enhance>
@@ -62,7 +62,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function BannerBasic() {
@@ -73,7 +73,7 @@ export default function BannerBasic() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Icon } from "satin-ui/vue";
 </script>
 
@@ -84,8 +84,8 @@ import { Icon } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -111,7 +111,7 @@ export class BannerBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function BannerBasic() {
   return (
     <sn-enhance>
@@ -123,7 +123,7 @@ export default function BannerBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function BannerBasic() {
@@ -141,7 +141,7 @@ export default function BannerBasic() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-banner-wrap"><div class="sn-banner" role="status"><span data-i="download"></span><div class="sn-msg">新版本 1.5 已经下载好，重启后生效。</div><button type="button" class="sn-btn sn-secondary sn-sm">重启</button><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-dismiss aria-label="关闭" data-tip="关闭" data-i="x"></button></div></div>
 </sn-enhance>
@@ -150,7 +150,7 @@ export default function BannerBasic() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Icon } from "satin-ui/react";
 
@@ -173,7 +173,7 @@ export default function UpdateBanner() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Icon } from "satin-ui/vue";
 
@@ -195,8 +195,8 @@ const closed = ref(false);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   let closed = $state(false);
@@ -237,7 +237,7 @@ export class BannerDismissComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 关掉：外层加 sn-closing，高度收起、下面的内容跟着上来；<sn-enhance> 把 data-i 换成图标
@@ -255,7 +255,7 @@ export default function UpdateBanner() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Icon } from "satin-ui/react";
 
@@ -285,7 +285,7 @@ role="alert"：读屏马上读；一直留到修好。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-banner-wrap"><div class="sn-banner sn-bad" role="alert"><span data-i="wifi-off"></span><div class="sn-msg"><b>网络断开了</b>，改动先存在这台电脑上，恢复后自动同步。</div><button type="button" class="sn-btn sn-ghost sn-sm">重新连接</button></div></div>
 </sn-enhance>
@@ -293,7 +293,7 @@ role="alert"：读屏马上读；一直留到修好。
 
 React 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function BannerError() {
@@ -304,7 +304,7 @@ export default function BannerError() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Icon } from "satin-ui/vue";
 </script>
 
@@ -315,8 +315,8 @@ import { Icon } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -342,7 +342,7 @@ export class BannerErrorComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function BannerError() {
   return (
     <sn-enhance>
@@ -354,7 +354,7 @@ export default function BannerError() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function BannerError() {

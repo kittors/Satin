@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Dialog from "satin-ui/svelte/Dialog.svelte";
 
   let open = $state(false), status = $state("还没打开过");

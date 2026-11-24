@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { openLightbox } from "satin-ui/lightbox";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
@@ -9,10 +9,10 @@
   ];
   const failOnce = new Set([1]); // 演示用：第二张第一次当作加载失败
   // 加载失败显示图标和"重试"，点了再加载一次；左右翻页跳过失败的那张
-  let state = $state({});
-  const thumbs = [];
+  let state = $state<Record<number, string | undefined>>({});
+  const thumbs: (HTMLDivElement | null)[] = [];
   // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-  const load = (i) => {
+  const load = (i: number) => {
     const img = new Image(), fail = () => (state[i] = "sn-failed");
     img.onload = () => (state[i] = "sn-loaded");
     img.onerror = fail;
@@ -20,11 +20,11 @@
     else img.src = ITEMS[i].thumb;
   };
   $effect(() => ITEMS.forEach((_, i) => load(i)));
-  const ok = (i) => state[i] === "sn-loaded";
+  const ok = (i: number) => state[i] === "sn-loaded";
   // 图片从缩略图的位置长到铺满窗口，关上时沿原路缩回；左右翻页跳过没加载好的
-  const open = (i) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k) => thumbs[k], enabled: ok }); };
-  const onkey = (e, i) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
-  const retry = (e, i) => { e.stopPropagation(); delete state[i]; load(i); };
+  const open = (i: number) => { if (ok(i)) openLightbox(ITEMS, i, { thumbOf: (k: number) => thumbs[k], enabled: ok }); };
+  const onkey = (e: KeyboardEvent, i: number) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); open(i); } };
+  const retry = (e: MouseEvent, i: number) => { e.stopPropagation(); delete state[i]; load(i); };
 </script>
 
 <div class="sn-row">

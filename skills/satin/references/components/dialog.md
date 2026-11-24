@@ -65,7 +65,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-primary" data-dlg="dlg-rename">重命名</button>
   <dialog class="sn-dlg" id="dlg-rename" aria-labelledby="dlg-rename-t">
@@ -93,8 +93,8 @@
 
 React 的写法：
 
-```jsx
-import { useId, useState } from "react";
+```tsx
+import { useId, useState, type FormEvent } from "react";
 import { Button, Dialog, toast } from "satin-ui/react";
 
 export default function RenameProject() {
@@ -102,7 +102,7 @@ export default function RenameProject() {
   const [name, setName] = useState("雨夜车站");
   const nameId = useId();
   // 弹窗不会因为提交自己关：在这里保存，成功了再关
-  function save(e) {
+  function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setOpen(false);
     toast({ text: "已改名为：" + name.trim() });
@@ -135,7 +135,7 @@ export default function RenameProject() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, useId } from "vue";
 import { Button, Dialog, toast } from "satin-ui/vue";
 
@@ -165,8 +165,8 @@ function save() {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Dialog from "satin-ui/svelte/Dialog.svelte";
   import { toast } from "satin-ui";
 
@@ -230,12 +230,12 @@ export class DialogBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { closeDialog, toast } from "satin-ui";
 
 // 标记照设计稿写，<sn-enhance> 接上 data-dlg 触发按钮、Esc、取消
 export default function RenameProject() {
-  let dlg, input;
+  let dlg!: HTMLDialogElement, input!: HTMLInputElement;
   // 弹窗不会因为提交自己关：在这里保存，成功了再关
   function save() {
     closeDialog(dlg);
@@ -260,7 +260,7 @@ export default function RenameProject() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useId, useState } from "preact/hooks";
 import { Button, Dialog, toast } from "satin-ui/react";
 
@@ -269,7 +269,7 @@ export default function RenameProject() {
   const [name, setName] = useState("雨夜车站");
   const nameId = useId();
   // 弹窗不会因为提交自己关：在这里保存，成功了再关
-  function save(e) {
+  function save(e: Event) {
     e.preventDefault();
     setOpen(false);
     toast({ text: "已改名为：" + name.trim() });
@@ -318,7 +318,7 @@ export default function RenameProject() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-danger-soft" data-dlg="dlg-del" data-i="trash-2:before">删除项目…</button>
   <dialog class="sn-dlg" id="dlg-del" aria-labelledby="dlg-del-t">
@@ -345,13 +345,13 @@ export default function RenameProject() {
 
 React 的写法：
 
-```jsx
-import { useState } from "react";
+```tsx
+import { useState, type FormEvent } from "react";
 import { Button, Dialog, toast } from "satin-ui/react";
 
 export default function DeleteProject() {
   const [open, setOpen] = useState(false);
-  function remove(e) {
+  function remove(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setOpen(false);
     toast({ text: '已删除"雨夜车站"' });
@@ -382,7 +382,7 @@ export default function DeleteProject() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Dialog, toast } from "satin-ui/vue";
 
@@ -408,8 +408,8 @@ function remove() {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Dialog from "satin-ui/svelte/Dialog.svelte";
   import Icon from "satin-ui/svelte/Icon.svelte";
   import { toast } from "satin-ui";
@@ -467,12 +467,12 @@ export class DialogDangerComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { closeDialog, toast } from "satin-ui";
 
 // 标记照设计稿写，<sn-enhance> 接上 data-dlg 触发按钮、Esc、取消，把 data-i 换成图标
 export default function DeleteProject() {
-  let dlg;
+  let dlg!: HTMLDialogElement;
   function remove() {
     closeDialog(dlg);
     toast({ text: '已删除"雨夜车站"' });
@@ -496,13 +496,13 @@ export default function DeleteProject() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "preact/hooks";
 import { Button, Dialog, toast } from "satin-ui/react";
 
 export default function DeleteProject() {
   const [open, setOpen] = useState(false);
-  function remove(e) {
+  function remove(e: Event) {
     e.preventDefault();
     setOpen(false);
     toast({ text: '已删除"雨夜车站"' });
@@ -550,7 +550,7 @@ guard 拦下 Esc 和取消：填了内容就在底栏原地问"放弃填写的�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-dlg="dlg-note">写备注</button>
   <dialog class="sn-dlg" id="dlg-note" aria-labelledby="dlg-note-t">
@@ -586,25 +586,25 @@ guard 拦下 Esc 和取消：填了内容就在底栏原地问"放弃填写的�
 
 React 的写法：
 
-```jsx
-import { useEffect, useRef, useState } from "react";
+```tsx
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button, Dialog } from "satin-ui/react";
 
 export default function SceneNote() {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [asking, setAsking] = useState(false);
-  const noteRef = useRef(null), keepRef = useRef(null);
+  const noteRef = useRef<HTMLTextAreaElement>(null), keepRef = useRef<HTMLButtonElement>(null);
   // 底栏两组按钮原地切换：问的时候焦点到"继续填写"，回去接着填时回到输入框（等这一轮把 inert 换过来再移焦点）
   useEffect(() => { if (open) (asking ? keepRef : noteRef).current?.focus(); }, [asking]);
   // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关
-  const guard = (close) => (asking ? setAsking(false) : note.trim() ? setAsking(true) : close());
+  const guard = (close: () => void) => (asking ? setAsking(false) : note.trim() ? setAsking(true) : close());
   function discard() {
     setOpen(false);
     setNote("");
     setAsking(false);
   }
-  function save(e) {
+  function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setOpen(false);
   }
@@ -633,19 +633,19 @@ export default function SceneNote() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, watch, nextTick } from "vue";
 import { Button, Dialog } from "satin-ui/vue";
 
 const open = ref(false), note = ref(""), asking = ref(false);
-const noteEl = ref(null), keepBtn = ref(null);
+const noteEl = ref<HTMLTextAreaElement | null>(null), keepBtn = ref<HTMLButtonElement | null>(null);
 // 底栏两组按钮原地切换：问的时候焦点到"继续填写"，回去接着填时回到输入框
 watch(asking, async (on) => {
   await nextTick();
   (on ? keepBtn.value?.$el : noteEl.value)?.focus();
 });
 // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关
-const guard = (close) => (asking.value ? (asking.value = false) : note.value.trim() ? (asking.value = true) : close());
+const guard = (close: () => void) => (asking.value ? (asking.value = false) : note.value.trim() ? (asking.value = true) : close());
 function discard() {
   open.value = false;
   note.value = "";
@@ -667,21 +667,21 @@ function discard() {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { tick } from "svelte";
   import Dialog from "satin-ui/svelte/Dialog.svelte";
 
   let open = $state(false), note = $state(""), asking = $state(false);
-  let noteEl = $state(), keepBtn = $state();
+  let noteEl = $state<HTMLTextAreaElement | undefined>(), keepBtn = $state<HTMLButtonElement | undefined>();
   // 底栏两组按钮原地切换：问的时候焦点到"继续填写"，回去接着填时回到输入框
-  async function ask(on) {
+  async function ask(on: boolean) {
     asking = on;
     await tick();
     (on ? keepBtn : noteEl).focus();
   }
   // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关
-  const guard = (close) => (asking ? ask(false) : note.trim() ? ask(true) : close());
+  const guard = (close: () => void) => (asking ? ask(false) : note.trim() ? ask(true) : close());
   function discard() {
     open = false;
     note = "";
@@ -757,17 +757,17 @@ export class DialogGuardComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onSettled } from "solid-js";
 import { closeDialog } from "satin-ui";
 
 // 标记照设计稿写，<sn-enhance> 接上 data-dlg 触发按钮、Esc、取消
 export default function SceneNote() {
   const [asking, setAsking] = createSignal(false);
-  let dlg, note, keep;
+  let dlg!: HTMLDialogElement & { guard?: () => void }, note!: HTMLTextAreaElement, keep!: HTMLButtonElement;
   const close = () => closeDialog(dlg);
   // 底栏两组按钮原地切换：问的时候焦点到"继续填写"，回去接着填时回到输入框
-  function ask(on) {
+  function ask(on: boolean) {
     setAsking(on);
     onSettled(() => (on ? keep : note).focus());
   }
@@ -800,7 +800,7 @@ export default function SceneNote() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Button, Dialog } from "satin-ui/react";
 
@@ -808,17 +808,17 @@ export default function SceneNote() {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [asking, setAsking] = useState(false);
-  const noteRef = useRef(null), keepRef = useRef(null);
+  const noteRef = useRef<HTMLTextAreaElement>(null), keepRef = useRef<HTMLButtonElement>(null);
   // 底栏两组按钮原地切换：问的时候焦点到"继续填写"，回去接着填时回到输入框（等这一轮把 inert 换过来再移焦点）
   useEffect(() => { if (open) (asking ? keepRef : noteRef).current?.focus(); }, [asking]);
   // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关
-  const guard = (close) => (asking ? setAsking(false) : note.trim() ? setAsking(true) : close());
+  const guard = (close: () => void) => (asking ? setAsking(false) : note.trim() ? setAsking(true) : close());
   function discard() {
     setOpen(false);
     setNote("");
     setAsking(false);
   }
-  function save(e) {
+  function save(e: Event) {
     e.preventDefault();
     setOpen(false);
   }
@@ -863,7 +863,7 @@ export default function SceneNote() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <button type="button" class="sn-btn sn-secondary" data-dlg="dlg-ev-d">导出设置</button>
@@ -887,7 +887,7 @@ export default function SceneNote() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Dialog } from "satin-ui/react";
 
@@ -914,7 +914,7 @@ export default function ExportSettings() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Dialog } from "satin-ui/vue";
 
@@ -940,8 +940,8 @@ function closed() {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Dialog from "satin-ui/svelte/Dialog.svelte";
 
   let open = $state(false), status = $state("还没打开过");
@@ -996,7 +996,7 @@ export class DialogEventsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 标记照设计稿写，<sn-enhance> 接上 data-dlg 触发按钮、Esc、取消
@@ -1023,7 +1023,7 @@ export default function ExportSettings() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "preact/hooks";
 import { Button, Dialog } from "satin-ui/react";
 
@@ -1066,7 +1066,7 @@ export default function ExportSettings() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-primary" id="new-project">新建项目</button>
 <dialog class="sn-dlg" id="dlg-ctl" aria-labelledby="dlg-ctl-t">
   <form method="dialog">
@@ -1094,15 +1094,15 @@ export default function ExportSettings() {
 
 React 的写法：
 
-```jsx
-import { useId, useState } from "react";
+```tsx
+import { useId, useState, type FormEvent } from "react";
 import { Button, Dialog, toast } from "satin-ui/react";
 
 export default function NewProject() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const nameId = useId();
-  function create(e) {
+  function create(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setOpen(false);
     toast({ text: "已创建：" + (name.trim() || "未命名项目") });
@@ -1135,7 +1135,7 @@ export default function NewProject() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, useId } from "vue";
 import { Button, Dialog, toast } from "satin-ui/vue";
 
@@ -1164,8 +1164,8 @@ function create() {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Dialog from "satin-ui/svelte/Dialog.svelte";
   import { toast } from "satin-ui";
 
@@ -1229,11 +1229,11 @@ export class DialogControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { closeDialog, openDialog, toast } from "satin-ui";
 
 export default function NewProject() {
-  let dlg, input;
+  let dlg!: HTMLDialogElement, input!: HTMLInputElement;
   function create() {
     const name = input.value.trim() || "未命名项目";
     closeDialog(dlg);
@@ -1259,7 +1259,7 @@ export default function NewProject() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useId, useState } from "preact/hooks";
 import { Button, Dialog, toast } from "satin-ui/react";
 
@@ -1267,7 +1267,7 @@ export default function NewProject() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const nameId = useId();
-  function create(e) {
+  function create(e: Event) {
     e.preventDefault();
     setOpen(false);
     toast({ text: "已创建：" + (name.trim() || "未命名项目") });

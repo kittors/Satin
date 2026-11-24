@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { toast } from "satin-ui";
 
   // 能撤销的操作不确认：直接做，再用轻提示给"撤销"

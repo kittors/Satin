@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import NumberFlow from "satin-ui/svelte/NumberFlow.svelte";
 </script>
 

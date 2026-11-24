@@ -46,9 +46,9 @@ export class ToastDemo0Component {
       // 不用写标记：第一次调 toast() 时在 body 末尾建一个 .sn-toasts 容器。这里四个按钮各演示一种
       const exportToast = (name?: any) => {
         const t = toast({ kind: "progress", text: `正在导出 ${name}` }); let p = 0;
-        const iv = setInterval(() => { // 换成你的导出进度
+        const iv = window.setInterval(() => { // 换成你的导出进度
           p = Math.min(1, p + 0.06 + Math.random() * 0.05); t.update({ progress: p });
-          if (p >= 1) { clearInterval(iv); setTimeout(() => t.update({ kind: "status", text: '已导出到"下载"', action: { label: "打开", run: (x?: any) => x.close() }, duration: 5000, done: true }), 260); }
+          if (p >= 1) { clearInterval(iv); window.setTimeout(() => t.update({ kind: "status", text: '已导出到"下载"', action: { label: "打开", run: (x?: any) => x.close() }, duration: 5000, done: true }), 260); }
         }, 200);
       };
       const DEMO = {

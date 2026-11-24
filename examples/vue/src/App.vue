@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { SINK as S } from "../../shared/sink.js";
 const view = ref(S.segmented.value), level = ref(S.slider.value), ratio = ref(S.select.value), saveDraft = ref(S.check.checked), notifyMe = ref(S.switch.checked), dur = ref(S.stepper.value);

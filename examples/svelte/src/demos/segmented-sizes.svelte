@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Segmented from "satin-ui/svelte/Segmented.svelte";
 </script>
 

@@ -1,15 +1,16 @@
-<script>
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
   // render 返回节点（或 HTML 字符串）：值是数据里来的，用 textContent 放，不拼进 HTML
-  const tagList = (tags) => {
+  const tagList = (tags: string[]) => {
     const box = document.createElement("span");
     box.className = "sn-row sn-gap-4";
     for (const t of tags) box.append(Object.assign(document.createElement("span"), { className: "sn-tag sn-sm", textContent: t }));
     return box;
   };
   // 只改显示的文字用 format（预算加上 ¥ 和千分位）；要放自己的标记用 render（一行好几个标签）
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 160 },
     { key: "tags", title: "标签", width: 200, render: tagList },
     { key: "budget", title: "预算", type: "money", width: 120, format: (v) => "¥" + v.toLocaleString("zh-CN") },

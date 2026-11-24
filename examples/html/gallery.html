@@ -7,7 +7,7 @@
 <script src="../../packages/satin-ui/src/theme-boot.js"></script>
 <link rel="stylesheet" href="../../packages/satin-ui/css/page.css">
 <link rel="stylesheet" href="../shared/gallery.css">
-<script type="importmap">{"imports":{"satin-ui":"../../packages/satin-ui/src/index.js","satin-ui/components":"../../packages/satin-ui/src/components.js","satin-ui/elements":"../../packages/satin-ui/elements/index.js","satin-ui/theme":"../../packages/satin-ui/src/theme.js","satin-ui/icons":"../../packages/satin-ui/src/icons.js","satin-ui/markdown":"../../packages/satin-ui/src/markdown.js","satin-ui/chat":"../../packages/satin-ui/src/chat.js","satin-ui/flow":"../../packages/satin-ui/src/flow.js","satin-ui/grid":"../../packages/satin-ui/src/grid.js","satin-ui/canvas-grid":"../../packages/satin-ui/src/canvas-grid.js","satin-ui/lightbox":"../../packages/satin-ui/src/lightbox.js","satin-ui/media":"../../packages/satin-ui/src/media.js"}}</script>
+<script type="importmap">{"imports":{"satin-ui":"../../packages/satin-ui/src/index.js","satin-ui/components":"../../packages/satin-ui/src/components.js","satin-ui/elements":"../../packages/satin-ui/elements/index.js","satin-ui/theme":"../../packages/satin-ui/src/theme.js","satin-ui/icons":"../../packages/satin-ui/src/icons.js","satin-ui/markdown":"../../packages/satin-ui/src/markdown.js","satin-ui/chat":"../../packages/satin-ui/src/chat.js","satin-ui/flow":"../../packages/satin-ui/src/flow.js","satin-ui/grid":"../../packages/satin-ui/src/grid.js","satin-ui/canvas-grid":"../../packages/satin-ui/src/canvas-grid.js","satin-ui/charts":"../../packages/satin-ui/src/charts.js","satin-ui/lightbox":"../../packages/satin-ui/src/lightbox.js","satin-ui/media":"../../packages/satin-ui/src/media.js"}}</script>
 </head>
 <body>
 <main class="gallery">
@@ -37,6 +37,7 @@
     <h2>圆角与线</h2>
     <div class="demo" data-demo="space-0"></div>
     <div class="demo" data-demo="space-1"></div>
+    <div class="demo" data-demo="space-2"></div>
   </section>
   <section id="elevation">
     <h2>阴影与层级</h2>
@@ -46,9 +47,18 @@
     <h2>动效曲线</h2>
     <div class="demo" data-demo="motion-0"></div>
   </section>
+  <section id="loadingmotion">
+    <h2>内容加载与过渡</h2>
+    <div class="demo" data-demo="loadingmotion-0"></div>
+  </section>
   <section id="icons">
     <h2>图标</h2>
     <div class="demo" data-demo="icons-0"></div>
+    <div class="demo" data-demo="icons-1"></div>
+  </section>
+  <section id="feel">
+    <h2>交互质感</h2>
+    <div class="demo" data-demo="feel-0"></div>
   </section>
   <section id="button">
     <h2>按钮</h2>
@@ -174,6 +184,7 @@
   <section id="loading">
     <h2>骨架与加载</h2>
     <div class="demo" data-demo="loading-0"></div>
+    <div class="demo" data-demo="loading-1"></div>
   </section>
   <section id="progress">
     <h2>进度</h2>
@@ -201,6 +212,13 @@
   <section id="cgrid">
     <h2>Canvas 表格</h2>
     <div class="demo" data-demo="cgrid-0"></div>
+  </section>
+  <section id="charts">
+    <h2>数据图表与 3D</h2>
+    <div class="demo" data-demo="charts-0"></div>
+    <div class="demo" data-demo="charts-1"></div>
+    <div class="demo" data-demo="charts-2"></div>
+    <div class="demo" data-demo="charts-3"></div>
   </section>
   <section id="list">
     <h2>列表与键值</h2>
@@ -246,6 +264,10 @@
   <section id="md">
     <h2>Markdown 文档</h2>
     <div class="demo" data-demo="md-0"></div>
+  </section>
+  <section id="editorial">
+    <h2>图文编排与内容张力</h2>
+    <div class="demo" data-demo="editorial-0"></div>
   </section>
   <section id="flow">
     <h2>流程图</h2>
@@ -315,6 +337,9 @@
     <h2>卡片</h2>
     <div class="demo" data-demo="card-basic"></div>
     <div class="demo" data-demo="card-grid"></div>
+    <div class="demo" data-demo="card-variants"></div>
+    <div class="demo" data-demo="card-layouts"></div>
+    <div class="demo" data-demo="card-content"></div>
     <div class="demo" data-demo="card-select"></div>
   </section>
   <section id="cgrid">
@@ -392,6 +417,7 @@
     <div class="demo" data-demo="empty-basic"></div>
     <div class="demo" data-demo="empty-search"></div>
     <div class="demo" data-demo="empty-error"></div>
+    <div class="demo" data-demo="empty-presets"></div>
   </section>
   <section id="field">
     <h2>字段与错误</h2>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance, injectIcons } from "satin-ui";
   import { createSelect, bindSelects } from "satin-ui/components";
@@ -6,20 +6,21 @@
   import "satin-ui/css/overlay.css";
   import "./select-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 一个一个接：选中时回调
       const ratio = createSelect(root.querySelector("[data-select]"), {
-        onChange: (value) => console.log("画面比例", value),
+        onChange: (value?: any) => console.log("画面比例", value),
       });
       ratio.update({ value: "9:16" }); // 改选中项（不触发回调）
       ratio.value;                     // "9:16"
 
       // 或者把页面上所有 .sn-select 一次接上，用事件拿结果
       bindSelects(document);
-      document.addEventListener("select", (e) => console.log(e.detail.value));
+      document.addEventListener("select", (e?: any) => console.log(e.detail.value));
 
       // 不写标记也行：createSelect(空容器, { items: ["16:9 · 横屏", "9:16 · 竖屏"], value: "16:9 · 横屏", label: "画面比例" }) 按选项渲染
     });

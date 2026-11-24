@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Sidebar } from "satin-ui/vue";
 
@@ -10,7 +10,7 @@ const NAV = [
   { key: "p2", label: "候车厅", icon: "folder" },
 ];
 const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
-const TITLE = { all: "全部项目", assets: "素材库", p1: "雨夜车站", p2: "候车厅", settings: "设置" };
+const TITLE: Record<string, string> = { all: "全部项目", assets: "素材库", p1: "雨夜车站", p2: "候车厅", settings: "设置" };
 // v-model 绑选中的 key
 const page = ref("all");
 </script>

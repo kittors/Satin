@@ -54,7 +54,7 @@ respond 是异步生成器，一段段 yield 文字；点"停止"时 ctx.stopped
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="chat-basic"></div>
 
 <script type="module">
@@ -74,11 +74,11 @@ respond 是异步生成器，一段段 yield 文字；点"停止"时 ctx.stopped
 
 React 的写法：
 
-```jsx
+```tsx
 import { Chat } from "satin-ui/react/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
@@ -95,11 +95,11 @@ export default function Assistant() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Chat } from "satin-ui/vue/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
@@ -116,11 +116,11 @@ async function* respond(question, ctx) {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createChat } from "satin-ui/chat";
   // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
-  async function* respond(question, ctx) {
+  async function* respond(question: string, ctx: { readonly stopped: boolean }) {
     const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
     for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
       await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
@@ -129,7 +129,7 @@ Svelte 的写法：
   }
 
   // 输入框里的字原地变成气泡飞进列表；回答先进缓冲、匀速流出，随时能点"停止"；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createChat(host, { title: "分镜助手", placeholder: "问点什么…", respond });
     return () => it.destroy();
@@ -173,12 +173,12 @@ export class ChatBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createChat } from "satin-ui/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
@@ -187,7 +187,7 @@ async function* respond(question, ctx) {
 }
 
 export default function Assistant() {
-  let host;
+  let host!: HTMLDivElement;
   // 输入框里的字原地变成气泡飞进列表；回答先进缓冲、匀速流出，随时能点"停止"；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createChat(host, { title: "分镜助手", placeholder: "问点什么…", respond });
@@ -199,11 +199,11 @@ export default function Assistant() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Chat } from "satin-ui/react/chat";
 
 // 接模型：异步生成器一段段 yield 文字；用户点"停止"时 ctx.stopped 变成 true（每次读都是现在的值）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40)); // 演示用：假装是模型一点点回
@@ -227,7 +227,7 @@ empty 给图标、标题、说明和建议（点了填进输入框）；输入�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="chat-new"></div>
 
 <script type="module">
@@ -259,12 +259,13 @@ empty 给图标、标题、说明和建议（点了填进输入框）；输入�
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Chat } from "satin-ui/react/chat";
+import type { ComposerMode } from "satin-ui/react";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
@@ -281,7 +282,7 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 
 export default function NewChat() {
@@ -297,12 +298,13 @@ export default function NewChat() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
+import type { ComposerMode } from "satin-ui/vue";
 import { ref } from "vue";
 import { Chat } from "satin-ui/vue/chat";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
@@ -319,7 +321,7 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 const model = ref("fine");
 </script>
@@ -333,11 +335,12 @@ const model = ref("fine");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
+  import type { ComposerMode } from "satin-ui";
   import { createChat } from "satin-ui/chat";
   // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
-  async function* respond(question, ctx) {
+  async function* respond(question: string, ctx: { readonly stopped: boolean }) {
     const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
     for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
       await new Promise((r) => setTimeout(r, 40));
@@ -353,11 +356,11 @@ Svelte 的写法：
     { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
   ];
   // 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）
-  const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
+  const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
   const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 
   // 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createChat(host, { title: "新对话", placeholder: "随心输入", respond, empty: EMPTY, context: CONTEXT, mode: MODE, models: MODELS, model: "fine",
       onModelChange: (v) => console.log("换了模型", v), onModeChange: (v) => console.log("换了权限", v) });
@@ -415,12 +418,13 @@ export class ChatNewComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
+import type { ComposerMode } from "satin-ui";
 import { onSettled } from "solid-js";
 import { createChat } from "satin-ui/chat";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
@@ -436,11 +440,11 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 
 export default function NewChat() {
-  let host;
+  let host!: HTMLDivElement;
   // 发出第一条以后空状态淡出，输入框原地不动；换了模型、权限、上下文都有事件；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createChat(host, { title: "新对话", placeholder: "随心输入", respond, empty: EMPTY, context: CONTEXT, mode: MODE, models: MODELS, model: "fine",
@@ -453,12 +457,13 @@ export default function NewChat() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Chat } from "satin-ui/react/chat";
+import type { ComposerMode } from "satin-ui/react";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
@@ -475,7 +480,7 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 
 export default function NewChat() {
@@ -498,7 +503,7 @@ history 给一开始的消息和"更早的一页"：往上翻到顶自动加载�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="chat-history"></div>
 
 <script type="module">
@@ -540,11 +545,11 @@ history 给一开始的消息和"更早的一页"：往上翻到顶自动加载�
 
 React 的写法：
 
-```jsx
-import { Chat } from "satin-ui/react/chat";
+```tsx
+import { Chat, type ChatHistory, type ChatItem } from "satin-ui/react/chat";
 
 // 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
-const CONVO = [
+const CONVO: [boolean, string][] = [
   [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
   [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
   [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
@@ -558,11 +563,11 @@ const CONVO = [
   [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
   [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
 ];
-const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
-const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+const msgs = (list: [boolean, string][]): ChatItem[] => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const OLDER: [string, [boolean, string][]][] = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
 let left = OLDER.length;
 // initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-const history = {
+const history: ChatHistory = {
   initial: () => [
     { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
     { kind: "day", text: "今天" },
@@ -570,7 +575,7 @@ const history = {
     { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
     { kind: "msg", me: false, text: "收到，下午配音。" },
   ],
-  older: () => new Promise((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
+  older: () => new Promise<ChatItem[]>((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
   hasMore: () => left > 0,
 };
 
@@ -583,7 +588,7 @@ export default function Conversation() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Chat } from "satin-ui/vue/chat";
 
 // 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
@@ -601,7 +606,7 @@ const CONVO = [
   [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
   [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
 ];
-const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const msgs = (list: [boolean, string][]) => list.map(([me, text]) => ({ kind: "msg" as const, me, text }));
 const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
 let left = OLDER.length;
 // initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
@@ -626,8 +631,8 @@ const history = {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createChat } from "satin-ui/chat";
   // 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
   const CONVO = [
@@ -644,7 +649,7 @@ Svelte 的写法：
     [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
     [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
   ];
-  const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+  const msgs = (list: [boolean, string][]) => list.map(([me, text]) => ({ kind: "msg" as const, me, text }));
   const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
   let left = OLDER.length;
   // initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
@@ -661,7 +666,7 @@ Svelte 的写法：
   };
 
   // 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createChat(host, { title: "林夏", status: "在线", placeholder: "发给林夏", history });
     return () => it.destroy();
@@ -727,7 +732,7 @@ export class ChatHistoryComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createChat } from "satin-ui/chat";
 
@@ -746,7 +751,7 @@ const CONVO = [
   [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
   [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
 ];
-const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const msgs = (list: [boolean, string][]) => list.map(([me, text]) => ({ kind: "msg" as const, me, text }));
 const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
 let left = OLDER.length;
 // initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
@@ -763,7 +768,7 @@ const history = {
 };
 
 export default function Conversation() {
-  let host;
+  let host!: HTMLDivElement;
   // 消息再多也只画看得见的；往上翻快到顶时自动要更早的一页，插进来后视口不跳；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createChat(host, { title: "林夏", status: "在线", placeholder: "发给林夏", history });
@@ -775,11 +780,11 @@ export default function Conversation() {
 
 Preact 的写法：
 
-```jsx
-import { Chat } from "satin-ui/react/chat";
+```tsx
+import { Chat, type ChatHistory, type ChatItem } from "satin-ui/react/chat";
 
 // 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
-const CONVO = [
+const CONVO: [boolean, string][] = [
   [false, "第三集的分镜我看完了，候车厅那段节奏有点赶。"], [true, "我也觉得，加一个她收伞的停顿？"],
   [false, "可以，停两秒左右就够。"], [true, "那第 6 个镜头往后顺延，结尾不动。"],
   [false, "配音稿要跟着改吗？"], [true, "旁白第三句往后挪半秒，别的不用动。"],
@@ -793,11 +798,11 @@ const CONVO = [
   [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
   [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
 ];
-const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
-const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
+const msgs = (list: [boolean, string][]): ChatItem[] => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const OLDER: [string, [boolean, string][]][] = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
 let left = OLDER.length;
 // initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有
-const history = {
+const history: ChatHistory = {
   initial: () => [
     { kind: "day", text: "昨天" }, ...msgs(CONVO.slice(12)),
     { kind: "day", text: "今天" },
@@ -805,7 +810,7 @@ const history = {
     { kind: "msg", me: true, type: "file", name: "第三集分镜脚本（终版）.docx", ext: "DOCX", size: 2516582 },
     { kind: "msg", me: false, text: "收到，下午配音。" },
   ],
-  older: () => new Promise((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
+  older: () => new Promise<ChatItem[]>((ok) => setTimeout(() => { const [day, list] = OLDER[--left]; ok([{ kind: "day", text: day }, ...msgs(list)]); }, 600)),
   hasMore: () => left > 0,
 };
 
@@ -825,7 +830,7 @@ respond 除了文字还能 yield { think }、{ step }、{ card }、{ image }：�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="chat-rich"></div>
 
 <script type="module">
@@ -854,15 +859,15 @@ respond 除了文字还能 yield { think }、{ step }、{ card }、{ image }：�
 
 React 的写法：
 
-```jsx
+```tsx
 import { Chat } from "satin-ui/react/chat";
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 // 演示用：一段文字几个字一组流出（换成模型的流式输出）
-async function* words(text, ctx) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
+async function* words(text: string, ctx: { readonly stopped: boolean }) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
 const CARDS = [["03", "远景 · 4 秒", "雨刚停，积水里的路灯", "url(https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=640&q=72) center / cover"], ["04", "全景 · 6 秒", "她收起伞走进候车厅", "url(https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=640&q=72) center / cover"]];
 // 先思考（灰字流出，正文一来就收起），再列步骤，再出正文、镜头卡片和生成的画面；ctx.stopped 变成 true 就尽快结束
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   for await (const t of words("先看开头几个镜头的色调，再按雨夜的冷色调。", ctx)) yield { think: t };
   yield { step: { t: "读取第三集的 48 个镜头", s: "run" } };
   await wait(600);
@@ -884,15 +889,15 @@ export default function Storyboard() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Chat } from "satin-ui/vue/chat";
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 // 演示用：一段文字几个字一组流出（换成模型的流式输出）
-async function* words(text, ctx) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
+async function* words(text: string, ctx: { readonly stopped: boolean }) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
 const CARDS = [["03", "远景 · 4 秒", "雨刚停，积水里的路灯", "url(https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=640&q=72) center / cover"], ["04", "全景 · 6 秒", "她收起伞走进候车厅", "url(https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=640&q=72) center / cover"]];
 // 先思考（灰字流出，正文一来就收起），再列步骤，再出正文、镜头卡片和生成的画面；ctx.stopped 变成 true 就尽快结束
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   for await (const t of words("先看开头几个镜头的色调，再按雨夜的冷色调。", ctx)) yield { think: t };
   yield { step: { t: "读取第三集的 48 个镜头", s: "run" } };
   await wait(600);
@@ -914,15 +919,15 @@ async function* respond(question, ctx) {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createChat } from "satin-ui/chat";
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
   // 演示用：一段文字几个字一组流出（换成模型的流式输出）
-  async function* words(text, ctx) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
+  async function* words(text: string, ctx: { readonly stopped: boolean }) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
   const CARDS = [["03", "远景 · 4 秒", "雨刚停，积水里的路灯", "url(https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=640&q=72) center / cover"], ["04", "全景 · 6 秒", "她收起伞走进候车厅", "url(https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=640&q=72) center / cover"]];
   // 先思考（灰字流出，正文一来就收起），再列步骤，再出正文、镜头卡片和生成的画面；ctx.stopped 变成 true 就尽快结束
-  async function* respond(question, ctx) {
+  async function* respond(question: string, ctx: { readonly stopped: boolean }) {
     for await (const t of words("先看开头几个镜头的色调，再按雨夜的冷色调。", ctx)) yield { think: t };
     yield { step: { t: "读取第三集的 48 个镜头", s: "run" } };
     await wait(600);
@@ -936,7 +941,7 @@ Svelte 的写法：
   }
 
   // respond 除了文字还能 yield { think }、{ step }、{ stepUpdate }、{ card }、{ image } / { imageProgress } / { imageDone }；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createChat(host, { title: "分镜助手", placeholder: "比如：把开头调冷一点", respond });
     return () => it.destroy();
@@ -989,16 +994,16 @@ export class ChatRichComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createChat } from "satin-ui/chat";
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 // 演示用：一段文字几个字一组流出（换成模型的流式输出）
-async function* words(text, ctx) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
+async function* words(text: string, ctx: { readonly stopped: boolean }) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
 const CARDS = [["03", "远景 · 4 秒", "雨刚停，积水里的路灯", "url(https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=640&q=72) center / cover"], ["04", "全景 · 6 秒", "她收起伞走进候车厅", "url(https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=640&q=72) center / cover"]];
 // 先思考（灰字流出，正文一来就收起），再列步骤，再出正文、镜头卡片和生成的画面；ctx.stopped 变成 true 就尽快结束
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   for await (const t of words("先看开头几个镜头的色调，再按雨夜的冷色调。", ctx)) yield { think: t };
   yield { step: { t: "读取第三集的 48 个镜头", s: "run" } };
   await wait(600);
@@ -1012,7 +1017,7 @@ async function* respond(question, ctx) {
 }
 
 export default function Storyboard() {
-  let host;
+  let host!: HTMLDivElement;
   // respond 除了文字还能 yield { think }、{ step }、{ stepUpdate }、{ card }、{ image } / { imageProgress } / { imageDone }；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createChat(host, { title: "分镜助手", placeholder: "比如：把开头调冷一点", respond });
@@ -1024,15 +1029,15 @@ export default function Storyboard() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Chat } from "satin-ui/react/chat";
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 // 演示用：一段文字几个字一组流出（换成模型的流式输出）
-async function* words(text, ctx) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
+async function* words(text: string, ctx: { readonly stopped: boolean }) { for (let i = 0; i < text.length && !ctx.stopped; i += 3) { await wait(40); yield text.slice(i, i + 3); } }
 const CARDS = [["03", "远景 · 4 秒", "雨刚停，积水里的路灯", "url(https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=640&q=72) center / cover"], ["04", "全景 · 6 秒", "她收起伞走进候车厅", "url(https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=640&q=72) center / cover"]];
 // 先思考（灰字流出，正文一来就收起），再列步骤，再出正文、镜头卡片和生成的画面；ctx.stopped 变成 true 就尽快结束
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   for await (const t of words("先看开头几个镜头的色调，再按雨夜的冷色调。", ctx)) yield { think: t };
   yield { step: { t: "读取第三集的 48 个镜头", s: "run" } };
   await wait(600);

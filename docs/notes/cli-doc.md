@@ -84,13 +84,13 @@ pnpm-workspace.yaml   只有 --pm pnpm 时有：放行这个写法要用的安�
 各写法自己的文件：
 
 ```text
-react     index.html  vite.config.js  src/main.jsx  src/App.jsx
-vue       index.html  vite.config.js  src/main.js   src/App.vue
-svelte    index.html  vite.config.js  src/main.js   src/App.svelte
-solid     index.html  vite.config.js  src/main.js   src/App.jsx        （Solid 2：@solidjs/web、@solidjs/vite-plugin）
-preact    index.html  vite.config.js  src/main.js   src/App.jsx
+react     index.html  tsconfig.json  vite.config.ts  src/main.tsx  src/App.tsx
+vue       index.html  tsconfig.json  vite.config.ts  src/main.ts   src/App.vue
+svelte    index.html  tsconfig.json  vite.config.ts  src/main.ts   src/App.svelte
+solid     index.html  tsconfig.json  vite.config.ts  src/main.tsx  src/App.tsx        （Solid 2：@solidjs/web、@solidjs/vite-plugin）
+preact    index.html  tsconfig.json  vite.config.ts  src/main.tsx  src/App.tsx
 angular   angular.json  tsconfig.json  src/index.html  src/main.ts  src/app.ts  src/styles.css
-next      next.config.mjs  app/layout.jsx  app/page.jsx  app/new-project.jsx
+next      next.config.mjs  tsconfig.json  app/layout.tsx  app/page.tsx  app/new-project.tsx
 nuxt      nuxt.config.ts  app/app.vue  app/plugins/satin.ts
 html      index.html  main.js  serve.mjs                              （不用打包工具；npm run dev 起一个本地服务）
 ```
@@ -99,8 +99,8 @@ html      index.html  main.js  serve.mjs                              （不用�
 
 | 写法 | 样式 | theme-boot | 组件 |
 |---|---|---|---|
-| React、Vue、Svelte、Solid、Preact（Vite） | 入口里 `import "satin-ui/css/page.css"` | `vite.config.js` 里的 `satin()` 插件 | React：`satin-ui/react`；Vue：`app.use(Satin)`；其余：`setup()` + `defineElements()`，用 `<sn-xxx>` |
-| Next.js | `app/layout.jsx` 里引 `page.css` | `satin-ui/theme-boot-script` 内联进 `<head>`，`<html>` 加 `suppressHydrationWarning` | `satin-ui/react`（服务端组件里也能用） |
+| React、Vue、Svelte、Solid、Preact（Vite） | 入口里 `import "satin-ui/css/page.css"` | `vite.config.ts` 里的 `satin()` 插件 | React：`satin-ui/react`；Vue：`app.use(Satin)`；其余：`setup()` + `defineElements()`，用 `<sn-xxx>` |
+| Next.js | `app/layout.tsx` 里引 `page.css` | `satin-ui/theme-boot-script` 内联进 `<head>`，`<html>` 加 `suppressHydrationWarning` | `satin-ui/react`（服务端组件里也能用） |
 | Nuxt | `nuxt.config.ts` 的 `css` | `app.head.script` 里 `tagPosition: "head"` | `app/plugins/satin.ts` 里 `vueApp.use(Satin)` |
 | Angular | `src/styles.css` 里 `@import` | `angular.json` 把 `theme-boot.js` 拷进构建，`src/index.html` 的 `<head>` 最前面引 | `setup()` + `defineElements()`，组件上加 `CUSTOM_ELEMENTS_SCHEMA` |
 | 纯 HTML | `<link>` 引 `node_modules` 里的 `page.css` | `<head>` 最前面的 `<script src="…/theme-boot.js">` | 导入映射把 `satin-ui` 指到 `node_modules`；`setup()` + `defineElements()` + `enhance()` |
@@ -114,7 +114,7 @@ satin add settings
 
 8 种页面配方：后台列表、设置页、登录注册、仪表盘、AI 对话、落地页、移动端下单、表单向导。
 纯 HTML 项目拷成项目根目录下的一张页面（比如 `settings.html`，开发服务器起来以后打开 `/settings.html`）；
-Vite 类的写法拷进 `src/recipes/<配方>/`，Next.js、Nuxt 拷进 `app/recipes/<配方>/`（Next.js 还会建好路由 `app/<配方>/page.jsx`）。
+Vite 类的写法拷进 `src/recipes/<配方>/`，Next.js、Nuxt 拷进 `app/recipes/<配方>/`（Next.js 还会建好路由 `app/<配方>/page.tsx`）。
 某种写法的配方模板还没有时，命令会说清楚现在有哪几种写法，退出码 1。
 
 ## 常见问题

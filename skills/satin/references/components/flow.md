@@ -51,7 +51,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="flow-basic"></div>
 
 <script type="module">
@@ -70,8 +70,8 @@
 
 React 的写法：
 
-```jsx
-import { Flow } from "satin-ui/react/flow";
+```tsx
+import { Flow, type FlowEdge } from "satin-ui/react/flow";
 
 const nodes = [
   { id: "src", x: 0, y: 40, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
@@ -79,7 +79,7 @@ const nodes = [
   { id: "img", x: 540, y: 40, title: "生成画面", icon: "image", detail: "电影感 · 16:9", kind: "image" },
   { id: "out", x: 810, y: 40, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["img", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["img", "out"]];
 
 export default function Pipeline() {
   // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；节点、连线只在创建时用（之后用户在画布上拖、连、删）
@@ -90,16 +90,16 @@ export default function Pipeline() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { Flow } from "satin-ui/vue/flow";
+<script setup lang="ts">
+import { Flow, type FlowNode, type FlowEdge } from "satin-ui/vue/flow";
 
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "src", x: 0, y: 40, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
   { id: "board", x: 270, y: 40, title: "生成分镜", icon: "clapperboard", detail: "第三集 · 48 个镜头", kind: "board" },
   { id: "img", x: 540, y: 40, title: "生成画面", icon: "image", detail: "电影感 · 16:9", kind: "image" },
   { id: "out", x: 810, y: 40, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["img", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["img", "out"]];
 </script>
 
 <template>
@@ -110,19 +110,19 @@ const edges = [["src", "board"], ["board", "img"], ["img", "out"]];
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createFlow } from "satin-ui/flow";
-  const nodes = [
+```svelte
+<script lang="ts">
+  import { createFlow, type FlowNode, type FlowEdge } from "satin-ui/flow";
+  const nodes: FlowNode[] = [
     { id: "src", x: 0, y: 40, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
     { id: "board", x: 270, y: 40, title: "生成分镜", icon: "clapperboard", detail: "第三集 · 48 个镜头", kind: "board" },
     { id: "img", x: 540, y: 40, title: "生成画面", icon: "image", detail: "电影感 · 16:9", kind: "image" },
     { id: "out", x: 810, y: 40, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
   ];
-  const edges = [["src", "board"], ["board", "img"], ["img", "out"]];
+  const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["img", "out"]];
 
   // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createFlow(host, { nodes, edges });
     return () => it.destroy();
@@ -165,20 +165,20 @@ export class FlowBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createFlow } from "satin-ui/flow";
+import { createFlow, type FlowNode, type FlowEdge } from "satin-ui/flow";
 
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "src", x: 0, y: 40, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
   { id: "board", x: 270, y: 40, title: "生成分镜", icon: "clapperboard", detail: "第三集 · 48 个镜头", kind: "board" },
   { id: "img", x: 540, y: 40, title: "生成画面", icon: "image", detail: "电影感 · 16:9", kind: "image" },
   { id: "out", x: 810, y: 40, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["img", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["img", "out"]];
 
 export default function Pipeline() {
-  let host;
+  let host!: HTMLDivElement;
   // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createFlow(host, { nodes, edges });
@@ -190,8 +190,8 @@ export default function Pipeline() {
 
 Preact 的写法：
 
-```jsx
-import { Flow } from "satin-ui/react/flow";
+```tsx
+import { Flow, type FlowEdge } from "satin-ui/react/flow";
 
 const nodes = [
   { id: "src", x: 0, y: 40, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
@@ -199,7 +199,7 @@ const nodes = [
   { id: "img", x: 540, y: 40, title: "生成画面", icon: "image", detail: "电影感 · 16:9", kind: "image" },
   { id: "out", x: 810, y: 40, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["img", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["img", "out"]];
 
 export default function Pipeline() {
   // 拖空白处平移、滚轮或触控板缩放；拖节点，连线跟着走；悬停一个节点高亮它的上下游；节点、连线只在创建时用（之后用户在画布上拖、连、删）
@@ -217,7 +217,7 @@ export default function Pipeline() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="flow-branch"></div>
 
 <script type="module">
@@ -243,8 +243,8 @@ export default function Pipeline() {
 
 React 的写法：
 
-```jsx
-import { Flow } from "satin-ui/react/flow";
+```tsx
+import { Flow, type FlowEdge } from "satin-ui/react/flow";
 
 const nodes = [
   { id: "src", x: 0, y: 243, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
@@ -259,7 +259,7 @@ const nodes = [
   { id: "out", x: 1510, y: 193, title: "导出横屏", icon: "download", detail: "第三集.mp4 · 16:9", kind: "out" },
   { id: "outV", x: 1510, y: 293, title: "导出竖屏", icon: "download", detail: "第三集-竖屏.mp4 · 9:16", kind: "out" },
 ];
-const edges = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
+const edges: FlowEdge[] = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap<FlowEdge>((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
 
 export default function FullPipeline() {
   // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点"运行"按依赖一层层点亮（演示用的进度）；节点、连线只在创建时用（之后用户在画布上拖、连、删）
@@ -270,10 +270,10 @@ export default function FullPipeline() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { Flow } from "satin-ui/vue/flow";
+<script setup lang="ts">
+import { Flow, type FlowNode, type FlowEdge } from "satin-ui/vue/flow";
 
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "src", x: 0, y: 243, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
   { id: "split", x: 270, y: 243, title: "拆分章节", icon: "list", detail: "12 集 · 每集约 2700 字", kind: "text" },
   { id: "board", x: 540, y: 243, title: "生成分镜", icon: "clapperboard", detail: "第三集 · 48 个镜头", kind: "board" },
@@ -286,7 +286,7 @@ const nodes = [
   { id: "out", x: 1510, y: 193, title: "导出横屏", icon: "download", detail: "第三集.mp4 · 16:9", kind: "out" },
   { id: "outV", x: 1510, y: 293, title: "导出竖屏", icon: "download", detail: "第三集-竖屏.mp4 · 9:16", kind: "out" },
 ];
-const edges = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
+const edges: FlowEdge[] = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap<FlowEdge>((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
 </script>
 
 <template>
@@ -297,10 +297,10 @@ const edges = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", 
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createFlow } from "satin-ui/flow";
-  const nodes = [
+```svelte
+<script lang="ts">
+  import { createFlow, type FlowNode, type FlowEdge } from "satin-ui/flow";
+  const nodes: FlowNode[] = [
     { id: "src", x: 0, y: 243, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
     { id: "split", x: 270, y: 243, title: "拆分章节", icon: "list", detail: "12 集 · 每集约 2700 字", kind: "text" },
     { id: "board", x: 540, y: 243, title: "生成分镜", icon: "clapperboard", detail: "第三集 · 48 个镜头", kind: "board" },
@@ -313,10 +313,10 @@ Svelte 的写法：
     { id: "out", x: 1510, y: 193, title: "导出横屏", icon: "download", detail: "第三集.mp4 · 16:9", kind: "out" },
     { id: "outV", x: 1510, y: 293, title: "导出竖屏", icon: "download", detail: "第三集-竖屏.mp4 · 9:16", kind: "out" },
   ];
-  const edges = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
+  const edges: FlowEdge[] = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap<FlowEdge>((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
 
   // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点"运行"按依赖一层层点亮（演示用的进度）；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createFlow(host, { nodes, edges });
     return () => it.destroy();
@@ -366,11 +366,11 @@ export class FlowBranchComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createFlow } from "satin-ui/flow";
+import { createFlow, type FlowNode, type FlowEdge } from "satin-ui/flow";
 
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "src", x: 0, y: 243, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
   { id: "split", x: 270, y: 243, title: "拆分章节", icon: "list", detail: "12 集 · 每集约 2700 字", kind: "text" },
   { id: "board", x: 540, y: 243, title: "生成分镜", icon: "clapperboard", detail: "第三集 · 48 个镜头", kind: "board" },
@@ -383,10 +383,10 @@ const nodes = [
   { id: "out", x: 1510, y: 193, title: "导出横屏", icon: "download", detail: "第三集.mp4 · 16:9", kind: "out" },
   { id: "outV", x: 1510, y: 293, title: "导出竖屏", icon: "download", detail: "第三集-竖屏.mp4 · 9:16", kind: "out" },
 ];
-const edges = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
+const edges: FlowEdge[] = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap<FlowEdge>((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
 
 export default function FullPipeline() {
-  let host;
+  let host!: HTMLDivElement;
   // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点"运行"按依赖一层层点亮（演示用的进度）；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createFlow(host, { nodes, edges });
@@ -398,8 +398,8 @@ export default function FullPipeline() {
 
 Preact 的写法：
 
-```jsx
-import { Flow } from "satin-ui/react/flow";
+```tsx
+import { Flow, type FlowEdge } from "satin-ui/react/flow";
 
 const nodes = [
   { id: "src", x: 0, y: 243, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
@@ -414,7 +414,7 @@ const nodes = [
   { id: "out", x: 1510, y: 193, title: "导出横屏", icon: "download", detail: "第三集.mp4 · 16:9", kind: "out" },
   { id: "outV", x: 1510, y: 293, title: "导出竖屏", icon: "download", detail: "第三集-竖屏.mp4 · 9:16", kind: "out" },
 ];
-const edges = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
+const edges: FlowEdge[] = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap<FlowEdge>((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
 
 export default function FullPipeline() {
   // 一个节点分出五条线并行，再汇到合成；kind 决定颜色，bg 给缩略图；点"运行"按依赖一层层点亮（演示用的进度）；节点、连线只在创建时用（之后用户在画布上拖、连、删）
@@ -432,7 +432,7 @@ export default function FullPipeline() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="flow-tidy"></div>
 
 <script type="module">
@@ -453,8 +453,8 @@ export default function FullPipeline() {
 
 React 的写法：
 
-```jsx
-import { Flow } from "satin-ui/react/flow";
+```tsx
+import { Flow, type FlowEdge } from "satin-ui/react/flow";
 
 const nodes = [
   { id: "src", x: 120, y: 300, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx", kind: "text" },
@@ -464,7 +464,7 @@ const nodes = [
   { id: "mix", x: 260, y: 180, title: "合成视频", icon: "film", detail: "1080p", kind: "video" },
   { id: "out", x: 640, y: 220, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
 
 export default function MessyPipeline() {
   // 坐标不用算准：点工具条上的"整理"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；节点、连线只在创建时用（之后用户在画布上拖、连、删）
@@ -475,10 +475,10 @@ export default function MessyPipeline() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { Flow } from "satin-ui/vue/flow";
+<script setup lang="ts">
+import { Flow, type FlowNode, type FlowEdge } from "satin-ui/vue/flow";
 
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "src", x: 120, y: 300, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx", kind: "text" },
   { id: "board", x: 30, y: 60, title: "生成分镜", icon: "clapperboard", detail: "第三集", kind: "board" },
   { id: "img", x: 420, y: 380, title: "生成画面", icon: "image", detail: "16:9", kind: "image" },
@@ -486,7 +486,7 @@ const nodes = [
   { id: "mix", x: 260, y: 180, title: "合成视频", icon: "film", detail: "1080p", kind: "video" },
   { id: "out", x: 640, y: 220, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
 </script>
 
 <template>
@@ -497,10 +497,10 @@ const edges = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createFlow } from "satin-ui/flow";
-  const nodes = [
+```svelte
+<script lang="ts">
+  import { createFlow, type FlowNode, type FlowEdge } from "satin-ui/flow";
+  const nodes: FlowNode[] = [
     { id: "src", x: 120, y: 300, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx", kind: "text" },
     { id: "board", x: 30, y: 60, title: "生成分镜", icon: "clapperboard", detail: "第三集", kind: "board" },
     { id: "img", x: 420, y: 380, title: "生成画面", icon: "image", detail: "16:9", kind: "image" },
@@ -508,10 +508,10 @@ Svelte 的写法：
     { id: "mix", x: 260, y: 180, title: "合成视频", icon: "film", detail: "1080p", kind: "video" },
     { id: "out", x: 640, y: 220, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
   ];
-  const edges = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
+  const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
 
   // 坐标不用算准：点工具条上的"整理"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createFlow(host, { nodes, edges });
     return () => it.destroy();
@@ -556,11 +556,11 @@ export class FlowTidyComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createFlow } from "satin-ui/flow";
+import { createFlow, type FlowNode, type FlowEdge } from "satin-ui/flow";
 
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "src", x: 120, y: 300, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx", kind: "text" },
   { id: "board", x: 30, y: 60, title: "生成分镜", icon: "clapperboard", detail: "第三集", kind: "board" },
   { id: "img", x: 420, y: 380, title: "生成画面", icon: "image", detail: "16:9", kind: "image" },
@@ -568,10 +568,10 @@ const nodes = [
   { id: "mix", x: 260, y: 180, title: "合成视频", icon: "film", detail: "1080p", kind: "video" },
   { id: "out", x: 640, y: 220, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
 
 export default function MessyPipeline() {
-  let host;
+  let host!: HTMLDivElement;
   // 坐标不用算准：点工具条上的"整理"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createFlow(host, { nodes, edges });
@@ -583,8 +583,8 @@ export default function MessyPipeline() {
 
 Preact 的写法：
 
-```jsx
-import { Flow } from "satin-ui/react/flow";
+```tsx
+import { Flow, type FlowEdge } from "satin-ui/react/flow";
 
 const nodes = [
   { id: "src", x: 120, y: 300, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx", kind: "text" },
@@ -594,7 +594,7 @@ const nodes = [
   { id: "mix", x: 260, y: 180, title: "合成视频", icon: "film", detail: "1080p", kind: "video" },
   { id: "out", x: 640, y: 220, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["board", "voice"], ["img", "mix"], ["voice", "mix"], ["mix", "out"]];
 
 export default function MessyPipeline() {
   // 坐标不用算准：点工具条上的"整理"（⇧L）自动分层排版，节点按弹簧曲线移到新位置；⇧1 适配、⇧2 居中；节点、连线只在创建时用（之后用户在画布上拖、连、删）

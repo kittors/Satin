@@ -12,14 +12,14 @@
 //   fallback      某个演示还没有专门写法时，代码块上说明用的是哪种（"暂用自定义元素写法"）
 export const FRAMEWORKS = [
   { id: "html", ver: "", name: "HTML", ext: "html", lang: "html", dir: "examples/html", demo: (s) => `demos/${s}.html`, recipe: (id) => `recipes/${id}.html`, install: "npm i satin-ui", setup: "纯 HTML" },
-  { id: "react", ver: "18+", name: "React", ext: "jsx", lang: "jsx", dir: "examples/react", demo: (s) => `src/demos/${s}.jsx`, recipe: (id) => `src/recipes/${id}.jsx`, install: "npm i satin-ui", setup: "React",
+  { id: "react", ver: "18+", name: "React", ext: "tsx", lang: "tsx", dir: "examples/react", demo: (s) => `src/demos/${s}.tsx`, recipe: (id) => `src/recipes/${id}.tsx`, install: "npm i satin-ui", setup: "React",
     envs: [{ id: "next", name: "Next.js", dir: "examples/next", setup: "Next.js" }] },
   { id: "vue", ver: "3.3+", name: "Vue", ext: "vue", lang: "vue", dir: "examples/vue", demo: (s) => `src/demos/${s}.vue`, recipe: (id) => `src/recipes/${id}.vue`, install: "npm i satin-ui", setup: "Vue",
     envs: [{ id: "nuxt", name: "Nuxt", dir: "examples/nuxt", setup: "Nuxt" }] },
-  { id: "svelte", ver: "5+", name: "Svelte", ext: "svelte", lang: "html", dir: "examples/svelte", demo: (s) => `src/demos/${s}.svelte`, recipe: (id) => `src/recipes/${id}.svelte`, install: "npm i satin-ui", setup: "Svelte", fallback: "Svelte 暂用自定义元素写法" },
+  { id: "svelte", ver: "5+", name: "Svelte", ext: "svelte", lang: "svelte", dir: "examples/svelte", demo: (s) => `src/demos/${s}.svelte`, recipe: (id) => `src/recipes/${id}.svelte`, install: "npm i satin-ui", setup: "Svelte", fallback: "Svelte 暂用自定义元素写法" },
   { id: "angular", ver: "19+", name: "Angular", ext: "ts", lang: "ts", dir: "examples/angular", demo: (s) => `src/demos/${s}.ts`, recipe: (id) => `src/recipes/${id}.ts`, install: "npm i satin-ui", setup: "Angular", fallback: "Angular 暂用自定义元素写法" },
-  { id: "solid", ver: "2.0+", name: "Solid", ext: "jsx", lang: "jsx", dir: "examples/solid", demo: (s) => `src/demos/${s}.jsx`, recipe: (id) => `src/recipes/${id}.jsx`, install: "npm i satin-ui solid-js @solidjs/web", setup: "Solid", fallback: "Solid 暂用自定义元素写法" },
-  { id: "preact", ver: "10+", name: "Preact", ext: "jsx", lang: "jsx", dir: "examples/preact", demo: (s) => `src/demos/${s}.jsx`, recipe: (id) => `src/recipes/${id}.jsx`, install: "npm i satin-ui", setup: "Preact", fallback: "Preact 暂用自定义元素写法" },
+  { id: "solid", ver: "2.0+", name: "Solid", ext: "tsx", lang: "tsx", dir: "examples/solid", demo: (s) => `src/demos/${s}.tsx`, recipe: (id) => `src/recipes/${id}.tsx`, install: "npm i satin-ui solid-js @solidjs/web", setup: "Solid", fallback: "Solid 暂用自定义元素写法" },
+  { id: "preact", ver: "10+", name: "Preact", ext: "tsx", lang: "tsx", dir: "examples/preact", demo: (s) => `src/demos/${s}.tsx`, recipe: (id) => `src/recipes/${id}.tsx`, install: "npm i satin-ui", setup: "Preact", fallback: "Preact 暂用自定义元素写法" },
 ];
 export const FW_IDS = FRAMEWORKS.map((f) => f.id);
 export const fwById = (id) => FRAMEWORKS.find((f) => f.id === id) || FRAMEWORKS.find((f) => f.envs?.some((e) => e.id === id));

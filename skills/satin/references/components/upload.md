@@ -52,7 +52,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-drop" tabindex="0" role="button" aria-label="把文件拖到这里，或者选择文件"><span class="sn-art" data-i="cloud-upload"></span><b>把文件拖到这里，或者 <u>选择文件</u></b><span class="sn-hint">支持 txt、docx，单个不超过 5 MB</span><input type="file" multiple accept=".txt,.docx" hidden></div>
@@ -68,7 +68,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Upload } from "satin-ui/react";
 
 export default function ScriptUpload() {
@@ -80,7 +80,7 @@ export default function ScriptUpload() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Upload } from "satin-ui/vue";
 </script>
 
@@ -92,12 +92,12 @@ import { Upload } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createUpload } from "satin-ui";
 
   // 格式不对、太大的当场标红，不等用户传完才说；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createUpload(host, { accept: /\.(txt|docx)$/i, maxSize: 5e6 });
     return () => it.destroy();
@@ -137,12 +137,12 @@ export class UploadBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createUpload } from "satin-ui";
 
 export default function ScriptUpload() {
-  let host;
+  let host!: HTMLDivElement;
   // 格式不对、太大的当场标红，不等用户传完才说；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createUpload(host, { accept: /\.(txt|docx)$/i, maxSize: 5e6 });
@@ -159,7 +159,7 @@ export default function ScriptUpload() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Upload } from "satin-ui/react";
 
 export default function ScriptUpload() {
@@ -178,7 +178,7 @@ upload(file, progress)：每个文件各自显示进度，可以单独取消或�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-drop" tabindex="0" role="button" aria-label="把文件拖到这里，或者选择文件"><span class="sn-art" data-i="cloud-upload"></span><b>把文件拖到这里，或者 <u>选择文件</u></b><span class="sn-hint">支持 txt、docx，单个不超过 5 MB</span><input type="file" multiple accept=".txt,.docx" hidden></div>
@@ -196,11 +196,11 @@ upload(file, progress)：每个文件各自显示进度，可以单独取消或�
 
 React 的写法：
 
-```jsx
+```tsx
 import { Upload } from "satin-ui/react";
 
 // upload(file, progress)：真上传在这里做，progress(0～1) 更新这一行的进度；返回 Promise（reject 那一行变成"重试"）
-const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function RealUpload() {
   return <Upload accept=".txt,.docx" maxSize={5e6} hint="支持 txt、docx，单个不超过 5 MB" upload={upload} />;
@@ -210,11 +210,11 @@ export default function RealUpload() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Upload } from "satin-ui/vue";
 
 // upload(file, progress)：真上传在这里做，progress(0～1) 更新这一行的进度；返回 Promise（reject 那一行变成"重试"）
-const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 </script>
 
 <template>
@@ -224,14 +224,14 @@ const upload = (file, progress) => new Promise((done) => { let p = 0; const t = 
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createUpload } from "satin-ui";
   // upload(file, progress)：真上传在这里做，progress(0～1) 更新这一行的进度；返回 Promise（reject 那一行变成"重试"）
-  const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+  const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
   // upload：每个文件真上传，各自显示进度、可以单独取消或重试；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createUpload(host, { accept: /\.(txt|docx)$/i, maxSize: 5e6, upload });
     return () => it.destroy();
@@ -274,15 +274,15 @@ export class UploadRealComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createUpload } from "satin-ui";
 
 // upload(file, progress)：真上传在这里做，progress(0～1) 更新这一行的进度；返回 Promise（reject 那一行变成"重试"）
-const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function RealUpload() {
-  let host;
+  let host!: HTMLDivElement;
   // upload：每个文件真上传，各自显示进度、可以单独取消或重试；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createUpload(host, { accept: /\.(txt|docx)$/i, maxSize: 5e6, upload });
@@ -299,11 +299,11 @@ export default function RealUpload() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Upload } from "satin-ui/react";
 
 // upload(file, progress)：真上传在这里做，progress(0～1) 更新这一行的进度；返回 Promise（reject 那一行变成"重试"）
-const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.2; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function RealUpload() {
   return <Upload accept=".txt,.docx" maxSize={5e6} hint="支持 txt、docx，单个不超过 5 MB" upload={upload} />;
@@ -320,7 +320,7 @@ multiple 关掉；title、pick 换掉框里的字。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-drop" tabindex="0" role="button" aria-label="把封面拖到这里，或者选择图片"><span class="sn-art" data-i="cloud-upload"></span><b>把封面拖到这里，或者 <u>选择图片</u></b><span class="sn-hint">一次一张，JPG 或 PNG</span><input type="file" accept=".jpg,.png" hidden></div>
@@ -336,7 +336,7 @@ multiple 关掉；title、pick 换掉框里的字。
 
 React 的写法：
 
-```jsx
+```tsx
 import { Upload } from "satin-ui/react";
 
 export default function CoverUpload() {
@@ -348,7 +348,7 @@ export default function CoverUpload() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Upload } from "satin-ui/vue";
 </script>
 
@@ -360,12 +360,12 @@ import { Upload } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createUpload } from "satin-ui";
 
   // 一次一个：input 不写 multiple；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createUpload(host, { accept: /\.(jpe?g|png)$/i, maxSize: 2e6 });
     return () => it.destroy();
@@ -405,12 +405,12 @@ export class UploadSingleComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createUpload } from "satin-ui";
 
 export default function CoverUpload() {
-  let host;
+  let host!: HTMLDivElement;
   // 一次一个：input 不写 multiple；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createUpload(host, { accept: /\.(jpe?g|png)$/i, maxSize: 2e6 });
@@ -427,7 +427,7 @@ export default function CoverUpload() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Upload } from "satin-ui/react";
 
 export default function CoverUpload() {

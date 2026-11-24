@@ -1,21 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createComposer, toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 提示词输入框：自动长高、字数、附件（拖进来、粘贴截图、附件菜单）；有文字或附件、附件传完才能发
     let timer = 0;
     createComposer(root.querySelector("[data-composer]"), {
       // 发送：返回 Promise，期间是"生成中"、发送键变成停止；Promise 结束回到可发送（换成你的生成请求）
-      onSend: ({ text }) => new Promise((done) => { timer = setTimeout(() => { done(); toast({ text: `已生成 3 个镜头：${text.slice(0, 12)}…` }); }, 2600); }),
+      onSend: ({ text }: any) => new Promise((done?: any) => { timer = window.setTimeout(() => { done(); toast({ text: `已生成 3 个镜头：${text.slice(0, 12)}…` }); }, 2600); }),
       onStop: () => clearTimeout(timer),
       // 上传：报进度，结束就完成，出错就失败（点一下重试）；换成你的上传
-      upload: (file, onProgress) => new Promise((ok) => { let p = 0; const iv = setInterval(() => { p = Math.min(1, p + 0.2); onProgress(p); if (p >= 1) { clearInterval(iv); ok(); } }, 220); }),
+      upload: (file?: any, onProgress?: any) => new Promise((ok?: any) => { let p = 0; const iv = window.setInterval(() => { p = Math.min(1, p + 0.2); onProgress(p); if (p >= 1) { clearInterval(iv); ok(); } }, 220); }),
     });
   });
   off = () => { done(); unsetup(); };

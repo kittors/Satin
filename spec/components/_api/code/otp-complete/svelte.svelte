@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Otp from "satin-ui/svelte/Otp.svelte";
 
   let note = $state("输入 6 位验证码");

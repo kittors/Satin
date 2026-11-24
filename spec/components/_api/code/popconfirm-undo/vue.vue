@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Button, toast } from "satin-ui/vue";
 
 // 能撤销的操作不确认：直接做，再用轻提示给"撤销"

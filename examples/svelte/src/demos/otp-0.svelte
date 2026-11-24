@@ -1,17 +1,18 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createOtp, toast } from "satin-ui/components";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 自动跳格、退格回上一格、粘贴自动分配；填进去的数字从下面淡入
       const otp = createOtp(root.querySelector("[data-otp]"), {
-        onComplete: (code) => { // 6 位都填满时调：换成你的校验请求
+        onComplete: (code?: any) => { // 6 位都填满时调：换成你的校验请求
           toast({ text: `已提交验证码 ${code}` });
-          setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
+          window.setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
         },
       });
     });

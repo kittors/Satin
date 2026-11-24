@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Button, toast } from "satin-ui/vue";
 
 const run = () => {

@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { closeDialog, busy, toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     (async () => {
       // [data-dlg="弹窗 id"] 打开：从按钮那里长出来，关闭时原路缩回，焦点回到按钮——enhance() 已经接上
       // 弹窗里的 [data-x]、[data-cancel] 和 Esc 关闭；点背景只"顶一下"，不关
@@ -16,10 +17,10 @@ onMounted(() => {
       // 关闭前先问一句：挂一个 guard，Esc / 取消 / 点 × 都会先调它（填了名字就先提示，不弹系统对话框）
       dlg.guard = () => {
         if (!name.value.trim()) { closeDialog(dlg); return; }
-        toast({ kind: "action", text: "名字还没保存", action: { label: "放弃并关闭", run: (t) => { name.value = ""; closeDialog(dlg); t.close(); } } });
+        toast({ kind: "action", text: "名字还没保存", action: { label: "放弃并关闭", run: (t?: any) => { name.value = ""; closeDialog(dlg); t.close(); } } });
       };
 
-      dlg.querySelector("form").addEventListener("submit", async (e) => {
+      dlg.querySelector("form").addEventListener("submit", async (e?: any) => {
         e.preventDefault();
         const v = name.value.trim(); if (!v) { name.focus(); return; }
         await busy(dlg.querySelector(".sn-ft .sn-primary"), 900); // 换成你的创建请求（Promise）

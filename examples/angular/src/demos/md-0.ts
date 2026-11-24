@@ -38,7 +38,7 @@ export class MdDemo0Component {
 - [x] 每个镜头都有景别和时长
 - [ ] 背景音乐的节拍对齐到镜头切换
 
-\`\`\`js
+\`\`\`ts
 const shots = await generateShots(list, { retry: 3 });
 console.log(timeline(shots, 24));
 \`\`\`

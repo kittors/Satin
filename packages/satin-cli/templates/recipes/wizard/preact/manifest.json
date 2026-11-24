@@ -1,7 +1,7 @@
 {
  "title": "表单向导",
  "files": [
-  "wizard.jsx"
+  "wizard.tsx"
  ],
- "entry": "wizard.jsx"
+ "entry": "wizard.tsx"
 }

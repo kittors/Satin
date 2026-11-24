@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Icon } from "satin-ui/vue";
 </script>
 

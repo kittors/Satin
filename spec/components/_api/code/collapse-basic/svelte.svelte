@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Collapse from "satin-ui/svelte/Collapse.svelte";
 
   const FAQ = [

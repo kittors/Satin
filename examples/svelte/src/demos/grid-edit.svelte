@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import DataGrid from "satin-ui/svelte/DataGrid.svelte";
+  import type { GridColumn } from "satin-ui/grid";
 
   // editable 的列：双击（或回车、F2、直接打字）开始改，回车保存、Esc 取消；状态列从选项里选，数字列按 min / max 检查
-  const columns = [
+  const columns: GridColumn[] = [
     { key: "name", title: "名称", width: 180, editable: true, parse: (text) => (text.trim() ? { value: text.trim() } : { error: "名称不能为空" }) },
     { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], editable: true },
     { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -16,11 +17,11 @@
     { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
     { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
   ];
-  const TITLES = { name: "名称", status: "状态", shots: "镜头" };
-  const savedText = ({ key, value, oldValue }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
+  const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头" };
+  const savedText = ({ key, value, oldValue }: { key: string; value: unknown; oldValue: unknown }) => `已保存：${TITLES[key]}从"${oldValue}"改成"${value}"`;
   let note = $state("双击格子改；名称不能空，镜头要是 1～999 的整数");
   // 表格先在自己那份数据里改好，再发 cellEdit：在这里把改动交给服务端（不用把 data 换成新数组）
-  const save = (e) => (note = savedText(e));
+  const save = (e: { key: string; value: unknown; oldValue: unknown }) => (note = savedText(e));
 </script>
 
 <div class="sn-stack sn-gap-8">

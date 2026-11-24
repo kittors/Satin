@@ -53,7 +53,7 @@ AI 的回复、说明文档都用它渲染：标题、列表和任务、引用�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="md-basic"></div>
 
 <script type="module">
@@ -85,7 +85,7 @@ AI 的回复、说明文档都用它渲染：标题、列表和任务、引用�
 
 React 的写法：
 
-```jsx
+```tsx
 import { Markdown } from "satin-ui/react/markdown";
 
 const MD = [
@@ -118,7 +118,7 @@ export default function Doc() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Markdown } from "satin-ui/vue/markdown";
 
 const MD = [
@@ -151,8 +151,8 @@ const MD = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createMarkdown } from "satin-ui/markdown";
   const MD = [
     "## 第三集 · 雨夜车站",
@@ -176,7 +176,7 @@ Svelte 的写法：
   ].join("\n");
 
   // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createMarkdown(host, { source: MD });
     return () => it.destroy();
@@ -232,7 +232,7 @@ export class MdBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createMarkdown } from "satin-ui/markdown";
 
@@ -258,7 +258,7 @@ const MD = [
 ].join("\n");
 
 export default function Doc() {
-  let host;
+  let host!: HTMLDivElement;
   // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createMarkdown(host, { source: MD });
@@ -270,7 +270,7 @@ export default function Doc() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Markdown } from "satin-ui/react/markdown";
 
 const MD = [
@@ -310,7 +310,7 @@ export default function Doc() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="md-stream"></div>
 
 <script type="module">
@@ -335,7 +335,7 @@ export default function Doc() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useState } from "react";
 import { Markdown } from "satin-ui/react/markdown";
 
@@ -349,7 +349,7 @@ const REPLY = [
   "三段加起来约 2 分 40 秒，站台那段最长。",
 ].join("\n");
 // 演示用：每 40ms 多给 3 个字（换成模型的流式输出）
-const stream = (onText) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
+const stream = (onText: (s: string) => void) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
 
 export default function Reply() {
   const [text, setText] = useState("");
@@ -362,7 +362,7 @@ export default function Reply() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { Markdown } from "satin-ui/vue/markdown";
 
@@ -376,9 +376,9 @@ const REPLY = [
   "三段加起来约 2 分 40 秒，站台那段最长。",
 ].join("\n");
 // 演示用：每 40ms 多给 3 个字（换成模型的流式输出）
-const stream = (onText) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
+const stream = (onText: (text: string) => void) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
 const text = ref("");
-let stop;
+let stop: (() => void) | undefined;
 onMounted(() => (stop = stream((t) => (text.value = t))));
 onBeforeUnmount(() => stop?.());
 </script>
@@ -391,8 +391,8 @@ onBeforeUnmount(() => stop?.());
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createMarkdown } from "satin-ui/markdown";
 
   const REPLY = [
@@ -405,9 +405,9 @@ Svelte 的写法：
     "三段加起来约 2 分 40 秒，站台那段最长。",
   ].join("\n");
   // 演示用：每 40ms 多给 3 个字（换成模型的流式输出）
-  const stream = (onText) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
+  const stream = (onText: (text: string) => void) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
   // AI 的回复一段段到：每次把到目前为止的全文给 source，整篇重渲染，滚动位置不跳；挂上以后建，卸载时停掉、destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const md = createMarkdown(host, { source: "" });
     const stop = stream((text) => md.update({ source: text }));
@@ -456,7 +456,7 @@ export class MdStreamComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createMarkdown } from "satin-ui/markdown";
 
@@ -470,10 +470,10 @@ const REPLY = [
   "三段加起来约 2 分 40 秒，站台那段最长。",
 ].join("\n");
 // 演示用：每 40ms 多给 3 个字（换成模型的流式输出）
-const stream = (onText) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
+const stream = (onText: (text: string) => void) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
 
 export default function Reply() {
-  let host;
+  let host!: HTMLDivElement;
   // AI 的回复一段段到：每次把到目前为止的全文给 source，整篇重渲染，滚动位置不跳；挂上以后建，卸载时停掉、destroy()
   onSettled(() => {
     const md = createMarkdown(host, { source: "" });
@@ -486,7 +486,7 @@ export default function Reply() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useState } from "react";
 import { Markdown } from "satin-ui/react/markdown";
 
@@ -500,7 +500,7 @@ const REPLY = [
   "三段加起来约 2 分 40 秒，站台那段最长。",
 ].join("\n");
 // 演示用：每 40ms 多给 3 个字（换成模型的流式输出）
-const stream = (onText) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
+const stream = (onText: (s: string) => void) => { let n = 0; const t = setInterval(() => { n = Math.min(REPLY.length, n + 3); onText(REPLY.slice(0, n)); if (n >= REPLY.length) clearInterval(t); }, 40); return () => clearInterval(t); };
 
 export default function Reply() {
   const [text, setText] = useState("");
@@ -520,7 +520,7 @@ export default function Reply() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="md-heights"></div>
 
 <script type="module">
@@ -567,7 +567,7 @@ export default function Reply() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Markdown } from "satin-ui/react/markdown";
 
 const MD = [
@@ -615,7 +615,7 @@ export default function LongDoc() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Markdown } from "satin-ui/vue/markdown";
 
 const MD = [
@@ -663,8 +663,8 @@ const MD = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createMarkdown } from "satin-ui/markdown";
   const MD = [
     "### 分镜脚本",
@@ -703,7 +703,7 @@ Svelte 的写法：
   ].join("\n");
 
   // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createMarkdown(host, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });
     return () => it.destroy();
@@ -774,7 +774,7 @@ export class MdHeightsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createMarkdown } from "satin-ui/markdown";
 
@@ -815,7 +815,7 @@ const MD = [
 ].join("\n");
 
 export default function LongDoc() {
-  let host;
+  let host!: HTMLDivElement;
   // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createMarkdown(host, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });
@@ -827,7 +827,7 @@ export default function LongDoc() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Markdown } from "satin-ui/react/markdown";
 
 const MD = [

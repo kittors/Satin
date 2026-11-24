@@ -1,17 +1,18 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createStepper } from "satin-ui/components";
   import "./number-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // <div class="sn-stepper" data-stepper data-min="1" data-max="60" data-value="4">…</div>
       // 按住连发（400ms 起、越来越快，最快 50ms 一次）；在数字上左右拖每 8px 一格；方向键一格、Shift 十格
       const dur = createStepper(root.querySelector("[data-stepper]"), {
-        onChange: (v) => console.log("时长", v),
+        onChange: (v?: any) => console.log("时长", v),
       });
       dur.set(10);
       dur.value; // 10

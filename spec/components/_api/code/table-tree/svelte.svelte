@@ -1,6 +1,6 @@
-<script>
-  import { createTable } from "satin-ui";
-  const COLUMNS = [
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "项目" },
     { key: "owner", title: "负责人" },
     { key: "shots", title: "镜头", align: "right" },
@@ -21,7 +21,7 @@
   ];
 
   // defaultExpandedKeys：一开始展开哪几行；点箭头时 onExpandChange 给出现在展开着的所有行（e.keys）；挂上以后建，卸载时 destroy()
-  let host, open = $state(1);
+  let host!: HTMLDivElement, open = $state(1);
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: DATA, defaultExpandedKeys: ["p1"], label: "项目和分集", onExpandChange: (e) => (open = e.keys.length) });
     return () => it.destroy();

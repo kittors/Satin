@@ -1,24 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { validateForm, busy, succeed } from "satin-ui/components";
 import "./field-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 每个要校验的字段写 data-f="名字"，下面放 <div class="sn-err"><span></span></div>
     const form = root.querySelector("#fieldDemo"), desc = root.querySelector("#f-desc"), count = form.querySelector(".sn-count");
     const rules = {
-      name: (v) => !v.trim() && "请填写项目名称",
-      mail: (v) => v.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) && "邮箱格式不对",
-      desc: (v) => !v.trim() && "写一句话就好，方便以后找到",
+      name: (v?: any) => !v.trim() && "请填写项目名称",
+      mail: (v?: any) => v.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) && "邮箱格式不对",
+      desc: (v?: any) => !v.trim() && "写一句话就好，方便以后找到",
     };
     // 字数：到上限变色
     desc.addEventListener("input", () => { count.textContent = `${desc.value.length}/80`; count.classList.toggle("sn-over", desc.value.length >= 80); });
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async (e?: any) => {
       e.preventDefault();
       if (!validateForm(form, rules)) return; // 有错的都标出来（错误在下方展开、输入框抖两下），焦点到第一个
       const btn = form.querySelector("button[type=submit]");

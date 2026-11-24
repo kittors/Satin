@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, CommandPalette, toast } from "satin-ui/vue";
 

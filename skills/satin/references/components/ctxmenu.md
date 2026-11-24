@@ -56,7 +56,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-ghost sn-ibtn" data-fmenu="mn-more" aria-haspopup="menu" aria-expanded="false" data-tip="更多操作" aria-label="更多操作" data-i="ellipsis"></button>
   <div class="sn-menu sn-float" id="mn-more" role="menu" tabindex="-1" aria-label="更多操作">
@@ -77,16 +77,16 @@
 
 React 的写法：
 
-```jsx
-import { Button, Menu, toast } from "satin-ui/react";
+```tsx
+import { Button, Menu, toast, type MenuItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: MenuItem[] = [
   { key: "open", label: "打开", icon: "external-link" },
   { key: "copy", label: "复制一份", icon: "copy", kbd: "⌘D" },
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 export default function MoreMenu() {
   // onSelect(key, 那一项)：点开贴着按钮弹出，↓ 键也能打开
@@ -101,7 +101,7 @@ export default function MoreMenu() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Menu, toast } from "satin-ui/vue";
 
 const ITEMS = [
@@ -110,7 +110,7 @@ const ITEMS = [
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 </script>
 
 <template>
@@ -123,15 +123,15 @@ const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回�
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { toast } from "satin-ui";
-  const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+  const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
-  let menu;
+  let menu!: HTMLElement;
   // 选了一项：菜单上冒泡 menuselect，e.detail.item 是那一行
   $effect(() => {
-    const pick = (e) => toast({ text: DONE[e.detail.item.dataset.key] });
+    const pick = (e: Event) => { const key = (e as CustomEvent<{ item: HTMLElement }>).detail.item.dataset.key; if (key) toast({ text: DONE[key] }); };
     menu.addEventListener("menuselect", pick);
     return () => menu.removeEventListener("menuselect", pick);
   });
@@ -180,13 +180,13 @@ export class CtxmenuBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { toast } from "satin-ui";
 
-const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 // 名字不是驼峰的事件用 ref 挂
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 // 标记照设计稿写，<sn-enhance> 接上触发器、键盘导航、子菜单；选了一项：菜单上冒泡 menuselect
 export default function MoreMenu() {
@@ -206,16 +206,16 @@ export default function MoreMenu() {
 
 Preact 的写法：
 
-```jsx
-import { Button, Menu, toast } from "satin-ui/react";
+```tsx
+import { Button, Menu, toast, type MenuItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: MenuItem[] = [
   { key: "open", label: "打开", icon: "external-link" },
   { key: "copy", label: "复制一份", icon: "copy", kbd: "⌘D" },
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 export default function MoreMenu() {
   // onSelect(key, 那一项)：点开贴着按钮弹出，↓ 键也能打开
@@ -237,7 +237,7 @@ export default function MoreMenu() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-ctx-zone" data-ctx="mn-ctx" tabindex="0" aria-label="镜头卡片，按 Shift+F10 打开菜单">在这里点右键</div>
   <div class="sn-menu sn-float" id="mn-ctx" role="menu" tabindex="-1" aria-label="镜头">
@@ -258,16 +258,16 @@ export default function MoreMenu() {
 
 React 的写法：
 
-```jsx
-import { ContextMenu, toast } from "satin-ui/react";
+```tsx
+import { ContextMenu, toast, type MenuItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: MenuItem[] = [
   { key: "open", label: "打开", icon: "external-link" },
   { key: "copy", label: "复制一份", icon: "copy", kbd: "⌘D" },
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 export default function ShotCard() {
   // onSelect(key, 那一项)：右键、触屏长按、Shift+F10 在指针处弹出
@@ -282,7 +282,7 @@ export default function ShotCard() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ContextMenu, toast } from "satin-ui/vue";
 
 const ITEMS = [
@@ -291,7 +291,7 @@ const ITEMS = [
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 </script>
 
 <template>
@@ -304,15 +304,15 @@ const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回�
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { toast } from "satin-ui";
-  const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+  const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
-  let menu;
+  let menu!: HTMLElement;
   // 选了一项：菜单上冒泡 menuselect，e.detail.item 是那一行
   $effect(() => {
-    const pick = (e) => toast({ text: DONE[e.detail.item.dataset.key] });
+    const pick = (e: Event) => { const key = (e as CustomEvent<{ item: HTMLElement }>).detail.item.dataset.key; if (key) toast({ text: DONE[key] }); };
     menu.addEventListener("menuselect", pick);
     return () => menu.removeEventListener("menuselect", pick);
   });
@@ -361,13 +361,13 @@ export class CtxmenuContextComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { toast } from "satin-ui";
 
-const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 // 名字不是驼峰的事件用 ref 挂
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 // 标记照设计稿写，<sn-enhance> 接上触发器、键盘导航、子菜单；选了一项：菜单上冒泡 menuselect
 export default function ShotCard() {
@@ -387,16 +387,16 @@ export default function ShotCard() {
 
 Preact 的写法：
 
-```jsx
-import { ContextMenu, toast } from "satin-ui/react";
+```tsx
+import { ContextMenu, toast, type MenuItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: MenuItem[] = [
   { key: "open", label: "打开", icon: "external-link" },
   { key: "copy", label: "复制一份", icon: "copy", kbd: "⌘D" },
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { open: "已打开", copy: "已复制一份", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 export default function ShotCard() {
   // onSelect(key, 那一项)：右键、触屏长按、Shift+F10 在指针处弹出
@@ -418,7 +418,7 @@ children 写成子菜单：斜着移过去时途经的行不抢高亮；右边�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-fmenu="mn-move" aria-haspopup="menu" aria-expanded="false" data-i="chevron-down:caret">整理</button>
   <div class="sn-menu sn-float" id="mn-move" role="menu" tabindex="-1" aria-label="整理">
@@ -444,15 +444,15 @@ children 写成子菜单：斜着移过去时途经的行不抢高亮；右边�
 
 React 的写法：
 
-```jsx
-import { Button, Menu, toast } from "satin-ui/react";
+```tsx
+import { Button, Menu, toast, type MenuItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: MenuItem[] = [
   { label: "移动到", icon: "folder", children: [{ key: "ep1", label: "第一集" }, { key: "ep2", label: "第二集" }, { key: "ep3", label: "第三集" }] },
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 export default function OrganizeMenu() {
   // onSelect(key, 那一项)：子菜单里的项也走这里；斜着移向子菜单时，途经的行不抢高亮
@@ -467,7 +467,7 @@ export default function OrganizeMenu() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Menu, toast } from "satin-ui/vue";
 
 const ITEMS = [
@@ -475,7 +475,7 @@ const ITEMS = [
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 </script>
 
 <template>
@@ -488,15 +488,15 @@ const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已�
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { toast } from "satin-ui";
-  const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+  const DONE: Record<string, string> = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
-  let menu;
+  let menu!: HTMLElement;
   // 选了一项：菜单上冒泡 menuselect，e.detail.item 是那一行
   $effect(() => {
-    const pick = (e) => toast({ text: DONE[e.detail.item.dataset.key] });
+    const pick = (e: Event) => { const key = (e as CustomEvent<{ item: HTMLElement }>).detail.item.dataset.key; if (key) toast({ text: DONE[key] }); };
     menu.addEventListener("menuselect", pick);
     return () => menu.removeEventListener("menuselect", pick);
   });
@@ -555,13 +555,13 @@ export class CtxmenuSubmenuComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { toast } from "satin-ui";
 
-const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 // 名字不是驼峰的事件用 ref 挂
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 // 标记照设计稿写，<sn-enhance> 接上触发器、键盘导航、子菜单；选了一项：菜单上冒泡 menuselect
 export default function OrganizeMenu() {
@@ -586,15 +586,15 @@ export default function OrganizeMenu() {
 
 Preact 的写法：
 
-```jsx
-import { Button, Menu, toast } from "satin-ui/react";
+```tsx
+import { Button, Menu, toast, type MenuItem } from "satin-ui/react";
 
-const ITEMS = [
+const ITEMS: MenuItem[] = [
   { label: "移动到", icon: "folder", children: [{ key: "ep1", label: "第一集" }, { key: "ep2", label: "第二集" }, { key: "ep3", label: "第三集" }] },
   { type: "divider" },
   { key: "trash", label: "移到回收站", icon: "trash-2", danger: true },
 ];
-const DONE = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
+const DONE: Record<string, string> = { ep1: "已移到第一集", ep2: "已移到第二集", ep3: "已移到第三集", trash: "已移到回收站" }; // 每一项做完的提示（演示用轻提示代替真的操作）
 
 export default function OrganizeMenu() {
   // onSelect(key, 那一项)：子菜单里的项也走这里；斜着移向子菜单时，途经的行不抢高亮

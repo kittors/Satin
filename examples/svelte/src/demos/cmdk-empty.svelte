@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
   import { createCommandPalette, toast } from "satin-ui";
 
   const GROUPS = [
     { name: "动作", items: [{ name: "新建项目", icon: "plus", keys: "⌘N" }, { name: "导出成片", icon: "film", keys: "⌘E" }] },
     { name: "跳转", items: [{ name: "素材库", icon: "image" }, { name: "设置", icon: "settings", keys: "⌘," }] },
   ];
-  let cmdk;
+  let cmdk: ReturnType<typeof createCommandPalette> | undefined;
   $effect(() => {
     cmdk = createCommandPalette(GROUPS, {
       onRun: (it) => toast({ text: "执行：" + it.name }),

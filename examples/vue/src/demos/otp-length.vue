@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Otp } from "satin-ui/vue";
 </script>
 

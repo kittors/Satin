@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 

@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-sk-list" aria-busy="true" aria-label="正在加载镜头">
 <div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:46%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>
 <div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:38%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>
@@ -63,7 +63,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 export default function LoadingBasic() {
   return (
     <div className="sn-sk-list" aria-busy="true" aria-label="正在加载镜头">
@@ -89,7 +89,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-sk-list" aria-busy="true" aria-label="正在加载镜头">
 <div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:46%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>
 <div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:38%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>
@@ -117,7 +117,7 @@ export class LoadingBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function LoadingBasic() {
   return (
     <div class="sn-sk-list" aria-busy="true" aria-label="正在加载镜头">
@@ -131,7 +131,7 @@ export default function LoadingBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function LoadingBasic() {
   return (
     <div class="sn-sk-list" aria-busy="true" aria-label="正在加载镜头">
@@ -153,7 +153,7 @@ loadWithSkeleton 管时机：快的那次不会闪出骨架，慢的至少留 50
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-sk-list" id="shot-list" aria-live="polite"></div>
 
 <script type="module">
@@ -169,17 +169,18 @@ loadWithSkeleton 管时机：快的那次不会闪出骨架，慢的至少留 50
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef } from "react";
 import { loadWithSkeleton } from "satin-ui";
 
 export default function ShotList() {
   // 容器交给 loadWithSkeleton 填（骨架和数据都是它写进去的 HTML），React 不往里渲染
-  const box = useRef(null);
+  const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    loadWithSkeleton(box.current, {
+    if (!box.current) return;
+    loadWithSkeleton<[string, string, string][]>(box.current, {
       // 300ms 内回来就不显示骨架；显示了就至少留 500ms；数据到了逐行替换（每行晚 40ms 淡入）
-      load: () => new Promise((ok) => setTimeout(() => ok([["1", "站台远景", "广角 · 6 秒"], ["2", "雨里的车灯", "近景 · 3 秒"], ["3", "推门进候车厅", "中景 · 5 秒"]]), 1200)),
+      load: () => new Promise<[string, string, string][]>((ok) => setTimeout(() => ok([["1", "站台远景", "广角 · 6 秒"], ["2", "雨里的车灯", "近景 · 3 秒"], ["3", "推门进候车厅", "中景 · 5 秒"]]), 1200)),
       skeleton: [46, 38, 52].map((w) => `<div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:${w}%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>`).join(""),
       render: (rows) => rows.map(([n, t, m]) => `<div class="sn-sk-row"><span class="sn-thumb"></span><div class="sn-meta" style="gap:2px"><b>镜头 ${n} · ${t}</b><span>${m}</span></div></div>`).join(""),
     });
@@ -191,12 +192,12 @@ export default function ShotList() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { loadWithSkeleton } from "satin-ui";
 
 // 容器交给 loadWithSkeleton 填（骨架和数据都是它写进去的 HTML），模板里留空
-const box = ref(null);
+const box = ref<HTMLDivElement | null>(null);
 onMounted(() => loadWithSkeleton(box.value, {
   // 300ms 内回来就不显示骨架；显示了就至少留 500ms；数据到了逐行替换（每行晚 40ms 淡入）
   load: () => new Promise((ok) => setTimeout(() => ok([["1", "站台远景", "广角 · 6 秒"], ["2", "雨里的车灯", "近景 · 3 秒"], ["3", "推门进候车厅", "中景 · 5 秒"]]), 1200)),
@@ -212,12 +213,12 @@ onMounted(() => loadWithSkeleton(box.value, {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { loadWithSkeleton } from "satin-ui";
 
   // 容器交给 loadWithSkeleton 填（骨架和数据都是它写进去的 HTML），模板里留空
-  let box;
+  let box!: HTMLDivElement;
   $effect(() => {
     loadWithSkeleton(box, {
       // 300ms 内回来就不显示骨架；显示了就至少留 500ms；数据到了逐行替换（每行晚 40ms 淡入）
@@ -257,13 +258,13 @@ export class LoadingListComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { loadWithSkeleton } from "satin-ui";
 
 export default function ShotList() {
   // 容器交给 loadWithSkeleton 填（骨架和数据都是它写进去的 HTML），模板里留空
-  let box;
+  let box!: HTMLDivElement;
   onSettled(() => {
     loadWithSkeleton(box, {
       // 300ms 内回来就不显示骨架；显示了就至少留 500ms；数据到了逐行替换（每行晚 40ms 淡入）
@@ -278,17 +279,18 @@ export default function ShotList() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef } from "react";
 import { loadWithSkeleton } from "satin-ui";
 
 export default function ShotList() {
   // 容器交给 loadWithSkeleton 填（骨架和数据都是它写进去的 HTML），React 不往里渲染
-  const box = useRef(null);
+  const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    loadWithSkeleton(box.current, {
+    if (!box.current) return;
+    loadWithSkeleton<[string, string, string][]>(box.current, {
       // 300ms 内回来就不显示骨架；显示了就至少留 500ms；数据到了逐行替换（每行晚 40ms 淡入）
-      load: () => new Promise((ok) => setTimeout(() => ok([["1", "站台远景", "广角 · 6 秒"], ["2", "雨里的车灯", "近景 · 3 秒"], ["3", "推门进候车厅", "中景 · 5 秒"]]), 1200)),
+      load: () => new Promise<[string, string, string][]>((ok) => setTimeout(() => ok([["1", "站台远景", "广角 · 6 秒"], ["2", "雨里的车灯", "近景 · 3 秒"], ["3", "推门进候车厅", "中景 · 5 秒"]]), 1200)),
       skeleton: [46, 38, 52].map((w) => `<div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:${w}%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div>`).join(""),
       render: (rows) => rows.map(([n, t, m]) => `<div class="sn-sk-row"><span class="sn-thumb"></span><div class="sn-meta" style="gap:2px"><b>镜头 ${n} · ${t}</b><span>${m}</span></div></div>`).join(""),
     });
@@ -307,7 +309,7 @@ export default function ShotList() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <span class="sn-spinner" role="status" aria-label="正在加载更多"></span><span class="sn-help">正在加载更多…</span>
 </div>
@@ -315,7 +317,7 @@ export default function ShotList() {
 
 React 的写法：
 
-```jsx
+```tsx
 export default function LoadingQuiet() {
   return (
     <div className="sn-row">
@@ -337,7 +339,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <span class="sn-spinner" role="status" aria-label="正在加载更多"></span><span class="sn-help">正在加载更多…</span>
 </div>
@@ -361,7 +363,7 @@ export class LoadingQuietComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function LoadingQuiet() {
   return (
     <div class="sn-row">
@@ -373,7 +375,7 @@ export default function LoadingQuiet() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function LoadingQuiet() {
   return (
     <div class="sn-row">

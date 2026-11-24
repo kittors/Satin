@@ -1,11 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import "./charts-3.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
   const done = enhance(root.value);
   off = () => { done(); unsetup(); };
@@ -99,8 +100,10 @@ onBeforeUnmount(() => off());
           <small class="sn-up">+14.2%</small>
         </div>
         <div id="spk1">
-          <canvas class="sn-ch-cv" width="120" height="60"></canvas>
-          <i></i>
+          <div class="sn-ch-host sn-ch-spark">
+            <canvas class="sn-ch-cv" width="120" height="60"></canvas>
+            <i></i>
+          </div>
         </div>
       </div>
       <div class="ch-spk-card">
@@ -110,8 +113,10 @@ onBeforeUnmount(() => off());
           <small class="sn-up">+4.8%</small>
         </div>
         <div id="spk2">
-          <canvas class="sn-ch-cv" width="120" height="60"></canvas>
-          <i></i>
+          <div class="sn-ch-host sn-ch-spark">
+            <canvas class="sn-ch-cv" width="120" height="60"></canvas>
+            <i></i>
+          </div>
         </div>
       </div>
       <div class="ch-spk-card">
@@ -121,8 +126,10 @@ onBeforeUnmount(() => off());
           <small class="sn-up">-22 秒</small>
         </div>
         <div id="spk3">
-          <canvas class="sn-ch-cv" width="120" height="60"></canvas>
-          <i></i>
+          <div class="sn-ch-host sn-ch-spark">
+            <canvas class="sn-ch-cv" width="120" height="60"></canvas>
+            <i></i>
+          </div>
         </div>
       </div>
     </div>

@@ -70,7 +70,7 @@ export class NumflowDemo0Component {
       const PLANS = [199, 2399, 49.9, 12800, 999];
       root.querySelector("[data-nf-plan]").addEventListener("click", () => price.set(PLANS[(PLANS.indexOf(price.value) + 1) % PLANS.length]));
       root.querySelector("[data-nf-badge]").addEventListener("click", () => badge.set(badge.value >= 120 ? 3 : badge.value + 9));
-      setInterval(() => live.set(live.value + 1), 1200); // 每 1.2 秒自动更新
+      window.setInterval(() => live.set(live.value + 1), 1200); // 每 1.2 秒自动更新
     });
     this.off = () => { done(); unsetup(); };
   }

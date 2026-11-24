@@ -58,7 +58,7 @@ npx satin-cli init my-app
 
 ### 1. 引入样式
 
-```js
+```ts
 // 整页使用 Satin（包含轻量化 reset 与全部组件样式，均位于 @layer satin）
 import "satin-ui/css/page.css";
 

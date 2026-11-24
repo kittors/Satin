@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { Table } from "satin-ui/vue";
+import { Table, type TableColumn } from "satin-ui/vue";
 
 // resizable：拖表头右边缘改宽（双击按内容定宽）；width 是数字的列固定宽度，没写的分剩下的
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", resizable: true, minWidth: 140 },
   { key: "type", title: "景别", width: 96, resizable: true },
   { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v) => `${v} 秒` },
@@ -18,7 +18,7 @@ const DATA = [
 ];
 // draggable-rows：按住左边的把手拖行，松手时 @row-reorder 给出新顺序（e.keys）；draggable-columns：按住表头拖列
 const rows = ref(DATA);
-const reorder = (e) => (rows.value = e.keys.map((k) => rows.value.find((r) => String(r.id) === k)));
+const reorder = (e: { keys: string[] }) => (rows.value = e.keys.map((k) => rows.value.find((r) => String(r.id) === k)!));
 </script>
 
 <template>

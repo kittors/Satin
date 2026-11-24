@@ -20,6 +20,7 @@
     onNewChat() { /* 自己接：开一段新对话（换一个会话、清空消息） */ },
     async *respond(text) {
       const res = await fetch("/api/chat", { method: "POST", body: JSON.stringify({ text }) });
+      if (!res.body) return;
       const reader = res.body.getReader(), dec = new TextDecoder();
       for (;;) { const { value, done } = await reader.read(); if (done) break; yield dec.decode(value); }
     },

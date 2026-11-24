@@ -7,3 +7,4 @@ type VueGridProps = Omit<GridOptions, "selectedKeys" | "onRowClick" | "onSortCha
 export const DataGrid: DefineComponent<VueGridProps>;
 export function gridComponent(create: unknown, name: string): DefineComponent<VueGridProps>;
 export const GRID_EVENTS: string[];
+export type { GridColumn, GridSort, GridDataSource, GridOptions, GridApi, GridEvents } from "./heavy";

@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { toast, createPlayer, createAudio } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 视频：缓冲转圈、拖动进度、音量、画中画、全屏、键盘；不动时控件自己藏起来。在写好的播放器标记上接交互（也可以给空容器按选项渲染）
     createPlayer(root.querySelector("#player"), { onError: () => toast({ icon: "circle-x", tone: "danger", text: "视频没能加载，检查网络后再试", alert: true }) });
 
@@ -23,7 +24,7 @@ onBeforeUnmount(() => off());
 <template>
   <div ref="root">
     <div class="sn-player" id="player" tabindex="0" aria-label="视频播放器：夜里安静的街道">
-      <video class="sn-frame" playsinline preload="metadata" disableremoteplayback="" src="https://assets.mixkit.co/videos/4451/4451-720.mp4"></video>
+      <video class="sn-frame" playsinline preload="metadata" disableremoteplayback data-src="https://assets.mixkit.co/videos/4451/4451-720.mp4"></video>
       <div class="sn-pip-note">
         <span data-i="picture-in-picture-2"></span>
         <b>正在画中画里播放</b>

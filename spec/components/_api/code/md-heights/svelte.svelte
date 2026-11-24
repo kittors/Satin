@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createMarkdown } from "satin-ui/markdown";
   const MD = [
     "### 分镜脚本",
@@ -37,7 +37,7 @@
   ].join("\n");
 
   // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createMarkdown(host, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });
     return () => it.destroy();

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import DatePicker from "satin-ui/svelte/DatePicker.svelte";
 
   let due = $state("");

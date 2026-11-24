@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Player } from "satin-ui/vue";
 
 // 实例上有 play()、pause()、toggle()，video 是里面的 <video>：自己的按钮直接控制播放；模板 ref 拿到组件，.instance 是实例
-const player = ref(null);
+const player = ref<{ instance?: { video: HTMLVideoElement; play(): void; pause(): void } } | null>(null);
 const restart = () => { const p = player.value.instance; p.video.currentTime = 0; p.play(); };
 </script>
 

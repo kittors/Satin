@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import { busy, succeed, toast } from "satin-ui";
 
   // 演示用的付款：1.2 秒后成功；换成真实的请求
   const pay = () => new Promise((done) => setTimeout(done, 1200));
-  let button;
+  let button!: HTMLButtonElement;
   async function onPay() {
     // 付款、永久删除、发给别人的操作不用乐观更新：等服务器确认，按钮转圈、不能连点
     await busy(button, pay()); // 300ms 内回来不转圈；转圈出现后至少留 500ms

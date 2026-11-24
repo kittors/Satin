@@ -33,7 +33,7 @@ export class OptimisticDemo0Component {
       let count = 24;
       const num = createNumberFlow(star.querySelector(".sn-n"), { value: count, style: "blur" });
       // 保存：换成你的接口。这里 700ms 后成功，勾上"模拟保存失败"时失败
-      const save = () => new Promise((ok?: any, fail?: any) => setTimeout(() => (failBox.checked ? fail(new Error("保存失败")) : ok()), 700));
+      const save = () => new Promise((ok?: any, fail?: any) => window.setTimeout(() => (failBox.checked ? fail(new Error("保存失败")) : ok()), 700));
 
       star.addEventListener("click", () => {
         const on = !star.classList.contains("sn-on");

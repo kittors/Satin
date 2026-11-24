@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-collapse open="[0]" items='[
   {"title":"导出的成片放在哪里？","content":"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。"},
   {"title":"额度用完了会怎样？","content":"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。"},
@@ -63,7 +63,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Collapse } from "satin-ui/react";
 
 const FAQ = [
@@ -80,7 +80,7 @@ export default function Faq() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Collapse } from "satin-ui/vue";
 
 const FAQ = [
@@ -97,8 +97,8 @@ const FAQ = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Collapse from "satin-ui/svelte/Collapse.svelte";
 
   const FAQ = [
@@ -135,7 +135,7 @@ export class CollapseBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const FAQ = JSON.stringify([
   { title: "导出的成片放在哪里？", content: "默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。" },
@@ -150,7 +150,7 @@ export default function Faq() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Collapse } from "satin-ui/react";
 
 const FAQ = [
@@ -174,7 +174,7 @@ export default function Faq() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-collapse single open="[0]" items='[
   {"title":"导出的成片放在哪里？","content":"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。"},
   {"title":"额度用完了会怎样？","content":"新的生成会排队，额度恢复或充值后自动继续，已经提交的任务不会丢。"},
@@ -184,7 +184,7 @@ export default function Faq() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Collapse } from "satin-ui/react";
 
 const FAQ = [
@@ -201,7 +201,7 @@ export default function FaqAccordion() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Collapse } from "satin-ui/vue";
 
 const FAQ = [
@@ -218,8 +218,8 @@ const FAQ = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Collapse from "satin-ui/svelte/Collapse.svelte";
 
   const FAQ = [
@@ -256,7 +256,7 @@ export class CollapseSingleComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const FAQ = JSON.stringify([
   { title: "导出的成片放在哪里？", content: "默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。" },
@@ -271,7 +271,7 @@ export default function FaqAccordion() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Collapse } from "satin-ui/react";
 
 const FAQ = [
@@ -295,7 +295,7 @@ export default function FaqAccordion() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="faq-box">
   <sn-collapse open="[0]" items='[
     {"title":"导出的成片放在哪里？","content":"默认放在“下载”文件夹里，以项目名建一个子文件夹；可以在设置 → 导出里改。"},
@@ -316,7 +316,7 @@ export default function FaqAccordion() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Collapse } from "satin-ui/react";
 
@@ -340,7 +340,7 @@ export default function FaqControlled() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Collapse } from "satin-ui/vue";
 
@@ -362,8 +362,8 @@ const open = ref([0]);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Collapse from "satin-ui/svelte/Collapse.svelte";
 
   const FAQ = [
@@ -411,7 +411,7 @@ export class CollapseControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 自定义元素的属性只认字符串：数组写成 JSON
@@ -421,7 +421,7 @@ const FAQ = JSON.stringify([
   { title: "可以多人一起编辑吗？", content: "可以。邀请协作者以后，大家改的是同一份分镜，谁改了哪里会在旁边标出来。" },
 ]);
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function FaqControlled() {
   const [open, setOpen] = createSignal([0]);
@@ -436,7 +436,7 @@ export default function FaqControlled() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Collapse } from "satin-ui/react";
 

@@ -29,7 +29,7 @@ export class OtpDemo0Component {
       const otp = createOtp(root.querySelector("[data-otp]"), {
         onComplete: (code?: any) => { // 6 位都填满时调：换成你的校验请求
           toast({ text: `已提交验证码 ${code}` });
-          setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
+          window.setTimeout(() => otp.clear(), 1200); // 清空、焦点回第一格
         },
       });
     });

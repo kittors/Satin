@@ -7,3 +7,4 @@ export const Chat: React.ForwardRefExoticComponent<{ className?: string; style?:
   renderEmpty?(): React.ReactNode } & ChatOptions & React.RefAttributes<SatinInstance & ChatApi>>;
 /** 独立侧边定位刻度轨 */
 export const ThreadRail: React.ForwardRefExoticComponent<{ className?: string; style?: React.CSSProperties; id?: string } & ThreadRailOptions & React.RefAttributes<SatinInstance & ThreadRailApi>>;
+export type { ChatOptions, ChatProps, ChatHistory, ChatItem, ChatEmpty, ChatApi, ChatToolItem, ChatToolRenderer } from "./heavy";

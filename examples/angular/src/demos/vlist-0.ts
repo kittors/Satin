@@ -35,7 +35,7 @@ export class VlistDemo0Component {
     const done = enhance(this.root.nativeElement, (root: any) => {
       // 行高固定：只画看得见的几十行，一万条照样流畅；滚到离底部 400px 自动要下一页（勾上"模拟加载失败"看失败后的重试）
       const vl = root.querySelector("#vl"), countEl = root.querySelector("#vlCount"), topBtn = root.querySelector("[data-vl-top]"), failBox = root.querySelector("#vlFail");
-      const wait = (ms?: any) => new Promise((r?: any) => setTimeout(r, ms)), TOTAL = 10000;
+      const wait = (ms?: any) => new Promise((r?: any) => window.setTimeout(r, ms)), TOTAL = 10000;
       const list = createInfiniteList(vl, {
         total: TOTAL, pageSize: 400, rowHeight: 56,
         // 换成你的接口：返回这一页的数据数组

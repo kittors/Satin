@@ -1,8 +1,8 @@
-<script setup>
-import { Table } from "satin-ui/vue";
+<script setup lang="ts">
+import { Table, type TableColumn } from "satin-ui/vue";
 
 // 负责人一样的相邻几行合成一格：列上写 merge
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "owner", title: "负责人", merge: true },
   { key: "name", title: "镜头" },
   { key: "type", title: "景别", format: (v, row) => row.note ?? v },
@@ -17,7 +17,7 @@ const DATA = [
   { id: 6, owner: "陈默", name: "末班列车", type: "全景", dur: 8 },
 ];
 // 转场那一行：景别、时长两列合成一格写说明（rows 是现在看得见的行，排序以后表格会重新问一遍）
-const spans = (rows) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
+const spans = (rows: typeof DATA) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
 </script>
 
 <template>

@@ -54,13 +54,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <p class="sn-t-body">登录即表示你同意<a class="sn-link" href="/terms">用户协议</a>和<a class="sn-link" href="/privacy">隐私说明</a>。第一次用验证码登录会自动创建账号。</p>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 export default function LinkBasic() {
   return <p className="sn-t-body">登录即表示你同意<a className="sn-link" href="/terms">用户协议</a>和<a className="sn-link" href="/privacy">隐私说明</a>。第一次用验证码登录会自动创建账号。</p>;
 }
@@ -76,7 +76,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <p class="sn-t-body">登录即表示你同意<a class="sn-link" href="/terms">用户协议</a>和<a class="sn-link" href="/privacy">隐私说明</a>。第一次用验证码登录会自动创建账号。</p>
 ```
 
@@ -96,7 +96,7 @@ export class LinkBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function LinkBasic() {
   return <p class="sn-t-body">登录即表示你同意<a class="sn-link" href="/terms">用户协议</a>和<a class="sn-link" href="/privacy">隐私说明</a>。第一次用验证码登录会自动创建账号。</p>;
 }
@@ -104,7 +104,7 @@ export default function LinkBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function LinkBasic() {
   return <p class="sn-t-body">登录即表示你同意<a class="sn-link" href="/terms">用户协议</a>和<a class="sn-link" href="/privacy">隐私说明</a>。第一次用验证码登录会自动创建账号。</p>;
 }
@@ -120,7 +120,7 @@ export default function LinkBasic() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <button type="button" class="sn-textbtn">编辑</button>
   <button type="button" class="sn-textbtn sn-quiet">取消</button>
@@ -131,7 +131,7 @@ export default function LinkBasic() {
 
 React 的写法：
 
-```jsx
+```tsx
 export default function LinkTextbtn() {
   return (
     <div className="sn-row">
@@ -159,7 +159,7 @@ Vue 的写法：
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <button type="button" class="sn-textbtn">编辑</button>
   <button type="button" class="sn-textbtn sn-quiet">取消</button>
@@ -189,7 +189,7 @@ export class LinkTextbtnComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function LinkTextbtn() {
   return (
     <div class="sn-row">
@@ -204,7 +204,7 @@ export default function LinkTextbtn() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 export default function LinkTextbtn() {
   return (
     <div class="sn-row">
@@ -227,7 +227,7 @@ export default function LinkTextbtn() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <a class="sn-textbtn" href="/projects">查看全部项目<span data-i="arrow-right:after"></span></a>
@@ -238,7 +238,7 @@ export default function LinkTextbtn() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function LinkArrow() {
@@ -254,7 +254,7 @@ export default function LinkArrow() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Icon } from "satin-ui/vue";
 </script>
 
@@ -268,8 +268,8 @@ import { Icon } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -301,7 +301,7 @@ export class LinkArrowComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function LinkArrow() {
   return (
     <sn-enhance>
@@ -316,7 +316,7 @@ export default function LinkArrow() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Icon } from "satin-ui/react";
 
 export default function LinkArrow() {

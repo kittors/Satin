@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Input } from "satin-ui/vue";
 </script>
 

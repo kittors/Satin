@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
   import { removeChip } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   let tags = $state(["雨夜", "车站", "列车"]);
   // 先播收起动画（keep：节点交给 Svelte 删），放完再从数组里删
-  const remove = (e, t) => removeChip(e.currentTarget.parentElement, { keep: true, onRemoved: () => (tags = tags.filter((x) => x !== t)) });
+  const remove = (e: MouseEvent, t: string) => removeChip((e.currentTarget as HTMLElement).parentElement!, { keep: true, onRemoved: () => (tags = tags.filter((x) => x !== t)) });
 </script>
 
 <div class="sn-row">

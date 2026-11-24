@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { openPopover, toast } from "satin-ui/components";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 气泡确认就是一个弹出面板：打开时焦点先落在"取消"上（防止回车误删）
       const btn = root.querySelector("#purge"), pc = root.querySelector("#pc");
       btn.addEventListener("click", () => {

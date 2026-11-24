@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-drag-list" id="reorder-basic">
@@ -76,7 +76,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef } from "react";
 import { createReorder } from "satin-ui";
 import { Icon } from "satin-ui/react";
@@ -90,10 +90,11 @@ const SHOTS = [
 ];
 
 export default function ShotOrder() {
-  const list = useRef(null);
+  const list = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
     // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
+    if (!list.current) return;
     const r = createReorder(list.current, { onReorder: ({ from, to }) => console.log(`第 ${from + 1} 个挪到了第 ${to + 1} 位`) });
     return () => r.destroy();
   }, []);
@@ -115,7 +116,7 @@ export default function ShotOrder() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { createReorder } from "satin-ui";
 import { Icon } from "satin-ui/vue";
@@ -127,10 +128,10 @@ const SHOTS = [
   { no: "10", name: "镜头 10 · 车窗里的倒影", meta: "特写 · 3 秒", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72" },
   { no: "11", name: "镜头 11 · 雨夜里的公交站", meta: "近景 · 4 秒", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72" },
 ];
-const list = ref(null);
+const list = ref<HTMLDivElement | null>(null);
 // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
 // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
-let r;
+let r: ReturnType<typeof createReorder> | undefined;
 onMounted(() => (r = createReorder(list.value, { onReorder: ({ from, to }) => console.log(`第 ${from + 1} 个挪到了第 ${to + 1} 位`) })));
 onBeforeUnmount(() => r?.destroy());
 </script>
@@ -149,8 +150,8 @@ onBeforeUnmount(() => r?.destroy());
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createReorder } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
@@ -161,7 +162,7 @@ Svelte 的写法：
     { no: "10", name: "镜头 10 · 车窗里的倒影", meta: "特写 · 3 秒", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72" },
     { no: "11", name: "镜头 11 · 雨夜里的公交站", meta: "近景 · 4 秒", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72" },
   ];
-  let list;
+  let list!: HTMLDivElement;
   // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
   // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
   $effect(() => {
@@ -231,7 +232,7 @@ export class ReorderBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, onSettled } from "solid-js";
 import { createReorder, icon } from "satin-ui";
 
@@ -244,7 +245,7 @@ const SHOTS = [
 ];
 
 export default function ShotOrder() {
-  let list;
+  let list!: HTMLDivElement;
   // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
   // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
   onSettled(() => {
@@ -268,7 +269,7 @@ export default function ShotOrder() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef } from "react";
 import { createReorder } from "satin-ui";
 import { Icon } from "satin-ui/react";
@@ -282,10 +283,11 @@ const SHOTS = [
 ];
 
 export default function ShotOrder() {
-  const list = useRef(null);
+  const list = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
     // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
+    if (!list.current) return;
     const r = createReorder(list.current, { onReorder: ({ from, to }) => console.log(`第 ${from + 1} 个挪到了第 ${to + 1} 位`) });
     return () => r.destroy();
   }, []);
@@ -314,7 +316,7 @@ onReorder 里把新顺序记到数据里（列表本身不重画）。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-stack sn-gap-12">
@@ -343,7 +345,7 @@ onReorder 里把新顺序记到数据里（列表本身不重画）。
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef, useState } from "react";
 import { createReorder } from "satin-ui";
 import { Icon } from "satin-ui/react";
@@ -355,14 +357,15 @@ const SHOTS = [
   { no: "10", name: "镜头 10 · 车窗里的倒影", meta: "特写 · 3 秒", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72" },
   { no: "11", name: "镜头 11 · 雨夜里的公交站", meta: "近景 · 4 秒", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72" },
 ];
-const move = (xs, from, to) => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
+const move = <T,>(xs: T[], from: number, to: number): T[] => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
 
 export default function ShotOrderSync() {
-  const list = useRef(null);
+  const list = useRef<HTMLDivElement>(null);
   const [order, setOrder] = useState(SHOTS.map((s) => s.no));
   useEffect(() => {
     // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
     // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
+    if (!list.current) return;
     const r = createReorder(list.current, { onReorder: ({ from, to }) => setOrder((o) => move(o, from, to)) });
     return () => r.destroy();
   }, []);
@@ -387,7 +390,7 @@ export default function ShotOrderSync() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { createReorder } from "satin-ui";
 import { Icon } from "satin-ui/vue";
@@ -399,12 +402,12 @@ const SHOTS = [
   { no: "10", name: "镜头 10 · 车窗里的倒影", meta: "特写 · 3 秒", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72" },
   { no: "11", name: "镜头 11 · 雨夜里的公交站", meta: "近景 · 4 秒", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72" },
 ];
-const move = (xs, from, to) => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
-const list = ref(null);
+const move = <T,>(xs: T[], from: number, to: number) => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
+const list = ref<HTMLDivElement | null>(null);
 const order = ref(SHOTS.map((s) => s.no));
 // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
 // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
-let r;
+let r: ReturnType<typeof createReorder> | undefined;
 onMounted(() => (r = createReorder(list.value, { onReorder: ({ from, to }) => (order.value = move(order.value, from, to)) })));
 onBeforeUnmount(() => r?.destroy());
 </script>
@@ -426,8 +429,8 @@ onBeforeUnmount(() => r?.destroy());
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createReorder } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
@@ -438,8 +441,8 @@ Svelte 的写法：
     { no: "10", name: "镜头 10 · 车窗里的倒影", meta: "特写 · 3 秒", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72" },
     { no: "11", name: "镜头 11 · 雨夜里的公交站", meta: "近景 · 4 秒", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72" },
   ];
-  const move = (xs, from, to) => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
-  let list;
+  const move = <T,>(xs: T[], from: number, to: number) => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
+  let list!: HTMLDivElement;
   let order = $state(SHOTS.map((s) => s.no));
   // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
   // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
@@ -518,7 +521,7 @@ export class ReorderOrderComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, onSettled, createSignal } from "solid-js";
 import { createReorder, icon } from "satin-ui";
 
@@ -529,10 +532,10 @@ const SHOTS = [
   { no: "10", name: "镜头 10 · 车窗里的倒影", meta: "特写 · 3 秒", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72" },
   { no: "11", name: "镜头 11 · 雨夜里的公交站", meta: "近景 · 4 秒", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72" },
 ];
-const move = (xs, from, to) => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
+const move = <T,>(xs: T[], from: number, to: number) => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
 
 export default function ShotOrderSync() {
-  let list;
+  let list!: HTMLDivElement;
   const [order, setOrder] = createSignal(SHOTS.map((s) => s.no));
   // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
   // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
@@ -560,7 +563,7 @@ export default function ShotOrderSync() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef, useState } from "react";
 import { createReorder } from "satin-ui";
 import { Icon } from "satin-ui/react";
@@ -572,14 +575,15 @@ const SHOTS = [
   { no: "10", name: "镜头 10 · 车窗里的倒影", meta: "特写 · 3 秒", thumb: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=96&h=56&q=72" },
   { no: "11", name: "镜头 11 · 雨夜里的公交站", meta: "近景 · 4 秒", thumb: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=96&h=56&q=72" },
 ];
-const move = (xs, from, to) => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
+const move = <T,>(xs: T[], from: number, to: number): T[] => { const ys = [...xs]; ys.splice(to, 0, ...ys.splice(from, 1)); return ys; };
 
 export default function ShotOrderSync() {
-  const list = useRef(null);
+  const list = useRef<HTMLDivElement>(null);
   const [order, setOrder] = useState(SHOTS.map((s) => s.no));
   useEffect(() => {
     // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
     // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
+    if (!list.current) return;
     const r = createReorder(list.current, { onReorder: ({ from, to }) => setOrder((o) => move(o, from, to)) });
     return () => r.destroy();
   }, []);
@@ -611,7 +615,7 @@ export default function ShotOrderSync() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- <sn-enhance> 把 data-i 换成图标 -->
 <sn-enhance>
   <div class="sn-drag-list" id="reorder-save">
@@ -646,7 +650,7 @@ export default function ShotOrderSync() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef } from "react";
 import { createReorder, flipSnapshot, optimistic } from "satin-ui";
 import { Icon } from "satin-ui/react";
@@ -660,9 +664,10 @@ const SHOTS = [
 ];
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 // 把一行挪到第 i 位，别的行平滑让位（已经在那儿就不动）
-const moveTo = (list, row, i) => {
+const moveTo = (list: HTMLElement | null, row: HTMLElement, i: number) => {
+  if (!list) return;
   const rows = [...list.querySelectorAll(".sn-drag-row")];
   if (rows.indexOf(row) === i) return;
   const play = flipSnapshot(list), rest = rows.filter((r) => r !== row);
@@ -671,11 +676,12 @@ const moveTo = (list, row, i) => {
 };
 
 export default function ShotOrderSave() {
-  const list = useRef(null);
+  const list = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
     // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
     // 放下就保存（乐观更新）：保存失败时这一行回到原位、抖两下，给"重试"
+    if (!list.current) return;
     const r = createReorder(list.current, { onReorder: ({ from, to, row }) => optimistic({ shake: row, apply: () => moveTo(list.current, row, to), revert: () => moveTo(list.current, row, from), save }) });
     return () => r.destroy();
   }, []);
@@ -697,7 +703,7 @@ export default function ShotOrderSave() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { createReorder, flipSnapshot, optimistic } from "satin-ui";
 import { Icon } from "satin-ui/vue";
@@ -711,20 +717,20 @@ const SHOTS = [
 ];
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 // 把一行挪到第 i 位，别的行平滑让位（已经在那儿就不动）
-const moveTo = (list, row, i) => {
+const moveTo = (list: HTMLElement, row: HTMLElement, i: number) => {
   const rows = [...list.querySelectorAll(".sn-drag-row")];
   if (rows.indexOf(row) === i) return;
   const play = flipSnapshot(list), rest = rows.filter((r) => r !== row);
   list.insertBefore(row, rest[i] || null);
   play();
 };
-const list = ref(null);
+const list = ref<HTMLDivElement | null>(null);
 // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
 // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
 // 放下就保存（乐观更新）：保存失败时这一行回到原位、抖两下，给"重试"
-let r;
+let r: ReturnType<typeof createReorder> | undefined;
 onMounted(() => (r = createReorder(list.value, { onReorder: ({ from, to, row }) => optimistic({ shake: row, apply: () => moveTo(list.value, row, to), revert: () => moveTo(list.value, row, from), save }) })));
 onBeforeUnmount(() => r?.destroy());
 </script>
@@ -743,8 +749,8 @@ onBeforeUnmount(() => r?.destroy());
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createReorder, flipSnapshot, optimistic } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
@@ -757,16 +763,16 @@ Svelte 的写法：
   ];
   // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
   let n = 0;
-  const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+  const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
   // 把一行挪到第 i 位，别的行平滑让位（已经在那儿就不动）
-  const moveTo = (list, row, i) => {
+  const moveTo = (list: HTMLElement, row: HTMLElement, i: number) => {
     const rows = [...list.querySelectorAll(".sn-drag-row")];
     if (rows.indexOf(row) === i) return;
     const play = flipSnapshot(list), rest = rows.filter((r) => r !== row);
     list.insertBefore(row, rest[i] || null);
     play();
   };
-  let list;
+  let list!: HTMLDivElement;
   // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
   // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
   // 放下就保存（乐观更新）：保存失败时这一行回到原位、抖两下，给"重试"
@@ -850,7 +856,7 @@ export class ReorderSaveComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For, onSettled } from "solid-js";
 import { createReorder, flipSnapshot, optimistic, icon } from "satin-ui";
 
@@ -863,9 +869,9 @@ const SHOTS = [
 ];
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 // 把一行挪到第 i 位，别的行平滑让位（已经在那儿就不动）
-const moveTo = (list, row, i) => {
+const moveTo = (list: HTMLElement, row: HTMLElement, i: number) => {
   const rows = [...list.querySelectorAll(".sn-drag-row")];
   if (rows.indexOf(row) === i) return;
   const play = flipSnapshot(list), rest = rows.filter((r) => r !== row);
@@ -874,7 +880,7 @@ const moveTo = (list, row, i) => {
 };
 
 export default function ShotOrderSave() {
-  let list;
+  let list!: HTMLDivElement;
   // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
   // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
   // 放下就保存（乐观更新）：保存失败时这一行回到原位、抖两下，给"重试"
@@ -899,7 +905,7 @@ export default function ShotOrderSave() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useRef } from "react";
 import { createReorder, flipSnapshot, optimistic } from "satin-ui";
 import { Icon } from "satin-ui/react";
@@ -913,9 +919,10 @@ const SHOTS = [
 ];
 // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
 let n = 0;
-const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
 // 把一行挪到第 i 位，别的行平滑让位（已经在那儿就不动）
-const moveTo = (list, row, i) => {
+const moveTo = (list: HTMLElement | null, row: HTMLElement, i: number) => {
+  if (!list) return;
   const rows = [...list.querySelectorAll(".sn-drag-row")];
   if (rows.indexOf(row) === i) return;
   const play = flipSnapshot(list), rest = rows.filter((r) => r !== row);
@@ -924,11 +931,12 @@ const moveTo = (list, row, i) => {
 };
 
 export default function ShotOrderSave() {
-  const list = useRef(null);
+  const list = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
     // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
     // 放下就保存（乐观更新）：保存失败时这一行回到原位、抖两下，给"重试"
+    if (!list.current) return;
     const r = createReorder(list.current, { onReorder: ({ from, to, row }) => optimistic({ shake: row, apply: () => moveTo(list.current, row, to), revert: () => moveTo(list.current, row, from), save }) });
     return () => r.destroy();
   }, []);

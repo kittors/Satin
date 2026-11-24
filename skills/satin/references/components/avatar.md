@@ -53,13 +53,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row"><sn-avatar name="张伟" size="16"></sn-avatar><sn-avatar name="张伟" size="20"></sn-avatar><sn-avatar name="张伟" size="24"></sn-avatar><sn-avatar name="张伟"></sn-avatar><sn-avatar name="张伟" size="40"></sn-avatar><sn-avatar name="张伟" size="64"></sn-avatar></div>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 export default function AvatarSizes() {
@@ -74,7 +74,7 @@ export default function AvatarSizes() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Avatar } from "satin-ui/vue";
 
 const sizes = [16, 20, 24, 32, 40, 64];
@@ -89,8 +89,8 @@ const sizes = [16, 20, 24, 32, 40, 64];
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Avatar from "satin-ui/svelte/Avatar.svelte";
 
   const sizes = [16, 20, 24, 32, 40, 64];
@@ -124,7 +124,7 @@ export class AvatarBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For } from "solid-js";
 
 export default function AvatarSizes() {
@@ -138,7 +138,7 @@ export default function AvatarSizes() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 export default function AvatarSizes() {
@@ -160,13 +160,13 @@ export default function AvatarSizes() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-set-list"><div class="sn-set-row"><sn-avatar name="何慧" decorative status="online"></sn-avatar><div class="sn-tx"><b>何慧</b><span>前端开发</span></div></div><div class="sn-set-row"><sn-avatar src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=80" name="黄磊" decorative></sn-avatar><div class="sn-tx"><b>黄磊</b><span>产品设计</span></div></div><div class="sn-set-row"><sn-avatar name="徐丽" decorative></sn-avatar><div class="sn-tx"><b>徐丽</b><span>财务顾问</span></div></div></div>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 const PEOPLE = [
@@ -192,7 +192,7 @@ export default function Members() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Avatar } from "satin-ui/vue";
 
 const people = [
@@ -214,8 +214,8 @@ const people = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Avatar from "satin-ui/svelte/Avatar.svelte";
 
   const people = [
@@ -263,7 +263,7 @@ export class AvatarListComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { For } from "solid-js";
 
 const PEOPLE = [
@@ -288,7 +288,7 @@ export default function Members() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Avatar } from "satin-ui/react";
 
 const PEOPLE = [

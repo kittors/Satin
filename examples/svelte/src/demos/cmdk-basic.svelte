@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createCommandPalette, toast } from "satin-ui";
 
   const GROUPS = [
@@ -6,7 +6,7 @@
     { name: "跳转", items: [{ name: "素材库", icon: "image" }, { name: "设置", icon: "settings", keys: "⌘," }] },
   ];
   // 面板只有一个，渲染在 <body> 末尾；⌘K 随时打开，onRun 是选中的那一条
-  let cmdk;
+  let cmdk: ReturnType<typeof createCommandPalette> | undefined;
   $effect(() => {
     cmdk = createCommandPalette(GROUPS, { onRun: (it) => toast({ text: "执行：" + it.name }) });
     return () => cmdk.destroy(); // 卸载时撤掉这次加的命令和 ⌘K 监听

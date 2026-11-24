@@ -160,8 +160,11 @@ const c3d = createChart3D(document.querySelector("#ch3d"), {
 });
 
 // 3. 3D 立体质感图标（陀螺仪倾角视差 + 动态高光）
-el.innerHTML = icon3DHTML({ name: "clapperboard", tone: "obsidian", size: "lg", label: "分镜创作" });
-bindIcons3D(el);`,
+const iconHost = document.querySelector("#chIcon3d");
+if (iconHost) {
+  iconHost.innerHTML = icon3DHTML({ name: "clapperboard", tone: "obsidian", size: "lg", label: "分镜创作" });
+  bindIcons3D(iconHost);
+}`,
   choice: `// 复选、单选、开关都是纯标记：勾上时方框轻轻弹一下是 setup() 装好的页面级行为，不用另外接
 // 标记可以照着手写，也可以用标记函数生成，两种一模一样：
 //   import { checkHTML, switchHTML } from "satin-ui/components";

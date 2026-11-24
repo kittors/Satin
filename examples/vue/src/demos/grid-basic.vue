@@ -1,8 +1,8 @@
-<script setup>
-import { DataGrid } from "satin-ui/vue/grid";
+<script setup lang="ts">
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
 // 列：key 取行里的哪个字段；type 选内置的显示（status 带色点、owner 带头像、dur 把秒显示成 分:秒）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },

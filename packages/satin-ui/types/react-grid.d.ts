@@ -8,3 +8,4 @@ export type DataGridColumn<Row = any> = Omit<GridColumn<Row>, "render"> & { rend
 /** 数据表格的属性：columns + data（或 dataSource）；受控的 sort / selectedKeys；事件 onXxx。列的 key 变了换一张新表；ref 拿到实例 */
 export type DataGridProps<Row = any> = Base & Omit<GridOptions<Row>, "columns"> & { columns: DataGridColumn<Row>[] };
 export const DataGrid: React.ForwardRefExoticComponent<DataGridProps & React.RefAttributes<SatinInstance & GridApi>>;
+export type { GridColumn, GridSort, GridDataSource, GridOptions, GridApi, GridEvents } from "./heavy";

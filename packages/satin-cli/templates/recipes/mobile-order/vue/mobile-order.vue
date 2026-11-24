@@ -1,21 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { Stepper as SnStepper } from "satin-ui/vue";
 import { busy, toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
-    const root = root.querySelector("[data-order-root]");
-    if (root) {
+  const done = enhance(root.value, (root: any) => {
+    const orderRoot = root.querySelector("[data-order-root]");
+    if (orderRoot) {
     const UNIT = 189, OFF = 20;
-    const totEl = root.querySelector("[data-ord-total]");
-    const unitEl = root.querySelector("[data-ord-unit]");
-    const specEl = root.querySelector("[data-ord-spec]");
-    const qtyEl = root.querySelector("[data-ord-qty]");
+    const totEl = orderRoot.querySelector("[data-ord-total]");
+    const unitEl = orderRoot.querySelector("[data-ord-unit]");
+    const specEl = orderRoot.querySelector("[data-ord-spec]");
+    const qtyEl = orderRoot.querySelector("[data-ord-qty]");
     const sync = () => {
       const q = Math.max(1, Number(qtyEl?.getAttribute("value") || qtyEl?.value || 1));
       const sub = UNIT * q;
@@ -25,8 +26,8 @@ onMounted(() => {
     qtyEl?.addEventListener("change", sync);
     qtyEl?.addEventListener("input", sync);
 
-    const colors = root.querySelector("[data-ord-colors]");
-    colors?.addEventListener("click", (e) => {
+    const colors = orderRoot.querySelector("[data-ord-colors]");
+    colors?.addEventListener("click", (e?: any) => {
       const btn = e.target.closest("button[data-color]");
       if (!btn) return;
       for (const b of colors.querySelectorAll("button[data-color]")) {
@@ -37,18 +38,18 @@ onMounted(() => {
       if (specEl) specEl.textContent = btn.dataset.color + " · 三档调光 · USB-C 充电";
     });
 
-    const payRow = root.querySelector("[data-ord-pay]");
-    const payVal = root.querySelector("[data-ord-pay-val]");
+    const payRow = orderRoot.querySelector("[data-ord-pay]");
+    const payVal = orderRoot.querySelector("[data-ord-pay-val]");
     payRow?.addEventListener("click", () => {
       if (!payVal) return;
       payVal.textContent = payVal.textContent === "微信支付" ? "支付宝" : "微信支付";
       toast({ text: "已切换至" + payVal.textContent, tone: "info" });
     });
 
-    const submitBtn = root.querySelector("[data-ord-submit]");
+    const submitBtn = orderRoot.querySelector("[data-ord-submit]");
     submitBtn?.addEventListener("click", () => {
-      busy(submitBtn, new Promise((r) => setTimeout(r, 600)).then(() => {
-        toast({ text: "订单已创建，正在拉起支付", tone: "success" });
+      busy(submitBtn, new Promise((r?: any) => window.setTimeout(r, 600)).then(() => {
+        toast({ text: "订单已创建，正在拉起支付", tone: "ok" });
       }));
     });
     }

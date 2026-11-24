@@ -1,14 +1,15 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance, injectIcons } from "satin-ui";
   import { bindSelects, copied } from "satin-ui/components";
   import "satin-ui/css/buttons.css";
   import "satin-ui/css/overlay.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       bindSelects(document); // 分裂按钮的备选菜单
 
       // 复制按钮：写入剪贴板，成功后图标换成对勾 1.2 秒

@@ -54,7 +54,7 @@ onSend 返回 Promise：发送后按钮变成停止、外圈转动，结束回�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="prompt-basic"></div>
 
 <script type="module">
@@ -73,11 +73,11 @@ onSend 返回 Promise：发送后按钮变成停止、外圈转动，结束回�
 
 React 的写法：
 
-```jsx
+```tsx
 import { Composer, toast } from "satin-ui/react";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text: _text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function ScenePrompt() {
   return <Composer placeholder="描述你想要的画面，比如：雨夜，林夏站在空荡的站台上" max={300} send="生成" onSend={generate} />;
@@ -87,11 +87,11 @@ export default function ScenePrompt() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Composer, toast } from "satin-ui/vue";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 </script>
 
 <template>
@@ -102,12 +102,12 @@ const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ 
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createComposer, toast } from "satin-ui";
   // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+  const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
   // 有内容时发送按钮才亮；⌘↵ 也能发送
   const options = {
@@ -155,15 +155,15 @@ export class PromptBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createComposer, toast } from "satin-ui";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function ScenePrompt() {
-  let host;
+  let host!: HTMLDivElement;
   // 有内容时发送按钮才亮；⌘↵ 也能发送；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createComposer(host, {
@@ -180,11 +180,11 @@ export default function ScenePrompt() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Composer, toast } from "satin-ui/react";
 
 // 发送以后返回 Promise：按钮变成"停止"、外圈转动；Promise 结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text: _text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function ScenePrompt() {
   return <Composer placeholder="描述你想要的画面，比如：雨夜，林夏站在空荡的站台上" max={300} send="生成" onSend={generate} />;
@@ -201,7 +201,7 @@ export default function ScenePrompt() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="prompt-stop"></div>
 
 <script type="module">
@@ -217,12 +217,12 @@ export default function ScenePrompt() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Composer, toast } from "satin-ui/react";
 
 // 点"停止"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送
-let cancel = null;
-const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error("已停止")); }; });
+let cancel: (() => void) | null = null;
+const generate = () => new Promise<void>((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error("已停止")); }; });
 const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
 export default function StoppablePrompt() {
@@ -233,11 +233,11 @@ export default function StoppablePrompt() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Composer, toast } from "satin-ui/vue";
 
 // 点"停止"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送
-let cancel = null;
+let cancel: (() => void) | null = null;
 const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error("已停止")); }; });
 const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 </script>
@@ -249,12 +249,12 @@ const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createComposer, toast } from "satin-ui";
   // 点"停止"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送
-  let cancel = null;
+  let cancel: (() => void) | null = null;
   const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error("已停止")); }; });
   const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
@@ -296,17 +296,17 @@ export class PromptStopComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createComposer, toast } from "satin-ui";
 
 // 点"停止"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送
-let cancel = null;
+let cancel: (() => void) | null = null;
 const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error("已停止")); }; });
 const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
 export default function StoppablePrompt() {
-  let host;
+  let host!: HTMLDivElement;
   // 生成中点停止，onStop 里取消；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createComposer(host, { placeholder: "描述你想要的画面", send: "生成", onSend: generate, onStop: stop });
@@ -318,12 +318,12 @@ export default function StoppablePrompt() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Composer, toast } from "satin-ui/react";
 
 // 点"停止"：onStop 里取消请求；onSend 返回的 Promise 结束（这里 reject）就回到可发送
-let cancel = null;
-const generate = () => new Promise((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error("已停止")); }; });
+let cancel: (() => void) | null = null;
+const generate = () => new Promise<void>((done, fail) => { const t = setTimeout(done, 5000); cancel = () => { clearTimeout(t); fail(new Error("已停止")); }; });
 const stop = () => { cancel?.(); toast({ text: "已停止生成" }); };
 
 export default function StoppablePrompt() {
@@ -341,7 +341,7 @@ upload(file, progress)：在这里上传，progress 更新附件上的进度环�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="prompt-upload"></div>
 
 <script type="module">
@@ -355,11 +355,11 @@ upload(file, progress)：在这里上传，progress 更新附件上的进度环�
 
 React 的写法：
 
-```jsx
+```tsx
 import { Composer, toast } from "satin-ui/react";
 
 // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise
-const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function PromptWithFiles() {
   return <Composer placeholder="描述画面，可以附上参考图" send="生成" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;
@@ -369,11 +369,11 @@ export default function PromptWithFiles() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Composer, toast } from "satin-ui/vue";
 
 // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise
-const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 </script>
 
 <template>
@@ -383,12 +383,12 @@ const upload = (file, progress) => new Promise((done) => { let p = 0; const t = 
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createComposer, toast } from "satin-ui";
   // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise
-  const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+  const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
   // 拖进来、粘贴截图、点 + 都能加附件
   const options = { placeholder: "描述画面，可以附上参考图", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } };
@@ -426,15 +426,15 @@ export class PromptUploadComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createComposer, toast } from "satin-ui";
 
 // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise
-const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function PromptWithFiles() {
-  let host;
+  let host!: HTMLDivElement;
   // 拖进来、粘贴截图、点 + 都能加附件；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createComposer(host, { placeholder: "描述画面，可以附上参考图", send: "生成", upload, onSend: ({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); } });
@@ -446,11 +446,11 @@ export default function PromptWithFiles() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Composer, toast } from "satin-ui/react";
 
 // upload(file, progress)：真上传在这里做，progress(0～1) 更新附件上的进度环；返回 Promise
-const upload = (file, progress) => new Promise((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
+const upload = (_file: File, progress: (p: number) => void) => new Promise<void>((done) => { let p = 0; const t = setInterval(() => { p += 0.25; progress(Math.min(1, p)); if (p >= 1) { clearInterval(t); done(); } }, 200); });
 
 export default function PromptWithFiles() {
   return <Composer placeholder="描述画面，可以附上参考图" send="生成" upload={upload} onSend={({ files }) => { toast({ text: `带着 ${files.length} 个附件发送` }); }} />;
@@ -467,7 +467,7 @@ context 是顶上的上下文栏，mode 是权限标签，models / model 是模�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="prompt-parts"></div>
 
 <script type="module">
@@ -490,9 +490,9 @@ context 是顶上的上下文栏，mode 是权限标签，models / model 是模�
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Composer, toast } from "satin-ui/react";
+import { Composer, toast, type ComposerMode } from "satin-ui/react";
 
 // 输入框顶上的上下文栏：带 options 的那项点开是菜单
 const CONTEXT = [
@@ -500,10 +500,10 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险；模型：名称 · 档位
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text: _text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function PromptParts() {
   const [model, setModel] = useState("fine");
@@ -515,7 +515,8 @@ export default function PromptParts() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
+import type { ComposerMode } from "satin-ui/vue";
 import { ref } from "vue";
 import { Composer, toast } from "satin-ui/vue";
 
@@ -525,10 +526,10 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险；模型：名称 · 档位
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 const model = ref("fine");
 </script>
 
@@ -540,8 +541,9 @@ const model = ref("fine");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
+  import type { ComposerMode } from "satin-ui";
   import { createComposer, toast } from "satin-ui";
   // 输入框顶上的上下文栏：带 options 的那项点开是菜单
   const CONTEXT = [
@@ -549,13 +551,13 @@ Svelte 的写法：
     { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
   ];
   // 权限：小圆点的颜色表示风险；模型：名称 · 档位
-  const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
+  const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
   const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
   // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-  const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+  const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
   // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createComposer(host, { placeholder: "随心输入", send: "生成", context: CONTEXT, mode: MODE, models: MODELS, model: "fine",
       onSend: generate, onModelChange: (v) => console.log("换了模型", v) });
@@ -604,7 +606,8 @@ export class PromptPartsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
+import type { ComposerMode } from "satin-ui";
 import { onSettled } from "solid-js";
 import { createComposer, toast } from "satin-ui";
 
@@ -614,13 +617,13 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险；模型：名称 · 档位
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function PromptParts() {
-  let host;
+  let host!: HTMLDivElement;
   // 模型用受控写法：选了别的发 modelChange；权限、上下文的菜单选了也有事件；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createComposer(host, { placeholder: "随心输入", send: "生成", context: CONTEXT, mode: MODE, models: MODELS, model: "fine",
@@ -633,9 +636,9 @@ export default function PromptParts() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Composer, toast } from "satin-ui/react";
+import { Composer, toast, type ComposerMode } from "satin-ui/react";
 
 // 输入框顶上的上下文栏：带 options 的那项点开是菜单
 const CONTEXT = [
@@ -643,10 +646,10 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险；模型：名称 · 档位
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text: _text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 
 export default function PromptParts() {
   const [model, setModel] = useState("fine");

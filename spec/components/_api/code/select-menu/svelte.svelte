@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   const sorts = ["最近更新", "名称", "创建时间"];

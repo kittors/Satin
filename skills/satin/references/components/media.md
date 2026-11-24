@@ -52,7 +52,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="media-basic"></div>
 
 <script type="module">
@@ -64,7 +64,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Player } from "satin-ui/react";
 
 export default function ClipPlayer() {
@@ -76,7 +76,7 @@ export default function ClipPlayer() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Player } from "satin-ui/vue";
 </script>
 
@@ -88,12 +88,12 @@ import { Player } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createPlayer } from "satin-ui";
 
   // 控制条叠在画面上；播放时指针停 2 秒不动，控制条和指针一起淡出，一动就回来；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createPlayer(host, { src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", label: "雨夜样片" });
     return () => it.destroy();
@@ -128,12 +128,12 @@ export class MediaBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createPlayer } from "satin-ui";
 
 export default function ClipPlayer() {
-  let host;
+  let host!: HTMLDivElement;
   // 控制条叠在画面上；播放时指针停 2 秒不动，控制条和指针一起淡出，一动就回来；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createPlayer(host, { src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", label: "雨夜样片" });
@@ -145,7 +145,7 @@ export default function ClipPlayer() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Player } from "satin-ui/react";
 
 export default function ClipPlayer() {
@@ -164,7 +164,7 @@ export default function ClipPlayer() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="media-audio"></div>
 
 <script type="module">
@@ -176,7 +176,7 @@ export default function ClipPlayer() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { AudioPlayer } from "satin-ui/react";
 
 export default function VoiceOver() {
@@ -188,7 +188,7 @@ export default function VoiceOver() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { AudioPlayer } from "satin-ui/vue";
 </script>
 
@@ -200,12 +200,12 @@ import { AudioPlayer } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createAudio } from "satin-ui";
 
   // 波形从音频本身算出来；点波形跳到那里；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createAudio(host, { src: "https://assets.mixkit.co/music/127/127.mp3", title: "Valley Sunset", sub: "Alejandro Magaña (A. M.) · Mixkit" });
     return () => it.destroy();
@@ -240,12 +240,12 @@ export class MediaAudioComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createAudio } from "satin-ui";
 
 export default function VoiceOver() {
-  let host;
+  let host!: HTMLDivElement;
   // 波形从音频本身算出来；点波形跳到那里；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createAudio(host, { src: "https://assets.mixkit.co/music/127/127.mp3", title: "Valley Sunset", sub: "Alejandro Magaña (A. M.) · Mixkit" });
@@ -257,7 +257,7 @@ export default function VoiceOver() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { AudioPlayer } from "satin-ui/react";
 
 export default function VoiceOver() {
@@ -276,7 +276,7 @@ export default function VoiceOver() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="media-methods">
   <div></div>
   <div class="sn-row" style="margin-top:12px"><button type="button" class="sn-btn sn-secondary sn-sm" data-act="restart">从头播放</button><button type="button" class="sn-btn sn-secondary sn-sm" data-act="pause">暂停</button></div>
@@ -294,20 +294,20 @@ export default function VoiceOver() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useRef } from "react";
-import { Player } from "satin-ui/react";
+import { Player, type PlayerHandle } from "satin-ui/react";
 
 export default function ClipControls() {
   // 实例上有 play()、pause()、toggle()，video 是里面的 <video>：自己的按钮直接控制播放；ref 拿到实例
-  const player = useRef(null);
-  const restart = () => { player.current.video.currentTime = 0; player.current.play(); };
+  const player = useRef<PlayerHandle>(null);
+  const restart = () => { if (!player.current) return; player.current.video.currentTime = 0; player.current.play(); };
   return (
     <div>
       <Player ref={player} src="https://assets.mixkit.co/videos/4451/4451-720.mp4" poster="https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg" label="雨夜样片" />
       <div className="sn-row" style={{ marginTop: 12 }}>
         <button type="button" className="sn-btn sn-secondary sn-sm" onClick={restart}>从头播放</button>
-        <button type="button" className="sn-btn sn-secondary sn-sm" onClick={() => player.current.pause()}>暂停</button>
+        <button type="button" className="sn-btn sn-secondary sn-sm" onClick={() => player.current?.pause()}>暂停</button>
       </div>
     </div>
   );
@@ -317,12 +317,12 @@ export default function ClipControls() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Player } from "satin-ui/vue";
 
 // 实例上有 play()、pause()、toggle()，video 是里面的 <video>：自己的按钮直接控制播放；模板 ref 拿到组件，.instance 是实例
-const player = ref(null);
+const player = ref<{ instance?: { video: HTMLVideoElement; play(): void; pause(): void } } | null>(null);
 const restart = () => { const p = player.value.instance; p.video.currentTime = 0; p.play(); };
 </script>
 
@@ -339,12 +339,12 @@ const restart = () => { const p = player.value.instance; p.video.currentTime = 0
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createPlayer } from "satin-ui";
 
   // 实例上有 play()、pause()、toggle()，video 是里面的 <video>：自己的按钮直接控制播放；挂上以后建，卸载时 destroy()
-  let host, player;
+  let host!: HTMLDivElement, player: ReturnType<typeof createPlayer> | undefined;
   $effect(() => {
     player = createPlayer(host, { src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", label: "雨夜样片" });
     return () => player.destroy();
@@ -401,13 +401,13 @@ export class MediaMethodsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createPlayer } from "satin-ui";
 
 export default function ClipControls() {
   // 实例上有 play()、pause()、toggle()，video 是里面的 <video>：自己的按钮直接控制播放；挂上以后建，卸载时 destroy()
-  let host, player;
+  let host!: HTMLDivElement, player: ReturnType<typeof createPlayer> | undefined;
   onSettled(() => {
     player = createPlayer(host, { src: "https://assets.mixkit.co/videos/4451/4451-720.mp4", poster: "https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg", label: "雨夜样片" });
     return () => player.destroy();
@@ -427,20 +427,20 @@ export default function ClipControls() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useRef } from "react";
-import { Player } from "satin-ui/react";
+import { Player, type PlayerHandle } from "satin-ui/react";
 
 export default function ClipControls() {
   // 实例上有 play()、pause()、toggle()，video 是里面的 <video>：自己的按钮直接控制播放；ref 拿到实例
-  const player = useRef(null);
-  const restart = () => { player.current.video.currentTime = 0; player.current.play(); };
+  const player = useRef<PlayerHandle>(null);
+  const restart = () => { if (!player.current) return; player.current.video.currentTime = 0; player.current.play(); };
   return (
     <div>
       <Player ref={player} src="https://assets.mixkit.co/videos/4451/4451-720.mp4" poster="https://assets.mixkit.co/videos/4451/4451-thumb-720-0.jpg" label="雨夜样片" />
       <div class="sn-row" style={{ marginTop: 12 }}>
         <button type="button" class="sn-btn sn-secondary sn-sm" onClick={restart}>从头播放</button>
-        <button type="button" class="sn-btn sn-secondary sn-sm" onClick={() => player.current.pause()}>暂停</button>
+        <button type="button" class="sn-btn sn-secondary sn-sm" onClick={() => player.current?.pause()}>暂停</button>
       </div>
     </div>
   );

@@ -100,8 +100,10 @@ import { setup, enhance } from "satin-ui";
             <small class="sn-up">+14.2%</small>
           </div>
           <div id="spk1">
-            <canvas class="sn-ch-cv" width="120" height="60"></canvas>
-            <i></i>
+            <div class="sn-ch-host sn-ch-spark">
+              <canvas class="sn-ch-cv" width="120" height="60"></canvas>
+              <i></i>
+            </div>
           </div>
         </div>
         <div class="ch-spk-card">
@@ -111,8 +113,10 @@ import { setup, enhance } from "satin-ui";
             <small class="sn-up">+4.8%</small>
           </div>
           <div id="spk2">
-            <canvas class="sn-ch-cv" width="120" height="60"></canvas>
-            <i></i>
+            <div class="sn-ch-host sn-ch-spark">
+              <canvas class="sn-ch-cv" width="120" height="60"></canvas>
+              <i></i>
+            </div>
           </div>
         </div>
         <div class="ch-spk-card">
@@ -122,8 +126,10 @@ import { setup, enhance } from "satin-ui";
             <small class="sn-up">-22 秒</small>
           </div>
           <div id="spk3">
-            <canvas class="sn-ch-cv" width="120" height="60"></canvas>
-            <i></i>
+            <div class="sn-ch-host sn-ch-spark">
+              <canvas class="sn-ch-cv" width="120" height="60"></canvas>
+              <i></i>
+            </div>
           </div>
         </div>
       </div>

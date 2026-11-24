@@ -70,32 +70,32 @@
   </div>
 </main>
 <script type="module">
-const root = document.querySelector("[data-nf-root]");
-if (root) {
+const page = document.querySelector("[data-nf-root]");
+if (page) {
   let rot = 0, timer = 0;
   const shoot = () => {
     rot += 30;
-    root.style.setProperty("--sn-e404-rot", rot + "deg");
-    root.classList.remove("sn-shutter");
-    void root.offsetWidth;
-    root.classList.add("sn-shutter");
+    page.style.setProperty("--sn-e404-rot", rot + "deg");
+    page.classList.remove("sn-shutter");
+    void page.offsetWidth;
+    page.classList.add("sn-shutter");
     clearTimeout(timer);
-    timer = setTimeout(() => root.classList.remove("sn-shutter"), 180);
+    timer = setTimeout(() => page.classList.remove("sn-shutter"), 180);
   };
 
-  root.querySelector("[data-nf-lens]")?.addEventListener("click", shoot);
-  root.querySelector("[data-nf-back]")?.addEventListener("click", () => { if (history.length > 1) history.back(); });
+  page.querySelector("[data-nf-lens]")?.addEventListener("click", shoot);
+  page.querySelector("[data-nf-back]")?.addEventListener("click", () => { if (history.length > 1) history.back(); });
 
-  root.addEventListener("pointermove", (e) => {
-    const r = root.getBoundingClientRect();
+  page.addEventListener("pointermove", (e) => {
+    const r = page.getBoundingClientRect();
     const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
     const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
-    root.style.setProperty("--sn-e404-x", (nx * 5).toFixed(1) + "px");
-    root.style.setProperty("--sn-e404-y", (ny * 5).toFixed(1) + "px");
+    page.style.setProperty("--sn-e404-x", (nx * 5).toFixed(1) + "px");
+    page.style.setProperty("--sn-e404-y", (ny * 5).toFixed(1) + "px");
   });
-  root.addEventListener("pointerleave", () => {
-    root.style.setProperty("--sn-e404-x", "0px");
-    root.style.setProperty("--sn-e404-y", "0px");
+  page.addEventListener("pointerleave", () => {
+    page.style.setProperty("--sn-e404-x", "0px");
+    page.style.setProperty("--sn-e404-y", "0px");
   });
   document.addEventListener("keydown", (e) => {
     if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "")) {

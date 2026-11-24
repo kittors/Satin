@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Pager from "satin-ui/svelte/Pager.svelte";
 
   let page = $state(1);

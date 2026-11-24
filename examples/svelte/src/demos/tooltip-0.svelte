@@ -1,17 +1,18 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance, showTip, hideTip } from "satin-ui";
   import "./tooltip-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 要在别处触发时：比如点了"放大预览"，在按钮上说一下结果，1.5 秒后收起
       const zoom = root.querySelector('[data-tip="放大预览"]');
       zoom.addEventListener("click", () => {
         showTip(zoom, "已放大到 200%");
-        setTimeout(hideTip, 1500);
+        window.setTimeout(hideTip, 1500);
       });
     });
     return () => { off(); unsetup(); };

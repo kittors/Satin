@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createPassword, createEmail, createSearch } from "satin-ui/components";
   import "./special-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 密码：四段强度条 + 文字，不到 8 位提示还差几位；大写锁定开着时提示
       createPassword(root.querySelector("input[data-pw]"));
 
@@ -17,7 +18,7 @@
       // 搜索：等待超过 300ms 才转圈、转了至少 500ms；search 返回结果数量（或 Promise）。换成你的搜索接口
       const SHOTS = ["车站外，雨刚停", "林夏走进候车厅", "站台上的最后一班车", "车窗里的倒影", "雨夜的公交站"];
       createSearch(root.querySelector("[data-search]"), {
-        search: (q) => new Promise((done) => setTimeout(() => done(SHOTS.filter((s) => s.includes(q)).length), 400)),
+        search: (q?: any) => new Promise((done?: any) => window.setTimeout(() => done(SHOTS.filter((s?: any) => s.includes(q)).length), 400)),
       });
       // 清除按钮（[data-clearable]）有内容时出现、点了清空，显示密码（[data-eye]）切换明文——这两个 enhance() 已经接上
     });

@@ -1,7 +1,7 @@
 <!-- 由 scripts/examples/gallery-entries.mjs 生成，别手改 -->
-<script setup>
+<script setup lang="ts">
 import "../../../shared/gallery.css";
-import DemoGuard from "../gallery/guard.js";
+import DemoGuard from "../gallery/guard";
 import ColorDemo0 from "../demos/color-0.vue";
 import TypeDemo0 from "../demos/type-0.vue";
 import TypeDemo1 from "../demos/type-1.vue";
@@ -14,9 +14,13 @@ import LayoutDemo0 from "../demos/layout-0.vue";
 import LayoutDemo1 from "../demos/layout-1.vue";
 import SpaceDemo0 from "../demos/space-0.vue";
 import SpaceDemo1 from "../demos/space-1.vue";
+import SpaceDemo2 from "../demos/space-2.vue";
 import ElevationDemo0 from "../demos/elevation-0.vue";
 import MotionDemo0 from "../demos/motion-0.vue";
+import LoadingmotionDemo0 from "../demos/loadingmotion-0.vue";
 import IconsDemo0 from "../demos/icons-0.vue";
+import IconsDemo1 from "../demos/icons-1.vue";
+import FeelDemo0 from "../demos/feel-0.vue";
 import ButtonDemo0 from "../demos/button-0.vue";
 import ButtonDemo1 from "../demos/button-1.vue";
 import ButtonDemo2 from "../demos/button-2.vue";
@@ -52,6 +56,7 @@ import NotifyDemo0 from "../demos/notify-0.vue";
 import BannerDemo0 from "../demos/banner-0.vue";
 import EmptyDemo0 from "../demos/empty-0.vue";
 import LoadingDemo0 from "../demos/loading-0.vue";
+import LoadingDemo1 from "../demos/loading-1.vue";
 import ProgressDemo0 from "../demos/progress-0.vue";
 import NumflowDemo0 from "../demos/numflow-0.vue";
 import TableDemo0 from "../demos/table-0.vue";
@@ -64,6 +69,10 @@ import TableDemo6 from "../demos/table-6.vue";
 import TableDemo7 from "../demos/table-7.vue";
 import GridDemo0 from "../demos/grid-0.vue";
 import CgridDemo0 from "../demos/cgrid-0.vue";
+import ChartsDemo0 from "../demos/charts-0.vue";
+import ChartsDemo1 from "../demos/charts-1.vue";
+import ChartsDemo2 from "../demos/charts-2.vue";
+import ChartsDemo3 from "../demos/charts-3.vue";
 import ListDemo0 from "../demos/list-0.vue";
 import CardDemo0 from "../demos/card-0.vue";
 import TagsDemo0 from "../demos/tags-0.vue";
@@ -82,6 +91,7 @@ import VlistDemo0 from "../demos/vlist-0.vue";
 import ChatDemo0 from "../demos/chat-0.vue";
 import ChatDemo1 from "../demos/chat-1.vue";
 import MdDemo0 from "../demos/md-0.vue";
+import EditorialDemo0 from "../demos/editorial-0.vue";
 import FlowDemo0 from "../demos/flow-0.vue";
 import ImageDemo0 from "../demos/image-0.vue";
 import MediaDemo0 from "../demos/media-0.vue";
@@ -109,6 +119,9 @@ import ButtonActions from "../demos/button-actions.vue";
 import ButtonMobile from "../demos/button-mobile.vue";
 import CardBasic from "../demos/card-basic.vue";
 import CardGrid from "../demos/card-grid.vue";
+import CardVariants from "../demos/card-variants.vue";
+import CardLayouts from "../demos/card-layouts.vue";
+import CardContent from "../demos/card-content.vue";
 import CardSelect from "../demos/card-select.vue";
 import CgridBasic from "../demos/cgrid-basic.vue";
 import CgridMillion from "../demos/cgrid-million.vue";
@@ -150,6 +163,7 @@ import DrawerFooter from "../demos/drawer-footer.vue";
 import EmptyBasic from "../demos/empty-basic.vue";
 import EmptySearch from "../demos/empty-search.vue";
 import EmptyError from "../demos/empty-error.vue";
+import EmptyPresets from "../demos/empty-presets.vue";
 import FieldBasic from "../demos/field-basic.vue";
 import FieldError from "../demos/field-error.vue";
 import FieldOptional from "../demos/field-optional.vue";
@@ -306,6 +320,7 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <h2>圆角与线</h2>
     <div class="demo" data-demo="space-0"><DemoGuard slug="space-0"><SpaceDemo0 /></DemoGuard></div>
     <div class="demo" data-demo="space-1"><DemoGuard slug="space-1"><SpaceDemo1 /></DemoGuard></div>
+    <div class="demo" data-demo="space-2"><DemoGuard slug="space-2"><SpaceDemo2 /></DemoGuard></div>
   </section>
   <section id="elevation">
     <h2>阴影与层级</h2>
@@ -315,9 +330,18 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <h2>动效曲线</h2>
     <div class="demo" data-demo="motion-0"><DemoGuard slug="motion-0"><MotionDemo0 /></DemoGuard></div>
   </section>
+  <section id="loadingmotion">
+    <h2>内容加载与过渡</h2>
+    <div class="demo" data-demo="loadingmotion-0"><DemoGuard slug="loadingmotion-0"><LoadingmotionDemo0 /></DemoGuard></div>
+  </section>
   <section id="icons">
     <h2>图标</h2>
     <div class="demo" data-demo="icons-0"><DemoGuard slug="icons-0"><IconsDemo0 /></DemoGuard></div>
+    <div class="demo" data-demo="icons-1"><DemoGuard slug="icons-1"><IconsDemo1 /></DemoGuard></div>
+  </section>
+  <section id="feel">
+    <h2>交互质感</h2>
+    <div class="demo" data-demo="feel-0"><DemoGuard slug="feel-0"><FeelDemo0 /></DemoGuard></div>
   </section>
   <section id="button">
     <h2>按钮</h2>
@@ -443,6 +467,7 @@ import VlistRetry from "../demos/vlist-retry.vue";
   <section id="loading">
     <h2>骨架与加载</h2>
     <div class="demo" data-demo="loading-0"><DemoGuard slug="loading-0"><LoadingDemo0 /></DemoGuard></div>
+    <div class="demo" data-demo="loading-1"><DemoGuard slug="loading-1"><LoadingDemo1 /></DemoGuard></div>
   </section>
   <section id="progress">
     <h2>进度</h2>
@@ -470,6 +495,13 @@ import VlistRetry from "../demos/vlist-retry.vue";
   <section id="cgrid">
     <h2>Canvas 表格</h2>
     <div class="demo" data-demo="cgrid-0"><DemoGuard slug="cgrid-0"><CgridDemo0 /></DemoGuard></div>
+  </section>
+  <section id="charts">
+    <h2>数据图表与 3D</h2>
+    <div class="demo" data-demo="charts-0"><DemoGuard slug="charts-0"><ChartsDemo0 /></DemoGuard></div>
+    <div class="demo" data-demo="charts-1"><DemoGuard slug="charts-1"><ChartsDemo1 /></DemoGuard></div>
+    <div class="demo" data-demo="charts-2"><DemoGuard slug="charts-2"><ChartsDemo2 /></DemoGuard></div>
+    <div class="demo" data-demo="charts-3"><DemoGuard slug="charts-3"><ChartsDemo3 /></DemoGuard></div>
   </section>
   <section id="list">
     <h2>列表与键值</h2>
@@ -515,6 +547,10 @@ import VlistRetry from "../demos/vlist-retry.vue";
   <section id="md">
     <h2>Markdown 文档</h2>
     <div class="demo" data-demo="md-0"><DemoGuard slug="md-0"><MdDemo0 /></DemoGuard></div>
+  </section>
+  <section id="editorial">
+    <h2>图文编排与内容张力</h2>
+    <div class="demo" data-demo="editorial-0"><DemoGuard slug="editorial-0"><EditorialDemo0 /></DemoGuard></div>
   </section>
   <section id="flow">
     <h2>流程图</h2>
@@ -584,6 +620,9 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <h2>卡片</h2>
     <div class="demo" data-demo="card-basic"><DemoGuard slug="card-basic"><CardBasic /></DemoGuard></div>
     <div class="demo" data-demo="card-grid"><DemoGuard slug="card-grid"><CardGrid /></DemoGuard></div>
+    <div class="demo" data-demo="card-variants"><DemoGuard slug="card-variants"><CardVariants /></DemoGuard></div>
+    <div class="demo" data-demo="card-layouts"><DemoGuard slug="card-layouts"><CardLayouts /></DemoGuard></div>
+    <div class="demo" data-demo="card-content"><DemoGuard slug="card-content"><CardContent /></DemoGuard></div>
     <div class="demo" data-demo="card-select"><DemoGuard slug="card-select"><CardSelect /></DemoGuard></div>
   </section>
   <section id="cgrid">
@@ -661,6 +700,7 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <div class="demo" data-demo="empty-basic"><DemoGuard slug="empty-basic"><EmptyBasic /></DemoGuard></div>
     <div class="demo" data-demo="empty-search"><DemoGuard slug="empty-search"><EmptySearch /></DemoGuard></div>
     <div class="demo" data-demo="empty-error"><DemoGuard slug="empty-error"><EmptyError /></DemoGuard></div>
+    <div class="demo" data-demo="empty-presets"><DemoGuard slug="empty-presets"><EmptyPresets /></DemoGuard></div>
   </section>
   <section id="field">
     <h2>字段与错误</h2>

@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Segmented } from "satin-ui/vue";
-import { DataGrid } from "satin-ui/vue/grid";
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180 },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"] },
   { key: "owner", title: "负责人", type: "owner", width: 120 },
@@ -18,7 +18,7 @@ const rows = [
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
 const STATES = ["有数据", "加载中", "出错", "空"];
-const EMPTY = [];
+const EMPTY: typeof rows = [];
 const state = ref("空");
 </script>
 

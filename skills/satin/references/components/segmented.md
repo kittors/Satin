@@ -55,13 +55,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-segmented items='["网格","列表"]' value="网格" label="视图"></sn-segmented>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Segmented } from "satin-ui/react";
 
 export default function ViewSwitch() {
@@ -72,7 +72,7 @@ export default function ViewSwitch() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Segmented } from "satin-ui/vue";
 </script>
 
@@ -83,8 +83,8 @@ import { Segmented } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Segmented from "satin-ui/svelte/Segmented.svelte";
 </script>
 
@@ -109,7 +109,7 @@ export class SegmentedBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const ITEMS = JSON.stringify(["网格", "列表"]);
 
@@ -120,7 +120,7 @@ export default function ViewSwitch() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Segmented } from "satin-ui/react";
 
 export default function ViewSwitch() {
@@ -138,7 +138,7 @@ export default function ViewSwitch() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="range-box">
   <sn-segmented items='["7 天","30 天","全部"]' value="30 天" label="时间范围"></sn-segmented>
   <span class="sn-help">显示最近 30 天的数据</span>
@@ -154,12 +154,12 @@ export default function ViewSwitch() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Segmented } from "satin-ui/react";
 
 const RANGES = ["7 天", "30 天", "全部"];
-const noteOf = (r) => (r === "全部" ? "显示全部数据" : `显示最近 ${r}的数据`);
+const noteOf = (r: string) => (r === "全部" ? "显示全部数据" : `显示最近 ${r}的数据`);
 
 export default function RangeSwitch() {
   const [range, setRange] = useState("30 天");
@@ -175,7 +175,7 @@ export default function RangeSwitch() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import { Segmented } from "satin-ui/vue";
 
@@ -194,8 +194,8 @@ const note = computed(() => (range.value === "全部" ? "显示全部数据" : `
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Segmented from "satin-ui/svelte/Segmented.svelte";
 
   const RANGES = ["7 天", "30 天", "全部"];
@@ -233,13 +233,13 @@ export class SegmentedControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 自定义元素的属性只认字符串：数组写成 JSON
 const RANGES = JSON.stringify(["7 天", "30 天", "全部"]);
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function RangeSwitch() {
   const [range, setRange] = createSignal("30 天");
@@ -254,12 +254,12 @@ export default function RangeSwitch() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Segmented } from "satin-ui/react";
 
 const RANGES = ["7 天", "30 天", "全部"];
-const noteOf = (r) => (r === "全部" ? "显示全部数据" : `显示最近 ${r}的数据`);
+const noteOf = (r: string) => (r === "全部" ? "显示全部数据" : `显示最近 ${r}的数据`);
 
 export default function RangeSwitch() {
   const [range, setRange] = useState("30 天");
@@ -282,7 +282,7 @@ export default function RangeSwitch() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <sn-segmented items='["全部","进行中","已完成"]' value="全部" size="sm" label="状态"></sn-segmented>
   <button type="button" class="sn-btn sn-secondary sn-sm">导出</button>
@@ -291,7 +291,7 @@ export default function RangeSwitch() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, Segmented } from "satin-ui/react";
 
 export default function StatusBar() {
@@ -307,7 +307,7 @@ export default function StatusBar() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Segmented } from "satin-ui/vue";
 </script>
 
@@ -321,8 +321,8 @@ import { Button, Segmented } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Segmented from "satin-ui/svelte/Segmented.svelte";
 </script>
 
@@ -354,7 +354,7 @@ export class SegmentedSizesComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 const ITEMS = JSON.stringify(["全部", "进行中", "已完成"]);
 
 export default function StatusBar() {
@@ -369,7 +369,7 @@ export default function StatusBar() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, Segmented } from "satin-ui/react";
 
 export default function StatusBar() {

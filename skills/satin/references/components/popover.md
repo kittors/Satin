@@ -55,7 +55,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-pop="pop-share" aria-haspopup="dialog" aria-expanded="false"><span data-i="share:before"></span>分享</button>
   <div class="sn-pop sn-popover" id="pop-share" role="dialog" aria-label="分享给协作者">
@@ -68,7 +68,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, Popover, Switch } from "satin-ui/react";
 
 export default function SharePopover() {
@@ -91,7 +91,7 @@ export default function SharePopover() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Popover, Switch } from "satin-ui/vue";
 
@@ -111,7 +111,7 @@ const download = ref(true);
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- <sn-enhance> 接上 data-pop 触发按钮：点开、再点或 Esc、点外面关上，焦点回到按钮 -->
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-pop="pop-share" aria-haspopup="dialog" aria-expanded="false"><span data-i="share:before"></span>分享</button>
@@ -147,7 +147,7 @@ export class PopoverBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 标记照设计稿写，<sn-enhance> 接上 data-pop 触发按钮：点开、再点或 Esc、点外面关上，焦点回到按钮
 export default function SharePopover() {
   return (
@@ -165,7 +165,7 @@ export default function SharePopover() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, Popover, Switch } from "satin-ui/react";
 
 export default function SharePopover() {
@@ -195,7 +195,7 @@ export default function SharePopover() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-pop="pop-rate" aria-haspopup="dialog" aria-expanded="false">画面比例：16:9</button>
   <div class="sn-pop sn-popover" id="pop-rate" role="dialog" aria-label="画面比例">
@@ -218,7 +218,7 @@ export default function SharePopover() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Popover, Radio } from "satin-ui/react";
 
@@ -228,7 +228,7 @@ export default function RatePicker() {
   const [open, setOpen] = useState(false);
   const [rate, setRate] = useState("16:9");
   // 受控：open 放在这里，选了就关上（改动立即生效，不需要"保存"）
-  const pick = (v) => { setRate(v); setOpen(false); };
+  const pick = (v: string) => { setRate(v); setOpen(false); };
   return (
     <Popover
       open={open}
@@ -251,7 +251,7 @@ export default function RatePicker() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Popover, Radio } from "satin-ui/vue";
 
@@ -259,7 +259,7 @@ const RATES = [["16:9", "16:9 横屏"], ["9:16", "9:16 竖屏"], ["1:1", "1:1 �
 const open = ref(false);
 const rate = ref("16:9");
 // 受控：v-model:open，选了就关上（改动立即生效，不需要"保存"）
-const pick = (v) => { rate.value = v; open.value = false; };
+const pick = (v: string) => { rate.value = v; open.value = false; };
 </script>
 
 <template>
@@ -276,12 +276,12 @@ const pick = (v) => { rate.value = v; open.value = false; };
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { popoverOf } from "satin-ui";
 
   const RATES = [["16:9", "16:9 横屏"], ["9:16", "9:16 竖屏"], ["1:1", "1:1 方形"]];
-  let rate = $state("16:9"), pop;
+  let rate = $state("16:9"), pop!: HTMLDivElement;
   // 改动立即生效、不需要"保存"：选了就把面板关上
   $effect(() => { rate; if (pop) popoverOf(pop)?.close(); });
 </script>
@@ -334,7 +334,7 @@ export class PopoverControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, For } from "solid-js";
 import { popoverOf } from "satin-ui";
 
@@ -343,8 +343,8 @@ const RATES = [["16:9", "16:9 横屏"], ["9:16", "9:16 竖屏"], ["1:1", "1:1 �
 // <sn-enhance> 接上 data-pop 触发按钮；改动立即生效、不需要"保存"：选了就把面板关上
 export default function RatePicker() {
   const [rate, setRate] = createSignal("16:9");
-  let pop;
-  const pick = (v) => { setRate(v); popoverOf(pop)?.close(); };
+  let pop!: HTMLDivElement;
+  const pick = (v: string) => { setRate(v); popoverOf(pop)?.close(); };
   return (
     <sn-enhance>
       <button type="button" class="sn-btn sn-secondary" data-pop="pop-rate" aria-haspopup="dialog" aria-expanded="false">画面比例：{rate()}</button>
@@ -361,7 +361,7 @@ export default function RatePicker() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Popover, Radio } from "satin-ui/react";
 
@@ -371,7 +371,7 @@ export default function RatePicker() {
   const [open, setOpen] = useState(false);
   const [rate, setRate] = useState("16:9");
   // 受控：open 放在这里，选了就关上（改动立即生效，不需要"保存"）
-  const pick = (v) => { setRate(v); setOpen(false); };
+  const pick = (v: string) => { setRate(v); setOpen(false); };
   return (
     <Popover
       open={open}
@@ -401,7 +401,7 @@ export default function RatePicker() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-ghost sn-ibtn" data-pop="pop-info" aria-haspopup="dialog" aria-expanded="false" data-tip="画面比例说明" aria-label="画面比例说明" data-i="info"></button>
   <div class="sn-pop sn-popover" id="pop-info" data-align="end" role="dialog" aria-label="画面比例说明">
@@ -413,7 +413,7 @@ export default function RatePicker() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, Popover } from "satin-ui/react";
 
 export default function InfoPopover() {
@@ -429,7 +429,7 @@ export default function InfoPopover() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Popover } from "satin-ui/vue";
 </script>
 
@@ -446,7 +446,7 @@ import { Button, Popover } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- <sn-enhance> 接上 data-pop 触发按钮：点开、再点或 Esc、点外面关上，焦点回到按钮；data-align="end"：面板和按钮右边对齐 -->
 <sn-enhance>
   <button type="button" class="sn-btn sn-ghost sn-ibtn" data-pop="pop-info" aria-haspopup="dialog" aria-expanded="false" data-tip="画面比例说明" aria-label="画面比例说明" data-i="info"></button>
@@ -480,7 +480,7 @@ export class PopoverAlignComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 标记照设计稿写，<sn-enhance> 接上 data-pop 触发按钮：点开、再点或 Esc、点外面关上，焦点回到按钮
 export default function InfoPopover() {
   return (
@@ -497,7 +497,7 @@ export default function InfoPopover() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, Popover } from "satin-ui/react";
 
 export default function InfoPopover() {

@@ -1,6 +1,6 @@
 // 组件文档完整度检查：逐个组件查官网组件页要的七部分齐不齐、各框架的示例源码文件在不在、API 表有没有类型 / 默认值 / 说明，缺什么列出来。
 // 数据来自合并后的组件契约（spec/components/<id>.json；手写部分在 spec/components/_api/<id>.mjs，格式见那里的 README.md），
-// 示例源码文件的路径按 site/frameworks.js 的 demo(slug) 找（比如 examples/react/src/demos/button-basic.jsx）。
+// 示例源码文件的路径按 site/frameworks.js 的 demo(slug) 找（比如 examples/react/src/demos/button-basic.tsx）。
 // 七部分：
 //   1 说明     title、lead、什么时候用、什么时候别用
 //   2 引入     7 个框架各一行（html、react、vue、svelte、angular、solid、preact）

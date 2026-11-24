@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   let autosave = $state(true);
   let remind = $state(false);
 </script>

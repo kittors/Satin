@@ -54,7 +54,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="table-basic"></div>
 
 <script type="module">
@@ -78,13 +78,13 @@
 
 React 的写法：
 
-```jsx
-import { Table } from "satin-ui/react";
+```tsx
+import { Table, type TableColumnReact } from "satin-ui/react";
 
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 const ROWS = [
@@ -103,10 +103,10 @@ export default function ShotTable() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { Table } from "satin-ui/vue";
+<script setup lang="ts">
+import { Table, type TableColumn } from "satin-ui/vue";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
   { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -128,10 +128,10 @@ const ROWS = [
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createTable } from "satin-ui";
-  const COLUMNS = [
+```svelte
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "镜头", sortable: true },
     { key: "type", title: "景别" },
     { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -145,7 +145,7 @@ Svelte 的写法：
   ];
 
   // 点表头排序，行按新顺序移到位；数字列右对齐、用等宽数字；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: ROWS, label: "镜头清单" });
     return () => it.destroy();
@@ -193,11 +193,11 @@ export class TableBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createTable } from "satin-ui";
+import { createTable, type TableColumn } from "satin-ui";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
   { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -211,7 +211,7 @@ const ROWS = [
 ];
 
 export default function ShotTable() {
-  let host;
+  let host!: HTMLDivElement;
   // 点表头排序，行按新顺序移到位；数字列右对齐、用等宽数字；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createTable(host, { columns: COLUMNS, data: ROWS, label: "镜头清单" });
@@ -223,13 +223,13 @@ export default function ShotTable() {
 
 Preact 的写法：
 
-```jsx
-import { Table } from "satin-ui/react";
+```tsx
+import { Table, type TableColumnReact } from "satin-ui/react";
 
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 const ROWS = [
@@ -255,7 +255,7 @@ export default function ShotTable() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="table-controlled"></div>
 
 <script type="module">
@@ -279,14 +279,14 @@ export default function ShotTable() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Table } from "satin-ui/react";
+import { Table, type TableColumnReact } from "satin-ui/react";
 
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 const ROWS = [
@@ -298,7 +298,7 @@ const ROWS = [
 
 export default function PickRows() {
   // 受控：selected 是勾上的行的 rowKey（默认 id）；onSelect 里更新
-  const [picked, setPicked] = useState([1]);
+  const [picked, setPicked] = useState<string[]>(["1"]);
   return (
     <div className="sn-stack sn-gap-8">
       <Table columns={COLUMNS} data={ROWS} selectable selected={picked} onSelect={setPicked} label="镜头清单" />
@@ -311,11 +311,11 @@ export default function PickRows() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { Table } from "satin-ui/vue";
+import { Table, type TableColumn } from "satin-ui/vue";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
   { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -341,10 +341,10 @@ const picked = ref([1]);
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createTable } from "satin-ui";
-  const COLUMNS = [
+```svelte
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "镜头", sortable: true },
     { key: "type", title: "景别" },
     { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -358,7 +358,7 @@ Svelte 的写法：
   ];
 
   // selectable：最左边一列勾选框；勾选后底部浮出批量操作条；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: ROWS, selectable: true, selected: [1], label: "镜头清单", onSelect: (keys) => console.log("勾上了：", keys) });
     return () => it.destroy();
@@ -406,11 +406,11 @@ export class TableControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createTable } from "satin-ui";
+import { createTable, type TableColumn } from "satin-ui";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
   { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -424,7 +424,7 @@ const ROWS = [
 ];
 
 export default function PickRows() {
-  let host;
+  let host!: HTMLDivElement;
   // selectable：最左边一列勾选框；勾选后底部浮出批量操作条；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createTable(host, { columns: COLUMNS, data: ROWS, selectable: true, selected: [1], label: "镜头清单", onSelect: (keys) => console.log("勾上了：", keys) });
@@ -436,14 +436,14 @@ export default function PickRows() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Table } from "satin-ui/react";
+import { Table, type TableColumnReact } from "satin-ui/react";
 
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 const ROWS = [
@@ -455,7 +455,7 @@ const ROWS = [
 
 export default function PickRows() {
   // 受控：selected 是勾上的行的 rowKey（默认 id）；onSelect 里更新
-  const [picked, setPicked] = useState([1]);
+  const [picked, setPicked] = useState<string[]>(["1"]);
   return (
     <div class="sn-stack sn-gap-8">
       <Table columns={COLUMNS} data={ROWS} selectable selected={picked} onSelect={setPicked} label="镜头清单" />
@@ -475,7 +475,7 @@ export default function PickRows() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="table-states"></div>
 
 <script type="module">
@@ -493,20 +493,20 @@ export default function PickRows() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useEffect, useState } from "react";
-import { Table } from "satin-ui/react";
+import { Table, type TableColumnReact } from "satin-ui/react";
 
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 
 export default function EmptyTable() {
   // 加载中给 loading（骨架行，300ms 内回来不出）；加载完是空数组就显示 empty
-  const [rows, setRows] = useState(null);
+  const [rows, setRows] = useState<Record<string, unknown>[] | null>(null);
   useEffect(() => { const t = setTimeout(() => setRows([]), 1200); return () => clearTimeout(t); }, []);
   return <Table columns={COLUMNS} data={rows ?? []} loading={rows === null} empty="还没有镜头，先导入原文" label="镜头清单" compact />;
 }
@@ -515,18 +515,18 @@ export default function EmptyTable() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { Table } from "satin-ui/vue";
+import { Table, type TableColumn } from "satin-ui/vue";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
   { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 // 加载中给 loading（骨架行，300ms 内回来不出）；加载完是空数组就显示 empty
-const rows = ref(null);
+const rows = ref<typeof DATA | null>(null);
 onMounted(() => setTimeout(() => (rows.value = []), 1200));
 </script>
 
@@ -537,10 +537,10 @@ onMounted(() => setTimeout(() => (rows.value = []), 1200));
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createTable } from "satin-ui";
-  const COLUMNS = [
+```svelte
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "镜头", sortable: true },
     { key: "type", title: "景别" },
     { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -548,7 +548,7 @@ Svelte 的写法：
   ];
 
   // data 是空数组时显示 empty；加载中给 loading（骨架行）；compact 紧凑密度；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: [], empty: "还没有镜头，先导入原文", label: "镜头清单", compact: true });
     return () => it.destroy();
@@ -590,11 +590,11 @@ export class TableStatesComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createTable } from "satin-ui";
+import { createTable, type TableColumn } from "satin-ui";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
   { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -602,7 +602,7 @@ const COLUMNS = [
 ];
 
 export default function EmptyTable() {
-  let host;
+  let host!: HTMLDivElement;
   // data 是空数组时显示 empty；加载中给 loading（骨架行）；compact 紧凑密度；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createTable(host, { columns: COLUMNS, data: [], empty: "还没有镜头，先导入原文", label: "镜头清单", compact: true });
@@ -614,20 +614,20 @@ export default function EmptyTable() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useEffect, useState } from "react";
-import { Table } from "satin-ui/react";
+import { Table, type TableColumnReact } from "satin-ui/react";
 
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人" },
 ];
 
 export default function EmptyTable() {
   // 加载中给 loading（骨架行，300ms 内回来不出）；加载完是空数组就显示 empty
-  const [rows, setRows] = useState(null);
+  const [rows, setRows] = useState<Record<string, unknown>[] | null>(null);
   useEffect(() => { const t = setTimeout(() => setRows([]), 1200); return () => clearTimeout(t); }, []);
   return <Table columns={COLUMNS} data={rows ?? []} loading={rows === null} empty="还没有镜头，先导入原文" label="镜头清单" compact />;
 }
@@ -646,7 +646,7 @@ export default function EmptyTable() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <div id="table-tree"></div>
   <span class="sn-help" id="table-tree-note">展开着 1 行</span>
@@ -684,11 +684,11 @@ export default function EmptyTable() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Table } from "satin-ui/react";
+import { Table, type TableColumnReact } from "satin-ui/react";
 
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "项目" },
   { key: "owner", title: "负责人" },
   { key: "shots", title: "镜头", align: "right" },
@@ -723,11 +723,11 @@ export default function ProjectTree() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { Table } from "satin-ui/vue";
+import { Table, type TableColumn } from "satin-ui/vue";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "项目" },
   { key: "owner", title: "负责人" },
   { key: "shots", title: "镜头", align: "right" },
@@ -760,10 +760,10 @@ const open = ref(["p1"]);
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createTable } from "satin-ui";
-  const COLUMNS = [
+```svelte
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "项目" },
     { key: "owner", title: "负责人" },
     { key: "shots", title: "镜头", align: "right" },
@@ -784,7 +784,7 @@ Svelte 的写法：
   ];
 
   // defaultExpandedKeys：一开始展开哪几行；点箭头时 onExpandChange 给出现在展开着的所有行（e.keys）；挂上以后建，卸载时 destroy()
-  let host, open = $state(1);
+  let host!: HTMLDivElement, open = $state(1);
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: DATA, defaultExpandedKeys: ["p1"], label: "项目和分集", onExpandChange: (e) => (open = e.keys.length) });
     return () => it.destroy();
@@ -848,11 +848,11 @@ export class TableTreeComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onSettled } from "solid-js";
-import { createTable } from "satin-ui";
+import { createTable, type TableColumn } from "satin-ui";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "项目" },
   { key: "owner", title: "负责人" },
   { key: "shots", title: "镜头", align: "right" },
@@ -873,7 +873,7 @@ const DATA = [
 ];
 
 export default function ProjectTree() {
-  let host;
+  let host!: HTMLDivElement;
   const [open, setOpen] = createSignal(1);
   // defaultExpandedKeys：一开始展开哪几行；点箭头时 onExpandChange 给出现在展开着的所有行（e.keys）；挂上以后建，卸载时 destroy()
   onSettled(() => {
@@ -891,11 +891,11 @@ export default function ProjectTree() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Table } from "satin-ui/react";
+import { Table, type TableColumnReact } from "satin-ui/react";
 
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "项目" },
   { key: "owner", title: "负责人" },
   { key: "shots", title: "镜头", align: "right" },
@@ -937,7 +937,7 @@ export default function ProjectTree() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="table-merge"></div>
 
 <script type="module">
@@ -966,17 +966,19 @@ export default function ProjectTree() {
 
 React 的写法：
 
-```jsx
-import { Table } from "satin-ui/react";
+```tsx
+import { Table, type TableColumnReact, type TableSpan } from "satin-ui/react";
+
+interface ShotRow { id: number; owner: string; name: string; type?: string; dur?: number; note?: string }
 
 // 负责人一样的相邻几行合成一格：列上写 merge
-const COLUMNS = [
+const COLUMNS: TableColumnReact<ShotRow>[] = [
   { key: "owner", title: "负责人", merge: true },
   { key: "name", title: "镜头" },
-  { key: "type", title: "景别", format: (v, row) => row.note ?? v },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => (v ? `${v} 秒` : "—") },
+  { key: "type", title: "景别", format: (v: string | undefined, row: ShotRow) => row.note ?? v ?? "" },
+  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number | undefined) => (v ? `${v} 秒` : "—") },
 ];
-const DATA = [
+const DATA: ShotRow[] = [
   { id: 1, owner: "林夏", name: "站台远景", type: "远景", dur: 6 },
   { id: 2, owner: "林夏", name: "推门进候车厅", type: "中景", dur: 5 },
   { id: 3, owner: "周屿", name: "雨里的车灯", type: "近景", dur: 3 },
@@ -985,7 +987,7 @@ const DATA = [
   { id: 6, owner: "陈默", name: "末班列车", type: "全景", dur: 8 },
 ];
 // 转场那一行：景别、时长两列合成一格写说明（rows 是现在看得见的行，排序以后表格会重新问一遍）
-const spans = (rows) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
+const spans = (rows: ShotRow[]): TableSpan[] => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
 
 export default function MergedShots() {
   // 合并只在网格线下显示（lines="grid"）；按时长排序以后负责人不再挨着，就各自一格
@@ -996,11 +998,11 @@ export default function MergedShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
-import { Table } from "satin-ui/vue";
+<script setup lang="ts">
+import { Table, type TableColumn } from "satin-ui/vue";
 
 // 负责人一样的相邻几行合成一格：列上写 merge
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "owner", title: "负责人", merge: true },
   { key: "name", title: "镜头" },
   { key: "type", title: "景别", format: (v, row) => row.note ?? v },
@@ -1015,7 +1017,7 @@ const DATA = [
   { id: 6, owner: "陈默", name: "末班列车", type: "全景", dur: 8 },
 ];
 // 转场那一行：景别、时长两列合成一格写说明（rows 是现在看得见的行，排序以后表格会重新问一遍）
-const spans = (rows) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
+const spans = (rows: typeof DATA) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
 </script>
 
 <template>
@@ -1026,11 +1028,11 @@ const spans = (rows) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type",
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createTable } from "satin-ui";
+```svelte
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
   // 负责人一样的相邻几行合成一格：列上写 merge
-  const COLUMNS = [
+  const COLUMNS: TableColumn[] = [
     { key: "owner", title: "负责人", merge: true },
     { key: "name", title: "镜头" },
     { key: "type", title: "景别", format: (v, row) => row.note ?? v },
@@ -1045,10 +1047,10 @@ Svelte 的写法：
     { id: 6, owner: "陈默", name: "末班列车", type: "全景", dur: 8 },
   ];
   // 转场那一行：景别、时长两列合成一格写说明（rows 是现在看得见的行，排序以后表格会重新问一遍）
-  const spans = (rows) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
+  const spans = (rows: typeof DATA) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
 
   // 合并只在网格线下显示（lines: "grid"）；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: DATA, spans, lines: "grid", label: "分镜" });
     return () => it.destroy();
@@ -1102,12 +1104,12 @@ export class TableMergeComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
-import { createTable } from "satin-ui";
+import { createTable, type TableColumn } from "satin-ui";
 
 // 负责人一样的相邻几行合成一格：列上写 merge
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "owner", title: "负责人", merge: true },
   { key: "name", title: "镜头" },
   { key: "type", title: "景别", format: (v, row) => row.note ?? v },
@@ -1122,10 +1124,10 @@ const DATA = [
   { id: 6, owner: "陈默", name: "末班列车", type: "全景", dur: 8 },
 ];
 // 转场那一行：景别、时长两列合成一格写说明（rows 是现在看得见的行，排序以后表格会重新问一遍）
-const spans = (rows) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
+const spans = (rows: typeof DATA) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
 
 export default function MergedShots() {
-  let host;
+  let host!: HTMLDivElement;
   // 合并只在网格线下显示（lines: "grid"）；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createTable(host, { columns: COLUMNS, data: DATA, spans, lines: "grid", label: "分镜" });
@@ -1137,17 +1139,19 @@ export default function MergedShots() {
 
 Preact 的写法：
 
-```jsx
-import { Table } from "satin-ui/react";
+```tsx
+import { Table, type TableColumnReact, type TableSpan } from "satin-ui/react";
+
+interface ShotRow { id: number; owner: string; name: string; type?: string; dur?: number; note?: string }
 
 // 负责人一样的相邻几行合成一格：列上写 merge
-const COLUMNS = [
+const COLUMNS: TableColumnReact<ShotRow>[] = [
   { key: "owner", title: "负责人", merge: true },
   { key: "name", title: "镜头" },
-  { key: "type", title: "景别", format: (v, row) => row.note ?? v },
-  { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => (v ? `${v} 秒` : "—") },
+  { key: "type", title: "景别", format: (v: string | undefined, row: ShotRow) => row.note ?? v ?? "" },
+  { key: "dur", title: "时长", align: "right", sortable: true, format: (v: number | undefined) => (v ? `${v} 秒` : "—") },
 ];
-const DATA = [
+const DATA: ShotRow[] = [
   { id: 1, owner: "林夏", name: "站台远景", type: "远景", dur: 6 },
   { id: 2, owner: "林夏", name: "推门进候车厅", type: "中景", dur: 5 },
   { id: 3, owner: "周屿", name: "雨里的车灯", type: "近景", dur: 3 },
@@ -1156,7 +1160,7 @@ const DATA = [
   { id: 6, owner: "陈默", name: "末班列车", type: "全景", dur: 8 },
 ];
 // 转场那一行：景别、时长两列合成一格写说明（rows 是现在看得见的行，排序以后表格会重新问一遍）
-const spans = (rows) => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
+const spans = (rows: ShotRow[]): TableSpan[] => rows.flatMap((r, i) => (r.note ? [{ row: i, key: "type", colSpan: 2 }] : []));
 
 export default function MergedShots() {
   // 合并只在网格线下显示（lines="grid"）；按时长排序以后负责人不再挨着，就各自一格
@@ -1177,7 +1181,7 @@ export default function MergedShots() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <div id="table-drag"></div>
   <span class="sn-help" id="table-drag-note">顺序：站台远景 → 雨里的车灯 → 推门进候车厅 → 车窗上的雨 → 末班列车</span>
@@ -1210,15 +1214,15 @@ export default function MergedShots() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Table } from "satin-ui/react";
+import { Table, type TableColumnReact, type TableRowReorderEvent } from "satin-ui/react";
 
 // resizable：拖表头右边缘改宽（双击按内容定宽）；width 是数字的列固定宽度，没写的分剩下的
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "镜头", resizable: true, minWidth: 140 },
   { key: "type", title: "景别", width: 96, resizable: true },
-  { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人", width: 100 },
 ];
 const DATA = [
@@ -1232,7 +1236,7 @@ const DATA = [
 export default function ShotOrder() {
   // draggableRows：按住左边的把手拖行，松手时 onRowReorder 给出新顺序（e.keys）；draggableColumns：按住表头拖列
   const [rows, setRows] = useState(DATA);
-  const reorder = (e) => setRows(e.keys.map((k) => rows.find((r) => String(r.id) === k)));
+  const reorder = (e: TableRowReorderEvent) => setRows(e.keys.map((k) => rows.find((r) => String(r.id) === k)!).filter(Boolean));
   return (
     <div className="sn-stack sn-gap-8">
       <Table columns={COLUMNS} data={rows} draggableRows draggableColumns onRowReorder={reorder} label="分镜顺序" />
@@ -1245,12 +1249,12 @@ export default function ShotOrder() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { Table } from "satin-ui/vue";
+import { Table, type TableColumn } from "satin-ui/vue";
 
 // resizable：拖表头右边缘改宽（双击按内容定宽）；width 是数字的列固定宽度，没写的分剩下的
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", resizable: true, minWidth: 140 },
   { key: "type", title: "景别", width: 96, resizable: true },
   { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v) => `${v} 秒` },
@@ -1265,7 +1269,7 @@ const DATA = [
 ];
 // draggable-rows：按住左边的把手拖行，松手时 @row-reorder 给出新顺序（e.keys）；draggable-columns：按住表头拖列
 const rows = ref(DATA);
-const reorder = (e) => (rows.value = e.keys.map((k) => rows.value.find((r) => String(r.id) === k)));
+const reorder = (e: { keys: string[] }) => (rows.value = e.keys.map((k) => rows.value.find((r) => String(r.id) === k)!));
 </script>
 
 <template>
@@ -1278,11 +1282,11 @@ const reorder = (e) => (rows.value = e.keys.map((k) => rows.value.find((r) => St
 
 Svelte 的写法：
 
-```jsx
-<script>
-  import { createTable } from "satin-ui";
+```svelte
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
   // resizable：拖表头右边缘改宽（双击按内容定宽）；width 是数字的列固定宽度，没写的分剩下的
-  const COLUMNS = [
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "镜头", resizable: true, minWidth: 140 },
     { key: "type", title: "景别", width: 96, resizable: true },
     { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v) => `${v} 秒` },
@@ -1295,10 +1299,10 @@ Svelte 的写法：
     { id: 4, name: "车窗上的雨", type: "特写", dur: 4, owner: "周屿" },
     { id: 5, name: "末班列车", type: "全景", dur: 8, owner: "陈默" },
   ];
-  const nameOf = (k) => DATA.find((r) => String(r.id) === k).name;
+  const nameOf = (k: string) => DATA.find((r) => String(r.id) === k)?.name ?? "";
 
   // draggableRows：按住左边的把手拖行，松手时 onRowReorder 给出新顺序（e.keys）；draggableColumns：按住表头拖列；挂上以后建，卸载时 destroy()
-  let host, order = $state(DATA.map((r) => r.name).join(" → "));
+  let host!: HTMLDivElement, order = $state(DATA.map((r) => r.name).join(" → "));
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: DATA, draggableRows: true, draggableColumns: true, label: "分镜顺序", onRowReorder: (e) => (order = e.keys.map(nameOf).join(" → ")) });
     return () => it.destroy();
@@ -1358,12 +1362,12 @@ export class TableDragComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, onSettled } from "solid-js";
-import { createTable } from "satin-ui";
+import { createTable, type TableColumn } from "satin-ui";
 
 // resizable：拖表头右边缘改宽（双击按内容定宽）；width 是数字的列固定宽度，没写的分剩下的
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", resizable: true, minWidth: 140 },
   { key: "type", title: "景别", width: 96, resizable: true },
   { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v) => `${v} 秒` },
@@ -1376,10 +1380,10 @@ const DATA = [
   { id: 4, name: "车窗上的雨", type: "特写", dur: 4, owner: "周屿" },
   { id: 5, name: "末班列车", type: "全景", dur: 8, owner: "陈默" },
 ];
-const nameOf = (k) => DATA.find((r) => String(r.id) === k).name;
+const nameOf = (k: string) => DATA.find((r) => String(r.id) === k)?.name ?? "";
 
 export default function ShotOrder() {
-  let host;
+  let host!: HTMLDivElement;
   const [order, setOrder] = createSignal(DATA.map((r) => r.name).join(" → "));
   // draggableRows：按住左边的把手拖行，松手时 onRowReorder 给出新顺序（e.keys）；draggableColumns：按住表头拖列；挂上以后建，卸载时 destroy()
   onSettled(() => {
@@ -1397,15 +1401,15 @@ export default function ShotOrder() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Table } from "satin-ui/react";
+import { Table, type TableColumnReact, type TableRowReorderEvent } from "satin-ui/react";
 
 // resizable：拖表头右边缘改宽（双击按内容定宽）；width 是数字的列固定宽度，没写的分剩下的
-const COLUMNS = [
+const COLUMNS: TableColumnReact[] = [
   { key: "name", title: "镜头", resizable: true, minWidth: 140 },
   { key: "type", title: "景别", width: 96, resizable: true },
-  { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v) => `${v} 秒` },
+  { key: "dur", title: "时长", align: "right", width: 96, resizable: true, format: (v: number) => `${v} 秒` },
   { key: "owner", title: "负责人", width: 100 },
 ];
 const DATA = [
@@ -1419,7 +1423,7 @@ const DATA = [
 export default function ShotOrder() {
   // draggableRows：按住左边的把手拖行，松手时 onRowReorder 给出新顺序（e.keys）；draggableColumns：按住表头拖列
   const [rows, setRows] = useState(DATA);
-  const reorder = (e) => setRows(e.keys.map((k) => rows.find((r) => String(r.id) === k)));
+  const reorder = (e: TableRowReorderEvent) => setRows(e.keys.map((k) => rows.find((r) => String(r.id) === k)!).filter(Boolean));
   return (
     <div className="sn-stack sn-gap-8">
       <Table columns={COLUMNS} data={rows} draggableRows draggableColumns onRowReorder={reorder} label="分镜顺序" />

@@ -53,13 +53,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-stepper value="4" min="1" max="60" unit="秒" label="镜头时长"></sn-stepper>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Stepper } from "satin-ui/react";
 
 export default function ShotLength() {
@@ -70,7 +70,7 @@ export default function ShotLength() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Stepper } from "satin-ui/vue";
 </script>
 
@@ -81,8 +81,8 @@ import { Stepper } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Stepper from "satin-ui/svelte/Stepper.svelte";
 </script>
 
@@ -104,7 +104,7 @@ export class NumberBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ShotLength() {
   return <sn-stepper value="4" min="1" max="60" unit="秒" label="镜头时长"></sn-stepper>;
 }
@@ -112,7 +112,7 @@ export default function ShotLength() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Stepper } from "satin-ui/react";
 
 export default function ShotLength() {
@@ -130,7 +130,7 @@ export default function ShotLength() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="number-controlled-box">
   <sn-stepper min="1" max="12" unit="集" label="集数" value="3"></sn-stepper>
   <span class="sn-help">预计生成 72 个镜头</span>
@@ -147,7 +147,7 @@ export default function ShotLength() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Stepper } from "satin-ui/react";
 
@@ -165,7 +165,7 @@ export default function EpisodeCount() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Stepper } from "satin-ui/vue";
 
@@ -182,8 +182,8 @@ const value = ref(3);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Stepper from "satin-ui/svelte/Stepper.svelte";
 
   let value = $state(3);
@@ -217,11 +217,11 @@ export class NumberControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function EpisodeCount() {
   const [value, setValue] = createSignal(3);
@@ -236,7 +236,7 @@ export default function EpisodeCount() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Stepper } from "satin-ui/react";
 
@@ -261,13 +261,13 @@ export default function EpisodeCount() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-stepper value="10" min="5" max="100" unit="张" label="每批张数"></sn-stepper>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Stepper } from "satin-ui/react";
 
 export default function BatchSize() {
@@ -278,7 +278,7 @@ export default function BatchSize() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Stepper } from "satin-ui/vue";
 </script>
 
@@ -289,8 +289,8 @@ import { Stepper } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Stepper from "satin-ui/svelte/Stepper.svelte";
 </script>
 
@@ -312,7 +312,7 @@ export class NumberRangeComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function BatchSize() {
   return <sn-stepper value="10" min="5" max="100" unit="张" label="每批张数"></sn-stepper>;
 }
@@ -320,7 +320,7 @@ export default function BatchSize() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Stepper } from "satin-ui/react";
 
 export default function BatchSize() {

@@ -1,8 +1,8 @@
-<script setup>
-import { DataGrid } from "satin-ui/vue/grid";
+<script setup lang="ts">
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
 // 只改显示的文字用 format（预算加上 ¥ 和千分位）；要放自己的标记用插槽 #cell-列的key（一行好几个标签）
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 160 },
   { key: "tags", title: "标签", width: 200 },
   { key: "budget", title: "预算", type: "money", width: 120, format: (v) => "¥" + v.toLocaleString("zh-CN") },

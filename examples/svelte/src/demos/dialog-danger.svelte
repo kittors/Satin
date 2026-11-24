@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Dialog from "satin-ui/svelte/Dialog.svelte";
   import Icon from "satin-ui/svelte/Icon.svelte";
   import { toast } from "satin-ui";

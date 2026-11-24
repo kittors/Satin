@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
   let name = $state("");
   let error = $state("");
-  const submit = (e) => {
+  const submit = (e: SubmitEvent) => {
     e.preventDefault();
     if (!name.trim()) return (error = "请填写项目名称");
     name = "";

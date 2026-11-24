@@ -54,7 +54,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-empty-state">
     <sn-empty-art name="projects"></sn-empty-art>
@@ -70,7 +70,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, EmptyArt } from "satin-ui/react";
 
 export default function FirstProject() {
@@ -91,7 +91,7 @@ export default function FirstProject() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, EmptyArt } from "satin-ui/vue";
 </script>
 
@@ -110,8 +110,8 @@ import { Button, EmptyArt } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import EmptyArt from "satin-ui/svelte/EmptyArt.svelte";
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
@@ -154,7 +154,7 @@ export class EmptyBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function EmptyBasic() {
   return (
     <sn-enhance>
@@ -174,7 +174,7 @@ export default function EmptyBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, EmptyArt } from "satin-ui/react";
 
 export default function FirstProject() {
@@ -202,7 +202,7 @@ export default function FirstProject() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-empty-state">
   <sn-empty-art name="search"></sn-empty-art>
   <h4>未找到“雨夜”相关镜头</h4>
@@ -215,7 +215,7 @@ export default function FirstProject() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, EmptyArt } from "satin-ui/react";
 
 export default function EmptySearch() {
@@ -235,7 +235,7 @@ export default function EmptySearch() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, EmptyArt } from "satin-ui/vue";
 </script>
 
@@ -253,8 +253,8 @@ import { Button, EmptyArt } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import EmptyArt from "satin-ui/svelte/EmptyArt.svelte";
 </script>
 
@@ -292,7 +292,7 @@ export class EmptySearchComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function EmptySearch() {
   return (
     <div class="sn-empty-state">
@@ -309,7 +309,7 @@ export default function EmptySearch() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, EmptyArt } from "satin-ui/react";
 
 export default function EmptySearch() {
@@ -336,7 +336,7 @@ export default function EmptySearch() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-empty-state">
   <sn-empty-art name="error"></sn-empty-art>
   <h4>暂时无法加载</h4>
@@ -349,7 +349,7 @@ export default function EmptySearch() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, EmptyArt } from "satin-ui/react";
 
 export default function LoadFailed() {
@@ -369,7 +369,7 @@ export default function LoadFailed() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, EmptyArt } from "satin-ui/vue";
 </script>
 
@@ -387,8 +387,8 @@ import { Button, EmptyArt } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import EmptyArt from "satin-ui/svelte/EmptyArt.svelte";
 </script>
 
@@ -426,7 +426,7 @@ export class EmptyErrorComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function LoadFailed() {
   return (
     <div class="sn-empty-state">
@@ -443,7 +443,7 @@ export default function LoadFailed() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, EmptyArt } from "satin-ui/react";
 
 export default function LoadFailed() {
@@ -470,7 +470,7 @@ export default function LoadFailed() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-empty-presets">
   <div class="sn-empty-preset"><sn-empty-art name="projects"></sn-empty-art><b>首次使用</b><code>projects</code></div>
   <div class="sn-empty-preset"><sn-empty-art name="search"></sn-empty-art><b>筛选无结果</b><code>search</code></div>
@@ -483,10 +483,10 @@ export default function LoadFailed() {
 
 React 的写法：
 
-```jsx
-import { EmptyArt } from "satin-ui/react";
+```tsx
+import { EmptyArt, type EmptyArtName } from "satin-ui/react";
 
-const PRESETS = [
+const PRESETS: { name: EmptyArtName; title: string }[] = [
   { name: "projects", title: "首次使用" },
   { name: "search", title: "筛选无结果" },
   { name: "error", title: "加载失败" },
@@ -513,7 +513,7 @@ export default function EmptyPresets() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { EmptyArt } from "satin-ui/vue";
 
 const presets = [
@@ -539,8 +539,8 @@ const presets = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import EmptyArt from "satin-ui/svelte/EmptyArt.svelte";
   const presets = [
     { name: "projects", title: "首次使用" },
@@ -587,7 +587,7 @@ export class EmptyPresetsComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function EmptyPresets() {
   return (
     <div class="sn-empty-presets">
@@ -604,10 +604,10 @@ export default function EmptyPresets() {
 
 Preact 的写法：
 
-```jsx
-import { EmptyArt } from "satin-ui/react";
+```tsx
+import { EmptyArt, type EmptyArtName } from "satin-ui/react";
 
-const PRESETS = [
+const PRESETS: { name: EmptyArtName; title: string }[] = [
   { name: "projects", title: "首次使用" },
   { name: "search", title: "筛选无结果" },
   { name: "error", title: "加载失败" },

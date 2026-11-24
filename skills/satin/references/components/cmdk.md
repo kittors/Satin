@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="cmdk-btn"><span data-i="search:before"></span>搜索或执行命令<span class="sn-key">⌘K</span></button>
 
 <script type="module">
@@ -69,7 +69,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, CommandPalette, toast } from "satin-ui/react";
 
@@ -93,7 +93,7 @@ export default function Commands() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, CommandPalette, toast } from "satin-ui/vue";
 
@@ -113,8 +113,8 @@ const open = ref(false);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createCommandPalette, toast } from "satin-ui";
 
   const GROUPS = [
@@ -122,7 +122,7 @@ Svelte 的写法：
     { name: "跳转", items: [{ name: "素材库", icon: "image" }, { name: "设置", icon: "settings", keys: "⌘," }] },
   ];
   // 面板只有一个，渲染在 <body> 末尾；⌘K 随时打开，onRun 是选中的那一条
-  let cmdk;
+  let cmdk: ReturnType<typeof createCommandPalette> | undefined;
   $effect(() => {
     cmdk = createCommandPalette(GROUPS, { onRun: (it) => toast({ text: "执行：" + it.name }) });
     return () => cmdk.destroy(); // 卸载时撤掉这次加的命令和 ⌘K 监听
@@ -163,7 +163,7 @@ export class CmdkBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createCommandPalette, toast } from "satin-ui";
 
@@ -174,7 +174,7 @@ const GROUPS = [
 
 export default function Commands() {
   // 面板只有一个，渲染在 <body> 末尾；⌘K 随时打开，onRun 是选中的那一条
-  let cmdk;
+  let cmdk: ReturnType<typeof createCommandPalette> | undefined;
   onSettled(() => {
     cmdk = createCommandPalette(GROUPS, { onRun: (it) => toast({ text: "执行：" + it.name }) });
     return () => cmdk.destroy(); // 卸载时撤掉这次加的命令和 ⌘K 监听
@@ -189,7 +189,7 @@ export default function Commands() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, CommandPalette, toast } from "satin-ui/react";
 
@@ -220,7 +220,7 @@ export default function Commands() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="cmdk-btn"><span data-i="search:before"></span>搜索或执行命令<span class="sn-key">⌘K</span></button>
 
 <script type="module">
@@ -239,7 +239,7 @@ export default function Commands() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, CommandPalette, toast } from "satin-ui/react";
 
@@ -248,7 +248,7 @@ const GROUPS = [
   { name: "跳转", items: [{ name: "素材库", icon: "image" }, { name: "设置", icon: "settings", keys: "⌘," }] },
 ];
 // 没有结果时说清楚搜了什么，再给一个出口：带 data-empty-act 的按钮点了（或直接回车）调 onEmpty
-const empty = (q) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`;
+const empty = (q: string) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`;
 
 export default function CommandsWithEmpty() {
   const [open, setOpen] = useState(false);
@@ -264,7 +264,7 @@ export default function CommandsWithEmpty() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, CommandPalette, toast } from "satin-ui/vue";
 
@@ -273,7 +273,7 @@ const GROUPS = [
   { name: "跳转", items: [{ name: "素材库", icon: "image" }, { name: "设置", icon: "settings", keys: "⌘," }] },
 ];
 // 没有结果时说清楚搜了什么，再给一个出口：带 data-empty-act 的按钮点了（或直接回车）发 empty
-const empty = (q) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`;
+const empty = (q: string) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`;
 const open = ref(false);
 </script>
 
@@ -285,15 +285,15 @@ const open = ref(false);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createCommandPalette, toast } from "satin-ui";
 
   const GROUPS = [
     { name: "动作", items: [{ name: "新建项目", icon: "plus", keys: "⌘N" }, { name: "导出成片", icon: "film", keys: "⌘E" }] },
     { name: "跳转", items: [{ name: "素材库", icon: "image" }, { name: "设置", icon: "settings", keys: "⌘," }] },
   ];
-  let cmdk;
+  let cmdk: ReturnType<typeof createCommandPalette> | undefined;
   $effect(() => {
     cmdk = createCommandPalette(GROUPS, {
       onRun: (it) => toast({ text: "执行：" + it.name }),
@@ -345,7 +345,7 @@ export class CmdkEmptyComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createCommandPalette, toast } from "satin-ui";
 
@@ -355,7 +355,7 @@ const GROUPS = [
 ];
 
 export default function CommandsWithEmpty() {
-  let cmdk;
+  let cmdk: ReturnType<typeof createCommandPalette> | undefined;
   onSettled(() => {
     cmdk = createCommandPalette(GROUPS, {
       onRun: (it) => toast({ text: "执行：" + it.name }),
@@ -375,7 +375,7 @@ export default function CommandsWithEmpty() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, CommandPalette, toast } from "satin-ui/react";
 
@@ -384,7 +384,7 @@ const GROUPS = [
   { name: "跳转", items: [{ name: "素材库", icon: "image" }, { name: "设置", icon: "settings", keys: "⌘," }] },
 ];
 // 没有结果时说清楚搜了什么，再给一个出口：带 data-empty-act 的按钮点了（或直接回车）调 onEmpty
-const empty = (q) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`;
+const empty = (q: string) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`;
 
 export default function CommandsWithEmpty() {
   const [open, setOpen] = useState(false);
@@ -407,7 +407,7 @@ export default function CommandsWithEmpty() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="recent-btn"><span data-i="clock:before"></span>最近打开</button>
 
 <script type="module">
@@ -422,7 +422,7 @@ export default function CommandsWithEmpty() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, CommandPalette, toast } from "satin-ui/react";
 
@@ -445,7 +445,7 @@ export default function RecentProjects() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, CommandPalette, toast } from "satin-ui/vue";
 
@@ -464,14 +464,14 @@ const open = ref(false);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { createCommandPalette, toast } from "satin-ui";
 
   const GROUPS = [
     { name: "最近打开", items: [{ name: "雨夜车站", icon: "folder", sub: "第三集 · 3 分钟前" }, { name: "候车厅", icon: "folder", sub: "第一集 · 昨天" }] },
   ];
-  let cmdk;
+  let cmdk: ReturnType<typeof createCommandPalette> | undefined;
   // hotkey: false：页面里 ⌘K 已经有别的用处时关掉快捷键，只从按钮打开；sub 写在每条右边
   $effect(() => {
     cmdk = createCommandPalette(GROUPS, { hotkey: false, placeholder: "搜索最近打开的项目", onRun: (it) => toast({ text: "打开：" + it.name }) });
@@ -511,7 +511,7 @@ export class CmdkHotkeyComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createCommandPalette, toast } from "satin-ui";
 
@@ -520,7 +520,7 @@ const GROUPS = [
 ];
 
 export default function RecentProjects() {
-  let cmdk;
+  let cmdk: ReturnType<typeof createCommandPalette> | undefined;
   // hotkey: false：页面里 ⌘K 已经有别的用处时关掉快捷键，只从按钮打开；sub 写在每条右边
   onSettled(() => {
     cmdk = createCommandPalette(GROUPS, { hotkey: false, placeholder: "搜索最近打开的项目", onRun: (it) => toast({ text: "打开：" + it.name }) });
@@ -536,7 +536,7 @@ export default function RecentProjects() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, CommandPalette, toast } from "satin-ui/react";
 

@@ -1,16 +1,17 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createCollapse, bindCollapses } from "satin-ui/components";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 点条目标题展开 / 收起（高度过渡）；single：同时只开一项
       const faq = createCollapse(root.querySelector(".sn-acc"), {
         single: true,
-        onToggle: ({ open }) => console.log(open ? "展开" : "收起"),
+        onToggle: ({ open }: any) => console.log(open ? "展开" : "收起"),
       });
       faq.open(0);
 

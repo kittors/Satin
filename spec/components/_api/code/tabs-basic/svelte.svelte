@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Tabs from "satin-ui/svelte/Tabs.svelte";
 
   const TABS = [

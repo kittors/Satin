@@ -1,15 +1,16 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createSlider } from "satin-ui/components";
   import "./slider-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       const slider = createSlider(root.querySelector("[data-slider]"), {
-        onChange: (value) => console.log("当前值", value),
+        onChange: (value?: any) => console.log("当前值", value),
       });
       slider.update({ value: 60 }); // 从外面改值
     });

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { notify } from "satin-ui";
 
   // 通知：右上角滑进来，不自己消失，点 × 关

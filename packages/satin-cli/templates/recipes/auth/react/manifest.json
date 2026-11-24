@@ -1,7 +1,7 @@
 {
  "title": "登录注册",
  "files": [
-  "auth.jsx"
+  "auth.tsx"
  ],
- "entry": "auth.jsx"
+ "entry": "auth.tsx"
 }

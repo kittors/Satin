@@ -1,14 +1,15 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { renderMarkdown } from "satin-ui/markdown";
   import "satin-ui/css/md.css";
   import "satin-ui/css/data.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       const source = `# 分镜生成说明
 
 把**一集剧本**拆成镜头，每个镜头写清楚景别、时长和画面。
@@ -30,7 +31,7 @@
 - [x] 每个镜头都有景别和时长
 - [ ] 背景音乐的节拍对齐到镜头切换
 
-\`\`\`js
+\`\`\`ts
 const shots = await generateShots(list, { retry: 3 });
 console.log(timeline(shots, 24));
 \`\`\`

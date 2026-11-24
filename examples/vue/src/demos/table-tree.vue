@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { Table } from "satin-ui/vue";
+import { Table, type TableColumn } from "satin-ui/vue";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "项目" },
   { key: "owner", title: "负责人" },
   { key: "shots", title: "镜头", align: "right" },

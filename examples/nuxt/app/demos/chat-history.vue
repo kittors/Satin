@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Chat } from "satin-ui/vue/chat";
 
 // 演示用的历史：一段真的对话（从旧到新，每条不重复）；换成你的接口——initial() 先给最近的，older() 往前要一页
@@ -16,7 +16,7 @@ const CONVO = [
   [false, "封面图换了吗？"], [true, "换成了雨夜站台那张，等会儿发你。"],
   [false, "那张的灯光好看。"], [true, "今天先这样，明天见。"],
 ];
-const msgs = (list) => list.map(([me, text]) => ({ kind: "msg", me, text }));
+const msgs = (list: [boolean, string][]) => list.map(([me, text]) => ({ kind: "msg" as const, me, text }));
 const OLDER = [["3 天前", CONVO.slice(0, 6)], ["前天", CONVO.slice(6, 12)]];
 let left = OLDER.length;
 // initial() 一开始的条目（从旧到新）；往上翻到顶时 older() 要更早的一页（可以是 Promise），hasMore() 说还有没有

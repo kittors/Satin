@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
   import { busy, succeed } from "satin-ui";
 
-  let button;
+  let button!: HTMLButtonElement;
   // 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
   const request = () => new Promise((done) => setTimeout(done, 1200));
   async function save() {

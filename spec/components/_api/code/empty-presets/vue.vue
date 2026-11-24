@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { EmptyArt } from "satin-ui/vue";
 
 const presets = [

@@ -1,16 +1,17 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { toast } from "satin-ui/components";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 侧栏布局 enhance() 已经接上：选中的底色 / 指示条在条目之间滑动（.sn-app 上 data-navfx="slide | bar | fade | text"）；
       // [data-collapse] 收起 / 展开（⌘\ 也行），主区宽度连续变，卡片按新列数从原位置滑过去；窄于 720 自动收成图标栏（data-collapse-below 可改）
       // 点导航：换成你的路由跳转
-      root.querySelector(".sn-side-nav").addEventListener("click", (e) => {
+      root.querySelector(".sn-side-nav").addEventListener("click", (e?: any) => {
         const a = e.target.closest("a[href]"); if (!a) return;
         e.preventDefault(); toast({ text: `打开"${a.textContent.trim()}"` });
       });

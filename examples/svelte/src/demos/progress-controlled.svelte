@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   let p = $state(0), running = $state(false), t = 0;
   const stop = () => { clearInterval(t); running = false; };
   const toggle = () => {

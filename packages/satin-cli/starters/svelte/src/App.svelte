@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { toast } from "satin-ui/components";
 
   const VIEWS = ["网格", "列表", "时间线"];
@@ -23,7 +23,7 @@
     </div>
     <div class="sn-field">
       <span class="sn-lbl">默认视图</span>
-      <sn-segmented items={JSON.stringify(VIEWS)} value={view} label="默认视图" onsn-change={(e) => (view = e.detail)}></sn-segmented>
+      <sn-segmented items={JSON.stringify(VIEWS)} value={view} label="默认视图" onsn-change={(e: CustomEvent<string>) => (view = e.detail)}></sn-segmented>
     </div>
     <div class="sn-row">
       <button class="sn-btn sn-primary" type="button" onclick={create}>创建项目</button>

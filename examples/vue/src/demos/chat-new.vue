@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
+import type { ComposerMode } from "satin-ui/vue";
 import { ref } from "vue";
 import { Chat } from "satin-ui/vue/chat";
 
 // 接模型：异步生成器一段段 yield 文字（演示用：假装是模型一点点回）
-async function* respond(question, ctx) {
+async function* respond(question: string, ctx: { readonly stopped: boolean }) {
   const answer = "第三集可以拆成三段：车站外用远景交代雨夜，候车厅放慢节奏，站台留给最后一班车。"; // 演示用的固定回答；接真模型时把 question 发过去，回来一段 yield 一段
   for (let i = 0; i < answer.length && !ctx.stopped; i += 2) {
     await new Promise((r) => setTimeout(r, 40));
@@ -20,7 +21,7 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险（ok 绿、need 主色、warn 橙）
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "auto", label: "自动", tone: "need" }, { value: "full", label: "完全访问", tone: "warn" }], value: "auto" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 const model = ref("fine");
 </script>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import EmptyArt from "satin-ui/svelte/EmptyArt.svelte";
   const presets = [
     { name: "projects", title: "首次使用" },

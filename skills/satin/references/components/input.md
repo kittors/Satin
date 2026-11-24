@@ -55,13 +55,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <input class="sn-input" placeholder="比如：雨夜车站" aria-label="项目名称">
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Input } from "satin-ui/react";
 
 export default function ProjectName() {
@@ -72,7 +72,7 @@ export default function ProjectName() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Input } from "satin-ui/vue";
 
@@ -86,8 +86,8 @@ const name = ref("");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   let name = $state("");
 </script>
 
@@ -108,7 +108,7 @@ export class InputBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ProjectName() {
   return <input class="sn-input" placeholder="比如：雨夜车站" aria-label="项目名称" />;
 }
@@ -116,7 +116,7 @@ export default function ProjectName() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Input } from "satin-ui/react";
 
 export default function ProjectName() {
@@ -134,7 +134,7 @@ export default function ProjectName() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8">
   <input class="sn-input sn-sm" placeholder="小号 sm" aria-label="小号">
   <input class="sn-input" placeholder="默认 md" aria-label="默认">
@@ -145,7 +145,7 @@ export default function ProjectName() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Input } from "satin-ui/react";
 
 export default function InputSizes() {
@@ -163,7 +163,7 @@ export default function InputSizes() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Input } from "satin-ui/vue";
 </script>
 
@@ -179,7 +179,7 @@ import { Input } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-stack sn-gap-8">
   <input class="sn-input sn-sm" placeholder="小号 sm" aria-label="小号" />
   <input class="sn-input" placeholder="默认 md" aria-label="默认" />
@@ -209,7 +209,7 @@ export class InputSizesComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function InputSizes() {
   return (
     <div class="sn-stack sn-gap-8">
@@ -224,7 +224,7 @@ export default function InputSizes() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Input } from "satin-ui/react";
 
 export default function InputSizes() {
@@ -249,7 +249,7 @@ export default function InputSizes() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="name-box">
   <input class="sn-input" value="雨夜车站" aria-label="项目名称">
   <span class="sn-help">4 / 12 个字</span>
@@ -268,7 +268,7 @@ export default function InputSizes() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Input } from "satin-ui/react";
 
@@ -286,7 +286,7 @@ export default function ProjectNameCount() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Input } from "satin-ui/vue";
 
@@ -303,8 +303,8 @@ const name = ref("雨夜车站");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   let name = $state("雨夜车站");
 </script>
 
@@ -335,7 +335,7 @@ export class InputControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 export default function ProjectNameCount() {
@@ -351,7 +351,7 @@ export default function ProjectNameCount() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Input } from "satin-ui/react";
 

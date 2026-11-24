@@ -1,6 +1,6 @@
-<script>
-  import { createTable } from "satin-ui";
-  const COLUMNS = [
+<script lang="ts">
+  import { createTable, type TableColumn } from "satin-ui";
+  const COLUMNS: TableColumn[] = [
     { key: "name", title: "镜头", sortable: true },
     { key: "type", title: "景别" },
     { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },
@@ -8,7 +8,7 @@
   ];
 
   // data 是空数组时显示 empty；加载中给 loading（骨架行）；compact 紧凑密度；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createTable(host, { columns: COLUMNS, data: [], empty: "还没有镜头，先导入原文", label: "镜头清单", compact: true });
     return () => it.destroy();

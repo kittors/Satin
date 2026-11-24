@@ -52,7 +52,7 @@ const snippet = (lang, src, cap = "") => codePanel([{ name: cap, lang, code: src
 
 // ———— 块渲染（开始、规范两组页的正文） ————
 let h2n = 0;
-const cell = (c) => (/^[\w.-]+\.(css|js)$/.test(c) ? `<code>${c}</code>` : c);
+const cell = (c) => (/^[\w.-]+\.(css|js|ts|tsx)$/.test(c) ? `<code>${c}</code>` : c);
 const anchor = (id, t) => `<h2 id="${id}"><a class="d-anchor" href="#" data-anchor="${id}" aria-label="这一节的链接" data-i="link"></a>${t}</h2>`;
 // 判断整列是否为纯数值/百分比/评分数据（自动应用 Satin 表格规范：右对齐 + 等宽数字 .sn-r.sn-num）
 const NUM_CELL_RE = /^[+\-–—−]?\d[\d.,/%]*(\s*(?:\/\s*\d+|分钟|秒|项|份|%|分))?$/;
@@ -497,7 +497,7 @@ const flexIn = (doc) => (el) => { const l = el.nodeType === 1 && liveOf(doc, el)
 function variantFiles(c, doc, n) {
   const html = filesOf(c, doc, n), ex = EXAMPLES[c.id]?.[n ?? 0];
   const src = ex?.files || html, markup = src.find((f) => f.lang === "html")?.code || "";
-  let js = src.find((f) => f.lang === "js")?.code || "", extra = src.filter((f) => f.lang !== "html" && f.lang !== "js");
+  let js = src.find((f) => f.lang === "ts" || f.lang === "js")?.code || "", extra = src.filter((f) => f.lang !== "html" && f.lang !== "ts" && f.lang !== "js");
   // 原文另放一个文件、脚本里 fetch 进来的（Markdown）：换成写在脚本里的常量，组件里不用 await、也不依赖服务器上的路径，复制就能跑
   const md = extra.find((f) => f.lang === "md");
   if (md && /await\s*\(await fetch\([^)]*\)\)\.text\(\)/.test(js)) { js = js.replace(/await\s*\(await fetch\([^)]*\)\)\.text\(\)/, "`" + md.code.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${") + "`"); extra = extra.filter((f) => f !== md); }
@@ -527,7 +527,7 @@ function filesOf(c, doc, n) {
   const ds = n == null ? c.demos : [c.demos[n]].filter(Boolean);
   const html = ex?.html ?? ds.map((d, i) => (ds.length > 1 ? `<!-- ${d.cap || "示例 " + (i + 1)} -->\n` : "") + codeOf(d, doc)).join("\n\n");
   const js = ex?.js ?? ((n == null || n === 0) ? EX[c.id] : null);
-  return [...(ex?.before || []), { name: "HTML", lang: "html", code: html }, ...(js ? [{ name: "JS", lang: "js", code: js }] : []), ...(ex?.after || [])];
+  return [...(ex?.before || []), { name: "HTML", lang: "html", code: html }, ...(js ? [{ name: "TS", lang: "ts", code: js }] : []), ...(ex?.after || [])];
 }
 // 演示文档一解析完（DOMContentLoaded）就接上，不等整页的图片、视频都加载完（load）：
 // 网慢的时候 load 要等很久，这期间打开的弹窗、看图会被关在演示框里。
@@ -827,7 +827,7 @@ function mirrorCtl(box, doc, id) {
 function usage(id) {
   const u = USAGE[id] || { css: [] }, css = ["tokens.css", "base.css", ...(u.css || [])];
   let h = anchor("usage", "引入") + `<p>样式（<code>tokens.css</code>、<code>base.css</code> 总是要引，它们带着颜色、字体、间距这些令牌和基础样式；整页都用 Satin 时直接引 <code>satin-ui/css/page.css</code>，全部组件和页面级重置一次带上）：</p>`
-    + snippet("js", css.map((f) => `import "satin-ui/css/${f}";`).join("\n"));
+    + snippet("ts", css.map((f) => `import "satin-ui/css/${f}";`).join("\n"));
   if (u.api?.length) {
     const mods = new Map();
     for (const [fn, m] of u.api) for (const part of fn.split(" / ")) {
@@ -835,7 +835,7 @@ function usage(id) {
       if (name) (mods.get(m) || mods.set(m, []).get(m)).push(name);
     }
     h += `<p>能直接调用的：</p><div class="sn-tbl-wrap d-tablewrap"><div class="sn-tbl-sc"><table class="sn-tbl d-table"><thead><tr><th>用法</th><th>模块</th></tr></thead><tbody>${u.api.map(([fn, m]) => `<tr><td><code>${esc(fn)}</code></td><td><code>${m}</code></td></tr>`).join("")}</tbody></table></div></div>`;
-    if (mods.size && !EX[id]) h += snippet("js", [...mods].map(([m, ns]) => `import { ${[...new Set(ns)].join(", ")} } from "${m}";`).join("\n"));
+    if (mods.size && !EX[id]) h += snippet("ts", [...mods].map(([m, ns]) => `import { ${[...new Set(ns)].join(", ")} } from "${m}";`).join("\n"));
   }
   if (u.js) h += `<p>交互：${u.js}。</p>`;
   if (!u.api?.length && !u.js) h += `<p>纯样式组件：写好标记就能用，不需要脚本。</p>`;
@@ -1466,7 +1466,7 @@ function contractHTML(c, k) {
   if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">什么时候别用</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${refOf(x.use) ? ` → <a href="${refOf(x.use).href}">${esc(refOf(x.use).name)}</a>` : ""}</li>`).join("")}</ul>`);
   if (k.related?.length) out.push(`<h3 class="d-h3">和相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [refOf(r.id) ? `<a href="${refOf(r.id).href}">${esc(refOf(r.id).name)}</a>` : esc(r.id), md(r.diff)])));
   // 2. 引入（当前框架）
-  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return codePanel([{ name: "", lang: "js", code: line }], { solo: true, lead: fwLead() }); }), k.importNote ? fwr(() => { const t = fwText(k.importNote); return t ? `<p>${md(t)}</p>` : ""; }) : "");
+  out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return codePanel([{ name: "", lang: key === "html" && /^</.test(line.trim()) ? "html" : "ts", code: line }], { solo: true, lead: fwLead() }); }), k.importNote ? fwr(() => { const t = fwText(k.importNote); return t ? `<p>${md(t)}</p>` : ""; }) : "");
   // 3. 示例：由浅入深，每个都是现场演示 + 当前框架的代码
   out.push(anchor("examples", "示例"));
   // 示例说明也按写法给（whyBy，或者写成 { react, vue, …, default }），换框架时跟着重画

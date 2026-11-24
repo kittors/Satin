@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { loadWithSkeleton } from "satin-ui";
 
   // 容器交给 loadWithSkeleton 填（骨架和数据都是它写进去的 HTML），模板里留空
-  let box;
+  let box!: HTMLDivElement;
   $effect(() => {
     loadWithSkeleton(box, {
       // 300ms 内回来就不显示骨架；显示了就至少留 500ms；数据到了逐行替换（每行晚 40ms 淡入）

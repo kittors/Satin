@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { Icon, Lightbox } from "satin-ui/vue";
 
@@ -8,9 +8,9 @@ const ITEMS = [
   { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1200&q=72", thumb: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=320&h=240&q=72", ratio: 4 / 3, alt: "积水映着街景" },
 ];
 const failOnce = new Set([1]); // 演示用：第二张第一次当作加载失败
-const state = reactive({}), index = ref(null), thumbs = [];
+const state = reactive<Record<number, string | undefined>>({}), index = ref<number | null>(null), thumbs: (HTMLDivElement | null)[] = [];
 // 先占位再淡入：缩略图加载好了加 sn-loaded（模糊淡入），失败加 sn-failed
-const load = (i) => {
+const load = (i: number) => {
   const img = new Image(), fail = () => (state[i] = "sn-failed");
   img.onload = () => (state[i] = "sn-loaded");
   img.onerror = fail;
@@ -18,9 +18,9 @@ const load = (i) => {
   else img.src = ITEMS[i].thumb;
 };
 onMounted(() => ITEMS.forEach((_, i) => load(i)));
-const ok = (i) => state[i] === "sn-loaded";
-const open = (i) => { if (ok(i)) index.value = i; };
-const retry = (i) => { delete state[i]; load(i); };
+const ok = (i: number) => state[i] === "sn-loaded";
+const open = (i: number) => { if (ok(i)) index.value = i; };
+const retry = (i: number) => { delete state[i]; load(i); };
 </script>
 
 <template>

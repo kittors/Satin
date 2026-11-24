@@ -21,23 +21,25 @@ import { createAreaChart, createBarChart, createDonutChart, createChart3D, creat
         <button type="button" class="sn-btn sn-ghost sn-sm" data-ch-area-replay="" data-i="refresh-cw:before">重播入场</button>
       </div>
       <div id="chArea">
-        <div class="sn-ch-top">
-          <div class="sn-ch-legend">
-            <button type="button" class="sn-ch-leg" data-si="0" aria-pressed="true">
-              <i class="sn-ch-leg-dot"></i>
-              <span class="sn-ch-leg-lbl">生成镜头</span>
-            </button>
-            <button type="button" class="sn-ch-leg" data-si="1" aria-pressed="true">
-              <i class="sn-ch-leg-dot"></i>
-              <span class="sn-ch-leg-lbl">一次通过</span>
-            </button>
+        <div class="sn-ch-host sn-ch sn-ch-area">
+          <div class="sn-ch-top">
+            <div class="sn-ch-legend">
+              <button type="button" class="sn-ch-leg" data-si="0" aria-pressed="true">
+                <i class="sn-ch-leg-dot"></i>
+                <span class="sn-ch-leg-lbl">生成镜头</span>
+              </button>
+              <button type="button" class="sn-ch-leg" data-si="1" aria-pressed="true">
+                <i class="sn-ch-leg-dot"></i>
+                <span class="sn-ch-leg-lbl">一次通过</span>
+              </button>
+            </div>
           </div>
+          <div class="sn-ch-stage">
+            <canvas class="sn-ch-cv" width="724" height="244"></canvas>
+            <div class="sn-ch-tip" role="status" aria-live="polite"></div>
+          </div>
+          <i></i>
         </div>
-        <div class="sn-ch-stage">
-          <canvas class="sn-ch-cv" width="724" height="244"></canvas>
-          <div class="sn-ch-tip" role="status" aria-live="polite"></div>
-        </div>
-        <i></i>
       </div>
     </div>`,
 })
@@ -68,8 +70,11 @@ export class ChartsDemo0Component {
       });
 
       // 3. 3D 立体质感图标（陀螺仪倾角视差 + 动态高光）
-      el.innerHTML = icon3DHTML({ name: "clapperboard", tone: "obsidian", size: "lg", label: "分镜创作" });
-      bindIcons3D(el);
+      const iconHost = root.querySelector("#chIcon3d");
+      if (iconHost) {
+        iconHost.innerHTML = icon3DHTML({ name: "clapperboard", tone: "obsidian", size: "lg", label: "分镜创作" });
+        bindIcons3D(iconHost);
+      }
     });
     this.off = () => { done(); unsetup(); };
   }

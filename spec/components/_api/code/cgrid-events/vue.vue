@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { CanvasGrid } from "satin-ui/vue/canvas-grid";
+import { CanvasGrid, type GridColumn } from "satin-ui/vue/canvas-grid";
 
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 180, sortable: true, editable: true },
   { key: "status", title: "状态", type: "status", width: 120, options: ["待开始", "进行中", "审核中", "已完成"], filter: "enum", editable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true, editable: true, min: 1, max: 999 },
@@ -16,11 +16,11 @@ const rows = [
   { id: 5, name: "出站口", status: "已完成", owner: "周屿", shots: 6, dur: 75 },
   { id: 6, name: "天桥", status: "进行中", owner: "许棠", shots: 8, dur: 96 },
 ];
-const TITLES = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
+const TITLES: Record<string, string> = { name: "名称", status: "状态", shots: "镜头", dur: "时长" };
 // 事件的参数：sortChange 给 { key, dir } 或 null；selectionChange 给 { keys, all, except }；cellEdit 给 { row, rowKey, key, value, oldValue }
-const sortText = (s) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
-const selText = (e) => `勾了 ${e.keys.length} 行`;
-const editText = (e) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
+const sortText = (s: { key: string; dir: number } | null) => (s ? `按${TITLES[s.key]}${s.dir > 0 ? "从小到大" : "从大到小"}排` : "取消了排序");
+const selText = (e: { keys: (string | number)[] }) => `勾了 ${e.keys.length} 行`;
+const editText = (e: { row: { name: string }; key: string; value: unknown }) => `${e.row.name}：${TITLES[e.key]}改成了"${e.value}"`;
 const note = ref("点表头排序、勾选、双击格子改，这里显示最近一次的事件");
 </script>
 

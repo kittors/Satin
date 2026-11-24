@@ -60,7 +60,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <button type="button" class="sn-btn sn-secondary">取消</button>
   <button type="button" class="sn-btn sn-primary">保存修改</button>
@@ -69,7 +69,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function SaveActions() {
@@ -85,7 +85,7 @@ export default function SaveActions() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -99,7 +99,7 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <button type="button" class="sn-btn sn-secondary">取消</button>
   <button type="button" class="sn-btn sn-primary">保存修改</button>
@@ -125,7 +125,7 @@ export class ButtonBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function SaveActions() {
   return (
     <div class="sn-row">
@@ -138,7 +138,7 @@ export default function SaveActions() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function SaveActions() {
@@ -168,7 +168,7 @@ export default function SaveActions() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <button type="button" class="sn-btn sn-primary">新建项目</button>
   <button type="button" class="sn-btn sn-secondary">导入原文</button>
@@ -181,7 +181,7 @@ export default function SaveActions() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ButtonVariants() {
@@ -201,7 +201,7 @@ export default function ButtonVariants() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -219,7 +219,7 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <button type="button" class="sn-btn sn-primary">新建项目</button>
   <button type="button" class="sn-btn sn-secondary">导入原文</button>
@@ -253,7 +253,7 @@ export class ButtonVariantsComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ButtonVariants() {
   return (
     <div class="sn-row">
@@ -270,7 +270,7 @@ export default function ButtonVariants() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ButtonVariants() {
@@ -301,7 +301,7 @@ sm（28）用在表格行和工具条；默认 32；lg（40）用在登录页和
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <button type="button" class="sn-btn sn-primary sn-sm">保存修改</button>
   <button type="button" class="sn-btn sn-primary">保存修改</button>
@@ -311,7 +311,7 @@ sm（28）用在表格行和工具条；默认 32；lg（40）用在登录页和
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ButtonSizes() {
@@ -328,7 +328,7 @@ export default function ButtonSizes() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -343,7 +343,7 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <button type="button" class="sn-btn sn-primary sn-sm">保存修改</button>
   <button type="button" class="sn-btn sn-primary">保存修改</button>
@@ -371,7 +371,7 @@ export class ButtonSizesComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ButtonSizes() {
   return (
     <div class="sn-row">
@@ -385,7 +385,7 @@ export default function ButtonSizes() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ButtonSizes() {
@@ -414,7 +414,7 @@ export default function ButtonSizes() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <button type="button" class="sn-btn sn-primary" data-i="plus:before">新建项目</button>
@@ -427,7 +427,7 @@ export default function ButtonSizes() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ButtonIcons() {
@@ -446,7 +446,7 @@ export default function ButtonIcons() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -463,8 +463,8 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>
 
@@ -501,7 +501,7 @@ export class ButtonIconsComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ButtonIcons() {
   return (
     <sn-enhance>
@@ -518,7 +518,7 @@ export default function ButtonIcons() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ButtonIcons() {
@@ -548,7 +548,7 @@ export default function ButtonIcons() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <button type="button" class="sn-btn sn-danger sn-is-disabled" aria-disabled="true" data-tip="输入项目名称后才能删除">删除项目</button>
   <button type="button" class="sn-btn sn-primary sn-busy"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">正在保存</span></span></button>
@@ -558,7 +558,7 @@ export default function ButtonIcons() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ButtonStates() {
@@ -577,7 +577,7 @@ export default function ButtonStates() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -594,7 +594,7 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <button type="button" class="sn-btn sn-danger sn-is-disabled" aria-disabled="true" data-tip="输入项目名称后才能删除">删除项目</button>
   <button type="button" class="sn-btn sn-primary sn-busy"><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">正在保存</span></span></button>
@@ -622,7 +622,7 @@ export class ButtonStatesComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ButtonStates() {
   return (
     <div class="sn-row">
@@ -636,7 +636,7 @@ export default function ButtonStates() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function ButtonStates() {
@@ -662,7 +662,7 @@ export default function ButtonStates() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-primary" id="save-project"><span class="sn-sheen"></span><span class="sn-label"><span class="sn-spin"></span><svg class="sn-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg><span class="sn-txt">保存修改</span></span></button>
 
 <script type="module">
@@ -680,7 +680,7 @@ export default function ButtonStates() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button } from "satin-ui/react";
 
@@ -708,7 +708,7 @@ export default function SaveButton() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button } from "satin-ui/vue";
 
@@ -735,11 +735,11 @@ async function save() {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { busy, succeed } from "satin-ui";
 
-  let button;
+  let button!: HTMLButtonElement;
   // 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
   const request = () => new Promise((done) => setTimeout(done, 1200));
   async function save() {
@@ -780,14 +780,14 @@ export class ButtonBusyComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { busy, succeed } from "satin-ui";
 
 // 换成真实的请求，比如 fetch("/api/projects/42", { method: "PUT" })
 const request = () => new Promise((done) => setTimeout(done, 1200));
 
 export default function SaveButton() {
-  let button;
+  let button!: HTMLButtonElement;
   async function save() {
     await busy(button, request()); // 300ms 内回来不转圈；转圈出现后至少留 500ms
     succeed(button); // 原地打勾 1.5 秒
@@ -803,7 +803,7 @@ export default function SaveButton() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "preact/hooks";
 import { Button } from "satin-ui/react";
 
@@ -844,7 +844,7 @@ export default function SaveButton() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row sn-between">
   <button type="button" class="sn-btn sn-ghost">不保存</button>
   <div class="sn-row sn-gap-8">
@@ -856,7 +856,7 @@ export default function SaveButton() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function FormActions() {
@@ -875,7 +875,7 @@ export default function FormActions() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -892,7 +892,7 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row sn-between">
   <button type="button" class="sn-btn sn-ghost">不保存</button>
   <div class="sn-row sn-gap-8">
@@ -924,7 +924,7 @@ export class ButtonActionsComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function FormActions() {
   return (
     <div class="sn-row sn-between">
@@ -940,7 +940,7 @@ export default function FormActions() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function FormActions() {
@@ -969,7 +969,7 @@ export default function FormActions() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-bottom-bar">
   <span class="sn-grow sn-num">合计 ¥ 1,280</span>
   <button type="button" class="sn-btn sn-primary sn-lg">提交订单</button>
@@ -978,7 +978,7 @@ export default function FormActions() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function CheckoutBar() {
@@ -994,7 +994,7 @@ export default function CheckoutBar() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button } from "satin-ui/vue";
 </script>
 
@@ -1008,7 +1008,7 @@ import { Button } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-bottom-bar">
   <span class="sn-grow sn-num">合计 ¥ 1,280</span>
   <button type="button" class="sn-btn sn-primary sn-lg">提交订单</button>
@@ -1034,7 +1034,7 @@ export class ButtonMobileComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function CheckoutBar() {
   return (
     <div class="sn-bottom-bar">
@@ -1047,7 +1047,7 @@ export default function CheckoutBar() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button } from "satin-ui/react";
 
 export default function CheckoutBar() {

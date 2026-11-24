@@ -1,14 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { busy, succeed } from "satin-ui/components";
 import "./button-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 点"保存修改"：300ms 内回来不转圈；转圈出现后至少留 500ms；完了打个勾
     for (const save of root.querySelectorAll(".sn-btn.sn-primary")) {
       save.addEventListener("click", async () => {

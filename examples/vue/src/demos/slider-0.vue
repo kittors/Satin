@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createSlider } from "satin-ui/components";
 import "./slider-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     const slider = createSlider(root.querySelector("[data-slider]"), {
-      onChange: (value) => console.log("当前值", value),
+      onChange: (value?: any) => console.log("当前值", value),
     });
     slider.update({ value: 60 }); // 从外面改值
   });

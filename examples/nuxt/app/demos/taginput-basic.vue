@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { TagInput } from "satin-ui/vue";
 </script>
 

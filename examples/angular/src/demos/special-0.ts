@@ -94,7 +94,7 @@ export class SpecialDemo0Component {
       // 搜索：等待超过 300ms 才转圈、转了至少 500ms；search 返回结果数量（或 Promise）。换成你的搜索接口
       const SHOTS = ["车站外，雨刚停", "林夏走进候车厅", "站台上的最后一班车", "车窗里的倒影", "雨夜的公交站"];
       createSearch(root.querySelector("[data-search]"), {
-        search: (q?: any) => new Promise((done?: any) => setTimeout(() => done(SHOTS.filter((s?: any) => s.includes(q)).length), 400)),
+        search: (q?: any) => new Promise((done?: any) => window.setTimeout(() => done(SHOTS.filter((s?: any) => s.includes(q)).length), 400)),
       });
       // 清除按钮（[data-clearable]）有内容时出现、点了清空，显示密码（[data-eye]）切换明文——这两个 enhance() 已经接上
     });

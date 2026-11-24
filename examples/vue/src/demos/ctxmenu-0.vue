@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 写在标记上：[data-ctx="菜单 id"] 右键（或 Shift+F10、菜单键）在指针处弹，触屏长按 500ms 弹；[data-fmenu="菜单 id"] 贴着按钮弹——enhance() 已经接上
     // 选中：根菜单上冒泡 menuselect，detail 里有条目文字和子菜单路径
-    root.querySelector("#m-shot").addEventListener("menuselect", (e) => {
+    root.querySelector("#m-shot").addEventListener("menuselect", (e?: any) => {
       const { label, path } = e.detail; // 比如 "第二集"、["移动到"]
       toast({ text: [...path, label].join(" › ") });
     });

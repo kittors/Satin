@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createReorder, flipSnapshot, optimistic } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
@@ -11,16 +11,16 @@
   ];
   // 演示用的保存：700ms 后返回，每第二次失败（模拟网络断了）；换成真实的请求
   let n = 0;
-  const save = () => new Promise((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
+  const save = () => new Promise<void>((ok, fail) => setTimeout(() => (++n % 2 ? ok() : fail(new Error("网络断了"))), 700));
   // 把一行挪到第 i 位，别的行平滑让位（已经在那儿就不动）
-  const moveTo = (list, row, i) => {
+  const moveTo = (list: HTMLElement, row: HTMLElement, i: number) => {
     const rows = [...list.querySelectorAll(".sn-drag-row")];
     if (rows.indexOf(row) === i) return;
     const play = flipSnapshot(list), rest = rows.filter((r) => r !== row);
     list.insertBefore(row, rest[i] || null);
     play();
   };
-  let list;
+  let list!: HTMLDivElement;
   // 按住左边的把手拖（移动 4px 才算拿起）；键盘：把手上按空格拿起，上下键移动，空格放下、Esc 取消
   // 行由库直接挪（不经过框架重画）：列表照初始顺序画一次，新顺序从 onReorder 里拿
   // 放下就保存（乐观更新）：保存失败时这一行回到原位、抖两下，给"重试"

@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { createUpload } from "satin-ui";
 
   // 格式不对、太大的当场标红，不等用户传完才说；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createUpload(host, { accept: /\.(txt|docx)$/i, maxSize: 5e6 });
     return () => it.destroy();

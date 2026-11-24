@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { nextTick, ref } from "vue";
 import { flipSnapshot, removeWithFlip } from "satin-ui";
 import { Button } from "satin-ui/vue";
 
-const rows = ref([{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }]), list = ref(null), els = new Map();
+const rows = ref([{ id: 1, name: "镜头 07 · 车站外，雨刚停" }, { id: 2, name: "镜头 08 · 林夏走进候车厅" }, { id: 3, name: "镜头 09 · 站台上的最后一班车" }]), list = ref<HTMLDivElement | null>(null), els = new Map<number, HTMLElement>();
 let seq = 0;
 // 新建的一行插在最前面，下面的往下让：改数据之前记下位置，DOM 更新以后播
 const add = async () => {
@@ -14,7 +14,7 @@ const add = async () => {
   play(els.get(row.id));
 };
 // 删一行：先脱离布局淡出，下面的用弹簧补位（keep：节点留给 Vue 删），播完再从数据里删
-const remove = async (id) => {
+const remove = async (id: number) => {
   await removeWithFlip(els.get(id), { keep: true });
   rows.value = rows.value.filter((x) => x.id !== id);
 };

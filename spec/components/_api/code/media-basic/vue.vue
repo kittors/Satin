@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Player } from "satin-ui/vue";
 </script>
 

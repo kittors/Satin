@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   let name = $state("站台 · 远景");
 </script>
 

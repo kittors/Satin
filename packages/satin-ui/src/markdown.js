@@ -207,8 +207,8 @@ function list(lines, i, ctx, out) {
   return i;
 }
 // ———————————————— 代码块：高亮 + 行号 + 复制 + 换行 + 折叠 ————————————————
-const LANG = { js: "JavaScript", javascript: "JavaScript", jsx: "JSX", ts: "TypeScript", typescript: "TypeScript", tsx: "TSX", py: "Python", python: "Python", go: "Go", golang: "Go", json: "JSON", jsonc: "JSON", css: "CSS", scss: "SCSS", html: "HTML", xml: "XML", vue: "Vue", svg: "SVG", sh: "Shell", bash: "Bash", zsh: "Zsh", shell: "Shell", get console() { return tt("markdown.6"); }, sql: "SQL", get text() { return tt("markdown.7"); }, get txt() { return tt("markdown.7"); }, md: "Markdown", markdown: "Markdown" };
-const FAMILY = { javascript: "js", jsx: "js", ts: "js", typescript: "js", tsx: "js", python: "py", golang: "go", jsonc: "json", scss: "css", less: "css", xml: "html", vue: "html", svg: "html", bash: "sh", zsh: "sh", shell: "sh", console: "sh" };
+const LANG = { js: "JavaScript", javascript: "JavaScript", jsx: "JSX", ts: "TypeScript", typescript: "TypeScript", tsx: "TSX", py: "Python", python: "Python", go: "Go", golang: "Go", json: "JSON", jsonc: "JSON", css: "CSS", scss: "SCSS", html: "HTML", xml: "XML", vue: "Vue", svelte: "Svelte", svg: "SVG", sh: "Shell", bash: "Bash", zsh: "Zsh", shell: "Shell", get console() { return tt("markdown.6"); }, sql: "SQL", get text() { return tt("markdown.7"); }, get txt() { return tt("markdown.7"); }, md: "Markdown", markdown: "Markdown" };
+const FAMILY = { javascript: "js", jsx: "js", ts: "js", typescript: "js", tsx: "js", python: "py", golang: "go", jsonc: "json", scss: "css", less: "css", xml: "html", vue: "html", svelte: "html", svg: "html", bash: "sh", zsh: "sh", shell: "sh", console: "sh" };
 const words = (s) => new Set(s.split(" "));
 const KW = {
   js: words("break case catch class const continue debugger default delete do else export extends finally for from function if import in instanceof let new of return static super switch this throw try typeof var void while with yield async await as interface type enum implements private public protected readonly declare namespace abstract keyof infer satisfies get set"),

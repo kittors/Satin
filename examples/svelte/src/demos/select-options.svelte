@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Select from "satin-ui/svelte/Select.svelte";
 
   const statuses = [

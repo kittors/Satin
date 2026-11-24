@@ -1,0 +1,307 @@
+import { useEffect, useRef } from "preact/hooks";
+import { setup, enhance, injectIcons } from "satin-ui";
+import { openMenu, toast } from "satin-ui/components";
+
+export default function CardDemo0() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const unsetup = setup();
+    const off = enhance(ref.current, (root: any) => {
+      // 卡片本身是标记：封面、标题、元信息；左上角的勾选框多选，右上角"更多"弹菜单
+      const cards = root.querySelector("#pcards");
+      const menu = document.createElement("div"); // 菜单也可以直接写在标记里
+      menu.className = "sn-menu sn-float"; menu.setAttribute("role", "menu");
+      menu.innerHTML = '<div class="sn-item" data-i="pencil:before">重命名</div><div class="sn-item" data-i="copy:before">复制一份</div><div class="sn-sep"></div><div class="sn-item sn-danger-item" data-i="trash-2:before">移到回收站</div>';
+      injectIcons(menu); cards.after(menu);
+      menu.addEventListener("menuselect", (e?: any) => toast({ text: e.detail.label }));
+
+      cards.addEventListener("change", (e?: any) => e.target.closest(".sn-pc")?.classList.toggle("sn-sel", e.target.checked));
+      cards.addEventListener("click", (e?: any) => {
+        const more = e.target.closest("[data-card-more]");
+        if (more) { e.stopPropagation(); openMenu(menu, { trigger: more, anchor: more, align: "end" }); return; }
+        if (e.target.closest(".sn-pick")) return;
+        const card = e.target.closest(".sn-pc"); if (card) toast({ icon: "info", text: `这里会打开"${card.getAttribute("aria-label")}"` });
+      });
+    });
+    return () => { off(); unsetup(); };
+  }, []);
+  return (
+    <div ref={ref}>
+      <div class="sn-pcards" id="pcards">
+        <div class="sn-pc" data-card="0" aria-label="雨夜车站">
+          <div class="sn-cover">
+            <span class="sn-art"></span>
+            <label class="sn-check sn-pick" aria-label="选择">
+              <input type="checkbox" />
+              <span class="sn-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2.5 6.2l2.4 2.4 4.6-5"></path>
+                </svg>
+                <span class="sn-bar"></span>
+              </span>
+            </label>
+            <button class="sn-btn sn-ibtn sn-sm sn-more" data-card-more="" data-tip="更多">
+              <span data-i="ellipsis"></span>
+            </button>
+            <span class="sn-len">12:36</span>
+          </div>
+          <div class="sn-meta">
+            <b>雨夜车站</b>
+            <span class="sn-sub">48 个镜头 · 3 分钟前<span class="sn-av-group">
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M12 6.3C10.4 7.7 8.3 8.4 7.35 9.9C6.75 10.9 6.7 12.6 7.05 14.2C7.3 15.4 7.85 16.4 8.2 17.5C8.5 18.6 8.55 19.9 8.15 20.8C7.4 21.6 5.95 21.6 5.2 20.85C4.5 17.4 4.5 13.5 5 10.5C5.6 6.6 8.4 4.35 12 4.35C15.6 4.35 18.4 6.6 19 10.5C19.5 13.5 19.5 17.4 18.8 20.85C18.05 21.6 16.6 21.6 15.85 20.8C15.45 19.9 15.5 18.6 15.8 17.5C16.15 16.4 16.7 15.4 16.95 14.2C17.3 12.6 17.25 10.9 16.65 9.9C15.7 8.4 13.6 7.7 12 6.3Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+</span></span>
+          </div>
+        </div>
+        <div class="sn-pc" data-card="1" aria-label="海边的第七天">
+          <div class="sn-cover">
+            <span class="sn-art"></span>
+            <label class="sn-check sn-pick" aria-label="选择">
+              <input type="checkbox" />
+              <span class="sn-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2.5 6.2l2.4 2.4 4.6-5"></path>
+                </svg>
+                <span class="sn-bar"></span>
+              </span>
+            </label>
+            <button class="sn-btn sn-ibtn sn-sm sn-more" data-card-more="" data-tip="更多">
+              <span data-i="ellipsis"></span>
+            </button>
+            <span class="sn-len">8:32</span>
+          </div>
+          <div class="sn-meta">
+            <b>海边的第七天</b>
+            <span class="sn-sub">32 个镜头 · 12 分钟前<span class="sn-av-group">
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M6.5 10.9C5.95 8.3 6.85 5.3 10.2 4.55C13.5 3.85 17 5.2 17.7 8.4C17.85 9.15 17.72 9.85 17.43 10.35C16.95 10.38 16.6 10.05 16.4 9.55C16.15 8.85 15.75 8.05 15.25 7.45C14.95 7.1 14.6 7.1 14.35 7.4C12.9 9.05 10.3 9.75 7.6 9.98C7.05 10.05 6.7 10.4 6.5 10.9Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M17.5 10.9C17.85 8.1 16.6 5.3 12.8 5C9 4.75 6.6 7 6.4 9C6.35 9.6 6.4 10.1 6.52 10.55C6.95 10.45 7.3 10 7.45 9.4C7.6 8.6 7.85 7.6 8.3 7.05C8.5 6.75 8.85 6.75 9.05 7.05C10.8 8.7 13.6 9.45 16.4 9.75C16.95 9.8 17.3 10.3 17.5 10.9Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+</span></span>
+          </div>
+        </div>
+        <div class="sn-pc" data-card="2" aria-label="城南旧事（第二版）">
+          <div class="sn-cover">
+            <span class="sn-art"></span>
+            <label class="sn-check sn-pick" aria-label="选择">
+              <input type="checkbox" />
+              <span class="sn-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2.5 6.2l2.4 2.4 4.6-5"></path>
+                </svg>
+                <span class="sn-bar"></span>
+              </span>
+            </label>
+            <button class="sn-btn sn-ibtn sn-sm sn-more" data-card-more="" data-tip="更多">
+              <span data-i="ellipsis"></span>
+            </button>
+            <span class="sn-len">3:00</span>
+          </div>
+          <div class="sn-meta">
+            <b>城南旧事（第二版）</b>
+            <span class="sn-sub">12 个镜头 · 1 小时前<span class="sn-av-group">
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M17.5 10.9C17.85 8.1 16.6 5.3 12.8 5C9 4.75 6.6 7 6.4 9C6.35 9.6 6.4 10.1 6.52 10.55C6.95 10.45 7.3 10 7.45 9.4C7.6 8.6 7.85 7.6 8.3 7.05C8.5 6.75 8.85 6.75 9.05 7.05C10.8 8.7 13.6 9.45 16.4 9.75C16.95 9.8 17.3 10.3 17.5 10.9Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M10.5 4.55A1.5 1.5 0 1 0 13.5 4.55A1.5 1.5 0 1 0 10.5 4.55"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M12 5.4C8.95 5.4 6.6 7.5 6.55 10.4C7.2 9.4 7.8 8.15 9.2 7.65C10.1 7.35 11.05 7.3 12 7.3C12.95 7.3 13.9 7.35 14.8 7.65C16.2 8.15 16.8 9.4 17.45 10.4C17.4 7.5 15.05 5.4 12 5.4Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M12 3.59A2.5 2.5 0 0 0 9.76 4.97A2.5 2.5 0 0 0 6.49 8.02A2.5 2.5 0 0 0 6.18 12.48A.75 .75 0 0 0 7 12C7.05 10.6 7.35 9.3 8.2 8.6C9.2 7.8 10.6 7.6 12 7.6C13.4 7.6 14.8 7.8 15.8 8.6C16.65 9.3 16.95 10.6 17 12A.75 .75 0 0 0 17.82 12.48A2.5 2.5 0 0 0 17.51 8.02A2.5 2.5 0 0 0 14.24 4.97A2.5 2.5 0 0 0 12 3.59Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+</span></span>
+          </div>
+        </div>
+        <div class="sn-pc" data-card="3" aria-label="长夜">
+          <div class="sn-cover">
+            <span class="sn-art"></span>
+            <label class="sn-check sn-pick" aria-label="选择">
+              <input type="checkbox" />
+              <span class="sn-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2.5 6.2l2.4 2.4 4.6-5"></path>
+                </svg>
+                <span class="sn-bar"></span>
+              </span>
+            </label>
+            <button class="sn-btn sn-ibtn sn-sm sn-more" data-card-more="" data-tip="更多">
+              <span data-i="ellipsis"></span>
+            </button>
+            <span class="sn-len">5:00</span>
+          </div>
+          <div class="sn-meta">
+            <b>长夜</b>
+            <span class="sn-sub">20 个镜头 · 昨天<span class="sn-av-group">
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M10.5 4.55A1.5 1.5 0 1 0 13.5 4.55A1.5 1.5 0 1 0 10.5 4.55"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M12 5.4C8.95 5.4 6.6 7.5 6.55 10.4C7.2 9.4 7.8 8.15 9.2 7.65C10.1 7.35 11.05 7.3 12 7.3C12.95 7.3 13.9 7.35 14.8 7.65C16.2 8.15 16.8 9.4 17.45 10.4C17.4 7.5 15.05 5.4 12 5.4Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+</span></span>
+          </div>
+        </div>
+        <div class="sn-pc" data-card="4" aria-label="山那边的学校">
+          <div class="sn-cover">
+            <span class="sn-art"></span>
+            <label class="sn-check sn-pick" aria-label="选择">
+              <input type="checkbox" />
+              <span class="sn-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2.5 6.2l2.4 2.4 4.6-5"></path>
+                </svg>
+                <span class="sn-bar"></span>
+              </span>
+            </label>
+            <button class="sn-btn sn-ibtn sn-sm sn-more" data-card-more="" data-tip="更多">
+              <span data-i="ellipsis"></span>
+            </button>
+            <span class="sn-len">17:02</span>
+          </div>
+          <div class="sn-meta">
+            <b>山那边的学校</b>
+            <span class="sn-sub">64 个镜头 · 昨天<span class="sn-av-group">
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M12 3.59A2.5 2.5 0 0 0 9.76 4.97A2.5 2.5 0 0 0 6.49 8.02A2.5 2.5 0 0 0 6.18 12.48A.75 .75 0 0 0 7 12C7.05 10.6 7.35 9.3 8.2 8.6C9.2 7.8 10.6 7.6 12 7.6C13.4 7.6 14.8 7.8 15.8 8.6C16.65 9.3 16.95 10.6 17 12A.75 .75 0 0 0 17.82 12.48A2.5 2.5 0 0 0 17.51 8.02A2.5 2.5 0 0 0 14.24 4.97A2.5 2.5 0 0 0 12 3.59Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M12 6.3C10.4 7.7 8.3 8.4 7.35 9.9C6.75 10.9 6.7 12.6 7.05 14.2C7.3 15.4 7.85 16.4 8.2 17.5C8.5 18.6 8.55 19.9 8.15 20.8C7.4 21.6 5.95 21.6 5.2 20.85C4.5 17.4 4.5 13.5 5 10.5C5.6 6.6 8.4 4.35 12 4.35C15.6 4.35 18.4 6.6 19 10.5C19.5 13.5 19.5 17.4 18.8 20.85C18.05 21.6 16.6 21.6 15.85 20.8C15.45 19.9 15.5 18.6 15.8 17.5C16.15 16.4 16.7 15.4 16.95 14.2C17.3 12.6 17.25 10.9 16.65 9.9C15.7 8.4 13.6 7.7 12 6.3Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+</span></span>
+          </div>
+        </div>
+        <div class="sn-pc" data-card="5" aria-label="最后一班地铁">
+          <div class="sn-cover">
+            <span class="sn-art"></span>
+            <label class="sn-check sn-pick" aria-label="选择">
+              <input type="checkbox" />
+              <span class="sn-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2.5 6.2l2.4 2.4 4.6-5"></path>
+                </svg>
+                <span class="sn-bar"></span>
+              </span>
+            </label>
+            <button class="sn-btn sn-ibtn sn-sm sn-more" data-card-more="" data-tip="更多">
+              <span data-i="ellipsis"></span>
+            </button>
+            <span class="sn-len">7:00</span>
+          </div>
+          <div class="sn-meta">
+            <b>最后一班地铁</b>
+            <span class="sn-sub">28 个镜头 · 11 月 14 日<span class="sn-av-group">
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M12 6.3C10.4 7.7 8.3 8.4 7.35 9.9C6.75 10.9 6.7 12.6 7.05 14.2C7.3 15.4 7.85 16.4 8.2 17.5C8.5 18.6 8.55 19.9 8.15 20.8C7.4 21.6 5.95 21.6 5.2 20.85C4.5 17.4 4.5 13.5 5 10.5C5.6 6.6 8.4 4.35 12 4.35C15.6 4.35 18.4 6.6 19 10.5C19.5 13.5 19.5 17.4 18.8 20.85C18.05 21.6 16.6 21.6 15.85 20.8C15.45 19.9 15.5 18.6 15.8 17.5C16.15 16.4 16.7 15.4 16.95 14.2C17.3 12.6 17.25 10.9 16.65 9.9C15.7 8.4 13.6 7.7 12 6.3Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M6.5 10.9C5.95 8.3 6.85 5.3 10.2 4.55C13.5 3.85 17 5.2 17.7 8.4C17.85 9.15 17.72 9.85 17.43 10.35C16.95 10.38 16.6 10.05 16.4 9.55C16.15 8.85 15.75 8.05 15.25 7.45C14.95 7.1 14.6 7.1 14.35 7.4C12.9 9.05 10.3 9.75 7.6 9.98C7.05 10.05 6.7 10.4 6.5 10.9Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+  <span class="sn-av sn-xs" aria-hidden="true">
+    <svg viewBox="2.6 2 18.8 18.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect width="24" height="24" stroke="none"></rect>
+      <g>
+        <path d="M12 15.6C7 15.6 3.4 19.4 3.4 25.5L12 25.5L20.6 25.5C20.6 19.4 17 15.6 12 15.6Z"></path>
+        <path d="M6.5 11.25A5.5 5.5 0 1 0 17.5 11.25A5.5 5.5 0 1 0 6.5 11.25"></path>
+        <path d="M17.5 10.9C17.85 8.1 16.6 5.3 12.8 5C9 4.75 6.6 7 6.4 9C6.35 9.6 6.4 10.1 6.52 10.55C6.95 10.45 7.3 10 7.45 9.4C7.6 8.6 7.85 7.6 8.3 7.05C8.5 6.75 8.85 6.75 9.05 7.05C10.8 8.7 13.6 9.45 16.4 9.75C16.95 9.8 17.3 10.3 17.5 10.9Z"></path>
+      </g>
+      <path d="M9.05 11.6A.8 .8 0 1 0 10.65 11.6A.8 .8 0 1 0 9.05 11.6M14.95 11.6A.8 .8 0 1 1 13.35 11.6A.8 .8 0 1 1 14.95 11.6" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

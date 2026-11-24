@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, CommandPalette, toast } from "satin-ui/vue";
 
@@ -7,7 +7,7 @@ const GROUPS = [
   { name: "跳转", items: [{ name: "素材库", icon: "image" }, { name: "设置", icon: "settings", keys: "⌘," }] },
 ];
 // 没有结果时说清楚搜了什么，再给一个出口：带 data-empty-act 的按钮点了（或直接回车）发 empty
-const empty = (q) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`;
+const empty = (q: string) => `<p>没找到“${q}”</p><button type="button" class="sn-btn sn-secondary sn-sm" data-empty-act>在素材库里搜“${q}”</button>`;
 const open = ref(false);
 </script>
 

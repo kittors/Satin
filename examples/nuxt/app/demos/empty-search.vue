@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Button, EmptyArt } from "satin-ui/vue";
 </script>
 

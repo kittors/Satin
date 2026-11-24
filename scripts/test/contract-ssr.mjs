@@ -66,21 +66,21 @@ function norm(html) {
 }
 const alias = { name: "alias", setup(b) { b.onResolve({ filter: /^satin-ui(\/.*)?$/ }, (a) => { const sub = a.path.slice("satin-ui".length) || ""; const map = { "": "src/index.js", "/react": "react/index.js", "/vue": "vue/index.js", "/components": "src/components.js" }; const rel = map[sub] ?? (sub.startsWith("/react/") || sub.startsWith("/vue/") ? sub.slice(1) + ".js" : "src" + sub + ".js"); return { path: path.join(PKG, rel) }; }); } };
 async function reactOf(code, slug) {
-  const f = path.join(TMP, slug + ".jsx"); fs.writeFileSync(f, code);
+  const f = path.join(TMP, slug + ".tsx"); fs.writeFileSync(f, code);
   const out = path.join(TMP, slug + ".react.mjs");
   await esbuild.build({ entryPoints: [f], outfile: out, bundle: true, format: "esm", platform: "node", jsx: "automatic", external: ["react", "react-dom", "react/jsx-runtime"], plugins: [alias], logLevel: "silent", nodePaths: [path.join(ROOT, "node_modules")] });
   const C = (await import(pathToFileURL(out).href + "?t=" + Date.now())).default;
   return renderToStaticMarkup(React.createElement(C));
 }
 async function vueOf(code, slug) {
-  // 只有 <template> 的 SFC（纯样式组件）：补一个空的 <script setup> 再编译
-  const src = /<script[\s>]/.test(code) ? code : `<script setup>\nconst __onlyTemplate = true;\n</script>\n${code}`;
+  // 只有 <template> 的 SFC（纯样式组件）：补一个空的 <script setup lang="ts"> 再编译
+  const src = /<script[\s>]/.test(code) ? code : `<script setup lang="ts">\nconst __onlyTemplate = true;\n</script>\n${code}`;
   const { descriptor, errors } = sfc.parse(src, { filename: slug + ".vue" }); if (errors.length) throw new Error(errors[0].message);
   const script = sfc.compileScript(descriptor, { id: slug, inlineTemplate: true, templateOptions: { compilerOptions: { isCustomElement: (t) => t.startsWith("sn-") } } });
-  const f = path.join(TMP, slug + ".vue.mjs"), entry = path.join(TMP, slug + ".vue.entry.mjs"), out = path.join(TMP, slug + ".vue.bundle.mjs");
+  const f = path.join(TMP, slug + ".vue.ts"), entry = path.join(TMP, slug + ".vue.entry.ts"), out = path.join(TMP, slug + ".vue.bundle.mjs");
   fs.writeFileSync(f, script.content);
   // 渲染也写在同一个包里：组件和 createSSRApp 用的是同一份 vue（Node 里 require 和 import 拿到的 vue 不是同一份）
-  fs.writeFileSync(entry, `import C from "./${slug}.vue.mjs";\nimport { createSSRApp, h } from "vue";\nimport { renderToString } from "vue/server-renderer";\nexport default () => { const app = createSSRApp({ render: () => h(C) }); return renderToString(app); };\n`);
+  fs.writeFileSync(entry, `import C from "./${slug}.vue.ts";\nimport { createSSRApp, h } from "vue";\nimport { renderToString } from "vue/server-renderer";\nexport default () => { const app = createSSRApp({ render: () => h(C) }); return renderToString(app); };\n`);
   await esbuild.build({ entryPoints: [entry], outfile: out, bundle: true, format: "esm", platform: "node", external: ["vue", "vue/server-renderer"], plugins: [alias], logLevel: "silent" });
   return (await import(pathToFileURL(out).href + "?t=" + Date.now())).default();
 }

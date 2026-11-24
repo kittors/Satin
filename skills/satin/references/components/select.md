@@ -58,13 +58,13 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Select } from "satin-ui/react";
 
 const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -77,7 +77,7 @@ export default function RatioSelect() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Select } from "satin-ui/vue";
 
@@ -92,8 +92,8 @@ const ratio = ref("16:9 · 横屏");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Select from "satin-ui/svelte/Select.svelte";
 
   const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -123,7 +123,7 @@ export class SelectBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
 
@@ -134,7 +134,7 @@ export default function RatioSelect() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Select } from "satin-ui/react";
 
 const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -154,13 +154,13 @@ export default function RatioSelect() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' placeholder="选择画面比例" label="画面比例"></sn-select>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Select } from "satin-ui/react";
 
 const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -173,7 +173,7 @@ export default function RatioSelect() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Select } from "satin-ui/vue";
 
@@ -188,8 +188,8 @@ const ratio = ref();
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Select from "satin-ui/svelte/Select.svelte";
 
   const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -219,7 +219,7 @@ export class SelectPlaceholderComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
 
@@ -230,7 +230,7 @@ export default function RatioSelect() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Select } from "satin-ui/react";
 
 const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -250,13 +250,13 @@ export default function RatioSelect() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-select items='[{"value":"draft","label":"草稿"},{"value":"review","label":"待审核"},{"value":"done","label":"已完成","disabled":true}]' value="draft" label="状态"></sn-select>
 ```
 
 React 的写法：
 
-```jsx
+```tsx
 import { Select } from "satin-ui/react";
 
 const STATUSES = [
@@ -273,7 +273,7 @@ export default function StatusSelect() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Select } from "satin-ui/vue";
 
@@ -292,8 +292,8 @@ const status = ref("draft");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Select from "satin-ui/svelte/Select.svelte";
 
   const statuses = [
@@ -331,7 +331,7 @@ export class SelectOptionsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const STATUSES = JSON.stringify([
   { value: "draft", label: "草稿" },
@@ -346,7 +346,7 @@ export default function StatusSelect() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Select } from "satin-ui/react";
 
 const STATUSES = [
@@ -374,7 +374,7 @@ export default function StatusSelect() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-field">
   <span class="sn-lbl">画面比例</span>
   <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
@@ -384,7 +384,7 @@ export default function StatusSelect() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Select } from "satin-ui/react";
 
 const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -403,7 +403,7 @@ export default function RatioField() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Select } from "satin-ui/vue";
 
@@ -422,8 +422,8 @@ const ratio = ref("16:9 · 横屏");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Select from "satin-ui/svelte/Select.svelte";
 
   const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -461,7 +461,7 @@ export class SelectFieldComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
 
@@ -478,7 +478,7 @@ export default function RatioField() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Select } from "satin-ui/react";
 
 const RATIOS = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -507,7 +507,7 @@ export default function RatioField() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="ratio-events">
   <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="16:9 · 横屏" label="画面比例"></sn-select>
   <span class="sn-help">当前：16:9 · 横屏</span>
@@ -524,7 +524,7 @@ export default function RatioField() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Select } from "satin-ui/react";
 
@@ -545,7 +545,7 @@ export default function RatioEvents() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Select } from "satin-ui/vue";
 
@@ -564,8 +564,8 @@ const current = ref("16:9 · 横屏");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Select from "satin-ui/svelte/Select.svelte";
 
   const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -607,13 +607,13 @@ export class SelectEventsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 自定义元素的属性只认字符串：数组写成 JSON
 const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
 // 名字带横线的原生事件用 ref 挂（Solid 2 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function RatioEvents() {
   const [current, setCurrent] = createSignal("16:9 · 横屏");
@@ -629,7 +629,7 @@ export default function RatioEvents() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "preact/hooks";
 import { Select } from "satin-ui/react";
 
@@ -660,7 +660,7 @@ export default function RatioEvents() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="ratio-controlled">
   <sn-select items='["16:9 · 横屏","9:16 · 竖屏","1:1 · 方形"]' value="9:16 · 竖屏" label="画面比例"></sn-select>
   <span class="sn-help">当前：9:16 · 竖屏</span>
@@ -677,7 +677,7 @@ export default function RatioEvents() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Select } from "satin-ui/react";
 
@@ -698,7 +698,7 @@ export default function RatioSelect() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Select } from "satin-ui/vue";
 
@@ -716,8 +716,8 @@ const ratio = ref("9:16 · 竖屏");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Select from "satin-ui/svelte/Select.svelte";
 
   const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];
@@ -758,13 +758,13 @@ export class SelectControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 自定义元素的属性只认字符串：数组写成 JSON
 const RATIOS = JSON.stringify(["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"]);
 // 名字带横线的原生事件用 ref 挂（Solid 2 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function RatioSelect() {
   const [ratio, setRatio] = createSignal("9:16 · 竖屏");
@@ -780,7 +780,7 @@ export default function RatioSelect() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "preact/hooks";
 import { Select } from "satin-ui/react";
 
@@ -815,7 +815,7 @@ export default function RatioSelect() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-select">
     <button type="button" class="sn-btn sn-secondary" data-menubtn data-prefix="排序：" data-i="chevron-down:caret">排序：最近更新</button>
@@ -830,7 +830,7 @@ export default function RatioSelect() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, Icon } from "satin-ui/react";
 
 const SORTS = ["最近更新", "名称", "创建时间"];
@@ -855,7 +855,7 @@ export default function SortMenu() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, Icon, vEnhance } from "satin-ui/vue";
 
 const sorts = ["最近更新", "名称", "创建时间"];
@@ -876,8 +876,8 @@ const sorts = ["最近更新", "名称", "创建时间"];
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   const sorts = ["最近更新", "名称", "创建时间"];
@@ -922,7 +922,7 @@ export class SelectMenuComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 菜单按钮：标记照设计稿写，<sn-enhance> 接上交互（选了就收起，按钮文字换成 前缀 + 选中项）
 export default function SortMenu() {
   return (
@@ -942,7 +942,7 @@ export default function SortMenu() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, Icon } from "satin-ui/react";
 
 const SORTS = ["最近更新", "名称", "创建时间"];

@@ -188,7 +188,8 @@
     },
   };
 
-  const LINE_SCALE = { all: [1, "全部业务线"], drama: [0.62, "剧集分镜"], ad: [0.44, "商业短片"], anime: [0.51, "二维动画"] };
+  const DATA_MAP = new Map(Object.entries(DATASET));
+  const LINE_SCALE = new Map([["all", { k: 1, name: "全部业务线" }], ["drama", { k: 0.62, name: "剧集分镜" }], ["ad", { k: 0.44, name: "商业短片" }], ["anime", { k: 0.51, name: "二维动画" }]]);
   const PROJECTS = [
     { name: "雨夜车站 · 第 3 集", owner: "林夏", line: "drama", genre: "电影感", status: "已完成", tone: "sn-ok", shots: 48, rate: "93.8%", avg: "1分38秒" },
     { name: "风起长街 · 预告片", owner: "周屿", line: "ad", genre: "纪录", status: "生成中", tone: "sn-run", shots: 32, rate: "84.4%", avg: "1分49秒" },
@@ -221,8 +222,7 @@
   });
 
   const donut = createDonutChart(document.getElementById("dbDonut"), {
-    size: 158,
-    centerLabel: "项目数",
+    totalLabel: "项目数",
     unit: " 个",
     items: DATASET["本周"].donut,
     onSelect(item) { filterStatus = item ? item.label : ""; renderRows(); },
@@ -267,15 +267,16 @@
   }
 
   function applyFilters() {
-    const d = DATASET[period] || DATASET["本周"], [k, lineName] = LINE_SCALE[line] || LINE_SCALE.all;
+    const d = DATA_MAP.get(period) || DATASET["本周"], { k, name: lineName } = LINE_SCALE.get(line) || { k: 1, name: "全部业务线" };
     const sc = (arr) => arr.map((v) => Math.max(1, Math.round(v * k)));
     document.getElementById("dbRange").textContent = `${d.range} · ${lineName}`;
-    nf0.set(Math.round(d.kpis[0].val * k));
-    nf1.set(d.kpis[1].val);
-    document.getElementById("kpiVal2").textContent = d.kpis[2].text;
-    nf3.set(d.kpis[3].val);
+    nf0.set(Math.round((d.kpis[0].val ?? 0) * k));
+    nf1.set(d.kpis[1].val ?? 0);
+    document.getElementById("kpiVal2").textContent = d.kpis[2].text ?? "";
+    nf3.set(d.kpis[3].val ?? 0);
     d.kpis.forEach((kp, i) => {
-      document.getElementById("kpiDelta" + i).textContent = kp.delta;
+      const deltaEl = document.querySelector("#kpiDelta" + i);
+      if (deltaEl) deltaEl.textContent = kp.delta;
       spks[i].update({ values: i === 0 ? sc(kp.spk) : kp.spk });
     });
     const gen = sc(d.area.gen), pass = sc(d.area.pass);
@@ -296,7 +297,7 @@
     const btn = e.currentTarget;
     await busy(btn, 720);
     succeed(btn);
-    toast({ text: `已导出「${period} · ${LINE_SCALE[line][1]}」效能分析周报` });
+    toast({ text: `已导出「${period} · ${LINE_SCALE.get(line)?.name || "全部业务线"}」效能分析周报` });
   });
 
   renderRows();

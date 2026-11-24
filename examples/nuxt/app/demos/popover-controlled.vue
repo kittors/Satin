@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Popover, Radio } from "satin-ui/vue";
 
@@ -6,7 +6,7 @@ const RATES = [["16:9", "16:9 横屏"], ["9:16", "9:16 竖屏"], ["1:1", "1:1 �
 const open = ref(false);
 const rate = ref("16:9");
 // 受控：v-model:open，选了就关上（改动立即生效，不需要"保存"）
-const pick = (v) => { rate.value = v; open.value = false; };
+const pick = (v: string) => { rate.value = v; open.value = false; };
 </script>
 
 <template>

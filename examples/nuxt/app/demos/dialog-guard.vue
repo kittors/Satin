@@ -1,16 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, nextTick } from "vue";
 import { Button, Dialog } from "satin-ui/vue";
 
 const open = ref(false), note = ref(""), asking = ref(false);
-const noteEl = ref(null), keepBtn = ref(null);
+const noteEl = ref<HTMLTextAreaElement | null>(null), keepBtn = ref<HTMLButtonElement | null>(null);
 // 底栏两组按钮原地切换：问的时候焦点到"继续填写"，回去接着填时回到输入框
 watch(asking, async (on) => {
   await nextTick();
   (on ? keepBtn.value?.$el : noteEl.value)?.focus();
 });
 // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关
-const guard = (close) => (asking.value ? (asking.value = false) : note.value.trim() ? (asking.value = true) : close());
+const guard = (close: () => void) => (asking.value ? (asking.value = false) : note.value.trim() ? (asking.value = true) : close());
 function discard() {
   open.value = false;
   note.value = "";

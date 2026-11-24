@@ -1,15 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance, injectIcons } from "satin-ui";
 import { bindSelects, copied } from "satin-ui/components";
 import "satin-ui/css/buttons.css";
 import "satin-ui/css/overlay.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     bindSelects(document); // 分裂按钮的备选菜单
 
     // 复制按钮：写入剪贴板，成功后图标换成对勾 1.2 秒

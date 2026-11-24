@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { popoverOf } from "satin-ui";
 
   const RATES = [["16:9", "16:9 横屏"], ["9:16", "9:16 竖屏"], ["1:1", "1:1 方形"]];
-  let rate = $state("16:9"), pop;
+  let rate = $state("16:9"), pop!: HTMLDivElement;
   // 改动立即生效、不需要"保存"：选了就把面板关上
   $effect(() => { rate; if (pop) popoverOf(pop)?.close(); });
 </script>

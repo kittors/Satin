@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
   const SHOTS = ["开场", "车站", "雨夜"];
   let picked = $state(["开场"]);
-  let allBox;
+  let allBox!: HTMLInputElement;
   const all = $derived(picked.length === SHOTS.length);
   // 半选只能用属性设（没有对应的 HTML 属性）
   $effect(() => { allBox.indeterminate = picked.length > 0 && !all; });

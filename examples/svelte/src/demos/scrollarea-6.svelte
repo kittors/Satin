@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createScrollArea } from "satin-ui/components";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 多行输入也能当滚动视口：系统滚动条换成细滚动条，输入时自动重新量长度
       createScrollArea(root.querySelector("textarea"), { fade: "none" });
     });

@@ -88,13 +88,13 @@
 <script type="module">
 import { busy, toast } from "satin-ui/components";
 
-const root = document.querySelector("[data-order-root]");
-if (root) {
+const orderRoot = document.querySelector("[data-order-root]");
+if (orderRoot) {
   const UNIT = 189, OFF = 20;
-  const totEl = root.querySelector("[data-ord-total]");
-  const unitEl = root.querySelector("[data-ord-unit]");
-  const specEl = root.querySelector("[data-ord-spec]");
-  const qtyEl = root.querySelector("[data-ord-qty]");
+  const totEl = orderRoot.querySelector("[data-ord-total]");
+  const unitEl = orderRoot.querySelector("[data-ord-unit]");
+  const specEl = orderRoot.querySelector("[data-ord-spec]");
+  const qtyEl = orderRoot.querySelector("[data-ord-qty]");
   const sync = () => {
     const q = Math.max(1, Number(qtyEl?.getAttribute("value") || qtyEl?.value || 1));
     const sub = UNIT * q;
@@ -104,7 +104,7 @@ if (root) {
   qtyEl?.addEventListener("change", sync);
   qtyEl?.addEventListener("input", sync);
 
-  const colors = root.querySelector("[data-ord-colors]");
+  const colors = orderRoot.querySelector("[data-ord-colors]");
   colors?.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-color]");
     if (!btn) return;
@@ -116,18 +116,18 @@ if (root) {
     if (specEl) specEl.textContent = btn.dataset.color + " · 三档调光 · USB-C 充电";
   });
 
-  const payRow = root.querySelector("[data-ord-pay]");
-  const payVal = root.querySelector("[data-ord-pay-val]");
+  const payRow = orderRoot.querySelector("[data-ord-pay]");
+  const payVal = orderRoot.querySelector("[data-ord-pay-val]");
   payRow?.addEventListener("click", () => {
     if (!payVal) return;
     payVal.textContent = payVal.textContent === "微信支付" ? "支付宝" : "微信支付";
     toast({ text: "已切换至" + payVal.textContent, tone: "info" });
   });
 
-  const submitBtn = root.querySelector("[data-ord-submit]");
+  const submitBtn = orderRoot.querySelector("[data-ord-submit]");
   submitBtn?.addEventListener("click", () => {
     busy(submitBtn, new Promise((r) => setTimeout(r, 600)).then(() => {
-      toast({ text: "订单已创建，正在拉起支付", tone: "success" });
+      toast({ text: "订单已创建，正在拉起支付", tone: "ok" });
     }));
   });
 }

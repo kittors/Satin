@@ -1,17 +1,18 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { setup, enhance } from "satin-ui";
   import { createUpload } from "satin-ui/components";
   import "./upload-0.css";
 
-  let root;
+  let root!: HTMLDivElement;
   onMount(() => {
+    if (!root) return;
     const unsetup = setup();
-    const off = enhance(root, (root) => {
+    const off = enhance(root, (root: any) => {
       // 点了选文件、拖进来；每个文件一行：进度、失败可重试、取消 / 移除。上传函数换成你的（报进度，结束 resolve，出错 reject）
-      const fakeUpload = (file, onProgress) => new Promise((ok, fail) => {
+      const fakeUpload = (file?: any, onProgress?: any) => new Promise((ok?: any, fail?: any) => {
         let p = 0; const bad = /失败/.test(file.name);
-        const iv = setInterval(() => { p = Math.min(1, p + 0.08 + Math.random() * 0.08); onProgress(p); if (bad && p > 0.6) { clearInterval(iv); fail(new Error("网络断了")); } else if (p >= 1) { clearInterval(iv); ok(); } }, 180);
+        const iv = window.setInterval(() => { p = Math.min(1, p + 0.08 + Math.random() * 0.08); onProgress(p); if (bad && p > 0.6) { clearInterval(iv); fail(new Error("网络断了")); } else if (p >= 1) { clearInterval(iv); ok(); } }, 180);
       });
       createUpload(root.querySelector("#drop"), {
         list: root.querySelector("#files"),

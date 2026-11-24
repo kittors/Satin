@@ -64,7 +64,7 @@ export class TooltipDemo0Component {
       const zoom = root.querySelector('[data-tip="放大预览"]');
       zoom.addEventListener("click", () => {
         showTip(zoom, "已放大到 200%");
-        setTimeout(hideTip, 1500);
+        window.setTimeout(hideTip, 1500);
       });
     });
     this.off = () => { done(); unsetup(); };

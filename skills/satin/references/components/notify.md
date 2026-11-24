@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="notify-basic-btn">模拟导出完成</button>
 
 <script type="module">
@@ -67,7 +67,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, notify } from "satin-ui/react";
 
 // 通知：右上角滑进来，不自己消失，点 × 关
@@ -83,7 +83,7 @@ export default function ExportDone() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, notify } from "satin-ui/vue";
 
 // 通知：右上角滑进来，不自己消失，点 × 关
@@ -99,8 +99,8 @@ const run = () => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { notify } from "satin-ui";
 
   // 通知：右上角滑进来，不自己消失，点 × 关
@@ -132,7 +132,7 @@ export class NotifyBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { notify } from "satin-ui";
 
 // 通知：右上角滑进来，不自己消失，点 × 关
@@ -147,7 +147,7 @@ export default function ExportDone() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, notify } from "satin-ui/react";
 
 // 通知：右上角滑进来，不自己消失，点 × 关
@@ -170,7 +170,7 @@ export default function ExportDone() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="notify-actions-btn">模拟收到邀请</button>
 
 <script type="module">
@@ -193,7 +193,7 @@ export default function ExportDone() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, notify } from "satin-ui/react";
 
 const run = () => {
@@ -218,7 +218,7 @@ export default function InviteNotice() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, notify } from "satin-ui/vue";
 
 const run = () => {
@@ -243,8 +243,8 @@ const run = () => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { notify } from "satin-ui";
 
   const run = () => {
@@ -294,7 +294,7 @@ export class NotifyActionsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { notify } from "satin-ui";
 
 const run = () => {
@@ -318,7 +318,7 @@ export default function InviteNotice() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, notify } from "satin-ui/react";
 
 const run = () => {
@@ -350,7 +350,7 @@ tone: "bad"：读屏马上读；说清原因、给去修改的按钮。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="notify-fail-btn">模拟生成失败</button>
 
 <script type="module">
@@ -369,7 +369,7 @@ tone: "bad"：读屏马上读；说清原因、给去修改的按钮。
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, notify } from "satin-ui/react";
 
 const run = () => {
@@ -390,7 +390,7 @@ export default function RenderFailed() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, notify } from "satin-ui/vue";
 
 const run = () => {
@@ -411,8 +411,8 @@ const run = () => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { notify } from "satin-ui";
 
   const run = () => {
@@ -454,7 +454,7 @@ export class NotifyFailComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { notify } from "satin-ui";
 
 const run = () => {
@@ -474,7 +474,7 @@ export default function RenderFailed() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, notify } from "satin-ui/react";
 
 const run = () => {

@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- 侧栏、主区；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height:320px">
@@ -71,17 +71,17 @@
 
 React 的写法：
 
-```jsx
-import { Sidebar } from "satin-ui/react";
+```tsx
+import { Sidebar, type SidebarItem } from "satin-ui/react";
 
-const NAV = [
+const NAV: SidebarItem[] = [
   { key: "all", label: "全部项目", icon: "layout-grid" },
   { key: "assets", label: "素材库", icon: "image", badge: 12 },
   { type: "group", label: "最近打开" },
   { key: "p1", label: "雨夜车站", icon: "folder" },
   { key: "p2", label: "候车厅", icon: "folder" },
 ];
-const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
+const FOOTER: SidebarItem[] = [{ key: "settings", label: "设置", icon: "settings" }];
 
 export default function AppShell() {
   // children 是右边的主区；收起按钮、⌘\ 收起和展开，主区宽度跟着连续变化
@@ -98,7 +98,7 @@ export default function AppShell() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Sidebar } from "satin-ui/vue";
 
 const NAV = [
@@ -123,7 +123,7 @@ const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- 侧栏、主区；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height: 320px">
@@ -167,7 +167,7 @@ export class SidebarBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 侧栏、主区；<sn-enhance> 接上选中滑块、收起按钮、⌘\
 export default function AppShell() {
   return (
@@ -189,17 +189,17 @@ export default function AppShell() {
 
 Preact 的写法：
 
-```jsx
-import { Sidebar } from "satin-ui/react";
+```tsx
+import { Sidebar, type SidebarItem } from "satin-ui/react";
 
-const NAV = [
+const NAV: SidebarItem[] = [
   { key: "all", label: "全部项目", icon: "layout-grid" },
   { key: "assets", label: "素材库", icon: "image", badge: 12 },
   { type: "group", label: "最近打开" },
   { key: "p1", label: "雨夜车站", icon: "folder" },
   { key: "p2", label: "候车厅", icon: "folder" },
 ];
-const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
+const FOOTER: SidebarItem[] = [{ key: "settings", label: "设置", icon: "settings" }];
 
 export default function AppShell() {
   // children 是右边的主区；收起按钮、⌘\ 收起和展开，主区宽度跟着连续变化
@@ -223,7 +223,7 @@ export default function AppShell() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- 选中哪一项、显示哪一页；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height:320px">
@@ -241,19 +241,19 @@ export default function AppShell() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Sidebar } from "satin-ui/react";
+import { Sidebar, type SidebarItem } from "satin-ui/react";
 
-const NAV = [
+const NAV: SidebarItem[] = [
   { key: "all", label: "全部项目", icon: "layout-grid" },
   { key: "assets", label: "素材库", icon: "image", badge: 12 },
   { type: "group", label: "最近打开" },
   { key: "p1", label: "雨夜车站", icon: "folder" },
   { key: "p2", label: "候车厅", icon: "folder" },
 ];
-const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
-const TITLE = { all: "全部项目", assets: "素材库", p1: "雨夜车站", p2: "候车厅", settings: "设置" };
+const FOOTER: SidebarItem[] = [{ key: "settings", label: "设置", icon: "settings" }];
+const TITLE: Record<string, string> = { all: "全部项目", assets: "素材库", p1: "雨夜车站", p2: "候车厅", settings: "设置" };
 
 export default function AppPages() {
   // 受控：value 是选中的 key，onNavigate 里换页
@@ -271,7 +271,7 @@ export default function AppPages() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Sidebar } from "satin-ui/vue";
 
@@ -283,7 +283,7 @@ const NAV = [
   { key: "p2", label: "候车厅", icon: "folder" },
 ];
 const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
-const TITLE = { all: "全部项目", assets: "素材库", p1: "雨夜车站", p2: "候车厅", settings: "设置" };
+const TITLE: Record<string, string> = { all: "全部项目", assets: "素材库", p1: "雨夜车站", p2: "候车厅", settings: "设置" };
 // v-model 绑选中的 key
 const page = ref("all");
 </script>
@@ -299,7 +299,7 @@ const page = ref("all");
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- 选中哪一项、显示哪一页；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height: 320px">
@@ -343,7 +343,7 @@ export class SidebarControlledComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 选中哪一项、显示哪一页；<sn-enhance> 接上选中滑块、收起按钮、⌘\
 export default function AppPages() {
   return (
@@ -365,19 +365,19 @@ export default function AppPages() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
-import { Sidebar } from "satin-ui/react";
+import { Sidebar, type SidebarItem } from "satin-ui/react";
 
-const NAV = [
+const NAV: SidebarItem[] = [
   { key: "all", label: "全部项目", icon: "layout-grid" },
   { key: "assets", label: "素材库", icon: "image", badge: 12 },
   { type: "group", label: "最近打开" },
   { key: "p1", label: "雨夜车站", icon: "folder" },
   { key: "p2", label: "候车厅", icon: "folder" },
 ];
-const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
-const TITLE = { all: "全部项目", assets: "素材库", p1: "雨夜车站", p2: "候车厅", settings: "设置" };
+const FOOTER: SidebarItem[] = [{ key: "settings", label: "设置", icon: "settings" }];
+const TITLE: Record<string, string> = { all: "全部项目", assets: "素材库", p1: "雨夜车站", p2: "候车厅", settings: "设置" };
 
 export default function AppPages() {
   // 受控：value 是选中的 key，onNavigate 里换页
@@ -402,7 +402,7 @@ fx="bar"：选中时左边一根指示条，窄侧栏用。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <!-- data-navfx="bar"：选中时左边一根指示条；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height:320px">
@@ -420,17 +420,17 @@ fx="bar"：选中时左边一根指示条，窄侧栏用。
 
 React 的写法：
 
-```jsx
-import { Sidebar } from "satin-ui/react";
+```tsx
+import { Sidebar, type SidebarItem } from "satin-ui/react";
 
-const NAV = [
+const NAV: SidebarItem[] = [
   { key: "all", label: "全部项目", icon: "layout-grid" },
   { key: "assets", label: "素材库", icon: "image", badge: 12 },
   { type: "group", label: "最近打开" },
   { key: "p1", label: "雨夜车站", icon: "folder" },
   { key: "p2", label: "候车厅", icon: "folder" },
 ];
-const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
+const FOOTER: SidebarItem[] = [{ key: "settings", label: "设置", icon: "settings" }];
 
 export default function AppBar() {
   // fx 选中的切换样子：slide 底色滑过去（默认）/ bar 左边指示条 / fade 原地淡入 / text 只换文字颜色
@@ -447,7 +447,7 @@ export default function AppBar() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Sidebar } from "satin-ui/vue";
 
 const NAV = [
@@ -472,7 +472,7 @@ const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- data-navfx="bar"：选中时左边一根指示条；<sn-enhance> 接上选中滑块、收起按钮、⌘\ -->
 <sn-enhance>
   <div style="height: 320px">
@@ -516,7 +516,7 @@ export class SidebarFxComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // data-navfx="bar"：选中时左边一根指示条；<sn-enhance> 接上选中滑块、收起按钮、⌘\
 export default function AppBar() {
   return (
@@ -538,17 +538,17 @@ export default function AppBar() {
 
 Preact 的写法：
 
-```jsx
-import { Sidebar } from "satin-ui/react";
+```tsx
+import { Sidebar, type SidebarItem } from "satin-ui/react";
 
-const NAV = [
+const NAV: SidebarItem[] = [
   { key: "all", label: "全部项目", icon: "layout-grid" },
   { key: "assets", label: "素材库", icon: "image", badge: 12 },
   { type: "group", label: "最近打开" },
   { key: "p1", label: "雨夜车站", icon: "folder" },
   { key: "p2", label: "候车厅", icon: "folder" },
 ];
-const FOOTER = [{ key: "settings", label: "设置", icon: "settings" }];
+const FOOTER: SidebarItem[] = [{ key: "settings", label: "设置", icon: "settings" }];
 
 export default function AppBar() {
   // fx 选中的切换样子：slide 底色滑过去（默认）/ bar 左边指示条 / fade 原地淡入 / text 只换文字颜色

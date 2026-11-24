@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import { Table } from "satin-ui/vue";
+import { Table, type TableColumn } from "satin-ui/vue";
 
-const COLUMNS = [
+const COLUMNS: TableColumn[] = [
   { key: "name", title: "镜头", sortable: true },
   { key: "type", title: "景别" },
   { key: "dur", title: "时长", align: "right", sortable: true, format: (v) => `${v} 秒` },

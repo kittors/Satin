@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   let name = $state("雨夜车站");
 </script>
 

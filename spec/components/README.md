@@ -32,7 +32,7 @@
 
 说明文字里的代码（标签、函数、类名、属性）用反引号包住（Markdown 行内代码），官网和技能参考都按代码显示。
 
-示例的源码文件由 `scripts/examples/gallery.mjs` 按 `site/frameworks.js` 的 `demo(slug)` 生成到各框架的示例目录（比如 `examples/react/src/demos/button-basic.jsx`），构建、截图后官网直接读这些文件。
+示例的源码文件由 `scripts/examples/gallery.mjs` 按 `site/frameworks.js` 的 `demo(slug)` 生成到各框架的示例目录（比如 `examples/react/src/demos/button-basic.tsx`），构建、截图后官网直接读这些文件。
 
 检查：
 - `node scripts/test/contracts.mjs`：契约和 `packages/satin-ui/types/*.d.ts` 逐项比对（选项、事件、实例方法、函数签名、React / Vue 组件的属性、自定义元素的属性、导出类型），多了少了都报错；没填契约的组件列为"未填"。
@@ -40,9 +40,9 @@
 
 ## 示例的 7 种写法（`code/<slug>/`）
 
-每个示例一个目录，7 个文件：`html.html`、`react.jsx`、`vue.vue`、`svelte.svelte`、`angular.ts`、`solid.jsx`、`preact.jsx`。契约里写 `code: code("button-basic")`（`import { code } from "./_code.mjs"`）。
+每个示例一个目录，7 个文件：`html.html`、`react.tsx`、`vue.vue`、`svelte.svelte`、`angular.ts`、`solid.tsx`、`preact.tsx`。契约里写 `code: code("button-basic")`（`import { code } from "./_code.mjs"`）。
 
-- 每个文件都是能直接放进项目的组件文件：React / Preact / Solid 是 `export default function Xxx() {…}`，Vue 是 SFC，Svelte 是 `.svelte`，Angular 是独立组件（类名是 slug 转大驼峰 + `Component`，比如 `ButtonBasicComponent`；选择器 `demo-<slug>`，全量示例的入口按这个引），纯 HTML 是标记 + 需要时的 `<script type="module">`（找元素用 id，全量示例里所有片段在同一页）。
+- 每个文件都是能直接放进 TypeScript 项目的组件文件：React / Preact / Solid 是 `export default function Xxx() {…}`（`.tsx`），Vue 是 `<script setup lang="ts">` SFC，Svelte 是 `<script lang="ts">` `.svelte`，Angular 是独立组件（类名是 slug 转大驼峰 + `Component`，比如 `ButtonBasicComponent`；选择器 `demo-<slug>`，全量示例的入口按这个引），纯 HTML 是标记 + 需要时的 `<script type="module">`（找元素用 id，全量示例里所有片段在同一页）。
 - 页面级的 `setup()`、`defineElements()`（Vue 是 `app.use(Satin)`，React 可以在根部包 `<SatinProvider>`）当作应用入口已经调过，示例里不写，也不加注释（初始化只在快速上手、框架接入页讲一次）。
 - 用各框架地道的写法：React、Vue、Preact（经 preact/compat）、Svelte 用组件和属性（`variant`、`v-model`、`bind:value`、`onChange`……），图标用 `<Icon>` 或组件的 `icon` 属性；Angular、Solid、纯 HTML 写自定义元素（`<sn-select>`）或包一层 `<sn-enhance>` 的标记。
 - 7 份的效果要一样（同样的内容、同样的状态）：全量示例会把 7 份分别构建、截图逐像素比。

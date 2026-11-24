@@ -1,14 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createCommandPalette, toast } from "satin-ui/components";
 import "./cmdk-0.css";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 命令面板：⌘K（Windows 上 Ctrl K）打开；输入就筛，↑↓ 选、回车执行、Esc 关；分组、图标、副标题、快捷键
     const cmdk = createCommandPalette([
       { name: "项目", items: [
@@ -19,7 +20,7 @@ onMounted(() => {
         { icon: "plus", name: "新建项目", keys: "⌘N", run: () => toast({ text: "新建项目" }) },
         { icon: "download", name: "导出当前一集", run: () => toast({ text: "开始导出" }) },
       ] },
-    ], { placeholder: "搜索项目、命令", onRun: (item) => item.run() });
+    ], { placeholder: "搜索项目、命令", onRun: (item?: any) => item.run() });
     root.querySelector("[data-cmdk]")?.addEventListener("click", () => cmdk.open()); // 按钮也能打开
   });
   off = () => { done(); unsetup(); };

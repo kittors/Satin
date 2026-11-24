@@ -1,7 +1,7 @@
-<script setup>
-import { Flow } from "satin-ui/vue/flow";
+<script setup lang="ts">
+import { Flow, type FlowNode, type FlowEdge } from "satin-ui/vue/flow";
 
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "src", x: 0, y: 243, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
   { id: "split", x: 270, y: 243, title: "拆分章节", icon: "list", detail: "12 集 · 每集约 2700 字", kind: "text" },
   { id: "board", x: 540, y: 243, title: "生成分镜", icon: "clapperboard", detail: "第三集 · 48 个镜头", kind: "board" },
@@ -14,7 +14,7 @@ const nodes = [
   { id: "out", x: 1510, y: 193, title: "导出横屏", icon: "download", detail: "第三集.mp4 · 16:9", kind: "out" },
   { id: "outV", x: 1510, y: 293, title: "导出竖屏", icon: "download", detail: "第三集-竖屏.mp4 · 9:16", kind: "out" },
 ];
-const edges = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
+const edges: FlowEdge[] = [["src", "split"], ["split", "board"], ...["img", "voice", "bgm", "sfx", "sub"].flatMap<FlowEdge>((k) => [["board", k], [k, "mix"]]), ["mix", "out"], ["mix", "outV"]];
 </script>
 
 <template>

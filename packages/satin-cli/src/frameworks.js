@@ -7,18 +7,18 @@ const ANGULAR = "^22.3.0";
 export const FRAMEWORKS = {
   react: {
     title: "React（Vite）", variant: "react", src: ["src", "index.html"], module: true, scripts: VITE,
-    deps: { react: "^19.3.1", "react-dom": "^19.3.1" }, dev: { vite: "^8.3.8", "@vitejs/plugin-react": "^6.3.0" },
+    deps: { react: "^19.3.1", "react-dom": "^19.3.1" }, dev: { vite: "^8.3.8", "@vitejs/plugin-react": "^6.3.0", typescript: "^5.9.3", "@types/react": "^19.3.0", "@types/react-dom": "^19.3.0" },
     builds: { esbuild: true },
   },
   vue: {
     title: "Vue（Vite）", variant: "vue", src: ["src", "index.html"], module: true, scripts: VITE,
-    deps: { vue: "^3.5.45" }, dev: { vite: "^8.3.8", "@vitejs/plugin-vue": "^6.0.11" },
+    deps: { vue: "^3.5.45" }, dev: { vite: "^8.3.8", "@vitejs/plugin-vue": "^6.0.11", typescript: "^5.9.3" },
     builds: { esbuild: true },
   },
   next: {
     title: "Next.js（App Router，服务端渲染）", variant: "react", src: ["app"], module: true,
     scripts: { dev: "next dev", build: "next build", start: "next start" },
-    deps: { next: "^16.4.6", react: "^19.3.1", "react-dom": "^19.3.1" }, dev: {},
+    deps: { next: "^16.4.6", react: "^19.3.1", "react-dom": "^19.3.1" }, dev: { typescript: "^5.9.3", "@types/react": "^19.3.0", "@types/react-dom": "^19.3.0" },
     builds: { sharp: false },
   },
   nuxt: {
@@ -29,7 +29,7 @@ export const FRAMEWORKS = {
   },
   svelte: {
     title: "Svelte（Vite）", variant: "svelte", src: ["src", "index.html"], module: true, scripts: VITE,
-    deps: {}, dev: { vite: "^8.3.8", svelte: "^5.58.0", "@sveltejs/vite-plugin-svelte": "^7.3.1" },
+    deps: {}, dev: { vite: "^8.3.8", svelte: "^5.58.0", "@sveltejs/vite-plugin-svelte": "^7.3.1", typescript: "^5.9.3" },
     builds: { esbuild: true },
   },
   angular: {
@@ -41,12 +41,12 @@ export const FRAMEWORKS = {
   },
   solid: {
     title: "Solid（Vite，Solid 2）", variant: "solid", src: ["src", "index.html"], module: true, scripts: VITE,
-    deps: { "solid-js": "^2.0.3", "@solidjs/web": "^2.0.3" }, dev: { vite: "^8.3.8", "@solidjs/vite-plugin": "^3.0.1" },
+    deps: { "solid-js": "^2.0.3", "@solidjs/web": "^2.0.3" }, dev: { vite: "^8.3.8", "@solidjs/vite-plugin": "^3.0.1", typescript: "^5.9.3" },
     builds: { esbuild: true },
   },
   preact: {
     title: "Preact（Vite）", variant: "preact", src: ["src", "index.html"], module: true, scripts: VITE,
-    deps: { preact: "^11.2.0" }, dev: { vite: "^8.3.8", "@preact/preset-vite": "^2.10.6" },
+    deps: { preact: "^11.2.0" }, dev: { vite: "^8.3.8", "@preact/preset-vite": "^2.10.6", typescript: "^5.9.3" },
     builds: { esbuild: true },
   },
   html: {

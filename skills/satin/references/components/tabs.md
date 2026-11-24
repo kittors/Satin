@@ -54,7 +54,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-tabs tabs='[
   {"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},
   {"label":"镜头","badge":48,"content":"镜头列表：按集分组，可以拖动排序。"},
@@ -64,7 +64,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Tabs } from "satin-ui/react";
 
 const TABS = [
@@ -81,7 +81,7 @@ export default function ProjectTabs() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Tabs } from "satin-ui/vue";
 
 const TABS = [
@@ -98,8 +98,8 @@ const TABS = [
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Tabs from "satin-ui/svelte/Tabs.svelte";
 
   const TABS = [
@@ -136,7 +136,7 @@ export class TabsBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 自定义元素的属性只认字符串：数组写成 JSON
 const TABS = JSON.stringify([
   { label: "概览", content: "项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。" },
@@ -151,7 +151,7 @@ export default function ProjectTabs() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Tabs } from "satin-ui/react";
 
 const TABS = [
@@ -175,7 +175,7 @@ export default function ProjectTabs() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="tabs-box">
   <sn-tabs value="1" tabs='[
     {"label":"概览","content":"项目概览：48 个镜头，12 分 36 秒，最后更新 3 分钟前。"},
@@ -196,7 +196,7 @@ export default function ProjectTabs() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Tabs } from "satin-ui/react";
 
@@ -223,7 +223,7 @@ export default function ProjectTabsControlled() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Tabs } from "satin-ui/vue";
 
@@ -248,8 +248,8 @@ const tab = ref(1);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Tabs from "satin-ui/svelte/Tabs.svelte";
 
   const TABS = [
@@ -303,7 +303,7 @@ export class TabsControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 const LIST = [
@@ -314,7 +314,7 @@ const LIST = [
 // 自定义元素的属性只认字符串：数组写成 JSON
 const TABS = JSON.stringify(LIST);
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function ProjectTabsControlled() {
   const [tab, setTab] = createSignal(1);
@@ -332,7 +332,7 @@ export default function ProjectTabsControlled() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Tabs } from "satin-ui/react";
 
@@ -366,7 +366,7 @@ export default function ProjectTabsControlled() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-8" id="tabs-pager-box">
   <sn-pager total="13" count="128" page="1"></sn-pager>
   <span class="sn-help">第 1 页</span>
@@ -383,7 +383,7 @@ export default function ProjectTabsControlled() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Pager } from "satin-ui/react";
 
@@ -401,7 +401,7 @@ export default function ShotPager() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Pager } from "satin-ui/vue";
 
@@ -418,8 +418,8 @@ const page = ref(1);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Pager from "satin-ui/svelte/Pager.svelte";
 
   let page = $state(1);
@@ -453,11 +453,11 @@ export class TabsPagerComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // 名字带横线的事件用 ref 挂（Solid 的 onXxx 只认驼峰的事件名）
-const on = (type, fn) => (el) => el.addEventListener(type, fn);
+const on = (type: string, fn: (e: CustomEvent<any>) => void) => (el: HTMLElement) => el.addEventListener(type, fn as EventListener);
 
 export default function ShotPager() {
   const [page, setPage] = createSignal(1);
@@ -472,7 +472,7 @@ export default function ShotPager() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Pager } from "satin-ui/react";
 
@@ -497,7 +497,7 @@ export default function ShotPager() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-stack sn-gap-12" id="steps-box">
   <div class="sn-steps"><span class="sn-st sn-done"><span class="sn-n">1</span>导入原文</span><span class="sn-ln sn-done"><i></i></span><span class="sn-st sn-cur"><span class="sn-n">2</span>拆分章节</span><span class="sn-ln"><i></i></span><span class="sn-st"><span class="sn-n">3</span>生成分镜</span><span class="sn-ln"><i></i></span><span class="sn-st"><span class="sn-n">4</span>配音</span></div>
   <div class="sn-row"><button type="button" class="sn-btn sn-secondary sn-sm" data-step="-1">上一步</button><button type="button" class="sn-btn sn-primary sn-sm" data-step="1">下一步</button></div>
@@ -514,7 +514,7 @@ export default function ShotPager() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Steps } from "satin-ui/react";
 
@@ -537,7 +537,7 @@ export default function MakeSteps() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Steps } from "satin-ui/vue";
 
@@ -558,8 +558,8 @@ const cur = ref(1);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   const STEPS = ["导入原文", "拆分章节", "生成分镜", "配音"];
   let cur = $state(1);
 </script>
@@ -608,7 +608,7 @@ export class TabsStepsComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, For, Show } from "solid-js";
 
 const STEPS = ["导入原文", "拆分章节", "生成分镜", "配音"];
@@ -638,7 +638,7 @@ export default function MakeSteps() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Steps } from "satin-ui/react";
 

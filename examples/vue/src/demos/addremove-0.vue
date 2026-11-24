@@ -1,30 +1,31 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance, injectIcons } from "satin-ui";
 import { insertWithFlip, removeWithFlip, toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 新增：从下面淡入，别的标签让位；删除：先脱离布局淡出，剩下的用弹簧补位，给撤销
     const box = root.querySelector("#chipsBox"), input = root.querySelector("#addTag");
-    const chipOf = (text) => {
+    const chipOf = (text?: any) => {
       const chip = document.createElement("span"); chip.className = "sn-chip sn-tag sn-on";
       chip.innerHTML = `${text}<button class="sn-x" aria-label="移除 ${text}" data-i="x"></button>`;
       injectIcons(chip); return chip;
     };
-    const add = (text, index) => insertWithFlip(box, chipOf(text), box.querySelectorAll(".sn-chip")[index ?? 1e9] || null);
+    const add = (text?: any, index?: any) => insertWithFlip(box, chipOf(text), box.querySelectorAll(".sn-chip")[index ?? 1e9] || null);
     const submit = () => { const v = input.value.trim(); if (!v) return; add(v); input.value = ""; };
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+    input.addEventListener("keydown", (e?: any) => { if (e.key === "Enter") submit(); });
     root.querySelector("[data-add-tag]").addEventListener("click", submit);
 
-    box.addEventListener("click", (e) => {
+    box.addEventListener("click", (e?: any) => {
       const x = e.target.closest(".sn-x"); if (!x) return;
       const chip = x.closest(".sn-chip"), text = chip.firstChild.textContent.trim(), index = [...box.querySelectorAll(".sn-chip")].indexOf(chip);
       removeWithFlip(chip);
-      toast({ kind: "action", text: `已移除标签"${text}"`, action: { label: "撤销", run: (t) => { add(text, index); t.update({ kind: "status", text: `已恢复"${text}"`, done: true, duration: 2000 }); } } });
+      toast({ kind: "action", text: `已移除标签"${text}"`, action: { label: "撤销", run: (t?: any) => { add(text, index); t.update({ kind: "status", text: `已恢复"${text}"`, done: true, duration: 2000 }); } } });
     });
   });
   off = () => { done(); unsetup(); };

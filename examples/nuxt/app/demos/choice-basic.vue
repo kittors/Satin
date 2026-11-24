@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Checkbox, Switch } from "satin-ui/vue";
 

@@ -55,7 +55,7 @@ search(q) 返回结果数，右边淡入"N 个结果"；空着时显示快捷键
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="special-basic"></div>
 
 <script type="module">
@@ -73,7 +73,7 @@ search(q) 返回结果数，右边淡入"N 个结果"；空着时显示快捷键
 
 React 的写法：
 
-```jsx
+```tsx
 import { Search } from "satin-ui/react";
 
 const SHOTS = ["站台远景", "雨里的车灯", "推门进候车厅", "站台告别", "末班列车"];
@@ -87,12 +87,12 @@ export default function ShotSearch() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Search } from "satin-ui/vue";
 
 const SHOTS = ["站台远景", "雨里的车灯", "推门进候车厅", "站台告别", "末班列车"];
 // search(q) 返回结果数：右边淡入"N 个结果"；返回 Promise 时等超过 300ms 放大镜换成转圈
-const count = (q) => SHOTS.filter((s) => s.includes(q)).length;
+const count = (q: string) => SHOTS.filter((s) => s.includes(q)).length;
 </script>
 
 <template>
@@ -102,8 +102,8 @@ const count = (q) => SHOTS.filter((s) => s.includes(q)).length;
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createSearch } from "satin-ui";
   const SHOTS = ["站台远景", "雨里的车灯", "推门进候车厅", "站台告别", "末班列车"];
@@ -153,14 +153,14 @@ export class SpecialBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createSearch } from "satin-ui";
 
 const SHOTS = ["站台远景", "雨里的车灯", "推门进候车厅", "站台告别", "末班列车"];
 
 export default function ShotSearch() {
-  let host;
+  let host!: HTMLDivElement;
   // 空着时显示快捷键 /，一输入换成清除按钮；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createSearch(host, {
@@ -177,7 +177,7 @@ export default function ShotSearch() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Search } from "satin-ui/react";
 
 const SHOTS = ["站台远景", "雨里的车灯", "推门进候车厅", "站台告别", "末班列车"];
@@ -198,7 +198,7 @@ meter 出强度条；大写锁定打开时下面展开提示；右边的眼睛�
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="special-password"></div>
 
 <script type="module">
@@ -210,7 +210,7 @@ meter 出强度条；大写锁定打开时下面展开提示；右边的眼睛�
 
 React 的写法：
 
-```jsx
+```tsx
 import { Password } from "satin-ui/react";
 
 export default function NewPassword() {
@@ -222,7 +222,7 @@ export default function NewPassword() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Password } from "satin-ui/vue";
 
@@ -237,8 +237,8 @@ const pw = ref("");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createPassword } from "satin-ui";
 
@@ -275,12 +275,12 @@ export class SpecialPasswordComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createPassword } from "satin-ui";
 
 export default function NewPassword() {
-  let host;
+  let host!: HTMLDivElement;
   // meter：强度条依次点亮；大写锁定打开时下面展开提示；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createPassword(host, { label: "设置密码", placeholder: "至少 8 位，字母加数字更安全", meter: true, id: "new-pw" });
@@ -292,7 +292,7 @@ export default function NewPassword() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Password } from "satin-ui/react";
 
 export default function NewPassword() {
@@ -311,7 +311,7 @@ value + onChange 受控；格式对了右边的对勾一笔画出来。
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div id="special-email"></div>
 
 <script type="module">
@@ -323,7 +323,7 @@ value + onChange 受控；格式对了右边的对勾一笔画出来。
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Email } from "satin-ui/react";
 
@@ -337,7 +337,7 @@ export default function NotifyEmail() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Email } from "satin-ui/vue";
 
@@ -352,8 +352,8 @@ const mail = ref("");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Satin from "satin-ui/svelte/Satin.svelte";
   import { createEmail } from "satin-ui";
 
@@ -390,12 +390,12 @@ export class SpecialEmailComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { onSettled } from "solid-js";
 import { createEmail } from "satin-ui";
 
 export default function NotifyEmail() {
-  let host;
+  let host!: HTMLDivElement;
   // 格式对了右边的对勾一笔画出来；挂上以后建，卸载时 destroy()
   onSettled(() => {
     const it = createEmail(host, { label: "通知邮箱", placeholder: "name@example.com", id: "notify-email" });
@@ -407,7 +407,7 @@ export default function NotifyEmail() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Email } from "satin-ui/react";
 

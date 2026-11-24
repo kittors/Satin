@@ -37,7 +37,7 @@ export default {
     { name: "apply", type: "() => void", default: "—", required: true, desc: "马上把界面改成结果（保存之前）；点\"重试\"时会再调一次，写成幂等的。", names: { js: "apply" } },
     { name: "revert", type: "() => void", default: "—", required: true, desc: "保存失败时改回去。", names: { js: "revert" } },
     { name: "save", type: "() => Promise<unknown> | unknown", default: "—", required: true, desc: "真正的保存：返回 Promise，reject 就算失败。", names: { js: "save" } },
-    { name: "shake", type: "HTMLElement", default: "—", required: false, desc: "失败时左右抖两下的元素（一般是这一行）。", names: { js: "shake" } },
+    { name: "shake", type: "HTMLElement | null", default: "—", required: false, desc: "失败时左右抖两下的元素（一般是这一行）。", names: { js: "shake" } },
     { name: "failText", type: "string", default: "\"没保存上，已恢复原样\"", required: false, desc: "失败提示的字（提示里自带\"重试\"）。", names: { js: "failText" } },
   ],
   events: [],

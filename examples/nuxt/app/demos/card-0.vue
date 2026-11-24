@@ -1,23 +1,24 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance, injectIcons } from "satin-ui";
 import { openMenu, toast } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 卡片本身是标记：封面、标题、元信息；左上角的勾选框多选，右上角"更多"弹菜单
     const cards = root.querySelector("#pcards");
     const menu = document.createElement("div"); // 菜单也可以直接写在标记里
     menu.className = "sn-menu sn-float"; menu.setAttribute("role", "menu");
     menu.innerHTML = '<div class="sn-item" data-i="pencil:before">重命名</div><div class="sn-item" data-i="copy:before">复制一份</div><div class="sn-sep"></div><div class="sn-item sn-danger-item" data-i="trash-2:before">移到回收站</div>';
     injectIcons(menu); cards.after(menu);
-    menu.addEventListener("menuselect", (e) => toast({ text: e.detail.label }));
+    menu.addEventListener("menuselect", (e?: any) => toast({ text: e.detail.label }));
 
-    cards.addEventListener("change", (e) => e.target.closest(".sn-pc")?.classList.toggle("sn-sel", e.target.checked));
-    cards.addEventListener("click", (e) => {
+    cards.addEventListener("change", (e?: any) => e.target.closest(".sn-pc")?.classList.toggle("sn-sel", e.target.checked));
+    cards.addEventListener("click", (e?: any) => {
       const more = e.target.closest("[data-card-more]");
       if (more) { e.stopPropagation(); openMenu(menu, { trigger: more, anchor: more, align: "end" }); return; }
       if (e.target.closest(".sn-pick")) return;

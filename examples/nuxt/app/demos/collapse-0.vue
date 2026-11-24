@@ -1,17 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance } from "satin-ui";
 import { createCollapse, bindCollapses } from "satin-ui/components";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     // 点条目标题展开 / 收起（高度过渡）；single：同时只开一项
     const faq = createCollapse(root.querySelector(".sn-acc"), {
       single: true,
-      onToggle: ({ open }) => console.log(open ? "展开" : "收起"),
+      onToggle: ({ open }: any) => console.log(open ? "展开" : "收起"),
     });
     faq.open(0);
 

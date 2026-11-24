@@ -274,7 +274,7 @@ export function removeWithFlip(el: HTMLElement, options?: { keep?: boolean }): P
 export function flipSnapshot(container: HTMLElement): (entering?: Element | Element[] | null) => void;
 /** 乐观更新：先 apply() 显示结果，再 save()；失败时 revert()、抖一下 shake 元素、弹出带"重试"的 Toast */
 /** apply 马上改界面；revert 保存失败时改回去；save 保存（返回 Promise，reject 算失败）；shake 失败时左右抖两下的元素；failText 失败提示（默认"没保存上，已恢复原样"），带"重试" */
-export interface OptimisticOptions { apply(): void; revert(): void; save(): Promise<unknown> | unknown; shake?: HTMLElement; failText?: string }
+export interface OptimisticOptions { apply(): void; revert(): void; save(): Promise<unknown> | unknown; shake?: HTMLElement | null; failText?: string }
 export function optimistic(options: OptimisticOptions): Promise<unknown>;
 /** load() 超过一小会儿还没回来才显示骨架屏 skeleton；回来以后换成 render(数据) 的内容（逐行错开淡入）。shown：骨架屏有没有出现过，waited：等了多少毫秒 */
 export function loadWithSkeleton<T>(el: HTMLElement, options: { load(): Promise<T> | T; skeleton?: string; render?(data: T): string; stagger?: number }): Promise<{ shown: boolean; waited: number }>;

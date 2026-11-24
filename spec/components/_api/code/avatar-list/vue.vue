@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Avatar } from "satin-ui/vue";
 
 const people = [

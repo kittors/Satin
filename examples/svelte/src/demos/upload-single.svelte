@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { createUpload } from "satin-ui";
 
   // 一次一个：input 不写 multiple；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createUpload(host, { accept: /\.(jpe?g|png)$/i, maxSize: 2e6 });
     return () => it.destroy();

@@ -1,4 +1,5 @@
-<script setup>
+<script setup lang="ts">
+import type { ComposerMode } from "satin-ui/vue";
 import { ref } from "vue";
 import { Composer, toast } from "satin-ui/vue";
 
@@ -8,10 +9,10 @@ const CONTEXT = [
   { icon: "git-branch", text: "第三集", options: [{ value: "ep3", label: "第三集" }, { value: "ep4", label: "第四集" }], value: "ep3" },
 ];
 // 权限：小圆点的颜色表示风险；模型：名称 · 档位
-const MODE = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
+const MODE: ComposerMode = { options: [{ value: "read", label: "只读", tone: "ok" }, { value: "full", label: "完全访问", tone: "warn" }], value: "read" };
 const MODELS = [{ value: "fine", label: "分镜模型 · 精细" }, { value: "fast", label: "分镜模型 · 快速" }];
 // 发送以后返回 Promise：按钮变成"停止"，结束回到可发送
-const generate = ({ text }) => new Promise((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
+const generate = ({ text }: { text: string }) => new Promise<void>((done) => setTimeout(() => { toast({ text: "已生成 4 张画面" }); done(); }, 2000));
 const model = ref("fine");
 </script>
 

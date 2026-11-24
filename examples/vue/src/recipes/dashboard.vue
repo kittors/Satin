@@ -1,15 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { setup, enhance, injectIcons } from "satin-ui";
 import { Select as SnSelect, Segmented as SnSegmented, Avatar as SnAvatar } from "satin-ui/vue";
 import { busy, succeed, toast, createNumberFlow, createScrollArea } from "satin-ui/components";
 import { createAreaChart, createBarChart, createDonutChart, createChart3D, createSparkline } from "satin-ui/charts";
 
-const root = ref(null);
+const root = ref<HTMLDivElement | null>(null);
 let off = () => {};
 onMounted(() => {
+  if (!root.value) return;
   const unsetup = setup();
-  const done = enhance(root.value, (root) => {
+  const done = enhance(root.value, (root: any) => {
     injectIcons();
     createScrollArea(root.querySelector("#dbTblSc"), { fade: "none", overscroll: "auto" });
 
@@ -18,9 +19,9 @@ onMounted(() => {
         range: "11.17 – 11.23",
         kpis: [
           { val: 1784, delta: "+14.2%", spk: [168, 214, 196, 268, 312, 284, 342] },
-          { val: 84.6, fmt: (v) => v.toFixed(1) + "%", delta: "+3.8%", spk: [79, 81, 80, 83, 85, 84, 86] },
+          { val: 84.6, fmt: (v?: any) => v.toFixed(1) + "%", delta: "+3.8%", spk: [79, 81, 80, 83, 85, 84, 86] },
           { text: "1 分 52 秒", delta: "快 14 秒", spk: [134, 128, 125, 119, 116, 114, 112] },
-          { val: 78.2, fmt: (v) => v.toFixed(1) + "%", delta: "余量 22%", spk: [66, 72, 70, 76, 82, 79, 78] },
+          { val: 78.2, fmt: (v?: any) => v.toFixed(1) + "%", delta: "余量 22%", spk: [66, 72, 70, 76, 82, 79, 78] },
         ],
         area: {
           labels: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
@@ -40,9 +41,9 @@ onMounted(() => {
         range: "11.01 – 11.23",
         kpis: [
           { val: 6230, delta: "+21.6%", spk: [1120, 1480, 1690, 1940] },
-          { val: 86.1, fmt: (v) => v.toFixed(1) + "%", delta: "+5.1%", spk: [81, 83, 85, 87] },
+          { val: 86.1, fmt: (v?: any) => v.toFixed(1) + "%", delta: "+5.1%", spk: [81, 83, 85, 87] },
           { text: "1 分 46 秒", delta: "快 22 秒", spk: [128, 118, 110, 106] },
-          { val: 82.4, fmt: (v) => v.toFixed(1) + "%", delta: "余量 18%", spk: [71, 76, 80, 82] },
+          { val: 82.4, fmt: (v?: any) => v.toFixed(1) + "%", delta: "余量 18%", spk: [71, 76, 80, 82] },
         ],
         area: {
           labels: ["第 1 周", "第 2 周", "第 3 周", "第 4 周"],
@@ -62,9 +63,9 @@ onMounted(() => {
         range: "2026 Q4（9 – 11 月）",
         kpis: [
           { val: 18420, delta: "+38.4%", spk: [4280, 5610, 6230, 7480] },
-          { val: 87.9, fmt: (v) => v.toFixed(1) + "%", delta: "+7.4%", spk: [78, 82, 86, 88] },
+          { val: 87.9, fmt: (v?: any) => v.toFixed(1) + "%", delta: "+7.4%", spk: [78, 82, 86, 88] },
           { text: "1 分 39 秒", delta: "快 35 秒", spk: [134, 120, 108, 99] },
-          { val: 85.1, fmt: (v) => v.toFixed(1) + "%", delta: "余量 15%", spk: [68, 75, 81, 85] },
+          { val: 85.1, fmt: (v?: any) => v.toFixed(1) + "%", delta: "余量 15%", spk: [68, 75, 81, 85] },
         ],
         area: {
           labels: ["9 月上", "9 月下", "10 月上", "10 月下", "11 月上", "11 月下"],
@@ -82,7 +83,8 @@ onMounted(() => {
       },
     };
 
-    const LINE_SCALE = { all: [1, "全部业务线"], drama: [0.62, "剧集分镜"], ad: [0.44, "商业短片"], anime: [0.51, "二维动画"] };
+    const DATA_MAP = new Map(Object.entries(DATASET));
+    const LINE_SCALE = new Map([["all", { k: 1, name: "全部业务线" }], ["drama", { k: 0.62, name: "剧集分镜" }], ["ad", { k: 0.44, name: "商业短片" }], ["anime", { k: 0.51, name: "二维动画" }]]);
     const PROJECTS = [
       { name: "雨夜车站 · 第 3 集", owner: "林夏", line: "drama", genre: "电影感", status: "已完成", tone: "sn-ok", shots: 48, rate: "93.8%", avg: "1分38秒" },
       { name: "风起长街 · 预告片", owner: "周屿", line: "ad", genre: "纪录", status: "生成中", tone: "sn-run", shots: 32, rate: "84.4%", avg: "1分49秒" },
@@ -95,8 +97,8 @@ onMounted(() => {
     let period = "本周", line = "all", filterStatus = "", filterGenre = "", query = "";
 
     const nf0 = createNumberFlow(root.querySelector("#kpiVal0"), { value: 1784 });
-    const nf1 = createNumberFlow(root.querySelector("#kpiVal1"), { value: 84.6, format: (v) => v.toFixed(1) + "%" });
-    const nf3 = createNumberFlow(root.querySelector("#kpiVal3"), { value: 78.2, format: (v) => v.toFixed(1) + "%" });
+    const nf1 = createNumberFlow(root.querySelector("#kpiVal1"), { value: 84.6, format: (v?: any) => v.toFixed(1) + "%" });
+    const nf3 = createNumberFlow(root.querySelector("#kpiVal3"), { value: 78.2, format: (v?: any) => v.toFixed(1) + "%" });
     const spks = [
       createSparkline(root.querySelector("#kpiSpk0"), { values: DATASET["本周"].kpis[0].spk, color: "accent", height: 30 }),
       createSparkline(root.querySelector("#kpiSpk1"), { values: DATASET["本周"].kpis[1].spk, color: "success", height: 30 }),
@@ -115,8 +117,7 @@ onMounted(() => {
     });
 
     const donut = createDonutChart(root.querySelector("#dbDonut"), {
-      size: 158,
-      centerLabel: "项目数",
+      totalLabel: "项目数",
       unit: " 个",
       items: DATASET["本周"].donut,
       onSelect(item) { filterStatus = item ? item.label : ""; renderRows(); },
@@ -145,9 +146,9 @@ onMounted(() => {
 
     function renderRows() {
       const q = query.trim().toLowerCase();
-      const list = PROJECTS.filter((p) => (line === "all" || p.line === line) && (!filterStatus || p.status === filterStatus) && (!filterGenre || p.genre === filterGenre) && (!q || p.name.toLowerCase().includes(q) || p.owner.toLowerCase().includes(q)));
+      const list = PROJECTS.filter((p?: any) => (line === "all" || p.line === line) && (!filterStatus || p.status === filterStatus) && (!filterGenre || p.genre === filterGenre) && (!q || p.name.toLowerCase().includes(q) || p.owner.toLowerCase().includes(q)));
       const tb = root.querySelector("#dbRows");
-      tb.innerHTML = list.length ? list.map((p) => `<tr>
+      tb.innerHTML = list.length ? list.map((p?: any) => `<tr>
     <td><b>${p.name}</b><div class="sn-t-caption sn-c-tertiary">${p.owner}</div></td>
     <td>${p.genre}</td>
     <td><span class="sn-tag ${p.tone}"><i></i>${p.status}</span></td>
@@ -161,36 +162,37 @@ onMounted(() => {
     }
 
     function applyFilters() {
-      const d = DATASET[period] || DATASET["本周"], [k, lineName] = LINE_SCALE[line] || LINE_SCALE.all;
-      const sc = (arr) => arr.map((v) => Math.max(1, Math.round(v * k)));
+      const d = DATA_MAP.get(period) || DATASET["本周"], { k, name: lineName } = LINE_SCALE.get(line) || { k: 1, name: "全部业务线" };
+      const sc = (arr?: any) => arr.map((v?: any) => Math.max(1, Math.round(v * k)));
       root.querySelector("#dbRange").textContent = `${d.range} · ${lineName}`;
-      nf0.set(Math.round(d.kpis[0].val * k));
-      nf1.set(d.kpis[1].val);
-      root.querySelector("#kpiVal2").textContent = d.kpis[2].text;
-      nf3.set(d.kpis[3].val);
-      d.kpis.forEach((kp, i) => {
-        document.getElementById("kpiDelta" + i).textContent = kp.delta;
+      nf0.set(Math.round((d.kpis[0].val ?? 0) * k));
+      nf1.set(d.kpis[1].val ?? 0);
+      root.querySelector("#kpiVal2").textContent = d.kpis[2].text ?? "";
+      nf3.set(d.kpis[3].val ?? 0);
+      d.kpis.forEach((kp?: any, i?: any) => {
+        const deltaEl = root.querySelector("#kpiDelta" + i);
+        if (deltaEl) deltaEl.textContent = kp.delta;
         spks[i].update({ values: i === 0 ? sc(kp.spk) : kp.spk });
       });
       const gen = sc(d.area.gen), pass = sc(d.area.pass);
-      const totalG = gen.reduce((a, b) => a + b, 0), totalP = pass.reduce((a, b) => a + b, 0);
+      const totalG = gen.reduce((a?: any, b?: any) => a + b, 0), totalP = pass.reduce((a?: any, b?: any) => a + b, 0);
       root.querySelector("#dbRateNote").textContent = `采纳率 ${((totalP / Math.max(1, totalG)) * 100).toFixed(1)}%`;
       area.update({ labels: d.area.labels, series: [{ name: "生成镜头", color: "accent", values: gen }, { name: "一次通过", color: "success", values: pass }] });
-      donut.update({ items: d.donut.map((it) => ({ ...it, value: Math.max(1, Math.round(it.value * k)) })) });
+      donut.update({ items: d.donut.map((it?: any) => ({ ...it, value: Math.max(1, Math.round(it.value * k)) })) });
       bar.update({ series: [{ name: "本期交付", color: "blue", values: sc(d.bar.cur) }, { name: "上期交付", color: "muted", values: sc(d.bar.prev) }] });
       c3d.update({ values: d.c3d.map(sc) });
       renderRows();
     }
 
-    root.querySelector("#dbPeriod").addEventListener("sn-change", (e) => { period = e.detail; applyFilters(); });
-    root.querySelector("#dbLine").addEventListener("sn-change", (e) => { line = e.detail; applyFilters(); });
-    root.querySelector("#dbSearch").addEventListener("input", (e) => { query = e.target.value; renderRows(); });
+    root.querySelector("#dbPeriod").addEventListener("sn-change", (e?: any) => { period = e.detail; applyFilters(); });
+    root.querySelector("#dbLine").addEventListener("sn-change", (e?: any) => { line = e.detail; applyFilters(); });
+    root.querySelector("#dbSearch").addEventListener("input", (e?: any) => { query = e.target.value; renderRows(); });
     root.querySelector("#dbReset").addEventListener("click", () => { filterStatus = ""; filterGenre = ""; query = ""; root.querySelector("#dbSearch").value = ""; donut.update({ activeIndex: -1 }); bar.update({ activeIndex: -1 }); renderRows(); });
-    root.querySelector("#dbExport").addEventListener("click", async (e) => {
+    root.querySelector("#dbExport").addEventListener("click", async (e?: any) => {
       const btn = e.currentTarget;
       await busy(btn, 720);
       succeed(btn);
-      toast({ text: `已导出「${period} · ${LINE_SCALE[line][1]}」效能分析周报` });
+      toast({ text: `已导出「${period} · ${LINE_SCALE.get(line)?.name || "全部业务线"}」效能分析周报` });
     });
 
     renderRows();

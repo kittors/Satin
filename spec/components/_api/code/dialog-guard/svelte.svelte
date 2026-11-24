@@ -1,17 +1,17 @@
-<script>
+<script lang="ts">
   import { tick } from "svelte";
   import Dialog from "satin-ui/svelte/Dialog.svelte";
 
   let open = $state(false), note = $state(""), asking = $state(false);
-  let noteEl = $state(), keepBtn = $state();
+  let noteEl = $state<HTMLTextAreaElement | undefined>(), keepBtn = $state<HTMLButtonElement | undefined>();
   // 底栏两组按钮原地切换：问的时候焦点到"继续填写"，回去接着填时回到输入框
-  async function ask(on) {
+  async function ask(on: boolean) {
     asking = on;
     await tick();
     (on ? keepBtn : noteEl).focus();
   }
   // Esc、取消都先走 guard：在问的时候再按一次就回去接着填；填了内容就问；空的直接关
-  const guard = (close) => (asking ? ask(false) : note.trim() ? ask(true) : close());
+  const guard = (close: () => void) => (asking ? ask(false) : note.trim() ? ask(true) : close());
   function discard() {
     open = false;
     note = "";

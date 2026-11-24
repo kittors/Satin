@@ -57,7 +57,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <div class="sn-row">
   <span class="sn-chip sn-on">进行中</span>
   <span class="sn-chip">已完成</span>
@@ -67,7 +67,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Chip } from "satin-ui/react";
 
 export default function ChipBasic() {
@@ -84,7 +84,7 @@ export default function ChipBasic() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Chip } from "satin-ui/vue";
 </script>
 
@@ -99,7 +99,7 @@ import { Chip } from "satin-ui/vue";
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <div class="sn-row">
   <span class="sn-chip sn-on">进行中</span>
   <span class="sn-chip">已完成</span>
@@ -127,7 +127,7 @@ export class ChipBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 export default function ChipBasic() {
   return (
     <div class="sn-row">
@@ -141,7 +141,7 @@ export default function ChipBasic() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Chip } from "satin-ui/react";
 
 export default function ChipBasic() {
@@ -165,7 +165,7 @@ export default function ChipBasic() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <button type="button" class="sn-chip sn-on" aria-pressed="true" data-toggle><span data-i="check"></span>进行中</button>
@@ -178,7 +178,7 @@ export default function ChipBasic() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Chip } from "satin-ui/react";
 
@@ -186,7 +186,7 @@ const STATUS = ["进行中", "已完成", "失败", "已归档"];
 
 export default function StatusFilter() {
   const [picked, setPicked] = useState(["进行中"]);
-  const toggle = (s, on) => setPicked((p) => (on ? [...p, s] : p.filter((x) => x !== s)));
+  const toggle = (s: string, on: boolean) => setPicked((p) => (on ? [...p, s] : p.filter((x) => x !== s)));
   return (
     <div className="sn-row">
       {STATUS.map((s) => (
@@ -200,13 +200,13 @@ export default function StatusFilter() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Chip } from "satin-ui/vue";
 
 const STATUS = ["进行中", "已完成", "失败", "已归档"];
 const picked = ref(["进行中"]);
-const toggle = (s, on) => { picked.value = on ? [...picked.value, s] : picked.value.filter((x) => x !== s); };
+const toggle = (s: string, on: boolean) => { picked.value = on ? [...picked.value, s] : picked.value.filter((x) => x !== s); };
 </script>
 
 <template>
@@ -218,13 +218,13 @@ const toggle = (s, on) => { picked.value = on ? [...picked.value, s] : picked.va
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   const STATUS = ["进行中", "已完成", "失败", "已归档"];
   let picked = $state(["进行中"]);
-  const toggle = (s) => (picked = picked.includes(s) ? picked.filter((x) => x !== s) : [...picked, s]);
+  const toggle = (s: string) => (picked = picked.includes(s) ? picked.filter((x) => x !== s) : [...picked, s]);
 </script>
 
 <div class="sn-row">
@@ -261,14 +261,14 @@ export class ChipControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, For } from "solid-js";
 
 const STATUS = ["进行中", "已完成", "失败", "已归档"];
 
 export default function StatusFilter() {
   const [picked, setPicked] = createSignal(["进行中"]);
-  const toggle = (s) => setPicked((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
+  const toggle = (s: string) => setPicked((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
   return (
     <sn-enhance>
       <div class="sn-row">
@@ -285,7 +285,7 @@ export default function StatusFilter() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Chip } from "satin-ui/react";
 
@@ -293,7 +293,7 @@ const STATUS = ["进行中", "已完成", "失败", "已归档"];
 
 export default function StatusFilter() {
   const [picked, setPicked] = useState(["进行中"]);
-  const toggle = (s, on) => setPicked((p) => (on ? [...p, s] : p.filter((x) => x !== s)));
+  const toggle = (s: string, on: boolean) => setPicked((p) => (on ? [...p, s] : p.filter((x) => x !== s)));
   return (
     <div class="sn-row">
       {STATUS.map((s) => (
@@ -314,7 +314,7 @@ export default function StatusFilter() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row" data-chips="removable">
     <span class="sn-chip sn-tag sn-on">雨夜<button type="button" class="sn-x" aria-label="移除 雨夜" data-i="x"></button></span>
@@ -326,7 +326,7 @@ export default function StatusFilter() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Chip } from "satin-ui/react";
 
@@ -346,7 +346,7 @@ export default function SceneTags() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Chip } from "satin-ui/vue";
 
@@ -363,14 +363,14 @@ const tags = ref(["雨夜", "车站", "列车"]);
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { removeChip } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   let tags = $state(["雨夜", "车站", "列车"]);
   // 先播收起动画（keep：节点交给 Svelte 删），放完再从数组里删
-  const remove = (e, t) => removeChip(e.currentTarget.parentElement, { keep: true, onRemoved: () => (tags = tags.filter((x) => x !== t)) });
+  const remove = (e: MouseEvent, t: string) => removeChip((e.currentTarget as HTMLElement).parentElement!, { keep: true, onRemoved: () => (tags = tags.filter((x) => x !== t)) });
 </script>
 
 <div class="sn-row">
@@ -411,14 +411,14 @@ export class ChipRemovableComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal, For } from "solid-js";
 import { removeChip } from "satin-ui";
 
 export default function SceneTags() {
   const [tags, setTags] = createSignal(["雨夜", "车站", "列车"]);
   // 先播收起动画（keep：节点交给 Solid 删），放完再从列表里删
-  const remove = (e, t) => removeChip(e.currentTarget.parentElement, { keep: true, onRemoved: () => setTags((x) => x.filter((y) => y !== t)) });
+  const remove = (e: MouseEvent, t: string) => removeChip((e.currentTarget as HTMLElement).parentElement!, { keep: true, onRemoved: () => setTags((x) => x.filter((y) => y !== t)) });
   return (
     <sn-enhance>
       <div class="sn-row">
@@ -433,7 +433,7 @@ export default function SceneTags() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Chip } from "satin-ui/react";
 

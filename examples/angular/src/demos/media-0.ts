@@ -9,7 +9,7 @@ import { toast, createPlayer, createAudio } from "satin-ui/components";
   template: `
     <div #root>
       <div class="sn-player" id="player" tabindex="0" aria-label="视频播放器：夜里安静的街道">
-        <video class="sn-frame" playsinline preload="metadata" disableremoteplayback="" src="https://assets.mixkit.co/videos/4451/4451-720.mp4"></video>
+        <video class="sn-frame" playsinline preload="metadata" disableremoteplayback data-src="https://assets.mixkit.co/videos/4451/4451-720.mp4"></video>
         <div class="sn-pip-note">
           <span data-i="picture-in-picture-2"></span>
           <b>正在画中画里播放</b>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { notify } from "satin-ui";
 
   const run = () => {

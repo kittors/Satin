@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { createScrollArea } from "satin-ui";
 
   // bar="always"：滚动条一直在；fade 四边都渐隐；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createScrollArea(host, { bar: "always", fade: "both" });
     return () => it.destroy();

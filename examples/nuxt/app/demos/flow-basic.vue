@@ -1,13 +1,13 @@
-<script setup>
-import { Flow } from "satin-ui/vue/flow";
+<script setup lang="ts">
+import { Flow, type FlowNode, type FlowEdge } from "satin-ui/vue/flow";
 
-const nodes = [
+const nodes: FlowNode[] = [
   { id: "src", x: 0, y: 40, title: "导入原文", icon: "book-open", detail: "雨夜车站.docx · 3.2 万字", kind: "text" },
   { id: "board", x: 270, y: 40, title: "生成分镜", icon: "clapperboard", detail: "第三集 · 48 个镜头", kind: "board" },
   { id: "img", x: 540, y: 40, title: "生成画面", icon: "image", detail: "电影感 · 16:9", kind: "image" },
   { id: "out", x: 810, y: 40, title: "导出", icon: "download", detail: "第三集.mp4", kind: "out" },
 ];
-const edges = [["src", "board"], ["board", "img"], ["img", "out"]];
+const edges: FlowEdge[] = [["src", "board"], ["board", "img"], ["img", "out"]];
 </script>
 
 <template>

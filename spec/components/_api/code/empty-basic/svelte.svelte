@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import EmptyArt from "satin-ui/svelte/EmptyArt.svelte";
   import Icon from "satin-ui/svelte/Icon.svelte";
 </script>

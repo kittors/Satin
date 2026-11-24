@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createMarkdown } from "satin-ui/markdown";
   const MD = [
     "## 第三集 · 雨夜车站",
@@ -22,7 +22,7 @@
   ].join("\n");
 
   // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createMarkdown(host, { source: MD });
     return () => it.destroy();

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Select from "satin-ui/svelte/Select.svelte";
 
   const ratios = ["16:9 · 横屏", "9:16 · 竖屏", "1:1 · 方形"];

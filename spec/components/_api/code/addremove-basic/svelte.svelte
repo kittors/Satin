@@ -1,16 +1,16 @@
-<script>
+<script lang="ts">
   import { flushSync } from "svelte";
   import { flipSnapshot, removeWithFlip } from "satin-ui";
   import Icon from "satin-ui/svelte/Icon.svelte";
 
   let tags = $state(["雨夜", "车站", "第三集", "悬疑", "长镜头", "暖色调"]);
   let text = $state("");
-  let box;
-  const els = new Map();
+  let box!: HTMLDivElement;
+  const els = new Map<string, HTMLElement>();
   // 记下每个标签的元素（出现、收起动画要用）
-  const keep = (el, t) => { els.set(t, el); return { destroy: () => els.delete(t) }; };
+  const keep = (el: HTMLElement, t: string) => { els.set(t, el); return { destroy: () => els.delete(t) }; };
   // 新的一项从它该在的位置出现，其余让位：改数据之前记下位置，DOM 更新以后播（flushSync 让 DOM 当场更新）
-  const add = (t, at = tags.length) => {
+  const add = (t: string, at = tags.length) => {
     if (!t || tags.includes(t)) return;
     const play = flipSnapshot(box);
     flushSync(() => tags.splice(at, 0, t));
@@ -18,7 +18,7 @@
   };
   const submit = () => { add(text.trim()); text = ""; };
   // 删除：先脱离布局淡出，剩下的用弹簧补位（keep：节点留给 Svelte 删），播完再从数据里删
-  const remove = async (t) => {
+  const remove = async (t: string) => {
     await removeWithFlip(els.get(t), { keep: true });
     tags = tags.filter((x) => x !== t);
   };

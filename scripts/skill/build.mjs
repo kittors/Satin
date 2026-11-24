@@ -67,7 +67,8 @@ function contractMD(c) {
     o += `## 示例（由浅入深）\n\n`;
     for (const e of c.examples) {
       o += `### ${pr(e.title)}\n\n${pr(e.why)}\n\n` + "```html\n" + e.html.trim() + "\n```\n\n" + (e.js ? "```js\n" + e.js.trim() + "\n```\n\n" : "") + (e.css ? "```css\n" + e.css.trim() + "\n```\n\n" : "");
-      for (const [fw, code] of Object.entries(e.code || {})) o += `${FW_NAME[fw] || fw} 的写法：\n\n` + "```" + (fw === "vue" ? "vue" : fw === "angular" ? "ts" : "jsx") + "\n" + code.trim() + "\n```\n\n";
+      const FW_LANG = { html: "html", react: "tsx", vue: "vue", svelte: "svelte", angular: "ts", solid: "tsx", preact: "tsx" };
+      for (const [fw, code] of Object.entries(e.code || {})) o += `${FW_NAME[fw] || fw} 的写法：\n\n` + "```" + (FW_LANG[fw] || "ts") + "\n" + code.trim() + "\n```\n\n";
     }
   }
   // 某种写法的类型不一样（typeBy）：跟在后面写上，比如 Vue 里只收字符串

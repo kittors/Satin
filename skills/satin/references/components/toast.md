@@ -55,7 +55,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="toast-basic-btn">存草稿</button>
 
 <script type="module">
@@ -69,7 +69,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, toast } from "satin-ui/react";
 
 // 状态提示：底部中间出现，3 秒后自己消失
@@ -85,7 +85,7 @@ export default function SaveDraft() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, toast } from "satin-ui/vue";
 
 // 状态提示：底部中间出现，3 秒后自己消失
@@ -101,8 +101,8 @@ const run = () => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { toast } from "satin-ui";
 
   // 状态提示：底部中间出现，3 秒后自己消失
@@ -134,7 +134,7 @@ export class ToastBasicComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { toast } from "satin-ui";
 
 // 状态提示：底部中间出现，3 秒后自己消失
@@ -149,7 +149,7 @@ export default function SaveDraft() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, toast } from "satin-ui/react";
 
 // 状态提示：底部中间出现，3 秒后自己消失
@@ -172,7 +172,7 @@ export default function SaveDraft() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-secondary" id="toast-action-btn">归档</button>
 
 <script type="module">
@@ -190,7 +190,7 @@ export default function SaveDraft() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, toast } from "satin-ui/react";
 
 const run = () => {
@@ -210,7 +210,7 @@ export default function ArchiveProject() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, toast } from "satin-ui/vue";
 
 const run = () => {
@@ -230,8 +230,8 @@ const run = () => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { toast } from "satin-ui";
 
   const run = () => {
@@ -271,7 +271,7 @@ export class ToastActionComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { toast } from "satin-ui";
 
 const run = () => {
@@ -290,7 +290,7 @@ export default function ArchiveProject() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, toast } from "satin-ui/react";
 
 const run = () => {
@@ -317,7 +317,7 @@ export default function ArchiveProject() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <button type="button" class="sn-btn sn-primary" id="toast-progress-btn">导出成片</button>
 
 <script type="module">
@@ -338,7 +338,7 @@ export default function ArchiveProject() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { Button, toast } from "satin-ui/react";
 
 const run = () => {
@@ -361,7 +361,7 @@ export default function ExportShots() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Button, toast } from "satin-ui/vue";
 
 const run = () => {
@@ -384,8 +384,8 @@ const run = () => {
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   import { toast } from "satin-ui";
 
   const run = () => {
@@ -431,7 +431,7 @@ export class ToastProgressComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { toast } from "satin-ui";
 
 const run = () => {
@@ -453,7 +453,7 @@ export default function ExportShots() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { Button, toast } from "satin-ui/react";
 
 const run = () => {

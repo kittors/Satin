@@ -60,7 +60,7 @@ export class GridDemo0Component {
           dataSource: {
             total: all.length,
             async load({ start, end, sort, filter }) {
-              await new Promise((r?: any) => setTimeout(r, 200)); // 模拟网络
+              await new Promise((r?: any) => window.setTimeout(r, 200)); // 模拟网络
               const rows = query({ sort, filter });
               return { rows: rows.slice(start, end), total: rows.length };
             },

@@ -1,0 +1,75 @@
+<sn-enhance id="demo-space-2">
+  <div class="sf-grid">
+    <div class="sf-card">
+      <span class="sn-cap">线条粗细 · --sn-bw-*</span>
+      <div class="sf-lines">
+        <div>
+          <i style="height:var(--sn-bw-hairline);background:var(--sn-line-control)"></i>
+          <span>1px 细线 / 控件</span>
+          <code>--sn-bw-hairline</code>
+        </div>
+        <div>
+          <i style="height:var(--sn-bw-accent);background:var(--sn-label2)"></i>
+          <span>2px 导引 / 拉引线</span>
+          <code>--sn-bw-accent</code>
+        </div>
+        <div>
+          <i style="height:var(--sn-bw-focus);background:var(--sn-focus)"></i>
+          <span>2px 焦点环</span>
+          <code>--sn-bw-focus</code>
+        </div>
+      </div>
+    </div>
+    <div class="sf-card">
+      <span class="sn-cap">毛玻璃虚化 · 仅限浮层</span>
+      <div class="sf-blur-stage">
+        <span class="sf-glass" style="backdrop-filter:blur(var(--sn-blur-sm));-webkit-backdrop-filter:blur(var(--sn-blur-sm))">8px · sm</span>
+        <span class="sf-glass" style="backdrop-filter:blur(var(--sn-blur-md));-webkit-backdrop-filter:blur(var(--sn-blur-md))">16px · md</span>
+        <span class="sf-glass" style="backdrop-filter:blur(var(--sn-blur-lg));-webkit-backdrop-filter:blur(var(--sn-blur-lg))">24px · lg</span>
+      </div>
+    </div>
+    <div class="sf-card">
+      <span class="sn-cap">克制功能渐变 · 严禁装饰</span>
+      <div class="sf-grads">
+        <div class="sf-grad-scrim">
+          <span>--sn-grad-scrim</span>
+          <small>照片压字护读底罩</small>
+        </div>
+        <div class="sf-grad-fade">
+          <span>--sn-grad-fade</span>
+          <small>列表边界融合渐隐</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</sn-enhance>
+
+<script type="module">
+  import { defineElements } from "satin-ui/elements";
+
+  defineElements(); // <sn-enhance> 放进页面就接上交互；也注册 <sn-segmented>、<sn-select> 这些组件元素
+</script>
+
+<style>
+  .demo.sn-cv { content-visibility: auto; contain-intrinsic-size: auto var(--sn-ch, 400px); }
+  .demo { margin-top: 12px; padding: 24px; border-radius: var(--sn-r-lg); background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-card-line), var(--sn-card-shadow); }
+  .demo + .demo { margin-top: 12px; }
+  .demo { container: demo / inline-size; }
+  .demo > .sn-app { height: 420px; }
+  .demo > .sn-app .sn-app-main { overflow: hidden; }
+  .sf-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .sf-card { display: grid; align-content: start; gap: 12px; padding: 16px; border-radius: var(--sn-r-lg); background: var(--sn-canvas); box-shadow: inset 0 0 0 var(--sn-bw-hairline, 1px) var(--sn-line); }
+  .sf-lines { display: grid; gap: 12px; }
+  .sf-lines > div { display: grid; gap: 4px; }
+  .sf-lines i { display: block; width: 100%; border-radius: 999px; }
+  .sf-lines span { font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label); }
+  .sf-lines code { font: 400 calc(11px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label3); }
+  .sf-blur-stage { position: relative; display: grid; gap: 8px; padding: 12px; border-radius: var(--sn-r-md); overflow: hidden; background: url("https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=480&h=320&q=70") center / cover; }
+  .sf-glass { position: relative; padding: 8px 12px; border-radius: var(--sn-r-sm); background: var(--sn-glass-bg); box-shadow: inset 0 0 0 1px var(--sn-glass-line); font: 500 calc(12px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-mono); color: var(--sn-label); }
+  .sf-grads { display: grid; gap: 10px; }
+  .sf-grad-scrim, .sf-grad-fade { position: relative; display: grid; align-content: end; gap: 2px; height: 64px; padding: 10px 12px; border-radius: var(--sn-r-md); overflow: hidden; box-shadow: inset 0 0 0 1px var(--sn-line); }
+  .sf-grad-scrim { background: var(--sn-grad-scrim), url("https://images.unsplash.com/photo-1554103577-c0d26e9b90e0?auto=format&fit=crop&w=480&h=240&q=70") center / cover; color: #fff; }
+  .sf-grad-fade { background: var(--sn-grad-fade), repeating-linear-gradient(to bottom, var(--sn-fill-subtle) 0 10px, transparent 10px 18px); color: var(--sn-label); }
+  .sf-grad-scrim span, .sf-grad-fade span { font: 500 calc(11.5px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-mono); }
+  .sf-grad-scrim small, .sf-grad-fade small { font: 400 calc(11px * var(--sn-font-scale, 1))/calc(14px * var(--sn-font-scale, 1)) var(--sn-sans); opacity: .78; }
+</style>

@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import { createScrollArea } from "satin-ui";
 
   // fade="none" 不要渐隐；overscroll="contain" 滚到头不带着外面的页面一起滚；挂上以后建，卸载时 destroy()
-  let host;
+  let host!: HTMLDivElement;
   $effect(() => {
     const it = createScrollArea(host, { fade: "none", overscroll: "contain" });
     return () => it.destroy();

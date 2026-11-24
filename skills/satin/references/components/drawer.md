@@ -53,7 +53,7 @@
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-drawer="drw-shot">编辑镜头</button>
   <aside class="sn-drawer" id="drw-shot" role="dialog" aria-modal="true" aria-labelledby="drw-shot-t" tabindex="-1">
@@ -67,7 +67,7 @@
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Drawer, Field, Input } from "satin-ui/react";
 
@@ -90,7 +90,7 @@ export default function EditShot() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Drawer, Field, Input } from "satin-ui/vue";
 
@@ -111,7 +111,7 @@ const name = ref("站台 · 远景");
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关、关闭按钮（data-x） -->
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-drawer="drw-shot">编辑镜头</button>
@@ -149,7 +149,7 @@ export class DrawerBasicComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 标记照设计稿写，<sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关、关闭按钮（data-x）
 export default function EditShot() {
   return (
@@ -168,7 +168,7 @@ export default function EditShot() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Drawer, Field, Input } from "satin-ui/react";
 
@@ -198,7 +198,7 @@ export default function EditShot() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <div class="sn-row">
     <b id="drw-live-title">站台 · 远景</b>
@@ -221,7 +221,7 @@ export default function EditShot() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Drawer, Field, Input } from "satin-ui/react";
 
@@ -248,7 +248,7 @@ export default function LiveEdit() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Drawer, Field, Input } from "satin-ui/vue";
 
@@ -272,8 +272,8 @@ const name = ref("站台 · 远景");
 
 Svelte 的写法：
 
-```jsx
-<script>
+```svelte
+<script lang="ts">
   let name = $state("站台 · 远景");
 </script>
 
@@ -323,7 +323,7 @@ export class DrawerControlledComponent {
 
 Solid 的写法：
 
-```jsx
+```tsx
 import { createSignal } from "solid-js";
 
 // <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关；抽屉不做确认：边改边反映到背后的页面
@@ -348,7 +348,7 @@ export default function LiveEdit() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Drawer, Field, Input } from "satin-ui/react";
 
@@ -382,7 +382,7 @@ export default function LiveEdit() {
 
 纯 HTML 的写法：
 
-```jsx
+```html
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-drawer="drw-more">镜头设置</button>
   <aside class="sn-drawer" id="drw-more" role="dialog" aria-modal="true" aria-labelledby="drw-more-t" tabindex="-1">
@@ -397,7 +397,7 @@ export default function LiveEdit() {
 
 React 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Drawer, Field, Textarea, toast } from "satin-ui/react";
 
@@ -421,7 +421,7 @@ export default function ShotSettings() {
 Vue 的写法：
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button, Drawer, Field, toast } from "satin-ui/vue";
 
@@ -446,7 +446,7 @@ const remove = () => { open.value = false; toast({ text: "已删除镜头" }); }
 
 Svelte 的写法：
 
-```jsx
+```svelte
 <!-- <sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关；底栏的 data-x 点了也关上 -->
 <sn-enhance>
   <button type="button" class="sn-btn sn-secondary" data-drawer="drw-more">镜头设置</button>
@@ -486,7 +486,7 @@ export class DrawerFooterComponent {}
 
 Solid 的写法：
 
-```jsx
+```tsx
 // 标记照设计稿写，<sn-enhance> 接上 data-drawer 触发按钮、Esc、点外面关；底栏的 data-x 点了也关上
 export default function ShotSettings() {
   return (
@@ -506,7 +506,7 @@ export default function ShotSettings() {
 
 Preact 的写法：
 
-```jsx
+```tsx
 import { useState } from "react";
 import { Button, Drawer, Field, Textarea, toast } from "satin-ui/react";
 

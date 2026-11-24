@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Sidebar } from "satin-ui/vue";
 
 const NAV = [

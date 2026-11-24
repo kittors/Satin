@@ -1,10 +1,11 @@
-<script setup>
-import { DataGrid } from "satin-ui/vue/grid";
+<script setup lang="ts">
+import { DataGrid, type GridColumn } from "satin-ui/vue/grid";
 
 const SCENES = ["雨夜车站", "候车厅", "站台", "末班列车", "出站口", "天桥", "售票处", "广场"];
 // 假的服务端（真的项目里换成 fetch）：按 sort、搜索词排好、筛好，切出 [start, end) 这一段
-let all = null, last = "", list = [];
-function query(sort, q) {
+type ShotRow = { id: number; name: string; shots: number; dur: number; [k: string]: string | number };
+let all: ShotRow[] | null = null, last = "", list: ShotRow[] = [];
+function query(sort: { key: string; dir: number } | null | undefined, q?: string) {
   all ??= Array.from({ length: 100000 }, (_, i) => ({ id: i + 1, name: `${SCENES[i % 8]} ${Math.floor(i / 8) + 1}`, shots: (i * 37) % 90 + 1, dur: (i * 53) % 600 + 30 }));
   const key = JSON.stringify([sort, q]);
   if (key !== last) {
@@ -24,7 +25,7 @@ const dataSource = {
     return { rows: found.slice(start, end), total: found.length };
   },
 };
-const columns = [
+const columns: GridColumn[] = [
   { key: "name", title: "名称", width: 200, sortable: true },
   { key: "shots", title: "镜头", type: "int", width: 96, sortable: true },
   { key: "dur", title: "时长", type: "dur", width: 96, sortable: true },
