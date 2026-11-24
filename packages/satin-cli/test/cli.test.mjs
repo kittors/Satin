@@ -211,7 +211,7 @@ test("satin check：转给技能里的检查器（起步页 0 error → 0）；�
 test("npx satin-ui …：satin-ui 的 bin 转给 satin-cli", () => {
   const r = spawnSync(process.execPath, [path.join(REPO, "packages/satin-ui/bin/satin-ui.js"), "--version"], { encoding: "utf8" });
   assert.equal(r.status, 0, r.stderr); assert.equal(r.stdout.trim(), CLI_VERSION);
-  assert.equal(json(REPO, "packages/satin-ui/package.json").bin["satin-ui"], "./bin/satin-ui.js");
+  assert.equal(json(REPO, "packages/satin-ui/package.json").bin["satin-ui"], "bin/satin-ui.js");
 });
 
 test("在仓库里运行、没写 --satin：satin-ui 打成本地 .tgz 放进项目（还没发布时的用法）", { skip: spawnSync("npm", ["--version"]).status !== 0 && "没有 npm" }, async () => {

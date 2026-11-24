@@ -42,7 +42,7 @@
   "module": "./src/index.js",
   "types": "./types/index.d.ts",
   "bin": {
-    "satin-ui": "./bin/satin-ui.js"
+    "satin-ui": "bin/satin-ui.js"
   },
   "exports": {
     ".": {

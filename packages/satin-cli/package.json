@@ -26,7 +26,7 @@
     "access": "public"
   },
   "bin": {
-    "satin": "./bin/satin.js"
+    "satin": "bin/satin.js"
   },
   "exports": {
     ".": "./src/cli.js",
