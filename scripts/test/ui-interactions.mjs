@@ -145,10 +145,32 @@ try {
     const hasBefore = await frame.locator(".sn-pk").first().evaluate((el) => el.classList.contains("sn-has"));
     assert(hasBefore, `${label} 选值后进入 .sn-has 状态`);
 
-    // 悬停后点击右侧边缘热区（距离触发框右内边 12px 处，验证无需精确像素点中也能清空且绝不误弹面板）
+    // 悬停后校验清除圆钮几何对齐：上=下=右等距同心圆（误差 <= 0.5px）且 × 图标位于圆正中心（误差 <= 0.5px）
     const tbox = await trig.boundingBox();
     await page.mouse.move(tbox.x + tbox.width - 12, tbox.y + tbox.height / 2);
-    await page.waitForTimeout(120);
+    await page.waitForTimeout(260);
+    const geom = await trig.evaluate((el) => {
+      const tr = el.getBoundingClientRect();
+      const b = el.querySelector(".sn-end > .sn-b").getBoundingClientRect();
+      const ic = el.querySelector(".sn-end > .sn-b .sn-ic").getBoundingClientRect();
+      return {
+        topGap: b.top - tr.top,
+        botGap: tr.bottom - b.bottom,
+        rightGap: tr.right - b.right,
+        icDx: (ic.left + ic.width / 2) - (b.left + b.width / 2),
+        icDy: (ic.top + ic.height / 2) - (b.top + b.height / 2),
+      };
+    });
+    assert(
+      Math.abs(geom.topGap - geom.botGap) <= 0.6 && Math.abs(geom.topGap - geom.rightGap) <= 0.6,
+      `${label} 清除圆钮与触发框上/下/右三边严格同心等距`,
+      `top=${geom.topGap.toFixed(1)}px, bot=${geom.botGap.toFixed(1)}px, right=${geom.rightGap.toFixed(1)}px`
+    );
+    assert(
+      Math.abs(geom.icDx) <= 0.6 && Math.abs(geom.icDy) <= 0.6,
+      `${label} 清除 × 图标严格居中在圆钮中心`,
+      `Δx=${geom.icDx.toFixed(2)}px, Δy=${geom.icDy.toFixed(2)}px`
+    );
     await page.mouse.click(tbox.x + tbox.width - 12, tbox.y + tbox.height / 2);
     await page.waitForTimeout(260);
     const afterClear = await frame.locator(".sn-pk").first().evaluate((el) => ({

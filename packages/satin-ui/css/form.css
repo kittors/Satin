@@ -55,8 +55,8 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 .sn-ib.sn-has-post > .sn-input { padding-right: 38px; } /* sp-ok: 给后置按钮让位 */
 .sn-ib .sn-unit { margin-right: 8px; font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3); }
 .sn-ib .sn-kbd { margin-right: 2px; }
-/* 清除按钮：有内容才出现，缩放淡入 */
-.sn-clear { all: unset; box-sizing: border-box; width: 24px; height: 24px; border-radius: max(4px, calc(var(--sn-btn-r) - 4px)); display: grid; place-items: center; cursor: pointer; color: var(--sn-label3);
+/* 清除按钮：有内容才出现，缩放淡入；默认 24×24 与 32px 输入框构成上=下=右=4px 同心等距 */
+.sn-clear { all: unset; box-sizing: border-box; width: 24px; height: 24px; border-radius: max(0px, calc(var(--sn-btn-r) - 4px)); display: grid; place-items: center; cursor: pointer; color: var(--sn-label3);
   opacity: 0; scale: .6; pointer-events: none; transition: opacity .14s var(--sn-ease-out), scale .2s var(--sn-ease-out-strong), background .12s, color .12s; }
 .sn-clear .sn-ic { width: 14px; height: 14px; }
 @media (hover: hover) {
@@ -65,11 +65,14 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 .sn-ib.sn-filled .sn-kbd { opacity: 0; scale: .8; }
 .sn-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--sn-r-xs); font: 500 calc(11px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label3);
   box-shadow: inset 0 0 0 1px var(--sn-line-control); transition: opacity .14s var(--sn-ease-out), scale .14s var(--sn-ease-out); }
-.sn-eye { all: unset; box-sizing: border-box; width: 28px; height: 28px; border-radius: max(4px, calc(var(--sn-btn-r) - 4px)); display: grid; place-items: center; cursor: pointer; color: var(--sn-label3);
+.sn-eye { all: unset; box-sizing: border-box; width: 24px; height: 24px; border-radius: max(0px, calc(var(--sn-btn-r) - 4px)); display: grid; place-items: center; cursor: pointer; color: var(--sn-label3);
   transition: background .12s var(--sn-ease-out), color .12s var(--sn-ease-out); }
+.sn-ib:has(> .sn-input.sn-sm) :is(.sn-clear, .sn-eye) { width: 20px; height: 20px; }
+.sn-ib:has(> .sn-input.sn-lg) :is(.sn-clear, .sn-eye) { width: 28px; height: 28px; }
+.sn-ib:has(> .sn-input.sn-xl) :is(.sn-clear, .sn-eye) { width: 32px; height: 32px; }
 @media (hover: hover) {
 .sn-eye:hover { background: var(--sn-fill-hover); color: var(--sn-label); } }
-.sn-eye .sn-ic { width: 16px; height: 16px; }
+.sn-eye .sn-ic { width: 15px; height: 15px; }
 /* 触屏：显示 / 隐藏密码看得见的 28，点击区用透明伪元素扩到 44 × 44（就在输入框里，不压别的东西），样子不变 */
 @media (pointer: coarse) { .sn-ib > .sn-post { z-index: 2; } .sn-eye { position: relative; } .sn-eye::after { content: ""; position: absolute; inset: 50% auto auto 50%; width: 44px; height: 44px; translate: -50% -50%; } }
 
@@ -195,10 +198,11 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 .sn-otp .sn-gap { width: 4px; }
 .sn-otp .sn-otp-eye { flex: none; width: 32px; height: 32px; margin-left: 2px; border-radius: var(--sn-btn-r); }
 .sn-otp .sn-otp-eye:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
-/* 胶囊形：前缀图标和后缀按钮离两头的半圆远一点 */
+/* 胶囊形：前缀图标离左侧半圆远一点；后缀若是圆形按钮（.sn-clear / .sn-eye）则保持 right:4px 满足严格同心圆，仅文字单位或快捷键微让弧线 */
 :is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-ib > .sn-pre { left: 13px; }
 :is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-ib.sn-has-pre > .sn-input { padding-left: 36px; } /* sp-ok: 给前置图标让位（胶囊） */
-:is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-ib > .sn-post { right: 6px; }
+:is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-ib > .sn-post:has(> .sn-unit) { right: 6px; }
+:is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-ib .sn-kbd { margin-right: 4px; }
 
 /* ———— 表格格子的编辑框（DOM 表格、Canvas 表格、简单表格共用一份）：白底、光标、外圈光晕、浮起一点——和选中框（贴边细线）一眼分开 ———— */
 .sn-cell-ed { position: absolute; inset: var(--sn-ed-inset, 3px); z-index: 2; min-width: 0; padding: 0 8px; border: 0; border-radius: var(--sn-r-sm); outline: none; background: var(--sn-raised); box-shadow: 0 0 0 1px var(--sn-focus), 0 0 0 4px var(--sn-ring), 0 6px 16px rgba(0, 0, 0, .12); font: inherit; color: var(--sn-label); caret-color: var(--sn-label); }

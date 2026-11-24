@@ -83,7 +83,7 @@
 .sn-ibtn .sn-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--sn-accent); box-shadow: 0 0 0 2px var(--sn-raised); }
 @keyframes sn-pop { from { transform: scale(.4); opacity: 0; } }
 .sn-swap { position: relative; display: grid; place-items: center; }
-.sn-swap > * { grid-area: 1 / 1; transition: opacity .14s var(--sn-ease-out), transform .22s var(--sn-ease-out-strong); }
+.sn-swap > * { grid-area: 1 / 1; display: grid; place-items: center; transition: opacity .14s var(--sn-ease-out), transform .22s var(--sn-ease-out-strong); }
 .sn-swap > .sn-b, .sn-swap.sn-on > .sn-a { opacity: 0; transform: scale(.6) rotate(-12deg); }
 .sn-swap.sn-on > .sn-b { opacity: 1; transform: none; }
 
