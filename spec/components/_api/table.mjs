@@ -45,6 +45,9 @@ export default {
     { name: "data", type: "R[]", default: "[]", required: false, desc: "数据：一行一个对象。行里带 `children`（数组）就是多级树：展开箭头、缩进、层级线放在第一列（或 `primary` 的那一列）。换数据时同一批行（`rowKey` 一样）只换内容变了的格子、行移到新位置。", names: all("data") },
     { name: "rows", type: "R[]", default: "—", required: false, desc: "`data` 的旧名，同一个东西。", names: all("rows") },
     { name: "rowKey", type: "string | ((row: R, index: number) => string | number)", default: "\"id\"", required: false, desc: "行的唯一键：字段名或函数（`index` 是同一级里第几个）；勾选、展开、排序动画、事件都按它认行（事件里给的是字符串）。", names: { ...all("rowKey"), vue: "rowKey（模板里写 row-key）" } },
+    { name: "detail", type: "(row: R, ctx: TableDetailContext) => string | number | Node | false | null | undefined", default: "—", required: false, desc: "行展开详情：为可展开行在正下方渲染跨全列详情面板（支持 HTML 字符串或 DOM 节点，返回空值则该行无展开箭头）；与 `expandedKeys`、`expand`、`expandAll` 统一联动。", names: all("detail") },
+    { name: "rowExpandable", type: "(row: R, ctx: TableDetailContext) => boolean", default: "—", required: false, desc: "判断某行是否允许展开详情；提供后 `detail` 仅在该行展开时按需懒渲染。", names: { ...all("rowExpandable"), vue: "rowExpandable（模板里写 row-expandable）" } },
+    { name: "expandOnRowClick", type: "boolean", default: "false", required: false, desc: "点击整行非交互区域时同时切换该行展开 / 收起。", names: { ...all("expandOnRowClick"), vue: "expandOnRowClick（模板里写 expand-on-row-click）" } },
     { name: "expandedKeys", type: "(string | number)[]", default: "—", required: false, desc: "展开着的行（受控）：传进来的值换了（按值比）才跟着变，点箭头时发 `expandChange`，在里面更新。", names: { ...all("expandedKeys"), vue: "v-model:expanded / expandedKeys" } },
     { name: "defaultExpandedKeys", type: "(string | number)[]", default: "[]", required: false, desc: "非受控：一开始展开哪几行。", names: { ...all("defaultExpandedKeys"), vue: "defaultExpandedKeys（模板里写 default-expanded-keys）" } },
     { name: "sort", type: "TableSort | null", default: "null", required: false, desc: "现在按哪一列排（受控：传进来的值换了才跟着变）。树形时每一级的同级之间排；一样大的保持现在的先后。", names: { ...all("sort"), vue: "v-model:sort / sort" } },
@@ -141,7 +144,7 @@ export default {
     { name: "th[aria-sort] / .sn-num", desc: "排着的表头 / 数字列（右对齐、等宽）" },
     { name: ".sn-tbl-empty / .sn-tbl-err / .sn-tbl-loading", desc: "空状态那一行 / 出错那一行 / 骨架行" },
   ],
-  types: ["TableOptions", "TableColumn", "TableCellContext", "TableSpan", "TableSort", "TableExpandEvent", "TableRowReorderEvent", "TableCellEditEvent", "TablePageEvent", "TablePagination", "TableApi", "TableProps", "TableColumnReact"],
+  types: ["TableOptions", "TableColumn", "TableCellContext", "TableDetailContext", "TableSpan", "TableSort", "TableExpandEvent", "TableRowReorderEvent", "TableCellEditEvent", "TablePageEvent", "TablePagination", "TableApi", "TableProps", "TableColumnReact"],
   keyboard: [
     { keys: "Tab / Enter / 空格", does: "表头能聚焦，Enter 排序；勾选框空格勾选；展开箭头 Enter / 空格展开收起。" },
     { keys: "方向键", when: "cellSelect", does: "在格子间移动（落在合并块里就选合并的那一格）；用 Tab 进到表格以后按方向键先选中第一格。" },

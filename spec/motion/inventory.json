@@ -1,6 +1,6 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 370,
+  "var(--sn-ease-out)": 371,
   "var(--sn-ease-out-strong)": 81,
   "cubic-bezier(.55, .15, .45, .85)": 2,
   "var(--sn-ease-overshoot)": 15,
@@ -11,7 +11,7 @@
   "cubic-bezier(.3, .1, .3, 1)": 1,
   "cubic-bezier(.25, .1, .25, 1)": 2,
   "cubic-bezier(.16, 1, .3, 1)": 4,
-  "var(--sn-ease-open)": 16,
+  "var(--sn-ease-open)": 20,
   "cubic-bezier(.45, .05, .55, .95)": 1,
   "cubic-bezier(.34, 1.56, .64, 1)": 1,
   "cubic-bezier(.62, .12, .38, .88)": 1,
@@ -1305,9 +1305,27 @@
   },
   {
    "file": "packages/satin-ui/css/data.css",
-   "selector": ".sn-tbl tr > td:has(> .sn-name > .sn-exp)::after",
+   "selector": ".sn-tbl tr[data-lv] > td:has(> .sn-name > .sn-exp)::after",
    "prop": "transition",
    "value": "scale .2s var(--sn-ease-open), opacity .16s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/data.css",
+   "selector": ".sn-tbl-detail-bd",
+   "prop": "transition",
+   "value": "grid-template-rows calc(240ms * var(--sn-motion-scale, 1)) var(--sn-ease-open), opacity calc(180ms * var(--sn-motion-scale, 1)) var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/data.css",
+   "selector": ".sn-tbl-detail-bd > .sn-tbl-detail-in",
+   "prop": "transition",
+   "value": "padding-top calc(240ms * var(--sn-motion-scale, 1)) var(--sn-ease-open), padding-bottom calc(240ms * var(--sn-motion-scale, 1)) var(--sn-ease-open), transform calc(240ms * var(--sn-motion-scale, 1)) var(--sn-ease-open)"
+  },
+  {
+   "file": "packages/satin-ui/css/data.css",
+   "selector": ".sn-tbl-detail-bd, .sn-tbl-detail-bd > .sn-tbl-detail-in",
+   "prop": "transition",
+   "value": "none"
   },
   {
    "file": "packages/satin-ui/css/data.css",

@@ -41,14 +41,14 @@ export const Email = /* @__PURE__ */ wrap(S.createEmail, { name: "SnEmail", prop
 // 自己画格子：插槽 #cell-<列的 key>="{ value, row, index }"，或者列的 render 返回 VNode（用 h() 写）；模板 ref 的 instance 是实例。
 // data 改了（换数组、就地 push / 改行里的字段）都跟着变：只换内容变了的行，行移到新位置
 // （属性、事件都写成字面量：defineComponent 的参数里有函数调用，打包时摇不掉，只用别的组件也会把表格带进来）
-const TABLE_PROPS = ["columns", "data", "rows", "rowKey", "sort", "defaultSort", "sortLocal", "selectable", "selected", "defaultSelected", "expanded", "expandedKeys", "defaultExpandedKeys", "filter", "spans", "draggableRows", "draggableColumns", "resizableRows", "cellSelect", "rowAttrs", "empty", "loading", "skeleton", "error", "label", "striped", "compact", "plain", "fill", "lines", "maxHeight", "pagination"];
+const TABLE_PROPS = ["columns", "data", "rows", "rowKey", "detail", "rowExpandable", "expandOnRowClick", "sort", "defaultSort", "sortLocal", "selectable", "selected", "defaultSelected", "expanded", "expandedKeys", "defaultExpandedKeys", "filter", "spans", "draggableRows", "draggableColumns", "resizableRows", "cellSelect", "rowAttrs", "empty", "loading", "skeleton", "error", "label", "striped", "compact", "plain", "fill", "lines", "maxHeight", "pagination"];
 const TABLE_EVENTS = ["sort", "select", "rowClick", "expandChange", "rowReorder", "columnReorder", "columnResize", "rowResize", "cellEdit", "pageChange", "retry", "layout"];
 const anyP = { type: null, default: undefined }, boolP = { type: Boolean, default: undefined };
 // 插槽在这个小组件的 render 里调（依赖跟着它收集：插槽里用到的响应式数据变了，这一格自己重画）
 const TableSlotCell = { name: "SnTableCell", props: { s: anyP, a: anyP }, render() { return this.s(this.a); } }; /* 布尔的写 Boolean：模板里 <Table selectable draggable-rows> 就是 true（不传还是 undefined） */
 export const Table = /* @__PURE__ */ defineComponent({
   name: "SnTable", inheritAttrs: false,
-  props: { columns: anyP, data: anyP, rows: anyP, rowKey: anyP, sort: anyP, defaultSort: anyP, sortLocal: boolP, selectable: boolP, selected: anyP, defaultSelected: anyP, expanded: anyP, expandedKeys: anyP, defaultExpandedKeys: anyP, filter: anyP, spans: anyP,
+  props: { columns: anyP, data: anyP, rows: anyP, rowKey: anyP, detail: anyP, rowExpandable: anyP, expandOnRowClick: boolP, sort: anyP, defaultSort: anyP, sortLocal: boolP, selectable: boolP, selected: anyP, defaultSelected: anyP, expanded: anyP, expandedKeys: anyP, defaultExpandedKeys: anyP, filter: anyP, spans: anyP,
     draggableRows: boolP, draggableColumns: boolP, resizableRows: boolP, cellSelect: boolP, rowAttrs: anyP, empty: anyP, loading: boolP, skeleton: anyP, error: { type: [Boolean, String], default: undefined },
     label: anyP, striped: boolP, compact: boolP, plain: boolP, fill: boolP, lines: anyP, maxHeight: anyP, pagination: anyP, modelValue: anyP },
   emits: ["sort", "select", "rowClick", "expandChange", "rowReorder", "columnReorder", "columnResize", "rowResize", "cellEdit", "pageChange", "retry", "layout", "update:modelValue", "update:expanded", "update:sort"],

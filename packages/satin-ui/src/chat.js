@@ -1211,7 +1211,27 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       (hasDetail ? `<span class="sn-tool-chev">${compact || curToolStyle !== "card" ? CHEV_R : CHEV}</span>` : "") +
       `</button>${hasDetail ? toolDetailHTML(t) : ""}</div>`;
   }
+  function syncTraceFade(list) {
+    if (!list) return;
+    const ch = list.clientHeight, sh = list.scrollHeight, ov = sh - ch;
+    if (ov <= 2 || ch <= 0) {
+      list.style.setProperty("--sn-tr-ft", "0px");
+      list.style.setProperty("--sn-tr-fb", "0px");
+      return;
+    }
+    const st = list.scrollTop, rem = Math.max(0, ov - st), cap = Math.min(28, Math.round(ch * .18));
+    const ft = st <= 1 ? 0 : Math.min(cap, Math.round(st * .9));
+    const fb = rem <= 1 ? 0 : Math.min(cap, Math.round(rem * .9));
+    list.style.setProperty("--sn-tr-ft", ft + "px");
+    list.style.setProperty("--sn-tr-fb", fb + "px");
+  }
+  function syncTraceFades(root) {
+    if (!root) return;
+    if (root.classList?.contains("sn-trace-list")) { syncTraceFade(root); return; }
+    for (const l of root.querySelectorAll(".sn-trace-list")) syncTraceFade(l);
+  }
   function applyCustomTools(root, it) {
+    if (root) requestAnimationFrame(() => syncTraceFades(root));
     if (!curRenderTool || !root || !it?.tools?.length) return;
     for (const node of root.querySelectorAll(".sn-tool[data-tool-i]")) {
       const k = Number(node.dataset.toolI), t = it.tools[k];
@@ -1454,6 +1474,18 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       rewindTimer = setTimeout(() => { rewindTimer = 0; finishEdit(); }, Math.max(120, maxEnd));
     }
   }
+  // 活动流内部滚动与展开收起过渡实时同步上下柔和渐隐（到顶/到底严格清零，绝不遮挡首末行内容）
+  canvas.addEventListener("scroll", (e) => {
+    const l = e.target;
+    if (l?.classList?.contains("sn-trace-list")) syncTraceFade(l);
+  }, true);
+  canvas.addEventListener("transitionend", (e) => {
+    const t = e.target;
+    if (t?.classList?.contains("sn-trace-bd") || t?.classList?.contains("sn-tool-bd") || t?.classList?.contains("sn-tr-bd")) {
+      const ci = t.closest(".sn-ci");
+      if (ci) { syncTraceFades(ci); if (ci._it) measureItem(ci._it); }
+    }
+  });
   // 复制、赞/踩、编辑、重新生成、过程汇总/工具展开、代码复制、置顶/按需历史加载：全委托在 canvas 上
   canvas.addEventListener("click", (e) => {
     const histBtn = e.target.closest("[data-hist-load]");
@@ -1486,6 +1518,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
         } else if (wrap) {
           wrap.classList.toggle("sn-open", it.traceOpen);
           trToggle.setAttribute("aria-expanded", String(it.traceOpen));
+          requestAnimationFrame(() => syncTraceFades(wrap));
         }
         userAt = performance.now();
       }
@@ -1498,6 +1531,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
         it.thinkOpen = !it.thinkOpen;
         item.classList.toggle("sn-open", it.thinkOpen);
         trThink.setAttribute("aria-expanded", String(it.thinkOpen));
+        requestAnimationFrame(() => syncTraceFades(ci));
         userAt = performance.now();
       }
       return;
@@ -1510,6 +1544,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
         it.tools[k].open = nextOpen;
         card.classList.toggle("sn-open", nextOpen);
         thd.setAttribute("aria-expanded", String(nextOpen));
+        requestAnimationFrame(() => syncTraceFades(ci));
         userAt = performance.now();
       }
       return;
@@ -1834,6 +1869,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   };
   new ResizeObserver(() => {
     const narrow = syncNarrow();
+    syncTraceFades(canvas);
     const w = Math.min(740, vp.clientWidth - (narrow ? 24 : 40));
     if (Math.abs(w - colW) < 2) { if (pinned) vp.scrollTop = maxTop(); render(); return; } // 输入框变高时，贴着底就继续贴底，最后一条不被挡住
     colW = w; for (const it of items) { it.e = undefined; } relayout(1); if (pinned) vp.scrollTop = maxTop(); render();

@@ -617,9 +617,17 @@
 .sn-trace.sn-open > .sn-trace-bd { grid-template-rows: 1fr; opacity: 1; }
 .sn-trace-bd > div { min-width: 0; min-height: 0; overflow: hidden; }
 .sn-trace-panel { margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--sn-line); display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; max-width: 100%; }
-.sn-trace-sum { display: flex; align-items: center; gap: 8px; min-height: 26px; padding: 0 2px 2px; font: 400 calc(12.5px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); min-width: 0; }
+.sn-trace-sum { display: flex; align-items: center; gap: 8px; min-height: 26px; padding: 0 2px 4px; font: 400 calc(12.5px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label2); min-width: 0; }
 .sn-trace-sum-t { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.sn-trace-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1px; max-height: var(--sn-trace-max, 280px); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding-right: 4px; scrollbar-width: thin; min-width: 0; max-width: 100%; }
+/* 活动流独立限高滚动区：仅在对应方向仍有未露出的内容时通过 mask-image 柔滑羽化边缘，到顶/到底严格清零为 0px，绝不遮挡首末行内容 */
+.sn-trace-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1px; max-height: var(--sn-trace-max, 280px); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 6px 8px 10px 0; scroll-padding-block: 28px; min-width: 0; max-width: 100%;
+  scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--sn-label) 16%, transparent) transparent;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sn-tr-ft, 0px), #000 calc(100% - var(--sn-tr-fb, 0px)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--sn-tr-ft, 0px), #000 calc(100% - var(--sn-tr-fb, 0px)), transparent 100%); }
+.sn-trace-list::-webkit-scrollbar { width: 5px; }
+.sn-trace-list::-webkit-scrollbar-track { background: transparent; }
+.sn-trace-list::-webkit-scrollbar-thumb { border-radius: 99px; background: color-mix(in srgb, var(--sn-label) 15%, transparent); }
+@media (hover: hover) { .sn-trace-list:hover::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sn-label) 28%, transparent); } }
 .sn-tr-item { min-width: 0; max-width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); }
 .sn-trace-list .sn-tool-hd, .sn-tr-hd { all: unset; box-sizing: border-box; width: 100%; max-width: 100%; display: flex; align-items: center; gap: 8px; min-height: 28px; padding: 3px 6px; margin: 0; border-radius: 7px; cursor: pointer; color: var(--sn-label2); transition: background-color var(--sn-dur-fast, 120ms) var(--sn-ease-out), color var(--sn-dur-fast, 120ms) var(--sn-ease-out); }
 .sn-tr-hd.sn-static { cursor: default; }

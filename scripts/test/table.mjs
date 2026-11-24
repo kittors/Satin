@@ -250,5 +250,46 @@ console.log("占满高度、左右固定列、贴底分页、Chrome 弧形页标
   ok(bt.tabs.length === 3 && bt.active === "s3", "add() 动态新增并激活页签");
   bt.destroy();
 }
+
+console.log("行展开详情（detail / rowExpandable / expandOnRowClick）");
+{
+  const host = document.getElementById("host"); host.replaceChildren();
+  const rows = [
+    { id: "a", name: "composer", type: "object", extra: "{ upload?(): Promise<unknown> }" },
+    { id: "b", name: "max", type: "number", extra: null },
+    { id: "c", name: "respond", type: "function", extra: "(text: string) => Promise<string>" },
+  ];
+  let detailCalls = 0;
+  const expEv = [];
+  const cols = [{ key: "name", title: "名称", sortable: true }, { key: "type", title: "类型" }];
+  const tb = createTable(host, {
+    columns: cols,
+    data: rows,
+    rowExpandable: (r) => !!r.extra,
+    detail: (r) => { detailCalls++; return `<div class="d-box">${r.extra}</div>`; },
+    expandOnRowClick: true,
+    onExpandChange: (e) => expEv.push(e),
+  });
+  const tr = (id) => host.querySelector(`tr[data-id="${id}"]`);
+  const dtr = (id) => host.querySelector(`tr[data-detail-for="${id}"]`);
+  ok(detailCalls === 0 && !!tr("a").querySelector(".sn-exp") && !tr("b").querySelector(".sn-exp") && !!tr("b").querySelector(".sn-leaf.sn-leaf-empty"), "rowExpandable：未展开时不提前调 detail，不可展开行保留空白对齐占位");
+  ok(dtr("a")?.hidden && !dtr("b") && dtr("c")?.hidden, "详情行初始隐藏，不可展开行不生成详情行");
+  down(tr("a").querySelector(".sn-exp"));
+  ok(!dtr("a").hidden && dtr("a").classList.contains("sn-open") && dtr("a").textContent.includes("upload?") && detailCalls === 1 && tb.isExpanded("a"), "点箭头展开：懒渲染详情内容并切 sn-open");
+  ok(expEv.at(-1)?.key === "a" && expEv.at(-1).expanded === true, "发 expandChange");
+  click(tr("c").querySelector('td[data-c="type"]'));
+  ok(!dtr("c").hidden && tb.isExpanded("c"), "expandOnRowClick：点击整行也可切换详情展开");
+  click(host.querySelector('.sn-sort[data-k="name"]'));
+  ok(tr("a").nextElementSibling === dtr("a") && tr("c").nextElementSibling === dtr("c"), "排序后详情行紧跟所属数据行移动");
+  tb.update({ filter: (r) => r.id === "c" });
+  ok(tr("a").hidden && dtr("a").hidden && !tr("c").hidden && !dtr("c").hidden, "筛选隐藏数据行时，其已展开的详情行同步隐藏");
+  tb.update({ filter: null });
+  ok(!dtr("a").hidden && !dtr("c").hidden, "清除筛选后，原展开详情行恢复显示");
+  tb.expandAll(false);
+  ok(dtr("a").hidden && dtr("c").hidden && tb.expanded.length === 0, "expandAll(false)：收起全部详情行");
+  tb.expandAll(true);
+  ok(!dtr("a").hidden && !dtr("c").hidden && tb.expanded.length === 2, "expandAll(true)：展开全部可展开行");
+  tb.destroy();
+}
 console.log(fail ? `表格测试：${fail} / ${n} 项不通过` : `表格测试：${n} 项全部通过`);
 process.exitCode = fail ? 1 : 0;

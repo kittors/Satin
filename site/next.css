@@ -33,18 +33,25 @@ body.n-docs, body.n-home {
 .n-home .n-fps { background: var(--site-surface); box-shadow: inset 0 0 0 1px var(--site-border); }
 
 /* ———— 1. 代码块 ———— */
-.cx { --cx-fg: #27272a; --cx-ln: #a1a1aa; --cx-pun: #8e8e93; --cx-bg: var(--dx-bg, var(--cx-solo));
+.cx, .d-api-code { --cx-fg: #27272a; --cx-ln: #a1a1aa; --cx-pun: #8e8e93; --cx-bg: var(--dx-bg, var(--cx-solo));
   --sn-t-kw: #be185d; --sn-t-str: #0369a1; --sn-t-num: #0369a1; --sn-t-com: #8e8e93; --sn-t-fn: #6d28d9; --sn-t-typ: #6d28d9; --sn-t-prop: #3f3f46; --sn-t-attr: #6d28d9; --sn-t-tag: #be185d;
   --cx-solo: var(--site-surface, #f7f8fa);
   position: relative; color: var(--cx-fg); }
-[data-theme="dark"] .cx { --cx-fg: #e4e4e7; --cx-ln: #52525b; --cx-pun: #71717a;
+[data-theme="dark"] .cx, [data-theme="dark"] .d-api-code { --cx-fg: #e4e4e7; --cx-ln: #52525b; --cx-pun: #71717a;
   --sn-t-kw: #f38ba8; --sn-t-str: #7cc4ff; --sn-t-num: #7cc4ff; --sn-t-com: #71717a; --sn-t-fn: #c4b5fd; --sn-t-typ: #c4b5fd; --sn-t-prop: #a1a1aa; --sn-t-attr: #c4b5fd; --sn-t-tag: #f38ba8;
   --cx-solo: var(--site-surface, #121215); }
 .cx.solo { margin-top: 12px; border-radius: 16px; background: var(--cx-solo); box-shadow: inset 0 0 0 1px var(--site-border, var(--sn-line)); overflow: hidden; --cx-bg: var(--cx-solo); }
 .cx.solo .cx-hd { box-shadow: inset 0 -1px 0 var(--site-border-subtle, var(--sn-line)); }
-.cx .sn-t-kw, .cx .sn-t-lit { color: var(--sn-t-kw); } .cx .sn-t-str { color: var(--sn-t-str); } .cx .sn-t-num { color: var(--sn-t-num); } .cx .sn-t-com { color: var(--sn-t-com); }
-.cx .sn-t-fn { color: var(--sn-t-fn); } .cx .sn-t-typ { color: var(--sn-t-typ); } .cx .sn-t-prop, .cx .sn-t-var { color: var(--sn-t-prop); }
-.cx .sn-t-attr, .cx .sn-t-dec, .cx .sn-t-sel { color: var(--sn-t-attr); } .cx .sn-t-tag { color: var(--sn-t-tag); } .cx .sn-t-op, .cx .sn-t-pun { color: var(--cx-pun); }
+.cx .sn-t-kw, .cx .sn-t-lit, .d-api-code .sn-t-kw, .d-api-code .sn-t-lit { color: var(--sn-t-kw); }
+.cx .sn-t-str, .d-api-code .sn-t-str { color: var(--sn-t-str); }
+.cx .sn-t-num, .d-api-code .sn-t-num { color: var(--sn-t-num); }
+.cx .sn-t-com, .d-api-code .sn-t-com { color: var(--sn-t-com); }
+.cx .sn-t-fn, .d-api-code .sn-t-fn { color: var(--sn-t-fn); }
+.cx .sn-t-typ, .d-api-code .sn-t-typ { color: var(--sn-t-typ); }
+.cx .sn-t-prop, .cx .sn-t-var, .d-api-code .sn-t-prop, .d-api-code .sn-t-var { color: var(--sn-t-prop); }
+.cx .sn-t-attr, .cx .sn-t-dec, .cx .sn-t-sel, .d-api-code .sn-t-attr, .d-api-code .sn-t-dec, .d-api-code .sn-t-sel { color: var(--sn-t-attr); }
+.cx .sn-t-tag, .d-api-code .sn-t-tag { color: var(--sn-t-tag); }
+.cx .sn-t-op, .cx .sn-t-pun, .d-api-code .sn-t-op, .d-api-code .sn-t-pun { color: var(--cx-pun); }
 .cx-bd { position: relative; }
 .cx pre { margin: 0; padding: 14px 0; overflow-x: auto; outline: none; counter-reset: ln; font: 400 calc(13px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-mono); tab-size: 2; scrollbar-width: thin; scrollbar-color: var(--sn-line-control) transparent; }
 .cx pre:focus-visible { box-shadow: inset 0 0 0 2px var(--sn-focus); border-radius: 12px; }
@@ -835,63 +842,122 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
 .d-dodont.d-dodont-one { grid-template-columns: 1fr; } /* 只有"这样做"或只有"不要"：一张卡占整行 */
 .d-dodont ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; font: 400 calc(14px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); }
 
-/* 组件页 API 表（契约）：表头只有两三个字（名称、类型、默认值、必填、说明），不许折行——"必填"那列常空着，会被挤成竖排两行 */
+/* 组件页 API 表（全面复用 Satin createTable）：排序、列宽拖拽、实时搜索筛选、复杂类型摘要与平滑行详情展开 */
 .n-docs .d-table th { white-space: nowrap; }
-/* 组件页 API 表（next-docs.js 的 apiTbl）：桌面是表格；窄屏（< 640px）每一项一块，不横着滑、不截断，行高跟着内容走——
-   第一行名称（代码样式），右边小字"类型 · 默认 … · 必填"，太长就整行放到名称下面（.d-k-long，脚本按字数判断）；说明整行在下面，不加列线；项和项之间一条细线 */
-.n-docs .d-api .d-k-sum { display: none; }
-/* 类型、默认值、名称里的代码一截一截不折行（next-docs.js 的 nbWord 包成 .d-nb）：≤ 14 个字整截不断（"secondary"、ComposerContextItem[]），
-   更长的只在 < ( { | , : => 后面断；带中文的长串照常折。"默认""必填""全局令牌"这几个小字不断开。
-   桌面表格按内容排（table-layout: auto）：前几列至少和它最长的那一小截一样宽，说明那列要 40%（apiTbl 的 colgroup），在里面正常折行 */
-.n-docs .d-nb { white-space: nowrap; } /* 正文里的行内代码也是这样包的（nbProse） */
-.n-docs .d-api .d-kv { display: inline-block; max-width: 100%; }
+.n-docs .d-nb { white-space: nowrap; } /* 短词不断行，超长串已由 nbWord 拆分并由外层 code overflow-wrap: anywhere 兜底不溢出 */
+.n-docs .d-table td code { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; box-sizing: border-box; }
+.n-docs .d-api-sec { margin: 14px 0 22px; min-width: 0; }
+.n-docs .d-api-sec .d-api-wrap { margin: 0; }
+.n-docs .d-api-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 10px; }
+.n-docs .d-api-search { position: relative; display: inline-flex; align-items: center; gap: 6px; width: min(260px, 100%); height: 32px; padding: 0 28px 0 10px; border-radius: var(--sn-r-md); background: var(--site-surface, var(--sn-raised)); box-shadow: inset 0 0 0 1px var(--site-border, var(--sn-line)); color: var(--sn-label3); transition: box-shadow .14s var(--sn-ease-out), background-color .14s var(--sn-ease-out); }
+.n-docs .d-api-search:focus-within { background: var(--sn-raised); box-shadow: inset 0 0 0 1.5px var(--sn-accent); color: var(--sn-label); }
+.n-docs .d-api-sic { flex: none; display: inline-flex; width: 14px; height: 14px; }
+.n-docs .d-api-sic .sn-ic { width: 14px; height: 14px; }
+.n-docs .d-api-q { all: unset; box-sizing: border-box; flex: 1; min-width: 0; font: 400 calc(13px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label); }
+.n-docs .d-api-q::placeholder { color: var(--sn-label3); }
+.n-docs .d-api-q::-webkit-search-cancel-button { display: none; }
+.n-docs .d-api-qx { all: unset; box-sizing: border-box; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: var(--sn-r-sm); display: grid; place-items: center; color: var(--sn-label3); cursor: pointer; }
+.n-docs .d-api-qx[hidden] { display: none; }
+.n-docs .d-api-qx .sn-ic { width: 13px; height: 13px; }
+@media (hover: hover) { .n-docs .d-api-qx:hover { background: var(--sn-fill-hover); color: var(--sn-label); } }
+.n-docs .d-api-bar-r { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+.n-docs .d-api-cnt { font: 400 calc(12px * var(--fsx))/1 var(--sn-sans); font-variant-numeric: tabular-nums; color: var(--sn-label3); white-space: nowrap; }
+.n-docs .d-api-expall { --sn-h: 28px; --sn-px: 10px; gap: 4px; font-size: calc(12px * var(--fsx)); color: var(--sn-label2); }
+.n-docs .d-api-expall-i { display: inline-flex; transition: rotate .22s var(--sn-ease-open); }
+.n-docs .d-api-expall-i .sn-ic { width: 13px; height: 13px; }
+.n-docs .d-api-expall.sn-on .d-api-expall-i { rotate: 180deg; }
+/* API 表格主体：精准复用 Satin createTable 能力（排序、拖拽改宽、展开箭头与原生行详情），支持多行自然排版零溢出 */
+.n-docs .d-api-tbl { table-layout: fixed; }
+.n-docs .d-api-tbl th { padding: 0 14px; }
+.n-docs .d-api-tbl tbody tr[data-id] > td { height: auto; padding: 11px 14px; vertical-align: top; white-space: normal; overflow-wrap: anywhere; }
+.n-docs .d-api-tbl tbody tr[data-id] > td.d-k-n .sn-name { align-items: flex-start; gap: 6px; }
+.n-docs .d-api-tbl tbody tr[data-id] > td.d-k-n .sn-exp,
+.n-docs .d-api-tbl tbody tr[data-id] > td.d-k-n .sn-leaf { margin-top: 2px; }
+.n-docs .d-api-name-cell { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; min-width: 0; max-width: 100%; }
+.n-docs .d-api-name-cell > code { display: inline-block; max-width: 100%; line-height: 1.45; }
+.n-docs .d-api-req { display: inline-flex; align-items: center; height: 17px; padding: 0 5px; border-radius: 4px; font: 500 calc(10.5px * var(--fsx))/1 var(--sn-sans); color: var(--sn-danger); background: color-mix(in srgb, var(--sn-danger) 10%, transparent); white-space: nowrap; }
+.n-docs .d-api-tok { display: inline-flex; align-items: center; height: 17px; padding: 0 5px; border-radius: 4px; font: 400 calc(10.5px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); background: var(--sn-fill-subtle); white-space: nowrap; }
+.n-docs .d-api-sub { flex-basis: 100%; font: 400 calc(11.5px * var(--fsx))/calc(16px * var(--fsx)) var(--sn-mono); color: var(--sn-label3); }
+.n-docs .d-api-t { display: inline-block; max-width: 100%; line-height: 1.45; }
+.n-docs .d-api-nil { color: var(--sn-label-off); }
+.n-docs .d-api-desc { min-width: 0; }
+.n-docs .d-api-desc > p:first-child { margin-top: 0; }
+.n-docs .d-api-desc > p:last-child { margin-bottom: 0; }
+.n-docs .d-k-note { font: 400 calc(12px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
+/* 复杂类型收起态交互胶囊（点击丝滑展开完整格式化高亮类型） */
+.n-docs .d-type-pill { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 5px; max-width: 100%; min-height: 24px; padding: 2px 7px; border-radius: 6px;
+  background: var(--sn-fill-subtle); box-shadow: inset 0 0 0 1px var(--sn-line); color: var(--sn-label); cursor: pointer;
+  transition: background-color .12s var(--sn-ease-out), box-shadow .12s var(--sn-ease-out); }
+@media (hover: hover) { .n-docs .d-type-pill:hover { background: var(--sn-fill-hover); box-shadow: inset 0 0 0 1px var(--sn-line-control); } }
+.n-docs .d-type-pill.sn-on { background: color-mix(in srgb, var(--sn-accent) 7%, var(--sn-raised)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sn-accent) 28%, var(--sn-line)); }
+.n-docs .d-type-pill:focus-visible { outline: 2px solid var(--sn-focus); outline-offset: 2px; }
+.n-docs .d-type-txt { all: unset; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 calc(12px * var(--fsx))/1.4 var(--sn-mono); color: var(--sn-label); }
+.n-docs .d-type-cnt { flex: none; padding: 0 4px; border-radius: 4px; background: color-mix(in srgb, var(--sn-label) 7%, transparent); font: 500 calc(10.5px * var(--fsx))/calc(16px * var(--fsx)) var(--sn-mono); font-variant-numeric: tabular-nums; color: var(--sn-label3); white-space: nowrap; }
+.n-docs .d-type-ic { flex: none; display: inline-flex; color: var(--sn-label3); transition: rotate .22s var(--sn-ease-open), color .14s; }
+.n-docs .d-type-ic .sn-ic { width: 12px; height: 12px; }
+.n-docs .d-type-pill.sn-on .d-type-ic { rotate: 180deg; color: var(--sn-label); }
+.n-docs .d-api-exbtn { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 2px; margin-left: 4px; padding: 0 6px; height: 20px; border-radius: 5px; background: var(--sn-fill-subtle); font: 500 calc(11.5px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label2); cursor: pointer; vertical-align: baseline; transition: background-color .12s, color .12s; }
+.n-docs .d-api-exbtn .sn-ic { width: 11px; height: 11px; transition: rotate .2s var(--sn-ease-open); }
+.n-docs .d-api-exbtn.sn-on .sn-ic { rotate: 180deg; }
+@media (hover: hover) { .n-docs .d-api-exbtn:hover { background: var(--sn-fill-hover); color: var(--sn-label); } }
+/* 展开后的全宽行详情面板（Pretty-Print TS 高亮 + 可选值枚举 + 一键复制） */
+.n-docs .d-api-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; max-width: 100%; }
+.n-docs .d-api-code { border-radius: 10px; border: 1px solid var(--sn-line); background: var(--site-surface, var(--sn-canvas)); overflow: hidden; min-width: 0; max-width: 100%; }
+.n-docs .d-api-code-hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 32px; padding: 0 6px 0 12px; border-bottom: 1px solid var(--sn-line); background: color-mix(in srgb, var(--sn-label) 2%, transparent); }
+.n-docs .d-api-code-t { font: 500 calc(11.5px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); }
+.n-docs .d-api-code-r { display: inline-flex; align-items: center; gap: 4px; }
+.n-docs .d-api-code-lang { padding: 1px 6px; border-radius: 4px; background: color-mix(in srgb, var(--sn-label) 6%, transparent); font: 500 calc(10px * var(--fsx))/calc(16px * var(--fsx)) var(--sn-mono); color: var(--sn-label3); letter-spacing: .02em; }
+.n-docs .d-api-copy { --sn-h: 24px; width: 24px; height: 24px; color: var(--sn-label3); }
+.n-docs .d-api-copy .sn-ic { width: 13px; height: 13px; }
+.n-docs .d-api-code pre { margin: 0; padding: 10px 14px; overflow-x: auto; font: 400 calc(12.5px * var(--fsx))/calc(20px * var(--fsx)) var(--sn-mono); tab-size: 2; color: var(--cx-fg); outline: none; }
+.n-docs .d-api-code code { font: inherit; background: none; padding: 0; border-radius: 0; box-shadow: none; display: block; max-width: none; overflow-wrap: normal; word-break: normal; }
+.n-docs .d-api-cl { display: block; white-space: pre; }
+.n-docs .d-api-enums { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-width: 0; }
+.n-docs .d-api-el { font: 500 calc(11.5px * var(--fsx))/1 var(--sn-sans); color: var(--sn-label3); white-space: nowrap; }
+.n-docs .d-api-ev { display: flex; flex-wrap: wrap; gap: 5px; min-width: 0; }
+.n-docs .d-api-enum { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 5px; background: var(--sn-raised); box-shadow: inset 0 0 0 1px var(--sn-line); font: 400 calc(12px * var(--fsx))/1.35 var(--sn-mono); color: var(--sn-label2); }
+.n-docs .d-api-enum.is-def { color: var(--sn-label); box-shadow: inset 0 0 0 1px var(--sn-line-control); }
+.n-docs .d-api-edef { padding: 0 4px; border-radius: 3px; background: var(--sn-fill-subtle); font: 500 calc(10px * var(--fsx))/calc(15px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
 /* "给 AI 用"页的规则表：查法一列按内容定宽、不折行；规则 id、怎么改里的令牌名 / 类名 / 路径是整体不断开的代码，只在" / "、逗号这些地方换行 */
 .d-nw { white-space: nowrap; }
 .n-docs table.d-rules td:nth-child(2), .n-docs table.d-rules th:nth-child(2) { width: 1%; white-space: nowrap; }
-/* 规则表第一列是"规则名 + id"：规则名是一整句（"按钮、标签、页签、表头不折行；页面不横向溢出"），可以折行；id 是代码、不断开。
-   site.css 给文档表格第一列统一设了不折行，这里放开——不然第一列被撑到 340 宽，整张表比外框宽，最右边"怎么改"被裁掉一截（1024 宽时抓到） */
 .n-docs table.d-rules td:first-child { white-space: normal; }
-/* 文档表格的第一列也一样：长的（"拖表头换列：看得见的格子从旧位置滑过去"）照常折行，不然整张表被撑宽、最右一列要横着滑；
-   短的格子（任何一列，6 个字以内或 2 个词以内）由 nbProse 加 .d-nw 不折行 */
 .n-docs .d-table td:first-child { white-space: normal; }
 .n-docs .d-table td.d-nw { white-space: nowrap; }
-/* 七个根源那张表（规则文件给了 roots 时）：根源名一列按内容定宽、不折行 */
 .n-docs .d-roots td:first-child, .n-docs .d-roots th:first-child { width: 1%; white-space: nowrap; }
-/* 只管检查器页的规则表（table.d-rules）：组件页"要点"列表也叫 .d-rules（ul），那里的长代码要能在空格处换行，不然 390 宽时把整页撑宽 */
-.n-docs table.d-rules code { display: inline-block; max-width: 100%; white-space: nowrap; overflow-wrap: normal; line-height: 1.45; }
-/* 桌面表格里名称、类型、默认值格子里的代码本身也是行内块：一截比格子还宽、只能在里面折时，代码的底色跟着整块走（行内的底色只铺在最后一行上，会错位）；
-   行高从 1 放到 1.45，折成两行时不挤在一起。手机上那行小字（.d-k-sum）里的代码照常是行内的：长的默认值紧跟在"默认"后面往下折 */
-.n-docs .d-api td.d-k-m code, .n-docs .d-api td.d-k-n code { display: inline-block; max-width: 100%; line-height: 1.45; }
-.n-docs .d-api .d-k-l, .n-docs .d-api .d-k-req, .n-docs .d-api td small { white-space: nowrap; }
-@media (min-width: 640px) { .n-docs .d-api td.d-k-d { overflow-wrap: anywhere; } }
-/* 名称那列：名字本身不断开，后面括号里的说明（模板里写 xxx、写成 JSON……）是小字，可以折到下一行（旧版表格第一列整列不折行，这里放开） */
-.n-docs .d-api td.d-k-n { white-space: normal; }
-.n-docs .d-api .d-k-note { margin-left: 2px; font: 400 calc(12px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
+.n-docs table.d-rules code { display: inline-block; max-width: 100%; overflow-wrap: anywhere; line-height: 1.45; }
 @media (max-width: 639px) {
-  .n-docs .d-api, .n-docs .d-api tbody { display: block; width: 100%; }
-  .n-docs .d-api thead { display: none; }
-  .n-docs .d-api tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sn-sp-6) var(--sn-sp-12); padding: var(--sn-sp-14) var(--sn-sp-16); box-shadow: inset 0 -1px 0 var(--sn-line); }
-  .n-docs .d-api tr:last-child { box-shadow: none; }
-  .n-docs .d-api td { display: block; padding: 0; box-shadow: none; white-space: normal; min-width: 0; }
-  .n-docs .d-api td.d-k-m { display: none; }
-  .n-docs .d-api td.d-k-n { order: 0; flex: 0 1 auto; max-width: 100%; overflow-wrap: anywhere; }
-  .n-docs .d-api td.d-k-sum { display: block; order: 1; margin-left: auto; text-align: right; font: 400 calc(12px * var(--fsx))/calc(20px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); overflow-wrap: anywhere; }
-  .n-docs .d-api td.d-k-sum.d-k-long { flex-basis: 100%; margin-left: 0; text-align: left; }
-  .n-docs .d-api td.d-k-sum code { font-size: calc(12px * var(--fsx)); }
-  .n-docs .d-api td.d-k-d { order: 2; flex-basis: 100%; color: var(--sn-label2); }
-  .n-docs .d-api .d-k-l { margin-right: var(--sn-sp-4); }
-  .n-docs .d-api .d-k-dot { margin: 0 var(--sn-sp-6); font-style: normal; }
-  /* 别的文档表格（快速上手、令牌、动效、浏览器支持、规则表……）也是一行一块：第一格当标题，后面每格前面小字写这一列叫什么（BLOCK.table 的 data-l）。
-     原来照样是表格，390 宽时短格子不折行、代码不断开，表格比屏幕宽一点，框里横着滑几十像素（巡检"意外溢出"抓到十几处） */
-  .n-docs .d-table:not(.d-api), .n-docs .d-table:not(.d-api) tbody, .n-docs .d-table:not(.d-api) tr, .n-docs .d-table:not(.d-api) td { display: block; width: auto; }
-  .n-docs .d-table:not(.d-api) thead { display: none; }
-  .n-docs .d-table:not(.d-api) tr { padding: var(--sn-sp-12) var(--sn-sp-16); box-shadow: inset 0 -1px 0 var(--sn-line); }
-  .n-docs .d-table:not(.d-api) tr:last-child { box-shadow: none; }
-  .n-docs .d-table:not(.d-api) td { padding: 0; box-shadow: none; }
-  .n-docs .d-table:not(.d-api) td + td { margin-top: var(--sn-sp-4); }
-  .n-docs .d-table:not(.d-api) td:first-child { color: var(--sn-label); font-weight: 500; }
-  .n-docs .d-table:not(.d-api) td + td[data-l]:not([data-l=""])::before { content: attr(data-l); display: block; font: 400 calc(12px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
-  .n-docs table.d-rules td:nth-child(n), .n-docs table.d-roots td:nth-child(n) { width: auto; } /* 桌面上"查法""根源"那列按内容定宽（1%），一行一块时不要 */
+  .n-docs .d-api-bar { gap: 8px; }
+  .n-docs .d-api-search { width: 100%; }
+  .n-docs .d-api-tbl { display: block; width: 100%; min-width: 0 !important; }
+  .n-docs .d-api-tbl colgroup, .n-docs .d-api-tbl thead { display: none; }
+  .n-docs .d-api-tbl tbody { display: block; width: 100%; }
+  .n-docs .d-api-tbl tbody tr[data-id] { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; padding: 12px 14px; background: var(--sn-raised); box-shadow: inset 0 -1px 0 var(--sn-line); transition: background-color .12s var(--sn-ease-out); }
+  .n-docs .d-api-tbl tbody tr[data-id].sn-detail-open { box-shadow: none; }
+  .n-docs .d-api-tbl tbody tr[data-id]:last-child { box-shadow: none; }
+  .n-docs .d-api-tbl tbody tr[data-id] > td { display: block; padding: 0; background: transparent !important; box-shadow: none; min-width: 0; }
+  @media (hover: hover) { .n-docs .d-api-tbl tbody tr[data-id]:hover { background: var(--sn-fill-hover-solid); } }
+  .n-docs .d-api-tbl .sn-leaf.sn-leaf-empty { display: none; }
+  .n-docs .d-api-tbl tbody tr[data-id] > td.d-k-n { order: 0; flex: 1 1 auto; max-width: 100%; }
+  .n-docs .d-api-tbl tbody tr[data-id] > td.d-k-m { order: 1; flex: 0 1 auto; max-width: 100%; }
+  .n-docs .d-api-tbl tbody tr[data-id] > td.d-k-def { order: 2; flex: 0 1 auto; font-size: calc(12px * var(--fsx)); color: var(--sn-label3); }
+  .n-docs .d-api-tbl tbody tr[data-id] > td.d-k-def::before { content: "默认 "; color: var(--sn-label3); }
+  .n-docs .d-api-tbl tbody tr[data-id] > td.d-k-def:has(.d-api-nil) { display: none; }
+  .n-docs .d-api-tbl tbody tr[data-id] > td.d-k-d { order: 3; flex-basis: 100%; color: var(--sn-label2); }
+  .n-docs .d-api-tbl tbody tr.sn-tbl-detail { display: block; width: 100%; }
+  .n-docs .d-api-tbl tbody tr.sn-tbl-detail[hidden] { display: none; }
+  .n-docs .d-api-tbl tbody tr.sn-tbl-detail > td { display: block; width: 100%; }
+  .n-docs .d-api-tbl tbody tr.sn-tbl-detail .sn-tbl-detail-in { padding-left: 14px; padding-right: 14px; }
+  /* 别的文档表格（快速上手、令牌、动效、浏览器支持、规则表……）也是一行一块 */
+  .n-docs .d-table:not(.d-api-tbl), .n-docs .d-table:not(.d-api-tbl) tbody, .n-docs .d-table:not(.d-api-tbl) tr, .n-docs .d-table:not(.d-api-tbl) td { display: block; width: auto; }
+  .n-docs .d-table:not(.d-api-tbl) thead { display: none; }
+  .n-docs .d-table:not(.d-api-tbl) tr { padding: var(--sn-sp-12) var(--sn-sp-16); box-shadow: inset 0 -1px 0 var(--sn-line); }
+  .n-docs .d-table:not(.d-api-tbl) tr:last-child { box-shadow: none; }
+  .n-docs .d-table:not(.d-api-tbl) td { padding: 0; box-shadow: none; }
+  .n-docs .d-table:not(.d-api-tbl) td + td { margin-top: var(--sn-sp-4); }
+  .n-docs .d-table:not(.d-api-tbl) td:first-child { color: var(--sn-label); font-weight: 500; }
+  .n-docs .d-table:not(.d-api-tbl) td + td[data-l]:not([data-l=""])::before { content: attr(data-l); display: block; font: 400 calc(12px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); color: var(--sn-label3); }
+  .n-docs table.d-rules td:nth-child(n), .n-docs table.d-roots td:nth-child(n) { width: auto; }
 }
 
 /* ———— 11. 手机设备框（device.js）：iframe 里跑真实页面，按屏幕的 CSS 尺寸；整体按可用宽高缩放（只动 transform），换机型 / 横竖屏淡出淡入（只动 opacity）

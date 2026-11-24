@@ -1437,6 +1437,9 @@ export default function ShotOrder() {
 | `data` | `R[]` | [] | 否 | 数据：一行一个对象。行里带 `children`（数组）就是多级树：展开箭头、缩进、层级线放在第一列（或 `primary` 的那一列）。换数据时同一批行（`rowKey` 一样）只换内容变了的格子、行移到新位置。 | createXxx 选项：`data`；React：`data`；Preact：`data`；Vue：`data` |
 | `rows` | `R[]` | — | 否 | `data` 的旧名，同一个东西。 | createXxx 选项：`rows`；React：`rows`；Preact：`rows`；Vue：`rows` |
 | `rowKey` | `string \| ((row: R, index: number) => string \| number)` | "id" | 否 | 行的唯一键：字段名或函数（`index` 是同一级里第几个）；勾选、展开、排序动画、事件都按它认行（事件里给的是字符串）。 | createXxx 选项：`rowKey`；React：`rowKey`；Preact：`rowKey`；Vue：`rowKey（模板里写 row-key）` |
+| `detail` | `(row: R, ctx: TableDetailContext) => string \| number \| Node \| false \| null \| undefined` | — | 否 | 行展开详情：为可展开行在正下方渲染跨全列详情面板（支持 HTML 字符串或 DOM 节点，返回空值则该行无展开箭头）；与 `expandedKeys`、`expand`、`expandAll` 统一联动。 | createXxx 选项：`detail`；React：`detail`；Preact：`detail`；Vue：`detail` |
+| `rowExpandable` | `(row: R, ctx: TableDetailContext) => boolean` | — | 否 | 判断某行是否允许展开详情；提供后 `detail` 仅在该行展开时按需懒渲染。 | createXxx 选项：`rowExpandable`；React：`rowExpandable`；Preact：`rowExpandable`；Vue：`rowExpandable（模板里写 row-expandable）` |
+| `expandOnRowClick` | `boolean` | false | 否 | 点击整行非交互区域时同时切换该行展开 / 收起。 | createXxx 选项：`expandOnRowClick`；React：`expandOnRowClick`；Preact：`expandOnRowClick`；Vue：`expandOnRowClick（模板里写 expand-on-row-click）` |
 | `expandedKeys` | `(string \| number)[]` | — | 否 | 展开着的行（受控）：传进来的值换了（按值比）才跟着变，点箭头时发 `expandChange`，在里面更新。 | createXxx 选项：`expandedKeys`；React：`expandedKeys`；Preact：`expandedKeys`；Vue：`v-model:expanded / expandedKeys` |
 | `defaultExpandedKeys` | `(string \| number)[]` | [] | 否 | 非受控：一开始展开哪几行。 | createXxx 选项：`defaultExpandedKeys`；React：`defaultExpandedKeys`；Preact：`defaultExpandedKeys`；Vue：`defaultExpandedKeys（模板里写 default-expanded-keys）` |
 | `sort` | `TableSort \| null` | null | 否 | 现在按哪一列排（受控：传进来的值换了才跟着变）。树形时每一级的同级之间排；一样大的保持现在的先后。 | createXxx 选项：`sort`；React：`sort`；Preact：`sort`；Vue：`v-model:sort / sort` |
@@ -1556,7 +1559,7 @@ export default function ShotOrder() {
 
 ## 导出的类型
 
-`TableOptions`、`TableColumn`、`TableCellContext`、`TableSpan`、`TableSort`、`TableExpandEvent`、`TableRowReorderEvent`、`TableCellEditEvent`、`TablePageEvent`、`TablePagination`、`TableApi`、`TableProps`、`TableColumnReact`
+`TableOptions`、`TableColumn`、`TableCellContext`、`TableDetailContext`、`TableSpan`、`TableSort`、`TableExpandEvent`、`TableRowReorderEvent`、`TableCellEditEvent`、`TablePageEvent`、`TablePagination`、`TableApi`、`TableProps`、`TableColumnReact`
 
 ## 键盘
 

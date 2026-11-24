@@ -327,6 +327,8 @@ export interface TableRowReorderEvent { key: string; parentKey: string | null; f
 export interface TableCellEditEvent<R = any> { row: R; key: string; value: unknown; oldValue: unknown }
 /** 表格翻页或改每页条数事件 */
 export interface TablePageEvent { page: number; pageSize: number }
+/** 表格行详情展开回调上下文 */
+export interface TableDetailContext { key: string; index: number; level: number }
 /** 表格内置贴底分页配置（传 true 启用默认每页 10 条的本地分页） */
 export interface TablePagination {
   page?: number;
@@ -341,6 +343,9 @@ export interface TableOptions<R = any> {
   /** 数据：一行一个对象；行里带 children 就是多级树 */ data?: R[];
   /** data 的旧名 */ rows?: R[];
   /** 行的唯一键：字段名或函数，默认 "id" */ rowKey?: string | ((row: R, index: number) => string | number);
+  /** 行展开详情：返回跨全列展示的 HTML 字符串或 DOM 节点（返回 null / "" 表示该行不可展开），与 expandedKeys / expand / expandAll 统一联动 */ detail?(row: R, ctx: TableDetailContext): string | number | Node | false | null | undefined;
+  /** 控制哪些行允许展开详情（可选；提供后详情面板仅在展开时按需懒渲染） */ rowExpandable?(row: R, ctx: TableDetailContext): boolean;
+  /** 点击整行空白处是否同时切换该行的展开收起（默认 false） */ expandOnRowClick?: boolean;
   /** 展开着的行（受控：传进来的值换了才跟着变） */ expandedKeys?: (string | number)[];
   /** 一开始展开的行（非受控） */ defaultExpandedKeys?: (string | number)[];
   sort?: TableSort | null; defaultSort?: TableSort | null;

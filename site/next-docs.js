@@ -6,6 +6,9 @@ import { $, $$, root, reduced, injectIcons, initSeg } from "../packages/satin-ui
 import { scrollArea } from "../packages/satin-ui/src/scroll.js";
 import { bindOverlays } from "../packages/satin-ui/src/overlay.js";
 import { openLightbox } from "../packages/satin-ui/src/lightbox.js";
+import { createTable } from "../packages/satin-ui/src/components.js";
+import { highlightLines } from "../packages/satin-ui/src/markdown.js";
+import { copied } from "../packages/satin-ui/src/form.js";
 import { loadCatalog } from "./catalog.js";
 import { codePanel, mountCode, fmtHTML } from "./code.js";
 import { deviceHTML, mountDevices } from "./device.js";
@@ -395,9 +398,9 @@ const NB_NUM = /(?:[¥$€£]\s?)?\d[\d,.]*\s?(?:px|ms|秒|分钟|分|小时|天
 // 短单元格（6 个字以内，或者 2 个词以内）不折行：表格挤的时候"整页""字号比例"这种被拆成两行（site.css 原来只让第一列不折行，长的第一列又把整张表撑宽）
 const shortCell = (t) => (/[㐀-鿿]/.test(t) ? t.replace(/\s/g, "").length <= 6 : t.split(/\s+/).length <= 2 && t.length <= 24);
 function nbProse(scope) {
-  for (const td of $$(".d-table td:not(.d-nw)", scope)) { const t = td.textContent.trim(); if (t && shortCell(t) && !td.querySelector("br")) td.classList.add("d-nw"); } // 带代码的短格子也算（"Popover（showPopover）"在全角括号前被折开）
+  for (const td of $$(".d-table:not(.d-api-tbl) td:not(.d-nw)", scope)) { const t = td.textContent.trim(); if (t && shortCell(t) && !td.querySelector("br")) td.classList.add("d-nw"); } // 带代码的短格子也算（"Popover（showPopover）"在全角括号前被折开）
   for (const c of $$("code:not([data-nb])", scope)) {
-    c.dataset.nb = ""; if (c.children.length || c.closest("pre")) continue;
+    c.dataset.nb = ""; if (c.children.length || c.closest("pre, .d-api-code, .d-type-pill, .d-api-enum")) continue;
     const t = c.textContent; if (!t.trim()) continue;
     c.innerHTML = t.split(/(\s+)/).map((w) => (/\S/.test(w) ? nbWord(esc(w)) : esc(w))).join(""); // 和 API 表同一个包法（nbWord）
   }
@@ -483,9 +486,9 @@ const renderFwb = (map) => { fwCtx = true; try { return renderFwb0(map); } final
 const renderFwb0 = (map) => { const b = fwPick(map), fw = getFw(); return b ? envTabs(map) + blocks(b) : `<p class="d-fw-miss">${esc(fw.name)} 这一段还没有专门的写法，下面是纯 HTML（自定义元素）的写法，在 ${esc(fw.name)} 里同样能用。</p>` + blocks(map.html || []); };
 onFw(() => {
   fillAll();
-  for (const el of $$(".d-fw[data-fwb]", main)) { el.innerHTML = renderFwb(FWB[+el.dataset.fwb]); injectIcons(el); mountCode(el); mountFwButtons(el); }
+  for (const el of $$(".d-fw[data-fwb]", main)) { destroyApiTables(el); el.innerHTML = renderFwb(FWB[+el.dataset.fwb]); injectIcons(el); mountCode(el); mountFwButtons(el); mountApiTables(el); }
   for (const el of $$("[data-fw-name]", main)) el.textContent = getFw().name + (getEnv() ? " · " + getEnv().name : "");
-  for (const el of $$(".d-fwr[data-fwr]", main)) { el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); mountFwButtons(el); nbProse(el); for (const w of $$(".d-tablewrap > .sn-tbl-sc", el)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 }); }
+  for (const el of $$(".d-fwr[data-fwr]", main)) { destroyApiTables(el); el.innerHTML = FWR[+el.dataset.fwr](); injectIcons(el); mountCode(el); mountFwButtons(el); mountApiTables(el); nbProse(el); for (const w of $$(".d-tablewrap > .sn-tbl-sc", el)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 }); }
 });
 // 计算样式拿来判断空白要不要留：在演示文档里找同样标签、同样类名的元素
 const liveOf = (doc, el) => { if (!doc || !el.classList?.length) return null; try { return doc.querySelector(el.localName + "." + [...el.classList].map((c) => CSS.escape(c)).join(".")); } catch { return null; } };
@@ -1044,41 +1047,411 @@ function mountPhoneToggles(scope) {
     });
   }
 }
-// 组件页的 API 表（属性、列定义、事件、插槽、方法、函数、样式定制、类名、键盘）：桌面照旧是表格；窄屏（< 640px）每一项一块——
-// 第一行名称，右边小字"类型 · 默认 … · 必填"（太长就整行放到名称下面），说明整行在下面（样式见 next.css 的 .d-api）。
-// cols 每列一个角色："n" 名称、"m" 小字信息（"m:默认" 带标签）、"r" 必填（"是" → 小字"必填"）、"d" 说明。空的（""、"—"）不进小字那一行
+// 组件页的 API 表：全面使用 Satin 原生表格组件（createTable）渲染，支持排序、列宽拖拽、实时搜索筛选与行详情展开收起。
+// 复杂 TypeScript 对象/回调/多联合类型与长函数签名在收起态展示精致语义摘要，展开后呈现 Pretty-Print 语法高亮代码块、可选值与一键复制，彻底消除窄列溢出与拉长条痛点。
 const plainOf = (s) => String(s).replace(/<[^>]+>/g, "").trim();
-// 类型、默认值、名称里的代码：只在空格处换行，一截（"确定"、"danger-soft"、GridColumn<Row>[]）放得下就不从中间断开——
-// 每截包成行内块（.d-nb，最宽不超过格子）：放得下整截换到下一行，比格子还宽才在里面折。不按字数定死，表格宽窄都对
-// 一截代码（已转义）怎么包：≤ 14 个字整截不折（"secondary"、ComposerContextItem[] 这类名字不从中间断开）；更长的只在 < ( { | , : => 后面可以断
-// （类型表达式的语法分界，不是从名字中间断），每一小截不折；带中文的长串照常折（中文本来就能在字和字之间换行），带中文的短串（≤ 6 个字）不折
+// 行内短代码防乱断行：≤ 12 字符短截不断，超长标识符允许在语法分隔符与驼峰边界断行，兜底不再强套 nowrap 防止撑破容器
 const nbWord = (w) => {
   const plain = w.replace(/&\w+;/g, "x");
-  // 带中文的长串：中文那几段照常折，夹在里面的英文、属性名（aria-label="、data-i=）一段一段不折——不然在连字符处被拆开
-  // 中文那几段：≤ 6 个字的（"面板""镜头名""邮箱格式不对"）也整段不折，只在段和段之间断；更长的中文段才在字和字之间折
   if (/[㐀-鿿぀-ヿ]/.test(plain)) return plain.length <= 6 ? `<span class="d-nb">${w}</span>` : w.split(/([㐀-鿿぀-ヿ]+)/).map((p) => (p && (!/[㐀-鿿぀-ヿ]/.test(p) || p.length <= 6) ? `<span class="d-nb">${p}</span>` : p)).join("");
-  if (plain.length <= 14) return `<span class="d-nb">${w}</span>`;
-  return w.split(/(?<=&lt;|=&gt;|[({|,:])(?=.{3,}$)/).map((p) => `<span class="d-nb">${p}</span>`).join("<wbr>");
+  if (plain.length <= 12) return `<span class="d-nb">${w}</span>`;
+  return w.split(/(?<=&lt;|=&gt;|[({|,:./_-])(?=.{2,}$)|(?<=[a-z])(?=[A-Z])/).map((p) => (p.replace(/&\w+;/g, "x").length <= 12 ? `<span class="d-nb">${p}</span>` : p)).join("<wbr>");
 };
 const nbText = (t) => t.split(/( +)/).map((w) => (/\S/.test(w) ? nbWord(w) : w)).join("");
-const nbCode = (html) => html.replace(/<code>([^<]*)<\/code>/g, (_, t) => "<code>" + nbText(t) + "</code>");
-// 名称：契约里有的写法带括号说明（"confirmText（模板里写 confirm-text）"）——名字是代码，括号里的说明是小字，可以折到下一行，
-// 不然整串不折行，名称那列被撑得很宽，说明那列被挤成一小条
-const nbName = (html) => html.replace(/<code>([^<]*)<\/code>/g, (_, t) => { const i = t.indexOf("（"); return i > 0 ? `<code>${nbText(t.slice(0, i))}</code><wbr><span class="d-k-note">${t.slice(i)}</span>` : `<code>${nbText(t)}</code>`; });
-// 桌面上按内容排（table-layout: auto）：名称、类型、默认值这几列跟着内容走——每列至少和它最长的那一小截代码一样宽（代码不从名字中间断开）；
-// 说明那列要 40%，内容实在挤时浏览器先让前面几列拿够最长那截，说明拿剩下的（原来固定排法下窄列里的代码被从中间断开）
-const colgroup = (head, cols) => `<colgroup>${head.map((_, i) => (cols[i] === "d" ? '<col style="width:40%">' : "<col>")).join("")}</colgroup>`;
-const apiTbl = (head, rows, cols) => `<div class="sn-tbl-wrap d-tablewrap"><div class="sn-tbl-sc"><table class="sn-tbl d-table d-api">${colgroup(head, cols)}<thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => {
-  const sum = [];
-  const tds = r.map((c, i) => {
-    const [k, label] = cols[i].split(":"), v = k === "m" ? nbCode(String(c ?? "")) : k === "n" ? nbName(String(c ?? "")) : String(c ?? "");
-    // 带标签的（"默认 "secondary""、"参数 number"）标签和值包成一块，不在两者之间断行
-    if ((k === "m" || k === "r") && v && plainOf(v) !== "—") { const val = v.replace(/^<p>([\s\S]*)<\/p>$/, "$1"); sum.push(k === "r" ? '<span class="d-k-req">必填</span>' : label ? `<span class="d-kv"><span class="d-k-l">${label}</span>${val}</span>` : val); }
-    return `<td class="d-k-${k === "r" ? "m d-k-r" : k}">${v}</td>`;
-  }).join("");
-  const plain = (s) => String(s).replace(/<[^>]+>/g, "").trim(), long = plain(r[0]).length + plain(sum.join(" · ")).length > 30;
-  return `<tr>${tds}${sum.length ? `<td class="d-k-sum${long ? " d-k-long" : ""}">${sum.join('<i class="d-k-dot">·</i>')}</td>` : ""}</tr>`;
-}).join("")}</tbody></table></div></div>`;
+
+// ———— TypeScript 复杂类型智能分析、摘要与 Pretty-Print 格式化 ————
+function splitTop(str, sep) {
+  const out = []; let cur = "", d1 = 0, d2 = 0, d3 = 0, d4 = 0, q = "";
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (q) { cur += ch; if (ch === q && str[i - 1] !== "\\") q = ""; continue; }
+    if (ch === '"' || ch === "'") { q = ch; cur += ch; continue; }
+    if (ch === "{") d1++; else if (ch === "}") d1 = Math.max(0, d1 - 1);
+    else if (ch === "(") d2++; else if (ch === ")") d2 = Math.max(0, d2 - 1);
+    else if (ch === "[") d3++; else if (ch === "]") d3 = Math.max(0, d3 - 1);
+    else if (ch === "<") d4++; else if (ch === ">" && str[i - 1] !== "=") d4 = Math.max(0, d4 - 1);
+    if (ch === sep && !d1 && !d2 && !d3 && !d4) { out.push(cur.trim()); cur = ""; continue; }
+    cur += ch;
+  }
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
+function findMatch(s, openIdx, openCh, closeCh) {
+  let d = 0, q = "";
+  for (let i = openIdx; i < s.length; i++) {
+    const ch = s[i];
+    if (q) { if (ch === q && s[i - 1] !== "\\") q = ""; continue; }
+    if (ch === '"' || ch === "'") { q = ch; continue; }
+    if (ch === openCh) d++;
+    else if (ch === closeCh && (closeCh !== ">" || s[i - 1] !== "=")) { d--; if (d === 0) return i; }
+  }
+  return -1;
+}
+function isComplexType(raw) {
+  const t = String(raw || "").trim();
+  if (!t || t === "—") return false;
+  if (t.includes("{") && t.includes("}")) return true;
+  if (t.includes("=>") && t.length > 26) return true;
+  const u = splitTop(t, "|");
+  if (u.length >= 4 || (u.length >= 2 && t.length > 34)) return true;
+  return t.length > 36;
+}
+function extractEnums(raw) {
+  const parts = splitTop(String(raw || "").trim(), "|");
+  if (parts.length < 2) return [];
+  const lits = parts.filter((p) => /^("[^"]*"|'[^']*'|true|false|null|\d+(?:\.\d+)?)$/.test(p));
+  return lits.length >= 2 ? lits : [];
+}
+function summarizeObj(s) {
+  const inner = s.slice(1, -1).trim();
+  const fields = splitTop(inner, ";").flatMap((x) => (x.includes(":") || x.includes("(") ? [x] : splitTop(x, ","))).filter(Boolean);
+  const keys = fields.map((f) => { const m = /^(?:readonly\s+)?([A-Za-z_$][\w$]*\??)/.exec(f.trim()); return m ? m[1] : ""; }).filter(Boolean);
+  if (!keys.length) return { text: "object", count: "" };
+  const joined2 = keys.length <= 2 ? `{ ${keys.join(", ")} }` : "";
+  if (joined2 && joined2.length <= 18) return { text: joined2, count: "" };
+  if (keys[0].length <= 11) return { text: `{ ${keys[0]} }`, count: keys.length > 1 ? `+${keys.length - 1}` : "" };
+  return { text: "object", count: `${keys.length} 项` };
+}
+function summarizeType(raw) {
+  const t = String(raw || "").trim();
+  if (t.startsWith("{") && t.endsWith("}") && findMatch(t, 0, "{", "}") === t.length - 1) return summarizeObj(t);
+  const union = splitTop(t, "|");
+  if (union.length >= 2) {
+    const shortPart = (p) => {
+      if (p.startsWith("{") && p.endsWith("}")) return "object";
+      if (p.includes("=>")) return "fn";
+      if (p.length > 15) { const g = /^([A-Za-z_$][\w$]*)</.exec(p); return g ? `${g[1]}<…>` : p.slice(0, 12) + "…"; }
+      return p;
+    };
+    const sp = union.map(shortPart);
+    if (sp.length > 2) {
+      const two = `${sp[0]} | ${sp[1]}`;
+      if (two.length <= 14) return { text: two, count: `+${sp.length - 2}` };
+      if (sp[0].length <= 14) return { text: sp[0], count: `+${sp.length - 1}` };
+      return { text: "联合类型", count: `${sp.length} 项` };
+    }
+    const both = `${sp[0]} | ${sp[1]}`;
+    return both.length <= 18 ? { text: both, count: "" } : { text: sp[0], count: "+1" };
+  }
+  const fnNamed = /^([A-Za-z_$][\w$]*)\(([\s\S]*)\)(?::\s*[\s\S]+)?$/.exec(t);
+  if (fnNamed) {
+    const closeAt = findMatch(t, fnNamed[1].length, "(", ")");
+    const argsStr = closeAt > 0 ? t.slice(fnNamed[1].length + 1, closeAt) : "";
+    const params = splitTop(argsStr, ",").map((p) => (/^(\.{0,3}[A-Za-z_$][\w$]*\??)/.exec(p.trim())?.[1] || "")).filter(Boolean);
+    const sig = `(${params.join(", ")}) => …`;
+    return sig.length <= 22 ? { text: sig, count: "" } : { text: `(${params.slice(0, 2).join(", ")}, …)`, count: params.length > 2 ? `${params.length} 参` : "" };
+  }
+  if (t.startsWith("(") && t.includes("=>")) {
+    const closeAt = findMatch(t, 0, "(", ")");
+    if (closeAt > 0) {
+      const params = splitTop(t.slice(1, closeAt), ",").map((p) => (/^(\.{0,3}[A-Za-z_$][\w$]*\??)/.exec(p.trim())?.[1] || "")).filter(Boolean);
+      const sig = `(${params.join(", ")}) => …`;
+      return sig.length <= 20 ? { text: sig, count: "" } : { text: "function", count: params.length ? `${params.length} 参` : "" };
+    }
+  }
+  const gen = /^([A-Za-z_$][\w$]*)</.exec(t);
+  if (gen) return { text: `${gen[1]}<…>`, count: "" };
+  return { text: t.length <= 18 ? t : t.slice(0, 16) + "…", count: "" };
+}
+function formatTypeTS(raw, indent = 0) {
+  const s = String(raw || "").trim().replace(/\s+/g, " ");
+  const pad = (n) => "  ".repeat(n);
+  if (s.length <= 54 && !s.includes(";")) return s;
+  const u = splitTop(s, "|");
+  if (u.length >= 3 && s.length > 48) {
+    return u.map((p, i) => (i === 0 ? pad(indent) + formatTypeTS(p, indent) : `${pad(indent)}| ${formatTypeTS(p, indent + 1)}`)).join("\n");
+  }
+  if (s.startsWith("{") && s.endsWith("}") && findMatch(s, 0, "{", "}") === s.length - 1) {
+    const inner = s.slice(1, -1).trim();
+    const parts = splitTop(inner, ";").filter(Boolean);
+    if (parts.length > 1 || inner.length > 38) {
+      const lines = parts.map((p) => `${pad(indent + 1)}${formatTypeTS(p, indent + 1)};`);
+      return `{\n${lines.join("\n")}\n${pad(indent)}}`;
+    }
+    return s;
+  }
+  // 扫描并把内部超长 { ... }、(...)、<...> 优雅分行
+  let out = "", q = "";
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (q) { out += ch; if (ch === q && s[i - 1] !== "\\") q = ""; continue; }
+    if (ch === '"' || ch === "'") { q = ch; out += ch; continue; }
+    if (ch === "{") {
+      const end = findMatch(s, i, "{", "}");
+      if (end > i) {
+        const sub = s.slice(i, end + 1);
+        if (sub.length > 36 || sub.includes(";")) { out += formatTypeTS(sub, indent); i = end; continue; }
+      }
+    }
+    if (ch === "(" || ch === "<") {
+      const closeCh = ch === "(" ? ")" : ">", end = findMatch(s, i, ch, closeCh);
+      if (end > i) {
+        const inner = s.slice(i + 1, end).trim(), args = splitTop(inner, ",");
+        if (inner.length > 48 && args.length > 1) {
+          out += `${ch}\n${args.map((a) => `${pad(indent + 1)}${formatTypeTS(a, indent + 1)}`).join(",\n")}\n${pad(indent)}${closeCh}`;
+          i = end; continue;
+        }
+      }
+    }
+    out += ch;
+  }
+  return out;
+}
+function hlBlockHTML(title, code, lang = "ts", extraBadge = "") {
+  const lines = highlightLines(code, lang);
+  return `<div class="d-api-code" data-src="${esc(code)}">` +
+    `<div class="d-api-code-hd"><span class="d-api-code-t">${esc(title)}</span>` +
+    `<span class="d-api-code-r">${extraBadge ? `<span class="d-api-code-lang">${esc(extraBadge)}</span>` : `<span class="d-api-code-lang">${esc(lang.toUpperCase())}</span>`}` +
+    `<button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn d-api-copy" data-api-copy data-tip="复制" aria-label="复制${esc(title)}"><span class="sn-swap"><span class="sn-a" data-i="copy"></span><span class="sn-b" data-i="check"></span></span></button></span></div>` +
+    `<pre tabindex="0"><code>${lines.map((l) => `<span class="d-api-cl">${l || " "}</span>`).join("")}</code></pre></div>`;
+}
+function buildApiDetailHTML(row, spec) {
+  const blocks = [];
+  if (row.typeComplex && row.typeRaw) {
+    const pretty = formatTypeTS(row.typeRaw);
+    blocks.push(hlBlockHTML(spec.typeTitle || "完整类型", pretty, "ts"));
+    const enums = extractEnums(row.typeRaw);
+    if (enums.length) {
+      const defNorm = String(row.defRaw || "").trim();
+      blocks.push(`<div class="d-api-enums"><span class="d-api-el">可选值</span><div class="d-api-ev">${enums.map((v) => `<code class="d-api-enum${defNorm === v ? " is-def" : ""}">${esc(v)}${defNorm === v ? `<span class="d-api-edef">默认</span>` : ""}</code>`).join("")}</div></div>`);
+    }
+  }
+  if (row.defComplex && row.defRaw) blocks.push(hlBlockHTML("默认值", formatTypeTS(row.defRaw), "ts"));
+  if (row.exampleRaw) blocks.push(hlBlockHTML("用法示例", row.exampleRaw, "tsx", "示例"));
+  return `<div class="d-api-detail">${blocks.join("")}</div>`;
+}
+
+// ———— Satin createTable 驱动全站组件 API 表格 ————
+const API_SPECS = [];
+function apiTableSlot(spec) {
+  const id = API_SPECS.push(spec) - 1;
+  return `<div class="d-api-sec" data-api-tbl="${id}"></div>`;
+}
+function destroyApiTables(scope) {
+  for (const el of $$("[data-api-tbl]", scope)) {
+    if (typeof el._apiDestroy === "function") { el._apiDestroy(); el._apiDestroy = null; }
+  }
+}
+function splitNameNote(raw) {
+  const s = String(raw ?? "");
+  const i = s.indexOf("（");
+  return i > 0 ? { main: s.slice(0, i), note: s.slice(i) } : { main: s, note: "" };
+}
+function mountApiTables(scope) {
+  for (const host of $$("[data-api-tbl]:not([data-api-mounted])", scope)) {
+    const spec = API_SPECS[+host.dataset.apiTbl];
+    if (!spec) continue;
+    host.dataset.apiMounted = "1";
+    const rows = spec.rows.map((r, idx) => {
+      const nm = splitNameNote(r.name ?? "");
+      const typeRaw = String(r.type ?? "").trim();
+      const defRaw = r.def != null && String(r.def).trim() !== "—" ? String(r.def).trim() : "";
+      const exampleRaw = String(r.example ?? "").trim();
+      const typeComplex = spec.rawType ? false : isComplexType(typeRaw);
+      const defComplex = defRaw.length > 26;
+      const typeSummary = typeComplex ? summarizeType(typeRaw) : null;
+      const hasDetail = typeComplex || defComplex || Boolean(exampleRaw);
+      const searchText = [r.name, r.sub, typeRaw, defRaw, plainOf(r.desc || ""), exampleRaw].join(" ").toLowerCase();
+      return {
+        id: `${idx}:${nm.main || idx}`,
+        ...r,
+        nameMain: nm.main,
+        nameNote: nm.note,
+        typeRaw,
+        defRaw,
+        exampleRaw,
+        typeComplex,
+        defComplex,
+        typeSummary,
+        hasDetail,
+        searchText,
+      };
+    });
+    const expRows = rows.filter((r) => r.hasDetail);
+    const hasAnyDetail = expRows.length > 0;
+    const hasDef = spec.showDef && rows.some((r) => r.defRaw);
+    const hasType = spec.showType;
+    const needSearch = rows.length >= 8;
+    const needBar = needSearch || expRows.length >= 2;
+
+    const cols = [];
+    cols.push({
+      key: "name",
+      title: spec.nameCol || "名称",
+      primary: true,
+      sortable: spec.sortable !== false && rows.length > 2,
+      resizable: true,
+      width: spec.nameWidth || (hasType ? 156 : 188),
+      minWidth: 108,
+      className: "d-k-n",
+      sort: (a, b) => a.nameMain.replace(/^[-.@#]+/, "").localeCompare(b.nameMain.replace(/^[-.@#]+/, ""), "en", { numeric: true }),
+      html: (_, r) => {
+        if (r.nameHtml) return r.nameHtml;
+        return `<span class="d-api-name-cell"><code>${nbText(esc(r.nameMain))}</code>` +
+          (r.required ? `<span class="d-api-req">必填</span>` : "") +
+          (r.token ? `<span class="d-api-tok">全局令牌</span>` : "") +
+          (r.nameNote ? `<wbr><span class="d-k-note">${esc(r.nameNote)}</span>` : "") +
+          (r.sub ? `<span class="d-api-sub">${esc(r.sub)}</span>` : "") +
+          `</span>`;
+      },
+    });
+    if (hasType) {
+      cols.push({
+        key: "type",
+        title: spec.typeCol || "类型",
+        resizable: true,
+        width: spec.typeWidth || (hasDef ? 196 : 230),
+        minWidth: 118,
+        className: "d-k-m",
+        html: (_, r) => {
+          if (spec.rawType) return r.typeHtml || (r.typeRaw ? md(r.typeRaw) : "—");
+          if (!r.typeRaw) return '<span class="d-api-nil">—</span>';
+          if (r.typeComplex) {
+            return `<button type="button" class="d-type-pill" data-api-toggle="${esc(r.id)}" aria-label="展开查看完整${esc(spec.typeCol || "类型")}">` +
+              `<code class="d-type-txt">${esc(r.typeSummary.text)}</code>` +
+              (r.typeSummary.count ? `<span class="d-type-cnt">${esc(r.typeSummary.count)}</span>` : "") +
+              `<span class="d-type-ic" data-i="chevron-down"></span></button>`;
+          }
+          return `<code class="d-api-t">${nbText(esc(r.typeRaw))}</code>`;
+        },
+      });
+    }
+    if (hasDef) {
+      cols.push({
+        key: "def",
+        title: spec.defCol || "默认值",
+        resizable: true,
+        width: spec.defWidth || 108,
+        minWidth: 74,
+        className: "d-k-def",
+        html: (_, r) => {
+          if (!r.defRaw) return '<span class="d-api-nil">—</span>';
+          if (r.defComplex) {
+            return `<button type="button" class="d-type-pill" data-api-toggle="${esc(r.id)}"><code class="d-type-txt">${esc(r.defRaw.slice(0, 14))}…</code><span class="d-type-ic" data-i="chevron-down"></span></button>`;
+          }
+          return `<code class="d-api-t">${nbText(esc(r.defRaw))}</code>`;
+        },
+      });
+    }
+    cols.push({
+      key: "desc",
+      title: spec.descCol || "说明",
+      minWidth: 210,
+      className: "d-k-d",
+      html: (_, r) => {
+        const base = r.desc || "";
+        const exBtn = r.exampleRaw && !r.typeComplex && !r.defComplex
+          ? ` <button type="button" class="d-api-exbtn" data-api-toggle="${esc(r.id)}">示例<span data-i="chevron-down"></span></button>`
+          : "";
+        return `<div class="d-api-desc">${base}${exBtn}</div>`;
+      },
+    });
+
+    let barEl = null, qInput = null, qClear = null, cntEl = null, expBtn = null;
+    if (needBar) {
+      barEl = document.createElement("div");
+      barEl.className = "d-api-bar";
+      barEl.innerHTML =
+        (needSearch
+          ? `<label class="d-api-search"><span class="d-api-sic" data-i="search"></span><input class="d-api-q" type="search" placeholder="筛选${esc(spec.label || "API")}…" aria-label="筛选${esc(spec.label || "API")}"><button type="button" class="d-api-qx" data-api-qx hidden aria-label="清除筛选" data-i="x"></button></label>`
+          : `<span></span>`) +
+        `<div class="d-api-bar-r"><span class="d-api-cnt" data-api-cnt>共 ${rows.length} 项</span>` +
+        (hasAnyDetail ? `<button type="button" class="sn-btn sn-ghost sn-sm d-api-expall" data-api-expall><span class="d-api-expall-t">展开全部 (${expRows.length})</span><span class="d-api-expall-i" data-i="chevron-down"></span></button>` : "") +
+        `</div>`;
+      host.append(barEl);
+      injectIcons(barEl);
+      qInput = $(".d-api-q", barEl);
+      qClear = $("[data-api-qx]", barEl);
+      cntEl = $("[data-api-cnt]", barEl);
+      expBtn = $("[data-api-expall]", barEl);
+    }
+
+    const tblWrap = document.createElement("div");
+    tblWrap.className = "d-api-tblhost";
+    host.append(tblWrap);
+
+    let allOpen = false;
+    const syncExpUI = () => {
+      const openKeys = new Set(tbl.expanded);
+      for (const btn of $$("[data-api-toggle]", host)) {
+        btn.classList.toggle("sn-on", openKeys.has(btn.dataset.apiToggle));
+        btn.setAttribute("aria-expanded", String(openKeys.has(btn.dataset.apiToggle)));
+      }
+      if (!expBtn) return;
+      allOpen = expRows.length > 0 && expRows.every((r) => tbl.isExpanded(r.id));
+      expBtn.classList.toggle("sn-on", allOpen);
+      expBtn.setAttribute("aria-expanded", String(allOpen));
+      $(".d-api-expall-t", expBtn).textContent = allOpen ? "收起全部" : `展开全部 (${expRows.length})`;
+    };
+    const syncCount = (visN) => {
+      if (!cntEl) return;
+      const qv = qInput?.value.trim();
+      cntEl.textContent = qv ? `匹配 ${visN} / ${rows.length} 项` : `共 ${rows.length} 项`;
+    };
+    const mountDetailNode = (row) => {
+      const box = document.createElement("div");
+      box.innerHTML = buildApiDetailHTML(row, spec);
+      injectIcons(box);
+      for (const pre of $$(".d-api-code pre", box)) scrollArea(pre, { fade: "x", size: 16, barSize: 4 });
+      return box.firstElementChild;
+    };
+
+    const tbl = createTable(tblWrap, {
+      columns: cols,
+      data: rows,
+      rowKey: "id",
+      label: spec.label,
+      expandOnRowClick: hasAnyDetail,
+      rowExpandable: hasAnyDetail ? (r) => r.hasDetail : undefined,
+      detail: hasAnyDetail ? (r) => mountDetailNode(r) : undefined,
+      empty: ({ filtered }) => (filtered
+        ? `<div class="sn-tbl-none"><span>没有匹配的项</span><button type="button" class="sn-btn sn-secondary sn-sm" data-api-clear>清除筛选</button></div>`
+        : "暂无内容"),
+      onExpandChange: () => syncExpUI(),
+      onLayout: ({ rows: vis }) => syncCount(vis.length),
+    });
+    const wrapEl = $(".sn-tbl-wrap", tblWrap);
+    wrapEl?.classList.add("d-tablewrap", "d-api-wrap");
+    $("table.sn-tbl", tblWrap)?.classList.add("d-table", "d-api", "d-api-tbl");
+    injectIcons(tblWrap);
+    // 给每个 td 挂窄屏卡片标签（< 640px 响应式可读）
+    for (const c of cols) {
+      if (!c.title) continue;
+      for (const td of $$(`tbody tr[data-id] td[data-c="${CSS.escape(c.key)}"]`, tblWrap)) td.dataset.l = c.title;
+    }
+
+    const applyFilter = () => {
+      const qv = (qInput?.value || "").trim().toLowerCase();
+      if (qClear) qClear.hidden = !qv;
+      tbl.update({ filter: qv ? (r) => r.searchText.includes(qv) : null });
+      syncExpUI();
+    };
+    qInput?.addEventListener("input", applyFilter);
+    qInput?.addEventListener("keydown", (e) => { if (e.key === "Escape" && qInput.value) { e.preventDefault(); qInput.value = ""; applyFilter(); } });
+    qClear?.addEventListener("click", () => { if (qInput) { qInput.value = ""; qInput.focus(); applyFilter(); } });
+    expBtn?.addEventListener("click", () => { tbl.expandAll(!allOpen); syncExpUI(); });
+
+    const onHostClick = (e) => {
+      const clr = e.target.closest("[data-api-clear]");
+      if (clr && host.contains(clr)) { if (qInput) { qInput.value = ""; qInput.focus(); applyFilter(); } return; }
+      const cp = e.target.closest("[data-api-copy]");
+      if (cp && host.contains(cp)) {
+        const src = cp.closest(".d-api-code")?.dataset.src;
+        if (src != null) navigator.clipboard?.writeText(src).then(() => copied(cp), () => {});
+        return;
+      }
+      const tg = e.target.closest("[data-api-toggle]");
+      if (tg && host.contains(tg)) {
+        const k = tg.dataset.apiToggle;
+        tbl.expand(k, !tbl.isExpanded(k));
+        syncExpUI();
+      }
+    };
+    host.addEventListener("click", onHostClick);
+    syncExpUI();
+    host._apiDestroy = () => { host.removeEventListener("click", onHostClick); tbl.destroy(); };
+  }
+}
 const md = (t) => md2html(String(t ?? ""));
 // 契约里提到的另一项（相近组件、别用时改用什么）：是组件就链到组件页；基础那几项（颜色、间距、布局……）没有组件页，链到规范里同名的那页
 function refOf(id) {
@@ -1101,22 +1474,65 @@ function contractHTML(c, k) {
   // 设计稿里的完整演示（更丰富的组合）
   // 完整演示：设计稿里更丰富的组合，只放现场演示（写法以上面的示例为准）
   if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示"), `<p>设计稿里把几种用法组合在一起的样子，可以直接操作；代码看上面的示例。</p>`); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n, code: false }))); }
-  // 4. API（按当前框架的叫法）
+  // 4. API（按当前框架的叫法，全面使用 Satin createTable 渲染）
   out.push(anchor("api", "API"));
-  if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => { const ps = k.props.filter(hasIn); return !ps.length ? "<p>这种写法里没有单独的属性。</p>" : apiTbl(["名称", "类型", "默认值", "必填", "说明"], ps.map((x) => [`<code>${esc(nameOf(x))}</code>`, `<code>${esc(by(x, "type") || "")}</code>`, by(x, "default") != null ? `<code>${esc(by(x, "default"))}</code>` : "—", x.required ? "是" : "", md(by(x, "desc")) + (by(x, "example") ? `<br><code>${esc(by(x, "example"))}</code>` : "")]), ["n", "m", "m:默认", "r", "d"]); }));
+  if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => {
+    const ps = k.props.filter(hasIn);
+    return !ps.length ? "<p>这种写法里没有单独的属性。</p>" : apiTableSlot({
+      label: "属性", nameCol: "名称", typeCol: "类型", typeTitle: "完整类型", defCol: "默认值", descCol: "说明",
+      showType: true, showDef: true,
+      rows: ps.map((x) => ({ name: nameOf(x), type: by(x, "type") || "", def: by(x, "default"), required: !!x.required, desc: md(by(x, "desc")), example: by(x, "example") || "" })),
+    });
+  }));
   // 列定义（数据表格、Canvas 表格契约里的 columnProps）：columns 里每一项的字段，各框架写法一样
-  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 里每一项的字段（各框架写法一样）。</p>`, apiTbl(["字段", "类型", "默认值", "说明"], k.columnProps.map((x) => [`<code>${esc(x.name)}</code>`, `<code>${esc(by(x, "type") || "")}</code>`, by(x, "default") != null ? `<code>${esc(by(x, "default"))}</code>` : "—", md(by(x, "desc"))]), ["n", "m", "m:默认", "d"]));
-  if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => { const es = k.events.filter(hasIn); return !es.length ? "<p>这种写法里没有单独的事件。</p>" : apiTbl(["名称", "参数", "什么时候触发"], es.map((x) => [`<code>${esc(nameOf(x))}</code>`, by(x, "payload") ? `<code>${esc(by(x, "payload"))}</code>` : "", md(by(x, "when"))]), ["n", "m:参数", "d"]); }));
-  if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => { const ss = k.slots.filter(hasIn); return !ss.length ? "<p>这种写法里没有插槽 / 子元素。</p>" : apiTbl(["名称", "说明"], ss.map((x) => [`<code>${esc(nameOf(x))}</code>`, md(by(x, "desc"))]), ["n", "d"]); }));
-  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, apiTbl(["名称", "签名", "说明"], k.methods.map((x) => [`<code>${esc(x.name)}</code>`, by(x, "signature") ? `<code>${esc(by(x, "signature"))}</code>` : "", md(by(x, "desc"))]), ["n", "m", "d"]));
-  if (k.functions?.length) out.push(`<h3 class="d-h3">函数</h3>`, apiTbl(["名称", "签名", "说明"], k.functions.map((x) => [`<code>${esc(x.name)}</code>${x.from ? `<br><small>${esc(x.from)}</small>` : ""}`, by(x, "signature") ? `<code>${esc(by(x, "signature"))}</code>` : "", md(by(x, "desc"))]), ["n", "m", "d"]));
-  if (k.cssVars?.length) out.push(`<h3 class="d-h3">样式定制</h3>`, apiTbl(["CSS 变量", "作用", "默认"], k.cssVars.map((x) => [`<code>${esc(x.name)}</code>${x.token ? " <small>全局令牌</small>" : ""}`, md(x.desc), esc(x.default || "")]), ["n", "d", "m:默认"]));
-  if (k.classes?.length) out.push(`<h3 class="d-h3">纯 HTML 写法的类名、data 属性</h3>`, apiTbl(["写法", "说明"], k.classes.map((x) => [`<code>${esc(x.name)}</code>`, md(x.desc)]), ["n", "d"]));
+  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 里每一项的字段（各框架写法一样）。</p>`, apiTableSlot({
+    label: "列定义", nameCol: "字段", typeCol: "类型", typeTitle: "完整类型", defCol: "默认值", descCol: "说明",
+    showType: true, showDef: true,
+    rows: k.columnProps.map((x) => ({ name: x.name, type: by(x, "type") || "", def: by(x, "default"), desc: md(by(x, "desc")) })),
+  }));
+  if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => {
+    const es = k.events.filter(hasIn);
+    return !es.length ? "<p>这种写法里没有单独的事件。</p>" : apiTableSlot({
+      label: "事件", nameCol: "名称", typeCol: "参数", typeTitle: "完整参数类型", descCol: "什么时候触发",
+      showType: true, showDef: false,
+      rows: es.map((x) => ({ name: nameOf(x), type: by(x, "payload") || "", desc: md(by(x, "when")) })),
+    });
+  }));
+  if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => {
+    const ss = k.slots.filter(hasIn);
+    return !ss.length ? "<p>这种写法里没有插槽 / 子元素。</p>" : apiTableSlot({
+      label: "插槽", nameCol: "名称", descCol: "说明", showType: false, showDef: false,
+      rows: ss.map((x) => ({ name: nameOf(x), desc: md(by(x, "desc")) })),
+    });
+  }));
+  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, apiTableSlot({
+    label: "实例方法", nameCol: "名称", typeCol: "签名", typeTitle: "完整方法签名", descCol: "说明",
+    showType: true, showDef: false, nameWidth: 150, typeWidth: 230,
+    rows: k.methods.map((x) => ({ name: x.name, type: by(x, "signature") || "", desc: md(by(x, "desc")) })),
+  }));
+  if (k.functions?.length) out.push(`<h3 class="d-h3">函数</h3>`, apiTableSlot({
+    label: "函数", nameCol: "名称", typeCol: "签名", typeTitle: "完整函数签名", descCol: "说明",
+    showType: true, showDef: false, nameWidth: 160, typeWidth: 230,
+    rows: k.functions.map((x) => ({ name: x.name, sub: x.from || "", type: by(x, "signature") || "", desc: md(by(x, "desc")) })),
+  }));
+  if (k.cssVars?.length) out.push(`<h3 class="d-h3">样式定制</h3>`, apiTableSlot({
+    label: "样式定制", nameCol: "CSS 变量", defCol: "默认", descCol: "作用",
+    showType: false, showDef: true, nameWidth: 196, defWidth: 132,
+    rows: k.cssVars.map((x) => ({ name: x.name, token: !!x.token, def: x.default || "", desc: md(x.desc) })),
+  }));
+  if (k.classes?.length) out.push(`<h3 class="d-h3">纯 HTML 写法的类名、data 属性</h3>`, apiTableSlot({
+    label: "类名", nameCol: "写法", descCol: "说明", showType: false, showDef: false, nameWidth: 220,
+    rows: k.classes.map((x) => ({ name: x.name, desc: md(x.desc) })),
+  }));
   if (k.types?.length) out.push(`<h3 class="d-h3">TypeScript 类型</h3><p>${k.types.map((t) => `<code>${esc(t)}</code>`).join("、")}</p>`);
   // 5. 键盘与无障碍
   if (k.keyboard?.length || k.a11y) {
     out.push(anchor("a11y", "键盘与无障碍"));
-    if (k.keyboard?.length) out.push(apiTbl(["按键", "什么时候", "做什么"], k.keyboard.map((x) => [keysHTML(x.keys), md(x.when || ""), md(x.does)]), ["n", "m", "d"]));
+    if (k.keyboard?.length) out.push(apiTableSlot({
+      label: "键盘操作", nameCol: "按键", typeCol: "什么时候", descCol: "做什么",
+      showType: true, showDef: false, rawType: true, sortable: false, nameWidth: 164, typeWidth: 176,
+      rows: k.keyboard.map((x) => ({ name: x.keys, nameHtml: keysHTML(x.keys), type: x.when || "", typeHtml: x.when ? md(x.when) : '<span class="d-api-nil">—</span>', desc: md(x.does) })),
+    }));
     for (const [t, list] of [["角色", k.a11y?.roles], ["焦点", k.a11y?.focus], ["说明", k.a11y?.notes]]) if (list?.length) out.push(`<h3 class="d-h3">${t}</h3><ul class="d-list">${list.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
   }
   // 6. 设计规范
@@ -1244,8 +1660,8 @@ async function fillAsync(scope, base) {
   }
   if (curPage?.hash !== base) return; // 载入期间已经换页了
   for (const [el, html] of results) el.outerHTML = html;
-  injectIcons(main); mountCode(main); mountFwButtons(main); wireWalls(main); mountDevices(main); mountPhoneToggles(main); mountEvalShowcase(main); fitRecipes(main); nbProse(main); balanceCards(main);
-  for (const w of $$(".d-tablewrap > .sn-tbl-sc", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
+  injectIcons(main); mountCode(main); mountFwButtons(main); mountApiTables(main); wireWalls(main); mountDevices(main); mountPhoneToggles(main); mountEvalShowcase(main); fitRecipes(main); nbProse(main); balanceCards(main);
+  for (const w of $$(".d-tablewrap:not(.d-api-wrap) > .sn-tbl-sc", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 });
   for (const box of $$(".dx:not([data-wired])", main)) { box.dataset.wired = ""; wireDemo(box, cat.byId[box.dataset.demo]); }
   pump();
   await fillAll();
@@ -1377,6 +1793,7 @@ function wireNotFound(scope) {
   document.addEventListener("keydown", (e) => { if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "")) { e.preventDefault(); shoot(); } }, { signal });
 }
 async function swapPage(pg, part, inVT = false) {
+  destroyApiTables(main); API_SPECS.length = 0;
   curPage = pg; frames.clear(); resetQueue(); h2n = 0; nfAbort?.abort(); nfAbort = null;
   const wasFirst = first;
   if (!pg) {
@@ -1387,8 +1804,8 @@ async function swapPage(pg, part, inVT = false) {
     const body = pg.kind === "comp" ? compPage(pg) : pg.kind === "overview" ? overviewPage(pg) : pg.kind === "recipes" ? recipesPage(pg) : pg.kind === "recipe" ? recipePage(pg) : textPage(pg);
     const enterCls = !wasFirst && !inVT && !reduced() ? " d-page-enter" : "";
     main.innerHTML = `<article class="d-page${pg.kind === "overview" || pg.kind === "recipes" ? " d-wide" : ""}${pg.kind === "recipe" ? " d-rpage" : ""}${pg.p?.id === "mobile" ? " d-devpage" : ""}${enterCls}">${body}${pager(pg)}</article>`;
-    injectIcons(main); mountCode(main); mountFwButtons(main); mountDevices(main); mountPhoneToggles(main); mountEvalShowcase(main); fitRecipes(main); nbProse(main); balanceCards(main);
-    for (const w of $$(".d-tablewrap > .sn-tbl-sc", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：与组件库一致挂在 .sn-tbl-sc 内部
+    injectIcons(main); mountCode(main); mountFwButtons(main); mountApiTables(main); mountDevices(main); mountPhoneToggles(main); mountEvalShowcase(main); fitRecipes(main); nbProse(main); balanceCards(main);
+    for (const w of $$(".d-tablewrap:not(.d-api-wrap) > .sn-tbl-sc", main)) if (!w._sa) scrollArea(w, { fade: "x", size: 20 }); // 规范页里的宽表格：与组件库一致挂在 .sn-tbl-sc 内部
     wireWalls(main);
     for (const box of $$(".dx", main)) { box.dataset.wired = ""; wireDemo(box, pg.c || cat.byId[box.dataset.demo]); }
     document.title = `${pg.title} · Satin`;

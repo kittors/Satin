@@ -39,7 +39,7 @@
 .sn-tbl tbody tr:is(.adding, .leaving) > td::before,
 .sn-tbl tbody tr.sn-open:is(.adding, .leaving) > td::after { opacity: var(--sn-row-op, 1); }
 @media (hover: hover) {
-.sn-tbl tbody tr:not(.sn-tbl-empty):hover td { background: var(--sn-fill-hover-solid); } } /* 格子的底都不透明（悬停、选中也是）：行和行、列和列交叉时一个盖住另一个，不叠字 */
+.sn-tbl tbody tr:not(.sn-tbl-empty):not(.sn-tbl-detail):hover td { background: var(--sn-fill-hover-solid); } } /* 格子的底都不透明（悬停、选中也是）：行和行、列和列交叉时一个盖住另一个，不叠字 */
 /* 有批量操作条时，表格底部让出位置，条不压住最后一行 */
 .sn-tbl-wrap { transition: padding-bottom .26s var(--sn-ease-open); }
 .sn-tbl-wrap.sn-has-bulk { padding-bottom: 64px; }
@@ -575,10 +575,23 @@
 .sn-tbl td:not(.sn-pin-l, .sn-pin-r):has(> .sn-name > :is(.sn-exp, .sn-leaf)) { position: relative; }
 .sn-tbl td > .sn-name:has(> :is(.sn-exp, .sn-leaf)) { padding-left: calc(var(--sn-lv, 0) * 24px); }
 .sn-tbl tr.sn-kid td:has(> .sn-name > :is(.sn-exp, .sn-leaf))::before { content: ""; position: absolute; top: 0; bottom: 0; left: 12px; width: calc(var(--sn-lv) * 24px); background: var(--sn-tbg, repeating-linear-gradient(90deg, transparent 0 3.5px, var(--sn-tree-line) 3.5px 4.5px, transparent 4.5px 24px)); pointer-events: none; }
-.sn-tbl tr > td:has(> .sn-name > .sn-exp)::after { content: ""; position: absolute; left: calc(15.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); pointer-events: none; transform-origin: top; scale: 1 0; opacity: 0; transition: scale .2s var(--sn-ease-open), opacity .16s var(--sn-ease-out); } /* 展开着的那一行：随箭头旋转同步生长出连接竖线，收起时柔和收回 */
-.sn-tbl tr.sn-open > td:has(> .sn-name > .sn-exp)::after { scale: 1 1; opacity: 1; }
+.sn-tbl tr[data-lv] > td:has(> .sn-name > .sn-exp)::after { content: ""; position: absolute; left: calc(15.5px + var(--sn-lv, 0) * 24px); top: calc(50% + 12px); bottom: 0; width: 1px; background: var(--sn-tree-line); pointer-events: none; transform-origin: top; scale: 1 0; opacity: 0; transition: scale .2s var(--sn-ease-open), opacity .16s var(--sn-ease-out); } /* 展开着的那一行：随箭头旋转同步生长出连接竖线，收起时柔和收回 */
+.sn-tbl tr[data-lv].sn-open > td:has(> .sn-name > .sn-exp)::after { scale: 1 1; opacity: 1; }
 .sn-tbl .sn-leaf { flex: none; display: grid; place-items: center; width: 20px; height: 20px; margin: 0 -4px 0 -6px; }
 .sn-tbl .sn-leaf::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--sn-line-control); }
+.sn-tbl .sn-leaf.sn-leaf-empty::after { display: none; }
+/* 通用行详情展开面板（createTable 的 detail 选项）：平滑推开、零硬跳、与主行自然衔接 */
+.sn-tbl tbody tr.sn-detail-open > td { box-shadow: none; }
+.sn-tbl tbody tr.sn-tbl-detail > td { height: auto; padding: 0; white-space: normal; background: color-mix(in srgb, var(--sn-label) 2%, var(--sn-raised)); box-shadow: inset 0 -1px 0 var(--sn-line); }
+[data-theme="dark"] .sn-tbl tbody tr.sn-tbl-detail > td { background: color-mix(in srgb, #fff 2.4%, var(--sn-raised)); }
+.sn-tbl tbody tr.sn-tbl-detail[hidden] { display: none; }
+.sn-tbl-detail-bd { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows calc(240ms * var(--sn-motion-scale, 1)) var(--sn-ease-open), opacity calc(180ms * var(--sn-motion-scale, 1)) var(--sn-ease-out); }
+.sn-tbl tbody tr.sn-tbl-detail.sn-open .sn-tbl-detail-bd { grid-template-rows: 1fr; opacity: 1; }
+.sn-tbl-detail-bd > .sn-tbl-detail-in { min-width: 0; min-height: 0; overflow: hidden; padding: 0 16px 0 38px; transform: translateY(-4px); transition: padding-top calc(240ms * var(--sn-motion-scale, 1)) var(--sn-ease-open), padding-bottom calc(240ms * var(--sn-motion-scale, 1)) var(--sn-ease-open), transform calc(240ms * var(--sn-motion-scale, 1)) var(--sn-ease-open); }
+.sn-tbl tbody tr.sn-tbl-detail.sn-open .sn-tbl-detail-bd > .sn-tbl-detail-in { padding-top: 10px; padding-bottom: 14px; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .sn-tbl-detail-bd, .sn-tbl-detail-bd > .sn-tbl-detail-in { transition: none; transform: none; }
+}
 
 /* 视频缓冲：300ms 内接上什么都不显示，超过才在正中转圈；加载失败时大播放键换成提示 */
 .sn-player .sn-pl-spin { position: absolute; left: 50%; top: 50%; z-index: 2; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-width: 2px; border-color: rgba(255, 255, 255, .25); border-top-color: #fff; opacity: 0; pointer-events: none; transition: opacity .2s var(--sn-ease-out); }
@@ -590,9 +603,9 @@
 /* ———— 表格的展示形式 ———— */
 /* 斑马纹：隔行一层很淡的底，不画行线（两样都有就重复了）；悬停照样盖一层 */
 .sn-tbl-wrap.sn-striped .sn-tbl tbody td { box-shadow: none; }
-.sn-tbl-wrap.sn-striped .sn-tbl tbody tr:nth-child(even of :not([hidden])) td { background: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); }
+.sn-tbl-wrap.sn-striped .sn-tbl tbody tr:nth-child(even of :not([hidden]):not(.sn-tbl-detail)) td { background: color-mix(in srgb, var(--sn-label) 3%, var(--sn-raised)); }
 @media (hover: hover) {
-.sn-tbl-wrap.sn-striped .sn-tbl tbody tr:not(.sn-tbl-empty):hover td { background: var(--sn-fill-hover-solid); } }
+.sn-tbl-wrap.sn-striped .sn-tbl tbody tr:not(.sn-tbl-empty):not(.sn-tbl-detail):hover td { background: var(--sn-fill-hover-solid); } }
 /* 无外框：放进卡片、面板里，外框和圆角交给外面；表头不另铺底；宽表时可水平平滑滚动不回弹 */
 .sn-tbl-wrap.sn-plain { border: 0; border-radius: 0; overflow: hidden; }
 .sn-tbl-wrap.sn-plain > .sn-tbl-sc,

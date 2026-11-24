@@ -198,6 +198,45 @@
       }
     },
     {
+      "name": "detail",
+      "type": "(row: R, ctx: TableDetailContext) => string | number | Node | false | null | undefined",
+      "default": "—",
+      "required": false,
+      "desc": "行展开详情：为可展开行在正下方渲染跨全列详情面板（支持 HTML 字符串或 DOM 节点，返回空值则该行无展开箭头）；与 `expandedKeys`、`expand`、`expandAll` 统一联动。",
+      "names": {
+        "js": "detail",
+        "react": "detail",
+        "preact": "detail",
+        "vue": "detail"
+      }
+    },
+    {
+      "name": "rowExpandable",
+      "type": "(row: R, ctx: TableDetailContext) => boolean",
+      "default": "—",
+      "required": false,
+      "desc": "判断某行是否允许展开详情；提供后 `detail` 仅在该行展开时按需懒渲染。",
+      "names": {
+        "js": "rowExpandable",
+        "react": "rowExpandable",
+        "preact": "rowExpandable",
+        "vue": "rowExpandable（模板里写 row-expandable）"
+      }
+    },
+    {
+      "name": "expandOnRowClick",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "点击整行非交互区域时同时切换该行展开 / 收起。",
+      "names": {
+        "js": "expandOnRowClick",
+        "react": "expandOnRowClick",
+        "preact": "expandOnRowClick",
+        "vue": "expandOnRowClick（模板里写 expand-on-row-click）"
+      }
+    },
+    {
       "name": "expandedKeys",
       "type": "(string | number)[]",
       "default": "—",
@@ -1005,6 +1044,7 @@
     "TableOptions",
     "TableColumn",
     "TableCellContext",
+    "TableDetailContext",
     "TableSpan",
     "TableSort",
     "TableExpandEvent",
