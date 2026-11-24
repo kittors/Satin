@@ -1,0 +1,313 @@
+# Satin 全自动发版流水线（零静态密钥 · npm OIDC Trusted Publishing · Sigstore Provenance · 自动 GitHub Release）
+# 触发方式一：本地运行 `pnpm release:patch` / `pnpm release:minor` / `pnpm release 0.2.0-beta.1` 推送 v* Tag 自动发版
+# 触发方式二：在 GitHub Actions 页面点击「Run workflow」一键升版发版（支持 dry_run 全链路演练）
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "升版类型（或选择 custom 并在 custom_version 填写指定版本）"
+        type: choice
+        required: true
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+          - custom
+      custom_version:
+        description: "当 bump=custom 时必填（如 0.2.0 或 0.2.0-beta.1，不带 v 前缀）"
+        type: string
+        required: false
+        default: ""
+      dry_run:
+        description: "仅演练（执行全量 CI 与 npm publish --dry-run，不提交、不真发 npm、不建 Release）"
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: release-pipeline
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: 版本校验与发版准备
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      dist_tag: ${{ steps.meta.outputs.dist_tag }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
+      ref: ${{ steps.meta.outputs.ref }}
+      dry_run: ${{ steps.meta.outputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: 安装依赖（仅自动升版时需要）
+        if: github.event_name == 'workflow_dispatch' && !inputs.dry_run
+        run: pnpm install --frozen-lockfile
+
+      - name: 解析版本并完成预检 / 自动升版
+        id: meta
+        run: |
+          set -euo pipefail
+          UI_VER=$(node -p "require('./packages/satin-ui/package.json').version")
+          CLI_VER=$(node -p "require('./packages/satin-cli/package.json').version")
+          if [ "$UI_VER" != "$CLI_VER" ]; then
+            echo "::error::双包版本号不一致（satin-ui=$UI_VER, satin-cli=$CLI_VER）"
+            exit 1
+          fi
+
+          DRY_RUN="false"
+          TARGET_REF="${GITHUB_SHA}"
+
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            TAG="${GITHUB_REF_NAME}"
+            VER="${TAG#v}"
+            if [ "$VER" != "$UI_VER" ]; then
+              echo "::error::Tag 版本 ($TAG) 与 package.json ($UI_VER) 不一致，请使用 pnpm release 统一升版打 Tag。"
+              exit 1
+            fi
+          else
+            BUMP="${{ inputs.bump }}"
+            if [ "$BUMP" = "custom" ]; then
+              SPEC="${{ inputs.custom_version }}"
+              if [ -z "$SPEC" ]; then
+                echo "::error::bump=custom 时必须填写 custom_version"
+                exit 1
+              fi
+            else
+              SPEC="$BUMP"
+            fi
+
+            if [ "${{ inputs.dry_run }}" = "true" ]; then
+              DRY_RUN="true"
+              node scripts/release/bump.mjs "$SPEC" --dry-run --ci
+              VER="$UI_VER"
+              TAG="v${VER}"
+            else
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              node scripts/release/bump.mjs "$SPEC" --ci --no-verify
+              VER=$(node -p "require('./packages/satin-ui/package.json').version")
+              TAG="v${VER}"
+              TARGET_REF=$(git rev-parse HEAD)
+            fi
+          fi
+
+          PRERELEASE="false"
+          DIST_TAG="latest"
+          if [[ "$VER" == *-* ]]; then
+            PRERELEASE="true"
+            PRE_HEAD=$(echo "${VER#*-}" | cut -d. -f1 | tr '[:upper:]' '[:lower:]')
+            case "$PRE_HEAD" in
+              alpha|beta|rc|next|canary) DIST_TAG="$PRE_HEAD" ;;
+              *) DIST_TAG="next" ;;
+            esac
+          fi
+
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=$DIST_TAG" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "ref=$TARGET_REF" >> "$GITHUB_OUTPUT"
+          echo "dry_run=$DRY_RUN" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### 🚀 发版计划"
+            echo "- **版本**：\`$VER\`（Tag：\`$TAG\`）"
+            echo "- **npm dist-tag**：\`$DIST_TAG\`"
+            echo "- **演练模式（dry-run）**：\`$DRY_RUN\`"
+            echo "- **目标提交**：\`$TARGET_REF\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  verify:
+    name: 全量质量门禁（复核 CI）
+    needs: prepare
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.prepare.outputs.ref }}
+
+  publish:
+    name: 发布至 npm（OIDC Trusted Publishing）
+    needs: [prepare, verify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: npm-release
+      url: https://www.npmjs.com/package/satin-ui/v/${{ needs.prepare.outputs.version }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # npm >= 11.5.1 原生支持 OIDC Trusted Publishing（无需任何静态 NPM_TOKEN Secret）
+      - name: 升级 npm CLI 以支持 OIDC Trusted Publishing 与 Provenance
+        run: |
+          npm install -g npm@latest
+          npm --version
+
+      - run: pnpm install --frozen-lockfile
+      - name: 校验生成物并构建发布资产
+        run: |
+          pnpm build:css
+          node scripts/test/sync.mjs
+
+      - name: 幂等发布 satin-ui 与 satin-cli（带 Sigstore Provenance）
+        env:
+          VER: ${{ needs.prepare.outputs.version }}
+          DIST_TAG: ${{ needs.prepare.outputs.dist_tag }}
+          DRY_RUN: ${{ needs.prepare.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          publish_pkg() {
+            local dir="$1"
+            local name="$2"
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "=== [DRY-RUN] $name@$VER (tag: $DIST_TAG) ==="
+              (cd "$dir" && npm publish --dry-run --access public --tag "$DIST_TAG")
+              return 0
+            fi
+            local existing
+            existing=$(npm view "${name}@${VER}" version 2>/dev/null || true)
+            if [ "$existing" = "$VER" ]; then
+              echo "ℹ️ ${name}@${VER} 已存在于 npm registry，幂等跳过。"
+              return 0
+            fi
+            echo "=== Publishing ${name}@${VER} (dist-tag: ${DIST_TAG}, OIDC + Provenance) ==="
+            (cd "$dir" && npm publish --access public --provenance --tag "$DIST_TAG")
+          }
+
+          publish_pkg "packages/satin-ui" "satin-ui"
+          publish_pkg "packages/satin-cli" "satin-cli"
+
+      - name: 打包 .tgz 供 GitHub Release 附件使用
+        run: |
+          mkdir -p /tmp/release-assets
+          pnpm --filter satin-ui pack --pack-destination /tmp/release-assets
+          pnpm --filter satin-cli pack --pack-destination /tmp/release-assets
+          ls -lh /tmp/release-assets
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-tarballs
+          path: /tmp/release-assets/*.tgz
+          retention-days: 7
+
+  github-release:
+    name: 线上冒烟验证与创建 GitHub Release
+    needs: [prepare, publish]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-tarballs
+          path: /tmp/release-assets
+
+      - name: 校验 npm 线上可安装性（隔离冒烟测试）
+        if: needs.prepare.outputs.dry_run != 'true'
+        env:
+          VER: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          for pkg in satin-ui satin-cli; do
+            echo "等待 ${pkg}@${VER} 在 npm CDN 上线..."
+            ready=""
+            for i in $(seq 1 24); do
+              v=$(npm view "${pkg}@${VER}" version 2>/dev/null || true)
+              if [ "$v" = "$VER" ]; then
+                ready="1"
+                echo "✓ ${pkg}@${VER} 已在线可用"
+                break
+              fi
+              sleep 5
+            done
+            if [ -z "$ready" ]; then
+              echo "::warning::${pkg}@${VER} 仍在 npm 异步处理中，跳过即时安装检查。"
+              exit 0
+            fi
+          done
+
+          SMOKE=$(mktemp -d)
+          cd "$SMOKE"
+          npm init -y >/dev/null
+          npm install "satin-ui@${VER}" "satin-cli@${VER}" --no-audit --no-fund
+          node -e 'import("satin-ui").then((m) => { if (!m.setup) process.exit(1); console.log("✓ ESM import satin-ui OK"); })'
+          CLI_OUT=$(npx --no-install satin --version)
+          echo "✓ npx satin --version → $CLI_OUT"
+          rm -rf "$SMOKE"
+
+      - name: 生成分类 Release Notes 并发布 GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER: ${{ needs.prepare.outputs.version }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          PRE: ${{ needs.prepare.outputs.prerelease }}
+          DRY_RUN: ${{ needs.prepare.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          node scripts/release/notes.mjs --version "$VER" --to HEAD --out /tmp/release-notes.md
+          {
+            echo "### 📝 Release Notes（$TAG）"
+            cat /tmp/release-notes.md
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "✓ [DRY-RUN] 跳过创建真实 GitHub Release。"
+            exit 0
+          fi
+
+          PRE_FLAG=""
+          if [ "$PRE" = "true" ]; then
+            PRE_FLAG="--prerelease"
+          fi
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file /tmp/release-notes.md
+            gh release upload "$TAG" /tmp/release-assets/*.tgz --clobber
+          else
+            gh release create "$TAG" /tmp/release-assets/*.tgz \
+              --title "Satin ${TAG}" \
+              --notes-file /tmp/release-notes.md \
+              $PRE_FLAG
+          fi

@@ -17,7 +17,8 @@ const EFFORT = arg("effort", "medium");
 const CONDS = arg("cond", "with,without").split(","), FWS = arg("fw", "react,vue,html").split(",");
 const TASKS = JSON.parse(fs.readFileSync(path.join(ROOT, "eval/tasks.json"), "utf8")).tasks.filter((t) => !arg("tasks") || arg("tasks").split(",").includes(t.id));
 const BASE = "/tmp/satin-eval", OUT = path.join(BASE, BATCH, MODEL.replace(/[^\w.-]+/g, "_"));
-const PKG = path.join(BASE, "_pkg/satin-ui-0.1.0.tgz");
+const UI_VERSION = JSON.parse(fs.readFileSync(path.join(ROOT, "packages/satin-ui/package.json"), "utf8")).version;
+const PKG = path.join(BASE, `_pkg/satin-ui-${UI_VERSION}.tgz`);
 fs.mkdirSync(OUT, { recursive: true });
 // 每次都按仓库里现在的 packages/satin-ui 重新打包；包变了，装过 satin-ui 的模板重装
 fs.mkdirSync(path.dirname(PKG), { recursive: true });

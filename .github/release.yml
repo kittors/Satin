@@ -1,0 +1,25 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - dependabot
+  categories:
+    - title: ✨ 新特性（Features）
+      labels:
+        - enhancement
+        - feature
+    - title: 🐛 问题修复（Bug Fixes）
+      labels:
+        - bug
+        - fix
+    - title: ⚡ 性能与体验优化
+      labels:
+        - performance
+        - polish
+    - title: 📚 文档与技能
+      labels:
+        - documentation
+    - title: 🔧 其他变更
+      labels:
+        - "*"

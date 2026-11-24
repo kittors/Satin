@@ -1,16 +1,38 @@
-# 持续集成：代码检查、Node 里的测试（导入、生成物、服务端渲染、体积预算、检查器）、类型测试、浏览器测试（生命周期泄漏、Markdown XSS）、各框架示例构建。
-# 和改造前逐像素比的效果对比（scripts/parity）要改造前的备份目录，只在本机跑，不在这里。
+# 持续集成（三路并行高速门禁）：
+# 1. quality：静态检查、Node 单元测试、TypeScript / 9 框架类型检查、CLI 22 项测试、SSR 契约、CSS 构建与发包体检查
+# 2. browser：真实 Chrome 浏览器全量交互 E2E、生命周期泄漏压测、XSS 防护、AI 技能检查器
+# 3. examples：React / Vue / Next / Nuxt / Svelte / Angular / Solid / Preact 全量构建
+# 同时暴露 workflow_call 供 release.yml 复用，保持主分支 CI 与发版门禁 100% 同源。
 name: CI
+
 on:
   push:
     branches: [main, web-v1]
   pull_request:
+  workflow_call:
+    inputs:
+      ref:
+        description: "要验证的 Git Ref / SHA（留空则使用默认触发提交）"
+        required: false
+        type: string
+        default: ""
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
+
+permissions:
+  contents: read
+
 jobs:
-  check:
+  quality:
+    name: 静态、类型、契约与打包校验
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -21,13 +43,50 @@ jobs:
       - run: pnpm test:node
       - run: pnpm test:types
       - run: pnpm test:cli
+      - run: node scripts/test/contract-ssr.mjs
+      - run: pnpm pack:check
+
+  browser:
+    name: 浏览器 E2E、泄漏与安全门禁
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build:css
-      # 浏览器测试用系统里的 Chrome（GitHub 的 ubuntu 镜像自带），Playwright 只装依赖库
       - run: npx playwright install-deps chromium
-      - name: 浏览器测试
+      - name: 运行浏览器全量交互与安全测试
         run: |
           python3 serve.py 5192 . > /tmp/serve.log 2>&1 &
-          sleep 2
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in $(seq 1 20); do
+            curl -sf http://127.0.0.1:5192/site/next-docs.html > /dev/null && break
+            sleep 0.5
+          done
           pnpm test:browser
           node skills/satin/scripts/check.test.mjs
+
+  examples:
+    name: 多框架示例构建（9 框架）
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:css
       - run: pnpm build:examples

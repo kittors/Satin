@@ -18,7 +18,13 @@
     "spec:build": "node scripts/spec/build.mjs",
     "skill:build": "node scripts/skill/build.mjs",
     "build:css": "node scripts/build/css-bundle.mjs",
-    "pack:check": "pnpm build:css && pnpm --filter satin-ui pack --pack-destination /tmp/satin-packs && pnpm --filter satin-cli pack --pack-destination /tmp/satin-packs"
+    "pack:check": "pnpm build:css && pnpm --filter satin-ui pack --pack-destination /tmp/satin-packs && pnpm --filter satin-cli pack --pack-destination /tmp/satin-packs",
+    "release": "node scripts/release/bump.mjs",
+    "release:patch": "node scripts/release/bump.mjs patch",
+    "release:minor": "node scripts/release/bump.mjs minor",
+    "release:major": "node scripts/release/bump.mjs major",
+    "release:dry": "node scripts/release/bump.mjs patch --dry-run",
+    "release:notes": "node scripts/release/notes.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
