@@ -41,7 +41,7 @@ export default {
     { name: "voice", type: "boolean", default: "true", required: false, desc: "发送键左侧的一键语音输入按钮：点击原地切换为动态微声纹并实时听写进输入框，再点一下或直接点发送即可停止，零多余确认步骤。", names: { js: "voice", react: "voice", preact: "voice", vue: "voice" } },
     { name: "send", type: "string", default: "\"发送\"", required: false, desc: "发送按钮的名字（读屏、提示里）：\"生成\"。", names: { js: "send", react: "send", preact: "send", vue: "send" } },
     { name: "submitKey", type: '"enter" | "mod-enter"', default: '"enter"', required: false, desc: "回车提交模式：enter（默认：Enter 直接发送、Shift+Enter 换行，自动防护中文输入法合成态）或 mod-enter（⌘/Ctrl+Enter 发送、Enter 换行）。", names: { js: "submitKey", react: "submitKey", preact: "submitKey", vue: "submitKey（模板里写 submit-key）" } },
-    { name: "upload", type: "(file: File, progress: (p: number) => void) => Promise<unknown>", default: "演示用的假进度", required: false,
+    { name: "upload", type: "(file: File, progress: (p: number) => void) => Promise<unknown>", default: "内置模拟进度", required: false,
       desc: "真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。", names: { js: "upload", react: "upload", preact: "upload", vue: "upload" } },
     { name: "external", type: "boolean", default: "false", required: false, desc: "发送由外面接管（对话组件里用），发送后不在这里清空。", names: { js: "external" } },
     { name: "context", type: "ComposerContextItem[]", default: "—", required: false, desc: "输入框顶上的上下文栏（项目文件夹、本地 / 云端、分支……）：每项 `{ icon?, text }`；给了 `options`（`[{ value, label }]`）和 `value` 的那项点开是菜单，选了发 `contextChange`，没有的点了发 `contextClick`。只是选中项换了不重画。", names: { js: "context", react: "context", preact: "context", vue: "context" } },
@@ -92,7 +92,7 @@ export default {
       { text: "生成中把整个页面锁住。", rule: "no-overlap" },
     ],
     copy: ["\"描述你想要的画面，比如：雨夜，林夏站在空荡的站台上\"。"],
-    motion: [{ what: "框长高", easing: "ease.out", duration: "180ms" }, { what: "发送按钮亮起来", easing: "ease.out", duration: "150ms" }, { what: "生成中外圈转动", easing: "linear", duration: "1.2s 一圈" }],
+    motion: [{ what: "输入框随内容增加平滑增高", easing: "ease.out", duration: "180ms" }, { what: "输入内容后发送按钮高亮激活", easing: "ease.out", duration: "150ms" }, { what: "生成进行中，停止按钮外环匀速旋转", easing: "linear", duration: "1.2s 循环" }],
   },
   examples: [
     { slug: "prompt-basic", title: "最简单的用法", why: "onSend 返回 Promise：发送后按钮变成停止、外圈转动，结束回到可发送。", html: `<div id="prompt-basic"></div>`, code: code("prompt-basic") },

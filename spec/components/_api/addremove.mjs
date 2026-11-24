@@ -53,13 +53,13 @@ export default {
   },
   design: {
     do: ["删掉的给\"撤销\"，撤销后从原来的位置回来。", "新的一项出现在它该在的位置，不总是放最后。"],
-    dont: [{ text: "删除前弹确认框（能撤销就不要确认）。", rule: "real-content" }, { text: "加、删时整块列表闪一下重画。", rule: "motion-props" }],
-    copy: ["删掉后：\"已移除标签\"雨夜\"\" + \"撤销\"。"],
+    dont: [{ text: "可撤销的删除操作仍弹出模态确认框（支持撤销时应直接执行并提供撤销入口）。" }, { text: "加、删时整块列表闪一下重画。", rule: "motion-props" }],
+    copy: ["删除后给出明确反馈与撤销入口，例如「已移除标签「雨夜」」+「撤销」。"],
     motion: [
-      { what: "新的一项出现（位移 8px、96% → 100%）", easing: "ease.out", duration: "240ms" },
-      { what: "别的项让位", easing: "ease.inOut", duration: "260ms" },
-      { what: "删掉的淡出、缩到 96%", easing: "ease.in", duration: "160ms" },
-      { what: "剩下的用弹簧补位", easing: "spring", duration: "520ms" },
+      { what: "新增项入场（位移 8px，缩放 96% → 100%）", easing: "ease.out", duration: "240ms" },
+      { what: "相邻项平滑让位（FLIP 过渡）", easing: "ease.inOut", duration: "260ms" },
+      { what: "删除项淡出并微缩至 96%", easing: "ease.in", duration: "160ms" },
+      { what: "剩余项按弹簧曲线平滑补位", easing: "spring", duration: "520ms" },
     ],
   },
   examples: [

@@ -442,7 +442,7 @@ export default function CoverUpload() {
 |---|---|---|---|---|---|
 | `accept` | `string \| RegExp` | 什么都收 | 否 | 允许的格式：".txt,.docx" 或正则；不对的当场标红、不上传。 | React：`accept`；Preact：`accept`；Vue：`accept`；纯 HTML：`input 的 accept + createUpload 的 accept（正则）` |
 | `maxSize` | `number` | 不限 | 否 | 单个文件最大多少字节。 | React：`maxSize`；Preact：`maxSize`；Vue：`maxSize（模板里写 max-size）`；纯 HTML：`createUpload 的 maxSize` |
-| `upload` | `(file: File, progress: (p: number) => void) => Promise<unknown>` | 演示用的假进度 | 否 | 真上传：`progress(0～1)` 更新这一行的进度，返回 Promise（reject 时这一行变成"重试"）。 | React：`upload`；Preact：`upload`；Vue：`upload`；纯 HTML：`createUpload 的 upload` |
+| `upload` | `(file: File, progress: (p: number) => void) => Promise<unknown>` | 内置模拟进度 | 否 | 真上传：`progress(0～1)` 更新这一行的进度，返回 Promise（reject 时这一行变成"重试"）。 | React：`upload`；Preact：`upload`；Vue：`upload`；纯 HTML：`createUpload 的 upload` |
 | `title / pick` | `string` | "把文件拖到这里，或者" / "选择文件" | 否 | 框里的说明和能点的那几个字。 | React：`title / pick`；Preact：`title / pick`；Vue：`title / pick`；纯 HTML：`.sn-drop b / u` |
 | `hint` | `string` | — | 否 | 支持的格式和大小："支持 txt、docx，单个不超过 5 MB"。 | React：`hint`；Preact：`hint`；Vue：`hint`；纯 HTML：`.sn-hint` |
 | `label` | `string` | title + pick | 否 | 读屏读出来的名字。 | React：`label`；Preact：`label`；Vue：`label`；纯 HTML：`.sn-drop 的 aria-label` |
@@ -483,7 +483,7 @@ export default function CoverUpload() {
 - 这样做：支持的格式和大小写在框里。
 - 这样做：每个文件各自显示进度，能单独取消、重试。
 - 不要：拖进来时整块变成彩色。（规则 `status-color`）
-- 不要：等传完才告诉用户格式不对。（规则 `real-content`）
+- 不要：等到文件全部上传完成后才提示格式或体积超限（应在选择时即时校验）。
 
 文案：
 
@@ -491,8 +491,8 @@ export default function CoverUpload() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 拖进来：整块高亮、图标往上抬一点 | `ease.outStrong` | 200ms |
-| 文件进列表：从上面淡入 | `ease.out` | 240ms |
+| 文件拖入区域时整体边框高亮、图标轻微上浮 | `ease.outStrong` | 200ms |
+| 新增上传文件项自上方平滑淡入列表 | `ease.out` | 240ms |
 
 ## 验收要点
 

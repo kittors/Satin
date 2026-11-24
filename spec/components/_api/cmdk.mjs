@@ -84,9 +84,9 @@ export default {
     ],
     copy: ["命令用动词开头：\"新建项目\"\"导出成片\"；跳转用名词：\"设置\"。"],
     motion: [
-      { what: "面板从上方落下、淡入", easing: "ease.outStrong", duration: "200ms" },
-      { what: "高亮条在行间滑过去", easing: "ease.outStrong", duration: "160ms" },
-      { what: "筛选时留下的行移到新位置，其他的淡出", easing: "ease.inOut", duration: "200ms" },
+      { what: "面板展开：自上方轻移落位并淡入", easing: "ease.outStrong", duration: "200ms" },
+      { what: "选中高亮背景在命令项间平滑滑移", easing: "ease.outStrong", duration: "160ms" },
+      { what: "实时筛选时匹配项平滑重排，未匹配项淡出", easing: "ease.inOut", duration: "200ms" },
     ],
   },
   examples: [

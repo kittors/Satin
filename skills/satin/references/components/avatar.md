@@ -336,7 +336,7 @@ export default function Members() {
 | 变量 | 作用 | 默认值 |
 |---|---|---|
 | `--sn-s` | 头像边长（尺寸类名就是改它） | 32px |
-| `--sn-av-bg`（全局令牌） | 预设的圆底，照片没加载出来时也露出它 | 浅色 #e8e8ed、深色 #a7a7aa |
+| `--sn-av-bg`（全局令牌） | 默认圆形背景底色（图片加载前作为占位底色展示） | 浅色 #e8e8ed、深色 #a7a7aa |
 | `--sn-av-ink / --sn-av-face`（全局令牌） | 预设的线条、脸 | #424245 / #fafafa |
 | `--sn-av-black / brown / gray / blue / green / pink / violet / beard`（全局令牌） | 预设的发色、衣服色、胡子 | 低饱和，深色主题压到约 90% |
 | `--sn-av-ring` | 叠放组里每个头像外面那圈分隔色，放在别的底色上时跟着设 | 卡片底色 |

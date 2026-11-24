@@ -65,7 +65,7 @@ export default {
     do: ["节点标题写动作（\"生成分镜\"），说明写具体的东西（\"第三集 · 48 个镜头\"）。", "坐标给个大概，交给\"整理\"排。"],
     dont: [{ text: "连线加光晕、发光。", rule: "no-colored-shadow" }, { text: "节点堆渐变底色。", rule: "no-gradient" }],
     copy: ["节点标题 2～6 个字。"],
-    motion: [{ what: "整理：节点移到新位置", easing: "spring", duration: "520ms" }, { what: "拖完连线晃两下再停", easing: "spring", duration: "物理模拟" }],
+    motion: [{ what: "自动整理排版：节点按弹簧曲线移至新坐标", easing: "spring", duration: "520ms" }, { what: "拖动节点释放后，连线带物理惯性轻晃归位", easing: "spring", duration: "物理模拟" }],
   },
   examples: [
     { slug: "flow-basic", title: "最简单的用法", why: "给节点和连线：拖空白处平移、滚轮缩放、拖节点，悬停高亮上下游。", html: `<div id="flow-basic"></div>`, code: code("flow-basic") },

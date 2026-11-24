@@ -515,6 +515,6 @@ export default function MailField() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 错误展开、收起（高度过渡） | `ease.inOut` | 200ms |
-| 输入框左右抖两下 | `ease.out` | 360ms |
+| 错误提示区域高度平滑展开与收起 | `ease.inOut` | 200ms |
+| 校验出错时输入框水平轻微抖动 | `ease.out` | 360ms |
 

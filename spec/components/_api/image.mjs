@@ -32,7 +32,7 @@ export default {
   props: [
     { name: "items", type: "LightboxItem[]", default: "[]", required: true, desc: "每张：`src` 图片地址（或 `bg` 直接给 CSS 背景）；`size` 原图 [宽, 高]（不放大超过原图），只知道比例时给 `ratio`；`alt` 读屏读的说明。视频写 `type: \"video\"`，`src` 是视频地址、`poster` 是封面。", names: { react: "items", preact: "items", vue: "items", html: "openLightbox 的第一个参数" } },
     { name: "index", type: "number | null", default: "null", required: false, desc: "打开到第几张；null 关着。在看图层里翻页不回写，只在关上时回写 null。", descBy: { react: "打开到第几张；null 关着，受控：在 `onClose` 里设回 null。在看图层里翻页不回写。", preact: "打开到第几张；null 关着，受控：在 `onClose` 里设回 null。在看图层里翻页不回写。", vue: "打开到第几张；null 关着：`v-model:index` 绑定，关上时回写 null（在看图层里翻页不回写）。" }, names: { react: "index", preact: "index", vue: "v-model:index", html: "openLightbox 的第二个参数" } },
-    { name: "thumbOf", type: "(i: number) => HTMLElement | null | undefined", default: "—", required: false, desc: "第 i 张的缩略图元素：从它的位置长出来、关上时缩回去（翻页以后缩回到那一张的缩略图；不给就在中间淡入淡出）。", names: { react: "thumbOf", preact: "thumbOf", vue: "thumbOf（模板里写 thumb-of）", html: "选项 thumbOf" } },
+    { name: "thumbOf", type: "(i: number) => HTMLElement | null | undefined", default: "—", required: false, desc: "返回第 i 张图片对应的缩略图元素，用于共享元素展开与缩回定位（翻页后会自动缩回对应缩略图；不传则在视口居中淡入淡出）。", names: { react: "thumbOf", preact: "thumbOf", vue: "thumbOf（模板里写 thumb-of）", html: "选项 thumbOf" } },
     { name: "enabled", type: "(i: number) => boolean", default: "全部", required: false, desc: "左右翻页能不能停在这一张（加载失败的跳过）。", names: { react: "enabled", preact: "enabled", vue: "enabled", html: "选项 enabled" } },
   ],
   events: [{ name: "close", payload: "—", when: "Esc、点关闭、点空白处关上以后。", names: { react: "onClose", preact: "onClose", vue: "@close / @update:index", html: "选项 onClose" } }],
@@ -45,7 +45,7 @@ export default {
   cssVars: [
     { name: "--sn-fill-subtle", desc: "缩略图的占位底色", default: "黑 5%", token: true },
     { name: "--sn-r-md", desc: "缩略图、看图层里图片的圆角", default: "8px", token: true },
-    { name: "--sn-g", desc: "缩略图的图（写在 .sn-im 上：url(…) center）", default: "—", token: false },
+    { name: "--sn-g", desc: "缩略图背景（设置在 `.sn-im` 元素上，如 `url(…) center / cover`）", default: "none", token: false },
   ],
   classes: [
     { name: ".sn-im > .sn-ph.sn-sk / .sn-pic / .sn-err", desc: "缩略图：骨架占位 / 淡入的图 / 失败时的图标和\"重试\"" },
@@ -57,12 +57,12 @@ export default {
     { keys: "← / →", does: "上一张 / 下一张。" },
     { keys: "+ / − / 0", does: "放大 / 缩小 / 还原。" },
     { keys: "R / Shift+R", does: "向右 / 向左转 90°。" },
-    { keys: "Esc", does: "关上，沿原路缩回到缩略图。" },
-    { keys: "Tab", does: "只在工具条里转。" },
+    { keys: "Esc", does: "关闭看图预览，沿原路径缩回对应缩略图。" },
+    { keys: "Tab", does: "焦点在看图工具栏按钮间循环移动。" },
   ],
   a11y: {
     roles: ["看图层 `role=\"dialog\"`、`aria-modal`、`aria-label=\"看图\"`；工具条 `role=\"toolbar\"`，按钮都写了 `aria-label`。", "缩略图写成能聚焦的按钮：`role=\"button\"`、`tabindex=\"0\"`、`aria-label`，Enter / 空格打开。"],
-    focus: ["打开后焦点在看图层上，Tab 只在工具条里转；关上回到那张缩略图。"],
+    focus: ["打开后焦点移入看图层，Tab 在工具栏内循环；关闭后焦点返回触发该预览的缩略图。"],
     notes: ["每张写 `alt`：看图层里读屏读的是它。"],
   },
   design: {
@@ -70,9 +70,9 @@ export default {
     dont: [{ text: "看图层用花哨的转场。", rule: "motion-props" }, { text: "缩略图堆渐变色当占位。", rule: "no-gradient" }],
     copy: ["失败写\"图片加载失败\" + \"重试\"；alt 写画面内容：\"夜里停在站台边的电车\"。"],
     motion: [
-      { what: "从缩略图长到铺满窗口", easing: "ease.open", duration: "380ms" },
-      { what: "关上沿原路缩回", easing: "cubic-bezier(.25,.1,.25,1)", duration: "280ms" },
-      { what: "缩略图从 8px 模糊淡入到清晰", easing: "ease.out", duration: "300ms" },
+      { what: "打开预览：从缩略图位置放大至铺满视口", easing: "ease.open", duration: "380ms" },
+      { what: "关闭预览：沿原路径缩回至缩略图位置", easing: "cubic-bezier(.25,.1,.25,1)", duration: "280ms" },
+      { what: "缩略图加载完成：从 8px 模糊过渡至清晰淡入", easing: "ease.out", duration: "300ms" },
     ],
   },
   examples: [

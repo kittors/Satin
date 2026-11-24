@@ -495,7 +495,7 @@ export default function CopyLink() {
 
 - 这样做：一组两到四个按钮，同一种样式。
 - 这样做：分裂按钮的主按钮做最常用的那一种。
-- 不要：按钮组里混用不同的样式、大小。（规则 `real-content`）
+- 不要：在同一按钮组内混用不同尺寸或视觉层级的按钮。
 - 不要：复制成功再弹一个轻提示。（规则 `no-overlap`）
 
 文案：
@@ -504,5 +504,5 @@ export default function CopyLink() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 复制：图标原地换成对勾 | `ease.outStrong` | 200ms，1.2 秒后换回 |
+| 复制成功：图标原地切换为对勾并在 1.2 秒后复原 | `ease.outStrong` | 200ms |
 

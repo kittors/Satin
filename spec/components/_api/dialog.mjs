@@ -130,16 +130,16 @@ export default {
       { text: "背景遮罩加毛玻璃、弹窗加彩色光晕。", rule: "no-colored-shadow" },
     ],
     copy: [
-      "标题写要做的事：\"删除\"雨夜车站\"？\"",
+      "标题直接说明操作对象与意图，例如「删除「雨夜车站」？」。",
       "按钮写动作：\"删除项目\"，不写\"确定\"。",
       "说明写后果：\"删除后无法恢复，协作者也会失去访问权限。\"",
     ],
     motion: [
-      { what: "打开：从按钮那边放大（0.96 → 1）", easing: "--sn-ease-out-strong", duration: "300ms" },
+      { what: "打开弹窗：自触发按钮方向平滑放大（0.96 → 1）", easing: "--sn-ease-out-strong", duration: "300ms" },
       { what: "打开：淡入", easing: "--sn-ease-out", duration: "140ms" },
-      { what: "关上：淡出并缩到 0.97", easing: "--sn-ease-in", duration: "180ms" },
+      { what: "关闭弹窗：淡出并微缩至 0.97", easing: "--sn-ease-in", duration: "180ms" },
       { what: "背景遮罩出现 / 消失", easing: "--sn-ease-out / --sn-ease-in", duration: "200ms / 180ms" },
-      { what: "点背景：顶一下（放大 1.5%）", easing: "--sn-ease-out", duration: "260ms" },
+      { what: "点击遮罩层时轻微回弹提示（放大 1.5%）", easing: "--sn-ease-out", duration: "260ms" },
     ],
   },
   examples: [

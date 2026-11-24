@@ -66,9 +66,9 @@ export default {
     dont: [{ text: "拖的时候整行变色、加彩色投影。", rule: "no-colored-shadow" }, { text: "放下后整个列表闪一下重画。", rule: "motion-props" }],
     copy: ["把手的读屏名写\"拖动排序：镜头 07 · 车站外，雨刚停\"。"],
     motion: [
-      { what: "拿起：向右拉开 16px、缩到 95%", easing: "ease.out", duration: "180ms" },
-      { what: "让位：离落点越远让得越少（× 0.7ⁿ）、越晚（24ms × n）", easing: "ease.outStrong", duration: "200ms" },
-      { what: "松手归位", easing: "spring", duration: "440ms（别的行 360ms）" },
+      { what: "拖起排序行：轻偏移 16px 并微缩至 95%", easing: "ease.out", duration: "180ms" },
+      { what: "其余行按距离衰减错峰让位（幅度 × 0.7ⁿ，延迟 24ms × n）", easing: "ease.outStrong", duration: "200ms" },
+      { what: "释放后按弹簧曲线归位（当前行 440ms，其余行 360ms）", easing: "spring", duration: "440ms / 360ms" },
     ],
   },
   examples: [

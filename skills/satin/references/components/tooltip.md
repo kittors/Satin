@@ -342,8 +342,8 @@ export default function LongTitle() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 淡入、从元素那边移出来 4px | `ease.out` | 150ms |
-| 在元素之间移动：直接换过去 | `ease.out` | 120ms |
+| 文字提示自触发元素方向轻移 4px 淡入 | `ease.out` | 150ms |
+| 在相邻触发元素间移动时平滑切换位置（免重复等待） | `ease.out` | 120ms |
 
 ## 验收要点
 

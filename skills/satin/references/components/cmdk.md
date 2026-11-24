@@ -628,9 +628,9 @@ export default function RecentProjects() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 面板从上方落下、淡入 | `ease.outStrong` | 200ms |
-| 高亮条在行间滑过去 | `ease.outStrong` | 160ms |
-| 筛选时留下的行移到新位置，其他的淡出 | `ease.inOut` | 200ms |
+| 面板展开：自上方轻移落位并淡入 | `ease.outStrong` | 200ms |
+| 选中高亮背景在命令项间平滑滑移 | `ease.outStrong` | 160ms |
+| 实时筛选时匹配项平滑重排，未匹配项淡出 | `ease.inOut` | 200ms |
 
 ## 验收要点
 

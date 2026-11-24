@@ -102,7 +102,7 @@ export default {
       { text: "手机上用 28 的小按钮做主要操作。", rule: "touch-target" },
     ],
     copy: ["名称两到四个字：\"设置\"\"复制链接\"\"更多操作\"。", "禁用时名称写原因：\"还没有可以下载的成片\"。"],
-    motion: [{ what: "按下缩一下", easing: "ease.out", duration: "100ms" }, { what: "悬停 500ms 后出 Tooltip", easing: "ease.out", duration: "150ms" }],
+    motion: [{ what: "按下态微幅缩放反馈", easing: "ease.out", duration: "100ms" }, { what: "悬停 500ms 后淡入文字提示", easing: "ease.out", duration: "150ms" }],
   },
   examples: [
     { slug: "iconbutton-basic", title: "工具栏里的纯图标按钮", why: "没有面，悬停才出底色；每个都写上名称，悬停、键盘聚焦都能看到。",

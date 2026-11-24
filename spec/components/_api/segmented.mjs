@@ -89,7 +89,7 @@ export default {
       { text: "选中段用彩色底。", rule: "status-color" },
     ],
     copy: ["\"网格 / 列表\"\"7 天 / 30 天 / 全部\"。"],
-    motion: [{ what: "滑块：前缘先到、后缘跟上，落定轻压", easing: "ease.outStrong / ease.inOut", duration: "300ms 左右" }],
+    motion: [{ what: "选中滑块切换：前缘先行、后缘跟进并轻缓落定", easing: "ease.outStrong / ease.inOut", duration: "约 300ms" }],
   },
   examples: [
     { slug: "segmented-basic", title: "最简单的用法", why: "给选项和初始值就能用：组件自己管选中，切换时滑块滑过去。",

@@ -71,7 +71,7 @@ export default {
       { text: "一行里堆好几个颜色不同的文字按钮：颜色只表达状态（危险）。", rule: "status-color" },
     ],
     copy: ["链接写名词（要去的地方）：\"用户协议\"\"隐私说明\"。", "文字按钮写动作：\"编辑\"\"查看全部项目\"。"],
-    motion: [{ what: "悬停时箭头往右挪 2px", easing: "ease.out", duration: "150ms" }, { what: "按下缩一下", easing: "ease.out", duration: "100ms" }],
+    motion: [{ what: "悬停时后置箭头右移 2px", easing: "ease.out", duration: "150ms" }, { what: "按下态微幅缩放反馈", easing: "ease.out", duration: "100ms" }],
   },
   examples: [
     { slug: "link-basic", title: "句子里的链接", why: "和正文同色、一条淡下划线，悬停变实；链接文字说清去哪。",

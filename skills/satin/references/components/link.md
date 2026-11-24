@@ -378,6 +378,6 @@ export default function LinkArrow() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 悬停时箭头往右挪 2px | `ease.out` | 150ms |
-| 按下缩一下 | `ease.out` | 100ms |
+| 悬停时后置箭头右移 2px | `ease.out` | 150ms |
+| 按下态微幅缩放反馈 | `ease.out` | 100ms |
 

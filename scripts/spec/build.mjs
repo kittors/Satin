@@ -13,7 +13,8 @@ import { pathToFileURL } from "node:url";
 const ROOT = path.resolve(import.meta.dirname, "../.."), SPEC = path.join(ROOT, "spec");
 const ONLY_COMPONENTS = process.argv.includes("--components");
 const w = (p, s) => { fs.mkdirSync(path.dirname(path.join(SPEC, p)), { recursive: true }); fs.writeFileSync(path.join(SPEC, p), s); };
-const strip = (h) => String(h).replace(/<code>(.*?)<\/code>/g, "`$1`").replace(/<b>(.*?)<\/b>/g, "**$1**").replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').trim();
+const wrapCode = (_, inner) => { const max = Math.max(0, ...(inner.match(/`+/g) || []).map((x) => x.length)); const f = "`".repeat(max + 1); const pad = inner.startsWith("`") || inner.endsWith("`") ? " " : ""; return `${f}${pad}${inner}${pad}${f}`; };
+const strip = (h) => String(h).replace(/<code[^>]*>(.*?)<\/code>/g, wrapCode).replace(/<b>(.*?)<\/b>/g, "**$1**").replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').trim();
 
 // ———— 1. 设计规范 ————
 const { GUIDES, START } = await import(path.join(ROOT, "site/pages.js"));

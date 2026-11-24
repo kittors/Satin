@@ -342,12 +342,12 @@
     ],
     "motion": [
       {
-        "what": "错误展开、收起（高度过渡）",
+        "what": "错误提示区域高度平滑展开与收起",
         "easing": "ease.inOut",
         "duration": "200ms"
       },
       {
-        "what": "输入框左右抖两下",
+        "what": "校验出错时输入框水平轻微抖动",
         "easing": "ease.out",
         "duration": "360ms"
       }

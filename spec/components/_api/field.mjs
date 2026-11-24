@@ -77,7 +77,7 @@ export default {
       { text: "错误用弹窗、轻提示说。", rule: "no-overlap" },
     ],
     copy: ["标签用名词：\"项目名称\"；错误用一句话说清楚。"],
-    motion: [{ what: "错误展开、收起（高度过渡）", easing: "ease.inOut", duration: "200ms" }, { what: "输入框左右抖两下", easing: "ease.out", duration: "360ms" }],
+    motion: [{ what: "错误提示区域高度平滑展开与收起", easing: "ease.inOut", duration: "200ms" }, { what: "校验出错时输入框水平轻微抖动", easing: "ease.out", duration: "360ms" }],
   },
   examples: [
     { slug: "field-basic", title: "最简单的用法", why: "标签、控件、说明三样；htmlFor 对上控件的 id，点标签就能聚焦。",

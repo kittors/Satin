@@ -256,8 +256,12 @@
   ],
   "keyboard": [
     {
-      "keys": "—",
-      "does": "原生输入框的按键（选字、撤销、输入法）都照常。"
+      "keys": "Tab",
+      "does": "聚焦或移出输入框。"
+    },
+    {
+      "keys": "⌘Z / Ctrl+Z",
+      "does": "撤销输入（完整保留原生选字、剪贴板与输入法体验）。"
     }
   ],
   "design": {
@@ -267,8 +271,7 @@
     ],
     "dont": [
       {
-        "text": "用 placeholder 当标签，输入以后就看不到在填什么了。",
-        "rule": "real-content"
+        "text": "将 placeholder 当作字段标签使用，用户输入后即无法确认当前字段含义。"
       },
       {
         "text": "聚焦时加彩色光晕。",
@@ -280,12 +283,12 @@
     ],
     "motion": [
       {
-        "what": "聚焦时边框、外圈过渡",
+        "what": "聚焦态边框与焦点环过渡",
         "easing": "ease.out",
         "duration": "150ms"
       },
       {
-        "what": "出错时左右抖两下",
+        "what": "校验失败时水平轻微抖动提示",
         "easing": "ease.out",
         "duration": "360ms"
       }

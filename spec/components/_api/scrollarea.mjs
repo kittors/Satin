@@ -59,7 +59,7 @@ export default {
     { name: ".sn-sa > .sn-sa-vp", desc: "外层（滚动条、渐隐）/ 滚动视口" },
   ],
   types: ["ScrollAreaOptions", "ScrollAreaProps"],
-  keyboard: [{ keys: "方向键 / PageUp / PageDown / 空格", does: "原生滚动，照常。" }],
+  keyboard: [{ keys: "方向键 / PageUp / PageDown / 空格", does: "保持原生滚动行为与惯性体验。" }],
   a11y: {
     roles: ["原生滚动：键盘、读屏、惯性都在；滚动条只是看的，不进 Tab 顺序。"],
     focus: ["视口能聚焦（键盘滚动）时写 `tabindex=\"0\"` 和 `aria-label`。"],
@@ -69,10 +69,10 @@ export default {
     do: ["限高的面板、列表都用它，滚动条风格一致。", "横着的一排用 fade=\"x\"、wheel=\"x\"。"],
     dont: [
       { text: "嵌好几层滚动区域。", rule: "no-overlap" },
-      { text: "用渐隐遮住还没看完的重要内容。", rule: "real-content" },
+      { text: "边缘渐隐区域过宽，遮挡首尾关键内容或交互按钮。" },
     ],
-    copy: ["—"],
-    motion: [{ what: "滚动条淡入、不滚 0.7 秒后淡出", easing: "ease.out", duration: "200ms" }, { what: "悬停、拖动时变粗", easing: "ease.out", duration: "150ms" }],
+    copy: ["当滚动容器作为独立可聚焦视口（`tabindex=\"0\"`）使用时，建议提供简明的 `aria-label`（如「镜头列表」），说明当前区域的内容主题。"],
+    motion: [{ what: "滚动条淡入，静止 0.7 秒后自动淡出", easing: "ease.out", duration: "200ms" }, { what: "悬停或拖动滚动条时滑块加粗", easing: "ease.out", duration: "150ms" }],
   },
   examples: [
     { slug: "scrollarea-basic", title: "最简单的用法", why: "写法和 div 一样，限高写在 style 上：滚动条细、不滚就淡出；上下还有内容时边缘渐隐。", html: `<div class="sn-sa-vp" style="max-height:160px"><p>第 1 场 · 车站外</p><p>第 2 场 · 候车厅</p><p>第 3 场 · 站台</p><p>第 4 场 · 车厢里</p><p>第 5 场 · 雨夜</p><p>第 6 场 · 回忆</p><p>第 7 场 · 告别</p><p>第 8 场 · 清晨</p><p>第 9 场 · 天台</p><p>第 10 场 · 便利店</p></div>`, code: code("scrollarea-basic") },

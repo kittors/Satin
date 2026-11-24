@@ -58,7 +58,7 @@ export default {
     do: ["旁边给\"重新发送\"，倒计时写清还要等几秒。", "填满就校验，不用再点\"确定\"。"],
     dont: [{ text: "格子之间加分隔符、装饰。", rule: "no-decorative-divider" }, { text: "用彩色边框表示\"正在输入\"。", rule: "status-color" }],
     copy: ["\"验证码已发到 138****1234\"。", "失败时写原因：\"验证码不对，请重新输入\"。"],
-    motion: [{ what: "数字从下面淡入上来", easing: "ease.outStrong", duration: "200ms" }, { what: "校验失败整排抖一下", easing: "spring", duration: "300ms" }],
+    motion: [{ what: "输入数字自下方平滑淡入", easing: "ease.outStrong", duration: "200ms" }, { what: "验证码校验失败时整组输入框轻微抖动", easing: "spring", duration: "300ms" }],
   },
   examples: [
     { slug: "otp-basic", title: "最简单的用法", why: "6 位，输入后自动跳格，粘贴一串数字也行。", html: `<sn-otp length="6"></sn-otp>`, code: code("otp-basic") },

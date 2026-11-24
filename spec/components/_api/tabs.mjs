@@ -85,7 +85,7 @@ export default {
       { text: "标签挤得换行、横向溢出。", rule: "button-wrap" },
     ],
     copy: ["标签用名词：\"概览\"\"镜头\"\"配音\"。"],
-    motion: [{ what: "下划线、当前页：前缘先走、后缘跟上", easing: "ease.outStrong / ease.inOut", duration: "300ms 左右" }, { what: "新内容从所选标签那一侧滑进来", easing: "ease.out", duration: "240ms" }],
+    motion: [{ what: "选中指示条切换：前缘先行、后缘跟进平滑落位", easing: "ease.outStrong / ease.inOut", duration: "约 300ms" }, { what: "切换标签后，新内容区沿目标标签方向淡入滑入", easing: "ease.out", duration: "240ms" }],
   },
   examples: [
     { slug: "tabs-basic", title: "最简单的用法", why: "给标签和内容就能用：组件自己管选中，下划线滑过去。", html: `<sn-tabs tabs='${TABS}'></sn-tabs>`, code: code("tabs-basic") },

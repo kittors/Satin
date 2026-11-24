@@ -52,7 +52,7 @@ export default {
   functions: [
     { name: "openMenu", signature: "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; onSelect?(detail: MenuSelectDetail): void }): void", returns: "void", from: "satin-ui",
       desc: "程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`keyboard: true` 先高亮第一项。" },
-    { name: "closeMenu", signature: "closeMenu(refocus?: boolean): void", returns: "void", from: "satin-ui", desc: "关上开着的菜单（`refocus` 焦点回到触发器）。" },
+    { name: "closeMenu", signature: "closeMenu(refocus?: boolean): void", returns: "void", from: "satin-ui", desc: "关闭当前展开的菜单（`refocus` 为 true 时焦点返回至触发元素）。" },
   ],
   cssVars: [
     { name: "--sn-menu-bg", desc: "菜单底色（毛玻璃）", default: "白 82%", token: true },
@@ -72,7 +72,7 @@ export default {
     { keys: "↑ / ↓", does: "在项之间移动。" },
     { keys: "→ / ←", does: "打开 / 收起子菜单。" },
     { keys: "Enter", does: "选中。" },
-    { keys: "Esc", does: "关上，焦点回到触发器。" },
+    { keys: "Esc", does: "关闭菜单，并将焦点返回至触发元素。" },
   ],
   a11y: {
     roles: ["菜单 `role=\"menu\"`、每项 `role=\"menuitem\"`；按钮 `aria-haspopup=\"menu\"`、`aria-expanded` 跟着变；有子菜单的项 `aria-haspopup=\"menu\"`。"],
@@ -87,9 +87,9 @@ export default {
     ],
     copy: ["动词开头：\"复制一份\"\"移到回收站\"。"],
     motion: [
-      { what: "从触发器那边长出来", easing: "ease.outStrong", duration: "160ms" },
-      { what: "子菜单打开等 220ms，切换最多等 1200ms，关闭等 360ms", easing: "—", duration: "220 / 1200 / 360ms" },
-      { what: "选中的行闪一下再收起", easing: "ease.in", duration: "140ms" },
+      { what: "菜单展开：从触发器方向缩放淡入", easing: "ease.outStrong", duration: "160ms" },
+      { what: "子菜单悬停延迟（打开 / 斜向移动容错 / 离开关闭）", easing: "无（悬停延迟）", duration: "220 / 1200 / 360ms" },
+      { what: "选中菜单项后轻闪烁确认并收起", easing: "ease.in", duration: "140ms" },
     ],
   },
   examples: [

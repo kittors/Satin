@@ -83,8 +83,8 @@ export default {
     ],
     copy: ["名称写调的是什么：\"镜头时长\"\"每批张数\"。"],
     motion: [
-      { what: "数字往上 / 往下滚到新值", easing: "ease.outStrong", duration: "260ms" },
-      { what: "到边界再按：数字抖一下", easing: "spring", duration: "300ms" },
+      { what: "增减数值时数字平滑上下滚动", easing: "ease.outStrong", duration: "260ms" },
+      { what: "到达最小值或最大值后继续点击，数字轻微抖动提示", easing: "spring", duration: "300ms" },
     ],
   },
   examples: [

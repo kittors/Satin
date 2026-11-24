@@ -230,7 +230,7 @@ const BLOCK = {
   tokens: () => '<div data-async="tokens"></div>',
   evalShowcase: () => evalShowcaseHTML(),
   img: (src, w, h, cap) => `<figure class="d-fig"><img src="${src}" width="${w}" height="${h}" alt="${esc(cap)}" loading="lazy" decoding="async"><figcaption>${cap}</figcaption></figure>`,
-  do: (yes, no) => `<div class="d-dodont"><div class="do"><b><span data-i="check"></span>这样做</b><p>${yes}</p></div><div class="dont"><b><span data-i="x"></span>不要</b><p>${no}</p></div></div>`,
+  do: (yes, no) => `<div class="d-dodont"><div class="do"><b><span data-i="check"></span>推荐做法</b><p>${yes}</p></div><div class="dont"><b><span data-i="x"></span>避免做法</b><p>${no}</p></div></div>`,
   // 统一采用 Satin 标准表格组件（.sn-tbl-wrap > .sn-tbl-sc > table.sn-tbl）：闭合圆角外框、干净表头、纯数值列自动等宽右对齐，窄屏自动折叠为卡片行
   table: (head, rows) => {
     const nums = head.map((_, i) => isNumCol(rows, i));
@@ -389,8 +389,13 @@ const CONTRACTED = new Set([...DEMOS.values()].filter((d) => d.contract).map((d)
 // 跟着框架变的小块（引入那一行、API 表里的叫法）：换框架时只重画这些，演示框不动
 const FWR = [];
 const fwr = (fn) => `<div class="d-fwr" data-fwr="${FWR.push(fn) - 1}">${fn()}</div>`;
-// 键盘表的按键："⌘ / Ctrl + 回车"按" / "拆成几组，每组一个不折行的 <kbd>（只在" / "处换行）；末尾括号里的说明（"（图片、视频气泡上）"）放到 kbd 外面，小字
-const keysHTML = (s) => { const m = /^(.*?)\s*（([^）]*)）\s*$/.exec(String(s)), keys = (m ? m[1] : String(s)).split(/\s+\/\s+/); return keys.map((k) => `<kbd class="d-nw">${esc(k)}</kbd>`).join(" / ") + (m ? `<wbr><span class="d-k-note">（${esc(m[2])}）</span>` : ""); };
+// 键盘表的按键："⌘ / Ctrl + 回车"按" / "拆成几组，每组一个不折行的 <kbd>（只在" / "处换行）；末尾括号里的说明（"（图片、视频气泡上）"）放到 kbd 外面，小字；"—" 表示无独立快捷键
+const keysHTML = (s) => {
+  const raw = String(s || "").trim();
+  if (!raw || raw === "—" || raw === "无") return '<span class="d-api-nil">无独立快捷键</span>';
+  const m = /^(.*?)\s*（([^）]*)）\s*$/.exec(raw), keys = (m ? m[1] : raw).split(/\s+\/\s+/);
+  return keys.map((k) => `<kbd class="d-nw">${esc(k)}</kbd>`).join(" / ") + (m ? `<wbr><span class="d-k-note">（${esc(m[2])}）</span>` : "");
+};
 // 正文里不许拆开的东西（乱换行）：行内代码一截一截不折行，只在空格处换行（一整截 ≤ 40 个字的不断开）；数字和单位、日期包成不折行的一块。
 // 渲染完、切框架重渲染以后各跑一遍（API 表、规则表里的代码已经自己包好了，带子元素的 code 不动）
 // 数字 + 单位、日期、时间；正文里没包代码样式的令牌名、类名（".sn-rg-tabs"、"--sn-label2"），都包成不折行的一块
@@ -864,7 +869,7 @@ function compPage(pg) {
 const plain = (h) => String(h).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 function overviewPage(pg) {
   const groups = cat.groups.filter((g) => g.name !== "基础");
-  return head(pg, "组件总览", `组件 <span>Components</span>`, `${cat.components.length} 个组件，按类别分组。点一张卡片进到组件页：现场演示、HTML / React / Vue / 自定义元素四种写法的代码、参数和要点。颜色、排版这些基础在<a href="#/guide/color">规范</a>里。`)
+  return head(pg, "组件总览", `组件 <span>Components</span>`, `${cat.components.length} 个组件，按类别分组。点击卡片进入组件页，查看现场演示、7 种主流框架 TypeScript / HTML 代码、完整 API 与设计规范。颜色、排版等基础规范见<a href="#/guide/color">规范</a>。`)
     + groups.map((g, i) => anchor("g" + i, `${esc(g.name)}<span class="d-h2-sub">${g.items.length}</span>`) + `<div class="d-cards">${g.items.map((c) => `<a class="d-card" href="#/c/${c.id}"><b>${esc(c.name)}</b><small>${esc(c.en.split(" · ")[0])}</small><span>${esc(plain(c.desc))}</span></a>`).join("")}</div>`).join("");
 }
 // 配方总览：9 种页面，每张卡片上是这一页缩小的实时预览（滚到附近才载入）
@@ -872,7 +877,7 @@ const RSUB = { "admin-table": "侧栏 + 搜索筛选 + 表格 + 分页", setting
   chat: "对话框占满主区：消息区 + 提示词输入框", landing: "首屏 + 3 个功能点 + 真实场景 + 页脚", "mobile-order": "单栏 + 底部贴边的操作栏", wizard: "步骤条 + 当前一步的字段 + 上一步 / 下一步",
   "not-found": "极简居中留白 + 互动 6 叶片机械光圈 404" };
 function recipesPage(pg) {
-  return head(pg, "配方总览", `配方 <span>Recipes</span>`, "9 种常见页面的骨架：先照着搭结构，再换成自己的内容。只用 Satin 的骨架类和组件，不用自己写布局和颜色。每一种都有实时预览和代码，代码可以切换 HTML、React、Vue。")
+  return head(pg, "配方总览", `配方 <span>Recipes</span>`, "9 种常见业务页面的完整结构模板：直接使用 Satin 布局类与组件，无需手写基础样式。每份配方均提供实时预览与 React、Vue、Svelte、Angular、Solid、Preact 及纯 HTML 代码。")
     + `<div class="d-cards d-rcards">${RECIPES.map((r) => {
       const inner = r.mobile
         ? `<span class="d-rprev-phone"><span class="d-rprev-body" data-rprev-w="390"><iframe src="../tests/recipes/${r.id}.html" loading="lazy" tabindex="-1" title=""></iframe></span></span>`
@@ -884,7 +889,42 @@ function recipesPage(pg) {
 function recipePage(pg) {
   return head(pg, pg.r.title, `配方 <span>Recipe</span>`, `<span data-async-lead></span>`) + `<div data-async="recipe:${pg.r.id}"></div>`;
 }
-const md2html = (t) => esc(t).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+// CommonMark 兼容行内解析：支持多反引号包裹（如 ```` ```ts title=app.ts ````）与粗体，彻底避免三反引号被误拆为乱码
+function md2html(t) {
+  const s = String(t ?? "");
+  let out = "", i = 0;
+  const bold = (txt) => esc(txt).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  while (i < s.length) {
+    if (s[i] === "`") {
+      let n = 0; while (s[i + n] === "`") n++;
+      const delim = "`".repeat(n);
+      let j = i + n, end = -1;
+      while (j < s.length) {
+        const hit = s.indexOf(delim, j);
+        if (hit < 0) break;
+        const beforeOk = hit === i + n || s[hit - 1] !== "`";
+        const afterOk = hit + n >= s.length || s[hit + n] !== "`";
+        if (beforeOk && afterOk) { end = hit; break; }
+        j = hit + 1;
+      }
+      if (end > i + n) {
+        let inner = s.slice(i + n, end);
+        if (inner.length >= 2 && inner.startsWith(" ") && inner.endsWith(" ") && inner.trim()) inner = inner.slice(1, -1);
+        out += `<code>${esc(inner)}</code>`;
+        i = end + n;
+        continue;
+      }
+      out += esc(delim);
+      i += n;
+      continue;
+    }
+    const next = s.indexOf("`", i);
+    if (next < 0) { out += bold(s.slice(i)); break; }
+    out += bold(s.slice(i, next));
+    i = next;
+  }
+  return out;
+}
 // 把配方代码段后面的 Markdown 案例说明渲染为完整结构化文档（## 自动进右侧 TOC、###、表格、列表、引用块、段落）；无 ## 时沿用原本的"补充说明"列表
 function renderRecipeAfter(raw) {
   const text = String(raw || "").trim();
@@ -1459,92 +1499,103 @@ function refOf(id) {
   const c = cat.byId[id]; if (c && byHash.has("#/c/" + id)) return { href: "#/c/" + id, name: c.name, en: (c.en || "").split(" · ")[0] }; // 目录里有、但不是组件页的（基础那几项）往下找规范页
   const g = byHash.get("#/guide/" + id); return g ? { href: g.hash, name: g.title, en: g.p?.en || "规范" } : null;
 }
-function contractHTML(c, k) {
+function contractHTML(c, k, ruleMap = null) {
   const cat0 = cat.byId[c.id], out = [];
-  // 1. 什么时候用、别用、和相近组件的区别
-  out.push(anchor("when", "什么时候用"), `<ul class="d-list">${(k.whenToUse || []).map((t) => `<li>${md(t)}</li>`).join("")}</ul>`);
-  if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">什么时候别用</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${refOf(x.use) ? ` → <a href="${refOf(x.use).href}">${esc(refOf(x.use).name)}</a>` : ""}</li>`).join("")}</ul>`);
-  if (k.related?.length) out.push(`<h3 class="d-h3">和相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [refOf(r.id) ? `<a href="${refOf(r.id).href}">${esc(refOf(r.id).name)}</a>` : esc(r.id), md(r.diff)])));
+  // 1. 适用场景、不适用场景与相近组件区别
+  out.push(anchor("when", "适用场景"), `<ul class="d-list">${(k.whenToUse || []).map((t) => `<li>${md(t)}</li>`).join("")}</ul>`);
+  if (k.whenNotToUse?.length) out.push(`<h3 class="d-h3">不适用场景</h3><ul class="d-list">${k.whenNotToUse.map((x) => `<li>${md(x.text)}${refOf(x.use) ? ` → <a href="${refOf(x.use).href}">${esc(refOf(x.use).name)}</a>` : ""}</li>`).join("")}</ul>`);
+  if (k.related?.length) out.push(`<h3 class="d-h3">与相近组件的区别</h3>`, tbl(["组件", "区别"], k.related.map((r) => [refOf(r.id) ? `<a href="${refOf(r.id).href}">${esc(refOf(r.id).name)}</a>` : esc(r.id), md(r.diff)])));
   // 2. 引入（当前框架）
   out.push(anchor("import", "引入"), fwr(() => { const key = nameKey(), line = k.import?.[key] || k.import?.html || ""; return codePanel([{ name: "", lang: key === "html" && /^</.test(line.trim()) ? "html" : "ts", code: line }], { solo: true, lead: fwLead() }); }), k.importNote ? fwr(() => { const t = fwText(k.importNote); return t ? `<p>${md(t)}</p>` : ""; }) : "");
   // 3. 示例：由浅入深，每个都是现场演示 + 当前框架的代码
   out.push(anchor("examples", "示例"));
   // 示例说明也按写法给（whyBy，或者写成 { react, vue, …, default }），换框架时跟着重画
   for (const ex of k.examples || []) out.push(`<h3 class="d-h3" id="ex-${ex.slug}">${esc(ex.title)}</h3>`, ex.why || ex.whyBy ? fwr(() => { const w = fwText(by(ex, "why")); return w ? `<p>${md(w)}</p>` : ""; }) : "", playBox(c, ex));
-  // 设计稿里的完整演示（更丰富的组合）
-  // 完整演示：设计稿里更丰富的组合，只放现场演示（写法以上面的示例为准）
-  if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示"), `<p>设计稿里把几种用法组合在一起的样子，可以直接操作；代码看上面的示例。</p>`); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n, code: false }))); }
+  // 完整演示：多种用法的组合演示（各场景独立代码见上方示例）
+  if (cat0?.demos?.length) { out.push(anchor("demo", "完整演示"), `<p>多种用法的完整交互组合演示，可直接操作体验；各场景独立代码请参考上方示例。</p>`); cat0.demos.forEach((d, n) => out.push(d.cap && cat0.demos.length > 1 ? `<h3 class="d-h3">${esc(d.cap)}</h3>` : "", demoBox(c.id, { n, code: false }))); }
   // 4. API（按当前框架的叫法，全面使用 Satin createTable 渲染）
   out.push(anchor("api", "API"));
   if (k.props?.length) out.push(`<h3 class="d-h3">属性</h3>`, fwr(() => {
     const ps = k.props.filter(hasIn);
-    return !ps.length ? "<p>这种写法里没有单独的属性。</p>" : apiTableSlot({
+    return !ps.length ? "<p>当前框架写法下无额外属性。</p>" : apiTableSlot({
       label: "属性", nameCol: "名称", typeCol: "类型", typeTitle: "完整类型", defCol: "默认值", descCol: "说明",
       showType: true, showDef: true,
       rows: ps.map((x) => ({ name: nameOf(x), type: by(x, "type") || "", def: by(x, "default"), required: !!x.required, desc: md(by(x, "desc")), example: by(x, "example") || "" })),
     });
   }));
   // 列定义（数据表格、Canvas 表格契约里的 columnProps）：columns 里每一项的字段，各框架写法一样
-  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 里每一项的字段（各框架写法一样）。</p>`, apiTableSlot({
+  if (k.columnProps?.length) out.push(`<h3 class="d-h3" id="api-columns">列定义</h3><p><code>columns</code> 配置项中每列支持的字段（各框架通用）。</p>`, apiTableSlot({
     label: "列定义", nameCol: "字段", typeCol: "类型", typeTitle: "完整类型", defCol: "默认值", descCol: "说明",
     showType: true, showDef: true,
     rows: k.columnProps.map((x) => ({ name: x.name, type: by(x, "type") || "", def: by(x, "default"), desc: md(by(x, "desc")) })),
   }));
   if (k.events?.length) out.push(`<h3 class="d-h3">事件</h3>`, fwr(() => {
     const es = k.events.filter(hasIn);
-    return !es.length ? "<p>这种写法里没有单独的事件。</p>" : apiTableSlot({
-      label: "事件", nameCol: "名称", typeCol: "参数", typeTitle: "完整参数类型", descCol: "什么时候触发",
+    return !es.length ? "<p>当前框架写法下无额外事件。</p>" : apiTableSlot({
+      label: "事件", nameCol: "名称", typeCol: "参数", typeTitle: "完整参数类型", descCol: "触发时机",
       showType: true, showDef: false,
       rows: es.map((x) => ({ name: nameOf(x), type: by(x, "payload") || "", desc: md(by(x, "when")) })),
     });
   }));
   if (k.slots?.length) out.push(`<h3 class="d-h3">插槽 / 子元素</h3>`, fwr(() => {
     const ss = k.slots.filter(hasIn);
-    return !ss.length ? "<p>这种写法里没有插槽 / 子元素。</p>" : apiTableSlot({
+    return !ss.length ? "<p>当前框架写法下无插槽或子元素。</p>" : apiTableSlot({
       label: "插槽", nameCol: "名称", descCol: "说明", showType: false, showDef: false,
       rows: ss.map((x) => ({ name: nameOf(x), desc: md(by(x, "desc")) })),
     });
   }));
-  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>createXxx 返回的实例、React 的 ref、Vue 模板 ref 的 instance 上都有。</p>`, apiTableSlot({
+  if (k.methods?.length) out.push(`<h3 class="d-h3">实例方法</h3><p>可通过工厂函数返回值、React 的 <code>ref</code> 或 Vue 模板 ref 的 <code>instance</code> 调用。</p>`, apiTableSlot({
     label: "实例方法", nameCol: "名称", typeCol: "签名", typeTitle: "完整方法签名", descCol: "说明",
     showType: true, showDef: false, nameWidth: 150, typeWidth: 230,
     rows: k.methods.map((x) => ({ name: x.name, type: by(x, "signature") || "", desc: md(by(x, "desc")) })),
   }));
-  if (k.functions?.length) out.push(`<h3 class="d-h3">函数</h3>`, apiTableSlot({
+  if (k.functions?.length) out.push(`<h3 class="d-h3">工具函数</h3>`, apiTableSlot({
     label: "函数", nameCol: "名称", typeCol: "签名", typeTitle: "完整函数签名", descCol: "说明",
     showType: true, showDef: false, nameWidth: 160, typeWidth: 230,
     rows: k.functions.map((x) => ({ name: x.name, sub: x.from || "", type: by(x, "signature") || "", desc: md(by(x, "desc")) })),
   }));
   if (k.cssVars?.length) out.push(`<h3 class="d-h3">样式定制</h3>`, apiTableSlot({
-    label: "样式定制", nameCol: "CSS 变量", defCol: "默认", descCol: "作用",
+    label: "样式定制", nameCol: "CSS 变量", defCol: "默认值", descCol: "说明",
     showType: false, showDef: true, nameWidth: 196, defWidth: 132,
     rows: k.cssVars.map((x) => ({ name: x.name, token: !!x.token, def: x.default || "", desc: md(x.desc) })),
   }));
-  if (k.classes?.length) out.push(`<h3 class="d-h3">纯 HTML 写法的类名、data 属性</h3>`, apiTableSlot({
-    label: "类名", nameCol: "写法", descCol: "说明", showType: false, showDef: false, nameWidth: 220,
+  if (k.classes?.length) out.push(`<h3 class="d-h3">类名与 data 属性（纯 HTML）</h3>`, apiTableSlot({
+    label: "类名", nameCol: "选择器 / 属性", descCol: "说明", showType: false, showDef: false, nameWidth: 220,
     rows: k.classes.map((x) => ({ name: x.name, desc: md(x.desc) })),
   }));
   if (k.types?.length) out.push(`<h3 class="d-h3">TypeScript 类型</h3><p>${k.types.map((t) => `<code>${esc(t)}</code>`).join("、")}</p>`);
   // 5. 键盘与无障碍
   if (k.keyboard?.length || k.a11y) {
     out.push(anchor("a11y", "键盘与无障碍"));
-    if (k.keyboard?.length) out.push(apiTableSlot({
-      label: "键盘操作", nameCol: "按键", typeCol: "什么时候", descCol: "做什么",
-      showType: true, showDef: false, rawType: true, sortable: false, nameWidth: 164, typeWidth: 176,
-      rows: k.keyboard.map((x) => ({ name: x.keys, nameHtml: keysHTML(x.keys), type: x.when || "", typeHtml: x.when ? md(x.when) : '<span class="d-api-nil">—</span>', desc: md(x.does) })),
-    }));
-    for (const [t, list] of [["角色", k.a11y?.roles], ["焦点", k.a11y?.focus], ["说明", k.a11y?.notes]]) if (list?.length) out.push(`<h3 class="d-h3">${t}</h3><ul class="d-list">${list.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
+    if (k.keyboard?.length) {
+      const hasWhen = k.keyboard.some((x) => x.when && String(x.when).trim());
+      out.push(apiTableSlot({
+        label: "键盘操作", nameCol: "按键", typeCol: "触发条件", descCol: "行为说明",
+        showType: hasWhen, showDef: false, rawType: true, sortable: false, nameWidth: 176, typeWidth: 184,
+        rows: k.keyboard.map((x) => ({ name: x.keys, nameHtml: keysHTML(x.keys), type: x.when || "", typeHtml: x.when ? md(x.when) : '<span class="d-api-nil">通用</span>', desc: md(x.does) })),
+      }));
+    }
+    for (const [t, list] of [["ARIA 角色", k.a11y?.roles], ["焦点管理", k.a11y?.focus], ["无障碍说明", k.a11y?.notes]]) if (list?.length) out.push(`<h3 class="d-h3">${t}</h3><ul class="d-list">${list.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
   }
   // 6. 设计规范
   const dz = k.design || {};
   if (dz.do || dz.dont || dz.copy || dz.motion) {
     out.push(anchor("design", "设计规范"));
-    // 只有一边有条目时只放那一张卡（整行宽），不留一张空的"不要"（万级节点压测只写了"这样做"）
-    const doH = dz.do?.length ? `<div class="do"><b><span data-i="check"></span>这样做</b><ul>${dz.do.map((x) => `<li>${md(x.text ?? x)}</li>`).join("")}</ul></div>` : "";
-    const dontH = dz.dont?.length ? `<div class="dont"><b><span data-i="x"></span>不要</b><ul>${dz.dont.map((x) => `<li>${md(x.text ?? x)}${x.rule ? ` <a href="#/guide/no-ai">${esc(x.rule)}</a>` : ""}</li>`).join("")}</ul></div>` : "";
+    const ruleRef = (id) => {
+      if (!id) return "";
+      const title = ruleMap?.get(id);
+      const label = title ? `规范：${title}` : `规范：${id}`;
+      return ` <a class="d-rule-ref" href="#/guide/no-ai" data-tip="查看反 AI 味设计规范（${esc(id)}）">${esc(label)}</a>`;
+    };
+    const doH = dz.do?.length ? `<div class="do"><b><span data-i="check"></span>推荐做法</b><ul>${dz.do.map((x) => `<li>${md(x.text ?? x)}</li>`).join("")}</ul></div>` : "";
+    const dontH = dz.dont?.length ? `<div class="dont"><b><span data-i="x"></span>避免做法</b><ul>${dz.dont.map((x) => `<li>${md(x.text ?? x)}${ruleRef(x.rule)}</li>`).join("")}</ul></div>` : "";
     if (doH || dontH) out.push(`<div class="d-dodont${doH && dontH ? "" : " d-dodont-one"}">${doH}${dontH}</div>`);
-    if (dz.copy?.length) out.push(`<h3 class="d-h3">文案</h3><ul class="d-list">${dz.copy.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
-    if (dz.motion?.length) out.push(`<h3 class="d-h3">动效</h3>`, tbl(["哪里", "曲线", "时长"], dz.motion.map((x) => [md(x.what), `<code>${esc(x.easing || "")}</code>`, esc(x.duration || "")])));
+    if (dz.copy?.length) out.push(`<h3 class="d-h3">文案建议</h3><ul class="d-list">${dz.copy.map((x) => `<li>${md(x)}</li>`).join("")}</ul>`);
+    if (dz.motion?.length) out.push(`<h3 class="d-h3">动效</h3>`, tbl(["交互场景", "缓动曲线", "时长"], dz.motion.map((x) => {
+      const e = String(x.easing || "").trim();
+      const easingCell = !e || e === "—" || e === "无" ? '<span class="d-api-nil">无</span>' : /^[-a-zA-Z0-9._/() ,]+$/.test(e) ? `<code>${esc(e)}</code>` : esc(e);
+      return [md(x.what), easingCell, esc(x.duration || "")];
+    })));
   }
   // 7. 相关组件
   if (k.related?.length) out.push(anchor("related", "相关组件"), `<div class="d-cards">${k.related.filter((r) => refOf(r.id)).map((r) => { const f = refOf(r.id); return `<a class="d-card" href="${f.href}"><b>${esc(f.name)}</b><small>${esc(f.en)}</small><span>${md(r.diff)}</span></a>`; }).join("")}</div>`);
@@ -1583,9 +1634,13 @@ side.addEventListener("focusin", (e) => { const a = e.target.closest?.("a[href]"
 
 const ASYNC = {
   async contract(id) {
-    const k = READY_CACHE.get(`contract:${id}`) || await prefetchAsync("contract", id);
+    const [k, rulesData] = await Promise.all([
+      READY_CACHE.get(`contract:${id}`) || prefetchAsync("contract", id),
+      (READY_CACHE.get("rules:") || prefetchAsync("rules", "")).catch(() => null),
+    ]);
+    const ruleMap = rulesData?.rules ? new Map(rulesData.rules.map((r) => [r.id, r.title])) : null;
     const lead = $("[data-async-lead]", main); if (lead && k.lead) lead.outerHTML = md(k.lead);
-    return contractHTML(cat.byId[id], k);
+    return contractHTML(cat.byId[id], k, ruleMap);
   },
   async recipe(id) {
     const r = RECIPES.find((x) => x.id === id), d = READY_CACHE.get(`recipe:${id}`) || await prefetchAsync("recipe", id), url = RECIPE_URL[id] || `studio.satin.dev/${id}`;
@@ -1607,14 +1662,14 @@ const ASYNC = {
     const cnt = $("[data-n-rules]", main); if (cnt) cnt.textContent = String(rules.length);
     // 规则文件还没给名字加反引号的，先按样子认出令牌名（--sn-…）、类名（sn-…）、路径（references/…）当代码；已经有反引号的照原样
     const codeify = (t) => (/`/.test(t) ? t : t.replace(/(--sn-[A-Za-z0-9-]+(?:\/[a-z0-9]+)*(?:…\d+)?|(?<![\w-])sn-[a-z][\w-]*\*?|references\/[\w./-]+|SKILL\.md)/g, "`$1`"));
-    const table = (list) => BLOCK.table(["规则", "查法", "怎么改"], list.map((r) => [`<b>${esc(r.title)}</b><br><code>${esc(r.id)}</code>`, how(r), md2html(codeify(r.fix || "")).replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="sn-tbl d-table"', 'class="sn-tbl d-table d-rules"');
-    // 按七个根源组织（主会话 11-22）：规则文件给了根源（roots：编号、名字、自检问题）就先列根源和"先问自己"的问题；
+    const table = (list) => BLOCK.table(["规则", "检查方式", "修复建议"], list.map((r) => [`<b>${esc(r.title)}</b><br><code>${esc(r.id)}</code>`, how(r), md2html(codeify(r.fix || "")).replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="sn-tbl d-table"', 'class="sn-tbl d-table d-rules"');
+    // 按七个根源组织（主会话 11-22）：规则文件给了根源（roots：编号、名字、自检问题）就先列根源和"核心自检问题"；
     // 规则带 root 字段就按根源分组，一类一张表；都还没有时照旧一张表。root 可以写编号、名字或者 { id }
     const NAMES = ["自说自话", "假", "照搬", "堆信号", "语义错位", "只在理想条件下成立", "生硬"];
     const noOf = (v) => { if (v == null) return null; if (typeof v === "object") return noOf(v.id ?? v.no ?? v.name); if (/^\d+$/.test(String(v))) return +v; const i = NAMES.indexOf(String(v)); return i < 0 ? null : i + 1; };
     const roots = (Array.isArray(data.roots) ? data.roots : data.roots ? Object.entries(data.roots).map(([id, v]) => (typeof v === "string" ? { id, name: v } : { id, ...v })) : [])
       .map((r, i) => ({ no: noOf(r.id ?? r.no) ?? i + 1, name: r.name || r.title || NAMES[i], ask: r.ask || r.question || r.check || "" }));
-    const head = roots.length ? BLOCK.table(["根源", "先问自己"], roots.map((r) => [`<span class="d-nw"><b>${r.no} ${esc(r.name)}</b></span>`, md2html(r.ask || "").replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="sn-tbl d-table"', 'class="sn-tbl d-table d-roots"') : "";
+    const head = roots.length ? BLOCK.table(["设计维度", "核心自检问题"], roots.map((r) => [`<span class="d-nw"><b>${r.no} ${esc(r.name)}</b></span>`, md2html(r.ask || "").replace(/^<p>([\s\S]*)<\/p>$/, "$1")])).replace('class="sn-tbl d-table"', 'class="sn-tbl d-table d-roots"') : "";
     if (!rules.some((r) => noOf(r.root) != null)) return head + table(rules);
     const groups = (roots.length ? roots : NAMES.map((name, i) => ({ no: i + 1, name }))).map((g) => ({ ...g, list: rules.filter((r) => noOf(r.root) === g.no) }));
     const rest = rules.filter((r) => !groups.some((g) => g.list.includes(r)));

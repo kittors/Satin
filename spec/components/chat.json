@@ -302,7 +302,7 @@
       "type": "number",
       "default": "5",
       "required": false,
-      "desc": "输入框最多长到几行，再多在框里滚。",
+      "desc": "输入框自动增高的最大行数，超出后在输入框内滚动。",
       "names": {
         "js": "maxLines",
         "react": "maxLines",
@@ -341,7 +341,7 @@
       "type": "{ upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: Partial<Record<\"img\" | \"vid\" | \"aud\" | \"doc\", (counter: { n: number }) => ComposerAttachment>> }",
       "default": "—",
       "required": false,
-      "desc": "底部输入框的选项：upload 真上传（不给是演示用的假进度）、attachments 附件菜单每一项（img / vid / aud / doc）点了以后给出的附件（演示、自己接选择器时用）。",
+      "desc": "底部提示词输入框配置：`upload` 指定真实上传回调（省略时使用内置模拟进度）；`attachments` 自定义各类型（`img` / `vid` / `aud` / `doc`）附件菜单项的选取处理。",
       "names": {
         "js": "composer",
         "react": "composer",
@@ -978,8 +978,7 @@
         "rule": "no-gradient"
       },
       {
-        "text": "每条消息都加时间、头像、气泡尾巴。",
-        "rule": "real-content"
+        "text": "为每条消息重复堆叠时间戳、头像与尖角气泡尾巴，增加视觉噪音。"
       }
     ],
     "copy": [
@@ -987,12 +986,12 @@
     ],
     "motion": [
       {
-        "what": "发送：字原地变成气泡飞进列表",
+        "what": "发送消息：输入文本化作气泡平滑飞入消息列表",
         "easing": "spring",
         "duration": "约 500ms"
       },
       {
-        "what": "思考结束收起",
+        "what": "思考过程结束后平滑收起",
         "easing": "ease.out",
         "duration": "240ms"
       }

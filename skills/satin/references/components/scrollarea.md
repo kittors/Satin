@@ -710,7 +710,7 @@ export default function SceneList() {
 
 | 按键 | 什么时候 | 做什么 |
 |---|---|---|
-| 方向键 / PageUp / PageDown / 空格 |  | 原生滚动，照常。 |
+| 方向键 / PageUp / PageDown / 空格 |  | 保持原生滚动行为与惯性体验。 |
 
 ## 无障碍
 
@@ -723,21 +723,21 @@ export default function SceneList() {
 - 这样做：限高的面板、列表都用它，滚动条风格一致。
 - 这样做：横着的一排用 fade="x"、wheel="x"。
 - 不要：嵌好几层滚动区域。（规则 `no-overlap`）
-- 不要：用渐隐遮住还没看完的重要内容。（规则 `real-content`）
+- 不要：边缘渐隐区域过宽，遮挡首尾关键内容或交互按钮。
 
 文案：
 
-- —
+- 当滚动容器作为独立可聚焦视口（`tabindex="0"`）使用时，建议提供简明的 `aria-label`（如「镜头列表」），说明当前区域的内容主题。
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 滚动条淡入、不滚 0.7 秒后淡出 | `ease.out` | 200ms |
-| 悬停、拖动时变粗 | `ease.out` | 150ms |
+| 滚动条淡入，静止 0.7 秒后自动淡出 | `ease.out` | 200ms |
+| 悬停或拖动滚动条时滑块加粗 | `ease.out` | 150ms |
 
 ## 验收要点
 
-- 用法：scrollArea(el, { fade: "y" | "x" | "both" | "top bottom…", size: 24 })；面板自己有定位时（菜单、侧栏）加 inner: true。
-- 可配置：bar 滚动条显示方式（auto 自动 / hover 悬停才出 / always 常显，悬浮在内容上 / gutter 常驻占位：滚动条有自己的一条、不压内容，只有真的溢出才出现 / none 隐藏）、barSize 粗细、barInset 离边距离；overscroll 滚到头（auto 默认：竖向交给页面接着滚、横向停住 / contain 停住，弹层和菜单里用 / bounce 回弹：越拉越紧、最多 72px、松手弹回 / chain 交给外层）；wheel: "x" 竖滚轮也横向滚。运行时可以用 set() 改。
+- 用法：`scrollArea(el, { fade: "y" | "x" | "both" | "top bottom…", size: 24 })`；面板自己有定位时（菜单、侧栏）加 `inner: true`。
+- 可配置：`bar` 滚动条显示方式（auto 自动 / hover 悬停才出 / always 常显，悬浮在内容上 / gutter 常驻占位：滚动条有自己的一条、不压内容，只有真的溢出才出现 / none 隐藏）、`barSize` 粗细、`barInset` 离边距离；`overscroll` 滚到头（auto 默认：竖向交给页面接着滚、横向停住 / contain 停住，弹层和菜单里用 / bounce 回弹：越拉越紧、最多 72px、松手弹回 / chain 交给外层）；`wheel: "x"` 竖滚轮也横向滚。运行时可以用 `set()` 改。
 - 横向长条（附件条、胶片条）：隐藏滚动条、竖滚轮转横向、回弹；只靠左右渐隐提示还有内容。
 - 滑块最短 24px；点轨道翻一屏（平滑）；拖滑块时滑块变粗、不淡出。
 - 不支持滚动时间线的环境，由 JS 每帧写位置，外观一样。

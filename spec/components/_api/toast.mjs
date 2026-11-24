@@ -73,8 +73,8 @@ export default {
       { text: "用轻提示说表单哪一项错了。", rule: "no-overlap" },
       { text: "成功用绿色大块底、加 emoji。", rule: "status-color" },
     ],
-    copy: ["\"已……\"开头说结果；失败说原因和下一步：\"没导出去：磁盘满了\"。"],
-    motion: [{ what: "从下面升上来、淡入", easing: "ease.outStrong", duration: "300ms" }, { what: "收起", easing: "ease.in", duration: "200ms" }, { what: "成功时扫一道光泽", easing: "ease.out", duration: "600ms" }],
+    copy: ["成功提示以「已……」开头说明结果；失败提示说明原因与下一步，例如「导出失败：磁盘空间不足」。"],
+    motion: [{ what: "轻提示自底部平滑升起并淡入", easing: "ease.outStrong", duration: "300ms" }, { what: "轻提示淡出收起", easing: "ease.in", duration: "200ms" }, { what: "成功提示单次光泽扫过", easing: "ease.out", duration: "600ms" }],
   },
   examples: [
     { slug: "toast-basic", title: "最简单的用法", why: "在事件里调一下：底部中间出现，3 秒后自己消失。",

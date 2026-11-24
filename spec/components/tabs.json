@@ -318,12 +318,12 @@
     ],
     "motion": [
       {
-        "what": "下划线、当前页：前缘先走、后缘跟上",
+        "what": "选中指示条切换：前缘先行、后缘跟进平滑落位",
         "easing": "ease.outStrong / ease.inOut",
-        "duration": "300ms 左右"
+        "duration": "约 300ms"
       },
       {
-        "what": "新内容从所选标签那一侧滑进来",
+        "what": "切换标签后，新内容区沿目标标签方向淡入滑入",
         "easing": "ease.out",
         "duration": "240ms"
       }

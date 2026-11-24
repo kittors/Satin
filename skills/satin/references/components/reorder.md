@@ -1018,9 +1018,9 @@ export default function ShotOrderSave() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 拿起：向右拉开 16px、缩到 95% | `ease.out` | 180ms |
-| 让位：离落点越远让得越少（× 0.7ⁿ）、越晚（24ms × n） | `ease.outStrong` | 200ms |
-| 松手归位 | `spring` | 440ms（别的行 360ms） |
+| 拖起排序行：轻偏移 16px 并微缩至 95% | `ease.out` | 180ms |
+| 其余行按距离衰减错峰让位（幅度 × 0.7ⁿ，延迟 24ms × n） | `ease.outStrong` | 200ms |
+| 释放后按弹簧曲线归位（当前行 440ms，其余行 360ms） | `spring` | 440ms / 360ms |
 
 ## 验收要点
 

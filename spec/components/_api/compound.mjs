@@ -59,11 +59,11 @@ export default {
   design: {
     do: ["一组两到四个按钮，同一种样式。", "分裂按钮的主按钮做最常用的那一种。"],
     dont: [
-      { text: "按钮组里混用不同的样式、大小。", rule: "real-content" },
+      { text: "在同一按钮组内混用不同尺寸或视觉层级的按钮。" },
       { text: "复制成功再弹一个轻提示。", rule: "no-overlap" },
     ],
     copy: ["分裂按钮：主按钮写动作（\"导出成片\"），菜单里写备选（\"MP4（4K）\"）。"],
-    motion: [{ what: "复制：图标原地换成对勾", easing: "ease.outStrong", duration: "200ms，1.2 秒后换回" }],
+    motion: [{ what: "复制成功：图标原地切换为对勾并在 1.2 秒后复原", easing: "ease.outStrong", duration: "200ms" }],
   },
   examples: [
     { slug: "compound-basic", title: "最简单的用法：按钮组", why: "相关的几个按钮连成一组：共用圆角、中间不留缝。", html: `<div class="sn-row"><div class="sn-group" role="group" aria-label="切换镜头"><button type="button" class="sn-btn sn-secondary sn-ibtn" data-tip="上一个" aria-label="上一个" data-i="chevron-left"></button><button type="button" class="sn-btn sn-secondary sn-ibtn" data-tip="下一个" aria-label="下一个" data-i="chevron-right"></button></div><div class="sn-group" role="group" aria-label="缩放"><button type="button" class="sn-btn sn-secondary sn-sm sn-ibtn" data-tip="缩小" aria-label="缩小" data-i="minus"></button><button type="button" class="sn-btn sn-secondary sn-sm sn-num" style="width:56px">100%</button><button type="button" class="sn-btn sn-secondary sn-sm sn-ibtn" data-tip="放大" aria-label="放大" data-i="plus"></button></div></div>`, code: code("compound-basic") },

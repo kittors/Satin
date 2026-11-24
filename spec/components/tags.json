@@ -163,7 +163,7 @@
     ],
     "motion": [
       {
-        "what": "生成中的圆点呼吸",
+        "what": "进行中状态圆点柔和呼吸闪烁",
         "easing": "ease.inOut",
         "duration": "1200ms 循环"
       }

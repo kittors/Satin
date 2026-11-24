@@ -1330,7 +1330,7 @@ export default function PickCards() {
 
 - 默认实面卡片带 `--sn-raised` 背景、1px `--sn-line` 描边与微托影，头像叠放环 `--sn-av-ring` 自动跟随卡片底色。
 - 封面 16:9，卡片默认圆角 12px（封面按嵌套公式减 4px 同心收敛）；支持 `--sn-card-bg` / `--sn-card-bd` / `--sn-card-bw` / `--sn-card-r` / `--sn-card-pad` / `--sn-card-sh` 一键定制。
-- 封面悬停放大 1.04、600ms ease.out，选中后外圈呈现主色强调框；纯静态信息卡可加 `.sn-static` 关闭悬停态。
+- 封面悬停放大 1.04、600ms `ease.out`，选中后外圈呈现主色强调框；纯静态信息卡可加 `.sn-static` 关闭悬停态。
 
 ## 规则
 

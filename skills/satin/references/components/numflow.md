@@ -405,7 +405,7 @@ export default function NumberEffect() {
 | `effect` | `"roll" \| "blur" \| "push" \| "fade"` | "roll" | 否 | 变化的样子：roll 像里程表一样滚（计数、统计）；blur 滚的时候带运动模糊（大号数字、跳得多）；push 旧的滑走、新的滑进来（价格、档位）；fade 原地淡出淡入（徽标、按钮里的小数字）。 | createXxx 选项：`effect`；React：`effect`；Vue：`effect`；Svelte：`effect`；Preact：`effect`；自定义元素：`effect` |
 | `style` | `"roll" \| "blur" \| "push" \| "fade"` | "roll" | 否 | `effect` 的旧名，只在 `createNumberFlow` 的选项里认（框架里 style 是写 CSS 的）。 | createXxx 选项：`style` |
 | `format` | `(v: number) => string` | 千分位（1,280） | 否 | 把数字变成要显示的字：金额、百分比、"99+"。逗号、货币符号这些不是数字的字不滚。 | createXxx 选项：`format`；React：`format`；Vue：`format`；Svelte：`format`；Preact：`format` |
-| `reduced` | `() => boolean` | 跟系统的"减少动态效果" | 否 | 返回 true 时不做动画、直接换数字。一般不用给。 | createXxx 选项：`reduced` |
+| `reduced` | `() => boolean` | 跟随系统设置 | 否 | 返回 true 时不做动画、直接换数字。一般不用给。 | createXxx 选项：`reduced` |
 
 ## 实例方法（createXxx 的返回值、React / Vue 的 ref）
 
@@ -438,7 +438,7 @@ export default function NumberEffect() {
 
 | 按键 | 什么时候 | 做什么 |
 |---|---|---|
-| — |  | 只显示，不能操作。 |
+| — |  | 纯数字展示组件，不参与键盘焦点流转。 |
 
 ## 无障碍
 
@@ -459,8 +459,8 @@ export default function NumberEffect() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 每一位滚到新数字，从个位开始每位晚 30ms | `ease.outStrong` | 约 600ms |
-| 新的一位从 0 宽长出来 | `ease.out` | 300ms 左右 |
+| 数字逐位滚动至新值（自个位起错峰 30ms） | `ease.outStrong` | 约 600ms |
+| 进位新增数位时从 0 宽度平滑展开 | `ease.out` | 约 300ms |
 
 ## 验收要点
 

@@ -63,7 +63,7 @@ export default {
       { text: "行图标用彩色底。", rule: "status-color" },
     ],
     copy: ["标题用名词：\"个人资料\"\"默认画面比例\"；说明写里面有什么。"],
-    motion: [{ what: "悬停时末尾的箭头往右挪 2px", easing: "ease.out", duration: "150ms" }],
+    motion: [{ what: "悬停可点击行时末尾箭头右移 2px", easing: "ease.out", duration: "150ms" }],
   },
   examples: [
     { slug: "list-basic", title: "最简单的用法：设置列表", why: "能点进去的行末尾有箭头；危险的一行加 sn-danger。", html: `<div class="sn-set-list"><div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="user"></span><div class="sn-tx"><b>个人资料</b><span>头像、昵称、邮箱</span></div><span class="sn-end" data-i="chevron-right"></span></div><div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="layout-grid"></span><div class="sn-tx"><b>默认画面比例</b></div><span class="sn-val">16:9</span><span class="sn-end" data-i="chevron-right"></span></div><div class="sn-set-row" tabindex="0"><span class="sn-ico" data-i="key-round"></span><div class="sn-tx"><b>修改密码</b></div><span class="sn-end" data-i="chevron-right"></span></div><div class="sn-set-row sn-danger" tabindex="0"><span class="sn-ico" data-i="log-out"></span><div class="sn-tx"><b>退出登录</b></div></div></div>`, code: code("list-basic") },

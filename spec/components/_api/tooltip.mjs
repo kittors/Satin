@@ -70,7 +70,7 @@ export default {
       { text: "提示用彩色底。", rule: "status-color" },
     ],
     copy: ["动词开头：\"复制链接\"；不写\"点击这里可以复制链接\"。"],
-    motion: [{ what: "淡入、从元素那边移出来 4px", easing: "ease.out", duration: "150ms" }, { what: "在元素之间移动：直接换过去", easing: "ease.out", duration: "120ms" }],
+    motion: [{ what: "文字提示自触发元素方向轻移 4px 淡入", easing: "ease.out", duration: "150ms" }, { what: "在相邻触发元素间移动时平滑切换位置（免重复等待）", easing: "ease.out", duration: "120ms" }],
   },
   examples: [
     { slug: "tooltip-basic", title: "最简单的用法", why: "包住一个元素就行：悬停 500ms 出现，键盘聚焦也出现。",

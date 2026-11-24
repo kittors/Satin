@@ -632,7 +632,7 @@ export default function OrganizeMenu() {
 | 签名 | 从哪引 | 说明 |
 |---|---|---|
 | `openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement \| "window"; onSelect?(detail: MenuSelectDetail): void }): void` | `satin-ui` | 程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`keyboard: true` 先高亮第一项。 |
-| `closeMenu(refocus?: boolean): void` | `satin-ui` | 关上开着的菜单（`refocus` 焦点回到触发器）。 |
+| `closeMenu(refocus?: boolean): void` | `satin-ui` | 关闭当前展开的菜单（`refocus` 为 true 时焦点返回至触发元素）。 |
 
 ## 样式定制
 
@@ -662,7 +662,7 @@ export default function OrganizeMenu() {
 | ↑ / ↓ |  | 在项之间移动。 |
 | → / ← |  | 打开 / 收起子菜单。 |
 | Enter |  | 选中。 |
-| Esc |  | 关上，焦点回到触发器。 |
+| Esc |  | 关闭菜单，并将焦点返回至触发元素。 |
 
 ## 无障碍
 
@@ -683,9 +683,9 @@ export default function OrganizeMenu() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 从触发器那边长出来 | `ease.outStrong` | 160ms |
-| 子菜单打开等 220ms，切换最多等 1200ms，关闭等 360ms | `—` | 220 / 1200 / 360ms |
-| 选中的行闪一下再收起 | `ease.in` | 140ms |
+| 菜单展开：从触发器方向缩放淡入 | `ease.outStrong` | 160ms |
+| 子菜单悬停延迟（打开 / 斜向移动容错 / 离开关闭） | `无（悬停延迟）` | 220 / 1200 / 360ms |
+| 选中菜单项后轻闪烁确认并收起 | `ease.in` | 140ms |
 
 ## 验收要点
 

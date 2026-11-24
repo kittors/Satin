@@ -530,6 +530,6 @@ export default function SceneTags() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 选中时对勾展开、文字往右让 | `ease.outStrong` | 200ms |
-| 移除：淡出 + 缩到 .96，旁边的补位 | `ease.in / spring` | 160ms |
+| 选中态对勾展开，文字平滑右移让位 | `ease.outStrong` | 200ms |
+| 移除标签：淡出微缩至 96%，相邻标签弹簧补位 | `ease.in / spring` | 160ms |
 

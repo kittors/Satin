@@ -34,7 +34,7 @@ export default {
   props: [
     { name: "accept", type: "string | RegExp", default: "什么都收", required: false, desc: "允许的格式：\".txt,.docx\" 或正则；不对的当场标红、不上传。", names: { react: "accept", preact: "accept", vue: "accept", html: "input 的 accept + createUpload 的 accept（正则）" } },
     { name: "maxSize", type: "number", default: "不限", required: false, desc: "单个文件最大多少字节。", names: { react: "maxSize", preact: "maxSize", vue: "maxSize（模板里写 max-size）", html: "createUpload 的 maxSize" } },
-    { name: "upload", type: "(file: File, progress: (p: number) => void) => Promise<unknown>", default: "演示用的假进度", required: false, desc: "真上传：`progress(0～1)` 更新这一行的进度，返回 Promise（reject 时这一行变成\"重试\"）。", names: { react: "upload", preact: "upload", vue: "upload", html: "createUpload 的 upload" } },
+    { name: "upload", type: "(file: File, progress: (p: number) => void) => Promise<unknown>", default: "内置模拟进度", required: false, desc: "真上传：`progress(0～1)` 更新这一行的进度，返回 Promise（reject 时这一行变成\"重试\"）。", names: { react: "upload", preact: "upload", vue: "upload", html: "createUpload 的 upload" } },
     { name: "title / pick", type: "string", default: "\"把文件拖到这里，或者\" / \"选择文件\"", required: false, desc: "框里的说明和能点的那几个字。", names: { react: "title / pick", preact: "title / pick", vue: "title / pick", html: ".sn-drop b / u" } },
     { name: "hint", type: "string", default: "—", required: false, desc: "支持的格式和大小：\"支持 txt、docx，单个不超过 5 MB\"。", names: { react: "hint", preact: "hint", vue: "hint", html: ".sn-hint" } },
     { name: "label", type: "string", default: "title + pick", required: false, desc: "读屏读出来的名字。", names: { react: "label", preact: "label", vue: "label", html: ".sn-drop 的 aria-label" } },
@@ -65,10 +65,10 @@ export default {
     do: ["支持的格式和大小写在框里。", "每个文件各自显示进度，能单独取消、重试。"],
     dont: [
       { text: "拖进来时整块变成彩色。", rule: "status-color" },
-      { text: "等传完才告诉用户格式不对。", rule: "real-content" },
+      { text: "等到文件全部上传完成后才提示格式或体积超限（应在选择时即时校验）。" },
     ],
     copy: ["\"把文件拖到这里，或者 选择文件\"；失败写原因：\"文件太大（超过 5 MB）\"。"],
-    motion: [{ what: "拖进来：整块高亮、图标往上抬一点", easing: "ease.outStrong", duration: "200ms" }, { what: "文件进列表：从上面淡入", easing: "ease.out", duration: "240ms" }],
+    motion: [{ what: "文件拖入区域时整体边框高亮、图标轻微上浮", easing: "ease.outStrong", duration: "200ms" }, { what: "新增上传文件项自上方平滑淡入列表", easing: "ease.out", duration: "240ms" }],
   },
   examples: [
     { slug: "upload-basic", title: "最简单的用法", why: "写清楚支持的格式和大小；不对的当场标红。", html: `<div class="sn-drop" tabindex="0" role="button" aria-label="把文件拖到这里，或者选择文件"><span class="sn-art" data-i="cloud-upload"></span><b>把文件拖到这里，或者 <u>选择文件</u></b><span class="sn-hint">支持 txt、docx，单个不超过 5 MB</span><input type="file" multiple accept=".txt,.docx" hidden></div><div class="sn-files"></div>`, code: code("upload-basic") },

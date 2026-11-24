@@ -736,6 +736,6 @@ export default function MakeSteps() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 下划线、当前页：前缘先走、后缘跟上 | `ease.outStrong / ease.inOut` | 300ms 左右 |
-| 新内容从所选标签那一侧滑进来 | `ease.out` | 240ms |
+| 选中指示条切换：前缘先行、后缘跟进平滑落位 | `ease.outStrong / ease.inOut` | 约 300ms |
+| 切换标签后，新内容区沿目标标签方向淡入滑入 | `ease.out` | 240ms |
 

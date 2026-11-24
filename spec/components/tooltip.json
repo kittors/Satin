@@ -275,12 +275,12 @@
     ],
     "motion": [
       {
-        "what": "淡入、从元素那边移出来 4px",
+        "what": "文字提示自触发元素方向轻移 4px 淡入",
         "easing": "ease.out",
         "duration": "150ms"
       },
       {
-        "what": "在元素之间移动：直接换过去",
+        "what": "在相邻触发元素间移动时平滑切换位置（免重复等待）",
         "easing": "ease.out",
         "duration": "120ms"
       }

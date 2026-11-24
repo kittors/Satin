@@ -577,7 +577,7 @@ export default function InfoPopover() {
 
 - 这样做：宽 248–320，内容少；改了立即生效。
 - 这样做：按钮靠右时 align="end"。
-- 不要：面板里放"保存 / 取消"。（规则 `real-content`）
+- 不要：在轻量弹出面板内放置阻塞式的「保存 / 取消」表单操作（复杂表单请改用弹窗或抽屉）。
 - 不要：面板被容器裁掉一截。（规则 `float-clipped`）
 
 文案：
@@ -586,8 +586,8 @@ export default function InfoPopover() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 从按钮那一侧长出来（缩放 + 淡入） | `ease.outStrong` | 200ms |
-| 收起 | `ease.in` | 140ms |
+| 面板展开：自触发按钮一侧轻缩放淡入 | `ease.outStrong` | 200ms |
+| 面板收起淡出 | `ease.in` | 140ms |
 
 ## 验收要点
 

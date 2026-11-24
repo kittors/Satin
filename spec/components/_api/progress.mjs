@@ -24,9 +24,9 @@ export default {
     preact: 'import { Progress, Spinner } from "satin-ui/react"; // 经 preact/compat',
   },
   importNote: {
-    react: "`<Progress value>`：`value` 0～1，不给是不定进度；`ring` 换成进度环，`label` 是读屏读的名字。不知道进度时用 `<Spinner>`。",
-    preact: "经 preact/compat 用 `satin-ui/react` 的 `Progress`、`Spinner`。",
-    vue: "`<Progress :value>`：0～1，不给是不定进度；`ring`、`size`、`label`。转圈用 `<Spinner>`。",
+    react: "`<Progress value>`：`value` 取值 0～1，省略时显示为不确定进度态；`ring` 切换为进度环，`label` 用于无障碍播报名称。未知时长等待可使用 `<Spinner>`。",
+    preact: "经 preact/compat 使用 `satin-ui/react` 的 `Progress`、`Spinner`。",
+    vue: "`<Progress :value>`：取值 0～1，省略时显示为不确定进度态；支持 `ring`、`size`、`label`。未知时长等待可使用 `<Spinner>`。",
     svelte: "没有专门的组件：`<div class=\"sn-pbar\" style:--sn-p={p} role=\"progressbar\">`，进度环 `.sn-pring`，转圈 `.sn-spinner`。",
     angular: "没有专门的组件：`<div class=\"sn-pbar\" [style.--sn-p]=\"p()\" role=\"progressbar\">`。",
     solid: "没有专门的组件：`<div class=\"sn-pbar\" style={{ \"--sn-p\": p() }} role=\"progressbar\">`。",
@@ -34,7 +34,7 @@ export default {
   },
   dts: { react: "Progress", vue: "Progress", factory: "createProgressCard" },
   props: [
-    { name: "value", type: "number", default: "不给是不定进度", required: false, desc: "进度 0～1；不给时进度条来回走（不知道还要多久）。", names: { react: "value", preact: "value", vue: "value", html: "--sn-p（0～1）+ aria-valuenow（百分数）" } },
+    { name: "value", type: "number", default: "undefined（不确定进度）", required: false, desc: "当前进度值（0～1）；不传时渲染为往复循环的不确定进度态。", names: { react: "value", preact: "value", vue: "value", html: "--sn-p（0～1）+ aria-valuenow（百分数）" } },
     { name: "ring", type: "boolean", default: "false", required: false, desc: "换成进度环：放在缩略图、按钮、列表行里。", names: { react: "ring", preact: "ring", vue: "ring", html: ".sn-pring" } },
     { name: "svg", type: "boolean", default: "false", required: false, desc: "配合 ring 使用，改用圆头 SVG 矢量环（支持中心数值与平滑弧长过渡）。", names: { react: "svg", preact: "svg", vue: "svg", html: ".sn-pring-svg" } },
     { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', required: false, desc: "尺寸档位（小 / 中 / 大）。", names: { react: "size", preact: "size", vue: "size", html: "sn-sm / sn-lg" } },
@@ -70,7 +70,7 @@ export default {
     { name: ".sn-pcard", desc: "导出卡片（图标、标题、百分数、进度条、副标题、取消 / 打开）" },
   ],
   types: ["ProgressProps", "ProgressOptions", "ProgressTone", "ProgressCardApi"],
-  keyboard: [{ keys: "—", does: "进度只显示；导出卡片里的\"取消\"\"打开\"是普通按钮。" }],
+  keyboard: [{ keys: "Tab / Enter", does: "进度指示本身为只读状态；导出卡片内的「取消」「打开」为标准可聚焦按钮。" }],
   a11y: {
     roles: ["进度条、进度环 `role=\"progressbar\"`，`aria-valuenow` 是百分数；不定进度不写 valuenow。", "转圈 `role=\"status\"`，`aria-label` 默认\"加载中\"。"],
     focus: ["不进 Tab 顺序。"],
@@ -80,10 +80,10 @@ export default {
     do: ["写清在做什么、做到多少：\"正在导出 第三集.mp4 · 62%\"。", "超过 10 秒的给\"取消\"和剩余时间。"],
     dont: [
       { text: "进度条用渐变、彩色。", rule: "no-gradient" },
-      { text: "进度跑完又从头来一遍（假进度）。", rule: "real-content" },
+      { text: "使用进度跑满后反复归零的虚假进度条，应改用不确定进度态。" },
     ],
-    copy: ["完成时说结果在哪：\"已导出到\"下载\"\"。"],
-    motion: [{ what: "进度往前走", easing: "ease.out", duration: "200ms" }, { what: "完成时旧文字模糊淡出、新文字淡入", easing: "ease.outStrong", duration: "300ms" }],
+    copy: ["任务完成时明确告知结果位置，例如「已导出至「下载」文件夹」。"],
+    motion: [{ what: "进度值推进平滑过渡", easing: "ease.out", duration: "200ms" }, { what: "任务完成时状态文案交叉淡入淡出", easing: "ease.outStrong", duration: "300ms" }],
   },
   examples: [
     { slug: "progress-basic", title: "最简单的用法", why: "给 0～1 的值就是进度条；不给是不知道还要多久，来回走。",

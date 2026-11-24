@@ -13,7 +13,8 @@ const OUT = path.join(ROOT, "skills/satin/references");
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(path.join(OUT, "components"), { recursive: true });
 const w = (f, s) => fs.writeFileSync(path.join(OUT, f), s.replace(/\n{3,}/g, "\n\n"));
-const md = (s) => String(s ?? "").replace(/<code[^>]*>(.*?)<\/code>/g, "`$1`").replace(/<b>(.*?)<\/b>/g, "**$1**").replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').trim();
+const wrapCode = (_, inner) => { const max = Math.max(0, ...(inner.match(/`+/g) || []).map((x) => x.length)); const f = "`".repeat(max + 1); const pad = inner.startsWith("`") || inner.endsWith("`") ? " " : ""; return `${f}${pad}${inner}${pad}${f}`; };
+const md = (s) => String(s ?? "").replace(/<code[^>]*>(.*?)<\/code>/g, wrapCode).replace(/<b>(.*?)<\/b>/g, "**$1**").replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').trim();
 
 // ———— 设计稿里的演示标记 ————
 const { document } = parseHTML(fs.readFileSync(path.join(ROOT, "index.html"), "utf8"));

@@ -67,11 +67,11 @@ export default {
   design: {
     do: ["只给单条、属于自己、不能撤销的操作。", "确认按钮写动作：\"永久删除\"\"提交\"。"],
     dont: [
-      { text: "能撤销的操作也弹确认。", rule: "real-content" },
+      { text: "对支持撤销的操作弹出气泡确认（应直接执行并通过轻提示提供撤销）。" },
       { text: "确认按钮写\"确定\"\"是\"。", rule: "marketing-copy" },
     ],
     copy: ["\"永久删除这个镜头？删除后无法恢复。\""],
-    motion: [{ what: "从按钮那里展开（缩放 0.97 → 1、位移 4px 回位）", easing: "ease.outStrong", duration: "140ms" }, { what: "收起（淡出）", easing: "ease.in", duration: "100ms" }],
+    motion: [{ what: "气泡确认展开：自触发按钮缩放（0.97 → 1）并位移 4px 落位", easing: "ease.outStrong", duration: "140ms" }, { what: "气泡确认收起淡出", easing: "ease.in", duration: "100ms" }],
   },
   examples: [
     { slug: "popconfirm-basic", title: "最简单的用法：永久删除", why: "锚在按钮上、从按钮那里展开；焦点先落在\"取消\"上。", html: `<button type="button" class="sn-btn sn-danger-soft" data-pc="popconfirm-basic" aria-haspopup="dialog" aria-expanded="false">永久删除</button><div class="sn-pop sn-popconfirm" id="popconfirm-basic" role="alertdialog" aria-labelledby="popconfirm-basic-q" aria-describedby="popconfirm-basic-d"><div class="sn-q"><span data-i="triangle-alert"></span><div><div id="popconfirm-basic-q">永久删除这个镜头？</div><div class="sn-d" id="popconfirm-basic-d">删除后无法恢复。</div></div></div><div class="sn-acts"><button type="button" class="sn-btn sn-ghost sn-sm" data-no>取消</button><button type="button" class="sn-btn sn-danger sn-sm" data-yes>永久删除</button></div></div>`, code: code("popconfirm-basic") },

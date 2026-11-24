@@ -68,7 +68,7 @@ export default {
   ],
   cssVars: [
     { name: "--sn-s", desc: "头像边长（尺寸类名就是改它）", default: "32px" },
-    { name: "--sn-av-bg", desc: "预设的圆底，照片没加载出来时也露出它", default: "浅色 #e8e8ed、深色 #a7a7aa", token: true },
+    { name: "--sn-av-bg", desc: "默认圆形背景底色（图片加载前作为占位底色展示）", default: "浅色 #e8e8ed、深色 #a7a7aa", token: true },
     { name: "--sn-av-ink / --sn-av-face", desc: "预设的线条、脸", default: "#424245 / #fafafa", token: true },
     { name: "--sn-av-black / brown / gray / blue / green / pink / violet / beard", desc: "预设的发色、衣服色、胡子", default: "低饱和，深色主题压到约 90%", token: true },
     { name: "--sn-av-ring", desc: "叠放组里每个头像外面那圈分隔色，放在别的底色上时跟着设", default: "卡片底色" },

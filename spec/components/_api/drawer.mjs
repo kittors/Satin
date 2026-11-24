@@ -76,11 +76,11 @@ export default {
   design: {
     do: ["悬浮在窗口里，四周留 8px，圆角 16。", "改动即时生效、随改随存，背后的页面跟着变。"],
     dont: [
-      { text: "在抽屉里放\"确定 / 取消\"做确认。", rule: "real-content" },
+      { text: "将抽屉当作阻塞式确认框使用（确认操作应改用弹窗或气泡确认）。" },
       { text: "背后的页面压得太暗、看不见。", rule: "no-overlap" },
     ],
     copy: ["标题写在改什么：\"编辑镜头\"\"镜头设置\"。"],
-    motion: [{ what: "滑进来", easing: "ease.open", duration: "320ms" }, { what: "滑出去", easing: "ease.in", duration: "220ms" }],
+    motion: [{ what: "抽屉自侧边滑入展开", easing: "ease.open", duration: "320ms" }, { what: "抽屉向侧边滑出收起", easing: "ease.in", duration: "220ms" }],
   },
   examples: [
     { slug: "drawer-basic", title: "最简单的用法", why: "按钮打开，Esc、点外面、右上角都能关；焦点回到按钮。",

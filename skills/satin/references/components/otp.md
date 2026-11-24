@@ -399,6 +399,6 @@ export default function ShortCode() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 数字从下面淡入上来 | `ease.outStrong` | 200ms |
-| 校验失败整排抖一下 | `spring` | 300ms |
+| 输入数字自下方平滑淡入 | `ease.outStrong` | 200ms |
+| 验证码校验失败时整组输入框轻微抖动 | `spring` | 300ms |
 

@@ -307,7 +307,7 @@
       "signature": "closeMenu(refocus?: boolean): void",
       "returns": "void",
       "from": "satin-ui",
-      "desc": "关上开着的菜单（`refocus` 焦点回到触发器）。"
+      "desc": "关闭当前展开的菜单（`refocus` 为 true 时焦点返回至触发元素）。"
     }
   ],
   "cssVars": [
@@ -376,7 +376,7 @@
     },
     {
       "keys": "Esc",
-      "does": "关上，焦点回到触发器。"
+      "does": "关闭菜单，并将焦点返回至触发元素。"
     }
   ],
   "design": {
@@ -399,17 +399,17 @@
     ],
     "motion": [
       {
-        "what": "从触发器那边长出来",
+        "what": "菜单展开：从触发器方向缩放淡入",
         "easing": "ease.outStrong",
         "duration": "160ms"
       },
       {
-        "what": "子菜单打开等 220ms，切换最多等 1200ms，关闭等 360ms",
-        "easing": "—",
+        "what": "子菜单悬停延迟（打开 / 斜向移动容错 / 离开关闭）",
+        "easing": "无（悬停延迟）",
         "duration": "220 / 1200 / 360ms"
       },
       {
-        "what": "选中的行闪一下再收起",
+        "what": "选中菜单项后轻闪烁确认并收起",
         "easing": "ease.in",
         "duration": "140ms"
       }

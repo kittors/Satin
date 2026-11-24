@@ -1017,7 +1017,7 @@ export default function GalleryRetry() {
 |---|---|---|---|---|---|
 | `items` | `LightboxItem[]` | [] | 是 | 每张：`src` 图片地址（或 `bg` 直接给 CSS 背景）；`size` 原图 [宽, 高]（不放大超过原图），只知道比例时给 `ratio`；`alt` 读屏读的说明。视频写 `type: "video"`，`src` 是视频地址、`poster` 是封面。 | React：`items`；Preact：`items`；Vue：`items`；纯 HTML：`openLightbox 的第一个参数` |
 | `index` | `number \| null` | null | 否 | 打开到第几张；null 关着。在看图层里翻页不回写，只在关上时回写 null。<br>React、Preact：打开到第几张；null 关着，受控：在 `onClose` 里设回 null。在看图层里翻页不回写。<br>Vue：打开到第几张；null 关着：`v-model:index` 绑定，关上时回写 null（在看图层里翻页不回写）。 | React：`index`；Preact：`index`；Vue：`v-model:index`；纯 HTML：`openLightbox 的第二个参数` |
-| `thumbOf` | `(i: number) => HTMLElement \| null \| undefined` | — | 否 | 第 i 张的缩略图元素：从它的位置长出来、关上时缩回去（翻页以后缩回到那一张的缩略图；不给就在中间淡入淡出）。 | React：`thumbOf`；Preact：`thumbOf`；Vue：`thumbOf（模板里写 thumb-of）`；纯 HTML：`选项 thumbOf` |
+| `thumbOf` | `(i: number) => HTMLElement \| null \| undefined` | — | 否 | 返回第 i 张图片对应的缩略图元素，用于共享元素展开与缩回定位（翻页后会自动缩回对应缩略图；不传则在视口居中淡入淡出）。 | React：`thumbOf`；Preact：`thumbOf`；Vue：`thumbOf（模板里写 thumb-of）`；纯 HTML：`选项 thumbOf` |
 | `enabled` | `(i: number) => boolean` | 全部 | 否 | 左右翻页能不能停在这一张（加载失败的跳过）。 | React：`enabled`；Preact：`enabled`；Vue：`enabled`；纯 HTML：`选项 enabled` |
 
 ## 事件
@@ -1039,7 +1039,7 @@ export default function GalleryRetry() {
 |---|---|---|
 | `--sn-fill-subtle`（全局令牌） | 缩略图的占位底色 | 黑 5% |
 | `--sn-r-md`（全局令牌） | 缩略图、看图层里图片的圆角 | 8px |
-| `--sn-g` | 缩略图的图（写在 .sn-im 上：url(…) center） | — |
+| `--sn-g` | 缩略图背景（设置在 `.sn-im` 元素上，如 `url(…) center / cover`） | none |
 
 | 类名 / 属性 | 作用 |
 |---|---|
@@ -1058,14 +1058,14 @@ export default function GalleryRetry() {
 | ← / → |  | 上一张 / 下一张。 |
 | + / − / 0 |  | 放大 / 缩小 / 还原。 |
 | R / Shift+R |  | 向右 / 向左转 90°。 |
-| Esc |  | 关上，沿原路缩回到缩略图。 |
-| Tab |  | 只在工具条里转。 |
+| Esc |  | 关闭看图预览，沿原路径缩回对应缩略图。 |
+| Tab |  | 焦点在看图工具栏按钮间循环移动。 |
 
 ## 无障碍
 
 - 看图层 `role="dialog"`、`aria-modal`、`aria-label="看图"`；工具条 `role="toolbar"`，按钮都写了 `aria-label`。
 - 缩略图写成能聚焦的按钮：`role="button"`、`tabindex="0"`、`aria-label`，Enter / 空格打开。
-- 打开后焦点在看图层上，Tab 只在工具条里转；关上回到那张缩略图。
+- 打开后焦点移入看图层，Tab 在工具栏内循环；关闭后焦点返回触发该预览的缩略图。
 - 每张写 `alt`：看图层里读屏读的是它。
 
 ## 设计规范
@@ -1081,14 +1081,14 @@ export default function GalleryRetry() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 从缩略图长到铺满窗口 | `ease.open` | 380ms |
-| 关上沿原路缩回 | `cubic-bezier(.25,.1,.25,1)` | 280ms |
-| 缩略图从 8px 模糊淡入到清晰 | `ease.out` | 300ms |
+| 打开预览：从缩略图位置放大至铺满视口 | `ease.open` | 380ms |
+| 关闭预览：沿原路径缩回至缩略图位置 | `cubic-bezier(.25,.1,.25,1)` | 280ms |
+| 缩略图加载完成：从 8px 模糊过渡至清晰淡入 | `ease.out` | 300ms |
 
 ## 验收要点
 
 - 占位是浅灰底加骨架光带；图片到了，300ms 从 8px 模糊淡入到清晰。
-- 放大 380ms ease.open，背景压暗 70%；关闭 260ms，缩回到缩略图原位。
+- 放大 380ms `ease.open`，背景压暗 70%；关闭 260ms，缩回到缩略图原位。
 - 比例只用 16:9、9:16、1:1、4:3，图片用 cover 铺满，不拉伸变形。
 
 ## 规则

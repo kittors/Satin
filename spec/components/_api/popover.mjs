@@ -79,11 +79,11 @@ export default {
   design: {
     do: ["宽 248–320，内容少；改了立即生效。", "按钮靠右时 align=\"end\"。"],
     dont: [
-      { text: "面板里放\"保存 / 取消\"。", rule: "real-content" },
+      { text: "在轻量弹出面板内放置阻塞式的「保存 / 取消」表单操作（复杂表单请改用弹窗或抽屉）。" },
       { text: "面板被容器裁掉一截。", rule: "float-clipped" },
     ],
     copy: ["标题写面板管什么：\"分享给协作者\"\"画面比例\"。"],
-    motion: [{ what: "从按钮那一侧长出来（缩放 + 淡入）", easing: "ease.outStrong", duration: "200ms" }, { what: "收起", easing: "ease.in", duration: "140ms" }],
+    motion: [{ what: "面板展开：自触发按钮一侧轻缩放淡入", easing: "ease.outStrong", duration: "200ms" }, { what: "面板收起淡出", easing: "ease.in", duration: "140ms" }],
   },
   examples: [
     { slug: "popover-basic", title: "最简单的用法", why: "包住一个按钮：点开、再点或 Esc、点外面关上，焦点回到按钮。",

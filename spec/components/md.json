@@ -7,11 +7,11 @@
   "specRef": "",
   "summary": "AI 的回复、说明文档都用它渲染：标题、列表和任务、引用和提示块、表格、代码（高亮、行号、复制、自动换行、超高折叠）、图片（定高、定宽、定比例、加载占位、失败提示、点开放大）、公式（TeX 写法转成浏览器原生的 MathML）。代码、图片、表格的高度都能设：整体给一个默认值，单个块也能在 Markdown 里单独写。下面切到\"源码\"或\"并排\"可以直接改着看。",
   "acceptance": [
-    "用法：renderMarkdown(el, md, { codeMax: 240, imgH: 220, tableMax: 0 })，返回的 set() 改高度、update() 换内容；也可以直接在容器上设 --md-code-max、--md-img-h、--md-table-max。",
-    "单个块：代码块的信息行写 ```js title=app.js maxh=120 wrap nonum（文件名、最高、自动换行、不要行号）；图片在地址后面写 =x160 定高、=320x 定宽、=16:9 定比例。",
-    "代码比上限高出一行以上才折叠，底部渐隐，点\"展开全部\"在 240ms 里缓缓展开；收起时代码块顶部跑出窗口就把它拉回来。复制的是原文，不带行号。",
-    "公式：行内 $…$、块级 $$…$$；支持分式、根号、上下标、求和与积分（块级时上下限在符号上下）、希腊字母、常用关系符和箭头、矩阵、分段函数、\\left … \\right 括号自动长高、\\text、\\mathbb。不认识的写法原样显示源码，不影响别的内容。",
-    "安全：文字全部转义，不渲染原始 HTML；链接只放行 http(s)、mailto 和站内地址，图片另外放行 data:image，外链新窗口打开。半截的 Markdown（流式输出时）也能渲：没闭合的代码块照样显示成代码块。"
+    "用法：`createMarkdown(el, { source, codeMax: 240, imgH: 220, tableMax: 0 })`（或快捷函数 `renderMarkdown(el, md, options)`），返回的 `set()` 用于调整高度设置、`update()` 用于更新内容；也可直接在容器上配置 `--sn-md-code-max`、`--sn-md-img-h`、`--sn-md-table-max`。",
+    "单块覆盖：代码块围栏首行可写 ```` ```ts title=app.ts maxh=120 wrap nonum ````（分别指定文件名、最大高度、自动换行、隐藏行号）；图片可在地址后写 `=x160`（定高）、`=320x`（定宽）或 `=16:9`（定比例）。",
+    "代码超出高度阈值一行以上时自动折叠并显示底部渐隐，点击「展开全部」在 240ms 内平滑展开；收起时若代码块顶部已滚出视口会自动回滚对齐。一键复制仅复制原始代码，不含行号。",
+    "公式支持：行内 `$…$` 与块级 `$$…$$`，支持分式、根号、上下标、求和与积分（块级时上下限位于符号上下）、希腊字母、常用关系符与箭头、矩阵、分段函数、`\\left … \\right` 自适应括号、`\\text` 与 `\\mathbb`；无法识别的语法原样回退显示，不影响其他内容。",
+    "安全与流式渲染：正文内容自动转义，仅放行白名单 HTML 标签与属性，过滤 script / style / iframe；链接仅放行 http(s)、mailto 与站内路径，图片另放行 data:image，外链新窗口打开。流式输出中尚未闭合的代码块也能正常按代码块形态渲染。"
   ],
   "api": [
     {
@@ -115,39 +115,39 @@
   "motion": [],
   "a11y": {
     "roles": [
-      "标题、列表、表格都是原生标签；提示块 `role=\"note\"`；任务列表的勾是 `role=\"img\"` 加\"已完成 / 未完成\"。"
+      "标题、列表与表格均输出语义化原生 HTML 标签；提示块带有 `role=\"note\"`；任务列表勾选图标带有 `role=\"img\"` 与「已完成 / 未完成」无障碍标签。"
     ],
     "focus": [
-      "代码块 `<pre tabindex=\"0\">`：键盘能滚动长代码。"
+      "代码块容器带有 `<pre tabindex=\"0\">`，确保纯键盘用户能够聚焦并滚动浏览超宽代码。"
     ],
     "notes": [
-      "图片的 alt 来自 Markdown 里写的说明，写清楚画面内容。"
+      "图片的 `alt` 属性直接取自 Markdown 图片语法中的替代文本，建议如实描述画面内容。"
     ]
   },
   "mobile": [],
   "contract": 1,
   "title": "Markdown 文档",
-  "lead": "AI 的回复、说明文档都用它渲染：标题、列表和任务、引用和提示块、表格、代码（高亮、行号、复制、自动换行、超高折叠）、图片（定高、定宽、定比例、加载占位、失败提示、点开放大）、公式（TeX 写法转成浏览器原生的 MathML）。代码、图片、表格的高度整体给一个默认值，单个块也能在 Markdown 里单独写。原文里的 HTML 只放行白名单里的标签和属性。",
+  "lead": "用于渲染 AI 回复与说明文档：支持标题、列表与任务清单、引用与提示块、表格、代码块（语法高亮、行号、一键复制、自动换行、超高折叠）、图片（定高/定宽/定比例、加载占位、失败重试、点击放大）以及 TeX 数学公式（转浏览器原生 MathML）。高度可全局配置也可按块单独覆盖；内置白名单过滤，安全剔除脚本与危险 HTML。",
   "whenToUse": [
-    "AI 的回复（流式也行：每次给到目前为止的全文）。",
-    "说明文档、更新日志、帮助页。"
+    "AI 助手回复（支持流式输出：每次传入截至当前的完整 Markdown 文本）。",
+    "说明文档、更新日志、帮助中心等阅读型内容。"
   ],
   "whenNotToUse": [
     {
-      "text": "要编辑的富文本：用编辑器。"
+      "text": "需要所见即所得编辑的富文本内容：请使用富文本编辑器。"
     },
     {
-      "text": "一两行带粗体的提示：直接写 HTML。"
+      "text": "仅有一两行简单粗体提示的短文案：直接编写 HTML 即可。"
     }
   ],
   "related": [
     {
       "id": "chat",
-      "diff": "对话里的回复就是用它渲染的。"
+      "diff": "AI 对话中的模型回复默认使用此组件渲染。"
     },
     {
       "id": "image",
-      "diff": "文档里的块级图片点开用看图。"
+      "diff": "文档中的块级图片点击后自动调用看图组件放大浏览。"
     }
   ],
   "import": {
@@ -160,13 +160,13 @@
     "preact": "import { Markdown } from \"satin-ui/react/markdown\"; // 经 preact/compat"
   },
   "importNote": {
-    "react": "`<Markdown source={文本} />` 或 `<Markdown>{文本}</Markdown>`；source 变了整篇重渲染（滚动位置不跳）。重组件，单独从 `satin-ui/react/markdown` 引。",
-    "preact": "经 preact/compat 用 `satin-ui/react/markdown` 的 `Markdown`。",
-    "vue": "`<Markdown :source=\"文本\" />`，从 `satin-ui/vue/markdown` 引。",
-    "svelte": "没有专门的 Svelte 组件：`$effect` 里 `createMarkdown(元素, 选项)`（从 satin-ui/markdown 引），返回的函数里 `destroy()`。",
-    "angular": "没有专门的组件：`afterNextRender` 里 `createMarkdown(元素, 选项)`，`DestroyRef.onDestroy` 里 `destroy()`。",
-    "solid": "没有专门的组件：`onSettled` 里 `createMarkdown(元素, 选项)`，返回的函数里 `destroy()`。",
-    "html": "给空容器 `createMarkdown(容器, { source, codeMax, imgH, tableMax })`，换内容 `update({ source })`；老写法 `renderMarkdown(容器, 文本, 选项)` 照样能用。"
+    "react": "使用 `<Markdown source={text} />` 或 `<Markdown>{text}</Markdown>`；`source` 变更时会平滑更新且保持滚动位置不跳动。作为重组件按需从 `satin-ui/react/markdown` 引入。",
+    "preact": "经 preact/compat 直接使用 `satin-ui/react/markdown` 导出的 `Markdown` 组件。",
+    "vue": "使用 `<Markdown :source=\"text\" />`，从 `satin-ui/vue/markdown` 按需引入。",
+    "svelte": "暂无专用 Svelte 封装：在 `$effect` 中调用 `createMarkdown(el, options)`（从 `satin-ui/markdown` 引入），并在清理函数中调用 `destroy()`。",
+    "angular": "暂无专用 Angular 封装：在 `afterNextRender` 中调用 `createMarkdown(el, options)`，在 `DestroyRef.onDestroy` 中调用 `destroy()`。",
+    "solid": "暂无专用 Solid 封装：在 `onSettled` 中调用 `createMarkdown(el, options)`，并在清理函数中调用 `destroy()`。",
+    "html": "传入空容器调用 `createMarkdown(el, { source, codeMax, imgH, tableMax })`，更新内容调用 `update({ source })`；同时也兼容快捷函数 `renderMarkdown(el, text, options)`。"
   },
   "dts": {
     "factory": "createMarkdown",
@@ -182,7 +182,7 @@
       "type": "string",
       "default": "\"\"",
       "required": false,
-      "desc": "Markdown 原文。变了整篇重渲染，滚动位置不跳。",
+      "desc": "Markdown 源文本。变更时增量重渲染，并保持当前滚动位置不跳动。",
       "names": {
         "js": "source",
         "react": "source",
@@ -195,7 +195,7 @@
       "type": "number",
       "default": "240",
       "required": false,
-      "desc": "代码块超过多高折叠（px），0 = 不折叠；单个代码块在信息行写 maxh=120。",
+      "desc": "代码块超出该高度（px）后自动折叠，设为 0 表示不折叠；单个代码块可在围栏首行写 `maxh=120` 单独覆盖。",
       "names": {
         "js": "codeMax",
         "react": "codeMax",
@@ -208,7 +208,7 @@
       "type": "number | \"auto\"",
       "default": "220",
       "required": false,
-      "desc": "块级图片统一高度（px），\"auto\" = 原比例；单张在地址后面写 =x160、=320x、=16:9。",
+      "desc": "块级图片统一高度（px），设为 \"auto\" 保持原比例；单张图片可在地址后写 `=x160`、`=320x` 或 `=16:9` 覆盖。",
       "names": {
         "js": "imgH",
         "react": "imgH",
@@ -221,7 +221,7 @@
       "type": "number",
       "default": "0",
       "required": false,
-      "desc": "表格最高（px），超出在框里滚（表头吸顶），0 = 不限。",
+      "desc": "表格最大高度（px），超出后启用容器内滚动并吸顶表头；设为 0 表示不限高度。",
       "names": {
         "js": "tableMax",
         "react": "tableMax",
@@ -232,9 +232,9 @@
     {
       "name": "reduced",
       "type": "() => boolean",
-      "default": "跟系统",
+      "default": "跟随系统设置",
       "required": false,
-      "desc": "要不要减少动态效果（折叠展开、图片淡入）。",
+      "desc": "是否开启减少动态效果（关闭折叠展开与图片淡入过渡）。",
       "names": {
         "js": "reduced",
         "react": "reduced",
@@ -247,7 +247,7 @@
       "type": "string / CSSProperties / string",
       "default": "—",
       "required": false,
-      "desc": "加在文档容器上。",
+      "desc": "附加到文档根容器上的类名、行内样式与 id。",
       "names": {
         "react": "className / style / id",
         "preact": "class / style / id"
@@ -258,7 +258,7 @@
   "slots": [
     {
       "name": "default",
-      "desc": "原文也能写在 children 里（字符串）。",
+      "desc": "也支持将 Markdown 源文本直接作为 children 字符串传入。",
       "names": {
         "react": "children",
         "preact": "children"
@@ -271,7 +271,7 @@
       "kind": "property",
       "signature": "readonly source: string",
       "returns": "string",
-      "desc": "现在渲染的原文。"
+      "desc": "当前已渲染的 Markdown 源文本。"
     }
   ],
   "functions": [
@@ -280,25 +280,25 @@
       "signature": "renderMarkdown(el: HTMLElement, md: string, opt?: Omit<MarkdownOptions, \"source\">): { el: HTMLElement; set(next: Omit<MarkdownOptions, \"source\">): void; update(md: string): void; destroy(): void; readonly options: Omit<MarkdownOptions, \"source\"> }",
       "returns": "{ el: HTMLElement; set(next: Omit<MarkdownOptions, \"source\">): void; update(md: string): void; destroy(): void; readonly options: Omit<MarkdownOptions, \"source\"> }",
       "from": "satin-ui/markdown",
-      "desc": "老写法：渲染到容器里；update(文本) 换内容，set(选项) 只改高度设置。"
+      "desc": "命令式快捷渲染函数：`update(text)` 更新源文本，`set(options)` 仅调整高度等显示选项。"
     }
   ],
   "cssVars": [
     {
       "name": "--sn-md-code-max",
-      "desc": "代码块折叠高度：库按 codeMax 写在容器的 style 上（要改用选项）",
+      "desc": "代码块折叠高度阈值（由组件根据 codeMax 自动写入容器 style，推荐通过选项修改）",
       "default": "240px",
       "token": false
     },
     {
       "name": "--sn-md-img-h",
-      "desc": "块级图片高度：按 imgH 写在容器上",
+      "desc": "块级图片统一高度（由组件根据 imgH 自动写入容器 style）",
       "default": "220px",
       "token": false
     },
     {
       "name": "--sn-md-table-max",
-      "desc": "表格最高：按 tableMax 写在容器上",
+      "desc": "表格最大高度（由组件根据 tableMax 自动写入容器 style）",
       "default": "none（不限）",
       "token": false
     }
@@ -306,11 +306,11 @@
   "classes": [
     {
       "name": ".sn-md",
-      "desc": "文档容器"
+      "desc": "Markdown 文档根容器"
     },
     {
       "name": ".sn-md-code / .sn-md-img / .sn-md-callout",
-      "desc": "代码块 / 图片 / 提示块"
+      "desc": "代码块 / 块级图片 / 提示块容器"
     }
   ],
   "types": [
@@ -319,35 +319,34 @@
   "keyboard": [
     {
       "keys": "Tab",
-      "does": "代码块能聚焦（横向滚动用方向键）；复制、展开全部是按钮。"
+      "does": "依次聚焦代码块及复制、展开等操作按钮；代码块聚焦后可用方向键横向滚动长代码。"
     }
   ],
   "design": {
     "do": [
-      "AI 回复流式渲染：每次给全文，不要自己拼 HTML。",
-      "长代码给折叠上限；表格多时给 tableMax。"
+      "流式渲染 AI 回复时，每次传入截至当前的完整 Markdown 文本，避免手动拼接 HTML。",
+      "超长代码块建议设置折叠高度上限（`codeMax`）；行数较多的表格建议设置 `tableMax` 开启容器内滚动。"
     ],
     "dont": [
       {
-        "text": "原文里塞样式、脚本（会被过滤）。",
-        "rule": "real-content"
+        "text": "在 Markdown 原文中内嵌 `<style>` 或 `<script>` 标签（渲染器出于安全会自动过滤）。"
       },
       {
-        "text": "提示块堆彩色大底。",
+        "text": "为提示块大面积铺设高饱和彩色背景。",
         "rule": "status-color"
       }
     ],
     "copy": [
-      "代码块的信息行写语言和文件名：```js title=app.js。"
+      "代码块围栏首行可同时注明语言与文件名，例如 ```` ```ts title=app.ts ````。"
     ],
     "motion": [
       {
-        "what": "长代码展开全部",
+        "what": "长代码块展开与收起",
         "easing": "ease.out",
         "duration": "240ms"
       },
       {
-        "what": "图片到了淡入",
+        "what": "图片加载完成后淡入",
         "easing": "ease.out",
         "duration": "300ms"
       }
@@ -360,13 +359,13 @@
       "why": "标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好。",
       "html": "<div id=\"md-basic\"></div>",
       "code": {
-        "html": "<div id=\"md-basic\"></div>\n\n<script type=\"module\">\n  import { createMarkdown } from \"satin-ui/markdown\";\n  const MD = [\n    \"## 第三集 · 雨夜车站\",\n    \"\",\n    \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n    \"\",\n    \"- [x] 原文拆成 12 个镜头\",\n    \"- [ ] 配音、配乐\",\n    \"\",\n    \"> [!NOTE]\",\n    \"> 第 9 个镜头换成近景，补一句旁白。\",\n    \"\",\n    \"| 镜头 | 景别 | 时长 |\",\n    \"| --- | --- | ---: |\",\n    \"| 07 | 远景 | 4 秒 |\",\n    \"| 08 | 全景 | 6 秒 |\",\n    \"\",\n    \"```js title=shots.js\",\n    \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n    \"```\",\n  ].join(\"\\n\");\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单\n  createMarkdown(document.getElementById(\"md-basic\"), { source: MD });\n</script>\n",
-        "react": "import { Markdown } from \"satin-ui/react/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```js title=shots.js\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n\nexport default function Doc() {\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单\n  return <Markdown source={MD} />;\n}\n",
-        "vue": "<script setup lang=\"ts\">\nimport { Markdown } from \"satin-ui/vue/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```js title=shots.js\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n</script>\n\n<template>\n  <!-- 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单 -->\n  <Markdown :source=\"MD\" />\n</template>\n",
-        "svelte": "<script lang=\"ts\">\n  import { createMarkdown } from \"satin-ui/markdown\";\n  const MD = [\n    \"## 第三集 · 雨夜车站\",\n    \"\",\n    \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n    \"\",\n    \"- [x] 原文拆成 12 个镜头\",\n    \"- [ ] 配音、配乐\",\n    \"\",\n    \"> [!NOTE]\",\n    \"> 第 9 个镜头换成近景，补一句旁白。\",\n    \"\",\n    \"| 镜头 | 景别 | 时长 |\",\n    \"| --- | --- | ---: |\",\n    \"| 07 | 远景 | 4 秒 |\",\n    \"| 08 | 全景 | 6 秒 |\",\n    \"\",\n    \"```js title=shots.js\",\n    \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n    \"```\",\n  ].join(\"\\n\");\n\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；挂上以后建，卸载时 destroy()\n  let host!: HTMLDivElement;\n  $effect(() => {\n    const it = createMarkdown(host, { source: MD });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
-        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createMarkdown } from \"satin-ui/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```js title=shots.js\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n\n@Component({\n  selector: \"demo-md-basic\",\n  template: `<div #host></div>`,\n})\nexport class MdBasicComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createMarkdown(this.host().nativeElement, { source: MD });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
-        "solid": "import { onSettled } from \"solid-js\";\nimport { createMarkdown } from \"satin-ui/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```js title=shots.js\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n\nexport default function Doc() {\n  let host!: HTMLDivElement;\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createMarkdown(host, { source: MD });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
-        "preact": "import { Markdown } from \"satin-ui/react/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```js title=shots.js\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n\nexport default function Doc() {\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单\n  return <Markdown source={MD} />;\n}\n"
+        "html": "<div id=\"md-basic\"></div>\n\n<script type=\"module\">\n  import { createMarkdown } from \"satin-ui/markdown\";\n  const MD = [\n    \"## 第三集 · 雨夜车站\",\n    \"\",\n    \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n    \"\",\n    \"- [x] 原文拆成 12 个镜头\",\n    \"- [ ] 配音、配乐\",\n    \"\",\n    \"> [!NOTE]\",\n    \"> 第 9 个镜头换成近景，补一句旁白。\",\n    \"\",\n    \"| 镜头 | 景别 | 时长 |\",\n    \"| --- | --- | ---: |\",\n    \"| 07 | 远景 | 4 秒 |\",\n    \"| 08 | 全景 | 6 秒 |\",\n    \"\",\n    \"```ts title=shots.ts\",\n    \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n    \"```\",\n  ].join(\"\\n\");\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单\n  createMarkdown(document.getElementById(\"md-basic\"), { source: MD });\n</script>\n",
+        "react": "import { Markdown } from \"satin-ui/react/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```ts title=shots.ts\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n\nexport default function Doc() {\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单\n  return <Markdown source={MD} />;\n}\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Markdown } from \"satin-ui/vue/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```ts title=shots.ts\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n</script>\n\n<template>\n  <!-- 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单 -->\n  <Markdown :source=\"MD\" />\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import { createMarkdown } from \"satin-ui/markdown\";\n  const MD = [\n    \"## 第三集 · 雨夜车站\",\n    \"\",\n    \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n    \"\",\n    \"- [x] 原文拆成 12 个镜头\",\n    \"- [ ] 配音、配乐\",\n    \"\",\n    \"> [!NOTE]\",\n    \"> 第 9 个镜头换成近景，补一句旁白。\",\n    \"\",\n    \"| 镜头 | 景别 | 时长 |\",\n    \"| --- | --- | ---: |\",\n    \"| 07 | 远景 | 4 秒 |\",\n    \"| 08 | 全景 | 6 秒 |\",\n    \"\",\n    \"```ts title=shots.ts\",\n    \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n    \"```\",\n  ].join(\"\\n\");\n\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；挂上以后建，卸载时 destroy()\n  let host!: HTMLDivElement;\n  $effect(() => {\n    const it = createMarkdown(host, { source: MD });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createMarkdown } from \"satin-ui/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```ts title=shots.ts\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n\n@Component({\n  selector: \"demo-md-basic\",\n  template: `<div #host></div>`,\n})\nexport class MdBasicComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createMarkdown(this.host().nativeElement, { source: MD });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createMarkdown } from \"satin-ui/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```ts title=shots.ts\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n\nexport default function Doc() {\n  let host!: HTMLDivElement;\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createMarkdown(host, { source: MD });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Markdown } from \"satin-ui/react/markdown\";\n\nconst MD = [\n  \"## 第三集 · 雨夜车站\",\n  \"\",\n  \"林夏在**最后一班车**开走前赶到站台，雨刚停。\",\n  \"\",\n  \"- [x] 原文拆成 12 个镜头\",\n  \"- [ ] 配音、配乐\",\n  \"\",\n  \"> [!NOTE]\",\n  \"> 第 9 个镜头换成近景，补一句旁白。\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 4 秒 |\",\n  \"| 08 | 全景 | 6 秒 |\",\n  \"\",\n  \"```ts title=shots.ts\",\n  \"export const shots = [{ id: 7, size: \\\"远景\\\", sec: 4 }];\",\n  \"```\",\n].join(\"\\n\");\n\nexport default function Doc() {\n  // 标题、任务列表、提示块、表格、代码（高亮、行号、复制）都按设计稿排好；原文里的 HTML 只放行白名单\n  return <Markdown source={MD} />;\n}\n"
       }
     },
     {
@@ -390,13 +389,13 @@
       "why": "超高的代码折叠、图片统一高度、表格限高在框里滚；单个块也能在 Markdown 里单独写。",
       "html": "<div id=\"md-heights\"></div>",
       "code": {
-        "html": "<div id=\"md-heights\"></div>\n\n<script type=\"module\">\n  import { createMarkdown } from \"satin-ui/markdown\";\n  const MD = [\n    \"### 分镜脚本\",\n    \"\",\n    \"```js title=storyboard.js maxh=120\",\n    \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n    \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n    \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n    \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n    \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n    \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n    \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n    \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n    \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n    \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n    \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n    \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n    \"```\",\n    \"\",\n    \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n    \"\",\n    \"| 镜头 | 景别 | 时长 |\",\n    \"| --- | --- | ---: |\",\n    \"| 07 | 远景 | 6 秒 |\",\n    \"| 08 | 全景 | 3 秒 |\",\n    \"| 09 | 中景 | 4 秒 |\",\n    \"| 10 | 特写 | 5 秒 |\",\n    \"| 11 | 近景 | 6 秒 |\",\n    \"| 12 | 远景 | 3 秒 |\",\n    \"| 13 | 全景 | 4 秒 |\",\n    \"| 14 | 中景 | 5 秒 |\",\n    \"| 15 | 特写 | 6 秒 |\",\n    \"| 16 | 近景 | 3 秒 |\",\n    \"| 17 | 远景 | 4 秒 |\",\n    \"| 18 | 全景 | 5 秒 |\",\n  ].join(\"\\n\");\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚\n  createMarkdown(document.getElementById(\"md-heights\"), { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });\n</script>\n",
-        "react": "import { Markdown } from \"satin-ui/react/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```js title=storyboard.js maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n\nexport default function LongDoc() {\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚\n  return <Markdown source={MD} codeMax={240} imgH={160} tableMax={160} />;\n}\n",
-        "vue": "<script setup lang=\"ts\">\nimport { Markdown } from \"satin-ui/vue/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```js title=storyboard.js maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n</script>\n\n<template>\n  <!-- 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚 -->\n  <Markdown :source=\"MD\" :code-max=\"240\" :img-h=\"160\" :table-max=\"160\" />\n</template>\n",
-        "svelte": "<script lang=\"ts\">\n  import { createMarkdown } from \"satin-ui/markdown\";\n  const MD = [\n    \"### 分镜脚本\",\n    \"\",\n    \"```js title=storyboard.js maxh=120\",\n    \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n    \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n    \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n    \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n    \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n    \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n    \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n    \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n    \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n    \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n    \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n    \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n    \"```\",\n    \"\",\n    \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n    \"\",\n    \"| 镜头 | 景别 | 时长 |\",\n    \"| --- | --- | ---: |\",\n    \"| 07 | 远景 | 6 秒 |\",\n    \"| 08 | 全景 | 3 秒 |\",\n    \"| 09 | 中景 | 4 秒 |\",\n    \"| 10 | 特写 | 5 秒 |\",\n    \"| 11 | 近景 | 6 秒 |\",\n    \"| 12 | 远景 | 3 秒 |\",\n    \"| 13 | 全景 | 4 秒 |\",\n    \"| 14 | 中景 | 5 秒 |\",\n    \"| 15 | 特写 | 6 秒 |\",\n    \"| 16 | 近景 | 3 秒 |\",\n    \"| 17 | 远景 | 4 秒 |\",\n    \"| 18 | 全景 | 5 秒 |\",\n  ].join(\"\\n\");\n\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；挂上以后建，卸载时 destroy()\n  let host!: HTMLDivElement;\n  $effect(() => {\n    const it = createMarkdown(host, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
-        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createMarkdown } from \"satin-ui/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```js title=storyboard.js maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n\n@Component({\n  selector: \"demo-md-heights\",\n  template: `<div #host></div>`,\n})\nexport class MdHeightsComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createMarkdown(this.host().nativeElement, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
-        "solid": "import { onSettled } from \"solid-js\";\nimport { createMarkdown } from \"satin-ui/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```js title=storyboard.js maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n\nexport default function LongDoc() {\n  let host!: HTMLDivElement;\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createMarkdown(host, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
-        "preact": "import { Markdown } from \"satin-ui/react/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```js title=storyboard.js maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n\nexport default function LongDoc() {\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚\n  return <Markdown source={MD} codeMax={240} imgH={160} tableMax={160} />;\n}\n"
+        "html": "<div id=\"md-heights\"></div>\n\n<script type=\"module\">\n  import { createMarkdown } from \"satin-ui/markdown\";\n  const MD = [\n    \"### 分镜脚本\",\n    \"\",\n    \"```ts title=storyboard.ts maxh=120\",\n    \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n    \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n    \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n    \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n    \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n    \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n    \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n    \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n    \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n    \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n    \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n    \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n    \"```\",\n    \"\",\n    \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n    \"\",\n    \"| 镜头 | 景别 | 时长 |\",\n    \"| --- | --- | ---: |\",\n    \"| 07 | 远景 | 6 秒 |\",\n    \"| 08 | 全景 | 3 秒 |\",\n    \"| 09 | 中景 | 4 秒 |\",\n    \"| 10 | 特写 | 5 秒 |\",\n    \"| 11 | 近景 | 6 秒 |\",\n    \"| 12 | 远景 | 3 秒 |\",\n    \"| 13 | 全景 | 4 秒 |\",\n    \"| 14 | 中景 | 5 秒 |\",\n    \"| 15 | 特写 | 6 秒 |\",\n    \"| 16 | 近景 | 3 秒 |\",\n    \"| 17 | 远景 | 4 秒 |\",\n    \"| 18 | 全景 | 5 秒 |\",\n  ].join(\"\\n\");\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚\n  createMarkdown(document.getElementById(\"md-heights\"), { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });\n</script>\n",
+        "react": "import { Markdown } from \"satin-ui/react/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```ts title=storyboard.ts maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n\nexport default function LongDoc() {\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚\n  return <Markdown source={MD} codeMax={240} imgH={160} tableMax={160} />;\n}\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Markdown } from \"satin-ui/vue/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```ts title=storyboard.ts maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n</script>\n\n<template>\n  <!-- 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚 -->\n  <Markdown :source=\"MD\" :code-max=\"240\" :img-h=\"160\" :table-max=\"160\" />\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import { createMarkdown } from \"satin-ui/markdown\";\n  const MD = [\n    \"### 分镜脚本\",\n    \"\",\n    \"```ts title=storyboard.ts maxh=120\",\n    \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n    \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n    \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n    \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n    \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n    \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n    \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n    \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n    \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n    \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n    \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n    \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n    \"```\",\n    \"\",\n    \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n    \"\",\n    \"| 镜头 | 景别 | 时长 |\",\n    \"| --- | --- | ---: |\",\n    \"| 07 | 远景 | 6 秒 |\",\n    \"| 08 | 全景 | 3 秒 |\",\n    \"| 09 | 中景 | 4 秒 |\",\n    \"| 10 | 特写 | 5 秒 |\",\n    \"| 11 | 近景 | 6 秒 |\",\n    \"| 12 | 远景 | 3 秒 |\",\n    \"| 13 | 全景 | 4 秒 |\",\n    \"| 14 | 中景 | 5 秒 |\",\n    \"| 15 | 特写 | 6 秒 |\",\n    \"| 16 | 近景 | 3 秒 |\",\n    \"| 17 | 远景 | 4 秒 |\",\n    \"| 18 | 全景 | 5 秒 |\",\n  ].join(\"\\n\");\n\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；挂上以后建，卸载时 destroy()\n  let host!: HTMLDivElement;\n  $effect(() => {\n    const it = createMarkdown(host, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createMarkdown } from \"satin-ui/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```ts title=storyboard.ts maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n\n@Component({\n  selector: \"demo-md-heights\",\n  template: `<div #host></div>`,\n})\nexport class MdHeightsComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；渲染完再建（只在浏览器里跑），组件销毁时 destroy()\n    afterNextRender(() => {\n      const it = createMarkdown(this.host().nativeElement, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createMarkdown } from \"satin-ui/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```ts title=storyboard.ts maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n\nexport default function LongDoc() {\n  let host!: HTMLDivElement;\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚；挂上以后建，卸载时 destroy()\n  onSettled(() => {\n    const it = createMarkdown(host, { source: MD, codeMax: 240, imgH: 160, tableMax: 160 });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Markdown } from \"satin-ui/react/markdown\";\n\nconst MD = [\n  \"### 分镜脚本\",\n  \"\",\n  \"```ts title=storyboard.ts maxh=120\",\n  \"scene(7, \\\"镜头 07\\\", { size: \\\"远景\\\", sec: 6 });\",\n  \"scene(8, \\\"镜头 08\\\", { size: \\\"全景\\\", sec: 3 });\",\n  \"scene(9, \\\"镜头 09\\\", { size: \\\"中景\\\", sec: 4 });\",\n  \"scene(10, \\\"镜头 10\\\", { size: \\\"特写\\\", sec: 5 });\",\n  \"scene(11, \\\"镜头 11\\\", { size: \\\"近景\\\", sec: 6 });\",\n  \"scene(12, \\\"镜头 12\\\", { size: \\\"远景\\\", sec: 3 });\",\n  \"scene(13, \\\"镜头 13\\\", { size: \\\"全景\\\", sec: 4 });\",\n  \"scene(14, \\\"镜头 14\\\", { size: \\\"中景\\\", sec: 5 });\",\n  \"scene(15, \\\"镜头 15\\\", { size: \\\"特写\\\", sec: 6 });\",\n  \"scene(16, \\\"镜头 16\\\", { size: \\\"近景\\\", sec: 3 });\",\n  \"scene(17, \\\"镜头 17\\\", { size: \\\"远景\\\", sec: 4 });\",\n  \"scene(18, \\\"镜头 18\\\", { size: \\\"全景\\\", sec: 5 });\",\n  \"```\",\n  \"\",\n  \"![雨夜里的电车](https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=960&q=72)\",\n  \"\",\n  \"| 镜头 | 景别 | 时长 |\",\n  \"| --- | --- | ---: |\",\n  \"| 07 | 远景 | 6 秒 |\",\n  \"| 08 | 全景 | 3 秒 |\",\n  \"| 09 | 中景 | 4 秒 |\",\n  \"| 10 | 特写 | 5 秒 |\",\n  \"| 11 | 近景 | 6 秒 |\",\n  \"| 12 | 远景 | 3 秒 |\",\n  \"| 13 | 全景 | 4 秒 |\",\n  \"| 14 | 中景 | 5 秒 |\",\n  \"| 15 | 特写 | 6 秒 |\",\n  \"| 16 | 近景 | 3 秒 |\",\n  \"| 17 | 远景 | 4 秒 |\",\n  \"| 18 | 全景 | 5 秒 |\",\n].join(\"\\n\");\n\nexport default function LongDoc() {\n  // 代码超过上限折叠（这一块在信息行写了 maxh=120），图片统一 160px 高，表格最高 160px、超出在框里滚\n  return <Markdown source={MD} codeMax={240} imgH={160} tableMax={160} />;\n}\n"
       }
     }
   ]

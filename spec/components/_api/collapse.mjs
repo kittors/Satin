@@ -89,9 +89,9 @@ export default {
     ],
     copy: ["标题用问句或名词：\"导出的成片放在哪里？\"\"高级设置\"。"],
     motion: [
-      { what: "内容高度长出来、收回去（0fr → 1fr）", easing: "ease.inOut", duration: "260ms" },
-      { what: "箭头转 90°", easing: "ease.outStrong", duration: "240ms" },
-      { what: "内容晚 120ms 淡入、从上方 4px 落下", easing: "ease.out / ease.outStrong", duration: "200–260ms" },
+      { what: "内容区高度平滑展开与收起（0fr → 1fr）", easing: "ease.inOut", duration: "260ms" },
+      { what: "展开指示箭头旋转 90°", easing: "ease.outStrong", duration: "240ms" },
+      { what: "内容文本延迟 120ms 自上方 4px 淡入", easing: "ease.out / ease.outStrong", duration: "200–260ms" },
     ],
   },
   examples: [

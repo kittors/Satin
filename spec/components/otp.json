@@ -238,12 +238,12 @@
     ],
     "motion": [
       {
-        "what": "数字从下面淡入上来",
+        "what": "输入数字自下方平滑淡入",
         "easing": "ease.outStrong",
         "duration": "200ms"
       },
       {
-        "what": "校验失败整排抖一下",
+        "what": "验证码校验失败时整组输入框轻微抖动",
         "easing": "spring",
         "duration": "300ms"
       }

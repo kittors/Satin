@@ -161,7 +161,7 @@
     ],
     "motion": [
       {
-        "what": "悬停时末尾的箭头往右挪 2px",
+        "what": "悬停可点击行时末尾箭头右移 2px",
         "easing": "ease.out",
         "duration": "150ms"
       }

@@ -61,11 +61,11 @@ export default {
   design: {
     do: ["圆角 12、高至少 44；要点加粗，后面写会怎样、怎么办。", "附上修复入口：\"查看额度\"\"重新连接\"。"],
     dont: [
-      { text: "用横幅说一次性的操作结果。", rule: "real-content" },
+      { text: "用顶部横幅反馈一次性操作结果（应改用轻提示 Toast）。" },
       { text: "横幅用大块饱和色、渐变。", rule: "no-gradient" },
     ],
     copy: ["\"额度只剩 10%，用完后新的生成会排队，不会丢失。\""],
-    motion: [{ what: "关掉：高度收起，下面的内容跟着上来", easing: "ease.inOut", duration: "260ms" }],
+    motion: [{ what: "关闭横幅：高度平滑收起，下方内容顺势上移", easing: "ease.inOut", duration: "260ms" }],
   },
   examples: [
     { slug: "banner-basic", title: "最简单的用法", why: "要点加粗，说清会怎样，附修复入口。", html: `<div class="sn-banner-wrap"><div class="sn-banner sn-warn" role="status"><span data-i="triangle-alert"></span><div class="sn-msg"><b>额度只剩 10%</b>，用完后新的生成会排队，不会丢失。</div><button type="button" class="sn-btn sn-secondary sn-sm">查看额度</button></div></div>`, code: code("banner-basic") },

@@ -33,7 +33,7 @@
         ],
         [
           "upload",
-          "(file, onProgress) => Promise：真上传；不给就是演示用的假进度"
+          "(file, onProgress) => Promise：真实上传回调；省略时使用内置模拟进度"
         ],
         [
           "返回 add(files)",
@@ -157,7 +157,7 @@
     {
       "name": "upload",
       "type": "(file: File, progress: (p: number) => void) => Promise<unknown>",
-      "default": "演示用的假进度",
+      "default": "内置模拟进度",
       "required": false,
       "desc": "真上传：`progress(0～1)` 更新这一行的进度，返回 Promise（reject 时这一行变成\"重试\"）。",
       "names": {
@@ -286,8 +286,7 @@
         "rule": "status-color"
       },
       {
-        "text": "等传完才告诉用户格式不对。",
-        "rule": "real-content"
+        "text": "等到文件全部上传完成后才提示格式或体积超限（应在选择时即时校验）。"
       }
     ],
     "copy": [
@@ -295,12 +294,12 @@
     ],
     "motion": [
       {
-        "what": "拖进来：整块高亮、图标往上抬一点",
+        "what": "文件拖入区域时整体边框高亮、图标轻微上浮",
         "easing": "ease.outStrong",
         "duration": "200ms"
       },
       {
-        "what": "文件进列表：从上面淡入",
+        "what": "新增上传文件项自上方平滑淡入列表",
         "easing": "ease.out",
         "duration": "240ms"
       }

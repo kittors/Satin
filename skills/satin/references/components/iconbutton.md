@@ -633,8 +633,8 @@ export default function GridToggle() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 按下缩一下 | `ease.out` | 100ms |
-| 悬停 500ms 后出 Tooltip | `ease.out` | 150ms |
+| 按下态微幅缩放反馈 | `ease.out` | 100ms |
+| 悬停 500ms 后淡入文字提示 | `ease.out` | 150ms |
 
 ## 验收要点
 

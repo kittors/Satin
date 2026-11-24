@@ -78,7 +78,7 @@ export default {
       { text: "搜索结果一出来就弹窗。", rule: "no-overlap" },
     ],
     copy: ["密码规则写在 placeholder 或说明里：\"至少 8 位，字母加数字更安全\"。"],
-    motion: [{ what: "清除按钮、结果数淡入", easing: "ease.out", duration: "150ms" }, { what: "强度条依次点亮", easing: "ease.outStrong", duration: "每格晚 60ms" }, { what: "邮箱对勾一笔画出来", easing: "ease.outStrong", duration: "300ms" }],
+    motion: [{ what: "清除按钮、结果数淡入", easing: "ease.out", duration: "150ms" }, { what: "强度条依次点亮", easing: "ease.outStrong", duration: "每格晚 60ms" }, { what: "邮箱格式校验通过时，右侧对勾路径绘制出现", easing: "ease.outStrong", duration: "300ms" }],
   },
   examples: [
     { slug: "special-basic", title: "最简单的用法：搜索框", why: "search(q) 返回结果数，右边淡入\"N 个结果\"；空着时显示快捷键，一输入换成清除按钮。", html: `<div id="special-basic"></div>`, code: code("special-basic") },

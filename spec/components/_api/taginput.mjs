@@ -86,9 +86,9 @@ export default {
     ],
     copy: ["提示写怎么加：\"输入标签，回车确认\"。", "说明写规则：\"最多 3 个\"。"],
     motion: [
-      { what: "新标签弹出来（缩放 + 淡入）", easing: "pop", duration: "260ms" },
-      { what: "删掉的原地缩小淡出，后面的补位", easing: "ease.in / 弹簧", duration: "140ms / 300ms" },
-      { what: "重复、满了：抖一下", easing: "spring", duration: "300ms" },
+      { what: "新增标签轻弹性弹出并淡入", easing: "pop", duration: "260ms" },
+      { what: "删除标签原地微缩淡出，后续标签弹簧补位", easing: "ease.in / spring", duration: "140ms / 300ms" },
+      { what: "输入重复标签或达到数量上限时轻微抖动提示", easing: "spring", duration: "300ms" },
     ],
   },
   examples: [

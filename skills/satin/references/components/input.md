@@ -405,7 +405,8 @@ export default function ProjectNameCount() {
 
 | 按键 | 什么时候 | 做什么 |
 |---|---|---|
-| — |  | 原生输入框的按键（选字、撤销、输入法）都照常。 |
+| Tab |  | 聚焦或移出输入框。 |
+| ⌘Z / Ctrl+Z |  | 撤销输入（完整保留原生选字、剪贴板与输入法体验）。 |
 
 ## 无障碍
 
@@ -417,7 +418,7 @@ export default function ProjectNameCount() {
 
 - 这样做：宽度按要填的内容定：名称 240 左右，链接、标题可以占满。
 - 这样做：一个表单里的输入框用同一档高度。
-- 不要：用 placeholder 当标签，输入以后就看不到在填什么了。（规则 `real-content`）
+- 不要：将 placeholder 当作字段标签使用，用户输入后即无法确认当前字段含义。
 - 不要：聚焦时加彩色光晕。（规则 `no-colored-shadow`）
 
 文案：
@@ -426,6 +427,6 @@ export default function ProjectNameCount() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 聚焦时边框、外圈过渡 | `ease.out` | 150ms |
-| 出错时左右抖两下 | `ease.out` | 360ms |
+| 聚焦态边框与焦点环过渡 | `ease.out` | 150ms |
+| 校验失败时水平轻微抖动提示 | `ease.out` | 360ms |
 

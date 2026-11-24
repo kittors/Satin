@@ -74,7 +74,7 @@ export default {
       { text: "侧栏用毛玻璃。", rule: "glass-only-floating" },
     ],
     copy: ["导航项用名词：\"全部项目\"\"素材库\"。"],
-    motion: [{ what: "收起、展开：主区宽度连续变化，卡片从原位移到新位", easing: "ease.inOut", duration: "300ms" }, { what: "选中项切换：底色滑过去", easing: "ease.outStrong", duration: "260ms" }],
+    motion: [{ what: "收起、展开：主区宽度连续变化，卡片从原位移到新位", easing: "ease.inOut", duration: "300ms" }, { what: "导航选中态指示背景平滑滑移", easing: "ease.outStrong", duration: "260ms" }],
   },
   examples: [
     { slug: "sidebar-basic", title: "最简单的用法", why: "给导航项和主区：收起按钮、⌘\\ 收起和展开，主区宽度跟着连续变化。", html: `<div style="height:320px"><div class="sn-app" data-navfx="slide"><aside class="sn-side"><div class="sn-side-top"><span class="sn-logo"></span><b>Satin</b><button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-collapse data-tip="收起侧栏" data-kbd="⌘\\" aria-label="收起侧栏" data-i="panel-left"></button></div><nav class="sn-side-nav"><span class="sn-hl-bar"></span><span class="sn-hl-ind"></span><a class="sn-on" data-key="all" data-i="layout-grid:before"><span class="sn-lbl">全部项目</span></a><a data-key="assets" data-i="image:before"><span class="sn-lbl">素材库</span><span class="sn-badge sn-soft">12</span></a><p>最近打开</p><a data-key="p1" data-i="folder:before"><span class="sn-lbl">雨夜车站</span></a><a data-key="p2" data-i="folder:before"><span class="sn-lbl">候车厅</span></a></nav><div class="sn-side-foot"><a data-key="settings" data-i="settings:before"><span class="sn-lbl">设置</span></a></div></aside><main class="sn-app-main"><div class="sn-app-head"><b>全部项目</b></div></main></div></div>`, code: code("sidebar-basic") },

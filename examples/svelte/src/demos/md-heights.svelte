@@ -3,7 +3,7 @@
   const MD = [
     "### 分镜脚本",
     "",
-    "```js title=storyboard.js maxh=120",
+    "```ts title=storyboard.ts maxh=120",
     "scene(7, \"镜头 07\", { size: \"远景\", sec: 6 });",
     "scene(8, \"镜头 08\", { size: \"全景\", sec: 3 });",
     "scene(9, \"镜头 09\", { size: \"中景\", sec: 4 });",

@@ -485,7 +485,7 @@ export default function NotifyEmail() {
 |---|---|---|
 | 清除按钮、结果数淡入 | `ease.out` | 150ms |
 | 强度条依次点亮 | `ease.outStrong` | 每格晚 60ms |
-| 邮箱对勾一笔画出来 | `ease.outStrong` | 300ms |
+| 邮箱格式校验通过时，右侧对勾路径绘制出现 | `ease.outStrong` | 300ms |
 
 ## 验收要点
 

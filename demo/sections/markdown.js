@@ -4,7 +4,7 @@
 // 表格（对齐、表头吸顶、限高滚动）、分隔线、代码块（高亮、行号、复制、换行开关、文件名、超高折叠）、图片（定高 / 定宽 / 比例、占位、失败、图注、点开放大）、
 // 公式（TeX 常用写法 → 浏览器原生 MathML：行内 $…$，块级 $$…$$；写法不认识时原样显示源码，不报错）。
 // 高度都能定：renderMarkdown(el, md, { codeMax, imgH, tableMax })，或容器上的 CSS 变量 --md-code-max / --md-img-h / --md-table-max；
-// 单个块在 Markdown 里写：```js title=app.js maxh=120 wrap nonum   ![说明](url "图注" =x160)   =320x  =320x180  =16:9
+// 单个块在 Markdown 里写：```ts title=app.ts maxh=120 wrap nonum   ![说明](url "图注" =x160)   =320x  =320x180  =16:9
 // 媒体：图片的写法，地址是视频（mp4 / webm / mov）就是视频播放器，是音频（mp3 / m4a / wav / ogg）就是音频条。
 // HTML：白名单里的标签（折叠块、图、视频、音频、表格、kbd、mark……）照样渲染，属性也只放行白名单；script / style / iframe 连内容一起去掉。
 // 能动的 HTML：```html preview 的代码块在沙箱 iframe 里运行（脚本、动画都能跑，碰不到外面的页面），可以在"预览 / 代码"之间切换，高度跟着内容走。
@@ -122,7 +122,7 @@ const SAMPLE = `# 分镜生成说明
 
 按镜头请求生成，失败的镜头自动重试三次：
 
-\`\`\`js title=storyboard.js
+\`\`\`ts title=storyboard.ts
 // 逐个镜头生成，失败重试三次，返回每个镜头的结果
 export async function generateShots(shots, { retry = 3, signal } = {}) {
   const results = [];

@@ -58,11 +58,11 @@ export default {
   design: {
     do: ["只用在几乎一定成功、能撤回的操作上。", "失败时说清楚已经恢复：\"没保存上，已恢复原样\"，给\"重试\"。"],
     dont: [
-      { text: "付款、永久删除、发出去的消息也先显示成功。", rule: "real-content" },
-      { text: "保存中给每一行转圈（乐观更新就是不等）。", rule: "real-content" },
+      { text: "对支付、永久删除、对外发送等不可逆操作使用乐观更新。" },
+      { text: "在乐观更新期间为每一行展示加载转圈（违背即时反馈原则）。" },
     ],
-    copy: ["失败：\"没保存上，已恢复原样\" + \"重试\"。"],
-    motion: [{ what: "失败时这一行左右抖两下", easing: "ease.out", duration: "360ms" }],
+    copy: ["失败回滚提示明确说明状态与补救操作，例如「保存失败，已恢复原状」+「重试」。"],
+    motion: [{ what: "提交失败回滚时，对应行水平轻微抖动提示", easing: "ease.out", duration: "360ms" }],
   },
   examples: [
     { slug: "optimistic-basic", title: "最简单的用法：收藏", why: "点了马上变成已收藏、数字加一；保存失败时改回去、这一行抖两下、给\"重试\"（示例每第二次保存失败）。", html: `<div class="sn-opt-row" id="optimistic-basic"><span class="sn-nm">雨夜车站</span><button type="button" class="sn-star" aria-pressed="false" aria-label="收藏"><span data-i="star"></span><span class="sn-n">24</span></button></div>`, code: code("optimistic-basic") },

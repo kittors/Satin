@@ -65,7 +65,10 @@ export default {
     { name: ".sn-ib.sn-has-pre / .sn-has-post", desc: "前后带图标、按钮的输入框（里面 .sn-pre / .sn-post）" },
   ],
   types: ["InputProps"],
-  keyboard: [{ keys: "—", does: "原生输入框的按键（选字、撤销、输入法）都照常。" }],
+  keyboard: [
+    { keys: "Tab", does: "聚焦或移出输入框。" },
+    { keys: "⌘Z / Ctrl+Z", does: "撤销输入（完整保留原生选字、剪贴板与输入法体验）。" },
+  ],
   a11y: {
     roles: ["原生 `<input>`；出错时 `aria-invalid=\"true\"`。"],
     focus: ["聚焦时边框加深、外面一圈；放进字段里时点标签也能聚焦。"],
@@ -74,11 +77,11 @@ export default {
   design: {
     do: ["宽度按要填的内容定：名称 240 左右，链接、标题可以占满。", "一个表单里的输入框用同一档高度。"],
     dont: [
-      { text: "用 placeholder 当标签，输入以后就看不到在填什么了。", rule: "real-content" },
+      { text: "将 placeholder 当作字段标签使用，用户输入后即无法确认当前字段含义。" },
       { text: "聚焦时加彩色光晕。", rule: "no-colored-shadow" },
     ],
     copy: ["placeholder 写例子：\"比如：雨夜车站\"。"],
-    motion: [{ what: "聚焦时边框、外圈过渡", easing: "ease.out", duration: "150ms" }, { what: "出错时左右抖两下", easing: "ease.out", duration: "360ms" }],
+    motion: [{ what: "聚焦态边框与焦点环过渡", easing: "ease.out", duration: "150ms" }, { what: "校验失败时水平轻微抖动提示", easing: "ease.out", duration: "360ms" }],
   },
   examples: [
     { slug: "input-basic", title: "最简单的用法", why: "就是原生的输入框加一个类名；没有可见的标签时写 aria-label。",

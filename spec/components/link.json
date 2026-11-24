@@ -169,12 +169,12 @@
     ],
     "motion": [
       {
-        "what": "悬停时箭头往右挪 2px",
+        "what": "悬停时后置箭头右移 2px",
         "easing": "ease.out",
         "duration": "150ms"
       },
       {
-        "what": "按下缩一下",
+        "what": "按下态微幅缩放反馈",
         "easing": "ease.out",
         "duration": "100ms"
       }

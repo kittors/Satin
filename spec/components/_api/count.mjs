@@ -76,7 +76,7 @@ export default {
       { text: "长文本长高时页面跳。", rule: "motion-props" },
     ],
     copy: ["快满时写\"还剩 3 字\"，超出时写\"超出 5 字\"。"],
-    motion: [{ what: "计数滚动变化", easing: "ease.outStrong", duration: "260ms" }, { what: "长文本长高", easing: "ease.out", duration: "180ms" }, { what: "写满再敲：计数抖一下", easing: "spring", duration: "300ms" }],
+    motion: [{ what: "字数统计平滑滚动更新", easing: "ease.outStrong", duration: "260ms" }, { what: "多行输入框随内容增加平滑增高", easing: "ease.out", duration: "180ms" }, { what: "达到字数上限后继续输入时，计数轻微抖动提示", easing: "spring", duration: "300ms" }],
   },
   examples: [
     { slug: "count-basic", title: "最简单的用法", why: "给上限就行：聚焦或有内容时右边淡入\"已写 / 上限\"。", html: `<div id="count-basic"></div>`, code: code("count-basic") },

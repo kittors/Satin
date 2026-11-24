@@ -669,7 +669,7 @@ export default function PromptParts() {
 | `voice` | `boolean` | true | 否 | 发送键左侧的一键语音输入按钮：点击原地切换为动态微声纹并实时听写进输入框，再点一下或直接点发送即可停止，零多余确认步骤。 | createXxx 选项：`voice`；React：`voice`；Preact：`voice`；Vue：`voice` |
 | `send` | `string` | "发送" | 否 | 发送按钮的名字（读屏、提示里）："生成"。 | createXxx 选项：`send`；React：`send`；Preact：`send`；Vue：`send` |
 | `submitKey` | `"enter" \| "mod-enter"` | "enter" | 否 | 回车提交模式：enter（默认：Enter 直接发送、Shift+Enter 换行，自动防护中文输入法合成态）或 mod-enter（⌘/Ctrl+Enter 发送、Enter 换行）。 | createXxx 选项：`submitKey`；React：`submitKey`；Preact：`submitKey`；Vue：`submitKey（模板里写 submit-key）` |
-| `upload` | `(file: File, progress: (p: number) => void) => Promise<unknown>` | 演示用的假进度 | 否 | 真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。 | createXxx 选项：`upload`；React：`upload`；Preact：`upload`；Vue：`upload` |
+| `upload` | `(file: File, progress: (p: number) => void) => Promise<unknown>` | 内置模拟进度 | 否 | 真上传附件：`progress(0～1)` 更新附件上的进度环，返回 Promise。 | createXxx 选项：`upload`；React：`upload`；Preact：`upload`；Vue：`upload` |
 | `external` | `boolean` | false | 否 | 发送由外面接管（对话组件里用），发送后不在这里清空。 | createXxx 选项：`external` |
 | `context` | `ComposerContextItem[]` | — | 否 | 输入框顶上的上下文栏（项目文件夹、本地 / 云端、分支……）：每项 `{ icon?, text }`；给了 `options`（`[{ value, label }]`）和 `value` 的那项点开是菜单，选了发 `contextChange`，没有的点了发 `contextClick`。只是选中项换了不重画。 | createXxx 选项：`context`；React：`context`；Preact：`context`；Vue：`context` |
 | `mode` | `ComposerMode \| string` | — | 否 | 底部一行加号旁边的模式 / 权限标签：`{ label, tone }`，tone 用状态色的小圆点（ok 绿、warn 橙、bad 红、need 主色）；给了 `options`（`[{ value, label, tone }]`）和 `value` 点开是菜单，选了发 `modeChange`。 | createXxx 选项：`mode`；React：`mode`；Preact：`mode`；Vue：`mode` |
@@ -749,9 +749,9 @@ export default function PromptParts() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 框长高 | `ease.out` | 180ms |
-| 发送按钮亮起来 | `ease.out` | 150ms |
-| 生成中外圈转动 | `linear` | 1.2s 一圈 |
+| 输入框随内容增加平滑增高 | `ease.out` | 180ms |
+| 输入内容后发送按钮高亮激活 | `ease.out` | 150ms |
+| 生成进行中，停止按钮外环匀速旋转 | `linear` | 1.2s 循环 |
 
 ## 验收要点
 

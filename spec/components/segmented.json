@@ -367,9 +367,9 @@
     ],
     "motion": [
       {
-        "what": "滑块：前缘先到、后缘跟上，落定轻压",
+        "what": "选中滑块切换：前缘先行、后缘跟进并轻缓落定",
         "easing": "ease.outStrong / ease.inOut",
-        "duration": "300ms 左右"
+        "duration": "约 300ms"
       }
     ]
   },

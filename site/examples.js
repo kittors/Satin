@@ -1301,7 +1301,7 @@ export const API = {
       ["list", "文件行放在哪个元素里"],
       ["accept / badType", "允许的扩展名（正则）/ 不允许时的提示"],
       ["maxSize / tooBig", "最大字节数 / 超出时的提示"],
-      ["upload", "(file, onProgress) => Promise：真上传；不给就是演示用的假进度"],
+      ["upload", "(file, onProgress) => Promise：真实上传回调；省略时使用内置模拟进度"],
       ["返回 add(files)", "加文件（拖放、选择之外的来源）"],
     ]],
   ],
@@ -1418,7 +1418,7 @@ export const API = {
     ["createComposer(容器, 选项)", ["选项", "说明"], [
       ["onSend", "({ text, files }) => {}：发送；期间“生成中”，发送键变停止，生成完调 setBusy(false)"],
       ["onStop", "() => {}：生成中点停止（键盘回车不会停止，只晃一下停止键）"],
-      ["upload", "(file, onProgress) => Promise：真上传；不给就是演示用的假进度"],
+      ["upload", "(file, onProgress) => Promise：真实上传回调；省略时使用内置模拟进度"],
     ]],
     ["返回值", ["名称", "说明"], [["setBusy(on)", "切换生成中"], ["clear({ smooth })", "清空；smooth：附件淡出、输入框平滑收起"], ["files()", "现在的附件元素"]]],
     ["事件", ["名称", "说明"], [["compose / compose-stop", "容器写了 data-external、用 bindInputs 接上（不给 onSend）时，发送 / 停止改成在容器上发这两个事件（对话组件这样接）"]]],

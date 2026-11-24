@@ -1068,10 +1068,10 @@ export default function Storyboard() {
 | `newChat` | `boolean` | false | 否 | 顶栏右边放"新对话"按钮（单色细线图标），点了发 `newChat`——自己清空、开一段新对话。 | createXxx 选项：`newChat`；React：`newChat`；Preact：`newChat`；Vue：`newChat（模板里写 new-chat）` |
 | `placeholder` | `string` | "" | 否 | 底部输入框的占位提示。 | createXxx 选项：`placeholder`；React：`placeholder`；Preact：`placeholder`；Vue：`placeholder` |
 | `max` | `number` | 500 | 否 | 输入框最多几个字。 | createXxx 选项：`max`；React：`max`；Preact：`max`；Vue：`max` |
-| `maxLines` | `number` | 5 | 否 | 输入框最多长到几行，再多在框里滚。 | createXxx 选项：`maxLines`；React：`maxLines`；Preact：`maxLines`；Vue：`maxLines（模板里写 max-lines）` |
+| `maxLines` | `number` | 5 | 否 | 输入框自动增高的最大行数，超出后在输入框内滚动。 | createXxx 选项：`maxLines`；React：`maxLines`；Preact：`maxLines`；Vue：`maxLines（模板里写 max-lines）` |
 | `attach` | `boolean` | true | 否 | 输入框带不带附件按钮。 | createXxx 选项：`attach`；React：`attach`；Preact：`attach`；Vue：`attach` |
 | `voice` | `boolean` | true | 否 | 输入框带不带语音输入按钮（支持实时声波与语音转写交互）。 | createXxx 选项：`voice`；React：`voice`；Preact：`voice`；Vue：`voice` |
-| `composer` | `{ upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: Partial<Record<"img" \| "vid" \| "aud" \| "doc", (counter: { n: number }) => ComposerAttachment>> }` | — | 否 | 底部输入框的选项：upload 真上传（不给是演示用的假进度）、attachments 附件菜单每一项（img / vid / aud / doc）点了以后给出的附件（演示、自己接选择器时用）。 | createXxx 选项：`composer`；React：`composer`；Preact：`composer`；Vue：`composer` |
+| `composer` | `{ upload?(file: File, onProgress: (p: number) => void): Promise<unknown>; attachments?: Partial<Record<"img" \| "vid" \| "aud" \| "doc", (counter: { n: number }) => ComposerAttachment>> }` | — | 否 | 底部提示词输入框配置：`upload` 指定真实上传回调（省略时使用内置模拟进度）；`attachments` 自定义各类型（`img` / `vid` / `aud` / `doc`）附件菜单项的选取处理。 | createXxx 选项：`composer`；React：`composer`；Preact：`composer`；Vue：`composer` |
 | `hiRes` | `(bg: string) => string` | 原样 | 否 | 点开看大图时用的高清背景（缩略图的 g 换成大图）。 | createXxx 选项：`hiRes`；React：`hiRes`；Preact：`hiRes`；Vue：`hiRes（模板里写 hi-res）` |
 | `empty` | `ChatEmpty \| boolean` | 对话图标 + "有什么可以帮你？" | 否 | 新对话：还没有消息时消息区正中的样子——`{ icon, title, subtitle, suggestions }`（单色图标、标题、说明、2～4 个建议，点建议填进输入框、不直接发）。第一次露出来时依次淡入；第一条消息进来（发出或收到）就淡出，输入框不动。不写也有默认的；`false` 不要；要自己画见插槽 empty。只在创建时用。 | createXxx 选项：`empty`；React：`empty`；Preact：`empty`；Vue：`empty` |
 | `context` | `ComposerContextItem[]` | — | 否 | 输入框顶上的上下文栏（项目文件夹、本地 / 云端、分支……）：每项 `{ icon?, text }`；给了 `options`（`[{ value, label }]`）和 `value` 的那项点开是菜单，选了发 `contextChange`，没有的点了发 `contextClick`。只是选中项换了不重画。 | createXxx 选项：`context`；React：`context`；Preact：`context`；Vue：`context` |
@@ -1179,7 +1179,7 @@ export default function Storyboard() {
 - 这样做：respond 里经常检查 ctx.stopped，点"停止"马上停。
 - 这样做：长回答流式给，不要等全部生成完。
 - 不要：给助手配彩色渐变头像、光晕。（规则 `no-gradient`）
-- 不要：每条消息都加时间、头像、气泡尾巴。（规则 `real-content`）
+- 不要：为每条消息重复堆叠时间戳、头像与尖角气泡尾巴，增加视觉噪音。
 
 文案：
 
@@ -1187,8 +1187,8 @@ export default function Storyboard() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 发送：字原地变成气泡飞进列表 | `spring` | 约 500ms |
-| 思考结束收起 | `ease.out` | 240ms |
+| 发送消息：输入文本化作气泡平滑飞入消息列表 | `spring` | 约 500ms |
+| 思考过程结束后平滑收起 | `ease.out` | 240ms |
 
 ## 验收要点
 

@@ -35,9 +35,9 @@
 | Solid | `// 只有样式：<div class="sn-pbar" style={{ "--sn-p": p() }}><i></i></div>` |
 | Preact | `import { Progress, Spinner } from "satin-ui/react"; // 经 preact/compat` |
 
-- React：`<Progress value>`：`value` 0～1，不给是不定进度；`ring` 换成进度环，`label` 是读屏读的名字。不知道进度时用 `<Spinner>`。
-- Preact：经 preact/compat 用 `satin-ui/react` 的 `Progress`、`Spinner`。
-- Vue：`<Progress :value>`：0～1，不给是不定进度；`ring`、`size`、`label`。转圈用 `<Spinner>`。
+- React：`<Progress value>`：`value` 取值 0～1，省略时显示为不确定进度态；`ring` 切换为进度环，`label` 用于无障碍播报名称。未知时长等待可使用 `<Spinner>`。
+- Preact：经 preact/compat 使用 `satin-ui/react` 的 `Progress`、`Spinner`。
+- Vue：`<Progress :value>`：取值 0～1，省略时显示为不确定进度态；支持 `ring`、`size`、`label`。未知时长等待可使用 `<Spinner>`。
 - Svelte：没有专门的组件：`<div class="sn-pbar" style:--sn-p={p} role="progressbar">`，进度环 `.sn-pring`，转圈 `.sn-spinner`。
 - Angular：没有专门的组件：`<div class="sn-pbar" [style.--sn-p]="p()" role="progressbar">`。
 - Solid：没有专门的组件：`<div class="sn-pbar" style={{ "--sn-p": p() }} role="progressbar">`。
@@ -483,7 +483,7 @@ export default function ExportProgress() {
 
 | 名称 | 类型 | 默认值 | 必填 | 说明 | 各写法里的叫法 |
 |---|---|---|---|---|---|
-| `value` | `number` | 不给是不定进度 | 否 | 进度 0～1；不给时进度条来回走（不知道还要多久）。 | React：`value`；Preact：`value`；Vue：`value`；纯 HTML：`--sn-p（0～1）+ aria-valuenow（百分数）` |
+| `value` | `number` | undefined（不确定进度） | 否 | 当前进度值（0～1）；不传时渲染为往复循环的不确定进度态。 | React：`value`；Preact：`value`；Vue：`value`；纯 HTML：`--sn-p（0～1）+ aria-valuenow（百分数）` |
 | `ring` | `boolean` | false | 否 | 换成进度环：放在缩略图、按钮、列表行里。 | React：`ring`；Preact：`ring`；Vue：`ring`；纯 HTML：`.sn-pring` |
 | `svg` | `boolean` | false | 否 | 配合 ring 使用，改用圆头 SVG 矢量环（支持中心数值与平滑弧长过渡）。 | React：`svg`；Preact：`svg`；Vue：`svg`；纯 HTML：`.sn-pring-svg` |
 | `size` | `"sm" \| "md" \| "lg"` | "md" | 否 | 尺寸档位（小 / 中 / 大）。 | React：`size`；Preact：`size`；Vue：`size`；纯 HTML：`sn-sm / sn-lg` |
@@ -536,7 +536,7 @@ export default function ExportProgress() {
 
 | 按键 | 什么时候 | 做什么 |
 |---|---|---|
-| — |  | 进度只显示；导出卡片里的"取消""打开"是普通按钮。 |
+| Tab / Enter |  | 进度指示本身为只读状态；导出卡片内的「取消」「打开」为标准可聚焦按钮。 |
 
 ## 无障碍
 
@@ -550,16 +550,16 @@ export default function ExportProgress() {
 - 这样做：写清在做什么、做到多少："正在导出 第三集.mp4 · 62%"。
 - 这样做：超过 10 秒的给"取消"和剩余时间。
 - 不要：进度条用渐变、彩色。（规则 `no-gradient`）
-- 不要：进度跑完又从头来一遍（假进度）。（规则 `real-content`）
+- 不要：使用进度跑满后反复归零的虚假进度条，应改用不确定进度态。
 
 文案：
 
-- 完成时说结果在哪："已导出到"下载""。
+- 任务完成时明确告知结果位置，例如「已导出至「下载」文件夹」。
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 进度往前走 | `ease.out` | 200ms |
-| 完成时旧文字模糊淡出、新文字淡入 | `ease.outStrong` | 300ms |
+| 进度值推进平滑过渡 | `ease.out` | 200ms |
+| 任务完成时状态文案交叉淡入淡出 | `ease.outStrong` | 300ms |
 
 ## 验收要点
 

@@ -70,7 +70,7 @@ export default {
       { text: "通知卡片用彩色底、彩色边。", rule: "status-color" },
     ],
     copy: ["\"第三集导出完成\"；失败写原因：\"画面描述里有不能生成的内容\"。"],
-    motion: [{ what: "从右边滑进来", easing: "ease.outStrong", duration: "320ms" }, { what: "关掉一条，其余的补位", easing: "spring", duration: "300ms" }],
+    motion: [{ what: "新通知卡片自右侧滑入", easing: "ease.outStrong", duration: "320ms" }, { what: "关闭单条通知后，其余通知按弹簧曲线补位", easing: "spring", duration: "300ms" }],
   },
   examples: [
     { slug: "notify-basic", title: "最简单的用法", why: "标题、说明、时间：右上角滑进来，不自己消失，点 × 关上。",

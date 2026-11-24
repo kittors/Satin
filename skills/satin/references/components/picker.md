@@ -35,10 +35,10 @@
 | Solid | `// 标记照示例写、包一层 <sn-enhance>（入口里调过 defineElements()），听冒泡上来的 pick 事件` |
 | Preact | `import { DatePicker } from "satin-ui/react"; // @preact/preset-vite 默认把 react 指到 preact/compat` |
 
-- React：`DatePicker` 组件：`kind` 选种类（date、range、time、datetime、region），选好、清除时 `onChange` 拿到 `{ text }`。还没做到：不能从外面设值，没有受控的 `value`。
-- Preact：经 preact/compat 用 `satin-ui/react` 的 `DatePicker`：`kind` 选种类，`onChange` 拿到 `{ text }`。
-- Vue：`DatePicker` 组件：`kind` 选种类，选好、清除时 `@change` 拿到 `{ text }`。还没做到：不能从外面设值，所以没有 `v-model`。
-- Svelte：`DatePicker` 组件（`satin-ui/svelte/DatePicker.svelte`）：`kind` 选种类，`onchange` 拿到 `{ text }`。还没做到：没有 `bind:value`。
+- React：`DatePicker` 组件：通过 `kind` 指定类型（`date`、`range`、`time`、`datetime`、`region`），选择或清除时由 `onChange` 返回 `{ text }`。当前限制：暂不支持外部受控 `value`。
+- Preact：经 preact/compat 使用 `satin-ui/react` 的 `DatePicker`：通过 `kind` 指定类型，`onChange` 返回 `{ text }`。
+- Vue：`DatePicker` 组件：通过 `kind` 指定类型，选择或清除时由 `@change` 返回 `{ text }`。当前限制：暂不支持外部受控与 `v-model`。
+- Svelte：`DatePicker` 组件（`satin-ui/svelte/DatePicker.svelte`）：通过 `kind` 指定类型，由 `onchange` 返回 `{ text }`。当前限制：暂不支持 `bind:value`。
 - Angular：把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `(pick)` 事件（`$event.detail.text`）。
 - Solid：把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `pick` 事件（`e.detail.text`）。
 - 纯 HTML：把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `pick` 事件（`e.detail.text`）；也可以 `createPicker(空容器, { kind })` 渲染并接上，卸载时 `destroy()`。
@@ -928,15 +928,15 @@ export default function DueDate() {
 
 | 按键 | 什么时候 | 做什么 |
 |---|---|---|
-| ↓ / Enter | 焦点在触发框 | 打开面板。 |
-| Esc | 面板开着 | 收起，焦点回到触发框。 |
-| ← / → | 日历 | 前一天 / 后一天。 |
+| ↓ / Enter | 聚焦触发器时 | 打开面板。 |
+| Esc | 面板展开时 | 收起，焦点回到触发框。 |
+| ← / → | 日历面板中 | 前一天 / 后一天。 |
 | ↑ / ↓ | 日历 | 上一周 / 下一周。 |
 | PageUp / PageDown | 日历 | 上个月 / 下个月。 |
 | Home / End | 日历 | 到这一周的周一 / 周日。 |
 | Enter / 空格 | 日历 | 选中这一天。 |
-| ↑ / ↓、PageUp / PageDown | 时间列 | 一格 / 五格。 |
-| 方向键、Enter | 地址 | 在三列的按钮或搜索结果里移动，回车选中。 |
+| ↑ / ↓、PageUp / PageDown | 时间列中 | 一格 / 五格。 |
+| 方向键、Enter | 地址选择中 | 在三列的按钮或搜索结果里移动，回车选中。 |
 
 ## 无障碍
 
@@ -946,7 +946,7 @@ export default function DueDate() {
 - 日历里同一时间只有焦点那一格能 Tab 进去，方向键移动焦点。
 - Esc 收起后焦点回到触发框。
 - 定时发布早于现在时"确定"用 `aria-disabled`，原因写在面板底部，不弹提示。
-- 还没做到：清除（×）是写在触发框按钮里面的 `role="button"`，按钮套按钮，读屏不好读。
+- 当前限制：清除按钮（×）目前嵌套在触发器按钮内部，后续将调整为同级结构以优化屏幕阅读器体验。
 
 ## 设计规范
 
@@ -961,14 +961,14 @@ export default function DueDate() {
 文案：
 
 - placeholder 写要选什么："选择日期""选择开始和结束日期"。
-- 快捷范围写成人话："最近 7 天""上个月"。
+- 快捷范围使用自然直观的时间表达，例如「最近 7 天」「上个月」。
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 面板展开（第一帧就不透明，只放大） | `--sn-ease-out-strong` | 140ms |
-| 面板收起：淡出 | `--sn-ease-in` | 100ms |
-| 换月：旧网格淡出，新网格往所去的方向滑进来 | `--sn-ease-out-strong` | 150ms + 220ms |
-| 触发框换值：旧字淡出、新字从下面 2px 淡入 | `--sn-ease-in / --sn-ease-out-strong` | 80ms + 160ms |
+| 选择面板展开（首帧不透明，轻缩放到位） | `--sn-ease-out-strong` | 140ms |
+| 选择面板收起淡出 | `--sn-ease-in` | 100ms |
+| 切换月份：旧日历淡出，新月份沿方向滑入 | `--sn-ease-out-strong` | 150ms + 220ms |
+| 触发器文本更新：旧值淡出，新值自下方 2px 淡入 | `--sn-ease-in / --sn-ease-out-strong` | 80ms + 160ms |
 
 ## 验收要点
 

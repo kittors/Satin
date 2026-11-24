@@ -17,7 +17,7 @@ const MD = [
   "| 07 | 远景 | 4 秒 |",
   "| 08 | 全景 | 6 秒 |",
   "",
-  "```js title=shots.js",
+  "```ts title=shots.ts",
   "export const shots = [{ id: 7, size: \"远景\", sec: 4 }];",
   "```",
 ].join("\n");

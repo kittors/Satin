@@ -181,7 +181,7 @@
   "keyboard": [
     {
       "keys": "—",
-      "does": "加载中的区域不能操作；数据到了以后照常。"
+      "does": "加载中的骨架区域为只读状态，不参与键盘聚焦；数据加载完成后恢复正常交互。"
     }
   ],
   "design": {
@@ -191,8 +191,8 @@
     ],
     "dont": [
       {
-        "text": "布局已知时只放一个居中的转圈。",
-        "rule": "real-content"
+        "text": "页面结构已知时仅放置单个居中转圈，应使用与真实内容同构的骨架屏。",
+        "rule": "no-text-loading"
       },
       {
         "text": "每块骨架各扫各的光。",
@@ -204,19 +204,19 @@
     ],
     "motion": [
       {
-        "what": "骨架淡入",
+        "what": "等待超过 300ms 后骨架屏淡入",
         "easing": "ease.out",
         "duration": "150ms"
       },
       {
-        "what": "光带扫过",
+        "what": "骨架屏统一微光扫过动画",
         "easing": "linear",
-        "duration": "1.2s 一次"
+        "duration": "1.2s 循环"
       },
       {
-        "what": "数据逐行淡入",
+        "what": "数据就绪后内容逐行错峰淡入",
         "easing": "ease.out",
-        "duration": "每行晚 40ms"
+        "duration": "每行错峰 40ms"
       }
     ]
   },

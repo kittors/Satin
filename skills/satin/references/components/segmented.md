@@ -453,5 +453,5 @@ export default function StatusBar() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 滑块：前缘先到、后缘跟上，落定轻压 | `ease.outStrong / ease.inOut` | 300ms 左右 |
+| 选中滑块切换：前缘先行、后缘跟进并轻缓落定 | `ease.outStrong / ease.inOut` | 约 300ms |
 

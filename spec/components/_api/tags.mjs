@@ -69,7 +69,7 @@ export default {
       { text: "用颜色区分种类而不是状态。", rule: "status-color" },
     ],
     copy: ["状态两三个字：\"生成中\"\"待审核\"。"],
-    motion: [{ what: "生成中的圆点呼吸", easing: "ease.inOut", duration: "1200ms 循环" }],
+    motion: [{ what: "进行中状态圆点柔和呼吸闪烁", easing: "ease.inOut", duration: "1200ms 循环" }],
   },
   examples: [
     { slug: "tags-basic", title: "状态标签", why: "中性底 + 前面的小圆点：一眼看出状态，又不抢内容。",

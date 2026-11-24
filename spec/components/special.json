@@ -366,7 +366,7 @@
         "duration": "每格晚 60ms"
       },
       {
-        "what": "邮箱对勾一笔画出来",
+        "what": "邮箱格式校验通过时，右侧对勾路径绘制出现",
         "easing": "ease.outStrong",
         "duration": "300ms"
       }

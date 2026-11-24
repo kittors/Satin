@@ -127,9 +127,9 @@
     "preact": "import { Progress, Spinner } from \"satin-ui/react\"; // 经 preact/compat"
   },
   "importNote": {
-    "react": "`<Progress value>`：`value` 0～1，不给是不定进度；`ring` 换成进度环，`label` 是读屏读的名字。不知道进度时用 `<Spinner>`。",
-    "preact": "经 preact/compat 用 `satin-ui/react` 的 `Progress`、`Spinner`。",
-    "vue": "`<Progress :value>`：0～1，不给是不定进度；`ring`、`size`、`label`。转圈用 `<Spinner>`。",
+    "react": "`<Progress value>`：`value` 取值 0～1，省略时显示为不确定进度态；`ring` 切换为进度环，`label` 用于无障碍播报名称。未知时长等待可使用 `<Spinner>`。",
+    "preact": "经 preact/compat 使用 `satin-ui/react` 的 `Progress`、`Spinner`。",
+    "vue": "`<Progress :value>`：取值 0～1，省略时显示为不确定进度态；支持 `ring`、`size`、`label`。未知时长等待可使用 `<Spinner>`。",
     "svelte": "没有专门的组件：`<div class=\"sn-pbar\" style:--sn-p={p} role=\"progressbar\">`，进度环 `.sn-pring`，转圈 `.sn-spinner`。",
     "angular": "没有专门的组件：`<div class=\"sn-pbar\" [style.--sn-p]=\"p()\" role=\"progressbar\">`。",
     "solid": "没有专门的组件：`<div class=\"sn-pbar\" style={{ \"--sn-p\": p() }} role=\"progressbar\">`。",
@@ -144,9 +144,9 @@
     {
       "name": "value",
       "type": "number",
-      "default": "不给是不定进度",
+      "default": "undefined（不确定进度）",
       "required": false,
-      "desc": "进度 0～1；不给时进度条来回走（不知道还要多久）。",
+      "desc": "当前进度值（0～1）；不传时渲染为往复循环的不确定进度态。",
       "names": {
         "react": "value",
         "preact": "value",
@@ -384,8 +384,8 @@
   ],
   "keyboard": [
     {
-      "keys": "—",
-      "does": "进度只显示；导出卡片里的\"取消\"\"打开\"是普通按钮。"
+      "keys": "Tab / Enter",
+      "does": "进度指示本身为只读状态；导出卡片内的「取消」「打开」为标准可聚焦按钮。"
     }
   ],
   "design": {
@@ -399,21 +399,20 @@
         "rule": "no-gradient"
       },
       {
-        "text": "进度跑完又从头来一遍（假进度）。",
-        "rule": "real-content"
+        "text": "使用进度跑满后反复归零的虚假进度条，应改用不确定进度态。"
       }
     ],
     "copy": [
-      "完成时说结果在哪：\"已导出到\"下载\"\"。"
+      "任务完成时明确告知结果位置，例如「已导出至「下载」文件夹」。"
     ],
     "motion": [
       {
-        "what": "进度往前走",
+        "what": "进度值推进平滑过渡",
         "easing": "ease.out",
         "duration": "200ms"
       },
       {
-        "what": "完成时旧文字模糊淡出、新文字淡入",
+        "what": "任务完成时状态文案交叉淡入淡出",
         "easing": "ease.outStrong",
         "duration": "300ms"
       }

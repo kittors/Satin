@@ -67,7 +67,7 @@ export default {
     do: ["旁边写上当前值和单位，拖的时候实时变。", "范围不大（0–100 以内）时用，太大的范围拖不准。"],
     dont: [{ text: "已选那段用渐变色。", rule: "no-gradient" }, { text: "手机上用太细的轨道，点不中。", rule: "touch-target" }],
     copy: ["名称写调的是什么：\"音量\"\"不透明度\"。"],
-    motion: [{ what: "悬停圆钮放大、拖动时再放大", easing: "ease.out", duration: "150ms" }],
+    motion: [{ what: "滑块手柄在悬停与拖动时分阶段平滑放大", easing: "ease.out", duration: "150ms" }],
   },
   examples: [
     { slug: "slider-basic", title: "最简单的用法", why: "给初始值和最大值就能拖，组件自己管值。", html: `<sn-slider value="40" max="100" label="音量"></sn-slider>`, code: code("slider-basic") },

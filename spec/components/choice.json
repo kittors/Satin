@@ -119,7 +119,7 @@
       "native": [
         "react"
       ],
-      "desc": "勾上没有。",
+      "desc": "当前是否处于选中 / 开启状态。",
       "descBy": {
         "react": "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。",
         "preact": "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。",
@@ -301,12 +301,12 @@
     ],
     "motion": [
       {
-        "what": "对勾一笔画出来、方框轻轻弹一下",
+        "what": "复选勾选：对勾路径绘制，方框轻微回弹",
         "easing": "ease.outStrong / spring",
         "duration": "200–300ms"
       },
       {
-        "what": "开关圆钮弹到另一边；按住时横向拉长",
+        "what": "开关切换：滑块按弹簧移至另一端，按住时横向微拉伸",
         "easing": "spring",
         "duration": "300ms"
       }

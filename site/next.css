@@ -838,9 +838,11 @@ html.s-lock, html.s-lock body { overflow: hidden; overscroll-behavior: none; }
   .s-nav .sn-btn.s-mbtn:active, .s-nav .sn-btn.s-mbtn[aria-expanded="true"], .n-nav .sn-btn.s-mbtn:active, .n-nav .sn-btn.s-mbtn[aria-expanded="true"] { --sn-bg: var(--sn-fill-hover); }
 }
 
-/* 组件页"设计规范"里的这样做 / 不要：一条一行 */
-.d-dodont.d-dodont-one { grid-template-columns: 1fr; } /* 只有"这样做"或只有"不要"：一张卡占整行 */
+/* 组件页"设计规范"里的推荐做法 / 避免做法：一条一行 */
+.d-dodont.d-dodont-one { grid-template-columns: 1fr; } /* 只有一侧时：一张卡占整行 */
 .d-dodont ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; font: 400 calc(14px * var(--fsx))/calc(22px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); }
+.d-dodont .d-rule-ref { display: inline-flex; align-items: center; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--sn-fill-subtle); box-shadow: inset 0 0 0 1px var(--sn-line); font: 400 calc(11.5px * var(--fsx))/calc(17px * var(--fsx)) var(--sn-sans); color: var(--sn-label2); text-decoration: none; vertical-align: 1px; transition: background-color .14s var(--sn-ease-out), color .14s var(--sn-ease-out), box-shadow .14s var(--sn-ease-out); }
+@media (hover: hover) { .d-dodont .d-rule-ref:hover { background: var(--sn-fill-hover); color: var(--sn-label); box-shadow: inset 0 0 0 1px var(--sn-line-control); text-decoration: none; } }
 
 /* 组件页 API 表（全面复用 Satin createTable）：排序、列宽拖拽、实时搜索筛选、复杂类型摘要与平滑行详情展开 */
 .n-docs .d-table th { white-space: nowrap; }

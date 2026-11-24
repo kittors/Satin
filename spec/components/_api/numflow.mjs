@@ -44,7 +44,7 @@ export default {
     { name: "format", type: "(v: number) => string", default: "千分位（1,280）", required: false,
       desc: "把数字变成要显示的字：金额、百分比、\"99+\"。逗号、货币符号这些不是数字的字不滚。",
       names: { js: "format", react: "format", vue: "format", svelte: "format", preact: "format" } },
-    { name: "reduced", type: "() => boolean", default: "跟系统的\"减少动态效果\"", required: false,
+    { name: "reduced", type: "() => boolean", default: "跟随系统设置", required: false,
       desc: "返回 true 时不做动画、直接换数字。一般不用给。", names: { js: "reduced" } },
   ],
   events: [],
@@ -63,7 +63,7 @@ export default {
     { name: ".sn-nf-sr", desc: "给读屏的最终值（看不见）" },
   ],
   types: ["NumberFlowOptions"],
-  keyboard: [{ keys: "—", does: "只显示，不能操作。" }],
+  keyboard: [{ keys: "—", does: "纯数字展示组件，不参与键盘焦点流转。" }],
   a11y: {
     roles: ["每一位 `aria-hidden`，另有一个看不见的 `.sn-nf-sr` 写着完整的值：读屏只读最终的值，不读滚动的过程。"],
     focus: ["不进 Tab 顺序。"],
@@ -77,8 +77,8 @@ export default {
     ],
     copy: ["单位跟着数字写：\"1,280 个\"\"¥199\"。"],
     motion: [
-      { what: "每一位滚到新数字，从个位开始每位晚 30ms", easing: "ease.outStrong", duration: "约 600ms" },
-      { what: "新的一位从 0 宽长出来", easing: "ease.out", duration: "300ms 左右" },
+      { what: "数字逐位滚动至新值（自个位起错峰 30ms）", easing: "ease.outStrong", duration: "约 600ms" },
+      { what: "进位新增数位时从 0 宽度平滑展开", easing: "ease.out", duration: "约 300ms" },
     ],
   },
   examples: [

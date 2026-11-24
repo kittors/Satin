@@ -1168,11 +1168,11 @@ export default function CheckoutBar() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 悬停、按下时的底色 | `--sn-ease-out` | 120ms |
-| 按下时缩到 0.97 | `--sn-ease-out` | 100ms |
-| 文字后的箭头悬停时右移 2px | `--sn-ease-out` | 150ms |
-| 转圈出现 | `--sn-ease-out` | 180ms |
-| 成功时光泽扫过一次 | `--sn-ease-in-out` | 700ms |
+| 悬停与按下态背景色过渡 | `--sn-ease-out` | 120ms |
+| 按下态微幅缩放反馈（0.97） | `--sn-ease-out` | 100ms |
+| 悬停时后置箭头图标右移 2px | `--sn-ease-out` | 150ms |
+| 加载指示器淡入展开 | `--sn-ease-out` | 180ms |
+| 完成态光泽单次扫过 | `--sn-ease-in-out` | 700ms |
 
 ## 验收要点
 

@@ -529,7 +529,7 @@ export default function FaqControlled() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 内容高度长出来、收回去（0fr → 1fr） | `ease.inOut` | 260ms |
-| 箭头转 90° | `ease.outStrong` | 240ms |
-| 内容晚 120ms 淡入、从上方 4px 落下 | `ease.out / ease.outStrong` | 200–260ms |
+| 内容区高度平滑展开与收起（0fr → 1fr） | `ease.inOut` | 260ms |
+| 展开指示箭头旋转 90° | `ease.outStrong` | 240ms |
+| 内容文本延迟 120ms 自上方 4px 淡入 | `ease.out / ease.outStrong` | 200–260ms |
 

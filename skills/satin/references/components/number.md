@@ -400,6 +400,6 @@ export default function BatchSize() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 数字往上 / 往下滚到新值 | `ease.outStrong` | 260ms |
-| 到边界再按：数字抖一下 | `spring` | 300ms |
+| 增减数值时数字平滑上下滚动 | `ease.outStrong` | 260ms |
+| 到达最小值或最大值后继续点击，数字轻微抖动提示 | `spring` | 300ms |
 

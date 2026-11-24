@@ -107,8 +107,8 @@ export default {
     ],
     copy: ["一两个词：\"进行中\"\"已完成\"；不要写成句子。", "移除按钮的读屏名称写\"移除 雨夜\"，不写\"关闭\"。"],
     motion: [
-      { what: "选中时对勾展开、文字往右让", easing: "ease.outStrong", duration: "200ms" },
-      { what: "移除：淡出 + 缩到 .96，旁边的补位", easing: "ease.in / spring", duration: "160ms" },
+      { what: "选中态对勾展开，文字平滑右移让位", easing: "ease.outStrong", duration: "200ms" },
+      { what: "移除标签：淡出微缩至 96%，相邻标签弹簧补位", easing: "ease.in / spring", duration: "160ms" },
     ],
   },
   examples: [

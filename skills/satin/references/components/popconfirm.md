@@ -540,7 +540,7 @@ export default function SubmitReview() {
 
 - 这样做：只给单条、属于自己、不能撤销的操作。
 - 这样做：确认按钮写动作："永久删除""提交"。
-- 不要：能撤销的操作也弹确认。（规则 `real-content`）
+- 不要：对支持撤销的操作弹出气泡确认（应直接执行并通过轻提示提供撤销）。
 - 不要：确认按钮写"确定""是"。（规则 `marketing-copy`）
 
 文案：
@@ -549,8 +549,8 @@ export default function SubmitReview() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 从按钮那里展开（缩放 0.97 → 1、位移 4px 回位） | `ease.outStrong` | 140ms |
-| 收起（淡出） | `ease.in` | 100ms |
+| 气泡确认展开：自触发按钮缩放（0.97 → 1）并位移 4px 落位 | `ease.outStrong` | 140ms |
+| 气泡确认收起淡出 | `ease.in` | 100ms |
 
 ## 验收要点
 

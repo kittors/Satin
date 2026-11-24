@@ -165,11 +165,11 @@ export default {
       "危险按钮写清后果：\"删除项目\"，不写\"删除\"两个字了事。",
     ],
     motion: [
-      { what: "悬停、按下时的底色", easing: "--sn-ease-out", duration: "120ms" },
-      { what: "按下时缩到 0.97", easing: "--sn-ease-out", duration: "100ms" },
-      { what: "文字后的箭头悬停时右移 2px", easing: "--sn-ease-out", duration: "150ms" },
-      { what: "转圈出现", easing: "--sn-ease-out", duration: "180ms" },
-      { what: "成功时光泽扫过一次", easing: "--sn-ease-in-out", duration: "700ms" },
+      { what: "悬停与按下态背景色过渡", easing: "--sn-ease-out", duration: "120ms" },
+      { what: "按下态微幅缩放反馈（0.97）", easing: "--sn-ease-out", duration: "100ms" },
+      { what: "悬停时后置箭头图标右移 2px", easing: "--sn-ease-out", duration: "150ms" },
+      { what: "加载指示器淡入展开", easing: "--sn-ease-out", duration: "180ms" },
+      { what: "完成态光泽单次扫过", easing: "--sn-ease-in-out", duration: "700ms" },
     ],
   },
   examples: [

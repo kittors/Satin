@@ -38,7 +38,7 @@ export default {
   dts: { react: "Checkbox", vue: "Checkbox" },
   props: [
     { name: "checked", type: "boolean", default: "false", required: false, native: ["react"],
-      desc: "勾上没有。", descBy: { react: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", preact: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", vue: "勾上没有：`v-model` 绑定。", svelte: "勾上没有：`bind:checked` 绑定。" },
+      desc: "当前是否处于选中 / 开启状态。", descBy: { react: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", preact: "勾上没有。和原生一样：`checked` + `onChange` 受控，`defaultChecked` 非受控。", vue: "勾上没有：`v-model` 绑定。", svelte: "勾上没有：`bind:checked` 绑定。" },
       names: { react: "checked / defaultChecked", preact: "checked / defaultChecked", vue: "v-model", svelte: "bind:checked", angular: "[checked]", solid: "checked", html: "checked" } },
     { name: "label", type: "string", typeBy: { react: "ReactNode | string", preact: "ComponentChildren | string" }, default: "—", required: false,
       desc: "旁边的文字（也可以写在子元素、默认插槽里）。", names: { react: "label", preact: "label", vue: "label", html: "<label> 里 input 后面的文字" } },
@@ -84,8 +84,8 @@ export default {
     ],
     copy: ["用肯定句：\"自动保存草稿\"，不写\"不要自动保存\"。"],
     motion: [
-      { what: "对勾一笔画出来、方框轻轻弹一下", easing: "ease.outStrong / spring", duration: "200–300ms" },
-      { what: "开关圆钮弹到另一边；按住时横向拉长", easing: "spring", duration: "300ms" },
+      { what: "复选勾选：对勾路径绘制，方框轻微回弹", easing: "ease.outStrong / spring", duration: "200–300ms" },
+      { what: "开关切换：滑块按弹簧移至另一端，按住时横向微拉伸", easing: "spring", duration: "300ms" },
     ],
   },
   examples: [

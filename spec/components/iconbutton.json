@@ -377,12 +377,12 @@
     ],
     "motion": [
       {
-        "what": "按下缩一下",
+        "what": "按下态微幅缩放反馈",
         "easing": "ease.out",
         "duration": "100ms"
       },
       {
-        "what": "悬停 500ms 后出 Tooltip",
+        "what": "悬停 500ms 后淡入文字提示",
         "easing": "ease.out",
         "duration": "150ms"
       }

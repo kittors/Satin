@@ -191,7 +191,7 @@
     {
       "name": "reduced",
       "type": "() => boolean",
-      "default": "跟系统的\"减少动态效果\"",
+      "default": "跟随系统设置",
       "required": false,
       "desc": "返回 true 时不做动画、直接换数字。一般不用给。",
       "names": {
@@ -260,7 +260,7 @@
   "keyboard": [
     {
       "keys": "—",
-      "does": "只显示，不能操作。"
+      "does": "纯数字展示组件，不参与键盘焦点流转。"
     }
   ],
   "design": {
@@ -283,14 +283,14 @@
     ],
     "motion": [
       {
-        "what": "每一位滚到新数字，从个位开始每位晚 30ms",
+        "what": "数字逐位滚动至新值（自个位起错峰 30ms）",
         "easing": "ease.outStrong",
         "duration": "约 600ms"
       },
       {
-        "what": "新的一位从 0 宽长出来",
+        "what": "进位新增数位时从 0 宽度平滑展开",
         "easing": "ease.out",
-        "duration": "300ms 左右"
+        "duration": "约 300ms"
       }
     ]
   },

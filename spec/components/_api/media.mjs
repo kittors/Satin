@@ -62,9 +62,9 @@ export default {
   },
   design: {
     do: ["给封面：没播的时候不黑屏。", "试听音频写清楚是什么、多长：\"旁白试音 · 0:32\"。"],
-    dont: [{ text: "自动播放带声音的视频。", rule: "real-content" }, { text: "控制条用彩色。", rule: "status-color" }],
+    dont: [{ text: "在未经用户交互时自动播放带声音的视频。" }, { text: "控制条用彩色。", rule: "status-color" }],
     copy: ["打不开时写原因和下一步：\"视频没能加载，检查网络后再试\"。"],
-    motion: [{ what: "控制条淡出 / 回来", easing: "ease.out", duration: "300ms" }, { what: "点进度条跳过去", easing: "easeOutCubic", duration: "150ms" }],
+    motion: [{ what: "播放控制条静止自动隐去与重新显现", easing: "ease.out", duration: "300ms" }, { what: "点击进度条时平滑跳转至目标时间点", easing: "easeOutCubic", duration: "150ms" }],
   },
   examples: [
     { slug: "media-basic", title: "最简单的用法：视频", why: "给地址和封面：控制条叠在画面上，指针不动 2 秒后淡出。", html: `<div id="media-basic"></div>`, code: code("media-basic") },

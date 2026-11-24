@@ -450,7 +450,7 @@ export default function ListSwitch() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 悬停时末尾的箭头往右挪 2px | `ease.out` | 150ms |
+| 悬停可点击行时末尾箭头右移 2px | `ease.out` | 150ms |
 
 ## 验收要点
 

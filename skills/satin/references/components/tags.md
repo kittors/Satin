@@ -451,5 +451,5 @@ export default function TagsAvatar() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 生成中的圆点呼吸 | `ease.inOut` | 1200ms 循环 |
+| 进行中状态圆点柔和呼吸闪烁 | `ease.inOut` | 1200ms 循环 |
 

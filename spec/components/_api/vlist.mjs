@@ -53,7 +53,7 @@ export default {
   cssVars: [{ name: "--sn-fill-subtle", desc: "骨架行的文字条", default: "黑 5%", token: true }, { name: "--sn-fill-hover", desc: "行悬停", default: "黑 4%", token: true }],
   classes: [
     { name: ".sn-vl / .sn-vl-row", desc: "列表（限高，默认 420px）/ 一行（复用）" },
-    { name: ".sn-vl-row.sn-sk-row / .sn-err / .sn-end", desc: "骨架行 / 没加载出来那一行 / 到底那一行" },
+    { name: ".sn-vl-row.sn-sk-row / .sn-err / .sn-end", desc: "骨架占位行 / 加载失败提示行 / 列表末尾提示行" },
   ],
   types: ["InfiniteListProps"],
   keyboard: [{ keys: "方向键 / PageUp / PageDown", does: "原生滚动。" }],
@@ -65,11 +65,11 @@ export default {
   design: {
     do: ["每行一样高；内容多的写成两行（标题 + 说明）。", "加载失败给\"重试\"，不要整块报错。"],
     dont: [
-      { text: "加载更多时整块换成转圈。", rule: "real-content" },
+      { text: "加载下一页时清空或用大面积转圈遮挡已有列表（应在底部追加骨架行）。", rule: "no-text-loading" },
       { text: "行之间都画分隔线。", rule: "no-decorative-divider" },
     ],
-    copy: ["到底了写\"已经到底了 · 共 N 条\"；失败写\"这一页没加载出来\" + \"重试\"。"],
-    motion: [{ what: "新到的一页：新行依次淡入", easing: "ease.out", duration: "240ms，每行晚 35ms（最多晚 175ms）" }, { what: "骨架行原地淡出（和新行交叉淡化）", easing: "ease.out", duration: "220ms" }],
+    copy: ["加载至末尾提示「已显示全部 · 共 N 条」；分页加载失败提示「加载失败，请重试」并附带「重试」按钮。"],
+    motion: [{ what: "下一页数据到达后，新增行依次错峰淡入（每行 35ms，上限 175ms）", easing: "ease.out", duration: "240ms" }, { what: "底部骨架行原地淡出并与新行平滑交叉淡化", easing: "ease.out", duration: "220ms" }],
   },
   examples: [
     { slug: "vlist-basic", title: "最简单的用法", why: "给 loadPage 和一行怎么画：滚到底自动要下一页。", html: `<div class="sn-vl-wrap"><div class="sn-vl" id="vlist-basic" style="height:320px"></div></div>`, code: code("vlist-basic") },

@@ -146,14 +146,14 @@ export default {
     "DataGridColumn",
   ],
   keyboard: [
-    { keys: "方向键 / Tab / Shift + Tab", does: "在格子间移动（单击也能选中一个格子）。" },
-    { keys: "Home / End", does: "到这一行的第一格 / 最后一格；加 ⌘（Ctrl）到第一行 / 最后一行。" },
-    { keys: "PageUp / PageDown", does: "往上 / 往下翻一屏。" },
-    { keys: "空格", does: "勾选、取消勾选当前行（按住 Shift 点勾选框可以连选）。" },
-    { keys: "Enter / F2 / 直接打字", does: "开始编辑当前格子（双击也行；列要 `editable`）。" },
-    { keys: "Enter / Tab", when: "编辑中", does: "提交；不合法时红框加一句原因，不提交。" },
-    { keys: "Esc", when: "编辑中", does: "取消编辑。" },
-    { keys: "Alt + ↑ / ↓", does: "把当前行往上 / 往下挪（要 `rowDraggable`；排序、筛选时不能挪，会提示先清除）。" },
+    { keys: "方向键 / Tab / Shift + Tab", when: "聚焦表格时", does: "在单元格间移动焦点（单击任意单元格也可直接选中）。" },
+    { keys: "Home / End", when: "聚焦表格时", does: "跳至当前行首格 / 尾格；配合 ⌘ / Ctrl 跳至首行 / 末行。" },
+    { keys: "PageUp / PageDown", when: "聚焦表格时", does: "向上 / 向下翻动一屏。" },
+    { keys: "空格", when: "开启行选择时", does: "勾选或取消勾选当前行（按住 Shift 点击勾选框支持连选）。" },
+    { keys: "Enter / F2 / 直接输入", when: "选中可编辑单元格时", does: "进入单元格编辑态（需对应列开启 `editable`，也支持双击进入）。" },
+    { keys: "Enter / Tab", when: "编辑单元格中", does: "提交修改；若校验失败则红框标出错误原因并阻止提交。" },
+    { keys: "Esc", when: "编辑单元格中", does: "放弃修改并退出编辑态。" },
+    { keys: "Alt + ↑ / ↓", when: "开启行拖拽且无排序筛选时", does: "将当前行上移或下移一位（需开启 `rowDraggable`；若存在排序或筛选则提示先清除）。" },
   ],
   a11y: {
     roles: [
@@ -163,7 +163,7 @@ export default {
       "空、加载、出错那一层是 `role=\"status\"`，变了读屏会读。",
     ],
     focus: ["焦点在视口上，当前格子用贴边细线标出；编辑时焦点进输入框，提交或取消后回到格子。"],
-    notes: ["还没做到：没有 `aria-rowcount`、`aria-rowindex`，读屏不知道一共多少行、现在在第几行（只渲染看得见的行）。"],
+    notes: ["当前限制：暂未注入 `aria-rowcount` 与 `aria-rowindex`，屏幕阅读器无法直接播报虚拟滚动的总行数与当前行序号。"],
   },
   design: {
     do: [
@@ -177,15 +177,15 @@ export default {
       { text: "改了一个格子就把整个 `data` 换成新数组：表格已经在本地改好了，`cellEdit` 里交给服务端就行。" },
     ],
     copy: [
-      "空的时候写为什么空、下一步做什么：\"还没有镜头，先从剧本里拆一批\"；筛选后没结果写\"没有符合条件的镜头\"，旁边给\"清除筛选\"。",
-      "出错写原因，不写\"出错了\"：\"网络断了，没拿到镜头\"。",
+      "空状态需说明原因并提供下一步引导（如「还没有镜头，先从剧本里拆一批」）；筛选无结果时提示「没有符合条件的镜头」并附带「清除筛选」操作。",
+      "错误状态需说明具体原因，避免泛泛写「出错了」（如「网络连接中断，未能获取镜头列表」）。",
     ],
     motion: [
-      { what: "拖表头换列：看得见的格子从旧位置滑过去", easing: "--sn-ease-out-strong", duration: "220ms" },
-      { what: "拖行：空位按时间常数跟着走，被越过的行一行接一行让开（越过一行至少 2.5 帧）", easing: "时间常数缓动（不是固定曲线）", duration: "约 150ms 跟上" },
-      { what: "树形展开、收起：位置变了的行滑过去", easing: "--sn-ease-in-out", duration: "300ms" },
-      { what: "树形展开：新出现的行淡入、往下落 6px（同一个上级的行错开，最多 150ms）", easing: "--sn-ease-out-strong", duration: "220ms" },
-      { what: "树形收起：下级先原地淡出再让位", easing: "--sn-ease-in-out", duration: "120ms" },
+      { what: "拖拽表头调整列顺序时，可见单元格平滑滑移至新列位置", easing: "--sn-ease-out-strong", duration: "220ms" },
+      { what: "拖拽排序行时，空位阻尼跟随，被越过的行逐行平滑让位", easing: "时间常数阻尼缓动", duration: "约 150ms" },
+      { what: "树形节点展开与收起时，位置变化的行平滑位移", easing: "--sn-ease-in-out", duration: "300ms" },
+      { what: "树形展开时，新增子行错峰淡入并轻移 6px 落位（最大错峰 150ms）", easing: "--sn-ease-out-strong", duration: "220ms" },
+      { what: "树形收起时，子行先原地淡出再收拢行距", easing: "--sn-ease-in-out", duration: "120ms" },
     ],
   },
   examples: [

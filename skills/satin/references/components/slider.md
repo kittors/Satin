@@ -401,5 +401,5 @@ export default function StrengthSlider() {
 
 | 动效 | 曲线 | 时长 |
 |---|---|---|
-| 悬停圆钮放大、拖动时再放大 | `ease.out` | 150ms |
+| 滑块手柄在悬停与拖动时分阶段平滑放大 | `ease.out` | 150ms |
 

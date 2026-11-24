@@ -36,10 +36,10 @@ export default {
     preact: 'import { DatePicker } from "satin-ui/react"; // @preact/preset-vite 默认把 react 指到 preact/compat',
   },
   importNote: {
-    react: "`DatePicker` 组件：`kind` 选种类（date、range、time、datetime、region），选好、清除时 `onChange` 拿到 `{ text }`。还没做到：不能从外面设值，没有受控的 `value`。",
-    preact: "经 preact/compat 用 `satin-ui/react` 的 `DatePicker`：`kind` 选种类，`onChange` 拿到 `{ text }`。",
-    vue: "`DatePicker` 组件：`kind` 选种类，选好、清除时 `@change` 拿到 `{ text }`。还没做到：不能从外面设值，所以没有 `v-model`。",
-    svelte: "`DatePicker` 组件（`satin-ui/svelte/DatePicker.svelte`）：`kind` 选种类，`onchange` 拿到 `{ text }`。还没做到：没有 `bind:value`。",
+    react: "`DatePicker` 组件：通过 `kind` 指定类型（`date`、`range`、`time`、`datetime`、`region`），选择或清除时由 `onChange` 返回 `{ text }`。当前限制：暂不支持外部受控 `value`。",
+    preact: "经 preact/compat 使用 `satin-ui/react` 的 `DatePicker`：通过 `kind` 指定类型，`onChange` 返回 `{ text }`。",
+    vue: "`DatePicker` 组件：通过 `kind` 指定类型，选择或清除时由 `@change` 返回 `{ text }`。当前限制：暂不支持外部受控与 `v-model`。",
+    svelte: "`DatePicker` 组件（`satin-ui/svelte/DatePicker.svelte`）：通过 `kind` 指定类型，由 `onchange` 返回 `{ text }`。当前限制：暂不支持 `bind:value`。",
     angular: "把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `(pick)` 事件（`$event.detail.text`）。",
     solid: "把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `pick` 事件（`e.detail.text`）。",
     html: "把标记照示例写好、外面包一层 `<sn-enhance>`，听冒泡上来的 `pick` 事件（`e.detail.text`）；也可以 `createPicker(空容器, { kind })` 渲染并接上，卸载时 `destroy()`。",
@@ -93,15 +93,15 @@ export default {
   ],
   types: ["PickerOptions", "PickDetail", "PickerKind", "DatePickerProps"],
   keyboard: [
-    { keys: "↓ / Enter", when: "焦点在触发框", does: "打开面板。" },
-    { keys: "Esc", when: "面板开着", does: "收起，焦点回到触发框。" },
-    { keys: "← / →", when: "日历", does: "前一天 / 后一天。" },
+    { keys: "↓ / Enter", when: "聚焦触发器时", does: "打开面板。" },
+    { keys: "Esc", when: "面板展开时", does: "收起，焦点回到触发框。" },
+    { keys: "← / →", when: "日历面板中", does: "前一天 / 后一天。" },
     { keys: "↑ / ↓", when: "日历", does: "上一周 / 下一周。" },
     { keys: "PageUp / PageDown", when: "日历", does: "上个月 / 下个月。" },
     { keys: "Home / End", when: "日历", does: "到这一周的周一 / 周日。" },
     { keys: "Enter / 空格", when: "日历", does: "选中这一天。" },
-    { keys: "↑ / ↓、PageUp / PageDown", when: "时间列", does: "一格 / 五格。" },
-    { keys: "方向键、Enter", when: "地址", does: "在三列的按钮或搜索结果里移动，回车选中。" },
+    { keys: "↑ / ↓、PageUp / PageDown", when: "时间列中", does: "一格 / 五格。" },
+    { keys: "方向键、Enter", when: "地址选择中", does: "在三列的按钮或搜索结果里移动，回车选中。" },
   ],
   a11y: {
     roles: [
@@ -112,7 +112,7 @@ export default {
     focus: ["日历里同一时间只有焦点那一格能 Tab 进去，方向键移动焦点。", "Esc 收起后焦点回到触发框。"],
     notes: [
       "定时发布早于现在时\"确定\"用 `aria-disabled`，原因写在面板底部，不弹提示。",
-      "还没做到：清除（×）是写在触发框按钮里面的 `role=\"button\"`，按钮套按钮，读屏不好读。",
+      "当前限制：清除按钮（×）目前嵌套在触发器按钮内部，后续将调整为同级结构以优化屏幕阅读器体验。",
     ],
   },
   design: {
@@ -127,12 +127,12 @@ export default {
       { text: "同一页里日期格式混着写（2026/11/19 和 11 月 19 日）。" },
       { text: "面板用毛玻璃、半透明，透出背后的字。" },
     ],
-    copy: ["placeholder 写要选什么：\"选择日期\"\"选择开始和结束日期\"。", "快捷范围写成人话：\"最近 7 天\"\"上个月\"。"],
+    copy: ["placeholder 写要选什么：\"选择日期\"\"选择开始和结束日期\"。", "快捷范围使用自然直观的时间表达，例如「最近 7 天」「上个月」。"],
     motion: [
-      { what: "面板展开（第一帧就不透明，只放大）", easing: "--sn-ease-out-strong", duration: "140ms" },
-      { what: "面板收起：淡出", easing: "--sn-ease-in", duration: "100ms" },
-      { what: "换月：旧网格淡出，新网格往所去的方向滑进来", easing: "--sn-ease-out-strong", duration: "150ms + 220ms" },
-      { what: "触发框换值：旧字淡出、新字从下面 2px 淡入", easing: "--sn-ease-in / --sn-ease-out-strong", duration: "80ms + 160ms" },
+      { what: "选择面板展开（首帧不透明，轻缩放到位）", easing: "--sn-ease-out-strong", duration: "140ms" },
+      { what: "选择面板收起淡出", easing: "--sn-ease-in", duration: "100ms" },
+      { what: "切换月份：旧日历淡出，新月份沿方向滑入", easing: "--sn-ease-out-strong", duration: "150ms + 220ms" },
+      { what: "触发器文本更新：旧值淡出，新值自下方 2px 淡入", easing: "--sn-ease-in / --sn-ease-out-strong", duration: "80ms + 160ms" },
     ],
   },
   examples: [

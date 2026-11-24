@@ -51,7 +51,7 @@ export default {
     { name: ".sn-spinner", desc: "转圈（0.9 秒一圈），只在很小的区域用" },
   ],
   types: [],
-  keyboard: [{ keys: "—", does: "加载中的区域不能操作；数据到了以后照常。" }],
+  keyboard: [{ keys: "—", does: "加载中的骨架区域为只读状态，不参与键盘聚焦；数据加载完成后恢复正常交互。" }],
   a11y: {
     roles: ["加载中的区域 `aria-busy=\"true\"`、写 `aria-label`；数据替换进来的容器 `aria-live=\"polite\"`。", "转圈 `role=\"status\"`。"],
     focus: ["加载完不移动焦点。"],
@@ -60,11 +60,11 @@ export default {
   design: {
     do: ["骨架的形状和真内容一样：缩略图、两行字。", "自动保存这类用户不用察觉的等待，只在固定位置放一个安静的状态字。"],
     dont: [
-      { text: "布局已知时只放一个居中的转圈。", rule: "real-content" },
+      { text: "页面结构已知时仅放置单个居中转圈，应使用与真实内容同构的骨架屏。", rule: "no-text-loading" },
       { text: "每块骨架各扫各的光。", rule: "motion-props" },
     ],
     copy: ["转圈旁边写在做什么：\"正在加载更多…\"。"],
-    motion: [{ what: "骨架淡入", easing: "ease.out", duration: "150ms" }, { what: "光带扫过", easing: "linear", duration: "1.2s 一次" }, { what: "数据逐行淡入", easing: "ease.out", duration: "每行晚 40ms" }],
+    motion: [{ what: "等待超过 300ms 后骨架屏淡入", easing: "ease.out", duration: "150ms" }, { what: "骨架屏统一微光扫过动画", easing: "linear", duration: "1.2s 循环" }, { what: "数据就绪后内容逐行错峰淡入", easing: "ease.out", duration: "每行错峰 40ms" }],
   },
   examples: [
     { slug: "loading-basic", title: "最简单的用法：骨架", why: "形状和真内容一样：缩略图、标题、一行说明。", html: `<div class="sn-sk-list" aria-busy="true" aria-label="正在加载镜头"><div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:46%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div><div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:38%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div><div class="sn-sk-row"><span class="sn-sk" style="width:64px;height:40px;border-radius:6px"></span><div class="sn-meta"><span class="sn-sk" style="width:52%;height:12px"></span><span class="sn-sk" style="width:22%;height:10px"></span></div></div></div>`, code: code("loading-basic") },

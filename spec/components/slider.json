@@ -294,7 +294,7 @@
     ],
     "motion": [
       {
-        "what": "悬停圆钮放大、拖动时再放大",
+        "what": "滑块手柄在悬停与拖动时分阶段平滑放大",
         "easing": "ease.out",
         "duration": "150ms"
       }
