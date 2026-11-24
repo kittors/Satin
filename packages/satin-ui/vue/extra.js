@@ -34,10 +34,10 @@ const nextId = () => "sn-vm-" + ++seq;
 function useFloatMenu(p) {
   const id = nextId(), box = ref(null), mounted = useMounted();
   onBeforeUnmount(() => { if (box.value?.firstElementChild?.classList.contains("sn-open")) closeMenu(false); });
-  const node = () => (mounted.value ? h(Teleport, { to: "body" }, h("div", { ref: box, style: "display: contents", innerHTML: menuHTML(p.items, id, p.label) })) : null);
+  const node = () => (mounted.value ? h(Teleport, { to: "body" }, h("div", { ref: box, style: "display: contents", innerHTML: menuHTML(p.items, id, p.label, p.surface) })) : null);
   return [box, node];
 }
-const menuProps = { items: { type: Array, default: () => [] }, label: String, bound: { type: null, default: undefined } };
+const menuProps = { items: { type: Array, default: () => [] }, label: String, bound: { type: null, default: undefined }, surface: String };
 // 菜单按钮：默认插槽是触发器（点了贴着它弹出，↓ 键也能打开；键盘打开时先高亮第一项）
 export const Menu = /* @__PURE__ */ defineComponent({
   name: "SnMenu", inheritAttrs: false,
@@ -46,7 +46,7 @@ export const Menu = /* @__PURE__ */ defineComponent({
   setup(p, { slots, emit }) {
     useSetup();
     const [box, menu] = useFloatMenu(p), trig = ref(null);
-    const open = (keyboard) => { const t = elOf(trig.value); openMenu(box.value.firstElementChild, { trigger: t, anchor: t, keyboard, align: p.align, bound: elOf(p.bound) ?? undefined, onSelect: ({ item }) => emit("select", item.dataset.key, findItem(p.items, item.dataset.key)) }); };
+    const open = (keyboard) => { const t = elOf(trig.value); openMenu(box.value.firstElementChild, { trigger: t, anchor: t, keyboard, align: p.align, bound: elOf(p.bound) ?? undefined, surface: p.surface, onSelect: ({ item }) => emit("select", item.dataset.key, findItem(p.items, item.dataset.key)) }); };
     return () => {
       const first = firstNode(slots.default?.());
       const trigger = first && cloneVNode(first, {
@@ -66,7 +66,7 @@ export const ContextMenu = /* @__PURE__ */ defineComponent({
   setup(p, { slots, emit }) {
     useSetup();
     const [box, menu] = useFloatMenu(p), zone = ref(null); let lp = null;
-    const open = (x, y, keyboard) => { const z = elOf(zone.value); openMenu(box.value.firstElementChild, { trigger: z, x, y, keyboard, bound: elOf(p.bound) ?? undefined, onSelect: ({ item }) => emit("select", item.dataset.key, findItem(p.items, item.dataset.key)) }); z.classList.add("sn-active"); };
+    const open = (x, y, keyboard) => { const z = elOf(zone.value); openMenu(box.value.firstElementChild, { trigger: z, x, y, keyboard, bound: elOf(p.bound) ?? undefined, surface: p.surface, onSelect: ({ item }) => emit("select", item.dataset.key, findItem(p.items, item.dataset.key)) }); z.classList.add("sn-active"); };
     const cancel = (e) => { if (!lp || lp.fired) return; if (e.type === "pointermove" && Math.hypot(e.clientX - lp.x, e.clientY - lp.y) < 8) return; clearTimeout(lp.t); lp = null; };
     onBeforeUnmount(() => clearTimeout(lp?.t));
     return () => {

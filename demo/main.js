@@ -23,6 +23,7 @@ import { initCharts } from "./sections/charts.js";
 import { initLoadingMotion } from "./sections/loading-motion.js";
 import { initFeel } from "./sections/feel.js";
 import { initEditorial } from "./sections/editorial.js";
+import { initTree } from "./sections/tree.js";
 import { mountThemePanel } from "../packages/satin-ui/src/theme-panel.js";
 import * as Theme from "../packages/satin-ui/src/theme.js";
 import { setup } from "../packages/satin-ui/src/setup.js";
@@ -196,6 +197,7 @@ if (need("charts") || need("icons")) initCharts({ $, $$, initSeg });
 if (need("loadingmotion")) initLoadingMotion({ $, $$, initSeg, reduced });
 if (need("feel")) initFeel({ $, $$, injectIcons, reduced, ...forms });
 if (need("editorial")) initEditorial({ $, $$ });
+if (need("tree") || need("files")) initTree();
 // 最后统一把会溢出滚动的地方换成滚动区域（菜单、命令面板、通知列表、抽屉、目录，以及带 data-sa 的元素）
 initScroll({ $, $$, initSeg });
 
@@ -205,7 +207,7 @@ initScroll({ $, $$, initSeg });
 // 嵌入模式（官网文档的演示 iframe）不用：只有一块，用不着跳过；而且画布一开始只有占位高，大部分内容算在视口外、按估算高度占位，
 // 画布长大后才真正排出来，高度又变——演示露出来以后框高跳一下（2026-11-20 巡检：间距规范 2092 → 2128）
 if (!EMBED) requestAnimationFrame(() => {
-  const demos = $$(".doc-main .demo").filter((d) => !d.querySelector(".sn-select, [data-menubtn], .sn-pk, .sn-chat, .sn-vl, .sn-flow, .sn-lo-frame, .sn-grid, .ld-grid, .sn-ed"));
+  const demos = $$(".doc-main .demo").filter((d) => !d.querySelector(".sn-select, [data-menubtn], .sn-pk, .sn-chat, .sn-vl, .sn-flow, .sn-lo-frame, .sn-grid, .ld-grid, .sn-ed, .sn-tree, .sn-fex"));
   const hs = demos.map((d) => d.offsetHeight);
   demos.forEach((d, i) => { d.style.setProperty("--sn-ch", hs[i] + "px"); d.classList.add("sn-cv"); });
 });

@@ -235,3 +235,109 @@ export const createSparkline: SatinFactory<SparklineOptions, Record<string, neve
 export const createIcon3D: SatinFactory<Icon3DOptions, Record<string, never>>;
 export function icon3DHTML(o?: Icon3DOptions): string;
 export function bindIcons3D(scope?: Document | HTMLElement): () => void;
+
+export interface TreeNode {
+  id: string;
+  label: string;
+  icon?: string;
+  meta?: string;
+  badge?: string | number;
+  disabled?: boolean;
+  hasChildren?: boolean;
+  children?: TreeNode[];
+}
+export type TreeActiveStyle =
+  | "subtle"
+  | "bar"
+  | "tint"
+  | { bg?: string; color?: string; ring?: string; bar?: string; hoverBg?: string };
+
+export interface TreeOptions {
+  items?: TreeNode[];
+  expanded?: string[];
+  defaultExpanded?: string[];
+  selected?: string | null;
+  defaultSelected?: string | null;
+  checked?: string[];
+  defaultChecked?: string[];
+  checkable?: boolean;
+  searchable?: boolean;
+  draggable?: boolean;
+  virtual?: boolean;
+  rowHeight?: number;
+  height?: number | string;
+  activeStyle?: TreeActiveStyle;
+  loadChildren?(node: TreeNode): Promise<TreeNode[]> | TreeNode[];
+  label?: string;
+  onSelect?(e: { id: string; node: TreeNode }): void;
+  onCheck?(e: { ids: string[]; id: string; checked: boolean; node: TreeNode }): void;
+  onExpand?(e: { id: string; expanded: boolean; node: TreeNode; expandedIds: string[] }): void;
+  onMove?(e: { dragId: string; targetId: string; position: "before" | "inside" | "after"; node: TreeNode; items: TreeNode[] }): void;
+}
+export interface TreeApi {
+  expand(id: string, open?: boolean): Promise<void> | void;
+  expandAll(open?: boolean): void;
+  filter(q: string): void;
+  select(id: string | null): void;
+  setItems(items: TreeNode[]): void;
+  getVisibleCount(): number;
+  getRenderedCount(): number;
+}
+export function treeHTML(o?: { height?: number | string; label?: string; searchable?: boolean; checkable?: boolean }): string;
+export const createTree: SatinFactory<TreeOptions, TreeApi>;
+
+export type FileKind = "folder" | "pdf" | "word" | "ppt" | "vue" | "tsx" | "txt" | "doc" | "image" | "video" | "audio" | "code" | "file";
+export type FileView = "card" | "list" | "tree";
+export type FolderColorPreset = "default" | "blue" | "amber" | "sage" | "violet" | "rose";
+export interface FileNode {
+  id: string;
+  name: string;
+  kind?: FileKind;
+  color?: FolderColorPreset | (string & {});
+  size?: string | number;
+  updated?: string;
+  preview?: string;
+  duration?: string;
+  excerpt?: string;
+  pages?: number;
+  hasChildren?: boolean;
+  children?: FileNode[];
+}
+export interface FileExplorerOptions {
+  items?: FileNode[];
+  view?: FileView;
+  path?: string[];
+  height?: number | string;
+  searchable?: boolean;
+  rootName?: string;
+  activeStyle?: TreeActiveStyle;
+  menuSurface?: "solid" | "blur";
+  loadChildren?(node: FileNode): Promise<FileNode[]> | FileNode[];
+  label?: string;
+  onChange?(e: { items: FileNode[]; action: string }): void;
+  onOpen?(e: { id: string; node: FileNode }): void;
+  onSelect?(e: { ids: string[] }): void;
+  onViewChange?(e: { view: FileView }): void;
+  onNavigate?(e: { path: string[]; folder: FileNode | null }): void;
+  onMove?(e: { ids: string[]; nodes: FileNode[]; targetId: string | null }): void;
+  onCreate?(e: { node: FileNode; parentId: string | null }): void;
+  onRename?(e: { id: string; name: string; oldName: string; node: FileNode }): void;
+  onDelete?(e: { ids: string[]; nodes: FileNode[] }): void;
+  onColorChange?(e: { ids: string[]; color: string }): void;
+}
+export interface FileExplorerApi {
+  setView(view: FileView): void;
+  openFolder(id: string): Promise<void>;
+  goUp(): void;
+  createItem(kind?: FileKind, parentId?: string | null): FileNode;
+  renameItem(id: string, name: string): boolean;
+  setFolderColor(ids: string | string[], color?: string): boolean;
+  moveItems(ids: string[], targetFolderId: string): boolean;
+  deleteItems(ids: string[]): boolean;
+  undo(): boolean;
+  getItems(): FileNode[];
+  getView(): FileView;
+  getPath(): string[];
+}
+export function fileExplorerHTML(o?: { height?: number | string; label?: string; view?: FileView; searchable?: boolean }): string;
+export const createFileExplorer: SatinFactory<FileExplorerOptions, FileExplorerApi>;

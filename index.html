@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="demo/layout.css">
 <link rel="stylesheet" href="packages/satin-ui/css/grid.css">
 <link rel="stylesheet" href="packages/satin-ui/css/md.css">
+<link rel="stylesheet" href="packages/satin-ui/css/tree.css">
 <link rel="stylesheet" href="demo/doc.css">
 <script>
 // 嵌入模式（官网文档里演示单个组件）：index.html?embed=区块 id —— 只显示这一块的演示，不要顶栏、目录、说明文字；
@@ -98,7 +99,7 @@
   <p>反馈</p>
   <a href="#toast">轻提示</a><a href="#notify">通知</a><a href="#banner">横幅与条目上的失败</a><a href="#empty">空状态</a><a href="#loading">骨架与加载</a><a href="#progress">进度</a><a href="#numflow">数字变化</a>
   <p>数据展示</p>
-  <a href="#table">表格</a><a href="#grid">数据表格</a><a href="#cgrid">Canvas 表格</a><a href="#charts">数据图表与 3D</a><a href="#list">列表与键值</a><a href="#card">卡片</a><a href="#tags">标签、徽标与头像</a><a href="#avatar" data-parity-appended>头像</a><a href="#collapse">折叠面板</a><a href="#scrollarea">滚动区域</a><a href="#vlist">无限列表</a><a href="#chat">聊天与 AI 对话</a><a href="#md">Markdown 文档</a><a href="#editorial" data-parity-appended>图文编排与内容张力</a><a href="#flow">流程图</a><a href="#flowstress">万级节点压测</a>
+  <a href="#table">表格</a><a href="#grid">数据表格</a><a href="#cgrid">Canvas 表格</a><a href="#charts">数据图表与 3D</a><a href="#list">列表与键值</a><a href="#card">卡片</a><a href="#tags">标签、徽标与头像</a><a href="#avatar" data-parity-appended>头像</a><a href="#collapse">折叠面板</a><a href="#tree" data-parity-appended>树形控件</a><a href="#files" data-parity-appended>文件管理</a><a href="#scrollarea">滚动区域</a><a href="#vlist">无限列表</a><a href="#chat">聊天与 AI 对话</a><a href="#md">Markdown 文档</a><a href="#editorial" data-parity-appended>图文编排与内容张力</a><a href="#flow">流程图</a><a href="#flowstress">万级节点压测</a>
   <p>媒体与上传</p>
   <a href="#image">图片</a><a href="#media">视频与音频</a><a href="#upload">上传</a>
   <p>导航</p>
@@ -1049,6 +1050,37 @@
       <div class="sn-acc-item"><button class="sn-acc-hd" aria-expanded="false"><span data-i="chevron-right"></span>额度用完了会怎样？</button><div class="sn-acc-bd"><div><p>新的生成会排队，等额度恢复或充值后自动继续，已经提交的任务不会丢。</p></div></div></div>
       <div class="sn-acc-item"><button class="sn-acc-hd" aria-expanded="false"><span data-i="chevron-right"></span>可以多人一起编辑一个项目吗？</button><div class="sn-acc-bd"><div><p>可以。在项目里点"分享"，把链接发给协作者；同一个镜头同一时间只能一个人编辑，别人会看到"正在编辑"。</p></div></div></div>
     </div></div>
+  </section>
+
+  <section class="spec" id="tree" data-parity-appended>
+    <h2>树形控件<small>Tree</small></h2>
+    <p>多级层级数据展示：1px 纤细缩进引导线、展开/折叠弹性旋转、父子三态联动勾选、实时搜索命中高亮、节点拖拽调序与移入父节点、异步懒加载子节点（带失败重试）以及万级节点自动虚拟化无限列表。</p>
+    <h3>勾选、搜索与拖拽移入</h3>
+    <div class="demo"><div id="treeBasicHost"></div></div>
+    <h3>异步懒加载与失败重试</h3>
+    <div class="demo"><div id="treeLazyHost"></div></div>
+    <h3>10,000+ 节点虚拟无限列表</h3>
+    <p id="treeVirtMeta" class="sn-note" style="margin:6px 0 8px">总可见节点 10,100 个 · 虚拟化仅渲染当前视口行</p>
+    <div class="demo"><div id="treeVirtHost"></div></div>
+    <ul class="rules">
+      <li><b>自动虚拟化</b>：显式设 <code>virtual: true</code> 或展平节点数超过 120 行时自动切入虚拟窗口模式，仅挂载可视区域及上下缓冲行（约 20～35 个 DOM 节点），万级数据滚动依然 60fps 低延迟。</li>
+      <li><b>异步懒加载</b>：节点带 <code>hasChildren: true</code> 且提供 <code>loadChildren</code> 时，展开自动切微旋加载态并缓存结果；请求失败原地给出「重试」按钮。</li>
+      <li><b>键盘全导航</b>：支持 ↑ / ↓ 移动焦点、→ 展开或进入子项、← 折叠或回到父级、Home / End 跳转首尾、Enter 选中、Space 切换三态勾选。</li>
+    </ul>
+  </section>
+
+  <section class="spec" id="files" data-parity-appended>
+    <h2>文件管理<small>FileExplorer</small></h2>
+    <p>面向创作与工程资产管理的文件工作台：支持<strong>文件卡片、列表、树形列表</strong>三视图丝滑切换，全面复用 Satin <code>ScrollArea</code> 悬浮细滚动条、<code>openMenu</code> 右键菜单与二级子菜单、<code>initSeg</code> 流体分段控件与 <code>toast</code> 撤销提示，严守极少间隔线去 AI 味原则。精巧高密度卡片完整覆盖 <strong>PDF、Word、PPT、Vue、TSX、TXT 微缩正文小字、高清图片小图与视频首帧画面</strong>；拟物折叠文件夹按真实子项动态探出 0～3 张微缩内容纸片，拖拽悬停前盖弹性掀开、松手吸入回弹并立即增多对应内容，支持双击进入、面包屑拖回上级、右键新建/行内重命名/复制/移动/删除与撤销。</p>
+    <h3>拟物文件夹与完整交互工作台</h3>
+    <div class="demo flush"><div id="filesDemoHost"></div></div>
+    <h3>树形列表与远程目录懒加载</h3>
+    <div class="demo flush"><div id="filesLazyHost"></div></div>
+    <ul class="rules">
+      <li><b>多格式真实微缩预览</b>：视频展示真实首帧与时长播放标、图片展示高清缩略小图、TXT/PDF/Word/Vue/TSX 呈现真实可见微缩小字与语义字标、PPT 呈现横向微缩幻灯片，拖入文件夹后夹层纸片同步呈现对应格式。</li>
+      <li><b>全面复用 Satin 原生组件与零多余横线</b>：滚动条复用 <code>scrollArea</code>（带 <code>sa-jump</code> 虚拟同步）、右键与新建菜单复用 <code>openMenu</code>、视图切换复用 <code>initSeg</code>、撤销复用 <code>toast</code>；工具栏/画布/底栏/表头靠明度层级与空间留白过渡，杜绝无意义间隔横线。</li>
+      <li><b>低延迟 60fps 拖拽与全操作可撤销</b>：基于 Pointer Events 与合成线程 <code>translate3d</code> 浮空叠卡，支持多选叠拖、拖入拟物文件夹及顶部面包屑祖先目录并防循环引用；所有移动、删除、新建、重命名、复制均支持 Toast 一键撤销或 ⌘/Ctrl+Z。</li>
+    </ul>
   </section>
 
   <!-- ======== 滚动、列表、聊天、流程图 ======== -->

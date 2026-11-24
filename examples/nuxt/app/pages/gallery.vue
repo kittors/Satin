@@ -80,6 +80,11 @@ import AvatarDemo0 from "../demos/avatar-0.vue";
 import AvatarDemo1 from "../demos/avatar-1.vue";
 import AvatarDemo2 from "../demos/avatar-2.vue";
 import CollapseDemo0 from "../demos/collapse-0.vue";
+import TreeDemo0 from "../demos/tree-0.vue";
+import TreeDemo1 from "../demos/tree-1.vue";
+import TreeDemo2 from "../demos/tree-2.vue";
+import FilesDemo0 from "../demos/files-0.vue";
+import FilesDemo1 from "../demos/files-1.vue";
 import ScrollareaDemo0 from "../demos/scrollarea-0.vue";
 import ScrollareaDemo1 from "../demos/scrollarea-1.vue";
 import ScrollareaDemo2 from "../demos/scrollarea-2.vue";
@@ -170,6 +175,8 @@ import EmptyPresets from "../demos/empty-presets.vue";
 import FieldBasic from "../demos/field-basic.vue";
 import FieldError from "../demos/field-error.vue";
 import FieldOptional from "../demos/field-optional.vue";
+import FilesBasic from "../demos/files-basic.vue";
+import FilesLazy from "../demos/files-lazy.vue";
 import FlowBasic from "../demos/flow-basic.vue";
 import FlowBranch from "../demos/flow-branch.vue";
 import FlowTidy from "../demos/flow-tidy.vue";
@@ -288,6 +295,9 @@ import ToastProgress from "../demos/toast-progress.vue";
 import TooltipBasic from "../demos/tooltip-basic.vue";
 import TooltipKbd from "../demos/tooltip-kbd.vue";
 import TooltipTruncate from "../demos/tooltip-truncate.vue";
+import TreeBasic from "../demos/tree-basic.vue";
+import TreeLazy from "../demos/tree-lazy.vue";
+import TreeVirtual from "../demos/tree-virtual.vue";
 import UploadBasic from "../demos/upload-basic.vue";
 import UploadReal from "../demos/upload-real.vue";
 import UploadSingle from "../demos/upload-single.vue";
@@ -529,6 +539,17 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <h2>折叠面板</h2>
     <div class="demo" data-demo="collapse-0"><DemoGuard slug="collapse-0"><CollapseDemo0 /></DemoGuard></div>
   </section>
+  <section id="tree">
+    <h2>树形控件</h2>
+    <div class="demo" data-demo="tree-0"><DemoGuard slug="tree-0"><TreeDemo0 /></DemoGuard></div>
+    <div class="demo" data-demo="tree-1"><DemoGuard slug="tree-1"><TreeDemo1 /></DemoGuard></div>
+    <div class="demo" data-demo="tree-2"><DemoGuard slug="tree-2"><TreeDemo2 /></DemoGuard></div>
+  </section>
+  <section id="files">
+    <h2>文件管理</h2>
+    <div class="demo" data-demo="files-0"><DemoGuard slug="files-0"><FilesDemo0 /></DemoGuard></div>
+    <div class="demo" data-demo="files-1"><DemoGuard slug="files-1"><FilesDemo1 /></DemoGuard></div>
+  </section>
   <section id="scrollarea">
     <h2>滚动区域</h2>
     <div class="demo" data-demo="scrollarea-0"><DemoGuard slug="scrollarea-0"><ScrollareaDemo0 /></DemoGuard></div>
@@ -717,6 +738,11 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <div class="demo" data-demo="field-basic"><DemoGuard slug="field-basic"><FieldBasic /></DemoGuard></div>
     <div class="demo" data-demo="field-error"><DemoGuard slug="field-error"><FieldError /></DemoGuard></div>
     <div class="demo" data-demo="field-optional"><DemoGuard slug="field-optional"><FieldOptional /></DemoGuard></div>
+  </section>
+  <section id="files">
+    <h2>文件管理</h2>
+    <div class="demo" data-demo="files-basic"><DemoGuard slug="files-basic"><FilesBasic /></DemoGuard></div>
+    <div class="demo" data-demo="files-lazy"><DemoGuard slug="files-lazy"><FilesLazy /></DemoGuard></div>
   </section>
   <section id="flow">
     <h2>流程图</h2>
@@ -937,6 +963,12 @@ import VlistRetry from "../demos/vlist-retry.vue";
     <div class="demo" data-demo="tooltip-basic"><DemoGuard slug="tooltip-basic"><TooltipBasic /></DemoGuard></div>
     <div class="demo" data-demo="tooltip-kbd"><DemoGuard slug="tooltip-kbd"><TooltipKbd /></DemoGuard></div>
     <div class="demo" data-demo="tooltip-truncate"><DemoGuard slug="tooltip-truncate"><TooltipTruncate /></DemoGuard></div>
+  </section>
+  <section id="tree">
+    <h2>树形控件</h2>
+    <div class="demo" data-demo="tree-basic"><DemoGuard slug="tree-basic"><TreeBasic /></DemoGuard></div>
+    <div class="demo" data-demo="tree-lazy"><DemoGuard slug="tree-lazy"><TreeLazy /></DemoGuard></div>
+    <div class="demo" data-demo="tree-virtual"><DemoGuard slug="tree-virtual"><TreeVirtual /></DemoGuard></div>
   </section>
   <section id="upload">
     <h2>上传</h2>

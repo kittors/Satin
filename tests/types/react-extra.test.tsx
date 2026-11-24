@@ -4,6 +4,7 @@ import { Chat } from "satin-ui/react/chat";
 import { Markdown } from "satin-ui/react/markdown";
 import { Flow } from "satin-ui/react/flow";
 import { CanvasGrid } from "satin-ui/react/canvas-grid";
+import { Tree, FileExplorer } from "satin-ui/react/tree";
 import { useRef, useState } from "react";
 const items: MenuItem[] = [{ key: "open", label: "打开", icon: "external-link", kbd: "↵" }, { type: "divider" }, { label: "移动到", children: [{ type: "group", label: "第一季" }, { key: "ep1", label: "第一集" }] }, { key: "del", label: "删除", danger: true }];
 export function Extra() {
@@ -28,6 +29,8 @@ export function Extra() {
       <Markdown>{"# 标题"}</Markdown>
       <Flow nodes={[{ id: "a", x: 0, y: 0, t: "剧本" }]} edges={[]} label="流程" />
       <CanvasGrid columns={[{ key: "name", title: "名称" }, { key: "size", title: "大小", type: "int", format: (v) => `${v} KB` }]} dataSource={{ total: 1000000, load: async () => [] }} label="素材明细" />
+      <Tree items={[{ id: "a", label: "项目", children: [{ id: "a1", label: "脚本.md" }] }]} checkable searchable draggable virtual />
+      <FileExplorer items={[{ id: "f1", name: "分镜", kind: "folder", children: [] }]} view="card" rootName="雨夜车站" />
     </div>
   );
 }

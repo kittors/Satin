@@ -1,6 +1,6 @@
 # 组件清单
 
-每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`popconfirm`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`table`、`grid`、`cgrid`、`list`、`card`、`tags`、`avatar`、`collapse`、`scrollarea`、`vlist`、`chat`、`md`、`editorial`、`flow`、`flowstress`、`image`、`media`、`upload`、`sidebar`、`tabs`、`reorder`、`addremove`、`optimistic`。
+每个组件一份契约（同名 .json）：说明、验收要点、标记、参数、用法、演示源码；状态、变体、尺寸、交互、动效、无障碍、移动端行为见各文件。已经填了手写 API 契约的（`contract: 1`，下表"契约"一列打勾）：`color`、`type`、`spacing`、`layout`、`space`、`elevation`、`motion`、`icons`、`button`、`iconbutton`、`link`、`compound`、`chip`、`field`、`input`、`special`、`count`、`taginput`、`number`、`prompt`、`select`、`picker`、`choice`、`segmented`、`slider`、`otp`、`tooltip`、`popover`、`popconfirm`、`ctxmenu`、`dialog`、`drawer`、`cmdk`、`toast`、`notify`、`banner`、`empty`、`loading`、`progress`、`numflow`、`table`、`grid`、`cgrid`、`list`、`card`、`tags`、`avatar`、`collapse`、`tree`、`files`、`scrollarea`、`vlist`、`chat`、`md`、`editorial`、`flow`、`flowstress`、`image`、`media`、`upload`、`sidebar`、`tabs`、`reorder`、`addremove`、`optimistic`。
 
 ## 契约格式（手写的 API 契约）
 
@@ -139,6 +139,8 @@ Angular、Solid、纯 HTML 保留 `data-i` 外面包 `<sn-enhance>`），写完�
 | `tags` | 标签、徽标与头像（Tag · Badge · Avatar） | ✓ | 标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块。头像有照片用照片，没有就按用户 id 挑一张预设头像（见"头像"），头像里不放文字。 |
 | `avatar` | 头像（Avatar） | ✓ | 有照片用照片；加载失败或者没有照片，就按用户 id（没有就用名字）稳定地挑一张预设头像，同一个人每次都是同一张。头像里不放文字。24px 及以下自动换成简化版，… |
 | `collapse` | 折叠面板（Collapse） | ✓ | 高度用 0fr → 1fr 过渡，内容在展开过半时淡入；箭头跟着转 90°。可以同时展开多个，也可以只开一个（手风琴）。 |
+| `tree` | 树形控件（Tree） | ✓ | 多级层级数据展示：1px 纤细缩进引导线、展开/折叠弹性旋转、父子三态联动勾选、实时搜索命中高亮、节点拖拽调序与移入父节点、异步懒加载子节点（带失败重试）以及万… |
+| `files` | 文件管理（FileExplorer） | ✓ | 面向创作与工程资产管理的文件工作台：支持文件卡片、列表、树形列表三视图丝滑切换，全面复用 Satin `ScrollArea` 悬浮细滚动条、`openMenu… |
 | `scrollarea` | 滚动区域（ScrollArea） | ✓ | 所有会溢出滚动的地方都用它：原生滚动（惯性、键盘、读屏都在），系统滚动条换成一根细的悬浮滚动条，不滚动 0.7 秒后淡出，悬停或拖动时变粗；边缘渐隐只在那个方向… |
 | `vlist` | 无限列表（VirtualList · InfiniteList） | ✓ | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置。滚到离底部 400px 时自动加载下一页，底部先出骨架行（300ms 内回来就不出）；加载失… |
 | `chat` | 聊天与 AI 对话（Chat） | ✓ | 超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条；已经载入的消息滚得再快、拖滚动条拖得再猛，都直接显示真内容，不换骨架，也不露白。发送时，输入框里… |

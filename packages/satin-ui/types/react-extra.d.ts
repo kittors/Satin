@@ -7,7 +7,7 @@ type Base = { className?: string; style?: React.CSSProperties; id?: string };
 export type MenuItem = { type?: undefined; key?: string; label: string; icon?: string; kbd?: string; danger?: boolean; disabled?: boolean; checked?: boolean; children?: MenuItem[] } | { type: "divider" } | { type: "group"; label: string };
 type Bound = HTMLElement | React.RefObject<HTMLElement | null> | "window";
 /** 菜单按钮：子元素是触发器（一个按钮），点了贴着它弹出；onSelect(key, item) */
-export interface MenuProps { items: MenuItem[]; onSelect?(key: string, item: MenuItem | undefined): void; align?: "start" | "center" | "end"; label?: string; bound?: Bound; children: React.ReactElement }
+export interface MenuProps { items: MenuItem[]; onSelect?(key: string, item: MenuItem | undefined): void; align?: "start" | "center" | "end"; label?: string; bound?: Bound; surface?: "solid" | "blur"; children: React.ReactElement }
 export function Menu(p: MenuProps): React.ReactElement;
 /** 右键菜单：子元素是右键区域（右键、触屏长按、Shift+F10 在指针处弹出） */
 export function ContextMenu(p: Omit<MenuProps, "align">): React.ReactElement;

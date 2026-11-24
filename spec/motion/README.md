@@ -28,15 +28,15 @@
 
 ## 实际用量
 
-样式表里的过渡 / 动画 476 处，脚本里的 WAAPI 113 处（清单见 inventory.json）。曲线用量：
+样式表里的过渡 / 动画 513 处，脚本里的 WAAPI 127 处（清单见 inventory.json）。曲线用量：
 
-- `var(--sn-ease-out)`：388
-- `var(--sn-ease-out-strong)`：90
-- `linear`：36
+- `var(--sn-ease-out)`：418
+- `var(--sn-ease-out-strong)`：107
+- `linear`：38
+- `var(--sn-ease-in)`：36
 - `var(--sn-ease-in-out)`：30
-- `var(--sn-ease-in)`：30
 - `var(--sn-ease-open)`：20
-- `var(--sn-ease-overshoot)`：16
+- `var(--sn-ease-overshoot)`：18
 - `cubic-bezier(.16, 1, .3, 1)`：4
 - `ease-in`：3
 - `cubic-bezier(.55, .15, .45, .85)`：2
@@ -47,6 +47,7 @@
 - `cubic-bezier(.62, .12, .38, .88)`：1
 - `cubic-bezier(.65, .815, .735, .395)`：1
 - `cubic-bezier(.165, .84, .44, 1)`：1
+- `var(--sn-ease-spring)`：1
 
 ## 验收
 

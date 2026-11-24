@@ -5,9 +5,9 @@ import type { ScrollAreaOptions } from "./components";
 /** 菜单的一条：key 不给就用 label；children 是子菜单。分隔线 { type: "divider" }，分组标题 { type: "group", label } */
 export type MenuItem = { type?: undefined; key?: string; label: string; icon?: string; kbd?: string; danger?: boolean; disabled?: boolean; checked?: boolean; children?: MenuItem[] } | { type: "divider" } | { type: "group"; label: string };
 /** 菜单按钮：默认插槽是触发器；@select(key, item) */
-export const Menu: DefineComponent<{ items: MenuItem[]; align?: "start" | "center" | "end"; label?: string; bound?: HTMLElement | "window" }>;
+export const Menu: DefineComponent<{ items: MenuItem[]; align?: "start" | "center" | "end"; label?: string; bound?: HTMLElement | "window"; surface?: "solid" | "blur" }>;
 /** 右键菜单：默认插槽是右键区域；@select(key, item) */
-export const ContextMenu: DefineComponent<{ items: MenuItem[]; label?: string; bound?: HTMLElement | "window" }>;
+export const ContextMenu: DefineComponent<{ items: MenuItem[]; label?: string; bound?: HTMLElement | "window"; surface?: "solid" | "blur" }>;
 /** Popover：默认插槽是触发按钮，#content 是面板内容；v-model:open */
 export const Popover: DefineComponent<{ title?: string; align?: "start" | "center" | "end"; open?: boolean; defaultOpen?: boolean; label?: string }>;
 /** 命令面板：⌘K 打开；@run(item)、v-model:open；模板 ref 能调 open() / close() / toggle() */

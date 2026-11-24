@@ -178,9 +178,15 @@ const area = (bound) => {
 };
 const fitHeight = (m, A) => { m.style.maxHeight = Math.min(420, Math.max(120, A.b - A.t)) + "px"; };
 // 比范围还高：限高，在菜单里滚动（菜单本来就是滚动区域）
-export function openMenu(rootMenu, { trigger, x, y, anchor, keyboard, align, bound, onSelect } = {}) {
+const applyMenuSurface = (m, surface) => {
+  if (!m || !surface) return;
+  m.classList.toggle("sn-blur", surface === "blur");
+  m.classList.toggle("sn-solid", surface === "solid");
+};
+export function openMenu(rootMenu, { trigger, x, y, anchor, keyboard, align, bound, surface, onSelect } = {}) {
   closeMenu(false); hideTip();
-  sys = { chain: [rootMenu], owner: new Map(), trigger, onSelect, pts: [], last: 0, holding: false, openT: 0, closeT: 0, closeLevel: -1, check: 0, level: 0, dragging: false, area: area(bound), offRepos: null };
+  applyMenuSurface(rootMenu, surface);
+  sys = { chain: [rootMenu], owner: new Map(), trigger, onSelect, surface, pts: [], last: 0, holding: false, openT: 0, closeT: 0, closeLevel: -1, check: 0, level: 0, dragging: false, area: area(bound), offRepos: null };
   if (anchor) {
     rootMenu.style.maxHeight = ""; place(rootMenu, anchor, { align }); anchor.classList.add("sn-is-open"); anchor.setAttribute("aria-expanded", "true");
     const onRepos = () => { if (sys && anchor.isConnected) { sys.area = area(bound); place(rootMenu, anchor, { align }); } };
@@ -231,6 +237,7 @@ function openSub(it, level, explicit) {
   if (sys.owner.get(sys.chain[level + 1]) === it) { if (explicit) { sys.level = level + 1; setHL(sys.chain[level + 1], rows(sys.chain[level + 1])[0]); } return; }
   closeFrom(level + 1);
   const A = sys.area, parent = sys.chain[level], sub = $("#" + it.dataset.sub), pr = parent.getBoundingClientRect(), ir = it.getBoundingClientRect();
+  applyMenuSurface(sub, sys.surface || (parent.classList.contains("sn-blur") ? "blur" : parent.classList.contains("sn-solid") ? "solid" : undefined));
   sub.classList.remove("sn-drill"); sub.style.minWidth = ""; fitHeight(sub, A);
   const w = sub.offsetWidth, h = sub.offsetHeight, firstRow = rows(sub)[0];
   const R = pr.right - 8, L = pr.left + 8 - w, fitsR = R + w <= A.r, fitsL = L >= A.l;

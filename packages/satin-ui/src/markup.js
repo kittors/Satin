@@ -10,8 +10,9 @@ export const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&am
 // ———— 浮动菜单（.sn-menu.sn-float）：根菜单 + 各层子菜单 ————
 // items：[{ key, label, icon, kbd, danger, disabled, checked, children }]；分隔线 { type: "divider" }；分组标题 { type: "group", label }。
 // key 不给就用 label；children 是子菜单（id 是 根菜单 id-1、-2……，库按 data-sub 找）
-export function menuHTML(items, id, label) {
+export function menuHTML(items, id, label, surface) {
   let n = 0; const subs = [];
+  const surfCls = surface === "blur" ? " sn-blur" : surface === "solid" ? " sn-solid" : "";
   const menu = (list, mid, sub, aria) => {
     const rows = (list || []).map((it) => {
       if (it.type === "divider") return '<div class="sn-sep"></div>';
@@ -20,10 +21,10 @@ export function menuHTML(items, id, label) {
       if (sid) subs.push(menu(it.children, sid, true, it.label));
       return `<div class="${cx("sn-item", it.disabled && "sn-is-off", it.danger && "sn-danger-item", it.checked && "sn-sel")}" role="menuitem" data-key="${esc(it.key ?? it.label)}"`
         + (it.disabled ? ' aria-disabled="true"' : "") + (sid ? ` data-sub="${sid}" aria-haspopup="menu"` : "") + ">"
-        + (it.icon ? icon(it.icon) : "") + esc(it.label) + (it.kbd ? `<span class="sn-key sn-sc">${esc(it.kbd)}</span>` : "") /* sn-sc：是快捷键（触屏上藏起来），区别于"JPG · PNG"这种说明 */
+        + (it.icon ? icon(it.icon) : "") + `<span data-tip-full>${esc(it.label)}</span>` + (it.kbd ? `<span class="sn-key sn-sc">${esc(it.kbd)}</span>` : "") /* sn-sc：是快捷键（触屏上藏起来），区别于"JPG · PNG"这种说明 */
         + (it.checked ? `<span class="sn-chk">${icon("check")}</span>` : "") + (sid ? icon("chevron-right").replace('class="sn-ic"', 'class="sn-ic sn-more"') : "") + "</div>";
     }).join("");
-    return `<div class="sn-menu sn-float${sub ? " sn-sub" : ""}" id="${mid}" role="menu" tabindex="-1"${aria ? ` aria-label="${esc(aria)}"` : ""}>`
+    return `<div class="sn-menu sn-float${sub ? " sn-sub" : ""}${surfCls}" id="${mid}" role="menu" tabindex="-1"${aria ? ` aria-label="${esc(aria)}"` : ""}>`
       + (sub ? `<div class="sn-item sn-back" role="menuitem">${icon("chevron-left")}<span></span></div>` : "") + rows + "</div>";
   };
   const root = menu(items, id, false, label);

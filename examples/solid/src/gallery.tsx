@@ -83,6 +83,11 @@ import AvatarDemo0 from "./demos/avatar-0.tsx";
 import AvatarDemo1 from "./demos/avatar-1.tsx";
 import AvatarDemo2 from "./demos/avatar-2.tsx";
 import CollapseDemo0 from "./demos/collapse-0.tsx";
+import TreeDemo0 from "./demos/tree-0.tsx";
+import TreeDemo1 from "./demos/tree-1.tsx";
+import TreeDemo2 from "./demos/tree-2.tsx";
+import FilesDemo0 from "./demos/files-0.tsx";
+import FilesDemo1 from "./demos/files-1.tsx";
 import ScrollareaDemo0 from "./demos/scrollarea-0.tsx";
 import ScrollareaDemo1 from "./demos/scrollarea-1.tsx";
 import ScrollareaDemo2 from "./demos/scrollarea-2.tsx";
@@ -173,6 +178,8 @@ import EmptyPresets from "./demos/empty-presets.tsx";
 import FieldBasic from "./demos/field-basic.tsx";
 import FieldError from "./demos/field-error.tsx";
 import FieldOptional from "./demos/field-optional.tsx";
+import FilesBasic from "./demos/files-basic.tsx";
+import FilesLazy from "./demos/files-lazy.tsx";
 import FlowBasic from "./demos/flow-basic.tsx";
 import FlowBranch from "./demos/flow-branch.tsx";
 import FlowTidy from "./demos/flow-tidy.tsx";
@@ -291,6 +298,9 @@ import ToastProgress from "./demos/toast-progress.tsx";
 import TooltipBasic from "./demos/tooltip-basic.tsx";
 import TooltipKbd from "./demos/tooltip-kbd.tsx";
 import TooltipTruncate from "./demos/tooltip-truncate.tsx";
+import TreeBasic from "./demos/tree-basic.tsx";
+import TreeLazy from "./demos/tree-lazy.tsx";
+import TreeVirtual from "./demos/tree-virtual.tsx";
 import UploadBasic from "./demos/upload-basic.tsx";
 import UploadReal from "./demos/upload-real.tsx";
 import UploadSingle from "./demos/upload-single.tsx";
@@ -532,6 +542,17 @@ function Gallery() {
         <h2>折叠面板</h2>
         <div class="demo" data-demo="collapse-0"><Errored fallback={(err: () => unknown) => { console.error("演示 collapse-0 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><CollapseDemo0 /></Errored></div>
       </section>
+      <section id="tree">
+        <h2>树形控件</h2>
+        <div class="demo" data-demo="tree-0"><Errored fallback={(err: () => unknown) => { console.error("演示 tree-0 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TreeDemo0 /></Errored></div>
+        <div class="demo" data-demo="tree-1"><Errored fallback={(err: () => unknown) => { console.error("演示 tree-1 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TreeDemo1 /></Errored></div>
+        <div class="demo" data-demo="tree-2"><Errored fallback={(err: () => unknown) => { console.error("演示 tree-2 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TreeDemo2 /></Errored></div>
+      </section>
+      <section id="files">
+        <h2>文件管理</h2>
+        <div class="demo" data-demo="files-0"><Errored fallback={(err: () => unknown) => { console.error("演示 files-0 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><FilesDemo0 /></Errored></div>
+        <div class="demo" data-demo="files-1"><Errored fallback={(err: () => unknown) => { console.error("演示 files-1 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><FilesDemo1 /></Errored></div>
+      </section>
       <section id="scrollarea">
         <h2>滚动区域</h2>
         <div class="demo" data-demo="scrollarea-0"><Errored fallback={(err: () => unknown) => { console.error("演示 scrollarea-0 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><ScrollareaDemo0 /></Errored></div>
@@ -720,6 +741,11 @@ function Gallery() {
         <div class="demo" data-demo="field-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 field-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><FieldBasic /></Errored></div>
         <div class="demo" data-demo="field-error"><Errored fallback={(err: () => unknown) => { console.error("演示 field-error 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><FieldError /></Errored></div>
         <div class="demo" data-demo="field-optional"><Errored fallback={(err: () => unknown) => { console.error("演示 field-optional 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><FieldOptional /></Errored></div>
+      </section>
+      <section id="files">
+        <h2>文件管理</h2>
+        <div class="demo" data-demo="files-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 files-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><FilesBasic /></Errored></div>
+        <div class="demo" data-demo="files-lazy"><Errored fallback={(err: () => unknown) => { console.error("演示 files-lazy 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><FilesLazy /></Errored></div>
       </section>
       <section id="flow">
         <h2>流程图</h2>
@@ -940,6 +966,12 @@ function Gallery() {
         <div class="demo" data-demo="tooltip-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 tooltip-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TooltipBasic /></Errored></div>
         <div class="demo" data-demo="tooltip-kbd"><Errored fallback={(err: () => unknown) => { console.error("演示 tooltip-kbd 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TooltipKbd /></Errored></div>
         <div class="demo" data-demo="tooltip-truncate"><Errored fallback={(err: () => unknown) => { console.error("演示 tooltip-truncate 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TooltipTruncate /></Errored></div>
+      </section>
+      <section id="tree">
+        <h2>树形控件</h2>
+        <div class="demo" data-demo="tree-basic"><Errored fallback={(err: () => unknown) => { console.error("演示 tree-basic 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TreeBasic /></Errored></div>
+        <div class="demo" data-demo="tree-lazy"><Errored fallback={(err: () => unknown) => { console.error("演示 tree-lazy 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TreeLazy /></Errored></div>
+        <div class="demo" data-demo="tree-virtual"><Errored fallback={(err: () => unknown) => { console.error("演示 tree-virtual 出错：", err()); return <p class="demo-err">演示出错：{String((err() as Error)?.message ?? err())}</p>; }}><TreeVirtual /></Errored></div>
       </section>
       <section id="upload">
         <h2>上传</h2>

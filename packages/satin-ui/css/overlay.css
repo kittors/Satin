@@ -22,7 +22,8 @@
 .sn-popconfirm .sn-acts { display: flex; justify-content: flex-end; gap: 6px; margin-top: 12px; }
 
 /* 浮在屏幕上的菜单（右键菜单、子菜单）：外观和行为全部沿用下拉菜单 .menu，只改定位，不另起一套 */
-.sn-menu.sn-float { position: fixed; z-index: 46; top: 0; left: 0; min-width: 210px; max-width: 260px; }
+.sn-menu.sn-float { position: fixed; z-index: 46; top: 0; left: 0; right: auto; bottom: auto; min-width: 210px; max-width: 260px; }
+.sn-menu.sn-float.sn-up { top: 0; bottom: auto; }
 .sn-menu .sn-item .sn-more { margin-left: auto; width: 14px; height: 14px; color: var(--sn-label3); }
 .sn-menu .sn-item.sn-sub-open { background: var(--sn-b-ghost-hover); }
 /* 子菜单：从父菜单那一侧轻轻滑出 6px，等比放大，退场同步收束 */

@@ -91,25 +91,41 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 .sn-select.sn-open > .sn-trigger .sn-ic { rotate: 180deg; }
 /* 高度上限按“窗口高”算：--vh 没设就是 100vh。嵌在别的页面里的小框（官网文档的演示 iframe）里，100vh 只是小框的高——
    菜单先被压成一个小滚动盒，演示框为了露出它往下伸，菜单又跟着长高，追两三帧才稳住、这几帧被截（2026-11-20）。文档页把 --vh 设成真实窗口高 */
-.sn-menu { position: absolute; z-index: 30; left: 0; top: calc(100% + 6px); width: max-content; min-width: 100%; max-width: min(320px, calc(100vw - 16px)); max-height: min(420px, calc(var(--sn-vh, 100vh) - 24px)); overflow: auto; padding: 4px; border-radius: var(--sn-r-lg);
+.sn-menu { position: absolute; z-index: 30; left: 0; top: calc(100% + 6px); width: max-content; min-width: 100%; max-width: min(320px, calc(100vw - 16px)); max-height: min(420px, calc(var(--sn-vh, 100vh) - 24px)); overflow-x: hidden; overflow-y: auto; padding: 4px; border-radius: var(--sn-r-lg);
   background: var(--sn-menu-bg); box-shadow: var(--sn-menu-shadow);
   transform-origin: top left; opacity: 0; scale: .96; translate: var(--sn-menu-dx, 0px) calc(var(--sn-menu-dy, 0px) - 6px); pointer-events: none; visibility: hidden;
   transition: opacity .16s var(--sn-ease-in), scale .16s var(--sn-ease-in), translate .16s var(--sn-ease-in), visibility 0s linear .16s; }
+/* 菜单表面材质：默认纯实底不透明（.sn-solid），支持 .sn-blur 或 [data-menu-surface="blur"] 一键切换高斯模糊毛玻璃 */
+.sn-menu.sn-solid { background: var(--sn-menu-bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.sn-menu.sn-blur, [data-menu-surface="blur"] .sn-menu:not(.sn-solid) {
+  background: color-mix(in srgb, var(--sn-overlay) 78%, transparent);
+  backdrop-filter: blur(var(--sn-menu-blur, var(--sn-blur-md))) saturate(1.75);
+  -webkit-backdrop-filter: blur(var(--sn-menu-blur, var(--sn-blur-md))) saturate(1.75);
+}
+[data-theme="dark"] .sn-menu.sn-blur, [data-theme="dark"] [data-menu-surface="blur"] .sn-menu:not(.sn-solid) {
+  background: color-mix(in srgb, var(--sn-overlay) 72%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .sn-menu.sn-blur, :root:not([data-theme]) [data-menu-surface="blur"] .sn-menu:not(.sn-solid) {
+    background: color-mix(in srgb, var(--sn-overlay) 72%, transparent);
+  }
+}
 .sn-menu.sn-up { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; translate: var(--sn-menu-dx, 0px) calc(var(--sn-menu-dy, 0px) + 6px); }
 .sn-menu.sn-end { left: auto; right: 0; transform-origin: top right; }
 .sn-menu.sn-up.sn-end { transform-origin: bottom right; }
 .sn-open > .sn-menu, .sn-menu.sn-open { opacity: 1; scale: 1; translate: var(--sn-menu-dx, 0px) var(--sn-menu-dy, 0px); pointer-events: auto; visibility: visible;
   transition: opacity .16s var(--sn-ease-out), scale .22s var(--sn-ease-out-strong), translate .22s var(--sn-ease-out-strong), visibility 0s; }
-.sn-menu .sn-item { display: flex; align-items: center; text-decoration: none; gap: 8px; height: 32px; padding: 0 8px; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); white-space: nowrap; cursor: pointer;
+.sn-menu .sn-item { display: flex; align-items: center; text-decoration: none; gap: 8px; height: 32px; padding: 0 8px; min-width: 0; max-width: 100%; overflow: hidden; box-sizing: border-box; border-radius: var(--sn-r-md); font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); white-space: nowrap; cursor: pointer;
   transition: background-color .08s var(--sn-ease-out); }
+.sn-menu .sn-item > span:not(.sn-key):not(.sn-chk):not(.sn-ic) { min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sn-menu .sn-item.sn-hl { background: var(--sn-b-ghost-hover); }
 .sn-menu .sn-item.sn-is-off { color: var(--sn-label-off); cursor: default; } .sn-menu .sn-item.sn-is-off .sn-ic { color: var(--sn-label-off); }
-.sn-menu .sn-item .sn-ic { width: 16px; height: 16px; color: var(--sn-label2); }
-.sn-menu .sn-item .sn-chk { margin-left: auto; color: var(--sn-label); opacity: 0; }
+.sn-menu .sn-item .sn-ic { width: 16px; height: 16px; flex: none; color: var(--sn-label2); }
+.sn-menu .sn-item .sn-chk { margin-left: auto; flex: none; color: var(--sn-label); opacity: 0; }
 .sn-menu .sn-item.sn-sel .sn-chk { opacity: 1; }
 .sn-menu .sn-item.sn-danger-item { color: var(--sn-danger); }
 .sn-menu .sn-item.sn-danger-item .sn-ic { color: var(--sn-danger); }
-.sn-menu .sn-item .sn-key { margin-left: auto; font-size: calc(12px * var(--sn-font-scale, 1)); color: var(--sn-label3); }
+.sn-menu .sn-item .sn-key { margin-left: auto; flex: none; font-size: calc(12px * var(--sn-font-scale, 1)); color: var(--sn-label3); }
 .sn-menu .sn-sep { height: 1px; margin: 4px 8px; background: var(--sn-line); }
 .sn-menu .sn-head { padding: 6px 8px 2px; font: 600 calc(11px * var(--sn-font-scale, 1))/calc(16px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
 

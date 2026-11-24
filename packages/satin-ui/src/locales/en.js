@@ -19,4 +19,5 @@ import picker from "./en/picker.js";
 import table from "./en/table.js";
 import theme from "./en/theme.js";
 import theme_panel from "./en/theme-panel.js";
-export default { ...browser_tabs, ...canvas_grid, ...charts, ...chat, ...components, ...feedback, ...flow, ...form, ...grid, ...input, ...lightbox, ...list, ...markdown, ...media, ...nav, ...overlay, ...picker, ...table, ...theme, ...theme_panel };
+import tree from "./en/tree.js";
+export default { ...browser_tabs, ...canvas_grid, ...charts, ...chat, ...components, ...feedback, ...flow, ...form, ...grid, ...input, ...lightbox, ...list, ...markdown, ...media, ...nav, ...overlay, ...picker, ...table, ...theme, ...theme_panel, ...tree };

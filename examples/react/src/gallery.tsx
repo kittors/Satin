@@ -83,6 +83,11 @@ import AvatarDemo0 from "./demos/avatar-0.tsx";
 import AvatarDemo1 from "./demos/avatar-1.tsx";
 import AvatarDemo2 from "./demos/avatar-2.tsx";
 import CollapseDemo0 from "./demos/collapse-0.tsx";
+import TreeDemo0 from "./demos/tree-0.tsx";
+import TreeDemo1 from "./demos/tree-1.tsx";
+import TreeDemo2 from "./demos/tree-2.tsx";
+import FilesDemo0 from "./demos/files-0.tsx";
+import FilesDemo1 from "./demos/files-1.tsx";
 import ScrollareaDemo0 from "./demos/scrollarea-0.tsx";
 import ScrollareaDemo1 from "./demos/scrollarea-1.tsx";
 import ScrollareaDemo2 from "./demos/scrollarea-2.tsx";
@@ -173,6 +178,8 @@ import EmptyPresets from "./demos/empty-presets.tsx";
 import FieldBasic from "./demos/field-basic.tsx";
 import FieldError from "./demos/field-error.tsx";
 import FieldOptional from "./demos/field-optional.tsx";
+import FilesBasic from "./demos/files-basic.tsx";
+import FilesLazy from "./demos/files-lazy.tsx";
 import FlowBasic from "./demos/flow-basic.tsx";
 import FlowBranch from "./demos/flow-branch.tsx";
 import FlowTidy from "./demos/flow-tidy.tsx";
@@ -291,6 +298,9 @@ import ToastProgress from "./demos/toast-progress.tsx";
 import TooltipBasic from "./demos/tooltip-basic.tsx";
 import TooltipKbd from "./demos/tooltip-kbd.tsx";
 import TooltipTruncate from "./demos/tooltip-truncate.tsx";
+import TreeBasic from "./demos/tree-basic.tsx";
+import TreeLazy from "./demos/tree-lazy.tsx";
+import TreeVirtual from "./demos/tree-virtual.tsx";
 import UploadBasic from "./demos/upload-basic.tsx";
 import UploadReal from "./demos/upload-real.tsx";
 import UploadSingle from "./demos/upload-single.tsx";
@@ -542,6 +552,17 @@ function Gallery() {
         <h2>折叠面板</h2>
         <div className="demo" data-demo="collapse-0"><Guard slug="collapse-0"><CollapseDemo0 /></Guard></div>
       </section>
+      <section id="tree">
+        <h2>树形控件</h2>
+        <div className="demo" data-demo="tree-0"><Guard slug="tree-0"><TreeDemo0 /></Guard></div>
+        <div className="demo" data-demo="tree-1"><Guard slug="tree-1"><TreeDemo1 /></Guard></div>
+        <div className="demo" data-demo="tree-2"><Guard slug="tree-2"><TreeDemo2 /></Guard></div>
+      </section>
+      <section id="files">
+        <h2>文件管理</h2>
+        <div className="demo" data-demo="files-0"><Guard slug="files-0"><FilesDemo0 /></Guard></div>
+        <div className="demo" data-demo="files-1"><Guard slug="files-1"><FilesDemo1 /></Guard></div>
+      </section>
       <section id="scrollarea">
         <h2>滚动区域</h2>
         <div className="demo" data-demo="scrollarea-0"><Guard slug="scrollarea-0"><ScrollareaDemo0 /></Guard></div>
@@ -730,6 +751,11 @@ function Gallery() {
         <div className="demo" data-demo="field-basic"><Guard slug="field-basic"><FieldBasic /></Guard></div>
         <div className="demo" data-demo="field-error"><Guard slug="field-error"><FieldError /></Guard></div>
         <div className="demo" data-demo="field-optional"><Guard slug="field-optional"><FieldOptional /></Guard></div>
+      </section>
+      <section id="files">
+        <h2>文件管理</h2>
+        <div className="demo" data-demo="files-basic"><Guard slug="files-basic"><FilesBasic /></Guard></div>
+        <div className="demo" data-demo="files-lazy"><Guard slug="files-lazy"><FilesLazy /></Guard></div>
       </section>
       <section id="flow">
         <h2>流程图</h2>
@@ -950,6 +976,12 @@ function Gallery() {
         <div className="demo" data-demo="tooltip-basic"><Guard slug="tooltip-basic"><TooltipBasic /></Guard></div>
         <div className="demo" data-demo="tooltip-kbd"><Guard slug="tooltip-kbd"><TooltipKbd /></Guard></div>
         <div className="demo" data-demo="tooltip-truncate"><Guard slug="tooltip-truncate"><TooltipTruncate /></Guard></div>
+      </section>
+      <section id="tree">
+        <h2>树形控件</h2>
+        <div className="demo" data-demo="tree-basic"><Guard slug="tree-basic"><TreeBasic /></Guard></div>
+        <div className="demo" data-demo="tree-lazy"><Guard slug="tree-lazy"><TreeLazy /></Guard></div>
+        <div className="demo" data-demo="tree-virtual"><Guard slug="tree-virtual"><TreeVirtual /></Guard></div>
       </section>
       <section id="upload">
         <h2>上传</h2>

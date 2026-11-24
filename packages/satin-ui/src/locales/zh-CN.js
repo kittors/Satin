@@ -19,4 +19,5 @@ import picker from "./zh-CN/picker.js";
 import table from "./zh-CN/table.js";
 import theme from "./zh-CN/theme.js";
 import theme_panel from "./zh-CN/theme-panel.js";
-export default { ...browser_tabs, ...canvas_grid, ...charts, ...chat, ...components, ...feedback, ...flow, ...form, ...grid, ...input, ...lightbox, ...list, ...markdown, ...media, ...nav, ...overlay, ...picker, ...table, ...theme, ...theme_panel };
+import tree from "./zh-CN/tree.js";
+export default { ...browser_tabs, ...canvas_grid, ...charts, ...chat, ...components, ...feedback, ...flow, ...form, ...grid, ...input, ...lightbox, ...list, ...markdown, ...media, ...nav, ...overlay, ...picker, ...table, ...theme, ...theme_panel, ...tree };

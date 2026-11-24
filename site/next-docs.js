@@ -603,9 +603,14 @@ function watchFloats(f, doc, { anchored = true } = {}) {
   const nav = document.querySelector(".s-nav");
   const navBottom = () => { const q = nav?.getBoundingClientRect(); return q && getComputedStyle(nav).position !== "static" ? Math.max(0, q.bottom) : 0; };
   // 向同源嵌入预览的统一浮层引擎（floating.js）注入真实宿主可见视口边界：
-  // 水平限制在预览框内（不超左右边界被裁），竖直使用真实窗口安全区（自动扣除固定顶栏 navBottom，并补偿 html paddingTop = up）
+  // 水平限制在预览框内（不超左右边界被裁），竖直使用真实窗口安全区（自动扣除固定顶栏 navBottom，并补偿 html paddingTop = up）；
+  // 当 iframe 处于 .global 全屏态（如轻提示在场期间打开右键菜单）时，同步加上 (wr.left, wr.top) 偏移以匹配全屏坐标系
   win.__satinViewportBounds = () => {
     const wr = wrap.getBoundingClientRect();
+    if (mode) {
+      if (!anchored) return { left: wr.left, top: wr.top, right: wr.right, bottom: wr.bottom };
+      return { left: wr.left, top: Math.max(navBottom(), 0), right: wr.right, bottom: innerHeight };
+    }
     if (!anchored) return { left: 0, top: 0, right: wr.width, bottom: wr.height };
     return { left: 0, top: navBottom() - wr.top + up, right: wr.width, bottom: innerHeight - wr.top + up };
   };
@@ -720,19 +725,38 @@ function watchFloats(f, doc, { anchored = true } = {}) {
     glowEl.style.cssText = `position:absolute;left:0;top:0;width:100%;height:${Math.min(band, wr.height)}px;overflow:hidden;pointer-events:none`;
     glowEl.innerHTML = parts.join(""); wrap.append(glowEl);
   };
+  let globalOrigin = null;
+  const shiftOpenFloats = (dx, dy) => {
+    if (!dx && !dy) return;
+    for (const el of doc.querySelectorAll(".sn-menu.sn-float.sn-open, .sn-pop.sn-open")) {
+      const l = parseFloat(el.style.left), t = parseFloat(el.style.top);
+      if (Number.isFinite(l)) el.style.left = (l + dx) + "px";
+      if (Number.isFinite(t)) el.style.top = (t + dy) + "px";
+    }
+  };
   const toGlobal = (modal) => {
     clearTimeout(pollT); pollT = setTimeout(() => later(), 250);
     if (up || down) extend(0, 0);
-    if (!mode) { glow(true, modal ? 40 : 0); f.classList.add("global"); place(); addEventListener("scroll", onScroll, { passive: true }); addEventListener("resize", onScroll); }
+    if (!mode) {
+      glow(true, modal ? 40 : 0); f.classList.add("global");
+      const r = place();
+      globalOrigin = { left: r.left, top: r.top };
+      shiftOpenFloats(r.left, r.top);
+      addEventListener("scroll", onScroll, { passive: true }); addEventListener("resize", onScroll);
+    }
     const was = mode; mode = modal ? "modal" : "loose";
     const de0 = document.documentElement; if (modal && !de0.classList.contains("dx-lock")) de0.style.setProperty("--sbw", innerWidth - de0.clientWidth + "px"); // 滚动条多宽，锁住时右边补多少
     de0.classList.toggle("dx-lock", modal);
     if (modal) { if (was === "loose") clip(null); clipPage(true); } else { if (was === "modal") clipPage(false); onScroll(); }
   };
   const toLocal = () => {
-    if (!mode) return; mode = ""; f.classList.remove("global"); clip(null); clipPage(false); glow(false);
+    if (!mode) return;
+    const prev = globalOrigin; globalOrigin = null;
+    mode = ""; f.classList.remove("global"); clip(null); clipPage(false); glow(false);
     const de = doc.documentElement; de.style.marginTop = ""; de.style.marginLeft = ""; doc.body.style.width = "";
+    if (prev) shiftOpenFloats(-prev.left, -prev.top);
     document.documentElement.classList.remove("dx-lock"); removeEventListener("scroll", onScroll); removeEventListener("resize", onScroll);
+    if (!dead) try { win.dispatchEvent(new win.Event("satin-reposition")); } catch {}
   };
   // 跟着元素弹出的浮层露出画布多少：只算真正画出来的部分——
   // 祖先透明 / 隐藏的（关着的菜单里的东西）不算；被祖先 overflow 裁掉的不算（滚动数字的长条、滚动区里的内容），
@@ -1040,6 +1064,9 @@ const PLAY_WIN = {
   "cgrid-million": { title: "Canvas 表格 — 1,000,000 行" },
   "md-basic": { title: "README.md" },
   "md-stream": { title: "AI 流式文档" },
+  "tree-virtual": { title: "万级节点虚拟树 — 10,100 项", flush: true },
+  "files-basic": { title: "雨夜车站 — 文件管理器", flush: true },
+  "files-lazy": { title: "云端资产库 — 树形懒加载", flush: true },
 };
 // 契约示例的演示框：现场演示就是纯 HTML 示例那份代码本身（examples/html/play.html?demo=<slug>），代码块读当前框架的同名文件
 function playBox(c, ex) {

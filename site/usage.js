@@ -44,6 +44,8 @@ export const USAGE = {
   card: { css: ["data.css"], api: [["openMenu(菜单, { trigger, anchor, align })", C]] },
   tags: { css: ["data.css"] },
   collapse: { css: ["data.css"], api: [["createCollapse(.sn-acc, { items, single, open, onToggle })", C], ["bindCollapses(root)", C]] },
+  tree: { css: ["tree.css", "scroll.css", "form.css"], api: [["createTree(空容器, { items, checkable, searchable, draggable, virtual, loadChildren })", "satin-ui/tree"]] },
+  files: { css: ["tree.css", "scroll.css", "form.css", "overlay.css", "feedback.css"], api: [["createFileExplorer(空容器, { items, view, rootName, loadChildren, onMove })", "satin-ui/tree"]] },
   scrollarea: { css: ["scroll.css"], api: [["createScrollArea(元素, 选项)", C]] },
   vlist: { css: ["scroll.css", "content.css"], api: [["createInfiniteList(容器, { loadPage, renderRow, rowHeight, total, pageSize, onCount })", C]] },
   chat: { css: ["content.css", "input.css", "data.css"], api: [["createChat(空容器或 .sn-chat, { title, respond, history })", "satin-ui/chat"]] },
@@ -202,4 +204,5 @@ export const WIN = {
   chat: { all: true, titles: ["分镜讨论 · 历史对话", "分镜讨论 · 新对话"], flush: true },
   md: { title: "README.md" },
   vlist: { title: "素材库" },
+  files: { title: "雨夜车站 — 文件管理器", flush: true },
 };

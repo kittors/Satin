@@ -42,7 +42,7 @@ export default function ChatDemo1() {
             <span data-i="arrow-down"></span>
             <span class="sn-badge" hidden>0</span>
           </button>
-          <div class="sn-chat-empty sn-enter-wait" data-chat-empty="">
+          <div class="sn-chat-empty" data-chat-empty="">
             <span class="sn-chat-empty-ic" aria-hidden="true">
               <span data-i="clapperboard"></span>
             </span>

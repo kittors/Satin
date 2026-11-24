@@ -614,6 +614,7 @@ export default function OrganizeMenu() {
 | `align` | `"start" \| "center" \| "end"` | "start" | 否 | 菜单和按钮的哪一边对齐（只有菜单按钮有）。 | React：`align`；Preact：`align`；Vue：`align` |
 | `label` | `string` | — | 否 | 读屏读出来的菜单名字："更多操作"。 | React：`label`；Preact：`label`；Vue：`label`；纯 HTML：`菜单的 aria-label` |
 | `bound` | `HTMLElement \| RefObject \| "window"` | "window" | 否 | 菜单（和每一层子菜单）只能待在这个容器里，四边留 8px；太矮就限高、在菜单里滚动；窄到子菜单放不下时点开它在原位下钻。 | React：`bound`；Preact：`bound`；Vue：`bound`；纯 HTML：`openMenu(菜单, { bound })` |
+| `surface` | `"solid" \| "blur"` | "solid" | 否 | 菜单面板材质：默认 "solid" 纯实底不透明；传 "blur"（或添加 `.sn-blur` 类）开启高斯模糊毛玻璃效果，超长项自动单行省略并悬停显示原生 Tooltip。 | React：`surface`；Preact：`surface`；Vue：`surface`；纯 HTML：`.sn-blur / .sn-solid` |
 
 ## 事件
 
@@ -631,7 +632,7 @@ export default function OrganizeMenu() {
 
 | 签名 | 从哪引 | 说明 |
 |---|---|---|
-| `openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement \| "window"; onSelect?(detail: MenuSelectDetail): void }): void` | `satin-ui` | 程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`keyboard: true` 先高亮第一项。 |
+| `openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement \| "window"; surface?: "solid" \| "blur"; onSelect?(detail: MenuSelectDetail): void }): void` | `satin-ui` | 程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`surface` 支持 "solid"（不透明）或 "blur"（高斯模糊）；`keyboard: true` 先高亮第一项。 |
 | `closeMenu(refocus?: boolean): void` | `satin-ui` | 关闭当前展开的菜单（`refocus` 为 true 时焦点返回至触发元素）。 |
 
 ## 样式定制

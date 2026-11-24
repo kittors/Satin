@@ -419,6 +419,266 @@ try {
     await page.keyboard.press("Escape");
   }
 
+  console.log("\n[11/12] 树形控件：轻微激活态 + 展开收起微动效 + 异步懒加载 + 失败重试 + 万级虚拟树");
+  await gotoDoc(page, "#/c/tree");
+  {
+    const { handle: hBasic, frame: fBasic } = await waitIframeReady(page, "tree-basic");
+    await hBasic.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
+    await fBasic.locator('.sn-tr[data-id="export"]').click();
+    await page.waitForTimeout(120);
+    const activeShadow = await fBasic.locator('.sn-tr[data-id="export"]').evaluate((el) => getComputedStyle(el).boxShadow);
+    assert(activeShadow === "none", "鼠标单击树节点采用轻微激活态，不显示厚重焦点硬框", `boxShadow=${activeShadow}`);
+    const beforeRows = await fBasic.locator(".sn-tr").count();
+    await fBasic.locator('[data-tr-tw="script"]').click();
+    await page.waitForTimeout(240);
+    const collapsedRows = await fBasic.locator(".sn-tr").count();
+    await fBasic.locator('[data-tr-tw="script"]').click();
+    await page.waitForTimeout(240);
+    const expandedRows = await fBasic.locator(".sn-tr").count();
+    assert(collapsedRows < beforeRows && expandedRows === beforeRows, "树形节点收起与展开经微动效平滑切换子节点", `before=${beforeRows}, collapsed=${collapsedRows}, expanded=${expandedRows}`);
+
+    const { handle: hLazy, frame: fLazy } = await waitIframeReady(page, "tree-lazy");
+    await hLazy.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
+    await fLazy.locator('[data-tr-tw="lz-ep1"]').click();
+    await fLazy.locator('.sn-tr[data-id="lz-ep1-1"]').waitFor({ state: "visible", timeout: 4000 });
+    assert((await fLazy.locator('.sn-tr[data-id="lz-ep1-1"]').count()) === 1, "树形懒加载展开后异步载入真实子节点");
+
+    await fLazy.locator('[data-tr-tw="lz-retry"]').click();
+    await fLazy.locator('[data-tr-retry="lz-retry"]').waitFor({ state: "visible", timeout: 4000 });
+    assert((await fLazy.locator('[data-tr-retry="lz-retry"]').count()) === 1, "树形懒加载失败时原地展示重试按钮");
+    await fLazy.locator('[data-tr-retry="lz-retry"]').click();
+    await fLazy.locator('.sn-tr[data-id="lz-retry-1"]').waitFor({ state: "visible", timeout: 4000 });
+    assert((await fLazy.locator('.sn-tr[data-id="lz-retry-1"]').count()) === 1, "点击重试后成功载入远程子节点");
+
+    const { handle: hVirt, frame: fVirt } = await waitIframeReady(page, "tree-virtual");
+    await hVirt.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
+    const statText = await fVirt.locator("[data-tr-stat]").textContent();
+    const domRows = await fVirt.locator(".sn-tr").count();
+    const hasTreeSa = await fVirt.locator(".sn-tree-vp.sn-sa > .sn-sa-vp").count();
+    assert(hasTreeSa === 1, "树形控件完整复用 Satin ScrollArea 悬浮滚动条");
+    assert(statText.includes("10100"), "万级虚拟树完整索引 10,100 个节点", `stat=${statText}`);
+    assert(domRows > 5 && domRows < 60, "万级虚拟树仅挂载视口窗口 DOM 行", `rendered=${domRows}`);
+    await fVirt.locator(".sn-tree-vp > .sn-sa-vp").evaluate((el) => { el.scrollTop = 120000; });
+    await page.waitForTimeout(150);
+    const afterScrollDom = await fVirt.locator(".sn-tr").count();
+    const scrolledLabels = await fVirt.locator(".sn-tr .sn-tr-lbl").allTextContents();
+    assert(afterScrollDom > 5 && afterScrollDom < 60 && scrolledLabels.some((t) => /03[6-9]|04\d/.test(t)), "万级虚拟树大跨度滚动即时定位不露白", `sample=${scrolledLabels[0] || ""}`);
+    await fVirt.locator("[data-tr-q]").fill("050-05");
+    await page.waitForTimeout(150);
+    const hits = await fVirt.locator(".sn-tr mark").count();
+    assert(hits >= 1, "万级虚拟树实时搜索精准命中并高亮 <mark>", `hits=${hits}`);
+  }
+
+  console.log("\n[12/12] 文件管理与拟物文件夹：精巧高密多格式 + ScrollArea 复用 + 零多余横线 + 逐帧微动效 + 全交互闭环");
+  await gotoDoc(page, "#/c/files");
+  {
+    const { handle, frame } = await waitIframeReady(page, "files-basic");
+    await handle.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300);
+
+    // 1. 复用 ScrollArea + 去 AI 味零多余间隔线 + 卡片精巧尺寸 + 全格式真实内容预览
+    const hasFxSa = await frame.locator("[data-fx-body].sn-sa > .sn-sa-vp").count();
+    assert(hasFxSa === 1, "文件管理器完整复用 Satin ScrollArea 悬浮细滚动条");
+    const noExtraBorders = await frame.evaluate(() => {
+      const bar = getComputedStyle(document.querySelector(".sn-fex-bar")).borderBottomWidth;
+      const foot = getComputedStyle(document.querySelector(".sn-fex-foot")).borderTopWidth;
+      return bar === "0px" && foot === "0px";
+    });
+    assert(noExtraBorders, "工具栏与底栏零多余横线间隔（去 AI 味规范）");
+
+    const tileW = (await frame.locator('[data-fx-id="f-shots"]').boundingBox()).width;
+    assert(tileW <= 140, "卡片模式尺寸收紧精致紧凑（一行可排 5~6 项）", `tileWidth=${Math.round(tileW)}px`);
+
+    const formatsOk = await frame.evaluate(() => {
+      const has = (k) => !!document.querySelector(`.sn-fex-tile[data-kind="${k}"]`);
+      const vidImg = !!document.querySelector('[data-kind="video"] .sn-fcard-frame img') && !!document.querySelector('[data-kind="video"] .sn-fcard-play');
+      const picImg = !!document.querySelector('[data-kind="image"] .sn-fcard-frame img');
+      const txtExcerpt = (document.querySelector('[data-kind="txt"] .sn-fcard-excerpt')?.textContent || "").trim().length > 8;
+      return has("pdf") && has("word") && has("ppt") && has("vue") && has("tsx") && vidImg && picImg && txtExcerpt;
+    });
+    assert(formatsOk, "完整呈现 PDF / Word / PPT / Vue / TSX / TXT小字 / 图片小图 / 视频首帧");
+
+    const initShotsSheets = await frame.locator('[data-fx-id="f-shots"] .sn-fdr-sheet').count();
+    const initInboxSheets = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr-sheet').count();
+    assert(initShotsSheets === 3 && initInboxSheets === 0, "拟物文件夹夹层微缩纸张真实反映子内容（满 3 张 / 空 0 张）", `shots=${initShotsSheets}, inbox=${initInboxSheets}`);
+
+    // 2. 真实鼠标拖拽图片卡片触发周边卡片 FLIP 避让重排（验证 <img> 不劫持拖拽 + 通透无白壳代理 + 无灰框空槽 + 过中缝即提前避让）
+    const imgTile = frame.locator('[data-fx-id="d-still"]');
+    const pptTile = frame.locator('[data-fx-id="d-ppt"]');
+    const ibox = await imgTile.boundingBox();
+    const pbox = await pptTile.boundingBox();
+    await page.mouse.move(ibox.x + ibox.width / 2, ibox.y + ibox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(pbox.x + pbox.width * 0.28, pbox.y + pbox.height / 2, { steps: 10 });
+    await page.waitForTimeout(240);
+    const dragInfo = await frame.evaluate(() => {
+      const pInner = document.querySelector(".sn-fex-proxy .sn-fex-proxy-inner");
+      const slot = document.querySelector('[data-fx-id="d-still"].sn-fex-slot');
+      const ids = [...document.querySelectorAll(".sn-fex-grid > [data-fx-id]")].map((el) => el.dataset.fxId);
+      return {
+        hasProxy: !!pInner,
+        hasSlot: !!slot,
+        proxyTransparent: pInner ? getComputedStyle(pInner).backgroundColor === "rgba(0, 0, 0, 0)" && getComputedStyle(pInner).boxShadow === "none" : false,
+        slotClean: slot ? getComputedStyle(slot).backgroundColor === "rgba(0, 0, 0, 0)" && getComputedStyle(slot).boxShadow === "none" : false,
+        avoided: ids.indexOf("d-ppt") < ids.indexOf("d-still"),
+      };
+    });
+    assert(dragInfo.hasProxy && dragInfo.hasSlot && dragInfo.proxyTransparent && dragInfo.slotClean && dragInfo.avoided, "图片卡片通透无白壳实体拖拽、原位干净无灰槽且刚越过相邻交界线即平滑避让重排", JSON.stringify(dragInfo));
+    await page.mouse.up();
+    await page.waitForTimeout(260);
+
+    // 2.5 真实鼠标拖拽 PDF 文件卡片到空拟物文件夹并逐帧采样 rAF 流畅度与掀盖姿态
+    const srcTile = frame.locator('[data-fx-id="d-pdf"]');
+    const dstTile = frame.locator('[data-fx-id="f-inbox"]');
+    const sbox = await srcTile.boundingBox();
+    const dbox = await dstTile.boundingBox();
+    await frame.evaluate(() => {
+      window.__fxFrames = [];
+      window.__fxStop = false;
+      let last = performance.now();
+      const tick = (now) => {
+        window.__fxFrames.push(now - last);
+        last = now;
+        if (!window.__fxStop) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+    await page.mouse.move(sbox.x + sbox.width / 2, sbox.y + sbox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(dbox.x + dbox.width / 2, dbox.y + dbox.height / 2, { steps: 14 });
+    await page.waitForTimeout(160);
+    const hasProxy = await frame.locator(".sn-fex-proxy").count();
+    const isDropOpen = await dstTile.evaluate((el) => el.classList.contains("sn-drop-target"));
+    const frontMat = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr-front').evaluate((el) => getComputedStyle(el).transform);
+    assert(hasProxy === 1 && isDropOpen && frontMat !== "none", "拖拽悬停拟物文件夹时真实本体代理跟手且前盖 3D 掀开", `proxy=${hasProxy}, dropTarget=${isDropOpen}, matrix=${frontMat.slice(0, 24)}`);
+    await page.mouse.up();
+    await page.waitForTimeout(340);
+    const frameStats = await frame.evaluate(() => {
+      window.__fxStop = true;
+      const dts = window.__fxFrames.slice(1).sort((a, b) => a - b);
+      const p95 = dts[Math.min(dts.length - 1, Math.floor(dts.length * 0.95))] || 0;
+      const max = dts[dts.length - 1] || 0;
+      return { n: dts.length, p95: +p95.toFixed(1), max: +max.toFixed(1) };
+    });
+    assert(frameStats.n >= 10 && frameStats.p95 <= 24, "拖拽与拟物掀盖吸入微动效逐帧流畅低延迟", `frames=${frameStats.n}, p95=${frameStats.p95}ms, max=${frameStats.max}ms`);
+
+    const afterInboxSheets = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr-sheet').count();
+    const afterInboxKind = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr-sheet').first().getAttribute("data-child-kind");
+    const afterInboxCount = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr').getAttribute("data-count");
+    const pdfInRoot = await frame.locator('[data-fx-id="d-pdf"]').count();
+    assert(afterInboxSheets === 1 && afterInboxKind === "pdf" && afterInboxCount === "1" && pdfInRoot === 0, "松手放入后拟物文件夹夹层实时长出对应 PDF 微缩纸片且计数 +1", `sheets=${afterInboxSheets}, kind=${afterInboxKind}, count=${afterInboxCount}`);
+
+    // 3. 双击拟物文件夹进入内部并确认文件就在其中
+    const dbox2 = await frame.locator('[data-fx-id="f-inbox"]').boundingBox();
+    await page.mouse.dblclick(dbox2.x + dbox2.width / 2, dbox2.y + dbox2.height / 2);
+    await page.waitForTimeout(220);
+    const crumbs = await frame.locator(".sn-fex-crumb").allTextContents();
+    const movedInside = await frame.locator('[data-fx-id="d-pdf"]').count();
+    assert(crumbs.length === 2 && crumbs[1].includes("待整理素材") && movedInside === 1, "双击拟物文件夹成功进入子目录并可见刚拖入的 PDF", `crumbs=${crumbs.join(" / ")}, inside=${movedInside}`);
+
+    // 点击根目录面包屑返回
+    await frame.locator('.sn-fex-crumb[data-crumb-idx="0"]').click();
+    await page.waitForTimeout(180);
+    assert((await frame.locator(".sn-fex-crumb").count()) === 1, "点击根目录面包屑顺利返回顶层");
+
+    // 4. 空白处右键新建文件夹（含底部向上翻转菜单高度防压扁检查） + 行内重命名 + 删除 + Toast 撤销恢复
+    const bodyBox = await frame.locator("[data-fx-body]").boundingBox();
+    await page.mouse.click(bodyBox.x + bodyBox.width - 24, bodyBox.y + bodyBox.height - 24, { button: "right" });
+    await page.waitForTimeout(240);
+    const menuInfo = await frame.locator(".sn-menu.sn-float.sn-open").first().evaluate((el) => ({
+      h: el.getBoundingClientRect().height,
+      noXOverflow: el.scrollWidth <= el.clientWidth + 1,
+      hasBlur: el.classList.contains("sn-blur"),
+    }));
+    const newFolderItem = frame.locator('.sn-menu.sn-float.sn-open .sn-item[data-act="new-folder"]');
+    assert((await newFolderItem.count()) === 1 && menuInfo.h >= 140 && menuInfo.noXOverflow && menuInfo.hasBlur, "右键菜单支持高斯模糊、向上翻转不被压扁、零横向溢出且含「新建文件夹」", JSON.stringify(menuInfo));
+    await newFolderItem.click();
+    await page.waitForTimeout(240);
+    const renInput = frame.locator("[data-fx-rename-input]");
+    assert((await renInput.count()) === 1, "新建文件夹自动进入行内重命名输入");
+    await renInput.fill("超长测试文件夹名称12345678901234567890");
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(200);
+    const createdTile = frame.locator(".sn-fex-tile", { hasText: "超长测试文件夹名称" });
+    assert((await createdTile.count()) === 1, "行内重命名提交后立即显示新拟物文件夹");
+
+    const cbox = await createdTile.boundingBox();
+    await page.mouse.click(cbox.x + cbox.width / 2, cbox.y + cbox.height / 2, { button: "right" });
+    await page.waitForTimeout(240);
+    // 右键文件夹色卡实时换色
+    const colorSwatch = frame.locator('.sn-menu.sn-float.sn-open [data-fx-color="violet"]');
+    assert((await colorSwatch.count()) === 1, "文件夹右键菜单内置自定义色卡圆点");
+    await colorSwatch.click();
+    await page.waitForTimeout(220);
+    const tintedFolder = await createdTile.locator(".sn-fdr.sn-fdr-tinted").count();
+    assert(tintedFolder === 1, "点击右键色卡圆点即时更新文件夹自定义配色");
+
+    // 再次右键悬停「移动到 ›」子菜单：验证超长名零横向溢出 + 删除 + Toast 撤销恢复
+    const cbox2 = await createdTile.boundingBox();
+    await page.mouse.click(cbox2.x + cbox2.width / 2, cbox2.y + cbox2.height / 2, { button: "right" });
+    await page.waitForTimeout(240);
+    const moveTrigger = frame.locator('.sn-menu.sn-float.sn-open .sn-item[data-sub]');
+    await moveTrigger.hover();
+    await page.waitForTimeout(360);
+    const subInfo = await frame.locator(".sn-menu.sn-float.sn-sub.sn-open").evaluateAll((els) => els.map((el) => ({
+      noX: el.scrollWidth <= el.clientWidth + 1,
+      blur: el.classList.contains("sn-blur"),
+    })));
+    assert(subInfo.length === 1 && subInfo[0].noX && subInfo[0].blur, "二级「移动到 ›」子菜单继承高斯模糊且超长名优雅省略零横向溢出", JSON.stringify(subInfo));
+    await frame.locator('.sn-menu.sn-float.sn-open .sn-item[data-act="del"]').click();
+    await page.waitForTimeout(360);
+    assert((await frame.locator(".sn-fex-tile", { hasText: "超长测试文件夹名称" }).count()) === 0, "右键删除经退场与 FLIP 补位微动效后移除目标文件夹");
+    const undoBtn = frame.locator(".sn-toast .sn-act").first();
+    if ((await undoBtn.count()) > 0) {
+      await undoBtn.click();
+      await page.waitForTimeout(280);
+    }
+    assert((await frame.locator(".sn-fex-tile", { hasText: "超长测试文件夹名称" }).count()) === 1, "点击 Toast 撤销按钮弹性恢复刚删除的文件夹");
+
+    // 4.5 普通单击绝不触发复选框勾选；点击复选框才进入多选态 + 悬浮批量操作胶囊 + 批量删除与撤销
+    await frame.locator('[data-fx-id="f-shots"]').click();
+    await page.waitForTimeout(100);
+    const singleChkOn = await frame.locator(".sn-fex-chk.sn-on").count();
+    const singleBatch = await frame.locator(".sn-fex-batch.sn-open").count();
+    assert(singleChkOn === 0 && singleBatch === 0, "普通单击卡片仅轻微激活聚焦，绝不误触发复选打勾或弹出批量胶囊", `chkOn=${singleChkOn}, batch=${singleBatch}`);
+
+    await frame.locator('[data-fx-id="d-vue"]').hover();
+    await page.waitForTimeout(100);
+    await frame.locator('[data-fx-chk="d-vue"]').click();
+    await page.waitForTimeout(120);
+    await frame.locator('[data-fx-chk="d-tsx"]').click();
+    await page.waitForTimeout(220);
+    const batchOpen = await frame.locator(".sn-fex-batch.sn-open").count();
+    const batchNum = await frame.locator("[data-fx-bnum]").textContent();
+    assert(batchOpen === 1 && batchNum === "2", "勾选多项自动浮起多选批量操作胶囊并精准计数", `open=${batchOpen}, num=${batchNum}`);
+    await frame.locator('[data-fx-bact="del"]').click();
+    await page.waitForTimeout(360);
+    assert((await frame.locator('[data-fx-id="d-vue"]').count()) === 0 && (await frame.locator('[data-fx-id="d-tsx"]').count()) === 0, "悬浮批量胶囊一键批量删除生效");
+    const undoBtn2 = frame.locator(".sn-toast .sn-act").first();
+    if ((await undoBtn2.count()) > 0) {
+      await undoBtn2.click();
+      await page.waitForTimeout(280);
+    }
+    assert((await frame.locator('[data-fx-id="d-vue"]').count()) === 1 && (await frame.locator('[data-fx-id="d-tsx"]').count()) === 1, "撤销批量删除完整弹性恢复两张文件卡片");
+    await frame.locator('[data-fx-bact="clear"]').click();
+    await page.waitForTimeout(160);
+
+    // 5. 切换三视图：卡片 → 列表 → 树形列表（并原地展开刚拖入的文件夹）
+    await frame.locator('[data-fx-seg] button[data-v="list"]').click();
+    await page.waitForTimeout(220);
+    assert((await frame.locator(".sn-fex-list-rows .sn-fex-row").count()) >= 11, "切换至列表视图正确展示全部行与表头");
+    await frame.locator('[data-fx-seg] button[data-v="tree"]').click();
+    await page.waitForTimeout(220);
+    assert((await frame.locator(".sn-fex-tree").count()) === 1, "切换至树形列表视图正常渲染");
+    await frame.locator('[data-fx-tw="f-inbox"]').click();
+    await page.waitForTimeout(260);
+    const arrowRot = await frame.locator('.sn-fex-row[data-fx-id="f-inbox"] .sn-tr-tw .sn-ic').evaluate((el) => getComputedStyle(el).rotate);
+    assert((await frame.locator('.sn-fex-tree [data-fx-id="d-pdf"]').count()) === 1 && parseFloat(arrowRot) >= 89, "树形列表原地展开文件夹、箭头平滑旋转 90° 并直接看到拖入的 PDF", `rotate=${arrowRot}`);
+  }
+
   assert(pageErrors.length === 0, "全流程 0 pageerror", pageErrors.join(" | "));
 } finally {
   await browser.close();

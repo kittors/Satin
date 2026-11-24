@@ -78,6 +78,11 @@
   import AvatarDemo1 from "./demos/avatar-1.svelte";
   import AvatarDemo2 from "./demos/avatar-2.svelte";
   import CollapseDemo0 from "./demos/collapse-0.svelte";
+  import TreeDemo0 from "./demos/tree-0.svelte";
+  import TreeDemo1 from "./demos/tree-1.svelte";
+  import TreeDemo2 from "./demos/tree-2.svelte";
+  import FilesDemo0 from "./demos/files-0.svelte";
+  import FilesDemo1 from "./demos/files-1.svelte";
   import ScrollareaDemo0 from "./demos/scrollarea-0.svelte";
   import ScrollareaDemo1 from "./demos/scrollarea-1.svelte";
   import ScrollareaDemo2 from "./demos/scrollarea-2.svelte";
@@ -168,6 +173,8 @@
   import FieldBasic from "./demos/field-basic.svelte";
   import FieldError from "./demos/field-error.svelte";
   import FieldOptional from "./demos/field-optional.svelte";
+  import FilesBasic from "./demos/files-basic.svelte";
+  import FilesLazy from "./demos/files-lazy.svelte";
   import FlowBasic from "./demos/flow-basic.svelte";
   import FlowBranch from "./demos/flow-branch.svelte";
   import FlowTidy from "./demos/flow-tidy.svelte";
@@ -286,6 +293,9 @@
   import TooltipBasic from "./demos/tooltip-basic.svelte";
   import TooltipKbd from "./demos/tooltip-kbd.svelte";
   import TooltipTruncate from "./demos/tooltip-truncate.svelte";
+  import TreeBasic from "./demos/tree-basic.svelte";
+  import TreeLazy from "./demos/tree-lazy.svelte";
+  import TreeVirtual from "./demos/tree-virtual.svelte";
   import UploadBasic from "./demos/upload-basic.svelte";
   import UploadReal from "./demos/upload-real.svelte";
   import UploadSingle from "./demos/upload-single.svelte";
@@ -526,6 +536,17 @@
     <h2>折叠面板</h2>
     <div class="demo" data-demo="collapse-0"><svelte:boundary onerror={(e) => console.error("演示 collapse-0 出错：", e)}><CollapseDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
+  <section id="tree">
+    <h2>树形控件</h2>
+    <div class="demo" data-demo="tree-0"><svelte:boundary onerror={(e) => console.error("演示 tree-0 出错：", e)}><TreeDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="tree-1"><svelte:boundary onerror={(e) => console.error("演示 tree-1 出错：", e)}><TreeDemo1 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="tree-2"><svelte:boundary onerror={(e) => console.error("演示 tree-2 出错：", e)}><TreeDemo2 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+  </section>
+  <section id="files">
+    <h2>文件管理</h2>
+    <div class="demo" data-demo="files-0"><svelte:boundary onerror={(e) => console.error("演示 files-0 出错：", e)}><FilesDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="files-1"><svelte:boundary onerror={(e) => console.error("演示 files-1 出错：", e)}><FilesDemo1 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+  </section>
   <section id="scrollarea">
     <h2>滚动区域</h2>
     <div class="demo" data-demo="scrollarea-0"><svelte:boundary onerror={(e) => console.error("演示 scrollarea-0 出错：", e)}><ScrollareaDemo0 />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
@@ -714,6 +735,11 @@
     <div class="demo" data-demo="field-basic"><svelte:boundary onerror={(e) => console.error("演示 field-basic 出错：", e)}><FieldBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="field-error"><svelte:boundary onerror={(e) => console.error("演示 field-error 出错：", e)}><FieldError />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="field-optional"><svelte:boundary onerror={(e) => console.error("演示 field-optional 出错：", e)}><FieldOptional />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+  </section>
+  <section id="files">
+    <h2>文件管理</h2>
+    <div class="demo" data-demo="files-basic"><svelte:boundary onerror={(e) => console.error("演示 files-basic 出错：", e)}><FilesBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="files-lazy"><svelte:boundary onerror={(e) => console.error("演示 files-lazy 出错：", e)}><FilesLazy />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="flow">
     <h2>流程图</h2>
@@ -934,6 +960,12 @@
     <div class="demo" data-demo="tooltip-basic"><svelte:boundary onerror={(e) => console.error("演示 tooltip-basic 出错：", e)}><TooltipBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="tooltip-kbd"><svelte:boundary onerror={(e) => console.error("演示 tooltip-kbd 出错：", e)}><TooltipKbd />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
     <div class="demo" data-demo="tooltip-truncate"><svelte:boundary onerror={(e) => console.error("演示 tooltip-truncate 出错：", e)}><TooltipTruncate />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+  </section>
+  <section id="tree">
+    <h2>树形控件</h2>
+    <div class="demo" data-demo="tree-basic"><svelte:boundary onerror={(e) => console.error("演示 tree-basic 出错：", e)}><TreeBasic />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="tree-lazy"><svelte:boundary onerror={(e) => console.error("演示 tree-lazy 出错：", e)}><TreeLazy />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
+    <div class="demo" data-demo="tree-virtual"><svelte:boundary onerror={(e) => console.error("演示 tree-virtual 出错：", e)}><TreeVirtual />{#snippet failed(e)}<p class="demo-err">演示出错：{(e as Error)?.message ?? e}</p>{/snippet}</svelte:boundary></div>
   </section>
   <section id="upload">
     <h2>上传</h2>

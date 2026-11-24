@@ -1,13 +1,13 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 388,
-  "var(--sn-ease-out-strong)": 90,
+  "var(--sn-ease-out)": 418,
+  "var(--sn-ease-out-strong)": 107,
   "cubic-bezier(.55, .15, .45, .85)": 2,
-  "var(--sn-ease-overshoot)": 16,
+  "var(--sn-ease-overshoot)": 18,
   "var(--sn-ease-in-out)": 30,
-  "var(--sn-ease-in)": 30,
+  "var(--sn-ease-in)": 36,
   "ease-in": 3,
-  "linear": 36,
+  "linear": 38,
   "cubic-bezier(.3, .1, .3, 1)": 1,
   "cubic-bezier(.25, .1, .25, 1)": 2,
   "cubic-bezier(.16, 1, .3, 1)": 4,
@@ -16,7 +16,8 @@
   "cubic-bezier(.34, 1.56, .64, 1)": 1,
   "cubic-bezier(.62, .12, .38, .88)": 1,
   "cubic-bezier(.65, .815, .735, .395)": 1,
-  "cubic-bezier(.165, .84, .44, 1)": 1
+  "cubic-bezier(.165, .84, .44, 1)": 1,
+  "var(--sn-ease-spring)": 1
  },
  "css": [
   {
@@ -2405,7 +2406,7 @@
    "file": "packages/satin-ui/css/overlay.css",
    "selector": ".sn-ctx-zone",
    "prop": "transition",
-   "value": "box-shadow .15s var(--sn-ease-out)"
+   "value": "box-shadow .15s var(--sn-ease-out), background-color .15s var(--sn-ease-out)"
   },
   {
    "file": "packages/satin-ui/css/overlay.css",
@@ -2873,6 +2874,228 @@
    "file": "packages/satin-ui/css/shell.css",
    "selector": ".sn-e404-dial, .sn-e404-iris-wrap, .sn-e404-blades, .sn-e404-dot, .sn-e404-lens",
    "prop": "transition",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-tr",
+   "prop": "transition",
+   "value": "background-color .1s var(--sn-ease-out), color .1s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-tr-tw",
+   "prop": "transition",
+   "value": "background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-tr-tw .sn-ic",
+   "prop": "transition",
+   "value": "rotate .18s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-tr-spin",
+   "prop": "animation",
+   "value": "sn-tr-rot .72s linear infinite"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-tr-retry",
+   "prop": "transition",
+   "value": "background-color .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-crumb",
+   "prop": "transition",
+   "value": "background-color .14s var(--sn-ease-out), color .14s var(--sn-ease-out), box-shadow .14s var(--sn-ease-out), transform .16s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-stage.sn-fex-enter",
+   "prop": "animation",
+   "value": "sn-fex-in .18s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-chk",
+   "prop": "transition",
+   "value": "opacity .14s var(--sn-ease-out), transform .18s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-row-chk",
+   "prop": "transition",
+   "value": "opacity .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-marquee",
+   "prop": "transition",
+   "value": "opacity .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-tile.sn-fex-removing",
+   "prop": "transition",
+   "value": "opacity .17s var(--sn-ease-in), transform .17s var(--sn-ease-in)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-row.sn-fex-removing",
+   "prop": "transition",
+   "value": "opacity .17s var(--sn-ease-in), transform .17s var(--sn-ease-in)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-tile.sn-fex-fresh",
+   "prop": "animation",
+   "value": "sn-fex-pop-in .26s var(--sn-ease-out-strong) backwards"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-row.sn-fex-fresh",
+   "prop": "animation",
+   "value": "sn-fex-row-in .24s var(--sn-ease-out-strong) backwards"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-batch",
+   "prop": "transition",
+   "value": "opacity .15s var(--sn-ease-in), transform .18s var(--sn-ease-in), visibility 0s linear .18s"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-batch.sn-open",
+   "prop": "transition",
+   "value": "opacity .16s var(--sn-ease-out), transform .24s var(--sn-ease-out-strong), visibility 0s"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-batch-num.sn-bump",
+   "prop": "animation",
+   "value": "sn-fdr-bump .28s var(--sn-ease-overshoot)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-batch-btn",
+   "prop": "transition",
+   "value": "background-color .12s var(--sn-ease-out), color .12s var(--sn-ease-out), transform .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-tile",
+   "prop": "transition",
+   "value": "background-color .14s var(--sn-ease-out), box-shadow .14s var(--sn-ease-out), transform .2s var(--sn-ease-out-strong), opacity .14s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-proxy-inner",
+   "prop": "transition",
+   "value": "transform .18s var(--sn-ease-out-strong), opacity .16s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fdr",
+   "prop": "transition",
+   "value": "transform .22s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-sw",
+   "prop": "transition",
+   "value": "transform .15s var(--sn-ease-out-strong), box-shadow .14s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fdr-sheet",
+   "prop": "transition",
+   "value": "transform .26s var(--sn-ease-out-strong), box-shadow .22s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fdr-front",
+   "prop": "transition",
+   "value": "transform .26s var(--sn-ease-out-strong), box-shadow .22s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fdr-cnt.sn-fdr-cnt-bump",
+   "prop": "animation",
+   "value": "sn-fdr-bump .36s var(--sn-ease-overshoot)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-tile.sn-fdr-dropped .sn-fdr",
+   "prop": "animation",
+   "value": "sn-fdr-gulp .42s var(--sn-ease-spring)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-tile.sn-fdr-dropped .sn-fdr-front",
+   "prop": "animation",
+   "value": "sn-fdr-flap .42s var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fdr-sheet.sn-fdr-sheet-new",
+   "prop": "animation",
+   "value": "sn-fdr-slip .38s var(--sn-ease-out-strong) backwards"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fcard",
+   "prop": "transition",
+   "value": "transform .2s var(--sn-ease-out-strong), box-shadow .18s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fcard-frame img",
+   "prop": "transition",
+   "value": "transform .36s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fcard-play",
+   "prop": "transition",
+   "value": "transform .2s var(--sn-ease-out-strong), background-color .16s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-th",
+   "prop": "transition",
+   "value": "color .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fex-row",
+   "prop": "transition",
+   "value": "background-color .1s var(--sn-ease-out), box-shadow .12s var(--sn-ease-out), opacity .12s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fdr, .sn-fdr-front, .sn-fdr-sheet, .sn-fcard, .sn-fcard-frame img, .sn-fcard-play, .sn-fex-tile, .sn-fex-row, .sn-fe",
+   "prop": "transition",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-fdr, .sn-fdr-front, .sn-fdr-sheet, .sn-fcard, .sn-fcard-frame img, .sn-fcard-play, .sn-fex-tile, .sn-fex-row, .sn-fe",
+   "prop": "animation",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-reduce-motion .sn-fdr, .sn-reduce-motion .sn-fdr-front, .sn-reduce-motion .sn-fdr-sheet, .sn-reduce-motion .sn-fcard",
+   "prop": "transition",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/tree.css",
+   "selector": ".sn-reduce-motion .sn-fdr, .sn-reduce-motion .sn-fdr-front, .sn-reduce-motion .sn-fdr-sheet, .sn-reduce-motion .sn-fcard",
+   "prop": "animation",
    "value": "none"
   }
  ],
@@ -3441,6 +3664,76 @@
    "file": "packages/satin-ui/src/table.js",
    "duration": "COL_DUR",
    "easing": "EASE_CSS.outStrong"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "190",
+   "easing": "\"cubic-bezier(.22"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "210",
+   "easing": ""
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "210",
+   "easing": ""
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "230",
+   "easing": "\"cubic-bezier(.22"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "165",
+   "easing": "\"cubic-bezier(.4"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "165",
+   "easing": "\"cubic-bezier(.4"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "175",
+   "easing": "\"cubic-bezier(.4"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "260",
+   "easing": "\"cubic-bezier(.22"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "165",
+   "easing": "\"cubic-bezier(.4"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "175",
+   "easing": "\"cubic-bezier(.4"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "190",
+   "easing": "\"cubic-bezier(.22"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "210",
+   "easing": ""
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "230",
+   "easing": "\"cubic-bezier(.22"
+  },
+  {
+   "file": "packages/satin-ui/src/tree.js",
+   "duration": "190",
+   "easing": "\"cubic-bezier(.22"
   }
  ]
 }

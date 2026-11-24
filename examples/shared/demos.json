@@ -702,6 +702,51 @@
   "css": false
  },
  {
+  "slug": "tree-0",
+  "id": "tree",
+  "n": 0,
+  "name": "树形控件",
+  "group": "数据展示",
+  "cap": "勾选、搜索与拖拽移入",
+  "css": false
+ },
+ {
+  "slug": "tree-1",
+  "id": "tree",
+  "n": 1,
+  "name": "树形控件",
+  "group": "数据展示",
+  "cap": "异步懒加载与失败重试",
+  "css": false
+ },
+ {
+  "slug": "tree-2",
+  "id": "tree",
+  "n": 2,
+  "name": "树形控件",
+  "group": "数据展示",
+  "cap": "10,000+ 节点虚拟无限列表",
+  "css": false
+ },
+ {
+  "slug": "files-0",
+  "id": "files",
+  "n": 0,
+  "name": "文件管理",
+  "group": "数据展示",
+  "cap": "拟物文件夹与完整交互工作台",
+  "css": false
+ },
+ {
+  "slug": "files-1",
+  "id": "files",
+  "n": 1,
+  "name": "文件管理",
+  "group": "数据展示",
+  "cap": "树形列表与远程目录懒加载",
+  "css": false
+ },
+ {
   "slug": "scrollarea-0",
   "id": "scrollarea",
   "n": 0,
@@ -1577,6 +1622,26 @@
   "name": "字段与错误",
   "group": "表单",
   "cap": "只标\"可选\"",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "files-basic",
+  "id": "files",
+  "n": -1,
+  "name": "文件管理",
+  "group": "数据展示",
+  "cap": "拟物文件夹与全交互工作台",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "files-lazy",
+  "id": "files",
+  "n": -1,
+  "name": "文件管理",
+  "group": "数据展示",
+  "cap": "树形列表与远程目录懒加载",
   "css": false,
   "contract": true
  },
@@ -2757,6 +2822,36 @@
   "name": "文字提示",
   "group": "浮层",
   "cap": "截断时显示全文",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tree-basic",
+  "id": "tree",
+  "n": -1,
+  "name": "树形控件",
+  "group": "数据展示",
+  "cap": "勾选、搜索与拖拽移入",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tree-lazy",
+  "id": "tree",
+  "n": -1,
+  "name": "树形控件",
+  "group": "数据展示",
+  "cap": "异步懒加载与失败重试",
+  "css": false,
+  "contract": true
+ },
+ {
+  "slug": "tree-virtual",
+  "id": "tree",
+  "n": -1,
+  "name": "树形控件",
+  "group": "数据展示",
+  "cap": "10,000+ 节点虚拟无限列表",
   "css": false,
   "contract": true
  },

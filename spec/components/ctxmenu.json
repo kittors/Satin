@@ -264,6 +264,19 @@
         "vue": "bound",
         "html": "openMenu(菜单, { bound })"
       }
+    },
+    {
+      "name": "surface",
+      "type": "\"solid\" | \"blur\"",
+      "default": "\"solid\"",
+      "required": false,
+      "desc": "菜单面板材质：默认 \"solid\" 纯实底不透明；传 \"blur\"（或添加 `.sn-blur` 类）开启高斯模糊毛玻璃效果，超长项自动单行省略并悬停显示原生 Tooltip。",
+      "names": {
+        "react": "surface",
+        "preact": "surface",
+        "vue": "surface",
+        "html": ".sn-blur / .sn-solid"
+      }
     }
   ],
   "events": [
@@ -297,10 +310,10 @@
   "functions": [
     {
       "name": "openMenu",
-      "signature": "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; onSelect?(detail: MenuSelectDetail): void }): void",
+      "signature": "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; surface?: \"solid\" | \"blur\"; onSelect?(detail: MenuSelectDetail): void }): void",
       "returns": "void",
       "from": "satin-ui",
-      "desc": "程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`keyboard: true` 先高亮第一项。"
+      "desc": "程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`surface` 支持 \"solid\"（不透明）或 \"blur\"（高斯模糊）；`keyboard: true` 先高亮第一项。"
     },
     {
       "name": "closeMenu",

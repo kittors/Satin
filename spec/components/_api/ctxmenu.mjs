@@ -42,6 +42,8 @@ export default {
     { name: "label", type: "string", default: "—", required: false, desc: "读屏读出来的菜单名字：\"更多操作\"。", names: { react: "label", preact: "label", vue: "label", html: "菜单的 aria-label" } },
     { name: "bound", type: 'HTMLElement | RefObject | "window"', default: '"window"', required: false,
       desc: "菜单（和每一层子菜单）只能待在这个容器里，四边留 8px；太矮就限高、在菜单里滚动；窄到子菜单放不下时点开它在原位下钻。", names: { react: "bound", preact: "bound", vue: "bound", html: "openMenu(菜单, { bound })" } },
+    { name: "surface", type: '"solid" | "blur"', default: '"solid"', required: false,
+      desc: '菜单面板材质：默认 "solid" 纯实底不透明；传 "blur"（或添加 `.sn-blur` 类）开启高斯模糊毛玻璃效果，超长项自动单行省略并悬停显示原生 Tooltip。', names: { react: "surface", preact: "surface", vue: "surface", html: ".sn-blur / .sn-solid" } },
   ],
   events: [
     { name: "select", payload: "(key: string, item: MenuItem)", when: "选中一项（子菜单里的也算）、菜单收起以后；不可用的、已经打勾的项不触发。",
@@ -50,8 +52,8 @@ export default {
   slots: [{ name: "trigger", desc: "触发器：菜单按钮（Menu），或者右键区域（ContextMenu）。", names: { react: "children", vue: "默认插槽", html: "data-fmenu 按钮 / data-ctx 区域" } }],
   methods: [],
   functions: [
-    { name: "openMenu", signature: "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; onSelect?(detail: MenuSelectDetail): void }): void", returns: "void", from: "satin-ui",
-      desc: "程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`keyboard: true` 先高亮第一项。" },
+    { name: "openMenu", signature: "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; surface?: \"solid\" | \"blur\"; onSelect?(detail: MenuSelectDetail): void }): void", returns: "void", from: "satin-ui",
+      desc: "程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`surface` 支持 \"solid\"（不透明）或 \"blur\"（高斯模糊）；`keyboard: true` 先高亮第一项。" },
     { name: "closeMenu", signature: "closeMenu(refocus?: boolean): void", returns: "void", from: "satin-ui", desc: "关闭当前展开的菜单（`refocus` 为 true 时焦点返回至触发元素）。" },
   ],
   cssVars: [

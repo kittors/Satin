@@ -42,6 +42,8 @@ const CASES = [
   ["createFlow", { nodes: [{ id: "a", x: 40, y: 40, t: "原文", ic: "file-text", d: "第三集" }, { id: "b", x: 320, y: 40, t: "分镜", ic: "clapperboard", k: "board", d: "12 镜" }], edges: [["a", "b"]] }, {}, { size: "height:360px" }],
   ["createDataGrid", { columns: GRID_COLS, data: gridRows(2000), selection: "multiple" }, { data: gridRows(300), sort: { key: "shots", dir: -1 } }, { size: "height:420px" }],
   ["createCanvasGrid", { columns: GRID_COLS, data: gridRows(20000) }, { data: gridRows(300), loading: true }, { size: "height:420px" }],
+  ["createTree", { items: [{ id: "a", label: "项目", children: [{ id: "a1", label: "脚本.md" }, { id: "a2", label: "画面.png" }] }], defaultExpanded: ["a"], checkable: true, searchable: true, draggable: true }, { items: [{ id: "b", label: "归档" }] }, { size: "height:300px" }],
+  ["createFileExplorer", { items: [{ id: "f1", name: "分镜", kind: "folder", children: [{ id: "f1-a", name: "镜01.png", kind: "image" }] }, { id: "d1", name: "剧本.md", kind: "doc" }], view: "card" }, { view: "tree" }, { size: "height:360px" }],
   ["createThemePanel", {}, {}],
   // 自定义元素（Svelte、Angular、Solid、Preact、纯 HTML 都走这条路）：插进页面自动创建、改属性 update、拿出来自动销毁
   ["<sn-avatar>", { name: "林夏" }, { name: "周屿", size: 24 }, { element: "sn-avatar" }],

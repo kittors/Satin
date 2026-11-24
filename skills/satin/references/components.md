@@ -82,6 +82,8 @@
 | [`tags`](components/tags.md) | 标签、徽标与头像 · Tag · Badge · Avatar | 标签只用中性底，靠前面的小圆点表示状态，不做大面积彩色块 |
 | [`avatar`](components/avatar.md) | 头像 · Avatar | 有照片用照片 |
 | [`collapse`](components/collapse.md) | 折叠面板 · Collapse | 高度用 0fr → 1fr 过渡，内容在展开过半时淡入 |
+| [`tree`](components/tree.md) | 树形控件 · Tree | 多级层级数据展示：1px 纤细缩进引导线、展开/折叠弹性旋转、父子三态联动勾选、实时搜索命中高亮、节点拖拽调序与移入父节点、异步懒加载子节点（带失败重试）以及万级节点自动虚拟化无限列表 |
+| [`files`](components/files.md) | 文件管理 · FileExplorer | 面向创作与工程资产管理的文件工作台：支持文件卡片、列表、树形列表三视图丝滑切换，全面复用 Satin `ScrollArea` 悬浮细滚动条、`openMenu` 右键菜单与二级子菜单、`initSeg` 流体分段控件与 `toast` 撤销提示，严守极少间隔线去 AI 味原则 |
 | [`scrollarea`](components/scrollarea.md) | 滚动区域 · ScrollArea | 所有会溢出滚动的地方都用它：原生滚动（惯性、键盘、读屏都在），系统滚动条换成一根细的悬浮滚动条，不滚动 0.7 秒后淡出，悬停或拖动时变粗 |
 | [`vlist`](components/vlist.md) | 无限列表 · VirtualList · InfiniteList | 一万条也不卡：只渲染看得见的几十行，行节点循环复用，滚动时只改位置 |
 | [`chat`](components/chat.md) | 聊天与 AI 对话 · Chat | 超多消息也流畅：已经载入一千多条，往上翻会继续加载，最多一万条 |

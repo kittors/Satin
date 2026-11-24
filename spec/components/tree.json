@@ -1,0 +1,577 @@
+{
+  "id": "tree",
+  "name": "树形控件",
+  "nav": "树形控件",
+  "en": "Tree",
+  "group": "数据展示",
+  "specRef": "",
+  "summary": "多级层级数据展示：1px 纤细缩进引导线、展开/折叠弹性旋转、父子三态联动勾选、实时搜索命中高亮、节点拖拽调序与移入父节点、异步懒加载子节点（带失败重试）以及万级节点自动虚拟化无限列表。",
+  "acceptance": [
+    "**自动虚拟化**：显式设 `virtual: true` 或展平节点数超过 120 行时自动切入虚拟窗口模式，仅挂载可视区域及上下缓冲行（约 20～35 个 DOM 节点），万级数据滚动依然 60fps 低延迟。",
+    "**异步懒加载**：节点带 `hasChildren: true` 且提供 `loadChildren` 时，展开自动切微旋加载态并缓存结果；请求失败原地给出「重试」按钮。",
+    "**键盘全导航**：支持 ↑ / ↓ 移动焦点、→ 展开或进入子项、← 折叠或回到父级、Home / End 跳转首尾、Enter 选中、Space 切换三态勾选。"
+  ],
+  "api": [],
+  "usage": {
+    "css": [
+      "tree.css",
+      "scroll.css",
+      "form.css"
+    ],
+    "api": [
+      [
+        "createTree(空容器, { items, checkable, searchable, draggable, virtual, loadChildren })",
+        "satin-ui/tree"
+      ]
+    ]
+  },
+  "example": null,
+  "demos": [
+    {
+      "caption": "勾选、搜索与拖拽移入",
+      "html": "<div id=\"treeBasicHost\"></div>"
+    },
+    {
+      "caption": "异步懒加载与失败重试",
+      "html": "<div id=\"treeLazyHost\"></div>"
+    },
+    {
+      "caption": "10,000+ 节点虚拟无限列表",
+      "html": "<div id=\"treeVirtHost\"></div>"
+    }
+  ],
+  "states": [],
+  "variants": [],
+  "sizes": [],
+  "interactions": [],
+  "motion": [],
+  "a11y": {
+    "roles": [
+      "滚动视口使用 `role=\"tree\"`，节点行使用 `role=\"treeitem\"`、`aria-level`、`aria-expanded`、`aria-selected` 与 `aria-disabled`。"
+    ],
+    "focus": [
+      "容器可聚焦，焦点节点有清晰可见的聚焦框并在键盘移动时自动滚入可视区。"
+    ],
+    "notes": [
+      "遵循 `prefers-reduced-motion` 与 `.sn-reduce-motion`，关闭多余过渡。"
+    ]
+  },
+  "mobile": [],
+  "contract": 1,
+  "title": "树形控件",
+  "lead": "多级层级结构展示：1px 纤细缩进引导线、展开/折叠弹性旋转、父子三态联动勾选、毫秒级搜索过滤高亮、节点拖拽调序与移入父节点、异步懒加载子节点（带失败重试），以及超过 120 行自动开启的万级节点虚拟无限列表。",
+  "whenToUse": [
+    "文件目录、组织架构、多级分类、组件大纲或需要懒加载与万级虚拟滚动的层级数据。"
+  ],
+  "whenNotToUse": [
+    {
+      "text": "只有一层可展开的问答或区块：用折叠面板。",
+      "use": "collapse"
+    },
+    {
+      "text": "需要文件卡片、拟物文件夹与多视图文件操作：用文件管理。",
+      "use": "files"
+    }
+  ],
+  "related": [
+    {
+      "id": "files",
+      "diff": "文件管理基于树形引擎，额外提供卡片/列表/树形三视图、拟物文件夹与右键拖拽移入。"
+    },
+    {
+      "id": "vlist",
+      "diff": "无限列表面向扁平单层大列表；树形控件同时维护父子层级与三态勾选。"
+    }
+  ],
+  "import": {
+    "html": "import { createTree } from \"satin-ui/tree\";",
+    "react": "import { Tree } from \"satin-ui/react/tree\";",
+    "vue": "import { Tree } from \"satin-ui/vue/tree\";",
+    "svelte": "import { createTree } from \"satin-ui/tree\";",
+    "angular": "import { createTree } from \"satin-ui/tree\";",
+    "solid": "import { createTree } from \"satin-ui/tree\";",
+    "preact": "import { Tree } from \"satin-ui/react/tree\"; // 经 preact/compat"
+  },
+  "importNote": {
+    "react": "`<Tree items checkable searchable draggable />`，从 `satin-ui/react/tree` 引入；ref 拿到实例方法（expand、expandAll、filter、getVisibleCount 等）。",
+    "preact": "经 preact/compat 引入 `satin-ui/react/tree` 的 `Tree`。",
+    "vue": "`<Tree :items checkable searchable draggable />`，从 `satin-ui/vue/tree` 引入。",
+    "svelte": "在 `$effect` 中调用 `createTree(el, opts)`（来自 `satin-ui/tree`），清理函数中调用 `destroy()`。",
+    "angular": "在 `afterNextRender` 中调用 `createTree(el, opts)`，`DestroyRef.onDestroy` 里调用 `destroy()`。",
+    "solid": "在 `onSettled` 中调用 `createTree(el, opts)`，返回清理函数调用 `destroy()`。",
+    "html": "传入空容器 `createTree(el, { items, checkable, searchable, draggable, virtual, loadChildren })` 即可渲染并挂载全部交互。"
+  },
+  "dts": {
+    "factory": "createTree",
+    "react": "Tree",
+    "vue": "Tree"
+  },
+  "props": [
+    {
+      "name": "items",
+      "type": "TreeNode[]",
+      "default": "[]",
+      "required": false,
+      "desc": "树形节点数组：`id`、`label`、可选 `icon` / `meta` / `badge` / `disabled` / `hasChildren` / `children`。",
+      "names": {
+        "js": "items",
+        "react": "items",
+        "preact": "items",
+        "vue": "items"
+      }
+    },
+    {
+      "name": "expanded",
+      "type": "string[]",
+      "default": "—",
+      "required": false,
+      "desc": "受控展开的节点 id 列表。",
+      "names": {
+        "js": "expanded",
+        "react": "expanded",
+        "preact": "expanded",
+        "vue": "expanded"
+      }
+    },
+    {
+      "name": "defaultExpanded",
+      "type": "string[]",
+      "default": "[]",
+      "required": false,
+      "desc": "初始展开的节点 id 列表。",
+      "names": {
+        "js": "defaultExpanded",
+        "react": "defaultExpanded",
+        "preact": "defaultExpanded",
+        "vue": "defaultExpanded"
+      }
+    },
+    {
+      "name": "selected",
+      "type": "string | null",
+      "default": "—",
+      "required": false,
+      "desc": "受控选中的节点 id。",
+      "names": {
+        "js": "selected",
+        "react": "selected",
+        "preact": "selected",
+        "vue": "selected"
+      }
+    },
+    {
+      "name": "defaultSelected",
+      "type": "string | null",
+      "default": "null",
+      "required": false,
+      "desc": "初始选中的节点 id。",
+      "names": {
+        "js": "defaultSelected",
+        "react": "defaultSelected",
+        "preact": "defaultSelected",
+        "vue": "defaultSelected"
+      }
+    },
+    {
+      "name": "checked",
+      "type": "string[]",
+      "default": "—",
+      "required": false,
+      "desc": "受控勾选的节点 id 列表（父子三态自动联动）。",
+      "names": {
+        "js": "checked",
+        "react": "checked",
+        "preact": "checked",
+        "vue": "checked"
+      }
+    },
+    {
+      "name": "defaultChecked",
+      "type": "string[]",
+      "default": "[]",
+      "required": false,
+      "desc": "初始勾选的节点 id 列表。",
+      "names": {
+        "js": "defaultChecked",
+        "react": "defaultChecked",
+        "preact": "defaultChecked",
+        "vue": "defaultChecked"
+      }
+    },
+    {
+      "name": "checkable",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "是否显示三态联动复选框。",
+      "names": {
+        "js": "checkable",
+        "react": "checkable",
+        "preact": "checkable",
+        "vue": "checkable"
+      }
+    },
+    {
+      "name": "searchable",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "是否在顶部显示内置搜索过滤栏与一键展开/折叠按钮。",
+      "names": {
+        "js": "searchable",
+        "react": "searchable",
+        "preact": "searchable",
+        "vue": "searchable"
+      }
+    },
+    {
+      "name": "draggable",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "是否开启拖拽排序与移入父节点（自动阻止循环移入子孙）。",
+      "names": {
+        "js": "draggable",
+        "react": "draggable",
+        "preact": "draggable",
+        "vue": "draggable"
+      }
+    },
+    {
+      "name": "virtual",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "强制开启虚拟滚动；即使为 false，展平节点超过 120 行也会自动切入虚拟窗口模式。",
+      "names": {
+        "js": "virtual",
+        "react": "virtual",
+        "preact": "virtual",
+        "vue": "virtual"
+      }
+    },
+    {
+      "name": "rowHeight",
+      "type": "number",
+      "default": "32",
+      "required": false,
+      "desc": "单行高度（px），用于虚拟滚动视口精确计算。",
+      "names": {
+        "js": "rowHeight",
+        "react": "rowHeight",
+        "preact": "rowHeight",
+        "vue": "rowHeight"
+      }
+    },
+    {
+      "name": "height",
+      "type": "number | string",
+      "default": "360",
+      "required": false,
+      "desc": "容器高度（px 数值或 CSS 长度字符串）。",
+      "names": {
+        "js": "height",
+        "react": "height",
+        "preact": "height",
+        "vue": "height"
+      }
+    },
+    {
+      "name": "activeStyle",
+      "type": "TreeActiveStyle",
+      "default": "\"subtle\"",
+      "required": false,
+      "desc": "激活/选中态外观：默认 \"subtle\" 极轻柔底色；可选 \"bar\"（带左侧 2px 精致微条）、\"tint\"（柔和主色晕染），或传 `{ bg, color, ring, bar, hoverBg }` 自由自定义。",
+      "names": {
+        "js": "activeStyle",
+        "react": "activeStyle",
+        "preact": "activeStyle",
+        "vue": "activeStyle"
+      }
+    },
+    {
+      "name": "loadChildren",
+      "type": "(node: TreeNode) => Promise<TreeNode[]> | TreeNode[]",
+      "default": "—",
+      "required": false,
+      "desc": "异步懒加载函数：展开带有 `hasChildren: true` 的节点时调用，失败自动提供原地重试按钮。",
+      "names": {
+        "js": "loadChildren",
+        "react": "loadChildren",
+        "preact": "loadChildren",
+        "vue": "loadChildren"
+      }
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": "\"树形列表\"",
+      "required": false,
+      "desc": "读屏无障碍标签。",
+      "names": {
+        "js": "label",
+        "react": "label",
+        "preact": "label",
+        "vue": "label"
+      }
+    },
+    {
+      "name": "className / style / id",
+      "type": "string / CSSProperties / string",
+      "default": "—",
+      "required": false,
+      "desc": "附加到树容器宿主元素上。",
+      "names": {
+        "react": "className / style / id",
+        "preact": "class / style / id"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "select",
+      "payload": "{ id: string; node: TreeNode }",
+      "when": "点击或按回车选中节点时触发。",
+      "names": {
+        "js": "onSelect",
+        "react": "onSelect",
+        "preact": "onSelect",
+        "vue": "@select"
+      }
+    },
+    {
+      "name": "check",
+      "payload": "{ ids: string[]; id: string; checked: boolean; node: TreeNode }",
+      "when": "切换三态复选框时触发，返回联动后的全部已勾选 id。",
+      "names": {
+        "js": "onCheck",
+        "react": "onCheck",
+        "preact": "onCheck",
+        "vue": "@check"
+      }
+    },
+    {
+      "name": "expand",
+      "payload": "{ id: string; expanded: boolean; node: TreeNode; expandedIds: string[] }",
+      "when": "节点展开、折叠或懒加载完成后触发。",
+      "names": {
+        "js": "onExpand",
+        "react": "onExpand",
+        "preact": "onExpand",
+        "vue": "@expand"
+      }
+    },
+    {
+      "name": "move",
+      "payload": "{ dragId: string; targetId: string; position: \"before\" | \"inside\" | \"after\"; node: TreeNode; items: TreeNode[] }",
+      "when": "拖拽排序或移入目标节点落定时触发。",
+      "names": {
+        "js": "onMove",
+        "react": "onMove",
+        "preact": "onMove",
+        "vue": "@move"
+      }
+    }
+  ],
+  "slots": [],
+  "methods": [
+    {
+      "name": "expand",
+      "kind": "method",
+      "signature": "expand(id: string, open?: boolean): Promise<void> | void",
+      "returns": "Promise<void> | void",
+      "desc": "展开或折叠指定节点（若为懒加载节点会自动触发加载）。"
+    },
+    {
+      "name": "expandAll",
+      "kind": "method",
+      "signature": "expandAll(open?: boolean): void",
+      "returns": "void",
+      "desc": "一键展开或折叠全部已加载分支。"
+    },
+    {
+      "name": "filter",
+      "kind": "method",
+      "signature": "filter(q: string): void",
+      "returns": "void",
+      "desc": "以关键字实时过滤树节点并高亮命中文本。"
+    },
+    {
+      "name": "select",
+      "kind": "method",
+      "signature": "select(id: string | null): void",
+      "returns": "void",
+      "desc": "以编程方式选中或清空选中节点。"
+    },
+    {
+      "name": "setItems",
+      "kind": "method",
+      "signature": "setItems(items: TreeNode[]): void",
+      "returns": "void",
+      "desc": "整体替换节点数据并刷新虚拟视口。"
+    },
+    {
+      "name": "getVisibleCount",
+      "kind": "method",
+      "signature": "getVisibleCount(): number",
+      "returns": "number",
+      "desc": "返回当前展平后的全部可见节点总数。"
+    },
+    {
+      "name": "getRenderedCount",
+      "kind": "method",
+      "signature": "getRenderedCount(): number",
+      "returns": "number",
+      "desc": "返回当前真实挂载到 DOM 的行节点数量（虚拟化时保持在视口常数级）。"
+    }
+  ],
+  "functions": [],
+  "cssVars": [
+    {
+      "name": "--sn-tr-h",
+      "desc": "树节点行高",
+      "default": "32px",
+      "token": false
+    },
+    {
+      "name": "--sn-tr-indent",
+      "desc": "每级层级缩进宽度",
+      "default": "18px",
+      "token": false
+    },
+    {
+      "name": "--sn-tr-active-bg",
+      "desc": "节点激活/选中背景色（可自定义）",
+      "default": "主文字 4.5%（深色 6.5%）",
+      "token": false
+    },
+    {
+      "name": "--sn-tr-active-bar",
+      "desc": "节点激活左侧 2px 微指示条颜色",
+      "default": "transparent",
+      "token": false
+    },
+    {
+      "name": "--sn-tree-line",
+      "desc": "1px 层级参考线颜色",
+      "default": "主文字 12% 透明",
+      "token": true
+    }
+  ],
+  "classes": [
+    {
+      "name": ".sn-tree / .sn-tree-virt / .sn-tree-vp",
+      "desc": "树根容器 / 虚拟化态 / 滚动视口"
+    },
+    {
+      "name": ".sn-tr / .sn-tr-tw / .sn-tr-guides / .sn-tr-spin",
+      "desc": "节点行 / 展开箭头 / 层级引导线 / 懒加载旋转态"
+    },
+    {
+      "name": ".sn-tr-drop-before / .sn-tr-drop-in / .sn-tr-drop-after",
+      "desc": "拖拽目标上方、移入子级与下方指示态"
+    }
+  ],
+  "types": [
+    "TreeOptions",
+    "TreeApi",
+    "TreeNode",
+    "TreeActiveStyle"
+  ],
+  "keyboard": [
+    {
+      "keys": "↑ / ↓",
+      "does": "在当前可见节点间移动焦点。"
+    },
+    {
+      "keys": "→",
+      "does": "折叠状态下展开节点（含懒加载）；已展开时移动至第一个子节点。"
+    },
+    {
+      "keys": "←",
+      "does": "展开状态下折叠节点；否则跳回父节点。"
+    },
+    {
+      "keys": "Home / End",
+      "does": "跳至首个或末尾可见节点。"
+    },
+    {
+      "keys": "Enter / Space",
+      "does": "Enter 选中当前节点；开启 checkable 时 Space 切换三态勾选。"
+    }
+  ],
+  "design": {
+    "do": [
+      "深层级树统一开启缩进引导线，超过 120 项默认依赖自动虚拟化保持 60fps。",
+      "异步懒加载失败时保留节点原地「重试」，不整树报错。"
+    ],
+    "dont": [
+      {
+        "text": "给树节点堆彩色背景块或霓虹边框。",
+        "rule": "no-colored-shadow"
+      }
+    ],
+    "copy": [
+      "节点文字简洁，副信息用 `meta` 靠右轻量呈现（如文件大小、镜头数）。"
+    ],
+    "motion": [
+      {
+        "what": "展开箭头旋转 0°→90°",
+        "easing": "ease.outStrong",
+        "duration": "180ms"
+      },
+      {
+        "what": "复选框勾选弹跳",
+        "easing": "ease.overshoot",
+        "duration": "260ms"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "slug": "tree-basic",
+      "title": "勾选、搜索与拖拽移入",
+      "why": "多级层级引导线、父子三态联动勾选、实时搜索命中高亮与节点拖拽排序/移入父节点。",
+      "html": "<div id=\"tree-basic\"></div>",
+      "code": {
+        "html": "<div id=\"tree-basic\"></div>\n\n<script type=\"module\">\n  import { createTree } from \"satin-ui/tree\";\n  const items = [\n    {\n      id: \"proj\", label: \"雨夜车站 · 第三集\", icon: \"clapperboard\", meta: \"48 镜\",\n      children: [\n        {\n          id: \"script\", label: \"剧本与分镜\", icon: \"book-open\",\n          children: [\n            { id: \"s1\", label: \"第一场 · 站前广场.md\", icon: \"file-text\", meta: \"12 KB\" },\n            { id: \"s2\", label: \"第二场 · 候车厅对话.md\", icon: \"file-text\", meta: \"18 KB\" },\n          ],\n        },\n        {\n          id: \"visual\", label: \"视觉与镜头\", icon: \"image\",\n          children: [\n            { id: \"v1\", label: \"5200K 冷雨定调帧.png\", icon: \"image\", meta: \"3.4 MB\" },\n            { id: \"v2\", label: \"站台九盏灯运镜.mov\", icon: \"film\", meta: \"84 MB\" },\n          ],\n        },\n      ],\n    },\n    {\n      id: \"export\", label: \"成片交付\", icon: \"archive\", meta: \"2 项\",\n      children: [\n        { id: \"e1\", label: \"第三集-1080p.mp4\", icon: \"film\", meta: \"210 MB\" },\n        { id: \"e2\", label: \"中英双语字幕.srt\", icon: \"file-text\", meta: \"42 KB\" },\n      ],\n    },\n  ];\n  createTree(document.getElementById(\"tree-basic\"), {\n    items,\n    defaultExpanded: [\"proj\", \"script\", \"visual\"],\n    defaultChecked: [\"s1\", \"v1\"],\n    checkable: true,\n    searchable: true,\n    draggable: true,\n    height: 320,\n  });\n</script>\n",
+        "react": "import { Tree, type TreeNode } from \"satin-ui/react/tree\";\n\nconst items: TreeNode[] = [\n  {\n    id: \"proj\", label: \"雨夜车站 · 第三集\", icon: \"clapperboard\", meta: \"48 镜\",\n    children: [\n      {\n        id: \"script\", label: \"剧本与分镜\", icon: \"book-open\",\n        children: [\n          { id: \"s1\", label: \"第一场 · 站前广场.md\", icon: \"file-text\", meta: \"12 KB\" },\n          { id: \"s2\", label: \"第二场 · 候车厅对话.md\", icon: \"file-text\", meta: \"18 KB\" },\n        ],\n      },\n      {\n        id: \"visual\", label: \"视觉与镜头\", icon: \"image\",\n        children: [\n          { id: \"v1\", label: \"5200K 冷雨定调帧.png\", icon: \"image\", meta: \"3.4 MB\" },\n          { id: \"v2\", label: \"站台九盏灯运镜.mov\", icon: \"film\", meta: \"84 MB\" },\n        ],\n      },\n    ],\n  },\n  {\n    id: \"export\", label: \"成片交付\", icon: \"archive\", meta: \"2 项\",\n    children: [\n      { id: \"e1\", label: \"第三集-1080p.mp4\", icon: \"film\", meta: \"210 MB\" },\n      { id: \"e2\", label: \"中英双语字幕.srt\", icon: \"file-text\", meta: \"42 KB\" },\n    ],\n  },\n];\n\nexport default function ProjectTree() {\n  return (\n    <Tree\n      items={items}\n      defaultExpanded={[\"proj\", \"script\", \"visual\"]}\n      defaultChecked={[\"s1\", \"v1\"]}\n      checkable\n      searchable\n      draggable\n      height={320}\n    />\n  );\n}\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Tree, type TreeNode } from \"satin-ui/vue/tree\";\n\nconst items: TreeNode[] = [\n  {\n    id: \"proj\", label: \"雨夜车站 · 第三集\", icon: \"clapperboard\", meta: \"48 镜\",\n    children: [\n      {\n        id: \"script\", label: \"剧本与分镜\", icon: \"book-open\",\n        children: [\n          { id: \"s1\", label: \"第一场 · 站前广场.md\", icon: \"file-text\", meta: \"12 KB\" },\n          { id: \"s2\", label: \"第二场 · 候车厅对话.md\", icon: \"file-text\", meta: \"18 KB\" },\n        ],\n      },\n      {\n        id: \"visual\", label: \"视觉与镜头\", icon: \"image\",\n        children: [\n          { id: \"v1\", label: \"5200K 冷雨定调帧.png\", icon: \"image\", meta: \"3.4 MB\" },\n          { id: \"v2\", label: \"站台九盏灯运镜.mov\", icon: \"film\", meta: \"84 MB\" },\n        ],\n      },\n    ],\n  },\n  {\n    id: \"export\", label: \"成片交付\", icon: \"archive\", meta: \"2 项\",\n    children: [\n      { id: \"e1\", label: \"第三集-1080p.mp4\", icon: \"film\", meta: \"210 MB\" },\n      { id: \"e2\", label: \"中英双语字幕.srt\", icon: \"file-text\", meta: \"42 KB\" },\n    ],\n  },\n];\n</script>\n\n<template>\n  <Tree\n    :items=\"items\"\n    :default-expanded=\"['proj', 'script', 'visual']\"\n    :default-checked=\"['s1', 'v1']\"\n    checkable\n    searchable\n    draggable\n    :height=\"320\"\n  />\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import { createTree, type TreeNode } from \"satin-ui/tree\";\n\n  const items: TreeNode[] = [\n    {\n      id: \"proj\", label: \"雨夜车站 · 第三集\", icon: \"clapperboard\", meta: \"48 镜\",\n      children: [\n        {\n          id: \"script\", label: \"剧本与分镜\", icon: \"book-open\",\n          children: [\n            { id: \"s1\", label: \"第一场 · 站前广场.md\", icon: \"file-text\", meta: \"12 KB\" },\n            { id: \"s2\", label: \"第二场 · 候车厅对话.md\", icon: \"file-text\", meta: \"18 KB\" },\n          ],\n        },\n        {\n          id: \"visual\", label: \"视觉与镜头\", icon: \"image\",\n          children: [\n            { id: \"v1\", label: \"5200K 冷雨定调帧.png\", icon: \"image\", meta: \"3.4 MB\" },\n            { id: \"v2\", label: \"站台九盏灯运镜.mov\", icon: \"film\", meta: \"84 MB\" },\n          ],\n        },\n      ],\n    },\n    {\n      id: \"export\", label: \"成片交付\", icon: \"archive\", meta: \"2 项\",\n      children: [\n        { id: \"e1\", label: \"第三集-1080p.mp4\", icon: \"film\", meta: \"210 MB\" },\n        { id: \"e2\", label: \"中英双语字幕.srt\", icon: \"file-text\", meta: \"42 KB\" },\n      ],\n    },\n  ];\n\n  let host!: HTMLDivElement;\n  $effect(() => {\n    const it = createTree(host, {\n      items,\n      defaultExpanded: [\"proj\", \"script\", \"visual\"],\n      defaultChecked: [\"s1\", \"v1\"],\n      checkable: true,\n      searchable: true,\n      draggable: true,\n      height: 320,\n    });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createTree, type TreeNode } from \"satin-ui/tree\";\n\nconst items: TreeNode[] = [\n  {\n    id: \"proj\", label: \"雨夜车站 · 第三集\", icon: \"clapperboard\", meta: \"48 镜\",\n    children: [\n      {\n        id: \"script\", label: \"剧本与分镜\", icon: \"book-open\",\n        children: [\n          { id: \"s1\", label: \"第一场 · 站前广场.md\", icon: \"file-text\", meta: \"12 KB\" },\n          { id: \"s2\", label: \"第二场 · 候车厅对话.md\", icon: \"file-text\", meta: \"18 KB\" },\n        ],\n      },\n      {\n        id: \"visual\", label: \"视觉与镜头\", icon: \"image\",\n        children: [\n          { id: \"v1\", label: \"5200K 冷雨定调帧.png\", icon: \"image\", meta: \"3.4 MB\" },\n          { id: \"v2\", label: \"站台九盏灯运镜.mov\", icon: \"film\", meta: \"84 MB\" },\n        ],\n      },\n    ],\n  },\n  {\n    id: \"export\", label: \"成片交付\", icon: \"archive\", meta: \"2 项\",\n    children: [\n      { id: \"e1\", label: \"第三集-1080p.mp4\", icon: \"film\", meta: \"210 MB\" },\n      { id: \"e2\", label: \"中英双语字幕.srt\", icon: \"file-text\", meta: \"42 KB\" },\n    ],\n  },\n];\n\n@Component({\n  selector: \"demo-tree-basic\",\n  template: `<div #host></div>`,\n})\nexport class TreeBasicComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    afterNextRender(() => {\n      const it = createTree(this.host().nativeElement, {\n        items,\n        defaultExpanded: [\"proj\", \"script\", \"visual\"],\n        defaultChecked: [\"s1\", \"v1\"],\n        checkable: true,\n        searchable: true,\n        draggable: true,\n        height: 320,\n      });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createTree, type TreeNode } from \"satin-ui/tree\";\n\nconst items: TreeNode[] = [\n  {\n    id: \"proj\", label: \"雨夜车站 · 第三集\", icon: \"clapperboard\", meta: \"48 镜\",\n    children: [\n      {\n        id: \"script\", label: \"剧本与分镜\", icon: \"book-open\",\n        children: [\n          { id: \"s1\", label: \"第一场 · 站前广场.md\", icon: \"file-text\", meta: \"12 KB\" },\n          { id: \"s2\", label: \"第二场 · 候车厅对话.md\", icon: \"file-text\", meta: \"18 KB\" },\n        ],\n      },\n      {\n        id: \"visual\", label: \"视觉与镜头\", icon: \"image\",\n        children: [\n          { id: \"v1\", label: \"5200K 冷雨定调帧.png\", icon: \"image\", meta: \"3.4 MB\" },\n          { id: \"v2\", label: \"站台九盏灯运镜.mov\", icon: \"film\", meta: \"84 MB\" },\n        ],\n      },\n    ],\n  },\n  {\n    id: \"export\", label: \"成片交付\", icon: \"archive\", meta: \"2 项\",\n    children: [\n      { id: \"e1\", label: \"第三集-1080p.mp4\", icon: \"film\", meta: \"210 MB\" },\n      { id: \"e2\", label: \"中英双语字幕.srt\", icon: \"file-text\", meta: \"42 KB\" },\n    ],\n  },\n];\n\nexport default function ProjectTree() {\n  let host!: HTMLDivElement;\n  onSettled(() => {\n    const it = createTree(host, {\n      items,\n      defaultExpanded: [\"proj\", \"script\", \"visual\"],\n      defaultChecked: [\"s1\", \"v1\"],\n      checkable: true,\n      searchable: true,\n      draggable: true,\n      height: 320,\n    });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Tree, type TreeNode } from \"satin-ui/react/tree\";\n\nconst items: TreeNode[] = [\n  {\n    id: \"proj\", label: \"雨夜车站 · 第三集\", icon: \"clapperboard\", meta: \"48 镜\",\n    children: [\n      {\n        id: \"script\", label: \"剧本与分镜\", icon: \"book-open\",\n        children: [\n          { id: \"s1\", label: \"第一场 · 站前广场.md\", icon: \"file-text\", meta: \"12 KB\" },\n          { id: \"s2\", label: \"第二场 · 候车厅对话.md\", icon: \"file-text\", meta: \"18 KB\" },\n        ],\n      },\n      {\n        id: \"visual\", label: \"视觉与镜头\", icon: \"image\",\n        children: [\n          { id: \"v1\", label: \"5200K 冷雨定调帧.png\", icon: \"image\", meta: \"3.4 MB\" },\n          { id: \"v2\", label: \"站台九盏灯运镜.mov\", icon: \"film\", meta: \"84 MB\" },\n        ],\n      },\n    ],\n  },\n  {\n    id: \"export\", label: \"成片交付\", icon: \"archive\", meta: \"2 项\",\n    children: [\n      { id: \"e1\", label: \"第三集-1080p.mp4\", icon: \"film\", meta: \"210 MB\" },\n      { id: \"e2\", label: \"中英双语字幕.srt\", icon: \"file-text\", meta: \"42 KB\" },\n    ],\n  },\n];\n\nexport default function ProjectTree() {\n  return (\n    <Tree\n      items={items}\n      defaultExpanded={[\"proj\", \"script\", \"visual\"]}\n      defaultChecked={[\"s1\", \"v1\"]}\n      checkable\n      searchable\n      draggable\n      height={320}\n    />\n  );\n}\n"
+      }
+    },
+    {
+      "slug": "tree-lazy",
+      "title": "异步懒加载与失败重试",
+      "why": "展开带 `hasChildren: true` 的远程目录时原地旋转加载并缓存子节点，加载失败支持原地重试。",
+      "html": "<div id=\"tree-lazy\"></div>",
+      "code": {
+        "html": "<div id=\"tree-lazy\"></div>\n\n<script type=\"module\">\n  import { createTree } from \"satin-ui/tree\";\n  const items = [\n    { id: \"lz-ep1\", label: \"第一集 · 远程素材库\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n    { id: \"lz-ep2\", label: \"第二集 · 分镜渲染帧\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n    { id: \"lz-retry\", label: \"历史归档（首次模拟失败可重试）\", icon: \"archive\", badge: \"重试演示\", hasChildren: true },\n  ];\n  let failedOnce = false;\n  createTree(document.getElementById(\"tree-lazy\"), {\n    items,\n    height: 250,\n    loadChildren: (node) => new Promise((resolve, reject) => {\n      setTimeout(() => {\n        if (node.id === \"lz-retry\" && !failedOnce) {\n          failedOnce = true;\n          reject(new Error(\"网络超时\"));\n          return;\n        }\n        resolve([\n          { id: `${node.id}-1`, label: `${node.label.slice(0, 3)} · 远景机位.mov`, icon: \"film\", meta: \"92 MB\" },\n          { id: `${node.id}-2`, label: `${node.label.slice(0, 3)} · 场记单.md`, icon: \"file-text\", meta: \"14 KB\" },\n          { id: `${node.id}-3`, label: \"子目录 · 精修帧\", icon: \"folder\", hasChildren: true },\n        ]);\n      }, 280);\n    }),\n  });\n</script>\n",
+        "react": "import { Tree, type TreeNode } from \"satin-ui/react/tree\";\n\nconst items: TreeNode[] = [\n  { id: \"lz-ep1\", label: \"第一集 · 远程素材库\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-ep2\", label: \"第二集 · 分镜渲染帧\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-retry\", label: \"历史归档（首次模拟失败可重试）\", icon: \"archive\", badge: \"重试演示\", hasChildren: true },\n];\n\nlet failedOnce = false;\nconst loadChildren = (node: TreeNode): Promise<TreeNode[]> => new Promise((resolve, reject) => {\n  setTimeout(() => {\n    if (node.id === \"lz-retry\" && !failedOnce) {\n      failedOnce = true;\n      reject(new Error(\"网络超时\"));\n      return;\n    }\n    resolve([\n      { id: `${node.id}-1`, label: `${node.label.slice(0, 3)} · 远景机位.mov`, icon: \"film\", meta: \"92 MB\" },\n      { id: `${node.id}-2`, label: `${node.label.slice(0, 3)} · 场记单.md`, icon: \"file-text\", meta: \"14 KB\" },\n      { id: `${node.id}-3`, label: \"子目录 · 精修帧\", icon: \"folder\", hasChildren: true },\n    ]);\n  }, 280);\n});\n\nexport default function LazyTree() {\n  return <Tree items={items} height={250} loadChildren={loadChildren} />;\n}\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Tree, type TreeNode } from \"satin-ui/vue/tree\";\n\nconst items: TreeNode[] = [\n  { id: \"lz-ep1\", label: \"第一集 · 远程素材库\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-ep2\", label: \"第二集 · 分镜渲染帧\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-retry\", label: \"历史归档（首次模拟失败可重试）\", icon: \"archive\", badge: \"重试演示\", hasChildren: true },\n];\n\nlet failedOnce = false;\nconst loadChildren = (node: TreeNode): Promise<TreeNode[]> => new Promise((resolve, reject) => {\n  setTimeout(() => {\n    if (node.id === \"lz-retry\" && !failedOnce) {\n      failedOnce = true;\n      reject(new Error(\"网络超时\"));\n      return;\n    }\n    resolve([\n      { id: `${node.id}-1`, label: `${node.label.slice(0, 3)} · 远景机位.mov`, icon: \"film\", meta: \"92 MB\" },\n      { id: `${node.id}-2`, label: `${node.label.slice(0, 3)} · 场记单.md`, icon: \"file-text\", meta: \"14 KB\" },\n      { id: `${node.id}-3`, label: \"子目录 · 精修帧\", icon: \"folder\", hasChildren: true },\n    ]);\n  }, 280);\n});\n</script>\n\n<template>\n  <Tree :items=\"items\" :height=\"250\" :load-children=\"loadChildren\" />\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import { createTree, type TreeNode } from \"satin-ui/tree\";\n\n  const items: TreeNode[] = [\n    { id: \"lz-ep1\", label: \"第一集 · 远程素材库\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n    { id: \"lz-ep2\", label: \"第二集 · 分镜渲染帧\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n    { id: \"lz-retry\", label: \"历史归档（首次模拟失败可重试）\", icon: \"archive\", badge: \"重试演示\", hasChildren: true },\n  ];\n\n  let host!: HTMLDivElement;\n  $effect(() => {\n    let failedOnce = false;\n    const it = createTree(host, {\n      items,\n      height: 250,\n      loadChildren: (node) => new Promise((resolve, reject) => {\n        setTimeout(() => {\n          if (node.id === \"lz-retry\" && !failedOnce) {\n            failedOnce = true;\n            reject(new Error(\"网络超时\"));\n            return;\n          }\n          resolve([\n            { id: `${node.id}-1`, label: `${node.label.slice(0, 3)} · 远景机位.mov`, icon: \"film\", meta: \"92 MB\" },\n            { id: `${node.id}-2`, label: `${node.label.slice(0, 3)} · 场记单.md`, icon: \"file-text\", meta: \"14 KB\" },\n            { id: `${node.id}-3`, label: \"子目录 · 精修帧\", icon: \"folder\", hasChildren: true },\n          ]);\n        }, 280);\n      }),\n    });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createTree, type TreeNode } from \"satin-ui/tree\";\n\nconst items: TreeNode[] = [\n  { id: \"lz-ep1\", label: \"第一集 · 远程素材库\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-ep2\", label: \"第二集 · 分镜渲染帧\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-retry\", label: \"历史归档（首次模拟失败可重试）\", icon: \"archive\", badge: \"重试演示\", hasChildren: true },\n];\n\n@Component({\n  selector: \"demo-tree-lazy\",\n  template: `<div #host></div>`,\n})\nexport class TreeLazyComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    afterNextRender(() => {\n      let failedOnce = false;\n      const it = createTree(this.host().nativeElement, {\n        items,\n        height: 250,\n        loadChildren: (node) => new Promise((resolve, reject) => {\n          setTimeout(() => {\n            if (node.id === \"lz-retry\" && !failedOnce) {\n              failedOnce = true;\n              reject(new Error(\"网络超时\"));\n              return;\n            }\n            resolve([\n              { id: `${node.id}-1`, label: `${node.label.slice(0, 3)} · 远景机位.mov`, icon: \"film\", meta: \"92 MB\" },\n              { id: `${node.id}-2`, label: `${node.label.slice(0, 3)} · 场记单.md`, icon: \"file-text\", meta: \"14 KB\" },\n              { id: `${node.id}-3`, label: \"子目录 · 精修帧\", icon: \"folder\", hasChildren: true },\n            ]);\n          }, 280);\n        }),\n      });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createTree, type TreeNode } from \"satin-ui/tree\";\n\nconst items: TreeNode[] = [\n  { id: \"lz-ep1\", label: \"第一集 · 远程素材库\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-ep2\", label: \"第二集 · 分镜渲染帧\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-retry\", label: \"历史归档（首次模拟失败可重试）\", icon: \"archive\", badge: \"重试演示\", hasChildren: true },\n];\n\nexport default function LazyTree() {\n  let host!: HTMLDivElement;\n  onSettled(() => {\n    let failedOnce = false;\n    const it = createTree(host, {\n      items,\n      height: 250,\n      loadChildren: (node) => new Promise((resolve, reject) => {\n        setTimeout(() => {\n          if (node.id === \"lz-retry\" && !failedOnce) {\n            failedOnce = true;\n            reject(new Error(\"网络超时\"));\n            return;\n          }\n          resolve([\n            { id: `${node.id}-1`, label: `${node.label.slice(0, 3)} · 远景机位.mov`, icon: \"film\", meta: \"92 MB\" },\n            { id: `${node.id}-2`, label: `${node.label.slice(0, 3)} · 场记单.md`, icon: \"file-text\", meta: \"14 KB\" },\n            { id: `${node.id}-3`, label: \"子目录 · 精修帧\", icon: \"folder\", hasChildren: true },\n          ]);\n        }, 280);\n      }),\n    });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Tree, type TreeNode } from \"satin-ui/react/tree\";\n\nconst items: TreeNode[] = [\n  { id: \"lz-ep1\", label: \"第一集 · 远程素材库\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-ep2\", label: \"第二集 · 分镜渲染帧\", icon: \"folder\", badge: \"远程\", hasChildren: true },\n  { id: \"lz-retry\", label: \"历史归档（首次模拟失败可重试）\", icon: \"archive\", badge: \"重试演示\", hasChildren: true },\n];\n\nlet failedOnce = false;\nconst loadChildren = (node: TreeNode): Promise<TreeNode[]> => new Promise((resolve, reject) => {\n  setTimeout(() => {\n    if (node.id === \"lz-retry\" && !failedOnce) {\n      failedOnce = true;\n      reject(new Error(\"网络超时\"));\n      return;\n    }\n    resolve([\n      { id: `${node.id}-1`, label: `${node.label.slice(0, 3)} · 远景机位.mov`, icon: \"film\", meta: \"92 MB\" },\n      { id: `${node.id}-2`, label: `${node.label.slice(0, 3)} · 场记单.md`, icon: \"file-text\", meta: \"14 KB\" },\n      { id: `${node.id}-3`, label: \"子目录 · 精修帧\", icon: \"folder\", hasChildren: true },\n    ]);\n  }, 280);\n});\n\nexport default function LazyTree() {\n  return <Tree items={items} height={250} loadChildren={loadChildren} />;\n}\n"
+      }
+    },
+    {
+      "slug": "tree-virtual",
+      "title": "10,000+ 节点虚拟无限列表",
+      "why": "一次性挂载 10,100 个分层节点，仅渲染视口附近的 ~28 个真实 DOM 行，滚动与实时搜索均毫秒级响应。",
+      "html": "<div id=\"tree-virtual\"></div>",
+      "code": {
+        "html": "<div id=\"tree-virtual\"></div>\n\n<script type=\"module\">\n  import { createTree } from \"satin-ui/tree\";\n  const items = Array.from({ length: 100 }, (_, g) => ({\n    id: `vg-${g}`,\n    label: `第 ${String(g + 1).padStart(3, \"0\")} 场 · 分镜序列`,\n    icon: \"folder\",\n    meta: \"100 镜\",\n    children: Array.from({ length: 100 }, (_, i) => ({\n      id: `vn-${g}-${i}`,\n      label: `镜头 ${String(g + 1).padStart(3, \"0\")}-${String(i + 1).padStart(2, \"0\")} · ${i % 3 === 0 ? \"定调帧.png\" : i % 3 === 1 ? \"运镜.mov\" : \"台词.md\"}`,\n      icon: i % 3 === 0 ? \"image\" : i % 3 === 1 ? \"film\" : \"file-text\",\n      meta: `${((g * 7 + i * 3) % 48) + 2}.4 MB`,\n    })),\n  }));\n  createTree(document.getElementById(\"tree-virtual\"), {\n    items,\n    defaultExpanded: items.map((g) => g.id),\n    searchable: true,\n    virtual: true,\n    height: 360,\n  });\n</script>\n",
+        "react": "import { Tree, type TreeNode } from \"satin-ui/react/tree\";\n\nconst items: TreeNode[] = Array.from({ length: 100 }, (_, g) => ({\n  id: `vg-${g}`,\n  label: `第 ${String(g + 1).padStart(3, \"0\")} 场 · 分镜序列`,\n  icon: \"folder\",\n  meta: \"100 镜\",\n  children: Array.from({ length: 100 }, (_, i) => ({\n    id: `vn-${g}-${i}`,\n    label: `镜头 ${String(g + 1).padStart(3, \"0\")}-${String(i + 1).padStart(2, \"0\")} · ${i % 3 === 0 ? \"定调帧.png\" : i % 3 === 1 ? \"运镜.mov\" : \"台词.md\"}`,\n    icon: i % 3 === 0 ? \"image\" : i % 3 === 1 ? \"film\" : \"file-text\",\n    meta: `${((g * 7 + i * 3) % 48) + 2}.4 MB`,\n  })),\n}));\nconst expanded = items.map((g) => g.id);\n\nexport default function VirtualTree() {\n  return <Tree items={items} defaultExpanded={expanded} searchable virtual height={360} />;\n}\n",
+        "vue": "<script setup lang=\"ts\">\nimport { Tree, type TreeNode } from \"satin-ui/vue/tree\";\n\nconst items: TreeNode[] = Array.from({ length: 100 }, (_, g) => ({\n  id: `vg-${g}`,\n  label: `第 ${String(g + 1).padStart(3, \"0\")} 场 · 分镜序列`,\n  icon: \"folder\",\n  meta: \"100 镜\",\n  children: Array.from({ length: 100 }, (_, i) => ({\n    id: `vn-${g}-${i}`,\n    label: `镜头 ${String(g + 1).padStart(3, \"0\")}-${String(i + 1).padStart(2, \"0\")} · ${i % 3 === 0 ? \"定调帧.png\" : i % 3 === 1 ? \"运镜.mov\" : \"台词.md\"}`,\n    icon: i % 3 === 0 ? \"image\" : i % 3 === 1 ? \"film\" : \"file-text\",\n    meta: `${((g * 7 + i * 3) % 48) + 2}.4 MB`,\n  })),\n}));\nconst expanded = items.map((g) => g.id);\n</script>\n\n<template>\n  <Tree :items=\"items\" :default-expanded=\"expanded\" searchable virtual :height=\"360\" />\n</template>\n",
+        "svelte": "<script lang=\"ts\">\n  import { createTree, type TreeNode } from \"satin-ui/tree\";\n\n  const items: TreeNode[] = Array.from({ length: 100 }, (_, g) => ({\n    id: `vg-${g}`,\n    label: `第 ${String(g + 1).padStart(3, \"0\")} 场 · 分镜序列`,\n    icon: \"folder\",\n    meta: \"100 镜\",\n    children: Array.from({ length: 100 }, (_, i) => ({\n      id: `vn-${g}-${i}`,\n      label: `镜头 ${String(g + 1).padStart(3, \"0\")}-${String(i + 1).padStart(2, \"0\")} · ${i % 3 === 0 ? \"定调帧.png\" : i % 3 === 1 ? \"运镜.mov\" : \"台词.md\"}`,\n      icon: i % 3 === 0 ? \"image\" : i % 3 === 1 ? \"film\" : \"file-text\",\n      meta: `${((g * 7 + i * 3) % 48) + 2}.4 MB`,\n    })),\n  }));\n\n  let host!: HTMLDivElement;\n  $effect(() => {\n    const it = createTree(host, {\n      items,\n      defaultExpanded: items.map((g) => g.id),\n      searchable: true,\n      virtual: true,\n      height: 360,\n    });\n    return () => it.destroy();\n  });\n</script>\n\n<div bind:this={host}></div>\n",
+        "angular": "import { Component, DestroyRef, ElementRef, afterNextRender, inject, viewChild } from \"@angular/core\";\nimport { createTree, type TreeNode } from \"satin-ui/tree\";\n\nconst items: TreeNode[] = Array.from({ length: 100 }, (_, g) => ({\n  id: `vg-${g}`,\n  label: `第 ${String(g + 1).padStart(3, \"0\")} 场 · 分镜序列`,\n  icon: \"folder\",\n  meta: \"100 镜\",\n  children: Array.from({ length: 100 }, (_, i) => ({\n    id: `vn-${g}-${i}`,\n    label: `镜头 ${String(g + 1).padStart(3, \"0\")}-${String(i + 1).padStart(2, \"0\")} · ${i % 3 === 0 ? \"定调帧.png\" : i % 3 === 1 ? \"运镜.mov\" : \"台词.md\"}`,\n    icon: i % 3 === 0 ? \"image\" : i % 3 === 1 ? \"film\" : \"file-text\",\n    meta: `${((g * 7 + i * 3) % 48) + 2}.4 MB`,\n  })),\n}));\n\n@Component({\n  selector: \"demo-tree-virtual\",\n  template: `<div #host></div>`,\n})\nexport class TreeVirtualComponent {\n  private host = viewChild.required<ElementRef<HTMLElement>>(\"host\");\n  constructor() {\n    const destroyRef = inject(DestroyRef);\n    afterNextRender(() => {\n      const it = createTree(this.host().nativeElement, {\n        items,\n        defaultExpanded: items.map((g) => g.id),\n        searchable: true,\n        virtual: true,\n        height: 360,\n      });\n      destroyRef.onDestroy(() => it.destroy());\n    });\n  }\n}\n",
+        "solid": "import { onSettled } from \"solid-js\";\nimport { createTree, type TreeNode } from \"satin-ui/tree\";\n\nconst items: TreeNode[] = Array.from({ length: 100 }, (_, g) => ({\n  id: `vg-${g}`,\n  label: `第 ${String(g + 1).padStart(3, \"0\")} 场 · 分镜序列`,\n  icon: \"folder\",\n  meta: \"100 镜\",\n  children: Array.from({ length: 100 }, (_, i) => ({\n    id: `vn-${g}-${i}`,\n    label: `镜头 ${String(g + 1).padStart(3, \"0\")}-${String(i + 1).padStart(2, \"0\")} · ${i % 3 === 0 ? \"定调帧.png\" : i % 3 === 1 ? \"运镜.mov\" : \"台词.md\"}`,\n    icon: i % 3 === 0 ? \"image\" : i % 3 === 1 ? \"film\" : \"file-text\",\n    meta: `${((g * 7 + i * 3) % 48) + 2}.4 MB`,\n  })),\n}));\n\nexport default function VirtualTree() {\n  let host!: HTMLDivElement;\n  onSettled(() => {\n    const it = createTree(host, {\n      items,\n      defaultExpanded: items.map((g) => g.id),\n      searchable: true,\n      virtual: true,\n      height: 360,\n    });\n    return () => it.destroy();\n  });\n  return <div ref={(el) => (host = el)}></div>;\n}\n",
+        "preact": "import { Tree, type TreeNode } from \"satin-ui/react/tree\";\n\nconst items: TreeNode[] = Array.from({ length: 100 }, (_, g) => ({\n  id: `vg-${g}`,\n  label: `第 ${String(g + 1).padStart(3, \"0\")} 场 · 分镜序列`,\n  icon: \"folder\",\n  meta: \"100 镜\",\n  children: Array.from({ length: 100 }, (_, i) => ({\n    id: `vn-${g}-${i}`,\n    label: `镜头 ${String(g + 1).padStart(3, \"0\")}-${String(i + 1).padStart(2, \"0\")} · ${i % 3 === 0 ? \"定调帧.png\" : i % 3 === 1 ? \"运镜.mov\" : \"台词.md\"}`,\n    icon: i % 3 === 0 ? \"image\" : i % 3 === 1 ? \"film\" : \"file-text\",\n    meta: `${((g * 7 + i * 3) % 48) + 2}.4 MB`,\n  })),\n}));\nconst expanded = items.map((g) => g.id);\n\nexport default function VirtualTree() {\n  return <Tree items={items} defaultExpanded={expanded} searchable virtual height={360} />;\n}\n"
+      }
+    }
+  ]
+}

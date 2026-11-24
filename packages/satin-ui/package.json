@@ -139,6 +139,10 @@
       "types": "./types/heavy.d.ts",
       "default": "./src/media.js"
     },
+    "./tree": {
+      "types": "./types/heavy.d.ts",
+      "default": "./src/tree.js"
+    },
     "./css": "./css/satin.css",
     "./css/min": "./dist/satin.min.css",
     "./css/page.min.css": "./dist/page.min.css",

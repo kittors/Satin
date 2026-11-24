@@ -36,9 +36,9 @@ function useLatest(v) { const r = useRef(v); r.current = v; return r; }
 // ———— 菜单、右键菜单 ————
 // items：[{ key, label, icon, kbd, danger, disabled, checked, children }]；分隔线 { type: "divider" }；分组标题 { type: "group", label }（标记见 menuHTML）
 // 菜单本体（根菜单 + 各层子菜单）渲染到 <body>
-function useFloatMenu(items, label) {
+function useFloatMenu(items, label, surface) {
   const uid = domId(useId()), box = useRef(null), mounted = useMounted();
-  const html = menuHTML(items, uid, label);
+  const html = menuHTML(items, uid, label, surface);
   const portal = mounted ? createPortal(h("div", { ref: box, style: { display: "contents" }, dangerouslySetInnerHTML: { __html: html } }), document.body) : null;
   // 卸载时菜单正开着：先关上（库里还记着这套菜单）
   useIso(() => () => { const root = box.current?.firstElementChild; if (root?.classList.contains("sn-open")) closeMenu(false); }, []);
@@ -47,10 +47,10 @@ function useFloatMenu(items, label) {
 const selectFrom = (latest) => ({ item }) => { const k = item.dataset.key; latest.current.onSelect?.(k, findItem(latest.current.items, k)); };
 
 // 菜单按钮：子元素是触发器（点了贴着它弹出，↓ 键也能打开；键盘打开时先高亮第一项）。onSelect(key, item)
-export function Menu({ items = [], onSelect, align, label, bound, children }) {
+export function Menu({ items = [], onSelect, align, label, bound, surface, children }) {
   useSetup();
-  const [box, portal] = useFloatMenu(items, label), trig = useRef(null), latest = useLatest({ items, onSelect, align, bound });
-  const open = (keyboard) => openMenu(box.current.firstElementChild, { trigger: trig.current, anchor: trig.current, keyboard, align: latest.current.align, bound: latest.current.bound?.current ?? latest.current.bound, onSelect: selectFrom(latest) });
+  const [box, portal] = useFloatMenu(items, label, surface), trig = useRef(null), latest = useLatest({ items, onSelect, align, bound, surface });
+  const open = (keyboard) => openMenu(box.current.firstElementChild, { trigger: trig.current, anchor: trig.current, keyboard, align: latest.current.align, bound: latest.current.bound?.current ?? latest.current.bound, surface: latest.current.surface, onSelect: selectFrom(latest) });
   const child = Children.only(children), p = child.props;
   const trigger = cloneElement(child, {
     ref: (n) => { trig.current = n; setRef(refOf(child), n); },
@@ -62,11 +62,11 @@ export function Menu({ items = [], onSelect, align, label, bound, children }) {
 }
 
 // 右键菜单：子元素是右键区域（右键、触屏长按 500ms、Shift+F10 / 菜单键在指针处弹出）。bound：菜单只能待在这个容器里（ref 或元素）
-export function ContextMenu({ items = [], onSelect, label, bound, children }) {
+export function ContextMenu({ items = [], onSelect, label, bound, surface, children }) {
   useSetup();
-  const [box, portal] = useFloatMenu(items, label), zone = useRef(null), lp = useRef(null), latest = useLatest({ items, onSelect, bound });
+  const [box, portal] = useFloatMenu(items, label, surface), zone = useRef(null), lp = useRef(null), latest = useLatest({ items, onSelect, bound, surface });
   const open = (x, y, keyboard) => {
-    openMenu(box.current.firstElementChild, { trigger: zone.current, x, y, keyboard, bound: latest.current.bound?.current ?? latest.current.bound, onSelect: selectFrom(latest) });
+    openMenu(box.current.firstElementChild, { trigger: zone.current, x, y, keyboard, bound: latest.current.bound?.current ?? latest.current.bound, surface: latest.current.surface, onSelect: selectFrom(latest) });
     zone.current.classList.add("sn-active");
   };
   const cancel = (e) => { const l = lp.current; if (!l || l.fired) return; if (e.type === "pointermove" && Math.hypot(e.clientX - l.x, e.clientY - l.y) < 8) return; clearTimeout(l.t); lp.current = null; };
