@@ -10,6 +10,7 @@
 //   8. CSS 裸类隔离门禁：Markdown [!TIP] 不被 .sn-tip 隐藏，滑块 .sn-rail 窄屏不消失
 // 用法：先起服务（python3 serve.py 5192 .），再跑 node scripts/test/ui-interactions.mjs
 import { launch, arg } from "../parity/lib.mjs";
+import { PNG } from "pngjs";
 
 const BASE = arg("base", "http://127.0.0.1:5192").replace(/\/$/, "");
 const DOCS = `${BASE}/site/next-docs.html`;
@@ -352,6 +353,50 @@ try {
       `pos=${iso.resTip.pos}, op=${iso.resTip.op}, h=${Math.round(iso.resTip.h)}`
     );
     assert(iso.cw < 200, "数据表格框选 .sn-g-cell.sn-rg 不被地址选择器 .sn-rg 撑成 352px", `width=${Math.round(iso.cw)}px`);
+  }
+
+  console.log("\n[9/9] 单行表单控件（Input / Picker / Select / Button / OTP）真实渲染墨迹垂直居中门禁");
+  {
+    const inkPage = await browser.newPage({ viewport: { width: 960, height: 600 }, deviceScaleFactor: 2 });
+    await inkPage.setContent(`<!doctype html><html lang="zh-CN"><head>
+      <link rel="stylesheet" href="${BASE}/packages/satin-ui/css/page.css">
+      <style>body{padding:24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;background:#fff}</style>
+    </head><body>
+      <input id="in-zh" class="sn-input" style="width:220px" value="选择开始和结束日期">
+      <input id="in-sm" class="sn-input sn-sm" style="width:220px" value="选择开始和结束日期">
+      <input id="in-lg" class="sn-input sn-lg" style="width:220px" value="选择开始和结束日期">
+      <input id="in-xl" class="sn-input sn-xl" style="width:220px" value="选择开始和结束日期">
+      <button id="pk-zh" class="sn-pk-trigger" style="width:220px"><span class="sn-val">选择开始和结束日期</span><span class="sn-end sn-swap"></span></button>
+      <div class="sn-select" style="width:220px"><button id="sel-zh" class="sn-trigger"><span class="sn-val">选择开始和结束日期</span></button></div>
+      <button id="btn-zh" class="sn-btn sn-secondary">选择开始和结束日期</button>
+      <div class="sn-otp"><input id="otp-in" value="8"></div>
+    </body></html>`, { waitUntil: "networkidle" });
+    await inkPage.evaluate(() => document.fonts.ready);
+    await inkPage.waitForTimeout(150);
+    for (const [id, label] of [
+      ["in-zh", "输入框 md 中文"], ["in-sm", "输入框 sm 中文"], ["in-lg", "输入框 lg 中文"], ["in-xl", "输入框 xl 中文"],
+      ["pk-zh", "日期选择器触发框"], ["sel-zh", "下拉选择触发框"], ["btn-zh", "标准按钮"], ["otp-in", "验证码单格"],
+    ]) {
+      const buf = await inkPage.locator("#" + id).screenshot();
+      const png = PNG.sync.read(buf);
+      const { width: W, height: H, data } = png;
+      const x0 = Math.max(4, Math.min(28, Math.floor(W * 0.15)));
+      const x1 = Math.min(W - 5, Math.max(x0 + 6, Math.floor(W * 0.8)));
+      let minY = H, maxY = -1;
+      for (let y = 4; y <= H - 5; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const i = (y * W + x) * 4;
+          if (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2] < 210) {
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      const topPad = minY / 2, botPad = (H - 1 - maxY) / 2;
+      const diff = ((minY + maxY) / 2 - (H - 1) / 2) / 2;
+      assert(Math.abs(diff) <= 0.6, `${label} 真实墨迹垂直居中`, `top=${topPad.toFixed(2)}px, bot=${botPad.toFixed(2)}px, Δy=${diff >= 0 ? "+" : ""}${diff.toFixed(2)}px`);
+    }
+    await inkPage.close();
   }
 
   assert(pageErrors.length === 0, "全流程 0 pageerror", pageErrors.join(" | "));

@@ -10,7 +10,7 @@
 @media (hover: hover) {
 .sn-pk-trigger:hover { border-color: var(--sn-line-control-hover); } }
 .sn-pk-trigger:focus-visible, .sn-pk.sn-open > .sn-pk-trigger { border-color: var(--sn-focus); box-shadow: var(--sn-field-inset), 0 0 0 3px var(--sn-ring); }
-.sn-pk-trigger .sn-val { flex: 1; min-width: 0; padding-bottom: 1px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.sn-pk-trigger .sn-val { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
 .sn-pk-trigger .sn-val.sn-ph { color: var(--sn-label3); }
 .sn-pk-trigger .sn-end { position: relative; width: 24px; height: 24px; flex: none; color: var(--sn-label3); }
 .sn-pk-trigger .sn-end .sn-ic { width: 15px; height: 15px; }

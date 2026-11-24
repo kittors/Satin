@@ -18,17 +18,16 @@
 .sn-shake { animation: sn-shake .36s var(--sn-ease-out); }
 
 /* ———— 输入框 ———— */
-/* 光学居中：浏览器按字体的上下伸部把文字放在正中，但拉丁小写字母的视觉重心偏下（实测 13px 时墨迹中线低 0.75px、14px 时低 1.25px），
-   所以底部多留一点内边距（--pb），文字整体上移半像素到一像素；中文字形占满字框，上移后依然居中。
+/* 上下零非对称内边距，配合 flex/原生垂直居中保证中文字形与拉丁字母在任意字号下均精确居中；
    胶囊形输入框两头是半圆，左右内边距加到 14px，文字不贴着弧线。 */
-.sn-input { --sn-h: 32px; --sn-r: var(--sn-btn-r); --sn-px: 11px; --sn-pb: 1.5px; all: unset; box-sizing: border-box; width: 100%; height: var(--sn-h); padding: 0 var(--sn-px) var(--sn-pb); border-radius: var(--sn-r);
-  font: 400 calc(13px * var(--sn-font-scale, 1))/1 var(--sn-sans); color: var(--sn-label); background: var(--sn-field); border: 1px solid var(--sn-line-control); box-shadow: var(--sn-field-inset), 0 0 0 0 var(--sn-ring);
+.sn-input { --sn-h: 32px; --sn-r: var(--sn-btn-r); --sn-px: 11px; all: unset; box-sizing: border-box; width: 100%; height: var(--sn-h); padding: 0 var(--sn-px); border-radius: var(--sn-r);
+  font: 400 calc(13px * var(--sn-font-scale, 1))/normal var(--sn-sans); color: var(--sn-label); background: var(--sn-field); border: 1px solid var(--sn-line-control); box-shadow: var(--sn-field-inset), 0 0 0 0 var(--sn-ring);
   transition: border-color .15s var(--sn-ease-out), box-shadow .18s var(--sn-ease-out), background .15s var(--sn-ease-out); }
 /* 浏览器自动填充（登录页的账号、密码）：Chrome 会把底色换成浅蓝 / 浅黄、深色模式下字也看不清。底色的变化拖到"永远"，字色保持正文色 */
 .sn-input:-webkit-autofill, .sn-input:-webkit-autofill:hover, .sn-input:-webkit-autofill:focus { -webkit-text-fill-color: var(--sn-label); caret-color: var(--sn-label); transition: border-color .15s var(--sn-ease-out), box-shadow .18s var(--sn-ease-out), background-color 600000s 0s, color 600000s 0s; }
-.sn-input.sn-sm { --sn-h: 28px; --sn-r: max(4px, calc(var(--sn-btn-r) - 2px)); --sn-px: 9px; --sn-pb: 1.5px; font-size: calc(12px * var(--sn-font-scale, 1)); }
-.sn-input.sn-lg { --sn-h: 36px; --sn-pb: 2px; font-size: calc(14px * var(--sn-font-scale, 1)); }
-.sn-input.sn-xl { --sn-h: 40px; --sn-r: calc(var(--sn-btn-r) + 2px); --sn-px: 12px; --sn-pb: 2px; font-size: calc(14px * var(--sn-font-scale, 1)); }
+.sn-input.sn-sm { --sn-h: 28px; --sn-r: max(4px, calc(var(--sn-btn-r) - 2px)); --sn-px: 9px; padding-bottom: 1px; font-size: calc(12px * var(--sn-font-scale, 1)); }
+.sn-input.sn-lg { --sn-h: 36px; font-size: calc(14px * var(--sn-font-scale, 1)); }
+.sn-input.sn-xl { --sn-h: 40px; --sn-r: calc(var(--sn-btn-r) + 2px); --sn-px: 12px; font-size: calc(14px * var(--sn-font-scale, 1)); }
 :is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-input:not(textarea) { --sn-px: 14px; }
 :is([data-radius="pill"], :where(:root:not([data-radius]))) .sn-input.sn-sm:not(textarea) { --sn-px: 12px; }
 /* 聚焦时外环从边框处往外长出来（只变扩展量，颜色不跳）；占位文字变淡一点，给要输入的内容让位 */
@@ -188,7 +187,7 @@ textarea.sn-input[data-autogrow] { overflow: hidden; }
 
 /* ———— 验证码：6 格，自动跳格，粘贴自动分配；填进去的数字淡入上移；支持密码掩码隐藏与显隐切换 ———— */
 .sn-otp { display: inline-flex; align-items: center; gap: 8px; }
-.sn-otp input { all: unset; box-sizing: border-box; width: 40px; height: 44px; border-radius: min(var(--sn-btn-r), 12px); text-align: center; font: 500 calc(18px * var(--sn-font-scale, 1))/1 var(--sn-sans); font-variant-numeric: tabular-nums;
+.sn-otp input { all: unset; box-sizing: border-box; width: 40px; height: 44px; padding-bottom: 1px; border-radius: min(var(--sn-btn-r), 12px); text-align: center; font: 500 calc(18px * var(--sn-font-scale, 1))/normal var(--sn-sans); font-variant-numeric: tabular-nums;
   color: var(--sn-label); background: var(--sn-field); border: 1px solid var(--sn-line-control); box-shadow: var(--sn-field-inset); caret-color: transparent;
   transition: border-color .15s var(--sn-ease-out), box-shadow .15s var(--sn-ease-out); }
 .sn-otp.sn-masked input { font-size: calc(20px * var(--sn-font-scale, 1)); }
