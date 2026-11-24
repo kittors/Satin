@@ -305,6 +305,8 @@ function demoBox(id, { code = true, n } = {}) {
 addEventListener("message", (e) => {
   if (e.origin !== location.origin || !e.data?.satinEmbed) return;
   for (const f of frames) if (f.contentWindow === e.source) {
+    // 演示处于全屏浮层态（.global：弹窗、抽屉、看图、轻提示）时 iframe 临时铺满整屏并加了 html marginTop，此时上报的高度会被污染，严禁篡改外框 --sn-h 导致关闭后页面跳动
+    if (f.classList.contains("global")) continue;
     // 窗口样式的完整演示设 640px 高度上限，避免在文档页里把窗口拉成长条迫使用户连续滚屏
     const box = f.parentElement, cap = box.closest(".dx.is-win") ? 640 : Infinity;
     const h = Math.min(cap, Math.max(Number(box.dataset.min), Math.ceil(e.data.h))); keepH(f, h);

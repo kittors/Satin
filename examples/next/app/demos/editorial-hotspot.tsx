@@ -1,5 +1,5 @@
 "use client";
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { Icon } from "satin-ui/react";
 import { openLightbox } from "satin-ui";
 
@@ -12,13 +12,14 @@ const SPOTS = [
 
 export default function EditorialHotspot() {
   const [active, setActive] = useState<number | null>(0);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const cur = SPOTS[active ?? 0];
   const next = () => setActive(((active ?? 0) + 1) % SPOTS.length);
-  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasRef.current });
 
   return (
     <section className="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-      <div className="sn-ed-canvas" onClick={() => setActive(null)}>
+      <div ref={canvasRef} className="sn-ed-canvas" onClick={() => setActive(null)}>
         <img src={IMG} alt="夜色街道与雨幕高光剖析帧" decoding="async" />
         <button type="button" className="sn-ed-canvas-zoom" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" onClick={(e) => { e.stopPropagation(); openFull(); }}><Icon name="maximize-2" /></button>
         {SPOTS.map((s, i) => (

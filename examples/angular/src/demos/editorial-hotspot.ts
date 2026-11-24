@@ -1,4 +1,4 @@
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, signal, ViewChild } from "@angular/core";
 import { openLightbox } from "satin-ui";
 
 const IMG = "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1200&h=675&q=84";
@@ -9,7 +9,7 @@ const IMG = "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=f
   template: `
     <sn-enhance>
       <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-        <div class="sn-ed-canvas" (click)="active.set(null)">
+        <div #canvas class="sn-ed-canvas" (click)="active.set(null)">
           <img [src]="img" alt="夜色街道与雨幕高光剖析帧" decoding="async">
           <button type="button" class="sn-ed-canvas-zoom" data-i="maximize-2" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" (click)="openFull($event)"></button>
           @for (s of spots; track s.title; let i = $index) {
@@ -38,6 +38,7 @@ const IMG = "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=f
   `,
 })
 export class EditorialHotspotComponent {
+  @ViewChild("canvas") canvasRef?: ElementRef<HTMLDivElement>;
   protected img = IMG;
   protected spots = [
     { x: 24, y: 74, align: "left", side: "above", short: "冷雨反射", label: "标注 01：5200K 冷雨积水反射", title: "5200K 冷雨积水反射", desc: "浅积水承接钠灯冷白反光并压低高光饱和度，与远景 3400K 暖灯拉开冷暖纵深。" },
@@ -48,5 +49,5 @@ export class EditorialHotspotComponent {
   protected cur = computed(() => this.spots[this.active() ?? 0]);
   pick(i: number, e: Event) { e.stopPropagation(); this.active.set(i); }
   next() { this.active.set(((this.active() ?? 0) + 1) % this.spots.length); }
-  openFull(e: Event) { e.stopPropagation(); openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0); }
+  openFull(e: Event) { e.stopPropagation(); openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => this.canvasRef?.nativeElement ?? null }); }
 }

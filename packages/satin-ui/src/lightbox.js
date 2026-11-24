@@ -15,9 +15,9 @@ import { playerHTML, mountPlayer } from "./media.js";
 import { scoped } from "./i18n.js";
 import I18N_DEFAULTS from "./locales/zh-CN/lightbox.js";
 const tt = /* @__PURE__ */ scoped(I18N_DEFAULTS);
-const OPEN = "cubic-bezier(.32,.72,0,1)", EASE_IN = "cubic-bezier(.42,0,1,1)";
-// 飞回缩略图：起步柔一点再加速、平缓落地。用打开那条曲线（起步极快）时，按下 Esc 后第一帧就缩掉四成面积，像跳了一下（2026-11-20 看图边界测试逐帧量到）
-const BACK = "cubic-bezier(.25,.1,.25,1)", T_BACK = 280;
+const OPEN = "cubic-bezier(.2,.9,.3,1)", EASE_IN = "cubic-bezier(.42,0,1,1)";
+// 飞回缩略图：起手自带轻微缓冲（首帧缩幅约 12%，不再猛跳三成多），中段顺滑回缩、末端干脆落位不拖尾
+const BACK = "cubic-bezier(.26,.68,.3,1)", T_BACK = 260;
 const ZMIN = .5, ZMAX = 8, STEPS = [.5, .75, 1, 1.5, 2, 3, 4, 6, 8];
 const out4 = (p) => 1 - (1 - p) ** 4;
 const inOut = (p) => (p < .5 ? 4 * p ** 3 : 1 - (-2 * p + 2) ** 3 / 2);
@@ -32,10 +32,11 @@ function visRect(el) {
   }
   return r;
 }
-// 缩略图已经加载好的那张背景：大图到之前先垫在底下（同一张图就不用垫）
+// 缩略图已经加载好的那张背景：大图到之前先垫在底下（同一张图就不用垫）；传的是包着 <img> 的容器时也自动取到里面的图片，绝不飞出空灰框
 function thumbBg(th) {
   if (!th) return "";
-  if (th.tagName === "IMG") return th.currentSrc ? `url("${th.currentSrc.replace(/["\\]/g, "\\$&")}") center / cover no-repeat` : "";
+  const im = th.tagName === "IMG" ? th : th.querySelector?.("img");
+  if (im?.currentSrc) return `url("${im.currentSrc.replace(/["\\]/g, "\\$&")}") center / cover no-repeat`;
   return th.style.getPropertyValue("--sn-g") || th.querySelector("[style*='--sn-g']")?.style.getPropertyValue("--sn-g") || "";
 }
 const urlOf = (bg) => (String(bg).match(/url\(\s*(["']?)(.*?)\1\s*\)/) || [])[2] || "";
@@ -253,15 +254,15 @@ export function openLightbox(items, n, { thumbOf = () => null, enabled = () => t
     const th = onPage(thumb) ? seenPart(thumb) : null, b = box.getBoundingClientRect();
     if (onPage(thumb)) thumb.style.visibility = "hidden";
     if (!reduced()) {
-      // 从缩略图露出来的那块长出来：裁掉的部分在前 3/4 的路程里慢慢露全，最后 1/4 把阴影放出来（一直裁着的话阴影在落地那一刻才突然出现）
+      // 单段式平滑展开：去掉旧的 offset:0.75 中途拐点，位移、缩放与圆角裁切严格同频，落点自然无二次弹出
       if (th) {
-        box.animate([atThumb(th, b), { clipPath: `inset(0px round ${rad()}px)`, offset: .75 }, { transform: "none", clipPath: `inset(-160px round ${rad()}px)` }], { duration: 380, easing: OPEN });
+        box.animate([atThumb(th, b), { transform: "none", clipPath: `inset(0px round ${rad()}px)` }], { duration: 340, easing: OPEN });
         // 视频：播放器的控制条、播放钮飞的路上先藏着（缩略图上没有它们，第一帧会突然多出一条缩小的控制条），落地后再淡出来
-        if (player) for (const e of box.querySelectorAll(".sn-player > .sn-ctrl, .sn-player > .sn-big-play")) e.animate([{ opacity: 0 }, { opacity: 0, offset: .7 }], { duration: 540, easing: "ease-out" });
-      } else box.animate([{ opacity: 0, transform: `translate(${b.width * .02}px, ${b.height * .02}px) scale(.96)` }, { opacity: 1, transform: "none" }], { duration: 260, easing: OPEN }); // 绕框的中心缩（变换原点在左上角）
+        if (player) for (const e of box.querySelectorAll(".sn-player > .sn-ctrl, .sn-player > .sn-big-play")) e.animate([{ opacity: 0 }, { opacity: 0, offset: .68 }], { duration: 480, easing: "ease-out" });
+      } else box.animate([{ opacity: 0, transform: `translate(${b.width * .02}px, ${b.height * .02}px) scale(.96)` }, { opacity: 1, transform: "none" }], { duration: 240, easing: OPEN }); // 绕框的中心缩（变换原点在左上角）
     }
     scrim.classList.add("sn-on"); bar.classList.add("sn-on");
-    if (player) setTimeout(() => !closed && player.play(), reduced() ? 0 : 380);
+    if (player) setTimeout(() => !closed && player.play(), reduced() ? 0 : 340);
   }));
   stage.focus({ preventScroll: true });
 
@@ -284,13 +285,19 @@ export function openLightbox(items, n, { thumbOf = () => null, enabled = () => t
     if (player) setTimeout(() => !closed && player.play(), reduced() ? 0 : 300);
   }
 
-  // ———— 关上：图同时回正（缩放、平移归零，旋转回到最近的整圈），沿原路缩回缩略图 ————
-  function close(instant) {
+  // ———— 关上：图同时回正（缩放、平移归零，旋转回到最近的整圈），沿原路平滑缩回缩略图 ————
+  function close(instant, viaKey = false) {
     if (closed) return; closed = true; if (cur === api) cur = null;
     removeEventListener("resize", onResize); player?.pause();
     scrim.classList.remove("sn-on"); bar.classList.remove("sn-on");
     const th = thumbOf(n);
-    const done = () => { player?.destroy(); scrim.remove(); stage.remove(); bar.remove(); if (thumb) thumb.style.visibility = ""; if (th && onPage(th)) th.focus?.({ preventScroll: true }); onClose?.(); };
+    const done = () => {
+      // 先在同帧恢复缩略图可见再移走预览框，彻底消除落地瞬间 1 帧闪空；仅键盘关闭时归还焦点，避免鼠标关闭后在原图容器上闪出焦点框
+      if (thumb) thumb.style.visibility = "";
+      player?.destroy(); scrim.remove(); stage.remove(); bar.remove();
+      if (viaKey && th && onPage(th)) th.focus?.({ preventScroll: true });
+      onClose?.();
+    };
     if (instant || reduced()) return done();
     const flyBack = () => {
       if (!box.getBoundingClientRect().width) return done(); // 还没开始飞就关了：框还没摆好、什么都没画出来，直接收掉
@@ -301,20 +308,20 @@ export function openLightbox(items, n, { thumbOf = () => null, enabled = () => t
       for (const a of box.getAnimations()) a.cancel();
       const b = box.getBoundingClientRect(), R = rad();
       if (seen) {
-        const from = midT ? [{ transform: midT, clipPath: midC !== "none" ? midC : `inset(-160px round ${R}px)` }] : [{ transform: "none", clipPath: `inset(-160px round ${R}px)` }, { clipPath: `inset(0px round ${R}px)`, offset: .25 }];
-        scrim.style.transition = `opacity ${T_BACK}ms ${BACK}`; // 遮罩和图一起退：原来遮罩用起步快的曲线 0.26 秒，图还在半路遮罩已经没了
-        // 视频：控制条、播放钮先淡掉；飞回去的路上画面慢慢换成缩略图那张（封面），落地时和缩略图一模一样——原来飞回去的是正在播的那一帧，落地一下换成封面
+        // 单段式平滑收束：去掉 offset:0.25 硬拐点，背景遮罩与画面严格同频退场
+        const from = { transform: midT || "none", clipPath: midT && midC !== "none" ? midC : `inset(0px round ${R}px)` };
+        scrim.style.transition = `opacity ${T_BACK}ms ${BACK}`;
+        // 视频：控制条、播放钮先淡掉；飞回去的路上画面慢慢换成缩略图那张（封面），落地时和缩略图一模一样
         if (player) {
           for (const e of box.querySelectorAll(".sn-player > .sn-ctrl, .sn-player > .sn-big-play, .sn-player > .sn-hud, .sn-player > .sn-pip-note, .sn-player > .sn-pl-spin")) e.animate([{ opacity: 0 }], { duration: 120, easing: EASE_IN, fill: "forwards" });
           const bg = thumbBg(th); if (bg) { const pv = document.createElement("div"); pv.style.cssText = `position:absolute;inset:0;border-radius:var(--sn-r-md);background:${bg};pointer-events:none`; box.append(pv); pv.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T_BACK * .7, easing: "ease-out", fill: "forwards" }); }
         }
-        box.animate([...from, atThumb(seen, b)], { duration: T_BACK, easing: BACK, fill: "forwards" }).onfinish = done;
+        box.animate([from, atThumb(seen, b)], { duration: T_BACK, easing: BACK, fill: "forwards" }).onfinish = done;
       } else { if (thumb) thumb.style.visibility = ""; box.animate([{ opacity: 1, transform: midT || "none" }, { opacity: 0, transform: `${midT} translate(${b.width * .02}px, ${b.height * .02}px) scale(.96)` }], { duration: 200, easing: EASE_IN, fill: "forwards" }).onfinish = done; }
     };
-    // 放大、拖开、转过的：先在原地平缓地缩回整张图，再沿原路缩回缩略图。原来两件事同时开始、都用起步很快的曲线，
-    // 第一帧就从局部特写跳成整张图（2026-11-20 用户录屏）
+    // 放大、拖开、转过的：先在原地平缓地缩回整张图，再沿原路缩回缩略图
     const R0 = Math.round(view.r / 360) * 360, off = img && (Math.abs(view.s - 1) > .01 || Math.hypot(view.x, view.y) > 1 || Math.abs(view.r - R0) > .5);
-    if (off) { animateTo({ x: 0, y: 0, s: 1, r: R0 }, 260, inOut, flyBack); tw.closing = true; } else flyBack();
+    if (off) { animateTo({ x: 0, y: 0, s: 1, r: R0 }, 220, inOut, flyBack); tw.closing = true; } else flyBack();
   }
 
   // ———— 窗口大小变了：框按新窗口重新适应，从原来的样子平滑挪过去 ————
@@ -387,7 +394,7 @@ export function openLightbox(items, n, { thumbOf = () => null, enabled = () => t
     else if (a === "rl" || a === "rr") rotate(a === "rr" ? 1 : -1); else if (a === "reset") reset();
   });
 
-  const api = { close: () => close(), step, zoom: zoomStep, rotate, reset, get video() { return it.video; }, el: stage, bar };
+  const api = { close: (instant, viaKey) => close(instant, viaKey), step, zoom: zoomStep, rotate, reset, get video() { return it.video; }, el: stage, bar };
   cur = api;
   return api;
 }
@@ -398,7 +405,7 @@ export function installLightbox() {
 document.addEventListener("keydown", (e) => {
   if (!cur || e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key;
-  if (k === "Escape") { e.preventDefault(); e.stopPropagation(); cur.close(); return; }
+  if (k === "Escape") { e.preventDefault(); e.stopPropagation(); cur.close(false, true); return; }
   if (cur.video && e.target.closest?.(".sn-player")) return;
   if ([" ", "PageUp", "PageDown", "Home", "End", "ArrowUp", "ArrowDown"].includes(k) && !e.target.closest?.(".sn-lb-bar")) { e.preventDefault(); return; } // 后面的页面不跟着滚
   if (k === "ArrowRight" || k === "ArrowLeft") { e.preventDefault(); cur.step(k === "ArrowRight" ? 1 : -1); }

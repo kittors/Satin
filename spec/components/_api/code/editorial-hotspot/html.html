@@ -61,7 +61,7 @@
   root?.querySelector(".sn-ed-pop-next")?.addEventListener("click", (e) => { e.stopPropagation(); pick(cur + 1); });
   root?.querySelector(".sn-ed-canvas-zoom")?.addEventListener("click", (e) => {
     e.stopPropagation();
-    openLightbox([{ bg: 'url("https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1000&q=84") center / cover', ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+    openLightbox([{ bg: 'url("https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=900&q=84") center / cover', ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvas });
   });
   canvas?.addEventListener("click", (e) => {
     if (e.target.closest(".sn-ed-pin, .sn-ed-pop, .sn-ed-canvas-zoom")) return;

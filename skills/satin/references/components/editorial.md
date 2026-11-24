@@ -884,7 +884,7 @@ export default function EditorialCompare() {
   root?.querySelector(".sn-ed-pop-next")?.addEventListener("click", (e) => { e.stopPropagation(); pick(cur + 1); });
   root?.querySelector(".sn-ed-canvas-zoom")?.addEventListener("click", (e) => {
     e.stopPropagation();
-    openLightbox([{ bg: 'url("https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1000&q=84") center / cover', ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+    openLightbox([{ bg: 'url("https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=900&q=84") center / cover', ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvas });
   });
   canvas?.addEventListener("click", (e) => {
     if (e.target.closest(".sn-ed-pin, .sn-ed-pop, .sn-ed-canvas-zoom")) return;
@@ -898,7 +898,7 @@ export default function EditorialCompare() {
 React 的写法：
 
 ```tsx
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { Icon } from "satin-ui/react";
 import { openLightbox } from "satin-ui";
 
@@ -911,13 +911,14 @@ const SPOTS = [
 
 export default function EditorialHotspot() {
   const [active, setActive] = useState<number | null>(0);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const cur = SPOTS[active ?? 0];
   const next = () => setActive(((active ?? 0) + 1) % SPOTS.length);
-  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasRef.current });
 
   return (
     <section className="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-      <div className="sn-ed-canvas" onClick={() => setActive(null)}>
+      <div ref={canvasRef} className="sn-ed-canvas" onClick={() => setActive(null)}>
         <img src={IMG} alt="夜色街道与雨幕高光剖析帧" decoding="async" />
         <button type="button" className="sn-ed-canvas-zoom" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" onClick={(e) => { e.stopPropagation(); openFull(); }}><Icon name="maximize-2" /></button>
         {SPOTS.map((s, i) => (
@@ -962,14 +963,15 @@ const SPOTS = [
 ] as const;
 
 const active = ref<number | null>(0);
+const canvasRef = ref<HTMLDivElement | null>(null);
 const cur = computed(() => SPOTS[active.value ?? 0]);
 const next = () => { active.value = ((active.value ?? 0) + 1) % SPOTS.length; };
-const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasRef.value });
 </script>
 
 <template>
   <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-    <div class="sn-ed-canvas" @click="active = null">
+    <div ref="canvasRef" class="sn-ed-canvas" @click="active = null">
       <img :src="IMG" alt="夜色街道与雨幕高光剖析帧" decoding="async" />
       <button type="button" class="sn-ed-canvas-zoom" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" @click.stop="openFull"><Icon name="maximize-2" /></button>
       <button v-for="(s, i) in SPOTS" :key="s.title" type="button" class="sn-ed-pin" :class="{ 'sn-on': active === i }" :style="{ '--sn-x': s.x + '%', '--sn-y': s.y + '%' }" :aria-label="s.label" :aria-pressed="active === i" @click.stop="active = i" />
@@ -1007,15 +1009,16 @@ Svelte 的写法：
   ] as const;
 
   let active = $state<number | null>(0);
+  let canvasEl: HTMLDivElement | undefined = $state();
   const cur = $derived(SPOTS[active ?? 0]);
   const next = () => { active = ((active ?? 0) + 1) % SPOTS.length; };
-  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasEl ?? null });
 </script>
 
 <sn-enhance>
   <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
     <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-    <div class="sn-ed-canvas" onclick={() => (active = null)}>
+    <div bind:this={canvasEl} class="sn-ed-canvas" onclick={() => (active = null)}>
       <img src={IMG} alt="夜色街道与雨幕高光剖析帧" decoding="async" />
       <button type="button" class="sn-ed-canvas-zoom" data-i="maximize-2" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" onclick={(e) => { e.stopPropagation(); openFull(); }}></button>
       {#each SPOTS as s, i (s.title)}
@@ -1047,7 +1050,7 @@ Svelte 的写法：
 Angular 的写法：
 
 ```ts
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, signal, ViewChild } from "@angular/core";
 import { openLightbox } from "satin-ui";
 
 const IMG = "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1200&h=675&q=84";
@@ -1058,7 +1061,7 @@ const IMG = "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=f
   template: `
     <sn-enhance>
       <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-        <div class="sn-ed-canvas" (click)="active.set(null)">
+        <div #canvas class="sn-ed-canvas" (click)="active.set(null)">
           <img [src]="img" alt="夜色街道与雨幕高光剖析帧" decoding="async">
           <button type="button" class="sn-ed-canvas-zoom" data-i="maximize-2" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" (click)="openFull($event)"></button>
           @for (s of spots; track s.title; let i = $index) {
@@ -1087,6 +1090,7 @@ const IMG = "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=f
   `,
 })
 export class EditorialHotspotComponent {
+  @ViewChild("canvas") canvasRef?: ElementRef<HTMLDivElement>;
   protected img = IMG;
   protected spots = [
     { x: 24, y: 74, align: "left", side: "above", short: "冷雨反射", label: "标注 01：5200K 冷雨积水反射", title: "5200K 冷雨积水反射", desc: "浅积水承接钠灯冷白反光并压低高光饱和度，与远景 3400K 暖灯拉开冷暖纵深。" },
@@ -1097,7 +1101,7 @@ export class EditorialHotspotComponent {
   protected cur = computed(() => this.spots[this.active() ?? 0]);
   pick(i: number, e: Event) { e.stopPropagation(); this.active.set(i); }
   next() { this.active.set(((this.active() ?? 0) + 1) % this.spots.length); }
-  openFull(e: Event) { e.stopPropagation(); openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0); }
+  openFull(e: Event) { e.stopPropagation(); openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => this.canvasRef?.nativeElement ?? null }); }
 }
 ```
 
@@ -1116,14 +1120,15 @@ const SPOTS = [
 
 export default function EditorialHotspot() {
   const [active, setActive] = createSignal<number | null>(0);
+  let canvasEl!: HTMLDivElement;
   const cur = () => SPOTS[active() ?? 0];
   const next = () => setActive(((active() ?? 0) + 1) % SPOTS.length);
-  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasEl });
 
   return (
     <sn-enhance>
       <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-        <div class="sn-ed-canvas" onClick={() => setActive(null)}>
+        <div ref={canvasEl} class="sn-ed-canvas" onClick={() => setActive(null)}>
           <img src={IMG} alt="夜色街道与雨幕高光剖析帧" decoding="async" />
           <button type="button" class="sn-ed-canvas-zoom" data-i="maximize-2" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" onClick={(e) => { e.stopPropagation(); openFull(); }}></button>
           <For each={SPOTS}>
@@ -1160,7 +1165,7 @@ export default function EditorialHotspot() {
 Preact 的写法：
 
 ```tsx
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { Icon } from "satin-ui/react";
 import { openLightbox } from "satin-ui";
 
@@ -1173,13 +1178,14 @@ const SPOTS = [
 
 export default function EditorialHotspot() {
   const [active, setActive] = useState<number | null>(0);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const cur = SPOTS[active ?? 0];
   const next = () => setActive(((active ?? 0) + 1) % SPOTS.length);
-  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasRef.current });
 
   return (
     <section className="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-      <div className="sn-ed-canvas" onClick={() => setActive(null)}>
+      <div ref={canvasRef} className="sn-ed-canvas" onClick={() => setActive(null)}>
         <img src={IMG} alt="夜色街道与雨幕高光剖析帧" decoding="async" />
         <button type="button" className="sn-ed-canvas-zoom" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" onClick={(e) => { e.stopPropagation(); openFull(); }}><Icon name="maximize-2" /></button>
         {SPOTS.map((s, i) => (

@@ -9,15 +9,16 @@
   ] as const;
 
   let active = $state<number | null>(0);
+  let canvasEl: HTMLDivElement | undefined = $state();
   const cur = $derived(SPOTS[active ?? 0]);
   const next = () => { active = ((active ?? 0) + 1) % SPOTS.length; };
-  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasEl ?? null });
 </script>
 
 <sn-enhance>
   <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
     <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-    <div class="sn-ed-canvas" onclick={() => (active = null)}>
+    <div bind:this={canvasEl} class="sn-ed-canvas" onclick={() => (active = null)}>
       <img src={IMG} alt="夜色街道与雨幕高光剖析帧" decoding="async" />
       <button type="button" class="sn-ed-canvas-zoom" data-i="maximize-2" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" onclick={(e) => { e.stopPropagation(); openFull(); }}></button>
       {#each SPOTS as s, i (s.title)}

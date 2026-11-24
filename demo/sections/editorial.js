@@ -10,11 +10,11 @@
 import { openLightbox, openDialog, toast, optimistic, copied, createSegmented, createNumberFlow, createAudio, createPlayer, createScrollArea } from "../../packages/satin-ui/src/components.js";
 
 const GALLERY = [
-  { src: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=1600&h=1000&q=84", alt: "图 01 · 站前广场雨后倒影（5200K 定调）" },
-  { src: "https://images.unsplash.com/photo-1554103577-c0d26e9b90e0?auto=format&fit=crop&w=1600&h=1000&q=84", alt: "图 02 · 候车厅暖光实景参考（3400K）" },
-  { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1000&q=84", alt: "图 03 · 站台九盏灯长镜头参考" },
-  { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=1000&q=84", alt: "镜头 08 · 雨夜街道构图与光位剖析" },
-  { src: "https://images.unsplash.com/photo-1541702467897-41915a07d3a7?auto=format&fit=crop&w=1600&h=1000&q=84", alt: "镜 09 · 车灯切过侧脸的 1.4 秒停顿" },
+  { src: "https://images.unsplash.com/photo-1516900557549-41557d405adf?auto=format&fit=crop&w=1600&h=900&q=84", ratio: 16 / 9, alt: "图 01 · 站前广场雨后倒影（5200K 定调）" },
+  { src: "https://images.unsplash.com/photo-1554103577-c0d26e9b90e0?auto=format&fit=crop&w=1600&h=1000&q=84", ratio: 16 / 10, alt: "图 02 · 候车厅暖光实景参考（3400K）" },
+  { src: "https://images.unsplash.com/photo-1576514864427-f0809d2b66eb?auto=format&fit=crop&w=1600&h=1000&q=84", ratio: 16 / 10, alt: "图 03 · 站台九盏灯长镜头参考" },
+  { src: "https://images.unsplash.com/photo-1589803196988-17b417281773?auto=format&fit=crop&w=1600&h=900&q=84", ratio: 16 / 9, alt: "镜头 08 · 雨夜街道构图与光位剖析" },
+  { src: "https://images.unsplash.com/photo-1541702467897-41915a07d3a7?auto=format&fit=crop&w=1600&h=1000&q=84", ratio: 16 / 10, alt: "镜 09 · 车灯切过侧脸的 1.4 秒停顿" },
 ];
 
 const HOTSPOTS = [
@@ -30,11 +30,29 @@ export function initEditorial({ $, $$ }) {
   const sec = $("#editorial");
   if (!sec) return;
 
-  // 1. 显式放大按钮呼出 Satin Lightbox（绝不与热点或拉帘产生误触冲突）
-  const lbItems = GALLERY.map((it) => ({ bg: `url("${it.src}") center / cover`, ratio: 16 / 10, alt: it.alt }));
+  // 1. 显式放大按钮呼出 Satin Lightbox（精准锚定图片画框本身：不含底部文字、100% 完整命中 seenPart、自动取内含 <img> 垫底零空框闪烁，翻页关闭也能精准飞回对应缩略图）
+  const lbItems = GALLERY.map((it) => ({ bg: `url("${it.src}") center / cover`, ratio: it.ratio, alt: it.alt }));
+  const frameOfTrigger = (el) => {
+    const shot = el?.closest(".sn-ed-shot");
+    if (shot) return shot.querySelector(".sn-ed-shot-img");
+    const fig = el?.closest(".sn-ed-fig-img");
+    if (fig) return fig;
+    const stage = el?.closest(".sn-ed-stage");
+    if (stage) return stage.querySelector(".sn-ed-compare");
+    const can = el?.closest(".sn-ed-canvas");
+    if (can) return can;
+    return null;
+  };
+  const defaultThumbs = [
+    () => sec.querySelector("#edCompare"),
+    () => sec.querySelector('[data-ed-open="1"].sn-ed-fig-img') || sec.querySelector('[data-ed-open="1"] .sn-ed-shot-img'),
+    () => sec.querySelector('[data-ed-open="2"].sn-ed-fig-img') || sec.querySelector('[data-ed-open="2"] .sn-ed-shot-img'),
+    () => sec.querySelector("#edInspect"),
+    () => sec.querySelector('[data-ed-open="4"] .sn-ed-shot-img'),
+  ];
   const openGallery = (idx, trigger) => {
-    const thumb = trigger?.closest(".sn-ed-shot, .sn-ed-fig-img") || trigger?.closest(".sn-ed-stage")?.querySelector(".sn-ed-compare") || trigger?.closest(".sn-ed-canvas") || trigger;
-    openLightbox(lbItems, idx, { thumbOf: (i) => (i === idx ? thumb : null) });
+    const originFrame = frameOfTrigger(trigger);
+    openLightbox(lbItems, idx, { thumbOf: (i) => (i === idx && originFrame ? originFrame : defaultThumbs[i]?.() || null) });
   };
   for (const btn of $$("[data-ed-open]", sec)) {
     btn.addEventListener("click", (e) => {

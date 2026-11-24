@@ -10,14 +10,15 @@ const SPOTS = [
 
 export default function EditorialHotspot() {
   const [active, setActive] = createSignal<number | null>(0);
+  let canvasEl!: HTMLDivElement;
   const cur = () => SPOTS[active() ?? 0];
   const next = () => setActive(((active() ?? 0) + 1) % SPOTS.length);
-  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+  const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasEl });
 
   return (
     <sn-enhance>
       <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-        <div class="sn-ed-canvas" onClick={() => setActive(null)}>
+        <div ref={canvasEl} class="sn-ed-canvas" onClick={() => setActive(null)}>
           <img src={IMG} alt="夜色街道与雨幕高光剖析帧" decoding="async" />
           <button type="button" class="sn-ed-canvas-zoom" data-i="maximize-2" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" onClick={(e) => { e.stopPropagation(); openFull(); }}></button>
           <For each={SPOTS}>

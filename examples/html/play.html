@@ -43,7 +43,7 @@ if (slug && /^[a-z0-9-]+$/.test(slug)) {
   box.append(tp.content);
   for (const s of scripts) run(box, s.textContent);
 }
-const send = () => parent.postMessage({ satinEmbed: slug, h: Math.ceil(box.getBoundingClientRect().bottom) }, location.origin);
+const send = () => parent.postMessage({ satinEmbed: slug, h: Math.ceil(box.offsetHeight) }, location.origin);
 new ResizeObserver(send).observe(box); send();
 document.documentElement.dataset.ready = "1";
 </script>

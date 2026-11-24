@@ -11,14 +11,15 @@ const SPOTS = [
 ] as const;
 
 const active = ref<number | null>(0);
+const canvasRef = ref<HTMLDivElement | null>(null);
 const cur = computed(() => SPOTS[active.value ?? 0]);
 const next = () => { active.value = ((active.value ?? 0) + 1) % SPOTS.length; };
-const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 10, alt: "夜色街道与雨幕高光剖析帧" }], 0);
+const openFull = () => openLightbox([{ bg: `url("${IMG}") center / cover`, ratio: 16 / 9, alt: "夜色街道与雨幕高光剖析帧" }], 0, { thumbOf: () => canvasRef.value });
 </script>
 
 <template>
   <section class="sn-ed-inspect" aria-label="雨夜构图与布光剖析">
-    <div class="sn-ed-canvas" @click="active = null">
+    <div ref="canvasRef" class="sn-ed-canvas" @click="active = null">
       <img :src="IMG" alt="夜色街道与雨幕高光剖析帧" decoding="async" />
       <button type="button" class="sn-ed-canvas-zoom" data-tip="全屏查看剖析帧" aria-label="全屏查看剖析帧" @click.stop="openFull"><Icon name="maximize-2" /></button>
       <button v-for="(s, i) in SPOTS" :key="s.title" type="button" class="sn-ed-pin" :class="{ 'sn-on': active === i }" :style="{ '--sn-x': s.x + '%', '--sn-y': s.y + '%' }" :aria-label="s.label" :aria-pressed="active === i" @click.stop="active = i" />
