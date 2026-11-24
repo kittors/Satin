@@ -99,7 +99,7 @@ export default {
     motion: [{ what: "拖拽悬停文件夹前盖 3D 掀开（-29deg）与纸张上浮", easing: "ease.outStrong", duration: "280ms" }, { what: "松手放入文件夹弹性吸入回弹与计数跳动", easing: "ease.spring", duration: "420ms" }],
   },
   examples: [
-    { slug: "files-basic", title: "拟物文件夹与全交互工作台", why: "体验拖拽文件移入拟物文件夹（悬停掀盖、放入多出微缩纸张与计数+1）、双击进入、拖回面包屑、右键新建/重命名/移动/删除与撤销，以及卡片/列表/树形三视图切换。", html: `<div id="files-basic"></div>`, code: code("files-basic") },
+    { slug: "files-basic", title: "拟物文件夹与全交互工作台", why: "体验通透实体拖拽移入拟物文件夹（悬停掀盖、吸入合盖并插进最前排新纸片）、轻点文件夹直接进入、空白处或卡片旁长按拖拉框选多选、右键菜单（新建/重命名/换色/移动/删除与撤销），以及卡片/列表/树形三视图切换。", html: `<div id="files-basic"></div>`, code: code("files-basic") },
     { slug: "files-lazy", title: "树形列表与远程目录懒加载", why: "默认树形列表视图：展开远程渲染农场目录异步加载 240 个镜头文件并自动启用虚拟滚动，同时支持切回卡片视图或右键整理。", html: `<div id="files-lazy"></div>`, code: code("files-lazy") },
   ],
 };

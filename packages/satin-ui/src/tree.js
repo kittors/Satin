@@ -3,7 +3,7 @@
 // · 全面复用 Satin 原生组件：scrollArea（悬浮细滚动条与边缘渐隐）、openMenu（右键菜单与二级子菜单）、initSeg（流体分段视图切换）、toast（撤销倒计时提示）、BOX/popCheck（三态复选框）
 // · 支持 PDF / Word / PPT / Vue / TSX / TXT / Markdown / 图片小图 / 视频首帧 / 音频 / 代码 全格式微缩内容呈现，拟物文件夹夹层真实随子内容动态变化
 import { icon } from "./icons.js";
-import { reduced, initSeg } from "./core.js";
+import { reduced, initSeg, retip } from "./core.js";
 import { scrollArea } from "./scroll.js";
 import { BOX, popCheck } from "./form.js";
 import { openMenu, closeMenu } from "./overlay.js";
@@ -343,7 +343,7 @@ export function treeHTML(o = {}) {
       + `</div>`
       + `<span class="sn-tree-stat" data-tr-stat></span>`
       + `<div class="sn-tree-acts">`
-      + `<button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-tr-exp="1" data-tip="${esc(tt("tree.3"))}" aria-label="${esc(tt("tree.3"))}">${icon("chevrons-up-down", 15)}</button>`
+      + `<button type="button" class="sn-btn sn-ghost sn-sm sn-ibtn" data-tr-exp="0" data-tip="${esc(tt("tree.3"))}" aria-label="${esc(tt("tree.3"))}" aria-pressed="false">${icon("chevrons-up-down", 15)}</button>`
       + `</div>`
       + `</div>`
     : "";
@@ -370,7 +370,14 @@ export const createTree = /* @__PURE__ */ defineComponent({
     const checked = new Set((opts.checked ?? opts.defaultChecked ?? []).map(String));
     const loadingIds = new Set();
     const errorIds = new Map();
-    let selectedId = opts.selected != null ? String(opts.selected) : opts.defaultSelected != null ? String(opts.defaultSelected) : null;
+    // 只有显式开启 selectable 或传入 selected/defaultSelected/activeStyle 时才呈现持续激活态；
+    // 否则（如复选树、纯目录浏览树）仅保留柔和 hover，不留无意义的持续灰底
+    const isSelectable = () => (opts.selectable !== undefined
+      ? !!opts.selectable
+      : (opts.selected !== undefined || opts.defaultSelected != null || opts.activeStyle !== undefined));
+    let selectedId = isSelectable()
+      ? (opts.selected != null ? String(opts.selected) : opts.defaultSelected != null ? String(opts.defaultSelected) : null)
+      : null;
     let focusId = selectedId;
     let query = "";
     let flat = [];
@@ -514,9 +521,33 @@ export const createTree = /* @__PURE__ */ defineComponent({
           : tt("tree.5", { p0: idx.total });
       }
       if (qWrap) qWrap.classList.toggle("sn-filled", !!query);
+      syncExpandAllBtn();
       lastWin = [-1, -1];
       renderWindow(true);
       sa.refresh();
+    }
+
+    function syncExpandAllBtn(overrideAllOpen) {
+      if (!expBtn) return;
+      let expandableCount = 0;
+      let expandedCount = 0;
+      for (const [id, rec] of idx.map) {
+        if (Array.isArray(rec.node.children) && rec.node.children.length > 0) {
+          expandableCount++;
+          if (expanded.has(id)) expandedCount++;
+        }
+      }
+      expBtn.hidden = expandableCount === 0;
+      const allOpen = overrideAllOpen !== undefined
+        ? !!overrideAllOpen
+        : (expandableCount > 0 && expandedCount >= expandableCount);
+      const nextState = allOpen ? "1" : "0";
+      const nextTip = allOpen ? tt("tree.4") : tt("tree.3");
+      expBtn.dataset.trExp = nextState;
+      expBtn.dataset.tip = nextTip;
+      expBtn.setAttribute("aria-label", nextTip);
+      expBtn.setAttribute("aria-pressed", String(allOpen));
+      retip(expBtn);
     }
 
     function rowMarkup(item, index) {
@@ -583,36 +614,60 @@ export const createTree = /* @__PURE__ */ defineComponent({
       renderedCount = end - start;
     }
 
-    function animateTreeExpand(parentId, prevIds, beforeRects) {
+    function animateTreeExpand(parentId, prevIds, beforeRects, pushedOutClones = null) {
       if (reduced()) return;
       const rows = [...rowsEl.querySelectorAll(".sn-tr")];
+      const nextIds = new Set(rows.map((el) => el.dataset.id));
+      // 虚拟树大展开（如展开 100 项）时，把被瞬间顶出视口外的原下方兄弟行做柔和下推淡出，视觉上真切感受到空间被推开
+      if (pushedOutClones && pushedOutClones.length) {
+        const ghostWrap = document.createElement("div");
+        ghostWrap.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:0;";
+        let kept = 0;
+        for (const item of pushedOutClones) {
+          if (nextIds.has(item.id)) continue;
+          kept++;
+          const g = item.clone;
+          ghostWrap.append(g);
+          const base = item.base;
+          g.animate(
+            [
+              { opacity: 1, transform: base || "none" },
+              { opacity: 0, transform: base ? `${base} translate3d(0,40px,0)` : "translate3d(0,40px,0)" },
+            ],
+            { duration: 190, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
+          );
+        }
+        if (kept) {
+          space.append(ghostWrap);
+          setTimeout(() => ghostWrap.remove(), 210);
+        }
+      }
       let addedSeq = 0;
       for (const el of rows) {
         const id = el.dataset.id;
         if (id === parentId) {
-          el.querySelector(".sn-tr-tw .sn-ic")?.animate([{ rotate: "0deg" }, { rotate: "90deg" }], { duration: 190, easing: "cubic-bezier(.22, 1, .36, 1)" });
+          el.querySelector(".sn-tr-tw .sn-ic")?.animate([{ rotate: "0deg" }, { rotate: "90deg" }], { duration: 195, easing: "cubic-bezier(.22, 1, .36, 1)" });
           continue;
         }
+        const base = isVirt ? (el.style.transform || "") : "";
         if (!prevIds.has(id)) {
-          const delay = Math.min(addedSeq++, 8) * 16;
-          if (isVirt) {
-            const base = el.style.transform || "";
-            el.animate(
-              [{ opacity: 0, transform: `${base} translate3d(0,-7px,0)` }, { opacity: 1, transform: base }],
-              { duration: 210, delay, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
-            );
-          } else {
-            el.animate(
-              [{ opacity: 0, transform: "translate3d(0,-7px,0)" }, { opacity: 1, transform: "none" }],
-              { duration: 210, delay, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
-            );
-          }
-        } else if (!isVirt && beforeRects.has(id)) {
+          const delay = Math.min(addedSeq++, 9) * 16;
+          el.animate(
+            [
+              { opacity: 0, transform: base ? `${base} translate3d(0,-14px,0)` : "translate3d(0,-14px,0)" },
+              { opacity: 1, transform: base || "none" },
+            ],
+            { duration: 220, delay, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
+          );
+        } else if (beforeRects.has(id)) {
           const dy = beforeRects.get(id) - el.getBoundingClientRect().top;
           if (Math.abs(dy) > 0.5) {
             el.animate(
-              [{ transform: `translate3d(0,${dy}px,0)` }, { transform: "none" }],
-              { duration: 230, easing: "cubic-bezier(.22, 1, .36, 1)" }
+              [
+                { transform: base ? `${base} translate3d(0,${dy}px,0)` : `translate3d(0,${dy}px,0)` },
+                { transform: base || "none" },
+              ],
+              { duration: 240, easing: "cubic-bezier(.22, 1, .36, 1)" }
             );
           }
         }
@@ -633,34 +688,50 @@ export const createTree = /* @__PURE__ */ defineComponent({
         closing.push(rows[i]);
       }
       if (!closing.length) { commit(); return; }
+      const beforeIds = new Set(rows.map((el) => el.dataset.id));
       const below = rows.slice(i);
       const collapseH = Math.min(closing.length * rowH(), (vp.clientHeight || 360) + rowH() * 2);
       parentEl.classList.remove("sn-open");
       parentEl.setAttribute("aria-expanded", "false");
       for (const el of closing) {
-        if (isVirt) {
-          const base = el.style.transform || "";
-          el.animate(
-            [{ opacity: 1, transform: base }, { opacity: 0, transform: `${base} translate3d(0,-6px,0)` }],
-            { duration: 165, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
-          );
-        } else {
-          el.animate(
-            [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translate3d(0,-6px,0)" }],
-            { duration: 165, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
-          );
-        }
+        const base = isVirt ? (el.style.transform || "") : "";
+        el.animate(
+          [
+            { opacity: 1, transform: base || "none" },
+            { opacity: 0, transform: base ? `${base} translate3d(0,-10px,0)` : "translate3d(0,-10px,0)" },
+          ],
+          { duration: 165, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
+        );
       }
-      if (!isVirt) {
-        for (const el of below) {
-          el.animate(
-            [{ transform: "none" }, { transform: `translate3d(0,${-collapseH}px,0)` }],
-            { duration: 175, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
-          );
-        }
+      for (const el of below) {
+        const base = isVirt ? (el.style.transform || "") : "";
+        el.animate(
+          [
+            { transform: base || "none" },
+            { transform: base ? `${base} translate3d(0,${-collapseH}px,0)` : `translate3d(0,${-collapseH}px,0)` },
+          ],
+          { duration: 175, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
+        );
       }
       clearTimeout(collapseTimer);
-      collapseTimer = setTimeout(commit, 170);
+      collapseTimer = setTimeout(() => {
+        commit();
+        // 虚拟树收起大量子节点后，新顶入视口的下方兄弟行顺滑上浮补位（不再瞬间硬闪现）
+        if (!reduced()) {
+          let seq = 0;
+          for (const el of rowsEl.querySelectorAll(".sn-tr")) {
+            if (beforeIds.has(el.dataset.id)) continue;
+            const base = isVirt ? (el.style.transform || "") : "";
+            el.animate(
+              [
+                { opacity: 0, transform: base ? `${base} translate3d(0,18px,0)` : "translate3d(0,18px,0)" },
+                { opacity: 1, transform: base || "none" },
+              ],
+              { duration: 210, delay: Math.min(seq++, 8) * 12, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
+            );
+          }
+        }
+      }, 170);
     }
 
     async function toggleExpand(id, wantOpen) {
@@ -681,11 +752,18 @@ export const createTree = /* @__PURE__ */ defineComponent({
       const captureBefore = () => {
         const prevIds = new Set();
         const beforeRects = new Map();
-        for (const el of rowsEl.querySelectorAll(".sn-tr")) {
+        const pushedOutClones = [];
+        const domRows = [...rowsEl.querySelectorAll(".sn-tr")];
+        const pi = domRows.findIndex((el) => el.dataset.id === id);
+        for (let k = 0; k < domRows.length; k++) {
+          const el = domRows[k];
           prevIds.add(el.dataset.id);
           beforeRects.set(el.dataset.id, el.getBoundingClientRect().top);
+          if (isVirt && pi >= 0 && k > pi && pushedOutClones.length < 12) {
+            pushedOutClones.push({ id: el.dataset.id, clone: el.cloneNode(true), base: el.style.transform || "" });
+          }
         }
-        return { prevIds, beforeRects };
+        return { prevIds, beforeRects, pushedOutClones };
       };
       if ((!Array.isArray(node.children) || !node.children.length) && node.hasChildren && typeof opts.loadChildren === "function") {
         if (loadingIds.has(id)) return;
@@ -700,7 +778,7 @@ export const createTree = /* @__PURE__ */ defineComponent({
           node.hasChildren = node.children.length > 0;
           expanded.add(id);
           rebuildFlat();
-          animateTreeExpand(id, before.prevIds, before.beforeRects);
+          animateTreeExpand(id, before.prevIds, before.beforeRects, before.pushedOutClones);
           emit("expand", { id, expanded: true, node, expandedIds: [...expanded] });
         } catch (e) {
           loadingIds.delete(id);
@@ -712,25 +790,30 @@ export const createTree = /* @__PURE__ */ defineComponent({
       const before = captureBefore();
       expanded.add(id);
       rebuildFlat();
-      animateTreeExpand(id, before.prevIds, before.beforeRects);
+      animateTreeExpand(id, before.prevIds, before.beforeRects, before.pushedOutClones);
       emit("expand", { id, expanded: true, node, expandedIds: [...expanded] });
     }
 
     function syncRowSelectionClasses() {
+      const canSel = isSelectable();
       for (const el of rowsEl.querySelectorAll(".sn-tr")) {
         const rid = el.dataset.id;
-        const isSel = selectedId === rid;
+        const isSel = canSel && selectedId === rid;
         el.classList.toggle("sn-sel", isSel);
         el.classList.toggle("sn-tr-focus", focusId === rid);
         el.setAttribute("aria-selected", String(isSel));
       }
     }
 
-    function setSelect(id, focus = false) {
+    function setSelect(id, focus = false, forceVisual = false) {
       const rec = id != null ? idx.map.get(String(id)) : null;
       if (rec?.node?.disabled) return;
-      selectedId = rec ? rec.id : null;
-      if (focus || selectedId) focusId = selectedId;
+      if (isSelectable() || forceVisual) {
+        selectedId = rec ? rec.id : null;
+      } else {
+        selectedId = null;
+      }
+      if (focus || rec) focusId = rec ? rec.id : null;
       syncRowSelectionClasses();
       if (rec) emit("select", { id: rec.id, node: rec.node });
     }
@@ -839,7 +922,13 @@ export const createTree = /* @__PURE__ */ defineComponent({
       if (chk) { e.stopPropagation(); toggleCheck(chk.dataset.trChk, chk.querySelector(".sn-box")); return; }
       const row = e.target.closest(".sn-tr");
       if (!row) return;
-      setSelect(row.dataset.id, true);
+      const rid = row.dataset.id;
+      const rec = idx.map.get(rid);
+      if (!isSelectable() && rec && !rec.node.disabled) {
+        const hasCh = (Array.isArray(rec.node.children) && rec.node.children.length > 0) || !!rec.node.hasChildren;
+        if (hasCh) toggleExpand(rid);
+      }
+      setSelect(rid, true);
       vp.focus({ preventScroll: true });
     });
 
@@ -987,9 +1076,8 @@ export const createTree = /* @__PURE__ */ defineComponent({
     if (clrBtn) clrBtn.addEventListener("click", () => { query = ""; if (qInput) { qInput.value = ""; qInput.focus(); } vp.scrollTop = 0; rebuildFlat(); });
     if (expBtn) {
       expBtn.addEventListener("click", () => {
-        const allOpen = expBtn.dataset.trExp === "0";
+        const allOpen = expBtn.dataset.trExp === "1";
         api.expandAll(!allOpen);
-        expBtn.dataset.trExp = allOpen ? "1" : "0";
       });
     }
 
@@ -998,13 +1086,142 @@ export const createTree = /* @__PURE__ */ defineComponent({
     const api = {
       expand(id, open) { return toggleExpand(String(id), open); },
       expandAll(open = true) {
-        expanded.clear();
-        if (open) {
-          for (const [id, rec] of idx.map) {
-            if (Array.isArray(rec.node.children) && rec.node.children.length) expanded.add(id);
+        clearTimeout(collapseTimer);
+        if (!open) {
+          const domRows = [...rowsEl.querySelectorAll(".sn-tr")];
+          const closing = domRows.filter((el) => Number(el.dataset.depth || 0) > 0);
+          const beforeIds = new Set(domRows.map((el) => el.dataset.id));
+          const commitCollapse = () => {
+            expanded.clear();
+            rebuildFlat();
+            if (!reduced()) {
+              let seq = 0;
+              for (const el of rowsEl.querySelectorAll(".sn-tr")) {
+                if (beforeIds.has(el.dataset.id)) continue;
+                const base = isVirt ? (el.style.transform || "") : "";
+                el.animate(
+                  [
+                    { opacity: 0, transform: base ? `${base} translate3d(0,14px,0)` : "translate3d(0,14px,0)" },
+                    { opacity: 1, transform: base || "none" },
+                  ],
+                  { duration: 205, delay: Math.min(seq++, 8) * 12, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
+                );
+              }
+            }
+          };
+          if (reduced() || !closing.length) {
+            commitCollapse();
+            return;
+          }
+          // 先即刻同步按钮图标形变与 Tooltip 文字，再优雅播放全部收起微动效
+          syncExpandAllBtn(false);
+          let seenClosing = 0;
+          for (const el of domRows) {
+            const depth = Number(el.dataset.depth || 0);
+            const base = isVirt ? (el.style.transform || "") : "";
+            if (depth > 0) {
+              seenClosing++;
+              el.animate(
+                [
+                  { opacity: 1, transform: base || "none" },
+                  { opacity: 0, transform: base ? `${base} translate3d(0,-10px,0)` : "translate3d(0,-10px,0)" },
+                ],
+                { duration: 155, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
+              );
+            } else {
+              if (el.classList.contains("sn-open")) {
+                el.classList.remove("sn-open");
+                el.setAttribute("aria-expanded", "false");
+              }
+              if (seenClosing > 0) {
+                const shift = Math.min(seenClosing * rowH(), (vp.clientHeight || 360) + rowH());
+                el.animate(
+                  [
+                    { transform: base || "none" },
+                    { transform: base ? `${base} translate3d(0,${-shift}px,0)` : `translate3d(0,${-shift}px,0)` },
+                  ],
+                  { duration: 165, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
+                );
+              }
+            }
+          }
+          collapseTimer = setTimeout(commitCollapse, 160);
+          return;
+        }
+
+        const prevOpenIds = new Set(expanded);
+        const prevIds = new Set();
+        const beforeRects = new Map();
+        const pushedOutClones = [];
+        const domRows = [...rowsEl.querySelectorAll(".sn-tr")];
+        for (let k = 0; k < domRows.length; k++) {
+          const el = domRows[k];
+          prevIds.add(el.dataset.id);
+          beforeRects.set(el.dataset.id, el.getBoundingClientRect().top);
+          if (isVirt && k > 0 && pushedOutClones.length < 12) {
+            pushedOutClones.push({ id: el.dataset.id, clone: el.cloneNode(true), base: el.style.transform || "" });
           }
         }
+        expanded.clear();
+        for (const [id, rec] of idx.map) {
+          if (Array.isArray(rec.node.children) && rec.node.children.length) expanded.add(id);
+        }
         rebuildFlat();
+        if (!reduced()) {
+          const nextRows = [...rowsEl.querySelectorAll(".sn-tr")];
+          const nextIds = new Set(nextRows.map((el) => el.dataset.id));
+          if (pushedOutClones.length) {
+            const ghostWrap = document.createElement("div");
+            ghostWrap.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:0;";
+            let kept = 0;
+            for (const item of pushedOutClones) {
+              if (nextIds.has(item.id)) continue;
+              kept++;
+              const g = item.clone;
+              ghostWrap.append(g);
+              const base = item.base;
+              g.animate(
+                [
+                  { opacity: 1, transform: base || "none" },
+                  { opacity: 0, transform: base ? `${base} translate3d(0,36px,0)` : "translate3d(0,36px,0)" },
+                ],
+                { duration: 185, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
+              );
+            }
+            if (kept) {
+              space.append(ghostWrap);
+              setTimeout(() => ghostWrap.remove(), 205);
+            }
+          }
+          let seq = 0;
+          for (const el of nextRows) {
+            const id = el.dataset.id;
+            const base = isVirt ? (el.style.transform || "") : "";
+            if (el.classList.contains("sn-open") && !prevOpenIds.has(id)) {
+              el.querySelector(".sn-tr-tw .sn-ic")?.animate([{ rotate: "0deg" }, { rotate: "90deg" }], { duration: 195, easing: "cubic-bezier(.22, 1, .36, 1)" });
+            }
+            if (!prevIds.has(id)) {
+              el.animate(
+                [
+                  { opacity: 0, transform: base ? `${base} translate3d(0,-12px,0)` : "translate3d(0,-12px,0)" },
+                  { opacity: 1, transform: base || "none" },
+                ],
+                { duration: 215, delay: Math.min(seq++, 9) * 15, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
+              );
+            } else if (beforeRects.has(id)) {
+              const dy = beforeRects.get(id) - el.getBoundingClientRect().top;
+              if (Math.abs(dy) > 0.5) {
+                el.animate(
+                  [
+                    { transform: base ? `${base} translate3d(0,${dy}px,0)` : `translate3d(0,${dy}px,0)` },
+                    { transform: base || "none" },
+                  ],
+                  { duration: 230, easing: "cubic-bezier(.22, 1, .36, 1)" }
+                );
+              }
+            }
+          }
+        }
       },
       filter(q) {
         query = String(q ?? "");
@@ -1012,7 +1229,7 @@ export const createTree = /* @__PURE__ */ defineComponent({
         vp.scrollTop = 0;
         rebuildFlat();
       },
-      select(id) { setSelect(id, false); },
+      select(id) { setSelect(id, false, true); },
       setItems(nextItems) { data = cloneTree(nextItems); rebuildFlat(); },
       getVisibleCount() { return flat.length; },
       getRenderedCount() { return renderedCount; },
@@ -1122,6 +1339,9 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
     let moveTimer = 0;
     let deleting = false;
     let suppressNextClick = false;
+    let canceledByEsc = false;
+    let lastNavAt = 0;
+    let ctxTargetId = null;
     const undoStack = [];
 
     for (const n of data.slice(0, 2)) {
@@ -1177,25 +1397,40 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
     function captureRects() {
       const m = new Map();
       if (reduced() || (view === "tree" && treeVirt)) return m;
+      const sr = stageEl.getBoundingClientRect();
       for (const el of stageEl.querySelectorAll("[data-fx-id]")) {
-        m.set(el.dataset.fxId, el.getBoundingClientRect());
+        const r = el.getBoundingClientRect();
+        m.set(el.dataset.fxId, { left: r.left - sr.left, top: r.top - sr.top, width: r.width, height: r.height });
       }
       return m;
     }
 
-    function playFlip(beforeRects) {
+    function playFlip(beforeRects, skipId = null) {
       if (!beforeRects || !beforeRects.size || reduced() || (view === "tree" && treeVirt)) return;
+      const sr = stageEl.getBoundingClientRect();
       for (const el of stageEl.querySelectorAll("[data-fx-id]")) {
+        if (skipId && el.dataset.fxId === skipId) continue;
         const old = beforeRects.get(el.dataset.fxId);
         if (!old || el.classList.contains("sn-fex-fresh")) continue;
-        const cur = el.getBoundingClientRect();
-        const dx = old.left - cur.left, dy = old.top - cur.top;
-        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        const r = el.getBoundingClientRect();
+        const dx = old.left - (r.left - sr.left), dy = old.top - (r.top - sr.top);
+        if (Math.abs(dx) <= 0.5 && Math.abs(dy) <= 0.5) continue;
+        // 卡片视图跨行折返补位（从下一行左侧折回上一行最右列）：柔和从右侧淡滑入位，避免对角线斜穿屏幕盖住其他卡片
+        if (view === "card" && Math.abs(dy) > 24 && Math.abs(dx) > old.width * 1.4) {
+          const sign = dx < 0 ? 1 : -1;
           el.animate(
-            [{ transform: `translate3d(${dx}px,${dy}px,0)` }, { transform: "none" }],
-            { duration: 260, easing: "cubic-bezier(.22, 1, .36, 1)" }
+            [
+              { opacity: 0.25, transform: `translate3d(${sign * 16}px,0,0) scale(.97)` },
+              { opacity: 1, transform: "none" },
+            ],
+            { duration: 230, easing: "cubic-bezier(.22, 1, .36, 1)" }
           );
+          continue;
         }
+        el.animate(
+          [{ transform: `translate3d(${dx}px,${dy}px,0)` }, { transform: "none" }],
+          { duration: 250, easing: "cubic-bezier(.22, 1, .36, 1)" }
+        );
       }
     }
 
@@ -1379,22 +1614,23 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
     }
 
     let lastVisibleCount = 0;
+    // 唯一统一的选中模型：凡已选中（selected.size > 0）必与复选框打勾、柔选底、底栏计数及悬浮批量操作胶囊四位一体 100% 同步，
+    // 平时常规态 0 持续灰底，仅保留柔和 hover，彻底消灭“无勾假灰底”的认知割裂
     function syncSelectionUI() {
       const visIds = visibleItemIds();
       const selCount = selected.size;
-      if (selCount === 0) multiMode = false;
-      const showChecks = selCount >= 2 || (multiMode && selCount >= 1);
+      const showChecks = selCount > 0;
+      multiMode = showChecks;
       root.classList.toggle("sn-selecting", showChecks);
       root.classList.toggle("sn-has-batch", showChecks);
 
       for (const el of stageEl.querySelectorAll("[data-fx-id]")) {
         const isSel = selected.has(el.dataset.fxId);
-        const isChk = showChecks && isSel;
         el.classList.toggle("sn-sel", isSel);
         const chk = el.querySelector("[data-fx-chk]");
         if (chk) {
-          chk.classList.toggle("sn-on", isChk);
-          chk.setAttribute("aria-pressed", String(isChk));
+          chk.classList.toggle("sn-on", isSel);
+          chk.setAttribute("aria-pressed", String(isSel));
         }
       }
 
@@ -1463,7 +1699,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       const { id, node, depth, fdr, hasCh, expanded: isExp, loading, guides } = it;
       const k = kindOf(node);
       const isSel = selected.has(id);
-      const isChk = (selected.size >= 2 || multiMode) && isSel;
+      const isChk = isSel;
       const isFresh = freshIds.has(id);
       const cnt = fdr ? (Array.isArray(node.children) ? node.children.length : 0) : 0;
       const guidesHtml = depth > 0
@@ -1562,10 +1798,14 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
                 if (k === "audio" && node.duration) return sz !== "—" ? `${sz} · ${node.duration}` : node.duration;
                 return sz !== "—" ? sz : tt(KIND_LABEL_KEY[k] || "tree.34");
               })();
-          const cls = ["sn-fex-tile", isSel ? "sn-sel" : "", isDropped ? "sn-fdr-dropped" : "", isFresh ? "sn-fex-fresh" : ""].filter(Boolean).join(" ");
-          const isChk = (selected.size >= 2 || multiMode) && isSel;
+          const tint = fdr ? resolveFolderColor(node.color) : "";
+          const cls = ["sn-fex-tile", isSel ? "sn-sel" : "", tint ? "sn-fex-tinted" : "", isDropped ? "sn-fdr-dropped" : "", isFresh ? "sn-fex-fresh" : ""].filter(Boolean).join(" ");
+          const isChk = isSel;
           const stVal = isFresh ? freshSeq++ : enterStagger ? Math.min(itemIdx, 9) : -1;
-          const st = stVal >= 0 ? ` style="--sn-stagger:${stVal}"` : "";
+          const styleParts = [];
+          if (stVal >= 0) styleParts.push(`--sn-stagger:${stVal}`);
+          if (tint) styleParts.push(`--sn-fdr-tint:${esc(tint)}`);
+          const st = styleParts.length ? ` style="${styleParts.join(";")}"` : "";
           const chkHtml = `<button type="button" class="sn-check sn-fex-chk${isChk ? " sn-on" : ""}" data-fx-chk="${esc(id)}" tabindex="-1" aria-pressed="${isChk}" aria-label="${esc(tt("tree.80", { p0: node.name }))}">${BOX}</button>`;
           return `<div class="${cls}" tabindex="0" data-fx-id="${esc(id)}" data-folder="${fdr ? "1" : "0"}" data-kind="${esc(kindOf(node))}"${st}>`
             + chkHtml
@@ -1582,7 +1822,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
           const isFresh = freshIds.has(id);
           const cnt = fdr && Array.isArray(node.children) ? node.children.length : 0;
           const cls = ["sn-fex-row", isSel ? "sn-sel" : "", isFresh ? "sn-fex-fresh" : ""].filter(Boolean).join(" ");
-          const isChk = (selected.size >= 2 || multiMode) && isSel;
+          const isChk = isSel;
           const stVal = isFresh ? freshSeq++ : enterStagger ? Math.min(itemIdx, 9) : -1;
           const st = stVal >= 0 ? ` style="--sn-stagger:${stVal}"` : "";
           const chkHtml = `<button type="button" class="sn-check sn-fex-row-chk${isChk ? " sn-on" : ""}" data-fx-chk="${esc(id)}" tabindex="-1" aria-pressed="${isChk}" aria-label="${esc(tt("tree.80", { p0: node.name }))}">${BOX}</button>`;
@@ -1665,6 +1905,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
             closing.push(rows[i]);
           }
           if (closing.length) {
+            const beforeIds = new Set(rows.map((el) => el.dataset.fxId));
             const below = rows.slice(i);
             const collapseH = Math.min(closing.length * TREE_ROW_H, (bodyEl.clientHeight || 360) + TREE_ROW_H * 2);
             parentEl.classList.remove("sn-open");
@@ -1672,22 +1913,32 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
             for (const el of closing) {
               const base = treeVirt ? (el.style.transform || "") : "";
               el.animate(
-                [{ opacity: 1, transform: base || "none" }, { opacity: 0, transform: base ? `${base} translate3d(0,-6px,0)` : "translate3d(0,-6px,0)" }],
+                [{ opacity: 1, transform: base || "none" }, { opacity: 0, transform: base ? `${base} translate3d(0,-10px,0)` : "translate3d(0,-10px,0)" }],
                 { duration: 165, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
               );
             }
-            if (!treeVirt) {
-              for (const el of below) {
-                el.animate(
-                  [{ transform: "none" }, { transform: `translate3d(0,${-collapseH}px,0)` }],
-                  { duration: 175, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
-                );
-              }
+            for (const el of below) {
+              const base = treeVirt ? (el.style.transform || "") : "";
+              el.animate(
+                [{ transform: base || "none" }, { transform: base ? `${base} translate3d(0,${-collapseH}px,0)` : `translate3d(0,${-collapseH}px,0)` }],
+                { duration: 175, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
+              );
             }
             clearTimeout(fxCollapseTimer);
             fxCollapseTimer = setTimeout(() => {
               treeExpanded.delete(rec.id);
               render(false);
+              if (!reduced()) {
+                let seq = 0;
+                for (const el of stageEl.querySelectorAll(".sn-fex-tree-rows .sn-fex-row")) {
+                  if (beforeIds.has(el.dataset.fxId)) continue;
+                  const base = treeVirt ? (el.style.transform || "") : "";
+                  el.animate(
+                    [{ opacity: 0, transform: base ? `${base} translate3d(0,16px,0)` : "translate3d(0,16px,0)" }, { opacity: 1, transform: base || "none" }],
+                    { duration: 200, delay: Math.min(seq++, 8) * 12, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
+                  );
+                }
+              }
             }, 170);
             return;
           }
@@ -1718,13 +1969,17 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
               const delay = Math.min(seq++, 8) * 16;
               const base = treeVirt ? (el.style.transform || "") : "";
               el.animate(
-                [{ opacity: 0, transform: base ? `${base} translate3d(0,-7px,0)` : "translate3d(0,-7px,0)" }, { opacity: 1, transform: base || "none" }],
-                { duration: 210, delay, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
+                [{ opacity: 0, transform: base ? `${base} translate3d(0,-12px,0)` : "translate3d(0,-12px,0)" }, { opacity: 1, transform: base || "none" }],
+                { duration: 220, delay, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
               );
-            } else if (!treeVirt && beforeRects.has(eid)) {
+            } else if (beforeRects.has(eid)) {
               const dy = beforeRects.get(eid) - el.getBoundingClientRect().top;
               if (Math.abs(dy) > 0.5) {
-                el.animate([{ transform: `translate3d(0,${dy}px,0)` }, { transform: "none" }], { duration: 230, easing: "cubic-bezier(.22, 1, .36, 1)" });
+                const base = treeVirt ? (el.style.transform || "") : "";
+                el.animate(
+                  [{ transform: base ? `${base} translate3d(0,${dy}px,0)` : `translate3d(0,${dy}px,0)` }, { transform: base || "none" }],
+                  { duration: 230, easing: "cubic-bezier(.22, 1, .36, 1)" }
+                );
               }
             }
           }
@@ -1734,6 +1989,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
 
     async function openFolder(id) {
       const prevDepth = pathIds.length;
+      lastNavAt = performance.now();
       if (!id) {
         pathIds = [];
         selected.clear();
@@ -1763,6 +2019,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
 
     function goUp() {
       if (!pathIds.length) return;
+      lastNavAt = performance.now();
       pathIds = pathIds.slice(0, -1);
       selected.clear();
       multiMode = false;
@@ -1826,7 +2083,6 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       idx = buildIndex(data);
       selected.clear();
       multiMode = false;
-      selected.add(node.id);
       renamingId = startRename ? node.id : null;
       markFresh([node.id]);
       render(false);
@@ -1881,8 +2137,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       }
       idx = buildIndex(data);
       selected.clear();
-      created.forEach((n) => selected.add(n.id));
-      multiMode = created.length >= 2;
+      multiMode = false;
       markFresh(created.map((n) => n.id));
       render(false);
       playFlip(beforeRects);
@@ -2004,13 +2259,73 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
           droppedTimer = setTimeout(() => {
             droppedFolderId = null;
             droppedFreshIds = new Set();
-            stageEl.querySelectorAll(".sn-fdr-dropped").forEach((el) => el.classList.remove("sn-fdr-dropped"));
+            stageEl.querySelectorAll(".sn-fdr-dropped, .sn-fdr-dropped-menu").forEach((el) => {
+              el.classList.remove("sn-fdr-dropped", "sn-fdr-dropped-menu");
+            });
           }, 580);
         }
 
         idx = buildIndex(data);
-        render(false);
-        playFlip(beforeRects);
+        // 卡片视图原地差量更新：保留目标 .sn-fdr 与 .sn-fdr-front 原 DOM 实例（前盖从 -28deg 无缝平滑合拢到 0deg，零重建断帧），
+        // 仅更新夹层微缩纸叠与计数角标，并移除已移走的卡片做平滑 FLIP 补位
+        const targetTileEl = view === "card" && targetId && !query.trim()
+          ? stageEl.querySelector(`.sn-fex-tile[data-fx-id="${CSS.escape(targetId)}"]`)
+          : null;
+        const targetNodeRec = targetId ? idx.map.get(targetId) : null;
+        if (targetTileEl && targetNodeRec) {
+          for (const id of effectiveIds) {
+            stageEl.querySelector(`.sn-fex-tile[data-fx-id="${CSS.escape(id)}"]`)?.remove();
+          }
+          const fdrEl = targetTileEl.querySelector(".sn-fdr");
+          const newChildren = Array.isArray(targetNodeRec.node.children) ? targetNodeRec.node.children : [];
+          const newCnt = newChildren.length;
+          if (fdrEl) {
+            fdrEl.dataset.count = String(newCnt);
+            const sheetsEl = fdrEl.querySelector(".sn-fdr-sheets");
+            if (sheetsEl) {
+              const previewItems = newChildren.slice(0, 3).reverse();
+              let freshSeq = 0;
+              sheetsEl.dataset.n = String(previewItems.length);
+              sheetsEl.innerHTML = previewItems
+                .map((c, i) => {
+                  const isNew = !!droppedFreshIds?.has(String(c.id));
+                  return renderMiniSheet(c, i, isNew, isNew ? freshSeq++ : 0);
+                })
+                .join("");
+            }
+            const frontEl = fdrEl.querySelector(".sn-fdr-front");
+            if (frontEl) {
+              let cntEl = frontEl.querySelector(".sn-fdr-cnt");
+              if (newCnt > 0) {
+                if (!cntEl) {
+                  cntEl = document.createElement("span");
+                  cntEl.className = "sn-fdr-cnt";
+                  frontEl.append(cntEl);
+                }
+                cntEl.textContent = String(newCnt);
+                cntEl.classList.remove("sn-fdr-cnt-bump");
+                void cntEl.offsetWidth;
+                cntEl.classList.add("sn-fdr-cnt-bump");
+              } else if (cntEl) {
+                cntEl.remove();
+              }
+            }
+          }
+          const subEl = targetTileEl.querySelector(".sn-fex-sub");
+          if (subEl) subEl.textContent = newCnt > 0 ? tt("tree.35", { p0: newCnt }) : tt("tree.36");
+          targetTileEl.classList.remove("sn-fdr-dropped", "sn-fdr-dropped-menu");
+          void targetTileEl.offsetWidth;
+          targetTileEl.classList.add("sn-fdr-dropped");
+          if (!immediate) targetTileEl.classList.add("sn-fdr-dropped-menu");
+          const { list: curVisList } = resolveFolder();
+          lastVisibleCount = sortedItems(curVisList).length;
+          syncSelectionUI();
+          bodySa.refresh();
+          playFlip(beforeRects, targetId);
+        } else {
+          render(false);
+          playFlip(beforeRects, targetId || null);
+        }
 
         const targetName = targetId ? idx.map.get(targetId)?.node?.name || "" : rootTitle();
         emit("move", { ids: effectiveIds, nodes: movedNodes, targetId: targetId || null });
@@ -2087,11 +2402,19 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       });
     }
 
+    function clearCtxMark() {
+      ctxTargetId = null;
+      stageEl.querySelectorAll(".sn-ctx-open").forEach((el) => el.classList.remove("sn-ctx-open"));
+    }
+
     function openContextMenu(targetId, coords, anchorEl) {
       idx = buildIndex(data);
+      clearCtxMark();
       if (targetId) {
         const rec = idx.map.get(String(targetId));
         if (!rec) return;
+        ctxTargetId = rec.id;
+        stageEl.querySelector(`[data-fx-id="${CSS.escape(rec.id)}"]`)?.classList.add("sn-ctx-open");
         const fdr = isFolderNode(rec.node);
         const ids = selected.has(rec.id) ? [...selected] : [rec.id];
         const folderIds = ids.filter((id) => { const r = idx.map.get(id); return r && isFolderNode(r.node); });
@@ -2137,6 +2460,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
           ...(anchorEl ? { anchor: anchorEl, trigger: anchorEl, align: "end" } : { x: coords.x, y: coords.y, trigger: root }),
           bound: root,
           surface: opts.menuSurface || "blur",
+          onClose: clearCtxMark,
           onSelect: ({ item }) => {
             const act = item.dataset.act;
             if (act === "open") {
@@ -2186,20 +2510,32 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       }
     }
 
-    // 实体 60fps 物理拖拽引擎：
-    // 1. 卡片视图完全通透无白壳，直接拎起真实缩略图/拟物文件夹本体并随横向移动速度自然轻摆，停手即回正；
+    // 实体 60fps 物理拖拽 + 10 场景完备橡胶框选引擎：
+    // 1. 卡片视图完全通透无白壳，直接拎起真实缩略图/拟物文件夹本体（共享 --sn-fex-* 全色板），随横向移动速度自然轻摆，停手即回正；
     // 2. 原位干净无框空槽，多选拖拽其余项先从流中收拢并在主缩略图后真实叠牌；
-    // 3. 基于静态槽位几何网格（不受 FLIP 动画坐标干扰）计算命中：跨过两格交界中线+4px 迟滞即触发可中断连续 FLIP 实时避让，绝不压脸、绝不振荡、绝不把文件夹挤跑；
-    // 4. 松手移入文件夹时实体平滑缩小飞入夹层再触发合盖与新纸片滑入；同级重排或取消时平滑飞落归位；
+    // 3. 差量维护落点高亮 + 8px 施密特迟滞，彻底根治文件夹悬停/放入抖动；悬停面包屑时侧移微缩不挡字；
+    // 4. 橡胶框选：卡片四周空白边距/缝隙/底部空白/列表右侧空白均可拉起，支持四向任意拉框、内容坐标系精准碰撞、边缘自动滚动、虚拟树全量框选、单选即入勾选态、Cmd/Shift 累加、Esc 恢复原选择与 blur 防幽灵框；
     let drag = null;
     let proxyEl = null;
     let dragRaf = 0;
     let tiltRaf = 0;
+    let activeDropEl = null;
+    let activeDropCls = "";
     let marquee = null;
     let marqueeEl = null;
     let marqueeRaf = 0;
+    let marqueeScrollRaf = 0;
+
+    function setActiveDrop(el, cls) {
+      if (activeDropEl === el && activeDropCls === cls) return;
+      if (activeDropEl && activeDropCls) activeDropEl.classList.remove(activeDropCls);
+      activeDropEl = el || null;
+      activeDropCls = cls || "";
+      if (activeDropEl && activeDropCls) activeDropEl.classList.add(activeDropCls);
+    }
 
     function clearDropTargets() {
+      setActiveDrop(null, "");
       root.querySelectorAll(".sn-drop-target, .sn-crumb-drop, .sn-fex-slot").forEach((el) => {
         el.classList.remove("sn-drop-target", "sn-crumb-drop", "sn-fex-slot");
       });
@@ -2238,45 +2574,88 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       drag = null;
 
       if (pEl && absorbTargetEl && !reduced() && absorbTargetEl.isConnected) {
-        // 吸入动画期间保持 sn-is-dragging，防止目标文件夹左上角突然蹦出悬停复选框；
-        // 实体平滑缩小飞入文件夹夹层，结束后立即触发 moveItems 与拟物合盖入纸
+        // 零跳动双层精准射线吸入：
+        // 1. 先在任何类名变更前捕获当前实时计算矩阵 startTransform、透明度与缩略图屏幕几何中心；
+        // 2. 立即挂上 .sn-proxy-absorbing 禁用一切 CSS transition/animation，锁定起点不暴涨、不卡帧；
+        // 3. inner 已在起手时将 transform-origin 精准锁在缩略图布局中心，右乘 scale(0.42) 严格绕缩略图自身中心纯缩小（卡片/文件夹/面包屑全场景 0 漂移），
+        //    外层 pEl 使用浮点精确位移直线送进文件夹开口，彻底杜绝松手瞬跳！
         const visualTarget = absorbTargetEl.querySelector(".sn-fdr, .sn-fex-row-ico") || absorbTargetEl;
         const tr = visualTarget.getBoundingClientRect();
+        const pVis = pEl.querySelector(".sn-fcard, .sn-fdr") || pEl;
+        const vr = pVis.getBoundingClientRect();
+        const inner = pEl.querySelector(".sn-fex-proxy-inner");
+        const startTransform = inner ? getComputedStyle(inner).transform : "none";
+        const startOpacity = inner ? (parseFloat(getComputedStyle(inner).opacity) || 0.92) : 0.92;
+        if (inner && typeof inner.getAnimations === "function") {
+          for (const a of inner.getAnimations()) a.cancel();
+        }
+        const targetCx = tr.left + tr.width / 2;
+        const targetCy = tr.top + tr.height * 0.42;
+        const dx = targetCx - (vr.left + vr.width / 2);
+        const dy = targetCy - (vr.top + vr.height / 2);
         const pr = pEl.getBoundingClientRect();
-        const tx = tr.left + tr.width / 2 - pr.width / 2;
-        const ty = tr.top + tr.height / 2 - pr.height / 2;
-        pEl.classList.remove("sn-proxy-tilting");
+        const fromX = pr.left;
+        const fromY = pr.top;
+        pEl.classList.add("sn-proxy-absorbing");
+        if (inner) {
+          const baseT = startTransform && startTransform !== "none" ? startTransform : "scale(1)";
+          const endT = `${baseT} scale(0.42)`;
+          inner.style.transform = baseT;
+          inner.style.opacity = String(startOpacity);
+          inner.animate(
+            [
+              { transform: baseT, opacity: startOpacity },
+              { transform: endT, opacity: 0 },
+            ],
+            { duration: 155, easing: "cubic-bezier(.32, 0, .67, 0)", fill: "forwards" }
+          );
+        }
         const anim = pEl.animate(
           [
-            { transform: pEl.style.transform, opacity: 0.94 },
-            { transform: `translate3d(${Math.round(tx)}px,${Math.round(ty)}px,0) scale(0.32)`, opacity: 0 },
+            { transform: `translate3d(${fromX}px,${fromY}px,0)` },
+            { transform: `translate3d(${fromX + dx}px,${fromY + dy}px,0)` },
           ],
-          { duration: 165, easing: "cubic-bezier(.32, 0, .67, 0)", fill: "forwards" }
+          { duration: 155, easing: "cubic-bezier(.32, 0, .67, 0)", fill: "forwards" }
         );
         anim.onfinish = () => {
           pEl.remove();
           root.classList.remove("sn-is-dragging");
-          clearDropTargets();
+          // 先同帧触发原地更新（挂上 .sn-fdr-dropped），再移除 .sn-drop-target 让前盖从 -28deg 丝滑无缝合拢到 0deg
           onAbsorbDone?.();
+          clearDropTargets();
         };
         return;
       }
 
       if (pEl && flyToEl && !reduced() && flyToEl.isConnected) {
         const to = flyToEl.getBoundingClientRect();
-        pEl.classList.remove("sn-proxy-tilting", "sn-proxy-aim");
-        pEl.classList.add("sn-proxy-settling");
+        const pr = pEl.getBoundingClientRect();
+        const fromX = pr.left;
+        const fromY = pr.top;
         const inner = pEl.querySelector(".sn-fex-proxy-inner");
+        const startTransform = inner ? getComputedStyle(inner).transform : "none";
+        if (inner && typeof inner.getAnimations === "function") {
+          for (const a of inner.getAnimations()) a.cancel();
+        }
+        pEl.classList.remove("sn-proxy-tilting", "sn-proxy-aim", "sn-proxy-crumb-aim");
+        pEl.classList.add("sn-proxy-settling", "sn-proxy-absorbing");
         if (inner) {
           inner.style.setProperty("--sn-drag-tilt", "0deg");
           inner.style.setProperty("--sn-drag-scale", "1");
+          inner.animate(
+            [
+              { transform: startTransform && startTransform !== "none" ? startTransform : "scale(1)" },
+              { transform: "scale(1) rotate(0deg)" },
+            ],
+            { duration: 190, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "forwards" }
+          );
         }
         const anim = pEl.animate(
           [
-            { transform: pEl.style.transform },
-            { transform: `translate3d(${Math.round(to.left)}px,${Math.round(to.top)}px,0)` },
+            { transform: `translate3d(${fromX}px,${fromY}px,0)` },
+            { transform: `translate3d(${to.left}px,${to.top}px,0)` },
           ],
-          { duration: 195, easing: "cubic-bezier(.22, 1, .36, 1)" }
+          { duration: 190, easing: "cubic-bezier(.22, 1, .36, 1)" }
         );
         const slotEl = flyToEl;
         anim.onfinish = () => {
@@ -2284,9 +2663,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
           root.classList.remove("sn-is-dragging");
           slotEl.classList.remove("sn-fex-slot");
         };
-        root.querySelectorAll(".sn-drop-target, .sn-crumb-drop").forEach((el) => {
-          el.classList.remove("sn-drop-target", "sn-crumb-drop");
-        });
+        setActiveDrop(null, "");
         return;
       }
 
@@ -2297,8 +2674,17 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       if (onAbsorbDone) onAbsorbDone();
     }
 
-    function endMarquee() {
+    function endMarquee(restoreBase = false) {
       cancelAnimationFrame(marqueeRaf);
+      cancelAnimationFrame(marqueeScrollRaf);
+      marqueeRaf = 0;
+      marqueeScrollRaf = 0;
+      root.classList.remove("sn-is-marquee");
+      if (restoreBase && marquee) {
+        selected.clear();
+        marquee.base.forEach((id) => selected.add(id));
+        syncSelectionUI();
+      }
       if (marqueeEl) {
         const el = marqueeEl;
         marqueeEl = null;
@@ -2306,6 +2692,99 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
         setTimeout(() => el.remove(), 130);
       }
       marquee = null;
+    }
+
+    function updateMarqueeSelection() {
+      if (!marquee || !marquee.active || !marqueeEl) return;
+      const sr = stageEl.getBoundingClientRect();
+      const maxW = Math.max(stageEl.clientWidth, bodyEl.clientWidth);
+      const maxH = Math.max(stageEl.scrollHeight, bodyEl.clientHeight);
+      const cx = Math.max(0, Math.min(maxW, marquee.x - sr.left));
+      const cy = Math.max(0, Math.min(maxH, marquee.y - sr.top));
+      const l = Math.min(marquee.ox, cx);
+      const t = Math.min(marquee.oy, cy);
+      const r = Math.max(marquee.ox, cx);
+      const b = Math.max(marquee.oy, cy);
+      marqueeEl.style.transform = `translate3d(${Math.round(l)}px,${Math.round(t)}px,0)`;
+      marqueeEl.style.width = Math.max(1, Math.round(r - l)) + "px";
+      marqueeEl.style.height = Math.max(1, Math.round(b - t)) + "px";
+
+      const hits = new Set();
+      if (view === "tree" && treeVirt) {
+        // 虚拟树全量内容坐标系精准框选（包括滚出可视窗外的行）
+        const hdrH = stageEl.querySelector(".sn-fex-tbl-hd")?.offsetHeight || 32;
+        for (let i = 0; i < treeFlat.length; i++) {
+          const rowTop = hdrH + i * TREE_ROW_H;
+          const rowBot = rowTop + TREE_ROW_H;
+          if (rowBot >= t && rowTop <= b && r >= 6 && l <= maxW - 6) hits.add(treeFlat[i].id);
+        }
+      } else {
+        for (const el of stageEl.querySelectorAll("[data-fx-id]")) {
+          if (el.hidden) continue;
+          let il, it, ir, ib;
+          if (view === "card") {
+            // 卡片视图以真实视觉主体（缩略图/文件夹 + 真实文件名文字）并集为碰撞盒，选框碰到实体才亮起勾选，零虚空误选
+            const vis = el.querySelector(".sn-fdr, .sn-fcard");
+            const meta = el.querySelector(".sn-fex-name");
+            if (vis && meta) {
+              const vr = vis.getBoundingClientRect();
+              const mr = meta.getBoundingClientRect();
+              il = Math.min(vr.left, mr.left) - sr.left;
+              it = Math.min(vr.top, mr.top) - sr.top;
+              ir = Math.max(vr.right, mr.right) - sr.left;
+              ib = Math.max(vr.bottom, mr.bottom) - sr.top;
+            } else {
+              const er = el.getBoundingClientRect();
+              il = er.left - sr.left; it = er.top - sr.top; ir = er.right - sr.left; ib = er.bottom - sr.top;
+            }
+          } else {
+            const er = el.getBoundingClientRect();
+            il = er.left - sr.left; it = er.top - sr.top; ir = er.right - sr.left; ib = er.bottom - sr.top;
+          }
+          if (ir >= l && il <= r && ib >= t && it <= b) hits.add(el.dataset.fxId);
+        }
+      }
+
+      const next = new Set();
+      if (marquee.toggle) {
+        marquee.base.forEach((id) => next.add(id));
+        for (const id of hits) {
+          if (marquee.base.has(id)) next.delete(id);
+          else next.add(id);
+        }
+      } else if (marquee.additive) {
+        marquee.base.forEach((id) => next.add(id));
+        hits.forEach((id) => next.add(id));
+      } else {
+        hits.forEach((id) => next.add(id));
+      }
+
+      let changed = next.size !== selected.size;
+      if (!changed) for (const id of next) if (!selected.has(id)) { changed = true; break; }
+      if (changed) {
+        selected.clear();
+        next.forEach((id) => selected.add(id));
+        syncSelectionUI();
+      }
+    }
+
+    function runMarqueeAutoScroll() {
+      marqueeScrollRaf = 0;
+      if (!marquee || !marquee.active) return;
+      const br = bodyEl.getBoundingClientRect();
+      const edge = 32;
+      let delta = 0;
+      if (marquee.y < br.top + edge && bodyEl.scrollTop > 0) {
+        delta = -Math.max(4, Math.min(18, Math.round((br.top + edge - marquee.y) * 0.35)));
+      } else if (marquee.y > br.bottom - edge && bodyEl.scrollTop + bodyEl.clientHeight < bodyEl.scrollHeight) {
+        delta = Math.max(4, Math.min(18, Math.round((marquee.y - (br.bottom - edge)) * 0.35)));
+      }
+      if (delta !== 0) {
+        bodyEl.scrollTop = Math.max(0, Math.min(bodyEl.scrollHeight - bodyEl.clientHeight, bodyEl.scrollTop + delta));
+        if (view === "tree" && treeVirt) paintTreeWindow(false);
+        updateMarqueeSelection();
+        marqueeScrollRaf = requestAnimationFrame(runMarqueeAutoScroll);
+      }
     }
 
     function canDropInto(dragIds, targetFolderId) {
@@ -2324,7 +2803,6 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
           if (a.playState === "running") { saved.push(a); a.pause(); }
         }
         const r = el.getBoundingClientRect();
-        // 还原未应用 transform 的布局位置：offsetLeft / offsetTop 对静态网格最精确且零抖动
         let left = 0, top = 0, node = el;
         while (node && node !== stageEl) {
           left += node.offsetLeft;
@@ -2340,16 +2818,16 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
 
     function playInterruptibleFlip(beforeVisualRects, skipEl) {
       if (!beforeVisualRects || !beforeVisualRects.size || reduced() || (view === "tree" && treeVirt)) return;
+      const sr = stageEl.getBoundingClientRect();
       for (const el of stageEl.querySelectorAll("[data-fx-id]")) {
         if (el === skipEl || el.hidden) continue;
         const old = beforeVisualRects.get(el.dataset.fxId);
         if (!old) continue;
-        // 取消正在进行的旧 FLIP，以当前实拍视觉坐标作为新起点无缝接力，彻底杜绝来回拖时跳变闪烁
         if (typeof el.getAnimations === "function") {
           for (const a of el.getAnimations()) a.cancel();
         }
         const cur = el.getBoundingClientRect();
-        const dx = old.left - cur.left, dy = old.top - cur.top;
+        const dx = old.left - (cur.left - sr.left), dy = old.top - (cur.top - sr.top);
         if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
           el.animate(
             [{ transform: `translate3d(${dx}px,${dy}px,0)` }, { transform: "none" }],
@@ -2393,17 +2871,28 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       if (e.button !== 0 || renamingId || deleting) return;
       if (e.target.closest("button, input, .sn-fex-tbl-hd")) return;
       const itemEl = e.target.closest("[data-fx-id]");
-      if (!itemEl) {
-        // 空白处按下准备橡胶框选
+      // 智能判定「框选起点」vs「实体拖拽起点」：
+      // 1. 空白画布 / 卡片缝隙 / 底部留白 / 按住 Alt → 橡胶框选
+      // 2. 卡片视图点在缩略图/文件夹/文件名以外的透明外侧空白边距 → 橡胶框选（像 Finder 桌面一样任意空白都能拉出选框！）
+      // 3. 列表/树形视图点在图标/名称区以外的右侧大片空白列 → 橡胶框选
+      const hitEntity = itemEl && !e.altKey && (
+        view === "card"
+          ? !!e.target.closest(".sn-fdr, .sn-fcard, .sn-fex-meta-box")
+          : !!e.target.closest(".sn-fex-row-ico, .sn-fex-row-name, .sn-fex-row-cnt")
+      );
+      if (!hitEntity) {
         const sr = stageEl.getBoundingClientRect();
+        const maxW = Math.max(stageEl.clientWidth, bodyEl.clientWidth);
+        const maxH = Math.max(stageEl.scrollHeight, bodyEl.clientHeight);
         marquee = {
           sx: e.clientX,
           sy: e.clientY,
           x: e.clientX,
           y: e.clientY,
-          ox: e.clientX - sr.left,
-          oy: e.clientY - sr.top,
-          additive: e.metaKey || e.ctrlKey || e.shiftKey,
+          ox: Math.max(0, Math.min(maxW, e.clientX - sr.left)),
+          oy: Math.max(0, Math.min(maxH, e.clientY - sr.top)),
+          toggle: e.metaKey || e.ctrlKey,
+          additive: e.shiftKey,
           base: new Set(selected),
           active: false,
         };
@@ -2427,6 +2916,8 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
         x: e.clientX,
         y: e.clientY,
         prevX: e.clientX,
+        lastPx: r.left,
+        lastPy: r.top,
         tilt: 0,
         grabX: e.clientX - r.left,
         grabY: e.clientY - r.top,
@@ -2448,7 +2939,6 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
     function runTiltDecay() {
       tiltRaf = 0;
       if (!drag || !drag.active || !proxyEl || view !== "card") return;
-      // 手指停住时惯性倾角自然平滑阻尼归 0°，绝不僵硬歪斜
       drag.tilt *= 0.78;
       const inner = proxyEl.querySelector(".sn-fex-proxy-inner");
       if (Math.abs(drag.tilt) < 0.08) {
@@ -2468,6 +2958,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
         if (!marquee.active) {
           if (Math.hypot(e.clientX - marquee.sx, e.clientY - marquee.sy) < 5) return;
           marquee.active = true;
+          root.classList.add("sn-is-marquee");
           marqueeEl = document.createElement("div");
           marqueeEl.className = "sn-fex-marquee";
           stageEl.append(marqueeEl);
@@ -2475,32 +2966,14 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
         if (!marqueeRaf) {
           marqueeRaf = requestAnimationFrame(() => {
             marqueeRaf = 0;
-            if (!marquee || !marquee.active || !marqueeEl) return;
-            const sr = stageEl.getBoundingClientRect();
-            const cx = marquee.x - sr.left, cy = marquee.y - sr.top;
-            const l = Math.max(0, Math.min(marquee.ox, cx));
-            const t = Math.max(0, Math.min(marquee.oy, cy));
-            const w = Math.min(stageEl.clientWidth - l, Math.abs(cx - marquee.ox));
-            const h = Math.min(stageEl.scrollHeight - t, Math.abs(cy - marquee.oy));
-            marqueeEl.style.transform = `translate3d(${Math.round(l)}px,${Math.round(t)}px,0)`;
-            marqueeEl.style.width = Math.round(w) + "px";
-            marqueeEl.style.height = Math.round(h) + "px";
-            const vl = Math.min(marquee.sx, marquee.x), vr = Math.max(marquee.sx, marquee.x);
-            const vt = Math.min(marquee.sy, marquee.y), vb = Math.max(marquee.sy, marquee.y);
-            const next = marquee.additive ? new Set(marquee.base) : new Set();
-            for (const el of stageEl.querySelectorAll("[data-fx-id]")) {
-              const r = el.getBoundingClientRect();
-              if (r.right >= vl && r.left <= vr && r.bottom >= vt && r.top <= vb) next.add(el.dataset.fxId);
-            }
-            let changed = next.size !== selected.size;
-            if (!changed) for (const id of next) if (!selected.has(id)) { changed = true; break; }
-            if (changed) {
-              selected.clear();
-              next.forEach((id) => selected.add(id));
-              if (selected.size >= 2) multiMode = true;
-              syncSelectionUI();
-            }
+            updateMarqueeSelection();
           });
+        }
+        if (!marqueeScrollRaf) {
+          const br = bodyEl.getBoundingClientRect();
+          if (marquee.y < br.top + 32 || marquee.y > br.bottom - 32) {
+            marqueeScrollRaf = requestAnimationFrame(runMarqueeAutoScroll);
+          }
         }
         return;
       }
@@ -2510,11 +2983,9 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       if (!drag.active) {
         if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 5) return;
         drag.active = true;
-        // 若拖起的是未选中项，立即切换单选聚焦到当前拖拽项，清除其它无关高亮背景
-        if (!drag.inSel) {
+        // 若拖起的是未勾选的单项，清空此前多选（退出多选态），绝不给当前项偷偷留下持续灰底
+        if (!drag.inSel && selected.size > 0) {
           selected.clear();
-          selected.add(drag.leadId);
-          multiMode = false;
           syncSelectionUI();
         }
         root.classList.add("sn-is-dragging");
@@ -2522,14 +2993,15 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
         proxyEl = document.createElement("div");
         proxyEl.className = "sn-fex-proxy" + (isRow ? " sn-proxy-row" : "") + (drag.ids.length > 1 ? " sn-proxy-multi" : "");
         proxyEl.style.width = Math.round(drag.width) + "px";
-        proxyEl.style.transform = `translate3d(${Math.round(drag.x - drag.grabX)}px,${Math.round(drag.y - drag.grabY)}px,0)`;
+        drag.lastPx = drag.x - drag.grabX;
+        drag.lastPy = drag.y - drag.grabY;
+        proxyEl.style.transform = `translate3d(${Math.round(drag.lastPx)}px,${Math.round(drag.lastPy)}px,0)`;
         const inner = document.createElement("div");
         inner.className = "sn-fex-proxy-inner";
         const clone = drag.leadEl.cloneNode(true);
         clone.removeAttribute("data-fx-id");
-        clone.classList.remove("sn-sel", "sn-fex-fresh", "sn-fdr-dropped");
+        clone.classList.remove("sn-sel", "sn-ctx-open", "sn-fex-fresh", "sn-fdr-dropped");
 
-        // 多选拖拽：只把其它选中项的真实缩略图/文件夹本体错角叠在主缩略图背后，不叠大白框
         const extraIds = drag.ids.filter((id) => id !== drag.leadId);
         const extraEls = extraIds.map((id) => stageEl.querySelector(`[data-fx-id="${CSS.escape(id)}"]`)).filter(Boolean);
         drag.extraEls = extraEls;
@@ -2567,7 +3039,29 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
         proxyEl.append(inner);
         document.body.append(proxyEl);
 
-        // 原位隐身成为干净空槽；多选副项收拢出流并让周围卡片 FLIP 平滑靠拢（绝不留满地透明大洞）
+        // 将 transform-origin 永久精准锚定在真实缩略图/文件夹的布局几何中心（彻底避免缩放/吸入/面包屑偏置时任何像素漂移）
+        if (!isRow) {
+          const visBody = inner.querySelector(".sn-fcard, .sn-fdr");
+          if (visBody) {
+            let ox = 0, oy = 0, curNode = visBody;
+            while (curNode && curNode !== inner) {
+              ox += curNode.offsetLeft;
+              oy += curNode.offsetTop;
+              curNode = curNode.offsetParent;
+            }
+            const localCx = ox + (visBody.offsetWidth || 54) / 2;
+            const localCy = oy + (visBody.offsetHeight || 54) / 2;
+            inner.style.transformOrigin = `${localCx}px ${localCy}px`;
+          }
+          // 一次性起手轻浮微动效（绝不用会在切换类名时重播跳变的 CSS animation）
+          if (!reduced()) {
+            inner.animate(
+              [{ transform: "scale(1) rotate(0deg)" }, { transform: "scale(1.06) rotate(0deg)" }],
+              { duration: 145, easing: "cubic-bezier(.22, 1, .36, 1)" }
+            );
+          }
+        }
+
         const beforeCollapse = extraEls.length ? captureRects() : null;
         drag.leadEl.classList.add("sn-fex-slot");
         for (const el of extraEls) el.hidden = true;
@@ -2587,16 +3081,18 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
           if (!drag || !drag.active || !proxyEl) return;
           const px = drag.x - drag.grabX;
           const py = drag.y - drag.grabY;
+          drag.lastPx = px;
+          drag.lastPy = py;
           proxyEl.style.transform = `translate3d(${Math.round(px)}px,${Math.round(py)}px,0)`;
 
-          // 卡片视图速度惯性轻摆：移动时顺势微倾，停手自动阻尼回正 0°
+          // 卡片视图速度惯性轻摆
           if (view === "card" && !reduced()) {
             const vx = drag.x - drag.prevX;
             drag.prevX = drag.x;
             const targetTilt = Math.max(-4, Math.min(4, vx * 0.24));
             drag.tilt = drag.tilt * 0.62 + targetTilt * 0.38;
             const inner = proxyEl.querySelector(".sn-fex-proxy-inner");
-            if (inner && !proxyEl.classList.contains("sn-proxy-aim")) {
+            if (inner && !proxyEl.classList.contains("sn-proxy-aim") && !proxyEl.classList.contains("sn-proxy-crumb-aim")) {
               proxyEl.classList.add("sn-proxy-tilting");
               inner.style.setProperty("--sn-drag-tilt", `${drag.tilt.toFixed(2)}deg`);
             }
@@ -2605,7 +3101,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
             drag.prevX = drag.x;
           }
 
-          // 边缘自动滚动：拖近列表/画布顶部或底部 36px 自动平滑微滚
+          // 边缘自动滚动
           const br = bodyEl.getBoundingClientRect();
           if (drag.y > br.top && drag.y < br.top + 36 && bodyEl.scrollTop > 0) {
             bodyEl.scrollTop = Math.max(0, bodyEl.scrollTop - 8);
@@ -2613,10 +3109,11 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
             bodyEl.scrollTop += 8;
           }
 
-          root.querySelectorAll(".sn-drop-target, .sn-crumb-drop").forEach((el) => el.classList.remove("sn-drop-target", "sn-crumb-drop"));
-          drag.dropTargetId = null;
-          drag.dropTargetEl = null;
-          drag.isCrumb = false;
+          const prevTargetId = drag.dropTargetId;
+          let nextTargetId = null;
+          let nextTargetEl = null;
+          let nextDropCls = "";
+          let nextIsCrumb = false;
 
           // 1. 优先命中面包屑祖先目录（拖回上级）
           const under = document.elementFromPoint(drag.x, drag.y);
@@ -2624,83 +3121,87 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
           if (crumb && crumbsEl.contains(crumb) && !crumb.hasAttribute("aria-current")) {
             const cid = crumb.dataset.crumbId;
             if (canDropInto(drag.ids, cid)) {
-              crumb.classList.add("sn-crumb-drop");
-              proxyEl.classList.add("sn-proxy-aim");
-              drag.dropTargetId = cid;
-              drag.dropTargetEl = crumb;
-              drag.isCrumb = true;
-              return;
+              nextTargetId = cid;
+              nextTargetEl = crumb;
+              nextDropCls = "sn-crumb-drop";
+              nextIsCrumb = true;
             }
           }
 
           // 2. 树形视图直接走元素命中移入文件夹
-          if (view === "tree" || !drag.container || !drag.slots.length) {
+          if (!nextTargetEl && (view === "tree" || !drag.container || !drag.slots.length)) {
             const overEl = under?.closest?.("[data-fx-id]");
             if (overEl && stageEl.contains(overEl) && !overEl.classList.contains("sn-fex-slot") && overEl.dataset.folder === "1") {
               const oid = overEl.dataset.fxId;
               if (canDropInto(drag.ids, oid)) {
-                overEl.classList.add("sn-drop-target");
-                proxyEl.classList.add("sn-proxy-aim");
-                drag.dropTargetId = oid;
-                drag.dropTargetEl = overEl;
-                return;
+                nextTargetId = oid;
+                nextTargetEl = overEl;
+                nextDropCls = "sn-drop-target";
               }
             }
-            proxyEl.classList.remove("sn-proxy-aim");
-            return;
           }
 
-          // 3. 卡片 / 列表视图：基于静态槽位网格坐标精准判定（零动画坐标抖动、零缝隙死区）
-          const sr = stageEl.getBoundingClientRect();
-          const cardCx = px + drag.width / 2 - sr.left;
-          const cardCy = py + drag.height / 2 - sr.top;
-          const ptrX = drag.x - sr.left;
-          const ptrY = drag.y - sr.top;
-          const visChildren = [...drag.container.querySelectorAll(":scope > [data-fx-id]")].filter((el) => !el.hidden);
-          if (visChildren.length !== drag.slots.length) {
-            drag.slots = measureStaticSlots(drag.container);
-            drag.slotIndex = visChildren.indexOf(drag.leadEl);
+          // 3. 卡片 / 列表视图：基于静态槽位网格坐标 + 8px 施密特离区迟滞精准判定（彻底防抖动）
+          let ctrIdx = -1;
+          let visChildren = null;
+          let cardCx = 0, cardCy = 0;
+          if (!nextTargetEl && view !== "tree" && drag.container && drag.slots.length) {
+            const sr = stageEl.getBoundingClientRect();
+            cardCx = px + drag.width / 2 - sr.left;
+            cardCy = py + drag.height / 2 - sr.top;
+            const ptrX = drag.x - sr.left;
+            const ptrY = drag.y - sr.top;
+            visChildren = [...drag.container.querySelectorAll(":scope > [data-fx-id]")].filter((el) => !el.hidden);
+            if (visChildren.length !== drag.slots.length) {
+              drag.slots = measureStaticSlots(drag.container);
+              drag.slotIndex = visChildren.indexOf(drag.leadEl);
+            }
+
+            const findSlotAt = (x, y, padX = 4, padY = 5) => {
+              for (let i = 0; i < drag.slots.length; i++) {
+                const b = drag.slots[i];
+                if (x >= b.left - padX && x <= b.right + padX && y >= b.top - padY && y <= b.bottom + padY) return i;
+              }
+              return -1;
+            };
+
+            const ptrIdx = findSlotAt(ptrX, ptrY, 0, 0);
+            ctrIdx = findSlotAt(cardCx, cardCy, 4, 5);
+            const matchFolderSlot = (idxCandidate, testX, testY) => {
+              if (idxCandidate < 0 || idxCandidate >= visChildren.length) return false;
+              const el = visChildren[idxCandidate];
+              if (!el || el === drag.leadEl || el.dataset.folder !== "1") return false;
+              const oid = el.dataset.fxId;
+              if (!canDropInto(drag.ids, oid)) return false;
+              const b = drag.slots[idxCandidate];
+              // 若已锁定在本文件夹，向外放宽 8px 施密特迟滞，彻底消灭边缘微移闪烁抖动
+              const locked = prevTargetId === oid;
+              const ix = locked ? -8 : (!drag.hasFolder ? b.width * 0.06 : (view === "card" ? b.width * 0.22 : 0));
+              const iy = locked ? -8 : (!drag.hasFolder ? b.height * 0.06 : (view === "card" ? b.height * 0.16 : b.height * 0.22));
+              if (testX >= b.left + ix && testX <= b.right - ix && testY >= b.top + iy && testY <= b.bottom - iy) {
+                nextTargetId = oid;
+                nextTargetEl = el;
+                nextDropCls = "sn-drop-target";
+                return true;
+              }
+              return false;
+            };
+
+            matchFolderSlot(ptrIdx, ptrX, ptrY) || matchFolderSlot(ctrIdx, cardCx, cardCy);
           }
 
-          const findSlotAt = (x, y, padX = 4, padY = 5) => {
-            for (let i = 0; i < drag.slots.length; i++) {
-              const b = drag.slots[i];
-              if (x >= b.left - padX && x <= b.right + padX && y >= b.top - padY && y <= b.bottom + padY) return i;
-            }
-            return -1;
-          };
+          // 差量更新落点类，零每帧反复 remove/add 抽搐
+          setActiveDrop(nextTargetEl, nextDropCls);
+          drag.dropTargetId = nextTargetId;
+          drag.dropTargetEl = nextTargetEl;
+          drag.isCrumb = nextIsCrumb;
+          proxyEl.classList.toggle("sn-proxy-aim", !!nextTargetEl && !nextIsCrumb);
+          proxyEl.classList.toggle("sn-proxy-crumb-aim", !!nextTargetEl && nextIsCrumb);
+          if (nextTargetEl) return;
 
-          // 优先检查指针或卡片中心是否落入有效目标文件夹热区（文件拖入文件夹绝不挤跑文件夹！）
-          const ptrIdx = findSlotAt(ptrX, ptrY, 0, 0);
-          const ctrIdx = findSlotAt(cardCx, cardCy, 4, 5);
-          const checkFolderSlot = (idxCandidate, testX, testY) => {
-            if (idxCandidate < 0 || idxCandidate >= visChildren.length) return false;
-            const el = visChildren[idxCandidate];
-            if (!el || el === drag.leadEl || el.dataset.folder !== "1") return false;
-            const oid = el.dataset.fxId;
-            if (!canDropInto(drag.ids, oid)) return false;
-            const b = drag.slots[idxCandidate];
-            // 拖普通文件到文件夹：几乎整张文件夹卡片都稳稳接住（内缩 6%），绝不把文件夹挤跑；
-            // 拖文件夹到另一个文件夹：中央核心 56% 区域为移入嵌套，左右外侧 22% 留给文件夹同级换序
-            const ix = !drag.hasFolder ? b.width * 0.06 : (view === "card" ? b.width * 0.22 : 0);
-            const iy = !drag.hasFolder ? b.height * 0.06 : (view === "card" ? b.height * 0.16 : b.height * 0.22);
-            if (testX >= b.left + ix && testX <= b.right - ix && testY >= b.top + iy && testY <= b.bottom - iy) {
-              el.classList.add("sn-drop-target");
-              proxyEl.classList.add("sn-proxy-aim");
-              drag.dropTargetId = oid;
-              drag.dropTargetEl = el;
-              return true;
-            }
-            return false;
-          };
-
-          if (checkFolderSlot(ptrIdx, ptrX, ptrY) || checkFolderSlot(ctrIdx, cardCx, cardCy)) return;
-
-          // 4. 同级网格 / 列表 FLIP 实时避让重排：卡片中心刚越过两格分界线+4px 迟滞即平滑让开，绝不压脸、绝不振荡
-          proxyEl.classList.remove("sn-proxy-aim");
-          if (!query.trim() && ctrIdx >= 0 && ctrIdx !== drag.slotIndex) {
+          // 4. 同级网格 / 列表 FLIP 实时避让重排
+          if (view !== "tree" && visChildren && !query.trim() && ctrIdx >= 0 && ctrIdx !== drag.slotIndex) {
             const targetEl = visChildren[ctrIdx];
-            // 普通文件不挤占文件夹区域（不把文件夹顶到文件后面去）
             if (!drag.hasFolder && targetEl && targetEl.dataset.folder === "1") return;
             const b = drag.slots[ctrIdx];
             const hyst = 4;
@@ -2723,12 +3224,18 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
     };
 
     const onDocUp = () => {
+      if (canceledByEsc) {
+        canceledByEsc = false;
+        suppressNextClick = true;
+        setTimeout(() => { suppressNextClick = false; }, 80);
+        return;
+      }
       if (marquee) {
         const wasActive = marquee.active;
-        endMarquee();
+        endMarquee(false);
         if (wasActive) {
           suppressNextClick = true;
-          setTimeout(() => { suppressNextClick = false; }, 0);
+          setTimeout(() => { suppressNextClick = false; }, 60);
           emit("select", { ids: [...selected] });
         }
         return;
@@ -2737,7 +3244,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       const cur = drag;
       if (cur.active) {
         suppressNextClick = true;
-        setTimeout(() => { suppressNextClick = false; }, 0);
+        setTimeout(() => { suppressNextClick = false; }, 60);
       }
       if (cur.active && cur.dropTargetId !== null) {
         const targetId = cur.dropTargetId;
@@ -2756,9 +3263,31 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       }
     };
 
+    const onWinBlur = () => {
+      if (marquee) endMarquee(false);
+      if (drag) endDrag(null);
+    };
+
+    const onDocKeyDown = (e) => {
+      if (e.key !== "Escape") return;
+      if (marquee) {
+        e.preventDefault();
+        canceledByEsc = true;
+        suppressNextClick = true;
+        endMarquee(true);
+      } else if (drag && drag.active) {
+        e.preventDefault();
+        canceledByEsc = true;
+        suppressNextClick = true;
+        endDrag(drag.leadEl);
+      }
+    };
+
     document.addEventListener("pointermove", onDocMove);
     document.addEventListener("pointerup", onDocUp);
     document.addEventListener("pointercancel", onDocUp);
+    document.addEventListener("keydown", onDocKeyDown);
+    window.addEventListener("blur", onWinBlur);
 
     function toggleSelectAll() {
       const visIds = visibleItemIds();
@@ -2767,14 +3296,23 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       selected.clear();
       if (!allOn) {
         visIds.forEach((id) => selected.add(id));
-        multiMode = visIds.length >= 1;
-      } else {
-        multiMode = false;
       }
       syncSelectionUI();
       const box = stageEl.querySelector("[data-fx-chk-all] .sn-box");
       if (box && !allOn) popCheck(box);
       emit("select", { ids: [...selected] });
+    }
+
+    function openItemAction(id) {
+      const rec = idx.map.get(String(id));
+      if (!rec) return;
+      if (isFolderNode(rec.node)) {
+        if (view === "tree") toggleTreeFolder(rec.id);
+        else openFolder(rec.id);
+      } else {
+        emit("open", { id: rec.id, node: rec.node });
+        toast({ text: tt("tree.64", { p0: rec.node.name }), icon: KIND_ICON[kindOf(rec.node)] || "file" });
+      }
     }
 
     stageEl.addEventListener("click", (e) => {
@@ -2786,17 +3324,9 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       if (chkBtn) {
         e.stopPropagation();
         const id = chkBtn.dataset.fxChk;
-        const alreadyChecked = multiMode && selected.has(id);
-        if (!multiMode) {
-          selected.clear();
-          selected.add(id);
-          multiMode = true;
-        } else if (alreadyChecked) {
-          selected.delete(id);
-          if (selected.size === 0) multiMode = false;
-        } else {
-          selected.add(id);
-        }
+        const alreadyChecked = selected.has(id);
+        if (alreadyChecked) selected.delete(id);
+        else selected.add(id);
         lastAnchorId = id;
         syncSelectionUI();
         if (!alreadyChecked) popCheck(chkBtn.querySelector(".sn-box"));
@@ -2814,35 +3344,40 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       }
       const itemEl = e.target.closest("[data-fx-id]");
       if (!itemEl) {
-        if (selected.size) { selected.clear(); multiMode = false; syncSelectionUI(); emit("select", { ids: [] }); }
+        if (selected.size) { selected.clear(); syncSelectionUI(); emit("select", { ids: [] }); }
         return;
       }
       const id = itemEl.dataset.fxId;
       if (e.metaKey || e.ctrlKey) {
         const on = !selected.has(id);
         if (on) selected.add(id); else selected.delete(id);
-        if (selected.size >= 2) multiMode = true;
         lastAnchorId = id;
         syncSelectionUI();
         if (on) popCheck(itemEl.querySelector("[data-fx-chk] .sn-box"));
+        emit("select", { ids: [...selected] });
       } else if (e.shiftKey && lastAnchorId) {
-        const allIds = [...stageEl.querySelectorAll("[data-fx-id]")].map((x) => x.dataset.fxId);
+        const allIds = visibleItemIds();
         const a = allIds.indexOf(lastAnchorId), b = allIds.indexOf(id);
         if (a >= 0 && b >= 0) {
           selected.clear();
           const [lo, hi] = a < b ? [a, b] : [b, a];
           for (let i = lo; i <= hi; i++) selected.add(allIds[i]);
-          if (selected.size >= 2) multiMode = true;
         }
         syncSelectionUI();
-      } else {
-        selected.clear();
-        selected.add(id);
-        multiMode = false;
+        emit("select", { ids: [...selected] });
+      } else if (selected.size > 0) {
+        // 已处于勾选多选态：轻点卡片顺手切换勾选（不误打开文件夹打断批量挑选）
+        const on = !selected.has(id);
+        if (on) selected.add(id); else selected.delete(id);
         lastAnchorId = id;
         syncSelectionUI();
+        if (on) popCheck(itemEl.querySelector("[data-fx-chk] .sn-box"));
+        emit("select", { ids: [...selected] });
+      } else {
+        // 常规纯净浏览态（0 勾选）：不留无意义持续灰底；轻点文件夹直接平滑进入（或树形展开/收起），轻点文件直接触发打开
+        if (performance.now() - lastNavAt < 280) return;
+        openItemAction(id);
       }
-      emit("select", { ids: [...selected] });
     });
 
     if (batchEl) {
@@ -2854,24 +3389,17 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
         else if (act === "move" && selected.size > 0) openMovePickerMenu([...selected], batchMoveBtn || btn);
         else if (act === "dup" && selected.size > 0) duplicateItems([...selected]);
         else if (act === "del" && selected.size > 0) deleteItems([...selected]);
-        else if (act === "clear") { selected.clear(); multiMode = false; syncSelectionUI(); emit("select", { ids: [] }); }
+        else if (act === "clear") { selected.clear(); syncSelectionUI(); emit("select", { ids: [] }); }
       });
     }
 
     stageEl.addEventListener("dblclick", (e) => {
       if (e.target.closest("button, input")) return;
+      // 单击已经进入文件夹时（320ms 内）拦截第二次点击，防止双击穿透误点新目录中的卡片
+      if (performance.now() - lastNavAt < 320) return;
       const itemEl = e.target.closest("[data-fx-id]");
       if (!itemEl) return;
-      const id = itemEl.dataset.fxId;
-      const rec = idx.map.get(id);
-      if (!rec) return;
-      if (isFolderNode(rec.node)) {
-        if (view === "tree") toggleTreeFolder(id);
-        else openFolder(id);
-      } else {
-        emit("open", { id, node: rec.node });
-        toast({ text: tt("tree.64", { p0: rec.node.name }), icon: KIND_ICON[kindOf(rec.node)] || "file" });
-      }
+      openItemAction(itemEl.dataset.fxId);
     });
 
     stageEl.addEventListener("keydown", (e) => {
@@ -2891,11 +3419,7 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       const itemEl = e.target.closest("[data-fx-id]");
       if (itemEl) {
         const id = itemEl.dataset.fxId;
-        if (!selected.has(id)) {
-          selected.clear();
-          selected.add(id);
-          syncSelectionUI();
-        }
+        // 右键仅对该项标记临时上下文态 .sn-ctx-open（菜单关闭立即清除），绝不污染勾选选中态
         openContextMenu(id, { x: e.clientX, y: e.clientY });
       } else {
         openContextMenu(null, { x: e.clientX, y: e.clientY });
@@ -2949,9 +3473,9 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
         e.preventDefault();
         undo();
       } else if (e.key === "Escape") {
-        if (marquee) endMarquee();
+        if (marquee) endMarquee(true);
         else if (drag) endDrag();
-        else if (selected.size) { selected.clear(); multiMode = false; syncSelectionUI(); emit("select", { ids: [] }); }
+        else if (selected.size) { selected.clear(); syncSelectionUI(); emit("select", { ids: [] }); }
       }
     });
 
@@ -2961,8 +3485,14 @@ export const createFileExplorer = /* @__PURE__ */ defineComponent({
       clearTimeout(deleteTimer);
       clearTimeout(moveTimer);
       clearTimeout(fxCollapseTimer);
+      document.removeEventListener("pointermove", onDocMove);
+      document.removeEventListener("pointerup", onDocUp);
+      document.removeEventListener("pointercancel", onDocUp);
+      document.removeEventListener("keydown", onDocKeyDown);
+      window.removeEventListener("blur", onWinBlur);
       endDrag();
-      endMarquee();
+      endMarquee(false);
+      clearCtxMark();
       closeMenu(false);
       mainMenu.remove();
       subMoveMenu.remove();

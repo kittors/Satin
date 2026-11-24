@@ -310,7 +310,7 @@
   "functions": [
     {
       "name": "openMenu",
-      "signature": "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; surface?: \"solid\" | \"blur\"; onSelect?(detail: MenuSelectDetail): void }): void",
+      "signature": "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; surface?: \"solid\" | \"blur\"; onSelect?(detail: MenuSelectDetail): void; onClose?(): void }): void",
       "returns": "void",
       "from": "satin-ui",
       "desc": "程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`surface` 支持 \"solid\"（不透明）或 \"blur\"（高斯模糊）；`keyboard: true` 先高亮第一项。"

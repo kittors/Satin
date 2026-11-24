@@ -904,8 +904,9 @@ export default function VirtualTree() {
 | `items` | `TreeNode[]` | [] | 否 | 树形节点数组：`id`、`label`、可选 `icon` / `meta` / `badge` / `disabled` / `hasChildren` / `children`。 | createXxx 选项：`items`；React：`items`；Preact：`items`；Vue：`items` |
 | `expanded` | `string[]` | — | 否 | 受控展开的节点 id 列表。 | createXxx 选项：`expanded`；React：`expanded`；Preact：`expanded`；Vue：`expanded` |
 | `defaultExpanded` | `string[]` | [] | 否 | 初始展开的节点 id 列表。 | createXxx 选项：`defaultExpanded`；React：`defaultExpanded`；Preact：`defaultExpanded`；Vue：`defaultExpanded` |
-| `selected` | `string \| null` | — | 否 | 受控选中的节点 id。 | createXxx 选项：`selected`；React：`selected`；Preact：`selected`；Vue：`selected` |
+| `selected` | `string \| null` | — | 否 | 受控选中的节点 id（传入后自动开启节点持续激活态）。 | createXxx 选项：`selected`；React：`selected`；Preact：`selected`；Vue：`selected` |
 | `defaultSelected` | `string \| null` | null | 否 | 初始选中的节点 id。 | createXxx 选项：`defaultSelected`；React：`defaultSelected`；Preact：`defaultSelected`；Vue：`defaultSelected` |
+| `selectable` | `boolean` | false | 否 | 是否开启单行持续激活态；默认仅保留轻柔 hover 反馈（复选树与纯目录浏览不留多余持续灰底），传入 selected / activeStyle 时自动开启。 | createXxx 选项：`selectable`；React：`selectable`；Preact：`selectable`；Vue：`selectable` |
 | `checked` | `string[]` | — | 否 | 受控勾选的节点 id 列表（父子三态自动联动）。 | createXxx 选项：`checked`；React：`checked`；Preact：`checked`；Vue：`checked` |
 | `defaultChecked` | `string[]` | [] | 否 | 初始勾选的节点 id 列表。 | createXxx 选项：`defaultChecked`；React：`defaultChecked`；Preact：`defaultChecked`；Vue：`defaultChecked` |
 | `checkable` | `boolean` | false | 否 | 是否显示三态联动复选框。 | createXxx 选项：`checkable`；React：`checkable`；Preact：`checkable`；Vue：`checkable` |

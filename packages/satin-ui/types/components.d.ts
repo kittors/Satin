@@ -237,7 +237,7 @@ export function openPopoverAt(pop: HTMLElement, trigger: HTMLElement, o?: { alig
 export function popoverOf(pop: HTMLElement): PopoverHandle | undefined;
 /** 菜单选中一项时给的东西（openMenu 的 onSelect，和根菜单上冒泡的 menuselect 事件的 detail） */
 export interface MenuSelectDetail { item: HTMLElement; label: string; /** 子菜单里的项：从根菜单往下经过的那几行的文字 */ path: string[]; menu: HTMLElement }
-export function openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | "window"; surface?: "solid" | "blur"; onSelect?(detail: MenuSelectDetail): void }): void;
+export function openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | "window"; surface?: "solid" | "blur"; onSelect?(detail: MenuSelectDetail): void; onClose?(): void }): void;
 export function closeMenu(refocus?: boolean): void;
 /** 命令面板的一条：name 显示的名字；sub 灰色的补充；key 右边显示的快捷键；keys 额外的搜索词（比如英文名）。可以带自己的字段，onRun 原样拿到 */
 export interface CommandItem { name: string; icon?: string; sub?: string; key?: string; keys?: string; [k: string]: unknown }

@@ -151,7 +151,7 @@
       "type": "string | null",
       "default": "—",
       "required": false,
-      "desc": "受控选中的节点 id。",
+      "desc": "受控选中的节点 id（传入后自动开启节点持续激活态）。",
       "names": {
         "js": "selected",
         "react": "selected",
@@ -170,6 +170,19 @@
         "react": "defaultSelected",
         "preact": "defaultSelected",
         "vue": "defaultSelected"
+      }
+    },
+    {
+      "name": "selectable",
+      "type": "boolean",
+      "default": "false",
+      "required": false,
+      "desc": "是否开启单行持续激活态；默认仅保留轻柔 hover 反馈（复选树与纯目录浏览不留多余持续灰底），传入 selected / activeStyle 时自动开启。",
+      "names": {
+        "js": "selectable",
+        "react": "selectable",
+        "preact": "selectable",
+        "vue": "selectable"
       }
     },
     {

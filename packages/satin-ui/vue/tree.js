@@ -5,7 +5,7 @@ import { wrap } from "./wrap.js";
 
 export const Tree = /* @__PURE__ */ wrap(createTree, {
   name: "SnTree",
-  props: ["items", "expanded", "defaultExpanded", "selected", "defaultSelected", "checked", "defaultChecked", "checkable", "searchable", "draggable", "virtual", "rowHeight", "height", "activeStyle", "loadChildren", "label"],
+  props: ["items", "expanded", "defaultExpanded", "selected", "defaultSelected", "selectable", "checked", "defaultChecked", "checkable", "searchable", "draggable", "virtual", "rowHeight", "height", "activeStyle", "loadChildren", "label"],
   valueKey: "selected",
   events: ["select", "check", "expand", "move"],
   modelEvent: null,

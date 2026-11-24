@@ -183,10 +183,10 @@ const applyMenuSurface = (m, surface) => {
   m.classList.toggle("sn-blur", surface === "blur");
   m.classList.toggle("sn-solid", surface === "solid");
 };
-export function openMenu(rootMenu, { trigger, x, y, anchor, keyboard, align, bound, surface, onSelect } = {}) {
+export function openMenu(rootMenu, { trigger, x, y, anchor, keyboard, align, bound, surface, onSelect, onClose } = {}) {
   closeMenu(false); hideTip();
   applyMenuSurface(rootMenu, surface);
-  sys = { chain: [rootMenu], owner: new Map(), trigger, onSelect, surface, pts: [], last: 0, holding: false, openT: 0, closeT: 0, closeLevel: -1, check: 0, level: 0, dragging: false, area: area(bound), offRepos: null };
+  sys = { chain: [rootMenu], owner: new Map(), trigger, onSelect, onClose, surface, pts: [], last: 0, holding: false, openT: 0, closeT: 0, closeLevel: -1, check: 0, level: 0, dragging: false, area: area(bound), offRepos: null };
   if (anchor) {
     rootMenu.style.maxHeight = ""; place(rootMenu, anchor, { align }); anchor.classList.add("sn-is-open"); anchor.setAttribute("aria-expanded", "true");
     const onRepos = () => { if (sys && anchor.isConnected) { sys.area = area(bound); place(rootMenu, anchor, { align }); } };
@@ -229,7 +229,7 @@ export function closeMenu(refocus) {
   const s = sys; clearTimeout(s.openT); clearTimeout(s.closeT); clearInterval(s.check); s.offRepos?.();
   closeFrom(0); document.removeEventListener("pointermove", onMove); drop(s.layer);
   s.trigger?.classList.remove("sn-is-open", "sn-active"); s.trigger?.setAttribute("aria-expanded", "false");
-  sys = null; if (refocus) s.trigger?.focus({ preventScroll: true });
+  sys = null; s.onClose?.(); if (refocus) s.trigger?.focus({ preventScroll: true });
 }
 // explicit：点击或按键打开（悬停打开时是 false）
 function openSub(it, level, explicit) {

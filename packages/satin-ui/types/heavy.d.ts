@@ -258,6 +258,7 @@ export interface TreeOptions {
   defaultExpanded?: string[];
   selected?: string | null;
   defaultSelected?: string | null;
+  selectable?: boolean;
   checked?: string[];
   defaultChecked?: string[];
   checkable?: boolean;

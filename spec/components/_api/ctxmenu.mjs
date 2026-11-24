@@ -52,7 +52,7 @@ export default {
   slots: [{ name: "trigger", desc: "触发器：菜单按钮（Menu），或者右键区域（ContextMenu）。", names: { react: "children", vue: "默认插槽", html: "data-fmenu 按钮 / data-ctx 区域" } }],
   methods: [],
   functions: [
-    { name: "openMenu", signature: "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; surface?: \"solid\" | \"blur\"; onSelect?(detail: MenuSelectDetail): void }): void", returns: "void", from: "satin-ui",
+    { name: "openMenu", signature: "openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement | \"window\"; surface?: \"solid\" | \"blur\"; onSelect?(detail: MenuSelectDetail): void; onClose?(): void }): void", returns: "void", from: "satin-ui",
       desc: "程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`surface` 支持 \"solid\"（不透明）或 \"blur\"（高斯模糊）；`keyboard: true` 先高亮第一项。" },
     { name: "closeMenu", signature: "closeMenu(refocus?: boolean): void", returns: "void", from: "satin-ui", desc: "关闭当前展开的菜单（`refocus` 为 true 时焦点返回至触发元素）。" },
   ],

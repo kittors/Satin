@@ -632,7 +632,7 @@ export default function OrganizeMenu() {
 
 | 签名 | 从哪引 | 说明 |
 |---|---|---|
-| `openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement \| "window"; surface?: "solid" \| "blur"; onSelect?(detail: MenuSelectDetail): void }): void` | `satin-ui` | 程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`surface` 支持 "solid"（不透明）或 "blur"（高斯模糊）；`keyboard: true` 先高亮第一项。 |
+| `openMenu(menu: HTMLElement, o?: { trigger?: HTMLElement; x?: number; y?: number; anchor?: HTMLElement; keyboard?: boolean; align?: string; bound?: HTMLElement \| "window"; surface?: "solid" \| "blur"; onSelect?(detail: MenuSelectDetail): void; onClose?(): void }): void` | `satin-ui` | 程序里打开菜单：贴着 `anchor`，或者在 `x`、`y`（右键的位置）；`surface` 支持 "solid"（不透明）或 "blur"（高斯模糊）；`keyboard: true` 先高亮第一项。 |
 | `closeMenu(refocus?: boolean): void` | `satin-ui` | 关闭当前展开的菜单（`refocus` 为 true 时焦点返回至触发元素）。 |
 
 ## 样式定制

@@ -419,16 +419,16 @@ try {
     await page.keyboard.press("Escape");
   }
 
-  console.log("\n[11/12] 树形控件：轻微激活态 + 展开收起微动效 + 异步懒加载 + 失败重试 + 万级虚拟树");
+  console.log("\n[11/12] 树形控件：默认纯 hover 无持续灰底 + 展开收起微动效 + 异步懒加载 + 失败重试 + 万级虚拟树");
   await gotoDoc(page, "#/c/tree");
   {
     const { handle: hBasic, frame: fBasic } = await waitIframeReady(page, "tree-basic");
     await hBasic.scrollIntoViewIfNeeded();
     await page.waitForTimeout(200);
     await fBasic.locator('.sn-tr[data-id="export"]').click();
-    await page.waitForTimeout(120);
-    const activeShadow = await fBasic.locator('.sn-tr[data-id="export"]').evaluate((el) => getComputedStyle(el).boxShadow);
-    assert(activeShadow === "none", "鼠标单击树节点采用轻微激活态，不显示厚重焦点硬框", `boxShadow=${activeShadow}`);
+    await page.waitForTimeout(220);
+    const hasStuckActive = await fBasic.locator(".sn-tr.sn-sel").count();
+    assert(hasStuckActive === 0, "默认复选树点击节点不残留多余持续激活态（有 hover 与展开即可）", `selCount=${hasStuckActive}`);
     const beforeRows = await fBasic.locator(".sn-tr").count();
     await fBasic.locator('[data-tr-tw="script"]').click();
     await page.waitForTimeout(240);
@@ -437,6 +437,47 @@ try {
     await page.waitForTimeout(240);
     const expandedRows = await fBasic.locator(".sn-tr").count();
     assert(collapsedRows < beforeRows && expandedRows === beforeRows, "树形节点收起与展开经微动效平滑切换子节点", `before=${beforeRows}, collapsed=${collapsedRows}, expanded=${expandedRows}`);
+
+    // 验证右上角「全部展开 / 全部折叠」按钮：Tooltip 实时当场换字、双箭头路径翻转形变、全部折叠双向微动效与手动折展联动
+    const expBtnLoc = fBasic.locator("[data-tr-exp]").first();
+    const expBox = await expBtnLoc.boundingBox();
+    await page.mouse.move(expBox.x + expBox.width / 2, expBox.y + expBox.height / 2);
+    await page.waitForTimeout(580);
+    const expBefore = await fBasic.evaluate(() => ({
+      trExp: document.querySelector("[data-tr-exp]")?.dataset.trExp,
+      tip: document.getElementById("sn-tip")?.textContent?.trim(),
+      tipOn: document.getElementById("sn-tip")?.classList.contains("sn-on"),
+      p1: getComputedStyle(document.querySelector("[data-tr-exp] .sn-ic path")).transform,
+    }));
+    await page.mouse.click(expBox.x + expBox.width / 2, expBox.y + expBox.height / 2);
+    await page.waitForTimeout(55);
+    const expMidCollapse = await fBasic.evaluate(() => ({
+      trExp: document.querySelector("[data-tr-exp]")?.dataset.trExp,
+      tip: document.getElementById("sn-tip")?.textContent?.trim(),
+      anims: [...document.querySelectorAll(".sn-tr")].filter((el) => el.getAnimations().some((a) => a.playState === "running")).length,
+    }));
+    await page.waitForTimeout(300);
+    const expCollapsed = await fBasic.evaluate(() => ({
+      trExp: document.querySelector("[data-tr-exp]")?.dataset.trExp,
+      tip: document.getElementById("sn-tip")?.textContent?.trim(),
+      rows: document.querySelectorAll(".sn-tr").length,
+      p1: getComputedStyle(document.querySelector("[data-tr-exp] .sn-ic path")).transform,
+    }));
+    await page.mouse.click(expBox.x + expBox.width / 2, expBox.y + expBox.height / 2);
+    await page.waitForTimeout(300);
+    const expReopened = await fBasic.evaluate(() => ({
+      trExp: document.querySelector("[data-tr-exp]")?.dataset.trExp,
+      tip: document.getElementById("sn-tip")?.textContent?.trim(),
+      rows: document.querySelectorAll(".sn-tr").length,
+    }));
+    assert(
+      expBefore.tipOn && expBefore.trExp === "1" && expBefore.tip === "全部折叠"
+        && expMidCollapse.trExp === "0" && expMidCollapse.tip === "全部展开" && expMidCollapse.anims >= 4
+        && expCollapsed.rows === 2 && expBefore.p1 !== expCollapsed.p1
+        && expReopened.trExp === "1" && expReopened.tip === "全部折叠" && expReopened.rows === 10,
+      "树形右上角全部展开/折叠按钮实时联动 Tooltip、双箭头对折形变与双向收起/展开微动效",
+      JSON.stringify({ expBefore, expMidCollapse, expCollapsed, expReopened })
+    );
 
     const { handle: hLazy, frame: fLazy } = await waitIframeReady(page, "tree-lazy");
     await hLazy.scrollIntoViewIfNeeded();
@@ -461,6 +502,22 @@ try {
     assert(hasTreeSa === 1, "树形控件完整复用 Satin ScrollArea 悬浮滚动条");
     assert(statText.includes("10100"), "万级虚拟树完整索引 10,100 个节点", `stat=${statText}`);
     assert(domRows > 5 && domRows < 60, "万级虚拟树仅挂载视口窗口 DOM 行", `rendered=${domRows}`);
+    await fVirt.locator(".sn-tree-vp > .sn-sa-vp").evaluate((el) => { el.scrollTop = 0; });
+    await page.waitForTimeout(120);
+    // 验证万级虚拟树展开/收起具备完整丝滑交互动画（子节点淡收 + 新升入兄弟滑入 + 下推离场层）
+    const firstVirtTw = fVirt.locator(".sn-tr .sn-tr-tw").first();
+    await firstVirtTw.click();
+    await page.waitForTimeout(50);
+    const virtCollapseAnims = await fVirt.evaluate(() => [...document.querySelectorAll(".sn-tr")].filter((el) => el.getAnimations().some((a) => a.playState === "running")).length);
+    await page.waitForTimeout(160);
+    const virtRiseAnims = await fVirt.evaluate(() => [...document.querySelectorAll(".sn-tr")].filter((el) => el.getAnimations().some((a) => a.playState === "running")).length);
+    await page.waitForTimeout(220);
+    await firstVirtTw.click();
+    await page.waitForTimeout(50);
+    const virtExpandAnims = await fVirt.evaluate(() => [...document.querySelectorAll(".sn-tr")].filter((el) => el.getAnimations().some((a) => a.playState === "running")).length);
+    assert(virtCollapseAnims >= 5 && virtRiseAnims >= 3 && virtExpandAnims >= 5, "万级虚拟树收起、下方兄弟升入与重新展开全程具备真实 60fps 交互微动效", `collapse=${virtCollapseAnims}, rise=${virtRiseAnims}, expand=${virtExpandAnims}`);
+    await page.waitForTimeout(240);
+
     await fVirt.locator(".sn-tree-vp > .sn-sa-vp").evaluate((el) => { el.scrollTop = 120000; });
     await page.waitForTimeout(150);
     const afterScrollDom = await fVirt.locator(".sn-tr").count();
@@ -551,11 +608,41 @@ try {
     await page.mouse.move(dbox.x + dbox.width / 2, dbox.y + dbox.height / 2, { steps: 14 });
     await page.waitForTimeout(160);
     const hasProxy = await frame.locator(".sn-fex-proxy").count();
+    const pdfColorPreserved = await frame.evaluate(() => {
+      const bar = document.querySelector(".sn-fex-proxy .sn-fcard-headbar.sn-fex-t-pdf");
+      const ext = document.querySelector(".sn-fex-proxy .sn-fcard-ext.sn-fex-t-pdf");
+      if (!bar || !ext) return false;
+      const bg = getComputedStyle(bar).backgroundColor;
+      const fg = getComputedStyle(ext).color;
+      return bg !== "rgba(0, 0, 0, 0)" && fg !== "rgb(0, 0, 0)" && fg.includes("180");
+    });
     const isDropOpen = await dstTile.evaluate((el) => el.classList.contains("sn-drop-target"));
     const frontMat = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr-front').evaluate((el) => getComputedStyle(el).transform);
-    assert(hasProxy === 1 && isDropOpen && frontMat !== "none", "拖拽悬停拟物文件夹时真实本体代理跟手且前盖 3D 掀开", `proxy=${hasProxy}, dropTarget=${isDropOpen}, matrix=${frontMat.slice(0, 24)}`);
+    assert(hasProxy === 1 && pdfColorPreserved && isDropOpen && frontMat !== "none", "拖拽 PDF 保持原色红条不褪色、悬停拟物文件夹时前盖 3D 优雅掀开且无硬黑框", `proxy=${hasProxy}, pdfColor=${pdfColorPreserved}, dropTarget=${isDropOpen}`);
+    // 同步逐帧采样松手吸入时的缩略图宽度与横向滚动溢出，严禁松手暴涨回弹与闪出横向滚动条
+    const absorbPromise = frame.evaluate(() => new Promise((resolve) => {
+      const widths = [];
+      let hadHScroll = false;
+      const t0 = performance.now();
+      const sample = () => {
+        const pVis = document.querySelector(".sn-fex-proxy .sn-fcard, .sn-fex-proxy .sn-fdr");
+        if (pVis) widths.push(+pVis.getBoundingClientRect().width.toFixed(2));
+        const vp = document.querySelector(".sn-fex-body > .sn-sa-vp");
+        if (vp && vp.scrollWidth > vp.clientWidth + 1) hadHScroll = true;
+        if (performance.now() - t0 < 340) requestAnimationFrame(sample);
+        else resolve({ widths, hadHScroll });
+      };
+      requestAnimationFrame(sample);
+    }));
+    await page.waitForTimeout(25);
     await page.mouse.up();
-    await page.waitForTimeout(340);
+    const absorbStats = await absorbPromise;
+    let maxBounce = 0;
+    for (let i = 1; i < absorbStats.widths.length; i++) {
+      maxBounce = Math.max(maxBounce, absorbStats.widths[i] - absorbStats.widths[i - 1]);
+    }
+    assert(absorbStats.widths.length >= 4 && maxBounce <= 0.6 && !absorbStats.hadHScroll, "松手吸入严格单调缩小零暴涨跳动且全程无横向滚动条溢出", JSON.stringify({ n: absorbStats.widths.length, maxBounce: +maxBounce.toFixed(2), hadHScroll: absorbStats.hadHScroll, sample: absorbStats.widths.slice(0, 6) }));
+    await page.waitForTimeout(80);
     const frameStats = await frame.evaluate(() => {
       window.__fxStop = true;
       const dts = window.__fxFrames.slice(1).sort((a, b) => a - b);
@@ -566,22 +653,23 @@ try {
     assert(frameStats.n >= 10 && frameStats.p95 <= 24, "拖拽与拟物掀盖吸入微动效逐帧流畅低延迟", `frames=${frameStats.n}, p95=${frameStats.p95}ms, max=${frameStats.max}ms`);
 
     const afterInboxSheets = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr-sheet').count();
-    const afterInboxKind = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr-sheet').first().getAttribute("data-child-kind");
+    const afterInboxKind = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr-sheet').last().getAttribute("data-child-kind");
     const afterInboxCount = await frame.locator('[data-fx-id="f-inbox"] .sn-fdr').getAttribute("data-count");
     const pdfInRoot = await frame.locator('[data-fx-id="d-pdf"]').count();
-    assert(afterInboxSheets === 1 && afterInboxKind === "pdf" && afterInboxCount === "1" && pdfInRoot === 0, "松手放入后拟物文件夹夹层实时长出对应 PDF 微缩纸片且计数 +1", `sheets=${afterInboxSheets}, kind=${afterInboxKind}, count=${afterInboxCount}`);
+    const stuckAfterDrag = await frame.locator(".sn-fex-tile.sn-sel").count();
+    assert(afterInboxSheets === 1 && afterInboxKind === "pdf" && afterInboxCount === "1" && pdfInRoot === 0 && stuckAfterDrag === 0, "松手放入后拟物文件夹夹层实时长出对应 PDF 微缩纸片、计数 +1 且画布零残留灰底", `sheets=${afterInboxSheets}, kind=${afterInboxKind}, count=${afterInboxCount}, stuck=${stuckAfterDrag}`);
 
-    // 3. 双击拟物文件夹进入内部并确认文件就在其中
+    // 3. 轻点拟物文件夹直接平滑进入内部（无莫名其妙的伪选中灰底！）并确认文件就在其中
     const dbox2 = await frame.locator('[data-fx-id="f-inbox"]').boundingBox();
-    await page.mouse.dblclick(dbox2.x + dbox2.width / 2, dbox2.y + dbox2.height / 2);
-    await page.waitForTimeout(220);
+    await page.mouse.click(dbox2.x + dbox2.width / 2, dbox2.y + dbox2.height / 2);
+    await page.waitForTimeout(260);
     const crumbs = await frame.locator(".sn-fex-crumb").allTextContents();
     const movedInside = await frame.locator('[data-fx-id="d-pdf"]').count();
-    assert(crumbs.length === 2 && crumbs[1].includes("待整理素材") && movedInside === 1, "双击拟物文件夹成功进入子目录并可见刚拖入的 PDF", `crumbs=${crumbs.join(" / ")}, inside=${movedInside}`);
+    assert(crumbs.length === 2 && crumbs[1].includes("待整理素材") && movedInside === 1, "轻点拟物文件夹直接平滑进入子目录并可见刚拖入的 PDF", `crumbs=${crumbs.join(" / ")}, inside=${movedInside}`);
 
     // 点击根目录面包屑返回
     await frame.locator('.sn-fex-crumb[data-crumb-idx="0"]').click();
-    await page.waitForTimeout(180);
+    await page.waitForTimeout(220);
     assert((await frame.locator(".sn-fex-crumb").count()) === 1, "点击根目录面包屑顺利返回顶层");
 
     // 4. 空白处右键新建文件夹（含底部向上翻转菜单高度防压扁检查） + 行内重命名 + 删除 + Toast 撤销恢复
@@ -638,22 +726,37 @@ try {
     }
     assert((await frame.locator(".sn-fex-tile", { hasText: "超长测试文件夹名称" }).count()) === 1, "点击 Toast 撤销按钮弹性恢复刚删除的文件夹");
 
-    // 4.5 普通单击绝不触发复选框勾选；点击复选框才进入多选态 + 悬浮批量操作胶囊 + 批量删除与撤销
-    await frame.locator('[data-fx-id="f-shots"]').click();
-    await page.waitForTimeout(100);
-    const singleChkOn = await frame.locator(".sn-fex-chk.sn-on").count();
-    const singleBatch = await frame.locator(".sn-fex-batch.sn-open").count();
-    assert(singleChkOn === 0 && singleBatch === 0, "普通单击卡片仅轻微激活聚焦，绝不误触发复选打勾或弹出批量胶囊", `chkOn=${singleChkOn}, batch=${singleBatch}`);
+    // 4.5 常规态零无勾伪灰底；橡胶框选（从空白处或卡片旁透明边距长按拖拉，支持反向拉框与单/多选同步出勾和批量胶囊）+ 批量删除与撤销
+    const idleSelBefore = await frame.locator(".sn-fex-tile.sn-sel").count();
+    assert(idleSelBefore === 0, "常规浏览态画布零多余持续激活灰底", `sel=${idleSelBefore}`);
 
+    // 测试橡胶框选：从卡片旁空白边缘往右下拖拉选中多项，并验证从空白处反向拉框选中 1 项与 Esc 恢复
+    const shotsTileBox = await frame.locator('[data-fx-id="f-shots"]').boundingBox();
+    const codeTileBox = await frame.locator('[data-fx-id="f-code"]').boundingBox();
+    await page.mouse.move(shotsTileBox.x + 4, shotsTileBox.y + 40);
+    await page.mouse.down();
+    await page.mouse.move(codeTileBox.x + codeTileBox.width - 10, codeTileBox.y + codeTileBox.height + 55, { steps: 10 });
+    await page.waitForTimeout(140);
+    const hasMarqueeBox = await frame.locator(".sn-fex-marquee").count();
+    await page.mouse.up();
+    await page.waitForTimeout(200);
+    const marqueeChkOn = await frame.locator(".sn-fex-chk.sn-on").count();
+    const batchOpen = await frame.locator(".sn-fex-batch.sn-open").count();
+    const batchNum = await frame.locator("[data-fx-bnum]").textContent();
+    assert(hasMarqueeBox === 1 && marqueeChkOn >= 2 && batchOpen === 1 && Number(batchNum) >= 2, "空白处或卡片旁透明边距长按橡胶框选实时画出选框、自动打勾并浮起批量操作胶囊", `marquee=${hasMarqueeBox}, chkOn=${marqueeChkOn}, batch=${batchOpen}, num=${batchNum}`);
+
+    // 取消后验证点击复选框单选同样与打勾、批量胶囊、底栏四位一体同步
+    await frame.locator('[data-fx-bact="clear"]').click();
+    await page.waitForTimeout(140);
     await frame.locator('[data-fx-id="d-vue"]').hover();
     await page.waitForTimeout(100);
     await frame.locator('[data-fx-chk="d-vue"]').click();
     await page.waitForTimeout(120);
+    const oneChk = await frame.locator(".sn-fex-chk.sn-on").count();
+    const oneBatch = await frame.locator(".sn-fex-batch.sn-open").count();
+    assert(oneChk === 1 && oneBatch === 1, "勾选 1 项即与黑勾、柔选底、批量胶囊完全同步（绝不出现无勾假已选）", `chk=${oneChk}, batch=${oneBatch}`);
     await frame.locator('[data-fx-chk="d-tsx"]').click();
-    await page.waitForTimeout(220);
-    const batchOpen = await frame.locator(".sn-fex-batch.sn-open").count();
-    const batchNum = await frame.locator("[data-fx-bnum]").textContent();
-    assert(batchOpen === 1 && batchNum === "2", "勾选多项自动浮起多选批量操作胶囊并精准计数", `open=${batchOpen}, num=${batchNum}`);
+    await page.waitForTimeout(200);
     await frame.locator('[data-fx-bact="del"]').click();
     await page.waitForTimeout(360);
     assert((await frame.locator('[data-fx-id="d-vue"]').count()) === 0 && (await frame.locator('[data-fx-id="d-tsx"]').count()) === 0, "悬浮批量胶囊一键批量删除生效");
@@ -663,8 +766,10 @@ try {
       await page.waitForTimeout(280);
     }
     assert((await frame.locator('[data-fx-id="d-vue"]').count()) === 1 && (await frame.locator('[data-fx-id="d-tsx"]').count()) === 1, "撤销批量删除完整弹性恢复两张文件卡片");
-    await frame.locator('[data-fx-bact="clear"]').click();
-    await page.waitForTimeout(160);
+    if ((await frame.locator(".sn-fex-batch.sn-open").count()) > 0) {
+      await frame.locator('[data-fx-bact="clear"]').click();
+      await page.waitForTimeout(160);
+    }
 
     // 5. 切换三视图：卡片 → 列表 → 树形列表（并原地展开刚拖入的文件夹）
     await frame.locator('[data-fx-seg] button[data-v="list"]').click();
