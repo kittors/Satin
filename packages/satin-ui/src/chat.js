@@ -217,14 +217,41 @@ export const createThreadRail = /* @__PURE__ */ defineComponent({
 //   meta：{ time?: true, duration?: true, tps?: true }（消息底部悬停操作栏元信息显示开关）
 //   actions："hover"（默认：鼠标移入对应消息内容区域才显示）| "latest"（最新一条 AI 回复常显）| "always"（全部常显）| false / "none"（关闭）
 //   caret："dot" | "bar"（流式输出光标样式，默认 "dot"）
-export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railOpt = "left", meta: metaOpt, actions = "hover", caret = "dot", composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, onMenu, onNewChat, ...view } = {}) {
+//   composerBlur："none" | "sm" | "md" | "lg" | number | false（输入框高斯模糊级别，默认 "md"；底色不透明度强制 ≥82%/80%，绝不允许透明）
+//   composerResizable：boolean（是否支持顶部微把手拖拽调整输入框高度，默认 true）
+//   composerHeight：number（初始输入框文本区高度，自动钳制在安全范围内）
+export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railOpt = "left", meta: metaOpt, actions = "hover", caret = "dot", composerBlur = "md", composerResizable = true, composerHeight, composer: cmOpts, onModelChange, onModeChange, onContextChange, onContextClick, onMenu, onNewChat, ...view } = {}) {
   if (!box || box._chat) return box?._chat;
   const metaCfg = { time: true, duration: true, tps: true, ...metaOpt };
   const normActions = (v) => (v === false || v === "none" ? "none" : v === "always" || v === "latest" ? v : "hover");
   const setActions = (v) => { box.dataset.actions = normActions(v); };
+  const BLUR_PRESETS = { none: { px: 0, tint: 100 }, sm: { px: 8, tint: 46 }, md: { px: 14, tint: 23 }, lg: { px: 22, tint: 0 } };
+  const setComposerBlur = (level) => {
+    let key = "none", px = 0, tint = 100;
+    if (level === false || level == null || level === "none" || level === "off" || level === 0) {
+      key = "none"; px = 0; tint = 100;
+    } else if (typeof level === "string" && Object.hasOwn(BLUR_PRESETS, level)) {
+      key = level; ({ px, tint } = BLUR_PRESETS[level]);
+    } else if (typeof level === "number" && Number.isFinite(level)) {
+      px = Math.round(Math.max(0, Math.min(28, level)));
+      if (px <= 0) { key = "none"; tint = 100; }
+      else { key = px <= 10 ? "sm" : px <= 18 ? "md" : "lg"; tint = Math.round(55 - (px / 28) * 55); }
+    } else {
+      key = "md"; ({ px, tint } = BLUR_PRESETS.md);
+    }
+    box.dataset.composerBlur = key;
+    if (px > 0) {
+      box.style.setProperty("--sn-chat-foot-blur", px + "px");
+      box.style.setProperty("--sn-chat-foot-tint", tint + "%");
+    } else {
+      box.style.removeProperty("--sn-chat-foot-blur");
+      box.style.removeProperty("--sn-chat-foot-tint");
+    }
+  };
   // 空容器：先按选项（title、status、placeholder、max……）填好标记
   if (!box.querySelector(".sn-chat-vp")) { box.classList.add("sn-chat"); box.innerHTML = chatHTML(view); injectIcons(box); }
   setActions(actions);
+  setComposerBlur(composerBlur);
   if (caret === "bar") box.dataset.caret = "bar";
   const bodyEl = $(".sn-chat-body", box), vp = $(".sn-chat-vp", box), canvas = $(".sn-chat-canvas", vp), phTop = $(".sn-chat-ph.sn-top", canvas), phBot = $(".sn-chat-ph.sn-bot", canvas);
   const jump = $("[data-chat-jump]", box), badge = $(".sn-badge", jump);
@@ -236,6 +263,71 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   // 底部的提示词输入框（data-external：发送 / 停止交给对话）：还没人接就在这里接上——页面不用再调 bindInputs。
   // cmOpts：传给输入框的选项（upload 上传函数、attachments 预置附件）
   if (!composer._cm) mountComposer(composer, { ...cmOpts, voice: view.voice, onModelChange, onModeChange, onContextChange, onContextClick });
+  // ———— 输入框可调高度（顶部微把手拖拽 + 双击/Home 恢复自动 + 安全上下限） ————
+  const minTaH = () => {
+    const cs = getComputedStyle(ta), lh = parseFloat(cs.lineHeight) || 22;
+    return Math.round((Number(ta.getAttribute("rows")) || 1) * lh + (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0));
+  };
+  const maxTaH = () => {
+    const chatH = box.clientHeight || 560;
+    return Math.max(minTaH() + 44, Math.min(300, Math.round(chatH * 0.46) - 56));
+  };
+  const setComposerHeight = (h) => {
+    if (h == null || h === "auto" || h === false || Number(h) <= 0) {
+      delete composer.dataset.cmH;
+      ta.dispatchEvent(new Event("input"));
+      return;
+    }
+    const clamped = Math.round(Math.max(minTaH(), Math.min(maxTaH(), Number(h) || minTaH())));
+    composer.dataset.cmH = String(clamped);
+    ta.dispatchEvent(new Event("input"));
+  };
+  let resizeEl = null;
+  if (composerResizable !== false) {
+    const cardHost = $(".sn-cm-card", composer) || composer;
+    resizeEl = document.createElement("div");
+    resizeEl.className = "sn-cm-resize";
+    resizeEl.setAttribute("role", "separator");
+    resizeEl.setAttribute("aria-orientation", "horizontal");
+    resizeEl.setAttribute("aria-label", tt("chat.resize"));
+    resizeEl.dataset.tip = tt("chat.resize");
+    resizeEl.tabIndex = 0;
+    resizeEl.innerHTML = "<i></i>";
+    cardHost.prepend(resizeEl);
+    let dragging = false, pid = null, startY = 0, startH = 0;
+    const stopDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      composer.classList.remove("sn-cm-resizing");
+      if (pid != null) { try { resizeEl.releasePointerCapture(pid); } catch { /* ignore */ } pid = null; }
+    };
+    resizeEl.addEventListener("pointerdown", (e) => {
+      if (e.button && e.button !== 0) return;
+      e.preventDefault(); e.stopPropagation();
+      dragging = true; pid = e.pointerId; startY = e.clientY; startH = ta.offsetHeight || minTaH();
+      composer.classList.add("sn-cm-resizing");
+      try { resizeEl.setPointerCapture(pid); } catch { /* ignore */ }
+    });
+    resizeEl.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const next = Math.round(Math.max(minTaH(), Math.min(maxTaH(), startH + (startY - e.clientY))));
+      composer.dataset.cmH = String(next);
+      ta.dispatchEvent(new Event("input"));
+    });
+    resizeEl.addEventListener("pointerup", stopDrag);
+    resizeEl.addEventListener("pointercancel", stopDrag);
+    resizeEl.addEventListener("dblclick", (e) => { e.preventDefault(); e.stopPropagation(); setComposerHeight("auto"); });
+    resizeEl.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        e.preventDefault();
+        const cur = Number(composer.dataset.cmH) || ta.offsetHeight || minTaH();
+        setComposerHeight(cur + (e.key === "ArrowUp" ? 22 : -22));
+      } else if (e.key === "Home" || e.key === "Enter" || e.key === "Escape") {
+        e.preventDefault(); setComposerHeight("auto");
+      }
+    });
+  }
+  if (composerHeight != null) setComposerHeight(composerHeight);
   const PAD_T = 12, GAP = 16; // GAP = 条目自己的下内边距（.ci 的 padding-bottom）
   // 列表一直延伸到输入框背后（零顶部白缝、零虚化渐变）：列表底部留出输入框高度 + 14px，停在最新一条时自然呼吸
   let PAD_B = 18; const foot = $(".sn-chat-foot", box);
@@ -682,6 +774,132 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   }
   const imgHTML = (m) => `<div class="sn-ai-image${m.done ? " sn-done" : ""}"><span class="sn-blur" style="--sn-g:${esc(m.g)}"></span><span class="sn-pic" style="--sn-g:${esc(m.g)}"></span><span class="sn-gen-l">${LD_ARC}${tt("chat.12")} <b class="sn-num">${Math.round(m.p * 100)}%</b></span></div>`;
   const STOPPED = tt("chat.13");
+  // ———— 编辑回溯：撤销当前用户消息及后续全部对话（逆序错峰柔撤），原气泡镜像弹簧飞回输入框，保留历史平滑落位 ————
+  let rewinding = false, rewindTimer = 0;
+  composer.addEventListener("animationend", (e) => { if (e.target === composer) composer.classList.remove("sn-cm-catch"); });
+  function editMessage(it) {
+    if (!it || rewinding) return;
+    const idx = index.get(it.id);
+    if (idx == null || !it.me || typeof it.text !== "string") return;
+    // 若 AI 正在回复中，立即静默中止（不追加“已停止”）
+    if (job) { job.stop = true; job.rewound = true; job = null; composer._cm?.setBusy(false); }
+    cancelAnimationFrame(fRaf); fRaf = 0; fv = 0;
+    cancelAnimationFrame(gRaf); gRaf = 0;
+    let cutAt = idx;
+    while (cutAt > 1 && items[cutAt - 1]?.kind === "day") cutAt--;
+    const text = it.text, removed = items.slice(cutAt);
+    const commit = () => {
+      const oldScroll = vp.scrollTop;
+      for (const r of removed) { const el = live.get(r.id); if (el) drop(r.id, el); }
+      items.splice(cutAt); reindex();
+      msgCount = 0; for (const x of items) if (x.kind === "msg" || x.kind === "ai") msgCount++;
+      relayout(1);
+      const newMax = maxTop(), clamped = Math.max(0, oldScroll - newMax);
+      pinned = true;
+      if (clamped > 1 && !reduced()) { vp.scrollTop = newMax; slide(-clamped, 280); }
+      else if (vp.scrollTop < newMax - 2) glide(newMax, 260);
+      else vp.scrollTop = newMax;
+      render();
+      for (const prev of canvas.querySelectorAll(".sn-ai-acts.sn-keep")) prev.classList.remove("sn-keep");
+      const lastIt = items[items.length - 1];
+      if (lastIt && (lastIt.kind === "ai" || (lastIt.kind === "msg" && !lastIt.me))) live.get(lastIt.id)?.querySelector(".sn-ai-acts")?.classList.add("sn-keep");
+      if (msgCount === 0) showEmpty();
+      syncRailItems(); syncJump();
+      rewinding = false;
+    };
+    if (reduced()) { composer._cm?.fill(text); commit(); return; }
+    rewinding = true;
+    const editEl = live.get(it.id), editBubble = editEl?.querySelector(".sn-bubble");
+    const br = editBubble?.getBoundingClientRect(), bcs = editBubble ? getComputedStyle(editBubble) : null;
+    // 静默回填让输入框提前算好目标高度与文本坐标，文字先藏起等待飞行影子落地无缝交接
+    ta.style.opacity = "0";
+    ta.value = text;
+    ta.dispatchEvent(new Event("input", { bubbles: true }));
+    const tr = ta.getBoundingClientRect(), tcs = getComputedStyle(ta);
+    const tpl = parseFloat(tcs.paddingLeft), tpt = parseFloat(tcs.paddingTop), tpr = parseFloat(tcs.paddingRight);
+    const dst = { x: tr.left + tpl, y: tr.top + tpt - ta.scrollTop, w: ta.clientWidth - tpl - tpr };
+    // 后续对话与孤立日期条：从最新往回逆序错峰柔撤（像时间倒流优雅收卷）
+    const tailEls = [];
+    for (let i = items.length - 1; i >= cutAt; i--) {
+      const r = items[i]; if (r.id === it.id) continue;
+      const el = live.get(r.id); if (el) tailEls.push(el);
+    }
+    const RETRACT_DUR = 220, RETRACT_STEP = 26, MAX_STAGGER = 110;
+    let maxEnd = 0;
+    tailEls.forEach((el, k) => {
+      el.classList.add("sn-rewinding");
+      const inner = el.firstElementChild || el, delay = Math.min(MAX_STAGGER, k * RETRACT_STEP);
+      maxEnd = Math.max(maxEnd, delay + RETRACT_DUR);
+      inner.animate(
+        [{ opacity: 1, transform: "translateY(0) scale(1)" }, { opacity: 0, transform: "translateY(-10px) scale(.982)" }],
+        { duration: RETRACT_DUR, delay, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }
+      );
+    });
+    // 镜像对称上凸抛物线：水平（285ms）略快于竖直（335ms），从右侧轻盈横移再温柔落进输入框第一行
+    const FLY_X = 285, FLY_Y = 335;
+    let ghost = null, step = null, taAnim = null;
+    const finishEdit = () => {
+      if (step) { ghosts.delete(step); step = null; }
+      ghost?.remove(); ghost = null;
+      taAnim?.cancel(); taAnim = null;
+      ta.style.opacity = "";
+      ta.focus({ preventScroll: true });
+      const n = ta.value.length; ta.setSelectionRange(n, n);
+      composer.classList.remove("sn-cm-catch"); void composer.offsetWidth; composer.classList.add("sn-cm-catch");
+      commit();
+    };
+    if (editEl && editBubble && br && bcs && br.width > 0 && br.height > 0) {
+      editEl.classList.add("sn-rewinding");
+      editBubble.style.visibility = "hidden";
+      const fxR = fx.getBoundingClientRect();
+      const bl = parseFloat(bcs.paddingLeft), bt = parseFloat(bcs.paddingTop), brp = parseFloat(bcs.paddingRight), bb = parseFloat(bcs.paddingBottom);
+      const bw = br.width - bl - brp, rad = bcs.borderRadius;
+      const slotX = br.left - fxR.left, slotY = br.top - fxR.top;
+      const dxTotal = dst.x - (br.left + bl), dyTotal = dst.y - (br.top + bt);
+      ghost = document.createElement("div"); ghost.className = "sn-fx-g sn-fx-back";
+      Object.assign(ghost.style, { left: slotX + "px", top: slotY + "px", width: br.width + "px", height: br.height + "px", borderRadius: rad });
+      ghost.style.setProperty("--sn-fx-d", FLY_Y + "ms");
+      const sh = document.createElement("i"); sh.className = "sn-fx-sh";
+      Object.assign(sh.style, { width: br.width + "px", height: br.height + "px", borderRadius: rad });
+      const clip = document.createElement("div"); clip.className = "sn-fx-clip";
+      const bg = document.createElement("i"); bg.className = "sn-fx-bg";
+      const c = editBubble.cloneNode(true); c.style.visibility = ""; c.style.width = br.width + "px";
+      const s = document.createElement("div"); s.className = "sn-fx-src"; s.textContent = text;
+      Object.assign(s.style, { left: bl + "px", top: bt + "px", font: tcs.font, lineHeight: tcs.lineHeight, width: "max-content" });
+      clip.append(bg, c, s); ghost.append(sh, clip); fx.append(ghost);
+      const natural = s.getBoundingClientRect().width;
+      if (natural <= bw + .5 && natural <= dst.w + .5) {
+        s.remove(); clip.style.clipPath = `inset(0 round ${rad})`;
+        c.style.lineHeight = tcs.lineHeight;
+        bg.animate([{ opacity: 1 }, { opacity: .45, offset: .45 }, { opacity: 0 }], { duration: Math.round(FLY_Y * .72), easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" });
+        c.animate([{ opacity: 1 }, { opacity: 1, offset: .86 }, { opacity: 0 }], { duration: FLY_Y, easing: "ease-out", fill: "forwards" });
+      } else {
+        s.style.width = dst.w + "px";
+        const th = s.offsetHeight, gw = Math.max(br.width, dst.w + bl + brp), gh = Math.max(br.height, th + bt + bb);
+        ghost.style.width = gw + "px"; ghost.style.height = gh + "px";
+        clip.animate(
+          [{ clipPath: `inset(0 ${gw - br.width}px ${gh - br.height}px 0 round ${rad})` }, { clipPath: `inset(0 ${gw - (dst.w + bl + brp)}px ${gh - (th + bt + bb)}px 0 round 12px)` }],
+          { duration: 240, easing: RISE_CSS, fill: "both" }
+        );
+        bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 210, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" });
+        c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: "ease-out", fill: "forwards" });
+        s.animate([{ opacity: 0 }, { opacity: 1, offset: .45 }, { opacity: 1, offset: .86 }, { opacity: 0 }], { duration: FLY_Y, delay: 40, easing: "ease-out", fill: "both" });
+      }
+      taAnim = ta.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 42, delay: Math.round(FLY_Y * .86), easing: "ease-out", fill: "forwards" });
+      const t0 = now0(), totalDur = Math.max(FLY_X, FLY_Y, maxEnd);
+      step = (now) => {
+        const elapsed = Math.max(0, now - t0);
+        const px = GLIDE(Math.min(1, elapsed / FLY_X)), py = RISE(Math.min(1, elapsed / FLY_Y));
+        ghost.style.transform = `translate(${dxTotal * px}px, ${dyTotal * py}px)`;
+        if (elapsed >= totalDur) finishEdit();
+      };
+      step(t0); ghosts.add(step); motion();
+    } else {
+      ta.style.opacity = "";
+      ta.animate([{ opacity: .15 }, { opacity: 1 }], { duration: 220, easing: "ease-out" });
+      rewindTimer = setTimeout(() => { rewindTimer = 0; finishEdit(); }, Math.max(120, maxEnd));
+    }
+  }
   // 复制、赞/踩、编辑、重新生成、工具调用展开：全委托在 canvas 上
   canvas.addEventListener("click", (e) => {
     const thd = e.target.closest(".sn-tool-hd");
@@ -698,7 +916,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       const sw = b.querySelector(".sn-swap"); if (sw) { sw.classList.add("sn-on"); clearTimeout(b._t); b._t = setTimeout(() => sw.classList.remove("sn-on"), 1500); }
       return;
     }
-    if (b.dataset.act === "edit" && it?.text) { composer._cm?.fill(it.text); ta?.focus(); return; }
+    if (b.dataset.act === "edit" && it?.text) { editMessage(it); return; }
     if (b.dataset.act === "regen" && respond && !job) {
       const i = it ? index.get(it.id) : -1;
       let q = ""; for (let k = i - 1; k >= 0; k--) if (items[k].me && items[k].text) { q = items[k].text; break; }
@@ -754,7 +972,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     const me = { stop: false }; job = me;
     const it = { id: ++seq, kind: "ai", me: false, keep: true, ph: "text", think: null, secs: 0, open: true, tools: [], steps: [], text: "", cards: 0, cardList: [], img: null, acts: false, stopped: false, time: fmtClock(), durSec: null, tps: null };
     composer._cm?.setBusy(true);
-    await after; await wait(90); if (me.stop) return finish(it, me);
+    await after; await wait(90); if (me.rewound) return; if (me.stop) return finish(it, me);
     let inserted = false, th = null, tx = null, t0 = 0, runStart = performance.now(), textStart = 0, thinkIv = 0;
     const stopThinkTimer = () => { if (thinkIv) { clearInterval(thinkIv); thinkIv = 0; } };
     const startThinkTimer = () => {
@@ -858,9 +1076,11 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
       } else { const text = await out; if (!me.stop && text) (await toText()).push(String(text)); }
     } catch (e) { if (!me.stop) { (await toText()).push(tt("chat.24")); } }
     stopThinkTimer();
+    if (me.rewound) { th?.stop(); tx?.stop(); return; }
     if (!inserted && !me.stop) show("text");
     unwait("text");
     await th?.drain(); await tx?.drain();
+    if (me.rewound) return;
     const nowEnd = performance.now();
     it.time = fmtClock();
     it.durSec = Math.max(.2, (nowEnd - runStart) / 1000);
@@ -940,6 +1160,11 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
     if (reduced() || emptyGone) return;
     PARTS().forEach((el, i) => el.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 480, delay: i * 50, easing: "cubic-bezier(.22,1,.36,1)", fill: "backwards" }));
   }
+  function showEmpty() {
+    if (!emptyEl) return;
+    emptyGone = false; emptyEl.hidden = false; box.classList.add("sn-fresh");
+    if (!reduced()) { emptyEl.classList.add("sn-enter-wait"); requestAnimationFrame(() => enter()); }
+  }
   function hideEmpty() {
     if (emptyGone) return; emptyGone = true; box.classList.remove("sn-fresh"); emptyEl.classList.remove("sn-enter-wait");
     if (reduced()) { emptyEl.hidden = true; return; }
@@ -967,7 +1192,7 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   const initNarrow = syncNarrow();
   colW = Math.min(740, vp.clientWidth - (initNarrow ? 24 : 40)); relayout(1); // 内容一栏最宽 740（与输入框左右轴线严格对齐）
   if (foot) {
-    const syncFoot = () => { const h = foot.offsetHeight; box.style.setProperty("--sn-foot-h", h + "px"); const nb = h + 14; if (nb === PAD_B) return; PAD_B = nb; relayout(1); if (pinned) vp.scrollTop = maxTop(); render(); };
+    const syncFoot = () => { const h = foot.offsetHeight; box.style.setProperty("--sn-foot-h", h + "px"); const nb = h + 14; if (nb === PAD_B) return; PAD_B = nb; relayout(1); if (pinned && !rewinding) vp.scrollTop = maxTop(); render(); };
     new ResizeObserver(syncFoot).observe(foot); syncFoot();
   }
   const toBottom = () => { vp.scrollTop = maxTop(); render(); syncRailActive(); };
@@ -976,9 +1201,9 @@ export function mountChat(box, { respond, history, hiRes = (g) => g, rail: railO
   new IntersectionObserver((es, io) => { if (es.some((x) => x.isIntersecting)) { toBottom(); requestAnimationFrame(toBottom); io.disconnect(); } }).observe(box);
   void $$; void injectIcons; void toast;
   // 销毁：停掉正在生成的回答、放开实例（同一个容器可以再挂一次）。挂载时加的监听、观察器由 createChat 一起撤
-  const destroy = () => { if (job) job.stop = true; job = null; rail?.destroy(); composer?._cm?.stopVoice?.(true); if (box._chat === api) delete box._chat; };
+  const destroy = () => { if (job) { job.stop = true; job.rewound = true; } job = null; clearTimeout(rewindTimer); rewindTimer = 0; ghosts.clear(); fx.replaceChildren(); ta.style.opacity = ""; resizeEl?.remove(); delete composer.dataset.cmH; composer.classList.remove("sn-cm-resizing"); delete box.dataset.composerBlur; box.style.removeProperty("--sn-chat-foot-blur"); box.style.removeProperty("--sn-chat-foot-tint"); rail?.destroy(); composer?._cm?.stopVoice?.(true); if (box._chat === api) delete box._chat; };
   // 程序里发一条（和用户在输入框里发一样：飞进列表、然后回复）
-  const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, scrollToId, setRail: (s) => rail?.setSide(s), setActions, destroy,
+  const api = { send: (text) => { ta.value = text; ta.dispatchEvent(new Event("input")); composer._cm && composer.dispatchEvent(new CustomEvent("compose", { detail: { text } })); }, receive, sendText, scrollToOldest, scrollToId, setRail: (s) => rail?.setSide(s), setActions, setComposerBlur, setComposerHeight, destroy,
     fill: (text) => composer._cm?.fill(text), get emptyEl() { return emptyEl; } };
   return (box._chat = api);
 }
@@ -997,11 +1222,13 @@ export const createChat = /* @__PURE__ */ defineComponent({
       onMenu: () => api.emit("menu"), onNewChat: () => api.emit("newChat") });
     const cm = () => el.querySelector(".sn-composer")?._cm;
     return {
-      send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, scrollToId: c.scrollToId, setRail: c.setRail, setActions: c.setActions, fill: c.fill,
+      send: c.send, receive: c.receive, sendText: c.sendText, scrollToOldest: c.scrollToOldest, scrollToId: c.scrollToId, setRail: c.setRail, setActions: c.setActions, setComposerBlur: c.setComposerBlur, setComposerHeight: c.setComposerHeight, fill: c.fill,
       get emptyEl() { return c.emptyEl; },
       update(next, prev) {
         if (next.status !== prev.status) { const s = el.querySelector("[data-chat-status]"); if (s) s.textContent = next.status ?? ""; }
         if (next.actions !== prev.actions) c.setActions(next.actions);
+        if (next.composerBlur !== prev.composerBlur) c.setComposerBlur(next.composerBlur);
+        if (next.composerHeight !== prev.composerHeight) c.setComposerHeight(next.composerHeight);
         // 底部输入框的上下文、模式、模型：只是选中项换了就只改选中（不发事件）；结构变了才换那一块
         syncComposerParts(cm(), next, prev);
       },

@@ -54,7 +54,7 @@ for (const b of $$("[data-copy-cmd]")) b.addEventListener("click", async () => {
   const toItem = (pg) => ({ href: "next-docs.html" + pg.hash, title: pg.title, icon: pg.icon });
   const toGroups = (cat) => sectionsOf(docPages(cat)).map((sc) => ({ name: sc.name, items: sc.items.map(toItem), cats: sc.cats.map((c) => ({ name: c.name, items: c.items.map(toItem) })) }));
   const mnav = mountMobileNav({
-    sections: toGroups(null), top: [{ href: "next.html", title: "首页", icon: "house" }],
+    sections: toGroups(null), top: [{ href: "next.html", title: "首页", icon: "house" }, { href: "https://github.com/kittors/Satin", title: "GitHub 开源仓库", icon: "github", ext: true }],
     current: (href) => href === "next.html",
   });
   let asked = false;

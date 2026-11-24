@@ -29,5 +29,6 @@ export default {
   "chat.30": "Result",
   "chat.31": "Thread navigation",
   "chat.file": "File",
-  "chat.empty": "What can I help with?"
+  "chat.empty": "What can I help with?",
+  "chat.resize": "Drag to resize height, double-click to reset"
 };

@@ -34,6 +34,12 @@ export interface ChatProps extends ComposerParts {
   actions?: "hover" | "latest" | "always" | false | "none";
   /** 流式输出光标样式："dot" | "bar" | false */
   caret?: "dot" | "bar" | false;
+  /** 底部输入框高斯模糊级别（带不透明度安全下限 ≥78%/76%，绝不允许透明）："none" | "sm" | "md" | "lg" | 0–28px 数值 */
+  composerBlur?: "none" | "sm" | "md" | "lg" | number | false;
+  /** 是否启用输入框顶部微把手拖拽调高（默认 true，双击微把手恢复自动高度） */
+  composerResizable?: boolean;
+  /** 手动指定底部输入框文本区高度（px，自动钳制在安全范围内） */
+  composerHeight?: number;
 }
 /** createChat 的选项：上面那些 + 输入框部件的事件回调 + 顶栏按钮的回调 */
 export interface ChatOptions extends ChatProps, ComposerPartEvents {
@@ -51,6 +57,10 @@ export interface ChatApi { send(text: string): void; receive(item: Partial<ChatI
   setRail(side: "left" | "right" | "off" | false): void;
   /** 动态切换消息操作栏显隐策略 */
   setActions(mode: "hover" | "latest" | "always" | false | "none"): void;
+  /** 动态调整输入框高斯模糊级别（受安全不透明度下限约束，不允许透明） */
+  setComposerBlur(level: "none" | "sm" | "md" | "lg" | number | false): void;
+  /** 动态设置输入框文本区高度（px）或传 "auto" 恢复自动伸缩 */
+  setComposerHeight(height: number | "auto" | null): void;
   /** 填一段字进底部输入框（字淡入、光标在最后），不发 */
   fill(text: string): void;
   /** 新对话那一块（empty 给 true 时自己往里画）；没有空状态时是 null */

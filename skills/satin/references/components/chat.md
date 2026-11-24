@@ -1077,6 +1077,9 @@ export default function Storyboard() {
 | `meta` | `boolean \| { time?: boolean; duration?: boolean; latency?: boolean; tps?: boolean }` | true | 否 | AI 回复底栏元信息开关：控制时间戳、首字/总耗时与生成速率（tok/s）展示。 | createXxx 选项：`meta`；React：`meta`；Preact：`meta`；Vue：`meta` |
 | `actions` | `"hover" \| "latest" \| "always" \| false \| "none"` | "hover" | 否 | 消息操作栏显隐策略：默认仅鼠标移入对应消息内容区域时平滑显现；支持 latest（最新一条常显）、always（全部常显）或 false / none（隐藏）。 | createXxx 选项：`actions`；React：`actions`；Preact：`actions`；Vue：`actions` |
 | `caret` | `"dot" \| "bar" \| false` | "dot" | 否 | 流式输出末尾跟随光标样式：柔和呼吸圆点、竖线光标或关闭。 | createXxx 选项：`caret`；React：`caret`；Preact：`caret`；Vue：`caret` |
+| `composerBlur` | `"none" \| "sm" \| "md" \| "lg" \| number \| false` | "md" | 否 | 底部输入框背景高斯模糊级别（受安全限度约束，底色不透明度强制 ≥78%/76%，绝不允许透明；数字自动钳制在 0–28px）。 | createXxx 选项：`composerBlur`；React：`composerBlur`；Preact：`composerBlur`；Vue：`composerBlur（模板里写 composer-blur）` |
+| `composerResizable` | `boolean` | true | 否 | 是否开启底部输入框顶部微把手拖拽调高（带安全最大高度上限，双击微把手恢复自动高度）。 | createXxx 选项：`composerResizable`；React：`composerResizable`；Preact：`composerResizable`；Vue：`composerResizable（模板里写 composer-resizable）` |
+| `composerHeight` | `number` | 自动 | 否 | 手动指定底部输入框文本区高度（px），自动钳制在单行至容器 46% 的安全区间内。 | createXxx 选项：`composerHeight`；React：`composerHeight`；Preact：`composerHeight`；Vue：`composerHeight（模板里写 composer-height）` |
 | `className / style / id` | `string / CSSProperties / string` | — | 否 | 加在对话框容器上（默认高 680、最宽 840）。 | React：`className / style / id`；Preact：`class / style / id` |
 
 ## 事件
@@ -1107,6 +1110,8 @@ export default function Storyboard() {
 | `scrollToId` | `scrollToId(id: string \| number): void` | 平滑滚动定位到指定消息 ID。 |
 | `setRail` | `setRail(side: "left" \| "right" \| "off" \| false): void` | 运行时动态切换侧边定位刻度轨的位置或隐藏。 |
 | `setActions` | `setActions(mode: "hover" \| "latest" \| "always" \| false \| "none"): void` | 运行时动态切换消息操作栏显隐策略。 |
+| `setComposerBlur` | `setComposerBlur(level: "none" \| "sm" \| "md" \| "lg" \| number \| false): void` | 运行时调整输入框高斯模糊级别（受不透明度安全下限约束，不允许透明）。 |
+| `setComposerHeight` | `setComposerHeight(height: number \| "auto" \| null): void` | 运行时设置输入框高度（px）或传 "auto" 恢复随内容自动伸缩。 |
 | `fill` | `fill(text: string): void` | 把一段字填进底部输入框（字淡入、拿到焦点、光标在最后），不发。新对话的建议点了就是这样。 |
 | `emptyEl` | `readonly emptyEl: HTMLElement \| null` | 新对话那一块的元素（empty 给 true 时自己往里画）；没有空状态时是 null。 |
 

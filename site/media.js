@@ -55,10 +55,11 @@ export const VIDEO = [
 ];
 export const videoSrc = (id) => `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`;
 
-// 页脚"素材来源"：按来源列出作者
+// 页脚"开源与素材来源"：列出开源仓库与素材作者
 export function creditsHTML() {
   const by = [...new Set(Object.values(PHOTO).map((p) => p.by))];
-  return `<p><b>照片</b>来自 <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>（Unsplash License）：${by.join("、")}。</p>`
+  return `<p><b>开源</b>代码托管于 <a href="https://github.com/kittors/Satin" target="_blank" rel="noopener noreferrer">GitHub（kittors/Satin）</a>，采用 MIT 协议开源，欢迎提交 Issue 与 Pull Request。</p>`
+    + `<p><b>照片</b>来自 <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>（Unsplash License）：${by.join("、")}。</p>`
     + `<p><b>音乐</b>来自 <a href="https://mixkit.co/free-stock-music/" target="_blank" rel="noopener">Mixkit</a>（Mixkit License）：${[...new Set(MUSIC.map((m) => m.by))].join("、")}。</p>`
     + `<p><b>视频</b>来自 <a href="https://mixkit.co/free-stock-video/" target="_blank" rel="noopener">Mixkit</a>（Mixkit License）。</p>`;
 }

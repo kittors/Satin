@@ -34,6 +34,7 @@ import { setLightboxBounds } from "../packages/satin-ui/src/lightbox.js";
 { let v = window.__satinView ?? null; setLightboxBounds(v); Object.defineProperty(window, "__satinView", { configurable: true, get: () => v, set: (x) => { v = x; setLightboxBounds(x); } }); }
 export { reduced, edgeFrames, initSeg, showTip, hideTip, tipTarget, resetTipLayer };
 // 页面级的全局行为（Tooltip、表单、浮层栈、看图键盘、主题）：原来各模块导入时就装上，现在显式装，顺序和原来一样
+ICONS.github ??= '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2" class="sn-ic-d"/>';
 setup();
 defineElements(); // 设计稿里的头像写成 <sn-avatar>（写标记的人也这样用）
 
@@ -162,7 +163,7 @@ addEventListener("storage", (e) => {
   pref = e.newValue || "auto"; themeSeg?.go(Math.max(0, ["auto", "light", "dark"].indexOf(pref)), false, true); applyTheme(!EMBED);
 });
 { const s = $('[data-seg="iconsize"]'); if (s) initSeg(s, (v) => paintIcons(Number(v))); }
-for (const s of $$(".doc-main .sn-seg[data-seg]")) if (!["theme", "iconsize", "toastpos", "safade", "navfx", "nfstyle", "sabar", "saover", "ctxbound", "ctxsize", "spdensity", "lomode", "gmode", "cgmode", "gsb", "cgsb", "glines", "cglines", "tlines", "mdcode", "mdimg", "mdtable", "mdview", "lmnav", "lmdelay", "charea", "ch3d", "ldsize", "ldspeed", "ldtone", "chatrail"].includes(s.dataset.seg)) initSeg(s);
+for (const s of $$(".doc-main .sn-seg[data-seg]")) if (!["theme", "iconsize", "toastpos", "safade", "navfx", "nfstyle", "sabar", "saover", "ctxbound", "ctxsize", "spdensity", "lomode", "gmode", "cgmode", "gsb", "cgsb", "glines", "cglines", "tlines", "mdcode", "mdimg", "mdtable", "mdview", "lmnav", "lmdelay", "charea", "ch3d", "ldsize", "ldspeed", "ldtone", "chatrail", "chatblur"].includes(s.dataset.seg)) initSeg(s);
 $("#reduce")?.addEventListener("change", (e) => root.classList.toggle("sn-reduce-motion", e.target.checked));
 // 动效曲线：点一下，圆点按这条曲线走到另一头；再点回来
 for (const c of $$(".curve")) c.addEventListener("click", () => {

@@ -506,8 +506,10 @@ body.n-docs, body.n-home {
 .n-foot li { list-style: none; margin-top: 8px; }
 .n-foot li a { color: var(--sn-label3); text-decoration: none; font: 400 calc(13px * var(--fsx))/calc(18px * var(--fsx)) var(--sn-sans); transition: color .15s var(--sn-ease-out); }
 .n-foot li a:hover { color: var(--sn-label); }
-.n-foot-mode { margin-top: 20px; }
+.n-foot-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+.n-foot-mode { margin-top: 0; }
 .n-foot-mode button .sn-ic { width: 14px; height: 14px; }
+.n-foot-gh { color: var(--sn-label2); }
 .n-credits { margin-top: 48px; padding-top: 24px; }
 
 /* ———— 7. 首页：窄屏 ———— */
@@ -601,7 +603,7 @@ html.dx-fs { padding-right: var(--fs-sbw, 0px); }
   /* 文档页顶栏 */
   .s-nav { height: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
   .s-nav .s-wrap { position: relative; gap: 12px; padding: 0 max(12px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
-  .s-nav .s-links, .s-nav .s-search, .s-nav [data-custom-btn], .s-nav .s-mode { display: none; }
+  .s-nav .s-links, .s-nav .s-search, .s-nav [data-repo], .s-nav [data-custom-btn], .s-nav .s-mode { display: none; }
   /* 首页顶栏：不长浮岛 */
   .n-nav { height: calc(56px + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); }
   .n-nav-in { padding: 0 max(12px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }

@@ -29,5 +29,6 @@ export default {
   "chat.jump": "跳到最新",
   "chat.27": "发送失败，点一下重发",
   "chat.file": "文件",
-  "chat.empty": "有什么可以帮你？"
+  "chat.empty": "有什么可以帮你？",
+  "chat.resize": "拖动调整高度，双击恢复自动"
 };

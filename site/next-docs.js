@@ -1423,7 +1423,7 @@ toc.addEventListener("click", (e) => { const a = e.target.closest("a[data-to]");
 const toItem = (pg) => ({ href: pg.hash, title: pg.title, icon: pg.icon });
 const mnav = mountMobileNav({
   sections: sectionsOf(pages).map((sc) => ({ name: sc.name, items: sc.items.map(toItem), cats: sc.cats.map((c) => ({ name: c.name, items: c.items.map(toItem) })) })),
-  top: [{ href: "next.html", title: "首页", icon: "house" }],
+  top: [{ href: "next.html", title: "首页", icon: "house" }, { href: "https://github.com/kittors/Satin", title: "GitHub 开源仓库", icon: "github", ext: true }],
   current: (href) => href === (parseHash().base || "#/intro"),
 });
 

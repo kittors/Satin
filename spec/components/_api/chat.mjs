@@ -53,6 +53,9 @@ export default {
     { name: "meta", type: "boolean | { time?: boolean; duration?: boolean; latency?: boolean; tps?: boolean }", default: "true", required: false, desc: "AI 回复底栏元信息开关：控制时间戳、首字/总耗时与生成速率（tok/s）展示。", names: { js: "meta", react: "meta", preact: "meta", vue: "meta" } },
     { name: "actions", type: '"hover" | "latest" | "always" | false | "none"', default: '"hover"', required: false, desc: "消息操作栏显隐策略：默认仅鼠标移入对应消息内容区域时平滑显现；支持 latest（最新一条常显）、always（全部常显）或 false / none（隐藏）。", names: { js: "actions", react: "actions", preact: "actions", vue: "actions" } },
     { name: "caret", type: '"dot" | "bar" | false', default: '"dot"', required: false, desc: "流式输出末尾跟随光标样式：柔和呼吸圆点、竖线光标或关闭。", names: { js: "caret", react: "caret", preact: "caret", vue: "caret" } },
+    { name: "composerBlur", type: '"none" | "sm" | "md" | "lg" | number | false', default: '"md"', required: false, desc: "底部输入框背景高斯模糊级别（受安全限度约束，底色不透明度强制 ≥78%/76%，绝不允许透明；数字自动钳制在 0–28px）。", names: { js: "composerBlur", react: "composerBlur", preact: "composerBlur", vue: "composerBlur（模板里写 composer-blur）" } },
+    { name: "composerResizable", type: "boolean", default: "true", required: false, desc: "是否开启底部输入框顶部微把手拖拽调高（带安全最大高度上限，双击微把手恢复自动高度）。", names: { js: "composerResizable", react: "composerResizable", preact: "composerResizable", vue: "composerResizable（模板里写 composer-resizable）" } },
+    { name: "composerHeight", type: "number", default: "自动", required: false, desc: "手动指定底部输入框文本区高度（px），自动钳制在单行至容器 46% 的安全区间内。", names: { js: "composerHeight", react: "composerHeight", preact: "composerHeight", vue: "composerHeight（模板里写 composer-height）" } },
     { name: "className / style / id", type: "string / CSSProperties / string", default: "—", required: false, desc: "加在对话框容器上（默认高 680、最宽 840）。", names: { react: "className / style / id", preact: "class / style / id" } },
   ],
   events: [
@@ -74,6 +77,8 @@ export default {
     { name: "scrollToId", kind: "method", signature: "scrollToId(id: string | number): void", returns: "void", desc: "平滑滚动定位到指定消息 ID。" },
     { name: "setRail", kind: "method", signature: 'setRail(side: "left" | "right" | "off" | false): void', returns: "void", desc: "运行时动态切换侧边定位刻度轨的位置或隐藏。" },
     { name: "setActions", kind: "method", signature: 'setActions(mode: "hover" | "latest" | "always" | false | "none"): void', returns: "void", desc: "运行时动态切换消息操作栏显隐策略。" },
+    { name: "setComposerBlur", kind: "method", signature: 'setComposerBlur(level: "none" | "sm" | "md" | "lg" | number | false): void', returns: "void", desc: "运行时调整输入框高斯模糊级别（受不透明度安全下限约束，不允许透明）。" },
+    { name: "setComposerHeight", kind: "method", signature: 'setComposerHeight(height: number | "auto" | null): void', returns: "void", desc: "运行时设置输入框高度（px）或传 \"auto\" 恢复随内容自动伸缩。" },
     { name: "fill", kind: "method", signature: "fill(text: string): void", returns: "void", desc: "把一段字填进底部输入框（字淡入、拿到焦点、光标在最后），不发。新对话的建议点了就是这样。" },
     { name: "emptyEl", kind: "property", signature: "readonly emptyEl: HTMLElement | null", returns: "HTMLElement | null", desc: "新对话那一块的元素（empty 给 true 时自己往里画）；没有空状态时是 null。" },
   ],

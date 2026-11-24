@@ -1,7 +1,7 @@
 {
  "easingUsage": {
-  "var(--sn-ease-out)": 355,
-  "var(--sn-ease-out-strong)": 77,
+  "var(--sn-ease-out)": 358,
+  "var(--sn-ease-out-strong)": 79,
   "cubic-bezier(.55, .15, .45, .85)": 2,
   "var(--sn-ease-overshoot)": 15,
   "var(--sn-ease-in-out)": 32,
@@ -9,6 +9,8 @@
   "ease-in": 2,
   "linear": 41,
   "cubic-bezier(.3, .1, .3, 1)": 1,
+  "cubic-bezier(.25, .1, .25, 1)": 2,
+  "cubic-bezier(.16, 1, .3, 1)": 4,
   "var(--sn-ease-open)": 13,
   "cubic-bezier(.34, 1.56, .64, 1)": 1,
   "cubic-bezier(.62, .12, .38, .88)": 1,
@@ -408,12 +410,6 @@
   },
   {
    "file": "packages/satin-ui/css/content.css",
-   "selector": ".sn-ai-acts",
-   "prop": "animation",
-   "value": "sn-tk-in .3s var(--sn-ease-out) both"
-  },
-  {
-   "file": "packages/satin-ui/css/content.css",
    "selector": ".sn-ci-ai.sn-streaming .sn-ai-plan li, .sn-ci-ai.sn-streaming .sn-ai-image",
    "prop": "animation",
    "value": "sn-rise-in .32s var(--sn-ease-out-strong) both"
@@ -510,9 +506,57 @@
   },
   {
    "file": "packages/satin-ui/css/content.css",
-   "selector": ".sn-ai-acts, .sn-me-acts",
+   "selector": ".sn-ai-acts > *, .sn-me-acts > *",
    "prop": "transition",
-   "value": "opacity var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(160ms * var(--sn-motion-scale, 1)) var(--sn-ease-out)"
+   "value": "opacity calc(240ms * var(--sn-motion-scale, 1)) cubic-bezier(.25, .1, .25, 1) calc((65ms + var(--sn-ai-out, 0) * 12ms) * var(--sn-motion-scale, 1)), transform calc(260ms * var(--sn-motion-scale, 1)) cubic-bezier(.25, .1, .25, 1) calc((65ms + var(--sn-ai-out, 0) * 12ms) * var(--sn-motion-scale, 1))"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-ai-body:hover > .sn-ai-acts > *, .sn-msg-col:hover > .sn-ai-acts > *, .sn-msg-col:hover > .sn-me-acts > *",
+   "prop": "transition",
+   "value": "opacity calc(260ms * var(--sn-motion-scale, 1)) cubic-bezier(.16, 1, .3, 1) calc((24ms + var(--sn-ai-i, 0) * 22ms) * var(--sn-motion-scale, 1)), transform calc(300ms * var(--sn-motion-scale, 1)) cubic-bezier(.16, 1, .3, 1) calc((24ms + var(--sn-ai-i, 0) * 22ms) * var(--sn-motion-scale, 1))"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-ai-body:has(:focus-visible) > .sn-ai-acts > *, .sn-msg-col:has(:focus-visible) > .sn-ai-acts > *, .sn-msg-col:has(:f",
+   "prop": "transition",
+   "value": "opacity calc(260ms * var(--sn-motion-scale, 1)) cubic-bezier(.16, 1, .3, 1) calc(var(--sn-ai-i, 0) * 22ms * var(--sn-motion-scale, 1)), transform calc(300ms * var(--sn-motion-scale, 1)) cubic-bezier(.16, 1, .3, 1) calc(var(--sn-ai-i, 0) * 22ms * var(--sn-motion-scale, 1))"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-ci.sn-rewinding .sn-ai-acts > *, .sn-ci.sn-rewinding .sn-me-acts > *",
+   "prop": "transition-duration",
+   "value": "90ms"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-chat-foot .sn-composer.sn-cm-catch",
+   "prop": "animation",
+   "value": "sn-cm-catch calc(300ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-ai-acts > *, .sn-me-acts > *",
+   "prop": "transition",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-chat-foot .sn-composer.sn-cm-catch",
+   "prop": "animation",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-reduce-motion .sn-ai-acts > *, .sn-reduce-motion .sn-me-acts > *",
+   "prop": "transition",
+   "value": "none"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-reduce-motion .sn-chat-foot .sn-composer.sn-cm-catch",
+   "prop": "animation",
+   "value": "none"
   },
   {
    "file": "packages/satin-ui/css/content.css",
@@ -639,6 +683,24 @@
    "selector": ".sn-ci.sn-reveal > .sn-msg",
    "prop": "animation",
    "value": "sn-msg-in .34s var(--sn-ease-out-strong) both"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-chat-foot .sn-composer:not(:has(> .sn-cm-card))",
+   "prop": "transition",
+   "value": "box-shadow .2s var(--sn-ease-out), background-color .22s var(--sn-ease-out), backdrop-filter .22s var(--sn-ease-out), -webkit-backdrop-filter .22s var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-cm-resize > i",
+   "prop": "transition",
+   "value": "width calc(200ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong), background-color var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(180ms * var(--sn-motion-scale, 1)) var(--sn-ease-out)"
+  },
+  {
+   "file": "packages/satin-ui/css/content.css",
+   "selector": ".sn-composer.sn-cm-resizing textarea",
+   "prop": "transition",
+   "value": "none"
   },
   {
    "file": "packages/satin-ui/css/content.css",
@@ -2661,6 +2723,51 @@
    "file": "packages/satin-ui/src/chat.js",
    "duration": "130",
    "easing": ""
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "RETRACT_DUR",
+   "easing": ""
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "Math.round(FLY_Y * .72)",
+   "easing": "\"cubic-bezier(.4"
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "FLY_Y",
+   "easing": "\"ease-out\""
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "240",
+   "easing": "RISE_CSS"
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "210",
+   "easing": "\"cubic-bezier(.4"
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "120",
+   "easing": "\"ease-out\""
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "FLY_Y",
+   "easing": ""
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "42",
+   "easing": ""
+  },
+  {
+   "file": "packages/satin-ui/src/chat.js",
+   "duration": "220",
+   "easing": "\"ease-out\""
   },
   {
    "file": "packages/satin-ui/src/chat.js",

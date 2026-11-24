@@ -197,7 +197,6 @@
 .sn-ai-image .sn-gen-l .sn-spinner { width: 12px; height: 12px; border-width: 1.5px; border-color: rgba(255, 255, 255, .3); border-top-color: #fff; }
 .sn-ai-image.sn-done .sn-gen-l { opacity: 0; }
 .sn-ai-stopped { font: 400 calc(12px * var(--sn-font-scale, 1))/calc(18px * var(--sn-font-scale, 1)) var(--sn-sans); color: var(--sn-label3); }
-.sn-ai-acts { display: flex; gap: 2px; margin-left: -6px; animation: sn-tk-in .3s var(--sn-ease-out) both; }
 /* 正在流出来的回复里，新加的步骤、卡片、画面依次浮现（重画时不再动） */
 .sn-ci-ai.sn-streaming .sn-ai-plan li, .sn-ci-ai.sn-streaming .sn-ai-image { animation: sn-rise-in .32s var(--sn-ease-out-strong) both; }
 .sn-ci-ai.sn-streaming .sn-ai-card { animation: sn-rise-in .36s var(--sn-ease-out-strong) both; }
@@ -407,16 +406,35 @@
   .sn-chat-sugs { margin-top: 16px; }
 }
 /* 回复下面的操作：严格统一 28×28 按钮 + 14px 图标 + 等宽元信息（时间 · 耗时 · TPS 速率）
-   默认（data-actions="hover"）全部消息仅在鼠标移入对应内容区域（.sn-ai-body / .sn-msg-col）或键盘聚焦/触屏点按时平滑淡入；
+   默认（data-actions="hover"）全部消息仅在鼠标移入对应内容区域（.sn-ai-body / .sn-msg-col）或键盘聚焦/触屏点按时丝滑浮现：
+   仅在子项做单层 opacity + transform 过渡（杜绝父子叠加 opacity 平方骤灭）：
+   入场 24ms 轻滤噪 + 280ms 柔展 + 22ms 方向级联涟漪；离场 65ms 防误触滞留 + 240ms 柔缓逆序收回；
    支持配置 data-actions="latest"（最新一条常显）| "always"（全部常显）| "none"（关闭） */
-.sn-ai-acts, .sn-me-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-height: 28px; margin-top: 2px; opacity: 0; transform: translateY(2px); pointer-events: none;
-  transition: opacity var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(160ms * var(--sn-motion-scale, 1)) var(--sn-ease-out); }
-.sn-ai-acts { margin-left: -6px; }
+.sn-ai-acts, .sn-me-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-height: 28px; margin-top: 4px; pointer-events: none; }
+.sn-ai-acts { margin-left: -6px; margin-top: -6px; }
+.sn-msg-col > .sn-ai-acts { margin-top: 4px; }
 .sn-me-acts { justify-content: flex-end; margin-right: -4px; }
+.sn-ai-acts > *, .sn-me-acts > * { opacity: 0; transform: translateY(-4px) scale(.94); transform-origin: center top;
+  transition: opacity calc(240ms * var(--sn-motion-scale, 1)) cubic-bezier(.25, .1, .25, 1) calc((65ms + var(--sn-ai-out, 0) * 12ms) * var(--sn-motion-scale, 1)),
+    transform calc(260ms * var(--sn-motion-scale, 1)) cubic-bezier(.25, .1, .25, 1) calc((65ms + var(--sn-ai-out, 0) * 12ms) * var(--sn-motion-scale, 1)); }
+.sn-ai-acts > :nth-child(1) { --sn-ai-i: 0; --sn-ai-out: 5; }
+.sn-ai-acts > :nth-child(2) { --sn-ai-i: 1; --sn-ai-out: 4; }
+.sn-ai-acts > :nth-child(3) { --sn-ai-i: 2; --sn-ai-out: 3; }
+.sn-ai-acts > :nth-child(4) { --sn-ai-i: 3; --sn-ai-out: 2; }
+.sn-ai-acts > :nth-child(5) { --sn-ai-i: 4; --sn-ai-out: 1; }
+.sn-ai-acts > :nth-child(6) { --sn-ai-i: 5; --sn-ai-out: 0; }
+.sn-me-acts > :nth-last-child(1) { --sn-ai-i: 0; --sn-ai-out: 2; }
+.sn-me-acts > :nth-last-child(2) { --sn-ai-i: 1; --sn-ai-out: 1; }
+.sn-me-acts > :nth-last-child(3) { --sn-ai-i: 2; --sn-ai-out: 0; }
 @media (hover: hover) {
   .sn-ai-body:hover > .sn-ai-acts,
   .sn-msg-col:hover > .sn-ai-acts,
-  .sn-msg-col:hover > .sn-me-acts { opacity: 1; transform: none; pointer-events: auto; }
+  .sn-msg-col:hover > .sn-me-acts { pointer-events: auto; }
+  .sn-ai-body:hover > .sn-ai-acts > *,
+  .sn-msg-col:hover > .sn-ai-acts > *,
+  .sn-msg-col:hover > .sn-me-acts > * { opacity: 1; transform: none;
+    transition: opacity calc(260ms * var(--sn-motion-scale, 1)) cubic-bezier(.16, 1, .3, 1) calc((24ms + var(--sn-ai-i, 0) * 22ms) * var(--sn-motion-scale, 1)),
+      transform calc(300ms * var(--sn-motion-scale, 1)) cubic-bezier(.16, 1, .3, 1) calc((24ms + var(--sn-ai-i, 0) * 22ms) * var(--sn-motion-scale, 1)); }
 }
 .sn-ai-body:has(:focus-visible) > .sn-ai-acts,
 .sn-msg-col:has(:focus-visible) > .sn-ai-acts,
@@ -425,9 +443,31 @@
 .sn-act-open > .sn-me-acts,
 .sn-chat[data-actions="latest"] .sn-ai-acts.sn-keep,
 .sn-chat[data-actions="always"] .sn-ai-acts,
-.sn-chat[data-actions="always"] .sn-me-acts { opacity: 1; transform: none; pointer-events: auto; }
+.sn-chat[data-actions="always"] .sn-me-acts { pointer-events: auto; }
+.sn-ai-body:has(:focus-visible) > .sn-ai-acts > *,
+.sn-msg-col:has(:focus-visible) > .sn-ai-acts > *,
+.sn-msg-col:has(:focus-visible) > .sn-me-acts > *,
+.sn-act-open > .sn-ai-acts > *,
+.sn-act-open > .sn-me-acts > *,
+.sn-chat[data-actions="latest"] .sn-ai-acts.sn-keep > *,
+.sn-chat[data-actions="always"] .sn-ai-acts > *,
+.sn-chat[data-actions="always"] .sn-me-acts > * { opacity: 1; transform: none;
+  transition: opacity calc(260ms * var(--sn-motion-scale, 1)) cubic-bezier(.16, 1, .3, 1) calc(var(--sn-ai-i, 0) * 22ms * var(--sn-motion-scale, 1)),
+    transform calc(300ms * var(--sn-motion-scale, 1)) cubic-bezier(.16, 1, .3, 1) calc(var(--sn-ai-i, 0) * 22ms * var(--sn-motion-scale, 1)); }
+.sn-ci.sn-rewinding { pointer-events: none; }
+.sn-ci.sn-rewinding .sn-ai-acts > *,
+.sn-ci.sn-rewinding .sn-me-acts > * { opacity: 0 !important; pointer-events: none !important; transition-duration: 90ms !important; transition-delay: 0ms !important; }
 .sn-chat[data-actions="none"] .sn-ai-acts,
 .sn-chat[data-actions="none"] .sn-me-acts { display: none; }
+.sn-fx-g.sn-fx-back > .sn-fx-sh { box-shadow: 0 8px 20px -8px rgb(0 0 0 / .16); }
+.sn-chat-foot .sn-composer.sn-cm-catch { animation: sn-cm-catch calc(300ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong); }
+@keyframes sn-cm-catch { 0% { transform: scale(1); } 36% { transform: scale(1.007); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .sn-ai-acts > *, .sn-me-acts > * { transition: none !important; transform: none !important; }
+  .sn-chat-foot .sn-composer.sn-cm-catch { animation: none !important; }
+}
+.sn-reduce-motion .sn-ai-acts > *, .sn-reduce-motion .sn-me-acts > * { transition: none !important; transform: none !important; }
+.sn-reduce-motion .sn-chat-foot .sn-composer.sn-cm-catch { animation: none !important; }
 .sn-ai-acts .sn-btn, .sn-me-acts .sn-btn { --sn-h: 28px; --sn-icon: 14px; --sn-r: 8px; width: 28px; height: 28px; --sn-fg: var(--sn-label3); }
 .sn-ai-acts .sn-btn .sn-ic, .sn-me-acts .sn-btn .sn-ic { width: 14px; height: 14px; }
 .sn-ai-acts .sn-btn.sn-is-on { --sn-fg: var(--sn-label); --sn-bg: var(--sn-b-ghost-active); }
@@ -538,13 +578,43 @@
 .sn-chat-jump:hover { background: var(--sn-fill-hover-solid); } }
 .sn-chat-jump.sn-on { translate: -50% 0; }
 .sn-chat-foot { padding: 0 var(--sn-chat-px) 14px; background: transparent; }
-.sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)) { border: 0; border-radius: 24px; background: var(--sn-raised); box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 9%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055), 0 1px 2px rgba(0, 0, 0, .025); }
+.sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)) { border: 0; border-radius: 24px; background: var(--sn-raised); box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 9%, transparent), 0 2px 12px -3px rgba(0, 0, 0, .055), 0 1px 2px rgba(0, 0, 0, .025);
+  transition: box-shadow .2s var(--sn-ease-out), background-color .22s var(--sn-ease-out), backdrop-filter .22s var(--sn-ease-out), -webkit-backdrop-filter .22s var(--sn-ease-out); }
 @media (hover: hover) {
 .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):hover { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 13%, transparent), 0 3px 14px -3px rgba(0, 0, 0, .065), 0 1px 3px rgba(0, 0, 0, .03); } }
 .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):focus-within { box-shadow: 0 0 0 1px color-mix(in srgb, var(--sn-label) 17%, transparent), 0 6px 20px -6px rgba(0, 0, 0, .085), 0 1px 3px rgba(0, 0, 0, .035); }
 [data-theme="dark"] .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)) { background: var(--sn-overlay); box-shadow: 0 0 0 1px rgba(255, 255, 255, .095), 0 4px 16px -4px rgba(0, 0, 0, .34); }
 [data-theme="dark"] .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)):focus-within { box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), 0 8px 24px -6px rgba(0, 0, 0, .44); }
-.sn-chat-foot .sn-composer textarea { padding: 14px 16px 6px; font-size: calc(14.5px * var(--sn-font-scale, 1)); line-height: calc(22px * var(--sn-font-scale, 1)); }
+/* 输入框可调高斯模糊背景（严格有限度，绝不允许透明）：
+   采用双层 color-mix 数学硬保底：无论 --sn-chat-foot-tint 如何设置（哪怕传 0%），最终不透明度严格 ≥78%（亮）/ ≥76%（暗） */
+.sn-chat[data-composer-blur]:not([data-composer-blur="none"]) .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)),
+.sn-chat[data-composer-blur]:not([data-composer-blur="none"]) .sn-chat-foot .sn-composer > .sn-cm-card {
+  --sn-foot-top: color-mix(in srgb, var(--sn-raised) var(--sn-chat-foot-tint, 23%), transparent);
+  background: color-mix(in srgb, var(--sn-raised) 78%, var(--sn-foot-top));
+  -webkit-backdrop-filter: blur(var(--sn-chat-foot-blur, 14px)) saturate(1.5);
+  backdrop-filter: blur(var(--sn-chat-foot-blur, 14px)) saturate(1.5);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 76%, transparent), 0 0 0 1px color-mix(in srgb, var(--sn-label) 10%, transparent), 0 4px 18px -4px rgba(0, 0, 0, .07), 0 1px 2px rgba(0, 0, 0, .03);
+}
+[data-theme="dark"] .sn-chat[data-composer-blur]:not([data-composer-blur="none"]) .sn-chat-foot .sn-composer:not(:has(> .sn-cm-card)),
+[data-theme="dark"] .sn-chat[data-composer-blur]:not([data-composer-blur="none"]) .sn-chat-foot .sn-composer > .sn-cm-card {
+  --sn-foot-top: color-mix(in srgb, var(--sn-overlay) var(--sn-chat-foot-tint, 23%), transparent);
+  background: color-mix(in srgb, var(--sn-overlay) 76%, var(--sn-foot-top));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .11), 0 0 0 1px rgba(255, 255, 255, .12), 0 6px 22px -4px rgba(0, 0, 0, .42);
+}
+/* 顶部极简高度调节微把手（悬停轻现、拖拽 1:1 零滞后跟手、双击回弹恢复自动高度） */
+.sn-cm-resize { position: absolute; left: 50%; top: 0; z-index: 4; width: 88px; height: 14px; transform: translateX(-50%); display: grid; place-items: center; cursor: ns-resize; touch-action: none; user-select: none; outline: none; }
+.sn-cm-resize > i { display: block; width: 30px; height: 3px; border-radius: 999px; background: color-mix(in srgb, var(--sn-label) 16%, transparent);
+  transition: width calc(200ms * var(--sn-motion-scale, 1)) var(--sn-ease-out-strong), background-color var(--sn-dur-fast, 120ms) var(--sn-ease-out), transform calc(180ms * var(--sn-motion-scale, 1)) var(--sn-ease-out); }
+@media (hover: hover) {
+  .sn-composer:hover .sn-cm-resize > i { background: color-mix(in srgb, var(--sn-label) 26%, transparent); }
+  .sn-cm-resize:hover > i { width: 42px; background: color-mix(in srgb, var(--sn-label) 48%, transparent); }
+}
+.sn-cm-resize:focus-visible > i { width: 42px; background: var(--sn-accent); box-shadow: 0 0 0 3px var(--sn-ring); }
+.sn-composer.sn-cm-resizing .sn-cm-resize > i { width: 52px; background: var(--sn-label2); transform: scaleY(1.15); }
+.sn-composer.sn-cm-resizing textarea { transition: none !important; }
+.sn-chat-foot .sn-composer.sn-cm-resizing:not(:has(> .sn-cm-card)),
+.sn-chat-foot .sn-composer.sn-cm-resizing > .sn-cm-card { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--sn-label) 20%, transparent), 0 8px 24px -6px rgba(0, 0, 0, .1); }
+.sn-chat-foot .sn-composer textarea { padding: 15px 16px 6px; font-size: calc(14.5px * var(--sn-font-scale, 1)); line-height: calc(22px * var(--sn-font-scale, 1)); }
 .sn-chat-foot .sn-cm-bar { padding: 4px 8px 8px 8px; gap: 4px; }
 .sn-cm-chip, .sn-cm-model { --sn-fg: var(--sn-label2); }
 .sn-cm-model .sn-ic { width: 14px; height: 14px; opacity: .6; }
@@ -558,6 +628,14 @@
 .sn-chat-foot > * { pointer-events: auto; }
 .sn-chat-foot::before { content: ""; position: absolute; left: 12px; right: 12px; top: 24px; bottom: 0; z-index: -1; background: var(--sn-raised); pointer-events: none; }
 .sn-chat-foot:has(> .sn-composer > .sn-cm-card)::before { top: 60px; }
+/* 开启高斯模糊时，::before 仅用精确圆角反演遮罩兜住底边 14px 缝隙及左下/右下 24px 圆角外弧（0px 穿帮，输入框圆角内部 100% 均匀磨砂） */
+.sn-chat[data-composer-blur]:not([data-composer-blur="none"]) .sn-chat-foot::before {
+  top: auto; left: var(--sn-chat-px); right: var(--sn-chat-px); height: 38px;
+  background:
+    radial-gradient(circle 24px at 24px 0, transparent 23.5px, var(--sn-raised) 24px) left top / 24px 24px no-repeat,
+    radial-gradient(circle 24px at 0 0, transparent 23.5px, var(--sn-raised) 24px) right top / 24px 24px no-repeat,
+    linear-gradient(var(--sn-raised), var(--sn-raised)) left bottom / 100% 15px no-repeat;
+}
 /* 外圈 1px 的线画在最上面一层，确保四边闭合连贯 */
 .sn-chat::after { content: ""; position: absolute; inset: 0; z-index: 7; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--sn-card-line); pointer-events: none; }
 .sn-chat-jump { bottom: calc(var(--sn-foot-h, 108px) + 12px); }

@@ -128,6 +128,7 @@ export function autoGrow(box) {
   document.body.append(mirror);
   onCleanup(() => {
     mirror.remove();
+    delete box.dataset.cmH;
     ta.style.height = h0; ta.style.overflowY = ov0;
     ta.classList.remove("sn-fade-top", "sn-fade-bottom");
     if (!ta.getAttribute("style")) ta.removeAttribute("style");
@@ -135,9 +136,10 @@ export function autoGrow(box) {
   const edges = () => { ta.classList.toggle("sn-fade-top", ta.scrollTop > 2); ta.classList.toggle("sn-fade-bottom", ta.scrollTop + ta.clientHeight < ta.scrollHeight - 2); };
   const fit = () => {
     mirror.style.width = ta.offsetWidth + "px"; mirror.textContent = ta.value + "​";
-    const h = Math.max(minH, Math.min(maxH, mirror.offsetHeight));
+    const manual = Number(box.dataset.cmH) || 0;
+    const h = manual > 0 ? Math.max(minH, manual) : Math.max(minH, Math.min(maxH, mirror.offsetHeight));
     if (ta.style.height !== h + "px") ta.style.height = h + "px";
-    ta.style.overflowY = mirror.offsetHeight > maxH ? "auto" : "hidden"; edges(); sa?.refresh();
+    ta.style.overflowY = mirror.offsetHeight > h + 1 ? "auto" : "hidden"; edges(); sa?.refresh();
   };
   ta.style.height = minH + "px"; ta.addEventListener("input", fit); ta.addEventListener("scroll", edges, { passive: true });
   new ResizeObserver(() => fit()).observe(box); fit();

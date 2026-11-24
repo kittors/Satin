@@ -155,9 +155,11 @@ async function* script(prompt, ctx) {
 export function initChat(ctx = {}) {
   const box = document.getElementById("chatBox"), chat = mountChat(box, { history: demoHistory(), respond: script, hiRes, rail: "left" });
   const sec = box.closest(".spec") || document;
-  // 侧边刻度轨位置切换（左侧 / 右侧 / 隐藏）
+  // 侧边刻度轨位置切换（左侧 / 右侧 / 隐藏）与输入框磨砂级别切换（实底 / 轻柔 / 标准 / 深邃）
   const railSeg = sec.querySelector('[data-seg="chatrail"]');
   if (railSeg && ctx.initSeg) ctx.initSeg(railSeg, (v) => chat.setRail(v === "off" ? false : v), 0);
+  const blurSeg = sec.querySelector('[data-seg="chatblur"]');
+  if (blurSeg && ctx.initSeg) ctx.initSeg(blurSeg, (v) => chat.setComposerBlur(v), 2);
   // 演示按钮
   sec.addEventListener("click", (e) => {
     const sim = e.target.closest("[data-chat-sim]")?.dataset.chatSim; if (!sim) return;

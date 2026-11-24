@@ -485,6 +485,45 @@
       }
     },
     {
+      "name": "composerBlur",
+      "type": "\"none\" | \"sm\" | \"md\" | \"lg\" | number | false",
+      "default": "\"md\"",
+      "required": false,
+      "desc": "底部输入框背景高斯模糊级别（受安全限度约束，底色不透明度强制 ≥78%/76%，绝不允许透明；数字自动钳制在 0–28px）。",
+      "names": {
+        "js": "composerBlur",
+        "react": "composerBlur",
+        "preact": "composerBlur",
+        "vue": "composerBlur（模板里写 composer-blur）"
+      }
+    },
+    {
+      "name": "composerResizable",
+      "type": "boolean",
+      "default": "true",
+      "required": false,
+      "desc": "是否开启底部输入框顶部微把手拖拽调高（带安全最大高度上限，双击微把手恢复自动高度）。",
+      "names": {
+        "js": "composerResizable",
+        "react": "composerResizable",
+        "preact": "composerResizable",
+        "vue": "composerResizable（模板里写 composer-resizable）"
+      }
+    },
+    {
+      "name": "composerHeight",
+      "type": "number",
+      "default": "自动",
+      "required": false,
+      "desc": "手动指定底部输入框文本区高度（px），自动钳制在单行至容器 46% 的安全区间内。",
+      "names": {
+        "js": "composerHeight",
+        "react": "composerHeight",
+        "preact": "composerHeight",
+        "vue": "composerHeight（模板里写 composer-height）"
+      }
+    },
+    {
       "name": "className / style / id",
       "type": "string / CSSProperties / string",
       "default": "—",
@@ -648,6 +687,20 @@
       "signature": "setActions(mode: \"hover\" | \"latest\" | \"always\" | false | \"none\"): void",
       "returns": "void",
       "desc": "运行时动态切换消息操作栏显隐策略。"
+    },
+    {
+      "name": "setComposerBlur",
+      "kind": "method",
+      "signature": "setComposerBlur(level: \"none\" | \"sm\" | \"md\" | \"lg\" | number | false): void",
+      "returns": "void",
+      "desc": "运行时调整输入框高斯模糊级别（受不透明度安全下限约束，不允许透明）。"
+    },
+    {
+      "name": "setComposerHeight",
+      "kind": "method",
+      "signature": "setComposerHeight(height: number | \"auto\" | null): void",
+      "returns": "void",
+      "desc": "运行时设置输入框高度（px）或传 \"auto\" 恢复随内容自动伸缩。"
     },
     {
       "name": "fill",
