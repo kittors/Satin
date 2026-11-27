@@ -386,6 +386,8 @@ export interface TableApi {
   expandAll(open?: boolean): void;
   select(keys: (string | number)[]): void;
   refresh(): void;
+  /** 高频宽幅变化时的零重建列宽更新通道（直接更新 colgroup 与表格宽度，不重绘单元格） */
+  setLayoutWidths(layout: { widths?: Record<string, number>; tableWidth?: number | string | null; fluidColumnId?: string | null }): void;
   edit(key: string | number, colKey?: string): void;
 }
 export const createTable: SatinFactory<TableOptions, TableApi>;

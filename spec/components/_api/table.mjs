@@ -122,6 +122,7 @@ export default {
     { name: "expandAll", kind: "method", signature: "expandAll(open?: boolean): void", returns: "void", desc: "所有级一起展开 / 收起（工具条上的\"全部展开\"）；不发事件。" },
     { name: "select", kind: "method", signature: "select(keys: (string | number)[]): void", returns: "void", desc: "程序里设勾选（批量操作条上的\"取消选择\"）；不发事件。" },
     { name: "refresh", kind: "method", signature: "refresh(): void", returns: "void", desc: "数据在外面就地改了、筛选函数读的外部变量变了：按现在的样子重新排一遍（从看到的样子过渡过去）。" },
+    { name: "setLayoutWidths", kind: "method", signature: "setLayoutWidths(layout: { widths?: Record<string, number>; tableWidth?: number | string | null; fluidColumnId?: string | null }): void", returns: "void", desc: "高频宽幅变化（如侧边栏收起/展开、窗口缩放）时的零重建列宽更新通道：直写 colgroup 与表格宽度，不重绘单元格。" },
     { name: "edit", kind: "method", signature: "edit(key: string | number, colKey?: string): void", returns: "void", desc: "开始改某一行的某一格（`colKey` 不给是第一个 `editable` 的列），行末\"重命名\"按钮用。" },
   ],
   functions: [

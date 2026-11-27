@@ -304,8 +304,19 @@ export function tableHTML(o = {}) {
   const total = pg ? (pg.total ?? M.T.top.length) : 0;
   return `<div class="${wrapClass(o, M.hasPin)}"${o.lines === "grid" ? ' data-lines="grid"' : ""}${o.maxHeight != null ? ` style="--sn-tbl-max:${esc(px(o.maxHeight))}"` : ""}><div class="sn-tbl-sc">${tableInner(M, CW, MINW)}</div>${footHTML(pg, total, 0)}</div>`;
 }
-// 列"长什么样"（不比函数本身）：React / Vue 每次渲染都传新数组，只要列没变就不整表重画（merge 另外比：变了只重新合并）
-const colSig = (cols = []) => cols.map((c) => [c.key, c.title, c.type, c.align, c.width, c.minWidth, c.sortable, c.sortFirst, c.resizable, c.fixed, c.primary, c.editable, c.num, c.className, "merge" in c, !!c.format, !!c.html, !!c.render].join("\u0001")).join("\u0002");
+// 列"长什么样"（不比函数本身，也不含纯宽度）：React / Vue 每次渲染都传新数组，只要列结构没变就不整表重画（宽变走 widthSig，merge 另外比）
+const colSig = (cols = []) => cols.map((c) => [c.key, c.title, c.type, c.align, c.sortable, c.sortFirst, c.resizable, c.fixed, c.primary, c.editable, c.num, c.className, "merge" in c, !!c.format, !!c.html, !!c.render].join("\u0001")).join("\u0002");
+const widthSig = (cols = []) => cols.map((c) => [c.key, c.width ?? "", c.minWidth ?? ""].join("\u0001")).join("\u0002");
+const sameColRenderers = (a = [], b = []) => {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    const x = a[i], y = b[i];
+    if (!x || !y) return false;
+    if ((x._snOrigRender ?? x.render) !== (y._snOrigRender ?? y.render)) return false;
+    if (x.format !== y.format || x.html !== y.html) return false;
+  }
+  return true;
+};
 const mergeSig = (cols = []) => cols.map((c) => (typeof c.merge === "function" ? "f" : String(c.merge))).join(",");
 const FLAGS = ["selectable", "draggableRows", "draggableColumns", "resizableRows", "cellSelect", "loading", "error", "detail"];
 
@@ -661,15 +672,18 @@ export function mountTable(wrap, o0 = {}, emit) {
     for (const nd of T.top) walk(nd, true, [], nd === lastTop);
     syncFooter();
   }
-  // ———— 固定列位置与离边投影 ————
+  // ———— 固定列位置与离边投影（先读后写 + 脏值跳过，避免宽幅动画期间全表 RecalcStyle） ————
+  const lastPinX = new Map();
+  let lastTw = -1, roRaf = 0;
   const syncPinScroll = () => {
     if (!M.hasPin || !scEl) { wrap.classList.remove("sn-pin-scrolled-l", "sn-pin-scrolled-r"); return; }
     const sl = scEl.scrollLeft, max = scEl.scrollWidth - scEl.clientWidth;
-    wrap.classList.toggle("sn-pin-scrolled-l", sl > 1);
-    wrap.classList.toggle("sn-pin-scrolled-r", max > 1 && sl < max - 1);
+    const onL = sl > 1, onR = max > 1 && sl < max - 1;
+    if (wrap.classList.contains("sn-pin-scrolled-l") !== onL) wrap.classList.toggle("sn-pin-scrolled-l", onL);
+    if (wrap.classList.contains("sn-pin-scrolled-r") !== onR) wrap.classList.toggle("sn-pin-scrolled-r", onR);
   };
-  const syncPinned = () => {
-    wrap.classList.toggle("sn-has-pin", M.hasPin);
+  const syncPinned = (force = false) => {
+    if (wrap.classList.contains("sn-has-pin") !== M.hasPin) wrap.classList.toggle("sn-has-pin", M.hasPin);
     if (!M.hasPin) { syncPinScroll(); return; }
     const thRow = $(":scope > tr", thead); if (!thRow) return;
     if (thRow.offsetWidth === 0) return; // 隐藏容器里不覆写初始有效偏移，等显露时由 ResizeObserver 精准校准
@@ -690,6 +704,8 @@ export function mountTable(wrap, o0 = {}, emit) {
       rx += th?.offsetWidth || CW[c.key] || MINW[c.key] || 100;
     }
     for (const [k, pxv] of widths) {
+      if (!force && lastPinX.get(k) === pxv) continue;
+      lastPinX.set(k, pxv);
       for (const el of $$(`th[data-c="${CSS.escape(k)}"], td[data-c="${CSS.escape(k)}"]`, table)) el.style.setProperty("--sn-pin-x", pxv + "px");
     }
     syncPinScroll();
@@ -1127,22 +1143,34 @@ export function mountTable(wrap, o0 = {}, emit) {
   const unbind = () => { for (const [el, t, f, opt] of on.splice(0)) el.removeEventListener(t, f, opt); };
   bind();
   let ro = null;
-  if (o.resizableRows || M.hasPin) { ro = new ResizeObserver(() => { if (o.resizableRows) wrap.style.setProperty("--sn-tw", table.offsetWidth + "px"); if (M.hasPin) syncPinned(); }); ro.observe(table); if (scEl && M.hasPin) ro.observe(scEl); }
+  const scheduleLayoutSync = () => {
+    if (roRaf) return;
+    roRaf = requestAnimationFrame(() => {
+      roRaf = 0;
+      if (o.resizableRows) {
+        const tw = table.offsetWidth;
+        if (tw !== lastTw) { lastTw = tw; wrap.style.setProperty("--sn-tw", tw + "px"); }
+      }
+      if (M.hasPin) syncPinned();
+    });
+  };
+  if (o.resizableRows || M.hasPin) { ro = new ResizeObserver(scheduleLayoutSync); ro.observe(table); if (scEl && M.hasPin) ro.observe(scEl); }
   if (!o.loading && !o.error) relayout(applyVis, { instant: true }); else syncFooter();
-  if (M.hasPin) syncPinned();
+  if (M.hasPin) syncPinned(true);
 
   // ———— 整表重画：列换了、加载中 / 出错切换、数据换了一批。表格元素本身留着（监听、滚动区域、合计行都还在） ————
   function render() {
     clearDetTimers();
     if (lay) stopLay(); dragNow?.flush(); colLand?.(); selTd = null; editing = null;
+    lastPinX.clear();
     M = modelOf(o, cur()); const tmp = document.createElement("div"); tmp.innerHTML = tableInner(M, CW, MINW); const nt = tmp.firstElementChild;
     for (const a of ["tabindex", "aria-label", "aria-busy", "style"]) { if (nt.hasAttribute(a)) { if (table.getAttribute(a) !== nt.getAttribute(a)) table.setAttribute(a, nt.getAttribute(a)); } else table.removeAttribute(a); }
     const tf = $(":scope > tfoot", table); unbind();
     table.replaceChildren(...nt.childNodes, ...(tf ? [tf] : []));
     refs(); fixMixed(); bind(); paintRenders(); remember();
     if (!o.loading && !o.error) relayout(applyVis, { instant: true }); else syncFooter();
-    if (M.hasPin) syncPinned();
-    saInst?.refresh();
+    if (M.hasPin) syncPinned(true);
+    (saInst?.refreshLater ?? saInst?.refresh)?.();
   }
   // 数据换了：同一批节点（键和上级都一样）就只换数据变了的行的格子、行移到新位置；否则整表重画（展开、勾选按 rowKey 带过去）
   function setData(list) {
@@ -1173,12 +1201,52 @@ export function mountTable(wrap, o0 = {}, emit) {
     select(keys) { picked = new Set(keyList(keys) ?? []); syncSel(); },
     // 数据在外面就地改了、筛选函数读的外部变量变了：按现在的样子重新排一遍（从看到的样子过渡过去）
     refresh() { dragNow?.flush(); relayout(() => { applyVis(); syncEmpty(); }); },
+    // 高频宽幅变化（如侧边栏收起/展开、窗口缩放）时的零重建列宽更新通道：直接写 <colgroup> 与表格宽度，不重绘单元格
+    setLayoutWidths({ widths, tableWidth, fluidColumnId } = {}) {
+      let changed = false;
+      if (widths) {
+        for (const c of M.dcols0) {
+          const nextW = typeof widths[c.key] === "number" ? widths[c.key] : CW[c.key];
+          if (nextW !== CW[c.key]) { CW[c.key] = nextW; changed = true; }
+        }
+      }
+      const nextTableWidth = fluidColumnId ? "100%" : tableWidth;
+      if (nextTableWidth !== undefined && nextTableWidth !== o._tableWidth) { o._tableWidth = nextTableWidth; changed = true; }
+      if (fluidColumnId !== o._fluidColumnId) { o._fluidColumnId = fluidColumnId; changed = true; }
+      if (!changed) return;
+      if (M.useCols) {
+        for (const col of $$(":scope > colgroup > col[data-c]", table)) {
+          const k = col.dataset.c;
+          const target = fluidColumnId === k ? "" : (CW[k] ? CW[k] + "px" : "");
+          if (col.style.width !== target) col.style.width = target;
+        }
+        if (o._tableWidth != null) {
+          const tw = px(o._tableWidth);
+          if (table.style.width !== tw) table.style.width = tw;
+        } else {
+          const mw = minWidthOf(M, CW, MINW) + "px";
+          if (table.style.minWidth !== mw) table.style.minWidth = mw;
+        }
+      } else if (widths) {
+        const ths = $$(":scope > tr > th", thead);
+        const lead = M.hasCk || M.hasPick ? 1 : 0;
+        M.dcols.forEach((c, idx) => {
+          const th = ths[lead + idx];
+          if (!th) return;
+          const target = fluidColumnId === c.key ? "" : (CW[c.key] ? CW[c.key] + "px" : "");
+          if (th.style.width !== target) th.style.width = target;
+        });
+      }
+      scheduleLayoutSync();
+      (saInst?.refreshLater ?? saInst?.refresh)?.();
+    },
     edit(key, colKey) { const tr = TR.get(String(key)), c = colKey ?? M.dcols.find((x) => x.editable)?.key, td = tr && c ? cellOf(tr, c) : null; if (!td) return; if (editing) editing.blur(); if (o.cellSelect) selectTd(td); rename(td); },
     // next 是合并以后的整份选项，prev 是上一份（createTable 给的）。受控的值（sort、selected、expandedKeys）"传进来的值换了（和上次给的比）"才跟过去：
     // 非受控时 React 封装不带这些值，表格自己的状态不会被打回初始值
     update(next, prev) {
       prev = prev ?? o; o = { ...o, ...next };
       const colsChanged = colSig(prev.columns) !== colSig(o.columns);
+      const widthsChanged = !colsChanged && widthSig(prev.columns) !== widthSig(o.columns);
       const flags = FLAGS.some((k) => !!prev[k] !== !!o[k]) || (!!o.error && prev.error !== o.error);
       const dataNext = o.data ?? o.rows ?? [], dataChanged = dataNext !== (prev.data ?? prev.rows ?? []);
       let sortChanged = false, selChanged = false, reopen = false;
@@ -1187,7 +1255,7 @@ export function mountTable(wrap, o0 = {}, emit) {
       if (next.selected && !sameList(next.selected, prev.selected)) { picked = new Set(keyList(next.selected)); selChanged = true; }
       if (next.expandedKeys && !sameList(next.expandedKeys, prev.expandedKeys)) { const want = keyList(next.expandedKeys); if (want.length !== open.size || want.some((k) => !open.has(k))) { open.clear(); for (const k of want) open.add(k); reopen = true; } }
       const fq = next.filter !== undefined && next.filter !== prev.filter, setQ = () => { q = typeof o.filter === "function" ? o.filter : null; if (!q) qOpen.clear(); };
-      // 列变了（加列、删列、标题、宽度……）、加载中 / 出错切换：整表重画
+      // 列结构变了（加列、删列、标题、排序/固定属性……）、加载中 / 出错切换：整表重画
       if (colsChanged) {
         const keys = colsOf(o.columns).data.map((c) => c.key); if (keys.slice().sort().join() !== order.slice().sort().join()) order.splice(0, order.length, ...keys);
         M = modelOf(o, cur()); ({ CW, MINW } = widthsOf(M.dcols0)); FLEX = new Set(M.dcols0.filter((c) => !CW[c.key]).map((c) => c.key));
@@ -1202,8 +1270,17 @@ export function mountTable(wrap, o0 = {}, emit) {
         render(); return;
       }
       M = modelOf(o, cur());
+      if (widthsChanged) {
+        ({ CW, MINW } = widthsOf(M.dcols0));
+        FLEX = new Set(M.dcols0.filter((c) => !CW[c.key]).map((c) => c.key));
+        if (M.useCols) applyW();
+        else {
+          const ths = $$(":scope > tr > th", thead), lead = M.hasCk || M.hasPick ? 1 : 0;
+          M.dcols.forEach((c, idx) => { const th = ths[lead + idx]; if (th) th.style.width = c.width != null ? px(c.width) : ""; });
+        }
+      }
       if (dataChanged) { if (fq) { dragNow?.flush(); setQ(); } setData(dataNext); } // 数据和筛选一起换：一次过渡
-      else if (next.columns !== prev.columns && !o.loading && !o.error) refreshAll(); // 列数组换了、长相没变（React / Vue 每次渲染新建的列，format / html / render 可能读着外面的状态）
+      else if (next.columns !== prev.columns && !sameColRenderers(prev.columns, o.columns) && !o.loading && !o.error) refreshAll(); // 仅当渲染器引用变化时才重绘单元格，避免纯列宽变更触发全表 Portal 重建
       else if (sortChanged) { headSync(); sortNow(); }
       if (selChanged) syncSel();
       // 外观：只切类名、属性，不重画
@@ -1235,14 +1312,16 @@ export function mountTable(wrap, o0 = {}, emit) {
         if (lines) wrap.dataset.lines = o.lines || "row";
         relayout(fq || reopen ? () => { applyVis(); if (fq) syncEmpty(); } : undefined);
       }
-      if (M.hasPin) syncPinned();
-      saInst?.refresh();
+      if (widthsChanged || dataChanged || lines || mg || reopen || pgChanged) {
+        if (M.hasPin) syncPinned();
+        (saInst?.refreshLater ?? saInst?.refresh)?.();
+      }
     },
     destroy() {
       clearDetTimers();
       psInst?.dispose(); psInst = null;
       saInst?.destroy();
-      if (lay) { clearLay(lay); lay = null; } dragNow?.flush(); colLand?.(); stopCW?.(); cancelAnimationFrame(colRaf); ro?.disconnect(); unbind();
+      if (lay) { clearLay(lay); lay = null; } dragNow?.flush(); colLand?.(); stopCW?.(); cancelAnimationFrame(colRaf); cancelAnimationFrame(roRaf); ro?.disconnect(); unbind();
     },
   };
 }

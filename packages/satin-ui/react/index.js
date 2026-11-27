@@ -60,7 +60,7 @@ const TableInstance = /* @__PURE__ */ wrap(S.createTable, { valueKey: "selected"
 function useTableCells(columns) {
   const box = useRef(null); if (box.current === null) box.current = { roots: new Map(), alive: true, sweep: false };
   useEffect(() => { const b = box.current; b.alive = true; return () => { b.alive = false; queueMicrotask(() => { if (b.alive) return; for (const r of b.roots.values()) r.unmount(); b.roots.clear(); }); }; }, []);
-  return useMemo(() => (columns || []).map((c) => (typeof c.render !== "function" ? c : { ...c, render: (v, row, ctx) => {
+  return useMemo(() => (columns || []).map((c) => (typeof c.render !== "function" ? c : { ...c, _snOrigRender: c.render, render: (v, row, ctx) => {
     const out = c.render(v, row, ctx);
     if (!isValidElement(out)) return out;
     if (!ctx.cell) return ""; // 字符串阶段（服务端、第一帧）：先空着

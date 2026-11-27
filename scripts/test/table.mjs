@@ -291,5 +291,31 @@ console.log("行展开详情（detail / rowExpandable / expandOnRowClick）");
   ok(!dtr("a").hidden && !dtr("c").hidden && tb.expanded.length === 2, "expandAll(true)：展开全部可展开行");
   tb.destroy();
 }
+
+console.log("高频列宽更新（零整表重建、零冗余单元格重绘、setLayoutWidths）");
+{
+  const host = document.getElementById("host"); host.replaceChildren();
+  const rows = [{ id: "1", name: "alpha", count: 10 }, { id: "2", name: "beta", count: 20 }];
+  let renderCalls = 0;
+  const renderName = (v, _row, { cell }) => { renderCalls++; if (cell) cell.textContent = v; };
+  const baseCols = [
+    { key: "name", title: "名称", width: 160, resizable: true, render: renderName },
+    { key: "count", title: "计数", width: 90, align: "right" },
+  ];
+  const tb = createTable(host, { columns: baseCols, data: rows });
+  const tr1 = host.querySelector('tbody tr[data-id="1"]');
+  const callsAfterMount = renderCalls;
+  // 仅更新列宽（保留相同 render 函数引用）：不重建 <tr>，也不重复触发单元格 render
+  tb.update({ columns: [{ ...baseCols[0], width: 220 }, baseCols[1]] });
+  ok(host.querySelector('tbody tr[data-id="1"]') === tr1, "仅更新列宽不重建表格行 DOM");
+  ok(host.querySelector('col[data-c="name"]')?.style.width === "220px", "仅更新列宽直写 colgroup 宽度");
+  ok(renderCalls === callsAfterMount, "仅更新列宽且 render 引用未变时不触发单元格重绘", `before=${callsAfterMount}, after=${renderCalls}`);
+  // 命令式快速通道 setLayoutWidths + fluidColumnId
+  tb.setLayoutWidths({ widths: { name: 260, count: 110 }, tableWidth: 370, fluidColumnId: "name" });
+  ok(host.querySelector('col[data-c="name"]')?.style.width === "" && host.querySelector('col[data-c="count"]')?.style.width === "110px", "setLayoutWidths：fluidColumnId 置空走原生 auto，其余列写精确宽度");
+  ok(host.querySelector("table.sn-tbl")?.style.width === "100%", "setLayoutWidths：启用 fluidColumnId 时表格宽度切 100% 消除宽幅滞后");
+  ok(renderCalls === callsAfterMount, "setLayoutWidths 零单元格重绘");
+  tb.destroy();
+}
 console.log(fail ? `表格测试：${fail} / ${n} 项不通过` : `表格测试：${n} 项全部通过`);
 process.exitCode = fail ? 1 : 0;
